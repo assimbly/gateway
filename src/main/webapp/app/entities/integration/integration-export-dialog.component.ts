@@ -1,7 +1,10 @@
 import { Component, OnInit, OnDestroy, AfterContentInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { AlertError } from 'app/shared/alert';
 import { IntegrationService } from './integration.service';
 import { IIntegration } from 'app/shared/model/integration.model';
 import { IntegrationPopupService } from 'app/entities/integration/integration-popup.service';
@@ -9,7 +12,8 @@ import { DeploymentService } from 'app/admin/deployment/deployment.service';
 
 @Component({
     selector: 'jhi-integration-export-dialog',
-    templateUrl: './integration-export-dialog.component.html'
+    templateUrl: './integration-export-dialog.component.html',
+    imports: [CommonModule, FormsModule, AlertError],
 })
 export class IntegrationExportDialogComponent implements AfterContentInit {
     integrationId: number;

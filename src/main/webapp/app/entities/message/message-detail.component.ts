@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
+import { AlertError } from 'app/shared/alert';
 import { MessageService } from './message.service';
 import { IMessage } from 'app/shared/model/message.model';
 import { HeaderService } from '../header/header.service';
@@ -8,7 +11,8 @@ import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'jhi-message-detail',
-    templateUrl: './message-detail.component.html'
+    templateUrl: './message-detail.component.html',
+    imports: [CommonModule, RouterModule, AlertError],
 })
 export class MessageDetailComponent implements OnInit {
     message: IMessage;

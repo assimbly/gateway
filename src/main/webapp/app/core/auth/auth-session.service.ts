@@ -9,31 +9,46 @@ import { Login } from './login.model';
 
 @Service()
 export class AuthServerProvider {
+
   private readonly http = inject(HttpClient);
+  private readonly tokenKey = 'authenticationToken';
 
-  login(credentials: Login): Observable<{}> {
-    const data =
-      `username=${encodeURIComponent(credentials.username)}` +
-      `&password=${encodeURIComponent(credentials.password)}` +
-      `&remember-me=${credentials.rememberMe ? 'true' : 'false'}` +
-      '&submit=Login';
-
-    const headers = new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded');
-
-    return this.http.post(`${serverApiUrl}api/authentication`, data, { headers });
+  login(credentials: Login): Observable<{ id_token: string }> {
+    return this.http
+      .post<{ id_token: string }>(`${serverApiUrl}api/authenticate`, {
+        username: credentials.username,
+        password: credentials.password,
+        rememberMe: credentials.rememberMe,
+      })
+      .pipe(
+        map(response => {
+          this.setToken(response.id_token);
+          return response;
+        }),
+      );
   }
 
   logout(): Observable<void> {
-    // logout from the server
-    return this.http.post(`${serverApiUrl}api/logout`, {}).pipe(
+    return this.http.post<void>(`${serverApiUrl}api/logout`, {}).pipe(
       map(() => {
-        // to get a new csrf token call the api
+        this.clearToken();
         this.http.get(`${serverApiUrl}api/account`).subscribe({
-          error() {
-            // Handled by interceptor
-          },
+          error() {},
         });
       }),
     );
   }
+
+  getToken(): string | null {
+    return localStorage.getItem(this.tokenKey);
+  }
+
+  setToken(token: string): void {
+    localStorage.setItem(this.tokenKey, token);
+  }
+
+  clearToken(): void {
+    localStorage.removeItem(this.tokenKey);
+  }
+
 }

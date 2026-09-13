@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AlertService } from 'app/core/util/alert.service';
+import { AlertError } from 'app/shared/alert';
 
 import { EnvironmentVariables, IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
 import { EnvironmentVariablesService } from './environment-variables.service';
@@ -13,7 +16,8 @@ import { forbiddenEnvironmentKeysValidator } from './environment-variables-valid
 
 @Component({
     selector: 'jhi-environment-variables-update',
-    templateUrl: './environment-variables-update.component.html'
+    templateUrl: './environment-variables-update.component.html',
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, AlertError],
 })
 export class EnvironmentVariablesUpdateComponent implements OnInit {
     environmentVariables: IEnvironmentVariables = new EnvironmentVariables();

@@ -2,6 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AlertError } from 'app/shared/alert';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
 import { IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
@@ -9,7 +11,8 @@ import { EnvironmentVariablesService } from './environment-variables.service';
 
 @Component({
     selector: 'jhi-environment-variables-delete-dialog',
-    templateUrl: './environment-variables-delete-dialog.component.html'
+    templateUrl: './environment-variables-delete-dialog.component.html',
+    imports: [FontAwesomeModule, AlertError],
 })
 export class EnvironmentVariablesDeleteDialogComponent {
     environmentVariables: IEnvironmentVariables;

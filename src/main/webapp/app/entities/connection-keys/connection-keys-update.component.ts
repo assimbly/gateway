@@ -1,8 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AlertService } from 'app/core/util/alert.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AlertError } from 'app/shared/alert';
 import { IConnectionKeys } from 'app/shared/model/connection-keys.model';
 import { ConnectionKeysService } from './connection-keys.service';
 import { IConnection } from 'app/shared/model/connection.model';
@@ -10,7 +14,8 @@ import { ConnectionService } from 'app/entities/connection/connection.service';
 
 @Component({
     selector: 'jhi-connection-keys-update',
-    templateUrl: './connection-keys-update.component.html'
+    templateUrl: './connection-keys-update.component.html',
+    imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError],
 })
 export class ConnectionKeysUpdateComponent implements OnInit {
     connectionKeys: IConnectionKeys;

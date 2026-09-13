@@ -6,14 +6,14 @@ import { environment } from 'environments/environment';
 
 import Login from 'app/login/login';
 import { FlowComponent } from 'app/entities/flow/flow.component';
-//import { BrokerComponent } from 'app/entities/broker/broker.component';
+import { BrokerComponent } from 'app/entities/broker/broker.component';
 
 
 @Component({
   selector: 'jhi-home',
   templateUrl: './home.html',
   styleUrl: './home.scss',
-  imports: [Login, FlowComponent],
+  imports: [Login, FlowComponent, BrokerComponent],
 })
 export default class Home {
   public readonly TYPE = environment.TYPE;

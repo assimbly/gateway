@@ -24,9 +24,9 @@
   <div class="table-responsive" *ngIf="environmentVariables">
     <table class="table table-striped">
       <thead>
-        <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse">
+        <tr jhiSort [(sortState)]="sortState">
           <th [style.display]="'none'"><span>ID</span></th>
-          <th jhiSortBy="key"><span>Key</span> <span class="fa fa-sort"></span></th>
+          <th jhiSortBy="key"><span>Key</span> <fa-icon></fa-icon></th>
           <th><span>Value</span></th>
           <th [style.display]="'none'"><span>Integration</span></th>
           <th></th>

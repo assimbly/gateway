@@ -34,8 +34,8 @@
   <div class="table-responsive">
     <table class="table table-striped">
       <thead>
-        <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse">
-          <th jhiSortBy="name"><span>Message name</span> <span class="fa fa-sort"></span></th>
+        <tr jhiSort [(sortState)]="sortState">
+          <th jhiSortBy="name"><span>Message name</span> <fa-icon></fa-icon></th>
           <th></th>
         </tr>
       </thead>

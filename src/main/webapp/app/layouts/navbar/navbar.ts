@@ -15,6 +15,8 @@ import { FindLanguageFromKeyPipe, TranslateDirective } from 'app/shared/language
 
 import ActiveMenuDirective from './active-menu.directive';
 
+import { environment } from 'environments/environment';
+
 @Component({
   selector: 'jhi-navbar',
   templateUrl: './navbar.html',
@@ -28,8 +30,6 @@ import ActiveMenuDirective from './active-menu.directive';
     NgbDropdownMenu,
     NgbDropdownToggle,
     HasAnyAuthorityDirective,
-    ActiveMenuDirective,
-    FindLanguageFromKeyPipe,
     TranslateDirective,
   ],
 })
@@ -40,6 +40,7 @@ export default class Navbar implements OnInit {
   readonly openAPIEnabled = signal(false);
   readonly version: string;
   readonly account = inject(AccountService).account;
+  readonly type = environment.TYPE;
 
   private readonly loginService = inject(LoginService);
   private readonly translateService = inject(TranslateService);

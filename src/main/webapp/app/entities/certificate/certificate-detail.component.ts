@@ -1,12 +1,16 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AlertError } from 'app/shared/alert';
 import { CertificateService } from './certificate.service';
 
 import { ICertificate } from 'app/shared/model/certificate.model';
 
 @Component({
     selector: 'jhi-certificate-detail',
-    templateUrl: './certificate-detail.component.html'
+    templateUrl: './certificate-detail.component.html',
+    imports: [CommonModule, FontAwesomeModule, AlertError],
 })
 export class CertificateDetailComponent implements OnInit {
     certificate: ICertificate;

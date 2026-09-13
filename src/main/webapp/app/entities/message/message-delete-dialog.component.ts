@@ -2,6 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AlertError } from 'app/shared/alert';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
 import { IMessage } from 'app/shared/model/message.model';
@@ -9,7 +11,8 @@ import { MessageService } from './message.service';
 
 @Component({
     selector: 'jhi-message-delete-dialog',
-    templateUrl: './message-delete-dialog.component.html'
+    templateUrl: './message-delete-dialog.component.html',
+    imports: [FontAwesomeModule, AlertError],
 })
 export class MessageDeleteDialogComponent {
     message: IMessage;

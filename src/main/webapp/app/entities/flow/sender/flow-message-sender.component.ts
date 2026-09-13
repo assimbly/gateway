@@ -1,9 +1,16 @@
 import { Component, OnDestroy, OnInit, TemplateRef, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { forkJoin, Observable, Subscription } from 'rxjs';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { PopoverModule } from 'ngx-bootstrap/popover';
+import { CodemirrorModule } from '@ctrl/ngx-codemirror';
+import { Alert } from 'app/shared/alert';
 
 import { Integration } from 'app/shared/model/integration.model';
 import { Flow, IFlow } from 'app/shared/model/flow.model';
@@ -35,10 +42,10 @@ import { ConnectionPopupService } from 'app/entities/connection/connection-popup
 import dayjs from 'dayjs/esm';
 
 @Component({
-    standalone: false,
     selector: 'jhi-flow-message-sender',
     templateUrl: './flow-message-sender.component.html',
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    imports: [CommonModule, ReactiveFormsModule, RouterModule, NgbModule, FontAwesomeModule, NgSelectModule, PopoverModule, CodemirrorModule, Alert],
 })
 export class FlowMessageSenderComponent implements OnInit, OnDestroy {
 

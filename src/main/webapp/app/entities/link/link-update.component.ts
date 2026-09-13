@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AlertService } from 'app/core/util/alert.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AlertError } from 'app/shared/alert';
 import { ILink } from 'app/shared/model/link.model';
 import { LinkService } from './link.service';
 import { IStep } from 'app/shared/model/step.model';
@@ -10,7 +13,8 @@ import { StepService } from 'app/entities/step/step.service';
 
 @Component({
     selector: 'jhi-link-update',
-    templateUrl: './link-update.component.html'
+    templateUrl: './link-update.component.html',
+    imports: [FormsModule, FontAwesomeModule, AlertError],
 })
 export class LinkUpdateComponent implements OnInit {
     link: ILink;

@@ -1,8 +1,11 @@
 import { Component, OnInit, AfterViewInit, AfterContentInit, ViewEncapsulation, ViewChild, ElementRef } from '@angular/core';
-import { FormBuilder, FormArray, FormControl, FormGroup } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormArray, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { AlertService } from 'app/core/util/alert.service';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 
 import { Integration } from 'app/shared/model/integration.model';
 import { IMessage } from 'app/shared/model/message.model';
@@ -17,7 +20,8 @@ import dayjs from 'dayjs/esm';
 
 @Component({
     selector: 'jhi-broker-message-sender',
-    templateUrl: './broker-message-sender.component.html'
+    templateUrl: './broker-message-sender.component.html',
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, FontAwesomeModule, NgbModule, CodemirrorModule],
 })
 export class BrokerMessageSenderComponent implements OnInit {
     @ViewChild('editor', { read: ElementRef, static: false }) editor: ElementRef;

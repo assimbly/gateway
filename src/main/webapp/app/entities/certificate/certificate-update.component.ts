@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -8,6 +9,8 @@ import { DATE_TIME_FORMAT } from 'app/config/input.constants';
 import { KEYSTORE_PWD } from 'app/app.constants';
 
 import { Router } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AlertError } from 'app/shared/alert';
 
 import { ICertificate } from 'app/shared/model/certificate.model';
 import { CertificateService } from './certificate.service';
@@ -17,6 +20,7 @@ import { CertificateService } from './certificate.service';
 @Component({
   selector: 'jhi-certificate-update',
   templateUrl: './certificate-update.component.html',
+  imports: [FormsModule, FontAwesomeModule, AlertError],
 })
 export class CertificateUpdateComponent implements OnInit {
   certificate: ICertificate;

@@ -1,8 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AlertError } from 'app/shared/alert';
+import { ForbiddenHeaderValidatorDirective } from './header-validation.directive';
+import { ForbiddenMessageNamesValidatorDirective } from './message-validation.directive';
 
 import { IMessage, Message } from 'app/shared/model/message.model';
 import { IHeader, Header } from 'app/shared/model/header.model';
@@ -14,6 +20,7 @@ import { filter } from 'rxjs/operators';
 @Component({
   selector: 'jhi-message-update',
   templateUrl: './message-update.component.html',
+  imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, ForbiddenHeaderValidatorDirective, ForbiddenMessageNamesValidatorDirective],
 })
 export class MessageUpdateComponent implements OnInit {
   message: IMessage;

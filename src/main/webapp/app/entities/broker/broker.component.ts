@@ -1,10 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Router } from '@angular/router';
+import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { Router, RouterModule } from '@angular/router';
 
 import { IBroker } from 'app/shared/model/broker.model';
 import { AccountService } from 'app/core/auth/account.service';
@@ -20,7 +22,8 @@ enum Status {
 }
 @Component({
     selector: 'jhi-broker',
-    templateUrl: './broker.component.html'
+    templateUrl: './broker.component.html',
+    imports: [CommonModule, RouterModule, FontAwesomeModule, NgbModule],
 })
 export class BrokerComponent implements OnInit, OnDestroy {
     brokers: IBroker[];

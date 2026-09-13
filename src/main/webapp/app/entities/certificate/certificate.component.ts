@@ -1,9 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';import { AlertService } from 'app/core/util/alert.service';
 import { ParseLinks } from 'app/core/util/parse-links.service';
+import { RouterModule } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import { SortDirective, SortByDirective, SortState } from 'app/shared/sort';
 
 import { ICertificate } from 'app/shared/model/certificate.model';
 import { AccountService } from 'app/core/auth/account.service';
@@ -24,6 +29,7 @@ import { saveAs } from 'file-saver/FileSaver';
 @Component({
   selector: 'jhi-certificate',
   templateUrl: './certificate.component.html',
+  imports: [CommonModule, RouterModule, FontAwesomeModule, NgbModule, InfiniteScrollModule, SortDirective, SortByDirective],
 })
 export class CertificateComponent implements OnInit, OnDestroy {
   securities: ICertificate[];
@@ -32,8 +38,7 @@ export class CertificateComponent implements OnInit, OnDestroy {
   itemsPerPage: number;
   links: any;
   page: any;
-  predicate: any;
-  reverse: any;
+  sortState: SortState = { predicate: 'id', order: 'asc' };
   totalItems: number;
   faDownload = faDownload;
 
@@ -52,8 +57,6 @@ export class CertificateComponent implements OnInit, OnDestroy {
     this.links = {
       last: 0,
     };
-    this.predicate = 'id';
-    this.reverse = true;
   }
 
   loadAll() {
@@ -112,9 +115,10 @@ export class CertificateComponent implements OnInit, OnDestroy {
     this.eventSubscriber = this.eventManager.subscribe('certificateListModification', response => this.reset());
   }
 
-  sort() {
-    const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
-    if (this.predicate !== 'id') {
+  sort(): string[] {
+    const { predicate, order } = this.sortState;
+    const result = [predicate + ',' + order];
+    if (predicate !== 'id') {
       result.push('id');
     }
     return result;

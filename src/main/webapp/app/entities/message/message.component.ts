@@ -1,9 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
 import { FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 import { IMessage } from 'app/shared/model/message.model';
 import { IHeader, Header } from 'app/shared/model/header.model';
@@ -15,6 +19,7 @@ import { HeaderService } from '../../entities/header/header.service';
 @Component({
     selector: 'jhi-message',
     templateUrl: './message.component.html',
+    imports: [CommonModule, FormsModule, RouterModule, NgSelectModule, HeaderComponent],
 })
 export class MessageComponent implements OnInit, OnDestroy {
     messages: IMessage[];

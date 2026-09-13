@@ -32,7 +32,7 @@
   <div class="table-responsive" *ngIf="securities">
     <table class="table table-striped">
       <thead>
-        <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse">
+        <tr jhiSort [(sortState)]="sortState">
           <th jhiSortBy="id" [style.display]="'none'"><span>ID</span> <fa-icon [icon]="'sort'"></fa-icon></th>
           <th jhiSortBy="url"><span>Url</span> <fa-icon [icon]="'sort'"></fa-icon></th>
           <th jhiSortBy="certificateName"><span>Certificate Name</span> <fa-icon [icon]="'sort'"></fa-icon></th>

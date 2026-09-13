@@ -1,7 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import { SortDirective, SortByDirective, SortState } from 'app/shared/sort';
 
 import { ConnectionDeleteDialogComponent } from './connection-delete-dialog.component';
 import { IConnection, Connection } from 'app/shared/model/connection.model';
@@ -12,14 +17,14 @@ import { AccountService } from 'app/core/auth/account.service';
 @Component({
   selector: 'jhi-connection-all',
   templateUrl: './connection-all.component.html',
+  imports: [CommonModule, RouterModule, FontAwesomeModule, InfiniteScrollModule, SortDirective, SortByDirective],
 })
 export class ConnectionAllComponent implements OnInit, OnDestroy {
   public connections: Array<Connection> = [];
   public page: any;
   private currentAccount: any;
   private eventSubscriber: Subscription;
-  predicate: any;
-  reverse: any;
+  sortState: SortState = { predicate: 'name', order: 'asc' };
 
   constructor(
     protected connectionService: ConnectionService,
@@ -29,8 +34,6 @@ export class ConnectionAllComponent implements OnInit, OnDestroy {
     protected accountService: AccountService
   ) {
     this.page = 0;
-    this.predicate = 'name';
-    this.reverse = true;
   }
 
   ngOnInit() {
@@ -81,9 +84,10 @@ export class ConnectionAllComponent implements OnInit, OnDestroy {
 	});
   }
 
-  sort() {
-    const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
-    if (this.predicate !== 'name') {
+  sort(): string[] {
+    const { predicate, order } = this.sortState;
+    const result = [predicate + ',' + order];
+    if (predicate !== 'name') {
       result.push('name');
     }
     return result;

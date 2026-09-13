@@ -1,4 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 
@@ -6,6 +8,7 @@ import { Observable } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
+import { AlertError } from 'app/shared/alert';
 
 import { filter, map } from 'rxjs/operators';
 import { EnvironmentVariablesService } from './environment-variables.service';
@@ -17,7 +20,8 @@ import { IEnvironmentVariables, EnvironmentVariables } from 'app/shared/model/en
 
 @Component({
     selector: 'jhi-environment-variables-dialog',
-    templateUrl: './environment-variables-dialog.component.html'
+    templateUrl: './environment-variables-dialog.component.html',
+    imports: [CommonModule, ReactiveFormsModule, AlertError],
 })
 export class EnvironmentVariablesDialogComponent implements OnInit {
     environmentVariables: IEnvironmentVariables = new EnvironmentVariables();

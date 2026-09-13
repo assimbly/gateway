@@ -16,6 +16,7 @@ import { provideServiceWorker } from '@angular/service-worker';
 import { NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap/datepicker';
 import { environment } from 'environments/environment';
 
+import { authInterceptor } from 'app/core/interceptor/auth-interceptor';
 import { authExpiredInterceptor } from 'app/core/interceptor/auth-expired.interceptor';
 import { errorHandlerInterceptor } from 'app/core/interceptor/error-handler.interceptor';
 import { notificationInterceptor } from 'app/core/interceptor/notification.interceptor';
@@ -52,7 +53,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, ...routerFeatures),
     // Set this to true to enable service worker (PWA)
     provideServiceWorker('ngsw-worker.js', { enabled: false }),
-    provideHttpClient(withInterceptors([authExpiredInterceptor, errorHandlerInterceptor, notificationInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, authExpiredInterceptor, errorHandlerInterceptor, notificationInterceptor])),
     Title,
     { provide: LOCALE_ID, useValue: 'en' },
     { provide: NgbDateAdapter, useClass: NgbDateDayjsAdapter },

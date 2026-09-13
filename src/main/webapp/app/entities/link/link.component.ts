@@ -1,4 +1,7 @@
 import { Component, OnInit, OnDestroy, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -6,6 +9,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
 import { Observable } from 'rxjs';
+import { Alert } from 'app/shared/alert';
 
 import { ILink, Link } from 'app/shared/model/link.model';
 import { LinkDeleteDialogComponent } from '././link-delete-dialog.component';
@@ -14,7 +18,8 @@ import { LinkService } from './link.service';
 
 @Component({
     selector: 'jhi-link',
-    templateUrl: './link.component.html'
+    templateUrl: './link.component.html',
+    imports: [CommonModule, FormsModule, RouterModule, Alert],
 })
 export class LinkComponent implements OnInit, OnChanges {
     @Input() links: ILink[];

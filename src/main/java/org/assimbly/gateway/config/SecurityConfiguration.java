@@ -112,11 +112,12 @@ public class SecurityConfiguration {
 
                         // API authentication and registration
                         .requestMatchers(HttpMethod.POST, "/api/authenticate").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/authenticate").permitAll()
                         .requestMatchers("/api/register").permitAll()
                         .requestMatchers("/api/activate").permitAll()
                         .requestMatchers("/api/account/reset-password/init").permitAll()
                         .requestMatchers("/api/account/reset-password/finish").permitAll()
+
+                        //.requestMatchers("/api/**").authenticated()
                         .requestMatchers("/api/**").permitAll()
 
                         // Actuator endpoints

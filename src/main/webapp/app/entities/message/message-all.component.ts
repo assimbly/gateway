@@ -1,7 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import { SortDirective, SortByDirective, SortState } from 'app/shared/sort';
 
 import { MessageDeleteDialogComponent } from './message-delete-dialog.component';
 import { MessageService } from './message.service';
@@ -12,14 +17,14 @@ import { AccountService } from 'app/core/auth/account.service';
 @Component({
   selector: 'jhi-message-all',
   templateUrl: './message-all.component.html',
+  imports: [CommonModule, RouterModule, FontAwesomeModule, InfiniteScrollModule, SortDirective, SortByDirective],
 })
 export class MessageAllComponent implements OnInit, OnDestroy {
   public messages: IMessage[] = [];
   public page: any;
   private eventSubscriber: Subscription;
   private currentAccount: any;
-  predicate: any;
-  reverse: any;
+  sortState: SortState = { predicate: 'name', order: 'asc' };
 
   constructor(
     protected messageService: MessageService,
@@ -29,8 +34,6 @@ export class MessageAllComponent implements OnInit, OnDestroy {
     protected accountService: AccountService
   ) {
     this.page = 0;
-    this.predicate = 'name';
-    this.reverse = true;
   }
 
   ngOnInit() {
@@ -38,9 +41,10 @@ export class MessageAllComponent implements OnInit, OnDestroy {
     this.registerChangeInMessages();
   }
 
-  sort() {
-    const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
-    if (this.predicate !== 'name') {
+  sort(): string[] {
+    const { predicate, order } = this.sortState;
+    const result = [predicate + ',' + order];
+    if (predicate !== 'name') {
       result.push('name');
     }
     return result;
