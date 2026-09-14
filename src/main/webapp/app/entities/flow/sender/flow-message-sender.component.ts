@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, TemplateRef, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, TemplateRef, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -157,7 +157,8 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         public connectionsList: Connections,
         private modalService: NgbModal,
         private messagePopupService: MessagePopupService,
-        private connectionPopupService: ConnectionPopupService
+        private connectionPopupService: ConnectionPopupService,
+        private cdr: ChangeDetectorRef,
     ) {}
 
     ngOnInit() {
@@ -208,6 +209,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
             this.setTypeLinks(this.requestStep, 0);
 
             this.finished = true;
+            this.cdr.detectChanges();
         });
     }
 

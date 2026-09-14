@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
@@ -11,7 +12,7 @@ import { ConnectionService } from './connection.service';
 @Component({
     selector: 'jhi-connection-delete-dialog',
     templateUrl: './connection-delete-dialog.component.html',
-    imports: [FontAwesomeModule, AlertError],
+    imports: [CommonModule, FontAwesomeModule, AlertError],
 })
 export class ConnectionDeleteDialogComponent {
     connection: IConnection;

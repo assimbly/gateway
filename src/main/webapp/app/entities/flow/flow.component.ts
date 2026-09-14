@@ -242,7 +242,7 @@ export class FlowComponent implements OnInit, OnDestroy {
   }
 
   navigateToFlowEditor(mode: string, editorType: string): void {
-	  this.router.navigate(['../flow/editor'], {queryParams: { mode: mode, editor: editorType }});
+	  this.router.navigate(['/flow/editor'], {queryParams: { mode: mode, editor: editorType }});
   }
 
   private onSuccess(data, headers) {

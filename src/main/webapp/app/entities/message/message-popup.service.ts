@@ -4,7 +4,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { MessageService } from './message.service';
 import { Message } from 'app/shared/model/message.model';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class MessagePopupService {
     private ngbModalRef: NgbModalRef;
 

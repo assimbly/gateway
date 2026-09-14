@@ -4,7 +4,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { RouteService } from './route.service';
 import { Route } from 'app/shared/model/route.model';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class RoutePopupService {
     private ngbModalRef: NgbModalRef;
 
