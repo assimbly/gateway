@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
@@ -26,7 +26,7 @@ enum Status {
     imports: [CommonModule, RouterModule, FontAwesomeModule, NgbModule],
 })
 export class BrokerComponent implements OnInit, OnDestroy {
-    brokers: IBroker[];
+    brokers: IBroker[] = [];
     broker: IBroker;
 
     currentAccount: any;
@@ -48,6 +48,8 @@ export class BrokerComponent implements OnInit, OnDestroy {
     public brokerStatusButton: string;
 
     lastError: string;
+
+    private readonly changeDetector = inject(ChangeDetectorRef);
 
     constructor(
         protected brokerService: BrokerService,
@@ -81,7 +83,9 @@ export class BrokerComponent implements OnInit, OnDestroy {
     loadAll() {
         this.brokerService.query().subscribe(
             (res: HttpResponse<IBroker[]>) => {
-                this.brokers = res.body;
+                this.brokers = res.body ?? [];
+                // Http callback was not refreshing *ngIf views; force CD so Create/table appears.
+                this.changeDetector.detectChanges();
 
                 if (this.brokers[0]) {
                     this.broker = this.brokers[0];
