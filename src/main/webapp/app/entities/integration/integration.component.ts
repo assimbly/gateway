@@ -9,6 +9,7 @@ import { AlertService } from 'app/core/util/alert.service';
 import { NgbModal, NgbActiveModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { Alert } from 'app/shared/alert';
+import { HasAnyAuthorityDirective } from 'app/shared/auth';
 import { IIntegration } from 'app/shared/model/integration.model';
 import { IntegrationDeleteDialogComponent } from './integration-delete-dialog.component';
 import { AccountService } from 'app/core/auth/account.service';
@@ -18,7 +19,7 @@ import { FlowService } from '../flow/flow.service';
 @Component({
     selector: 'jhi-integration',
     templateUrl: './integration.component.html',
-    imports: [CommonModule, RouterModule, FontAwesomeModule, Alert],
+    imports: [CommonModule, RouterModule, FontAwesomeModule, HasAnyAuthorityDirective],
 })
 export class IntegrationComponent implements OnInit, OnDestroy {
     integrations: IIntegration[] = [];

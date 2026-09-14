@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 import { forkJoin } from 'rxjs';
 import dayjs from 'dayjs/esm';
 import { DATE_TIME_FORMAT } from 'app/config/input.constants';
-import { KEYSTORE_PWD } from 'app/app.constants';
+import { environment } from 'environments/environment';
 
 import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -46,7 +46,7 @@ export class CertificateUpdateComponent implements OnInit {
 
     this.certificate.certificateExpiry = this.certificateExpiry != null ? dayjs(this.certificateExpiry, DATE_TIME_FORMAT) : null;
 
-    this.certificateService.importCertificate(this.certificate.url, 'truststore.jks', KEYSTORE_PWD).subscribe(
+    this.certificateService.importCertificate(this.certificate.url, 'truststore.jks', environment.KEYSTORE_PWD).subscribe(
       res => {
         const json = JSON.parse(res.body);
 

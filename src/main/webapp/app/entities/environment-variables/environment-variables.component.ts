@@ -9,6 +9,7 @@ import { AlertService } from 'app/core/util/alert.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { SortDirective, SortByDirective, SortState } from 'app/shared/sort';
+import { HasAnyAuthorityDirective } from 'app/shared/auth';
 
 import { IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
 import { EnvironmentVariablesDeleteDialogComponent } from './environment-variables-delete-dialog.component';
@@ -18,7 +19,7 @@ import { EnvironmentVariablesService } from './environment-variables.service';
 @Component({
     selector: 'jhi-environment-variables',
     templateUrl: './environment-variables.component.html',
-    imports: [CommonModule, RouterModule, FontAwesomeModule, InfiniteScrollModule, SortDirective, SortByDirective],
+    imports: [CommonModule, RouterModule, FontAwesomeModule, InfiniteScrollModule, SortDirective, SortByDirective, HasAnyAuthorityDirective],
 })
 export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
     environmentVariables: IEnvironmentVariables[];

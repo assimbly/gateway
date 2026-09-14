@@ -14,6 +14,7 @@ import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { SortDirective, SortByDirective, SortState } from 'app/shared/sort';
 
 import { BrokerMessageBrowserRowComponent } from './broker-message-browser-row.component';
+import { MessageSearchByMessageIdPipe } from '../message.searchbymessageid.pipe';
 import { MessageSortByHeaderPipePipe } from '../message.sortbyheader.pipe';
 
 import { IMessage } from 'app/shared/model/message.model';
@@ -42,6 +43,7 @@ import { CodemirrorComponent } from "@ctrl/ngx-codemirror";
     SortDirective,
     SortByDirective,
     BrokerMessageBrowserRowComponent,
+    MessageSearchByMessageIdPipe,
     MessageSortByHeaderPipePipe,
   ],
 })

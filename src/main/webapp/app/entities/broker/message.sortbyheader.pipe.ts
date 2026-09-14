@@ -4,13 +4,13 @@ import { Header } from 'app/shared/model/header.model';
 
 @Pipe({ name: 'MessageSortByHeaderPipe' })
 export class MessageSortByHeaderPipePipe implements PipeTransform {
-    transform(headers: KeyValue<string, any>[], ascending: boolean, predicate: string) {
+    transform(headers: KeyValue<string | number | symbol, any>[], ascending: boolean, predicate: string) {
         let sortedHeaders: Header[] = [];
 
         if(headers){
 
           for (let i = 0; i < headers.length; i++) {
-              sortedHeaders.push(new Header(i, headers[i].key, headers[i].value, null, null, null));
+              sortedHeaders.push(new Header(i, String(headers[i].key), headers[i].value, null, null, null));
           }
           const asc: number = ascending ? 1 : -1;
 

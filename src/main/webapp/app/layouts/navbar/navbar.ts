@@ -11,9 +11,7 @@ import { AccountService, StateStorageService } from 'app/core/auth';
 import { ProfileService } from 'app/layouts/profiles/profile.service';
 import { LoginService } from 'app/login/login.service';
 import { HasAnyAuthorityDirective } from 'app/shared/auth';
-import { FindLanguageFromKeyPipe, TranslateDirective } from 'app/shared/language';
-
-import ActiveMenuDirective from './active-menu.directive';
+import { TranslateDirective } from 'app/shared/language';
 
 import { environment } from 'environments/environment';
 
@@ -47,9 +45,6 @@ export default class Navbar implements OnInit {
   private readonly stateStorageService = inject(StateStorageService);
   private readonly profileService = inject(ProfileService);
   private readonly router = inject(Router);
-
-  constructor() {
-  }
 
   ngOnInit(): void {
     this.profileService.getProfileInfo().subscribe(profileInfo => {
