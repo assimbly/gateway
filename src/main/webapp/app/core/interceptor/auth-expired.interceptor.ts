@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { tap } from 'rxjs';
 
 import { StateStorageService } from 'app/core/auth';
+import { agentDebugLog } from 'app/core/util/agent-debug-log';
 import { LoginService } from 'app/login/login.service';
 
 export const authExpiredInterceptor: HttpInterceptorFn = (req, next) => {
@@ -15,13 +16,28 @@ export const authExpiredInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     tap({
       error(err: HttpErrorResponse) {
-        if (err.status === 401 && err.url && !err.url.includes('api/account')) {
+        if (err.status === 401 && err.url && !err.url.includes('api/account') && !err.url.includes('_agent-debug')) {
+          // #region agent log
+          agentDebugLog({
+            runId: 'post-fix',
+            hypothesisId: 'B',
+            location: 'auth-expired.interceptor.ts:401',
+            message: 'authExpired handling 401',
+            data: {
+              url: err.url,
+              isI18n: err.url.includes('/i18n/') || err.url.includes('i18n/'),
+              isLogoutUrl: err.url.includes(loginService.logoutUrl()),
+              willCallLogout: !err.url.includes(loginService.logoutUrl()),
+            },
+          });
+          // #endregion
           if (err.url.includes(loginService.logoutUrl())) {
             loginService.logoutInClient();
             return;
           }
           stateStorageService.storeUrl(router.routerState.snapshot.url);
-          loginService.logout();
+          // Clear expired JWT immediately (client-side); do not depend on /api/logout.
+          loginService.logoutInClient();
           router.navigate(['/login']);
         }
       },

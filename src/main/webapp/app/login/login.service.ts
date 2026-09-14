@@ -19,6 +19,7 @@ export class LoginService {
   }
 
   logoutInClient(): void {
+    this.authServerProvider.clearToken();
     this.accountService.authenticate(null);
   }
 
