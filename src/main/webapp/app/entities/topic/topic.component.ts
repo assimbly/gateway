@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, TrackByFunction } from '@angular/core';
+import { Component, OnInit, OnDestroy, TrackByFunction, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -58,6 +58,8 @@ export class TopicComponent implements OnInit, OnDestroy {
 
   searchTopicText: string = '';
   brokerType = '';
+
+  private readonly changeDetector = inject(ChangeDetectorRef);
 
   constructor(
     protected topicService: TopicService,
@@ -173,6 +175,7 @@ export class TopicComponent implements OnInit, OnDestroy {
           } else {
             this.isBroker = false;
           }
+          this.changeDetector.detectChanges();
         }
       },
       error => console.log(error)
@@ -197,10 +200,12 @@ export class TopicComponent implements OnInit, OnDestroy {
           } else {
             this.isBroker = false;
           }
+          this.changeDetector.detectChanges();
         },
         error => {
           console.log(error);
           this.isBroker = false;
+          this.changeDetector.detectChanges();
         }
       );
     }
@@ -221,10 +226,12 @@ export class TopicComponent implements OnInit, OnDestroy {
               this.addresses = [...this.addresses];
             }
           }
+          this.changeDetector.detectChanges();
         },
         error => {
           console.log(error);
           this.isBroker = false;
+          this.changeDetector.detectChanges();
         }
       );
     }

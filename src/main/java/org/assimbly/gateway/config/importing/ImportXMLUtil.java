@@ -2,6 +2,7 @@ package org.assimbly.gateway.config.importing;
 
 import org.apache.commons.lang3.StringUtils;
 import org.assimbly.docconverter.DocConverter;
+import org.assimbly.docconverter.StringConverter;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
@@ -16,18 +17,18 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ImportXMLUtil {
 
-    public static Document getDocument(String mediaType, String configuration) throws Exception {
+    public static Document getDocument(String mediaType, String configuration) {
 
         String xmlConfiguration;
         if (mediaType.contains("json")) {
-            xmlConfiguration = DocConverter.convertJsonToXml(configuration);
+            xmlConfiguration = DocConverter.jsonToXml(configuration);
         } else if (mediaType.contains("yaml") || mediaType.contains("text")) {
-            xmlConfiguration = DocConverter.convertYamlToXml(configuration);
+            xmlConfiguration = DocConverter.yamlToXml(configuration);
         } else {
             xmlConfiguration = configuration;
         }
 
-        return DocConverter.convertStringToDoc(xmlConfiguration);
+        return StringConverter.stringToDoc(xmlConfiguration);
 
     }
 

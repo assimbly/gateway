@@ -14,7 +14,7 @@ import { TopicUpdateComponent } from './topic-update.component';
 
 @Injectable({ providedIn: 'root' })
 export class TopicResolve implements Resolve<ITopic> {
-  constructor(private service: TopicService, private router: Router) {}s
+  constructor(private service: TopicService, private router: Router) {}
 
   resolve(route: ActivatedRouteSnapshot): Observable<ITopic> | Observable<never> {
     const id = route.params['id'];

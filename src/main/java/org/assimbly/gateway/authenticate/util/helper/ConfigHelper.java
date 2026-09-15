@@ -1,6 +1,5 @@
 package org.assimbly.gateway.authenticate.util.helper;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;

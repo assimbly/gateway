@@ -31,9 +31,9 @@ public class Export {
 		xmlConfiguration = exportXML.getXMLConfiguration(integrationId);
 
 		if (mediaType.contains("json")) {
-			configuration = DocConverter.convertXmlToJson(xmlConfiguration);
+			configuration = DocConverter.xmlToJson(xmlConfiguration);
 		} else if (mediaType.contains("yaml") || mediaType.contains("text")) {
-			configuration = DocConverter.convertXmlToYaml(xmlConfiguration);
+			configuration = DocConverter.xmlToYaml(xmlConfiguration);
 		} else {
 			configuration = xmlConfiguration;
 		}
@@ -52,9 +52,9 @@ public class Export {
 		xmlConfiguration = exportXML.getXMLConfigurationByIds(integrationId, flowids);
 
 		if (mediaType.contains("json")) {
-			configuration = DocConverter.convertXmlToJson(xmlConfiguration);
+			configuration = DocConverter.xmlToJson(xmlConfiguration);
 		} else if (mediaType.contains("yaml") || mediaType.contains("text")) {
-			configuration = DocConverter.convertXmlToYaml(xmlConfiguration);
+			configuration = DocConverter.xmlToYaml(xmlConfiguration);
 		} else {
 			configuration = xmlConfiguration;
 		}
@@ -73,9 +73,9 @@ public class Export {
 		xmlConfiguration = exportXML.getXMLFlowConfiguration(id);
 
 		if (mediaType.contains("json")) {
-			configuration = DocConverter.convertXmlToJson(xmlConfiguration);
+			configuration = DocConverter.xmlToJson(xmlConfiguration);
 		} else if (mediaType.contains("yaml") || mediaType.contains("text")) {
-			configuration = DocConverter.convertXmlToYaml(xmlConfiguration);
+			configuration = DocConverter.xmlToYaml(xmlConfiguration);
 		} else {
 			configuration = xmlConfiguration;
 		}

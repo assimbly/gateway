@@ -164,6 +164,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
                 this.brokerStatus = 'inactiveError';
                 break;
         }
+        this.changeDetector.detectChanges();
     }
 
     setBrokerStatusDefaults() {
@@ -230,6 +231,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
                     this.setbrokerStatus(response.body);
                 }
                 this.disableActionBtns = false;
+                this.changeDetector.detectChanges();
             },
             err => {
                 // this.getFlowLastError(this.broker.id, 'Start', err.error);
@@ -255,6 +257,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
                     }
                 }
                 this.disableActionBtns = false;
+                this.changeDetector.detectChanges();
             },
             err => {
                 // this.getFlowLastError(this.broker.id, 'Restart', err.error);
@@ -276,12 +279,14 @@ export class BrokerComponent implements OnInit, OnDestroy {
                     this.setbrokerStatus(response.body);
                 }
                 this.disableActionBtns = false;
+                this.changeDetector.detectChanges();
             },
             err => {
                 // this.getFlowLastError(this.broker.id, 'Stop', err.error);
                 this.isBrokerStatusOK = false;
                 this.brokerStatusError = `Flow with id=${this.broker.id} is not stopped.`;
                 this.disableActionBtns = false;
+                this.changeDetector.detectChanges();
             }
         );
     }

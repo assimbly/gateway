@@ -3,6 +3,7 @@ package org.assimbly.gateway.config.exporting;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xerces.dom.DocumentImpl;
 import org.assimbly.docconverter.DocConverter;
+import org.assimbly.docconverter.StringConverter;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.domain.*;
 import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
@@ -87,7 +88,7 @@ public class ExportXML {
             }
         }
 
-        xmlConfiguration = DocConverter.convertDocToString(doc);
+        xmlConfiguration = StringConverter.docToString(doc);
 
         return xmlConfiguration;
     }
@@ -111,7 +112,7 @@ public class ExportXML {
             }
         }
 
-        xmlConfiguration = DocConverter.convertDocToString(doc);
+        xmlConfiguration = StringConverter.docToString(doc);
 
         return xmlConfiguration;
     }
@@ -142,7 +143,7 @@ public class ExportXML {
 
         }
 
-        xmlConfiguration = DocConverter.convertDocToString(doc);
+        xmlConfiguration = StringConverter.docToString(doc);
 
         xmlConfiguration = StringUtils.substringBeforeLast(xmlConfiguration,"</dil>") + "</dil>";
 
@@ -159,7 +160,7 @@ public class ExportXML {
             setFlows(flow);
         }
 
-        xmlConfiguration = DocConverter.convertDocToString(doc);
+        xmlConfiguration = StringConverter.docToString(doc);
 
         return xmlConfiguration;
 

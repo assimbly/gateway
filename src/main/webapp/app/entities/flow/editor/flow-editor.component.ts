@@ -18,7 +18,6 @@ export class FlowEditorComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-
     this.route.params.subscribe(params => {
       this.editor = 'esb';
     });

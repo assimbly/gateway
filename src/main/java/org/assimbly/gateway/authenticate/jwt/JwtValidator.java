@@ -7,6 +7,7 @@ import io.jsonwebtoken.Jwts;
 import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 public final class JwtValidator {
 
@@ -35,7 +36,7 @@ public final class JwtValidator {
         try {
             decode(jwt);
             valid = true;
-        } catch (JwtException | UnsupportedEncodingException e) {
+        } catch (JwtException e) {
             LOG.warn(e.getMessage());
             valid = false;
         }
@@ -52,11 +53,11 @@ public final class JwtValidator {
      * @throws JwtException                 when something is wrong with the token.
      * @throws UnsupportedEncodingException when the encoding used to sign the token is not supported.
      */
-    public static Claims decode(String jwt) throws JwtException, UnsupportedEncodingException {
+    public static Claims decode(String jwt) throws JwtException {
         String key = System.getenv("MONGO_SECRET_KEY");
 
         JwtParser parser = Jwts.parser()
-            .setSigningKey(key.getBytes("UTF-8"))
+            .setSigningKey(key.getBytes(StandardCharsets.UTF_8))
             .build();
 
         return parser

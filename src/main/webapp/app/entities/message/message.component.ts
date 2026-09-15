@@ -15,11 +15,12 @@ import { AccountService } from 'app/core/auth/account.service';
 import { MessageService } from './message.service';
 import { HeaderComponent } from '../../entities/header/header.component';
 import { HeaderService } from '../../entities/header/header.service';
+import { HasAnyAuthorityDirective } from 'app/shared/auth';
 
 @Component({
     selector: 'jhi-message',
     templateUrl: './message.component.html',
-    imports: [CommonModule, FormsModule, RouterModule, NgSelectModule, HeaderComponent],
+    imports: [CommonModule, FormsModule, RouterModule, NgSelectModule, HeaderComponent, HasAnyAuthorityDirective],
 })
 export class MessageComponent implements OnInit, OnDestroy {
     messages: IMessage[];
