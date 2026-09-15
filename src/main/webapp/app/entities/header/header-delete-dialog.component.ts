@@ -2,15 +2,17 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AlertError } from 'app/shared/alert';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
 import { IHeader } from 'app/shared/model/header.model';
 import { HeaderService } from './header.service';
 
 @Component({
-    standalone: false,
     selector: 'jhi-header-delete-dialog',
-    templateUrl: './header-delete-dialog.component.html'
+    templateUrl: './header-delete-dialog.component.html',
+    imports: [FontAwesomeModule, AlertError],
 })
 export class HeaderDeleteDialogComponent {
     header: IHeader;

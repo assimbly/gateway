@@ -1,4 +1,6 @@
 import { Component, OnInit, OnDestroy, AfterContentInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
@@ -10,9 +12,9 @@ import { DATE_TIME_FORMAT } from 'app/config/input.constants';
 import dayjs from 'dayjs/esm';
 
 @Component({
-  standalone: false,
   selector: 'jhi-certificate-uploadp12-dialog',
   templateUrl: './certificate-uploadp12-dialog.component.html',
+  imports: [CommonModule, ReactiveFormsModule],
 })
 export class CertificateUploadP12DialogComponent implements OnInit, AfterContentInit {
   certificate: ICertificate;

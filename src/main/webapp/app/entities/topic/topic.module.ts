@@ -16,7 +16,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TopicClearDialogComponent } from 'app/entities/topic/topic-clear-dialog.component';
 
 @NgModule({
-  imports: [SharedModule, SortDirective, SortByDirective, RouterModule.forChild(topicRoute), ReactiveFormsModule, PopoverModule.forRoot()],
+  imports: [SharedModule, SortDirective, SortByDirective, RouterModule.forChild(topicRoute), ReactiveFormsModule, PopoverModule],
   declarations: [
     TopicComponent,
     TopicDetailComponent,

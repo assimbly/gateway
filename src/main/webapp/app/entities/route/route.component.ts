@@ -1,18 +1,22 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { DataUtils } from 'app/core/util/data-util.service';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AlertError } from 'app/shared/alert';
 
 import { IRoute } from 'app/shared/model/route.model';
 import { RouteService } from './route.service';
 import { RouteDeleteDialogComponent } from './route-delete-dialog.component';
 
 @Component({
-  standalone: false,
   selector: 'jhi-route',
-  templateUrl: './route.component.html'
+  templateUrl: './route.component.html',
+  imports: [CommonModule, RouterModule, FontAwesomeModule, AlertError],
 })
 export class RouteComponent implements OnInit, OnDestroy {
     routes?: IRoute[];

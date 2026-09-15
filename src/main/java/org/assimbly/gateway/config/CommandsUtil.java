@@ -15,7 +15,7 @@ public final class CommandsUtil {
 
     private static final Logger log = LoggerFactory.getLogger(CommandsUtil.class);
 
-    private final static String USER_HOME_DIR = System.getProperty("user.home");
+    private static final String USER_HOME_DIR = System.getProperty("user.home");
 
     private CommandsUtil() {
     }
@@ -152,8 +152,8 @@ public final class CommandsUtil {
 
     public static boolean isWindows()
     {
-        String OS = System.getProperty("os.name");
-        return OS.startsWith("Windows");
+        String operationSystem = System.getProperty("os.name");
+        return operationSystem.startsWith("Windows");
     }
 
     private static String[] getArguments(String[] args) {

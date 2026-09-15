@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, Observer } from 'rxjs';
 
-import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { serverApiUrl } from 'app/config';
 
 import { createRequestOption } from 'app/shared/util/request-util';
 
@@ -20,12 +20,12 @@ type EntityArrayResponseType = HttpResponse<IQueue[]>;
 
 @Injectable({ providedIn: 'root' })
 export class QueueService {
-  public queuesResourceUrl = this.applicationConfigService.getEndpointFor('api/queues');
-  public brokersResourceUrl = this.applicationConfigService.getEndpointFor('api/brokers');
+  public queuesResourceUrl = `${serverApiUrl}api/queues`;
+  public brokersResourceUrl = `${serverApiUrl}api/brokers`;
 
   brokerType: string;
 
-  constructor(protected http: HttpClient, protected router: Router, protected $window: WindowRef, private applicationConfigService: ApplicationConfigService, protected brokerService: BrokerService) {   
+  constructor(protected http: HttpClient, protected router: Router, protected $window: WindowRef, protected brokerService: BrokerService) {   
   }
 
   create(queue: IQueue): Observable<EntityResponseType> {

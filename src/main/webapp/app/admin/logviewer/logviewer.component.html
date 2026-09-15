@@ -1,19 +1,7 @@
 <h1>Log viewer</h1>
 <hr>
 
-<div class="form-group" contenteditable="true">
-	<code contenteditable="true" *ngFor="let logLine of (logLines | SearchByName: searchText)">
-		<div>
-			  <span *ngIf="logLine.includes(' ERROR ') else logLineWarning" style="color: red">{{logLine}}</span>
-		</div>
-		<ng-template #logLineWarning>
-			<span *ngIf="logLine.includes(' WARN ') else logLineDefault" style="color: orange">{{logLine}}</span>
-		</ng-template>
-		<ng-template #logLineDefault>
-			<span style="color: green">{{logLine}}</span>
-		</ng-template>
-	</code>
-</div>
+<pre #logArea class="form-group" style="max-height: 60vh; overflow: auto; white-space: pre-wrap; word-break: break-word;" [innerHTML]="coloredLog"></pre>
 
 <form name="logsForm" #logsForm="ngForm">
     <div class="form-row row" style="margin-top: 1em;">
@@ -21,7 +9,7 @@
                 <div class="input-group-prepend">
                     <div class="input-group-text">Filter:</div>
                 </div>
-                <input type="text" style="height: 36px; max-width: 220px;" [(ngModel)]="searchText"	id="searchTextId" name="searchText"	placeholder="Filter Log"/>
+                <input type="text" style="height: 36px; max-width: 220px;" [(ngModel)]="searchText" (ngModelChange)="onFilterChange()" id="searchTextId" name="searchText" placeholder="Filter Log"/>
             </div>
             <div class="col-9"></div>
      </div>

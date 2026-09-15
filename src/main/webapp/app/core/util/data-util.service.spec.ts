@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 
 import { DataUtils } from './data-util.service';
@@ -14,16 +15,15 @@ describe('Data Utils Service Test', () => {
 
   describe('byteSize', () => {
     it('should return the bytesize of the text', () => {
-      expect(service.byteSize('Hello JHipster')).toBe(`10.5 bytes`);
+      expect(service.byteSize('Hello JHipster')).toBe('10.5 bytes');
     });
   });
 
   describe('openFile', () => {
     it('should open the file in the new window', () => {
       const newWindow = { ...window };
-      newWindow.document.write = jest.fn();
-      window.open = jest.fn(() => newWindow);
-      window.URL.createObjectURL = jest.fn();
+      window.open = vi.fn(() => newWindow);
+      window.URL.createObjectURL = vi.fn();
       // 'JHipster' in base64 is 'SkhpcHN0ZXI='
       const data = 'SkhpcHN0ZXI=';
       const contentType = 'text/plain';

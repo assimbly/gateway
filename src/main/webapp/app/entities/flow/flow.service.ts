@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Service, inject } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, Observer, Subscription } from 'rxjs';
 
-import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { serverApiUrl } from 'app/config';
 
 import { createRequestOption } from 'app/shared/util/request-util';
 
@@ -15,15 +15,16 @@ import { IFlow, Flow } from 'app/shared/model/flow.model';
 type EntityResponseType = HttpResponse<IFlow>;
 type EntityArrayResponseType = HttpResponse<IFlow[]>;
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class FlowService {
-  public resourceUrl = this.applicationConfigService.getEndpointFor('api/flows');
-  public integrationUrl = this.applicationConfigService.getEndpointFor('api/integration');
-  public validationUrl = this.applicationConfigService.getEndpointFor('api/validation');
-  public environmentUrl = this.applicationConfigService.getEndpointFor('api/environment');
+  protected http = inject(HttpClient);
+  protected router = inject(Router);
+  protected $window = inject(WindowRef);
 
-  constructor(protected http: HttpClient, protected router: Router, protected $window: WindowRef, private applicationConfigService: ApplicationConfigService) {
-  }
+  public resourceUrl = `${serverApiUrl}api/flows`;
+  public integrationUrl = `${serverApiUrl}api/integration`;
+  public validationUrl = `${serverApiUrl}api/validation`;
+  public environmentUrl = `${serverApiUrl}api/environment`;
 
   create(flow: IFlow): Observable<EntityResponseType> {
     return this.http.post<IFlow>(this.resourceUrl, flow, { observe: 'response' });
@@ -144,17 +145,17 @@ export class FlowService {
   }
 
   getWikiDocUrl(): Observable<HttpResponse<any>> {
-	const url = this.applicationConfigService.getEndpointFor('/api/wiki-url');
+    const url = `${serverApiUrl}api/wiki-url`;
     return this.http.get(url, { observe: 'response', responseType: 'text' });
   }
 
   getCamelDocUrl(): Observable<HttpResponse<any>> {
-    const url = this.applicationConfigService.getEndpointFor('/api/camel-url');
+    const url = `${serverApiUrl}api/camel-url`;
     return this.http.get(url, { observe: 'response', responseType: 'text' });
   }
 
   getIntegrationName(): Observable<HttpResponse<any>> {
-	const url = this.applicationConfigService.getEndpointFor('/api/gateway-name');
+    const url = `${serverApiUrl}api/gateway-name`;
     return this.http.get(url, { observe: 'response', responseType: 'text' });
   }
 
@@ -283,4 +284,5 @@ export class FlowService {
 
     return year + month + day;
   }
+
 }

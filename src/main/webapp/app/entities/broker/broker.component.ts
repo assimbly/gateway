@@ -1,10 +1,12 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Router } from '@angular/router';
+import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { Router, RouterModule } from '@angular/router';
 
 import { IBroker } from 'app/shared/model/broker.model';
 import { AccountService } from 'app/core/auth/account.service';
@@ -19,12 +21,12 @@ enum Status {
     activeError = 'activeError'
 }
 @Component({
-    standalone: false,
     selector: 'jhi-broker',
-    templateUrl: './broker.component.html'
+    templateUrl: './broker.component.html',
+    imports: [CommonModule, RouterModule, FontAwesomeModule, NgbModule],
 })
 export class BrokerComponent implements OnInit, OnDestroy {
-    brokers: IBroker[];
+    brokers: IBroker[] = [];
     broker: IBroker;
 
     currentAccount: any;
@@ -46,6 +48,8 @@ export class BrokerComponent implements OnInit, OnDestroy {
     public brokerStatusButton: string;
 
     lastError: string;
+
+    private readonly changeDetector = inject(ChangeDetectorRef);
 
     constructor(
         protected brokerService: BrokerService,
@@ -79,7 +83,9 @@ export class BrokerComponent implements OnInit, OnDestroy {
     loadAll() {
         this.brokerService.query().subscribe(
             (res: HttpResponse<IBroker[]>) => {
-                this.brokers = res.body;
+                this.brokers = res.body ?? [];
+                // Http callback was not refreshing *ngIf views; force CD so Create/table appears.
+                this.changeDetector.detectChanges();
 
                 if (this.brokers[0]) {
                     this.broker = this.brokers[0];
@@ -158,6 +164,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
                 this.brokerStatus = 'inactiveError';
                 break;
         }
+        this.changeDetector.detectChanges();
     }
 
     setBrokerStatusDefaults() {
@@ -224,6 +231,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
                     this.setbrokerStatus(response.body);
                 }
                 this.disableActionBtns = false;
+                this.changeDetector.detectChanges();
             },
             err => {
                 // this.getFlowLastError(this.broker.id, 'Start', err.error);
@@ -249,6 +257,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
                     }
                 }
                 this.disableActionBtns = false;
+                this.changeDetector.detectChanges();
             },
             err => {
                 // this.getFlowLastError(this.broker.id, 'Restart', err.error);
@@ -270,12 +279,14 @@ export class BrokerComponent implements OnInit, OnDestroy {
                     this.setbrokerStatus(response.body);
                 }
                 this.disableActionBtns = false;
+                this.changeDetector.detectChanges();
             },
             err => {
                 // this.getFlowLastError(this.broker.id, 'Stop', err.error);
                 this.isBrokerStatusOK = false;
                 this.brokerStatusError = `Flow with id=${this.broker.id} is not stopped.`;
                 this.disableActionBtns = false;
+                this.changeDetector.detectChanges();
             }
         );
     }

@@ -1,4 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpResponse } from '@angular/common/http';
 
@@ -6,6 +8,10 @@ import { Observable } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AlertError } from 'app/shared/alert';
+import { ForbiddenConnectionNamesValidatorDirective } from './connection-validation.directive';
+import { ForbiddenConnectionKeysValidatorDirective } from './connection-keys-validation.directive';
 
 import { IConnection, Connection } from 'app/shared/model/connection.model';
 import { ConnectionKeys } from 'app/shared/model/connection-keys.model';
@@ -17,9 +23,9 @@ import { ConnectionPopupService } from 'app/entities/connection/connection-popup
 import { Connections } from '../../shared/camel/connections';
 
 @Component({
-    standalone: false,
     selector: 'jhi-connection-dialog',
-    templateUrl: './connection-dialog.component.html'
+    templateUrl: './connection-dialog.component.html',
+    imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, ForbiddenConnectionNamesValidatorDirective, ForbiddenConnectionKeysValidatorDirective],
 })
 export class ConnectionDialogComponent implements OnInit {
 
@@ -229,7 +235,6 @@ export class ConnectionDialogComponent implements OnInit {
 }
 
 @Component({
-    standalone: false,
     selector: 'jhi-connection-popup',
     template: ''
 })

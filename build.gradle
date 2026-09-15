@@ -20,7 +20,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("org.springframework.boot:spring-boot-starter-liquibase:4.1.0")
+        classpath("org.springframework.boot:spring-boot-starter-liquibase:4.1.1")
     }
 }
 
@@ -41,7 +41,7 @@ plugins {
     id "io.spring.nohttp"
     id 'de.undercouch.download' version '5.7.0'
     id "io.github.ben-manes.versions" version "0.61.0"
-    id 'org.graalvm.buildtools.native' version '1.1.8'
+    id 'org.graalvm.buildtools.native' version '1.1.11'
     //id("org.openrewrite.rewrite") version("latest.release")
 }
 
@@ -81,14 +81,20 @@ configurations.configureEach {
         exclude group: 'io.netty', module: 'netty-transport-native-epoll'
         exclude group: 'io.netty', module: 'netty-transport-native-kqueue'
     }
+
+    /*
     resolutionStrategy.eachDependency { DependencyResolveDetails details ->
         if (details.requested.group.startsWith("org.graalvm")) {
             details.useVersion "25.2.4"
         }
-    }
+    }*/
 }
 
-
+dependencyManagement {
+    imports {
+        mavenBom "tools.jackson:jackson-bom:3.2.2"
+    }
+}
 
 idea {
     module {
@@ -289,6 +295,8 @@ dependencies {
 
     implementation group:  "org.assimbly", name: "oauth2token", version: "${version}", changing: true
     implementation group:  "org.assimbly", name: "sql", version: "${version}", changing: true
+
+    implementation platform("tools.jackson:jackson-bom:3.2.2")
 
     implementation "com.fasterxml.jackson.core:jackson-annotations"
     implementation "tools.jackson.core:jackson-databind"
@@ -494,7 +502,7 @@ dependencyUpdates {
 
 //After upgrading execute Gradle wrapper task: ./gradlew wrapper (gradlew.bat wrapper on Windows)
 wrapper {
-    gradleVersion = "9.7.0"
+    gradleVersion = "9.7.1"
 }
 
 if (project.hasProperty("nodeInstall")) {

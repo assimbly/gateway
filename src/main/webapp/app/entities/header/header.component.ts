@@ -1,4 +1,7 @@
 import { Component, OnInit, OnDestroy, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -6,6 +9,8 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
 import { Observable } from 'rxjs';
+import { Alert } from 'app/shared/alert';
+import { ForbiddenHeaderValidatorDirective } from './header-validation.directive';
 
 import { IHeader, Header } from 'app/shared/model/header.model';
 import { HeaderDeleteDialogComponent } from '././header-delete-dialog.component';
@@ -13,9 +18,9 @@ import { AccountService } from 'app/core/auth/account.service';
 import { HeaderService } from './header.service';
 
 @Component({
-    standalone: false,
     selector: 'jhi-header',
-    templateUrl: './header.component.html'
+    templateUrl: './header.component.html',
+    imports: [CommonModule, FormsModule, RouterModule, Alert, ForbiddenHeaderValidatorDirective],
 })
 export class HeaderComponent implements OnInit, OnChanges {
     @Input() headers: IHeader[];

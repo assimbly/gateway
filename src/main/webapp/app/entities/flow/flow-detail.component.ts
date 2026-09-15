@@ -1,5 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
+
+import { AlertError } from 'app/shared/alert';
 
 import { IFlow, Flow } from 'app/shared/model/flow.model';
 import { Step } from 'app/shared/model/step.model';
@@ -15,9 +19,9 @@ import { EventManager, EventWithContent } from 'app/core/util/event-manager.serv
 import { Subscription } from 'rxjs';
 
 @Component({
-  standalone: false,
   selector: 'jhi-flow-detail',
   templateUrl: './flow-detail.component.html',
+  imports: [CommonModule, RouterModule, AlertError],
 })
 export class FlowDetailComponent implements OnInit {
   flow: IFlow;

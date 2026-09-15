@@ -1,4 +1,6 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { Address, IAddress } from 'app/shared/model/address.model';
 
 import { QueueService } from './queue.service';
@@ -11,9 +13,9 @@ import { QueueDeleteDialogComponent } from 'app/entities/queue/queue-delete-dial
 import { QueueClearDialogComponent } from 'app/entities/queue/queue-clear-dialog.component';
 
 @Component({
-  standalone: false,
   selector: '[jhi-queue-row]',
   templateUrl: './queue-row.component.html',
+  imports: [RouterModule, FontAwesomeModule],
 })
 export class QueueRowComponent implements OnInit, OnDestroy {
   @Input() address: Address;

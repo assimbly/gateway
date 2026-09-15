@@ -1,4 +1,5 @@
 import 'zone.js';
+import 'zone.js/plugins/zone-patch-fetch';
 import '@angular/localize/init';
 
 // Fix needed for SockJS, see https://github.com/sockjs/sockjs-client/issues/439

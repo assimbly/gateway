@@ -2,15 +2,17 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AlertError } from 'app/shared/alert';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
 import { IConnectionKeys } from 'app/shared/model/connection-keys.model';
 import { ConnectionKeysService } from './connection-keys.service';
 
 @Component({
-    standalone: false,
     selector: 'jhi-connection-keys-delete-dialog',
-    templateUrl: './connection-keys-delete-dialog.component.html'
+    templateUrl: './connection-keys-delete-dialog.component.html',
+    imports: [FontAwesomeModule, AlertError],
 })
 export class ConnectionKeysDeleteDialogComponent {
     connectionKeys: IConnectionKeys;

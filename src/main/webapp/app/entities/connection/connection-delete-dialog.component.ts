@@ -1,15 +1,18 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AlertError } from 'app/shared/alert';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { IConnection } from 'app/shared/model/connection.model';
 import { ConnectionService } from './connection.service';
 
 @Component({
-    standalone: false,
     selector: 'jhi-connection-delete-dialog',
-    templateUrl: './connection-delete-dialog.component.html'
+    templateUrl: './connection-delete-dialog.component.html',
+    imports: [CommonModule, FontAwesomeModule, AlertError],
 })
 export class ConnectionDeleteDialogComponent {
     connection: IConnection;

@@ -1,8 +1,8 @@
 export type HealthStatus = 'UP' | 'DOWN' | 'UNKNOWN' | 'OUT_OF_SERVICE';
 
-export type HealthKey = 'diskSpace' | 'mail' | 'ping' | 'livenessState' | 'readinessState' | 'db';
+export type HealthKey = 'diskSpace' | 'ssl' | 'mail' | 'ping' | 'livenessState' | 'readinessState' | 'db';
 
-export interface Health {
+export interface HealthModel {
   status: HealthStatus;
   components?: Partial<Record<HealthKey, HealthDetails>>;
 }

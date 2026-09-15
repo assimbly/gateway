@@ -4,9 +4,9 @@ import { Observable } from 'rxjs';
 import dayjs from 'dayjs/esm';
 import { DATE_FORMAT } from 'app/config/input.constants';
 import { map } from 'rxjs/operators';
-import { KEYSTORE_PWD } from 'app/app.constants';
+import { environment } from 'environments/environment';
 
-import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { serverApiUrl } from 'app/config';
 
 import { createRequestOption } from 'app/shared/util/request-util';
 import { ICertificate } from 'app/shared/model/certificate.model';
@@ -17,9 +17,9 @@ type EntityArrayResponseType = HttpResponse<ICertificate[]>;
 @Injectable({ providedIn: 'root' })
 export class CertificateService {
 
-  public resourceUrl = this.applicationConfigService.getEndpointFor('api/certificates');
+  public resourceUrl = `${serverApiUrl}api/certificates`;
 
-  constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
+  constructor(protected http: HttpClient) {}
 
   create(certificate: ICertificate): Observable<EntityResponseType> {
     const copy = this.convertDateFromClient(certificate);
@@ -72,7 +72,7 @@ export class CertificateService {
     syncTrustore(): Observable<HttpResponse<any>> {
          const options = new HttpHeaders({
             keystoreName: "keystore.jks",
-            keystorePassword: KEYSTORE_PWD
+            keystorePassword: environment.KEYSTORE_PWD
         });
         return this.http.post(`${this.resourceUrl}/syncTrustore`, '', { observe: 'response', responseType: 'text' });
     }*/
@@ -80,7 +80,7 @@ export class CertificateService {
   updateTruststore(url: string): Observable<HttpResponse<any>> {
     const options = new HttpHeaders({
       keystoreName: 'keystore.jks',
-      keystorePassword: KEYSTORE_PWD,
+      keystorePassword: environment.KEYSTORE_PWD,
     });
 
     return this.http.post(`${this.resourceUrl}/update`, url, { observe: 'response', responseType: 'text' });
@@ -89,7 +89,7 @@ export class CertificateService {
   uploadCertificate(keystoreName, certificate, fileType): Observable<HttpResponse<any>> {
     const options = new HttpHeaders({
       keystoreName,
-      keystorePassword: KEYSTORE_PWD,
+      keystorePassword: environment.KEYSTORE_PWD,
       fileType,
     });
     return this.http.post(`${this.resourceUrl}/upload`, certificate, {
@@ -102,7 +102,7 @@ export class CertificateService {
   uploadP12Certificate(keystoreName, certificate, fileType, password): Observable<HttpResponse<any>> {
     const options = new HttpHeaders({
       keystoreName,
-      keystorePassword: KEYSTORE_PWD,
+      keystorePassword: environment.KEYSTORE_PWD,
       fileType,
       password,
     });
@@ -117,7 +117,7 @@ export class CertificateService {
   generateCertificate(keystoreName, cn): Observable<HttpResponse<any>> {
     const options = new HttpHeaders({
       keystoreName,
-      keystorePassword: KEYSTORE_PWD,
+      keystorePassword: environment.KEYSTORE_PWD,
       cn,
     });
 
@@ -144,7 +144,7 @@ export class CertificateService {
   deleteCertificate(certificateName: String): Observable<HttpResponse<any>> {
     const options = new HttpHeaders({
       keystoreName: 'keystore.jks',
-      keystorePassword: KEYSTORE_PWD,
+      keystorePassword: environment.KEYSTORE_PWD,
     });
 
     return this.http.get(`${this.resourceUrl}/delete/${certificateName}`, {

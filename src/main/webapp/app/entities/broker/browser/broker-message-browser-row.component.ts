@@ -1,12 +1,13 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { RouterModule } from '@angular/router';
 
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Message } from 'app/shared/model/message.model';
 
 @Component({
-  standalone: false,
   selector: '[jhi-broker-message-browser-row]',
   templateUrl: './broker-message-browser-row.component.html',
+  imports: [RouterModule],
 })
 export class BrokerMessageBrowserRowComponent implements OnInit, OnDestroy {
   @Input() message: Message;

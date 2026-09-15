@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, Routes } from '@angular/router';
-import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
+import { userRouteAccessService } from 'app/core/auth';
 import { Observable, of } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { Link } from 'app/shared/model/link.model';
@@ -35,7 +35,7 @@ export const linkRoute: Routes = [
       authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
   {
     path: 'link/:id/view',
@@ -47,7 +47,7 @@ export const linkRoute: Routes = [
       authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
   {
     path: 'link/new',
@@ -59,7 +59,7 @@ export const linkRoute: Routes = [
       authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
   {
     path: 'link/:id/edit',
@@ -71,6 +71,6 @@ export const linkRoute: Routes = [
       authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
 ];

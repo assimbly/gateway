@@ -31,9 +31,19 @@ management:
       base-path: /management
       exposure:
         include:
+          - configprops
+          - env
           - health
           - info
+          - jhimetrics
+          - jhiopenapigroups
+          - logfile
+          - loggers
+          - prometheus
+          - threaddump
           - metrics
+          - caches
+          - liquibase
   endpoint:
     health:
       show-details: "ALWAYS"

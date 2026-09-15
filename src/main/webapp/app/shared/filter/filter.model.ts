@@ -1,4 +1,5 @@
 import { ParamMap } from '@angular/router';
+
 import { Subject } from 'rxjs';
 
 export interface IFilterOptions {
@@ -26,7 +27,7 @@ export class FilterOption implements IFilterOption {
   }
 
   nameAsQueryParam(): string {
-    return 'filter[' + this.name + ']';
+    return `filter[${this.name}]`;
   }
 
   isSet(): boolean {
@@ -67,7 +68,7 @@ export class FilterOption implements IFilterOption {
 }
 
 export class FilterOptions implements IFilterOptions {
-  readonly filterChanges: Subject<FilterOption[]> = new Subject();
+  readonly filterChanges = new Subject<FilterOption[]>();
   private _filterOptions: FilterOption[];
 
   constructor(filterOptions: FilterOption[] = []) {
@@ -97,14 +98,13 @@ export class FilterOptions implements IFilterOptions {
     this._filterOptions = [];
 
     const filterRegex = /filter\[(.+)\]/;
-    params.keys
-      .filter(paramKey => filterRegex.test(paramKey))
-      .forEach(matchingParam => {
-        const matches = filterRegex.exec(matchingParam);
-        if (matches && matches.length > 1) {
-          this.getFilterOptionByName(matches[1], true).addValue(...params.getAll(matchingParam));
-        }
-      });
+    const matchingParams = params.keys.filter(paramKey => filterRegex.test(paramKey));
+    for (const matchingParam of matchingParams) {
+      const matches = filterRegex.exec(matchingParam);
+      if (matches?.[1]) {
+        this.getFilterOptionByName(matches[1], true).addValue(...params.getAll(matchingParam));
+      }
+    }
 
     if (oldFilters.equals(this)) {
       return false;
@@ -146,8 +146,7 @@ export class FilterOptions implements IFilterOptions {
   }
 
   protected getFilterOptionByName(name: string, add: true): FilterOption;
-  protected getFilterOptionByName(name: string, add: false): FilterOption | null;
-  protected getFilterOptionByName(name: string): FilterOption | null;
+  protected getFilterOptionByName(name: string, add?: false): FilterOption | null;
   protected getFilterOptionByName(name: string, add = false): FilterOption | null {
     const addOption = (option: FilterOption): FilterOption => {
       this._filterOptions.push(option);

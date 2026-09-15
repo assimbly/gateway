@@ -1,20 +1,12 @@
-import { Injectable } from '@angular/core';
+import { Service, inject } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { RouterStateSnapshot, TitleStrategy } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
 
-@Injectable()
+@Service()
 export class AppPageTitleStrategy extends TitleStrategy {
-  constructor(private translateService: TranslateService) {
-    super();
-  }
+  private readonly title = inject(Title);
 
-  override updateTitle(routerState: RouterStateSnapshot): void {
-    let pageTitle = this.buildTitle(routerState);
-    if (!pageTitle) {
-      pageTitle = 'global.title';
-    }
-    this.translateService.get(pageTitle).subscribe(title => {
-      document.title = title;
-    });
+  override updateTitle(_routerState: RouterStateSnapshot): void {
+    this.title.setTitle('Assimbly');
   }
 }

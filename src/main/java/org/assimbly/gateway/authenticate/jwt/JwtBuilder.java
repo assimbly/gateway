@@ -4,17 +4,16 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.assimbly.gateway.authenticate.util.helper.ConfigHelper;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.Random;
 
 public final class JwtBuilder {
 
-    private static final Random RANDOM = new Random();
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     private JwtBuilder() {
         //Static class cannot be instantiated.
@@ -26,9 +25,8 @@ public final class JwtBuilder {
      * @param name    claim of the token.
      * @param scope   claim of the token.
      * @return a valid signed JSON Web Token.
-     * @throws UnsupportedEncodingException when the encoding used to sign the token is not supported.
      */
-    public static String build(String name, String scope) throws UnsupportedEncodingException {
+    public static String build(String name, String scope) {
         String key = System.getenv("MONGO_SECRET_KEY");
         int expiration = Integer.parseInt(ConfigHelper.get("expiration"));
 
@@ -51,7 +49,7 @@ public final class JwtBuilder {
      * @return a date represented as a Date object.
      */
     private static Date creatExpiration(int seconds) {
-        LocalDateTime date = LocalDateTime.now();
+        LocalDateTime date = LocalDateTime.now(ZoneId.systemDefault());
         date = date.plusSeconds(seconds);
 
         Instant instant = date.atZone(ZoneId.systemDefault()).toInstant();

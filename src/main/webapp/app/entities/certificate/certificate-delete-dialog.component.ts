@@ -2,15 +2,17 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AlertError } from 'app/shared/alert';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
 import { ICertificate } from 'app/shared/model/certificate.model';
 import { CertificateService } from './certificate.service';
 
 @Component({
-    standalone: false,
     selector: 'jhi-certificate-delete-dialog',
-    templateUrl: './certificate-delete-dialog.component.html'
+    templateUrl: './certificate-delete-dialog.component.html',
+    imports: [FontAwesomeModule, AlertError],
 })
 export class CertificateDeleteDialogComponent {
     certificate: ICertificate;

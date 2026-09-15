@@ -1,17 +1,21 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AlertService } from 'app/core/util/alert.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AlertError } from 'app/shared/alert';
 import { IHeader } from 'app/shared/model/header.model';
 import { HeaderService } from './header.service';
 import { IMessage } from 'app/shared/model/message.model';
 import { MessageService } from 'app/entities/message/message.service';
 
 @Component({
-    standalone: false,
     selector: 'jhi-header-update',
-    templateUrl: './header-update.component.html'
+    templateUrl: './header-update.component.html',
+    imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError],
 })
 export class HeaderUpdateComponent implements OnInit {
     header: IHeader;

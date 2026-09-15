@@ -3,41 +3,36 @@ import { Routes } from '@angular/router';
 
 const routes: Routes = [
   {
-    path: 'user-management',
-    loadChildren: () => import('./user-management/user-management.route'),
-    title: 'userManagement.home.title',
-  },
-  {
     path: 'docs',
-    loadComponent: () => import('./docs/docs.component'),
+    loadComponent: () => import('./docs/docs'),
     title: 'global.menu.admin.apidocs',
   },
   {
     path: 'configuration',
-    loadComponent: () => import('./configuration/configuration.component'),
+    loadComponent: () => import('./configuration/configuration'),
     title: 'configuration.title',
   },
   {
     path: 'health',
-    loadComponent: () => import('./health/health.component'),
+    loadComponent: () => import('./health/health'),
     title: 'health.title',
   },
   {
     path: 'logs',
-    loadComponent: () => import('./logs/logs.component'),
+    loadComponent: () => import('./logs/logs'),
     title: 'logs.title',
   },
   {
-    path: 'logviewer',
-    loadComponent: () => import('./logviewer/logviewer.component'),
-    title: 'logviewer.title',
-  },
-  {
     path: 'metrics',
-    loadComponent: () => import('./metrics/metrics.component'),
+    loadComponent: () => import('./metrics/metrics'),
     title: 'metrics.title',
   },
-  /* jhipster-needle-add-admin-route - JHipster will add admin routes here */
+   {
+     path: 'logviewer',
+     loadComponent: () => import('./logviewer/logviewer.component'),
+     title: 'logviewer.title',
+   }
+  // jhipster-needle-add-admin-route - JHipster will add admin routes here
 ];
 
 export default routes;

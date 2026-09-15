@@ -1,4 +1,6 @@
 import { Component, OnInit, OnDestroy, AfterContentInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
@@ -10,9 +12,9 @@ import { DATE_TIME_FORMAT } from 'app/config/input.constants';
 import dayjs from 'dayjs/esm';
 
 @Component({
-  standalone: false,
   selector: 'jhi-certificate-self-sign-dialog',
   templateUrl: './certificate-self-sign-dialog.component.html',
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class CertificateSelfSignDialogComponent implements OnInit {
   certificate: ICertificate;

@@ -30,7 +30,7 @@
             "outputPath": "build/resources/main/static/",
             "index": "src/main/webapp/index.html",
             "main": "src/main/webapp/main.ts",
-            "polyfills": ["zone.js"],
+            "polyfills": ["zone.js", "zone.js/plugins/zone-patch-fetch"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "stylePreprocessorOptions": {

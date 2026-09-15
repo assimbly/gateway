@@ -23,7 +23,7 @@ import { CertificatePopupService } from './certificate-popup.service';
 const ENTITY_STATES = [...certificateRoute];
 
 @NgModule({
-  imports: [SharedModule, SortDirective, SortByDirective, FormsModule, ReactiveFormsModule, PopoverModule.forRoot(), RouterModule.forChild(ENTITY_STATES)],
+  imports: [SharedModule, SortDirective, SortByDirective, FormsModule, ReactiveFormsModule, PopoverModule, RouterModule.forChild(ENTITY_STATES)],
   declarations: [
     CertificateComponent,
     CertificateDetailComponent,

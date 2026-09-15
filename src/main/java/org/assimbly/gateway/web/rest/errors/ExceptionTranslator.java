@@ -64,7 +64,13 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     public @Nullable ResponseEntity<Object> handleAnyException(Throwable ex, NativeWebRequest request) {
         LOG.debug("Converting Exception to Problem Details:", ex);
         ProblemDetailWithCause pdCause = wrapAndCustomizeProblem(ex, request);
-        return handleExceptionInternal((Exception) ex, pdCause, Objects.requireNonNull(buildHeaders(ex)), HttpStatusCode.valueOf(pdCause.getStatus()), request);
+		return handleExceptionInternal(
+			(Exception) ex,
+			pdCause,
+			buildHeaders(ex),
+			HttpStatusCode.valueOf(pdCause.getStatus()),
+			request
+		);
     }
 
     @SuppressWarnings("java:S2638")

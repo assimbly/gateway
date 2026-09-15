@@ -1,22 +1,28 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 import { Connection } from 'app/shared/model/connection.model';
 import { Observable, Subscription } from 'rxjs';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
+import { Alert } from 'app/shared/alert';
 
 import { ConnectionKeysDeleteDialogComponent } from './connection-keys-delete-dialog.component';
 import { IConnectionKeys, ConnectionKeys } from 'app/shared/model/connection-keys.model';
 import { AccountService } from 'app/core/auth/account.service';
 import { ConnectionKeysService } from './connection-keys.service';
 import { Connections } from '../../shared/camel/connections';
+import { ForbiddenConnectionKeysValidatorDirective } from './connection-keys-validation.directive';
 
 @Component({
-    standalone: false,
     selector: 'jhi-connection-keys',
-    templateUrl: './connection-keys.component.html'
+    templateUrl: './connection-keys.component.html',
+    imports: [CommonModule, FormsModule, RouterModule, FontAwesomeModule, Alert, ForbiddenConnectionKeysValidatorDirective],
 })
 export class ConnectionKeysComponent implements OnInit, OnChanges {
     @Input() connectionKeys: Array<IConnectionKeys> = [];

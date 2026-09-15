@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, Routes } from '@angular/router';
-import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
+import { userRouteAccessService } from 'app/core/auth';
 import { Observable, of } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { Connection } from 'app/shared/model/connection.model';
@@ -37,7 +37,7 @@ export const connectionRoute: Routes = [
       authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
   {
     path: 'connection',
@@ -46,7 +46,7 @@ export const connectionRoute: Routes = [
       authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
   {
     path: 'connection/:id/view',
@@ -58,7 +58,7 @@ export const connectionRoute: Routes = [
       authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
   {
     path: 'connection/new',
@@ -70,7 +70,7 @@ export const connectionRoute: Routes = [
       authorities: ['ROLE_ADMIN'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
   {
     path: 'connection-all-new',
@@ -79,7 +79,7 @@ export const connectionRoute: Routes = [
       authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
   {
     path: 'connection/:id/edit',
@@ -91,7 +91,7 @@ export const connectionRoute: Routes = [
       authorities: ['ROLE_ADMIN'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
 ];
 
@@ -103,7 +103,7 @@ export const connectionPopupRoute: Routes = [
       authorities: ['ROLE_ADMIN'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
     outlet: 'popup',
   },
   {
@@ -113,7 +113,7 @@ export const connectionPopupRoute: Routes = [
       authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
     outlet: 'popup',
   },
   {
@@ -123,7 +123,7 @@ export const connectionPopupRoute: Routes = [
       authorities: ['ROLE_ADMIN'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
     outlet: 'popup',
   }
 ];

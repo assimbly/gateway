@@ -1,13 +1,17 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AlertError } from 'app/shared/alert';
 import { DataUtils } from 'app/core/util/data-util.service';
 
 import { IRoute } from 'app/shared/model/route.model';
 
 @Component({
-    standalone: false,
     selector: 'jhi-route-detail',
-    templateUrl: './route-detail.component.html'
+    templateUrl: './route-detail.component.html',
+    imports: [CommonModule, RouterModule, FontAwesomeModule, AlertError],
 })
 export class RouteDetailComponent implements OnInit {
     route: IRoute | null = null;

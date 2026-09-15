@@ -20,14 +20,14 @@
   <div class="table-responsive">
     <table class="table table-striped">
       <thead>
-        <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse">
+        <tr jhiSort [(sortState)]="sortState">
           <th jhiSortBy="name">
             <span>Name</span>
-            <span class="fa fa-sort"></span>
+            <fa-icon></fa-icon>
           </th>
           <th jhiSortBy="type">
             <span>Type</span>
-            <span class="fa fa-sort"></span>
+            <fa-icon></fa-icon>
           </th>
           <th></th>
         </tr>

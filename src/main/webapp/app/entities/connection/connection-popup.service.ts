@@ -4,7 +4,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ConnectionService } from './connection.service';
 import { IConnection, Connection } from 'app/shared/model/connection.model';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ConnectionPopupService {
     private ngbModalRef: NgbModalRef;
 

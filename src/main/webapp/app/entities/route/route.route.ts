@@ -4,7 +4,7 @@ import { Resolve, ActivatedRouteSnapshot, Routes, Router } from '@angular/router
 import { Observable, of, EMPTY } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
 
-import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
+import { userRouteAccessService } from 'app/core/auth';
 import { IRoute, Route } from 'app/shared/model/route.model';
 import { RouteService } from './route.service';
 import { RouteComponent } from './route.component';
@@ -43,7 +43,7 @@ export const routeRoute: Routes = [
       authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
   {
     path: 'route/:id/view',
@@ -55,7 +55,7 @@ export const routeRoute: Routes = [
       authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
   {
     path: 'route/new',
@@ -67,7 +67,7 @@ export const routeRoute: Routes = [
       authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
   {
     path: 'route/:id/edit',
@@ -79,7 +79,7 @@ export const routeRoute: Routes = [
       authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
   },
 ];
 
@@ -91,7 +91,7 @@ export const routePopupRoute: Routes = [
       authorities: ['ROLE_ADMIN'],
       pageTitle: 'Headers',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
     outlet: 'popup',
   },
   {
@@ -101,7 +101,7 @@ export const routePopupRoute: Routes = [
       authorities: ['ROLE_ADMIN'],
       pageTitle: 'Headers',
     },
-    canActivate: [UserRouteAccessService],
+    canActivate: [userRouteAccessService],
     outlet: 'popup',
   }
 ];

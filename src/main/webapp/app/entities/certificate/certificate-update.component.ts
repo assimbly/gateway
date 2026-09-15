@@ -1,13 +1,16 @@
 import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { forkJoin } from 'rxjs';
 import dayjs from 'dayjs/esm';
 import { DATE_TIME_FORMAT } from 'app/config/input.constants';
-import { KEYSTORE_PWD } from 'app/app.constants';
+import { environment } from 'environments/environment';
 
 import { Router } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AlertError } from 'app/shared/alert';
 
 import { ICertificate } from 'app/shared/model/certificate.model';
 import { CertificateService } from './certificate.service';
@@ -15,9 +18,9 @@ import { CertificateService } from './certificate.service';
 // import { faSync } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
-  standalone: false,
   selector: 'jhi-certificate-update',
   templateUrl: './certificate-update.component.html',
+  imports: [FormsModule, FontAwesomeModule, AlertError],
 })
 export class CertificateUpdateComponent implements OnInit {
   certificate: ICertificate;
@@ -43,7 +46,7 @@ export class CertificateUpdateComponent implements OnInit {
 
     this.certificate.certificateExpiry = this.certificateExpiry != null ? dayjs(this.certificateExpiry, DATE_TIME_FORMAT) : null;
 
-    this.certificateService.importCertificate(this.certificate.url, 'truststore.jks', KEYSTORE_PWD).subscribe(
+    this.certificateService.importCertificate(this.certificate.url, 'truststore.jks', environment.KEYSTORE_PWD).subscribe(
       res => {
         const json = JSON.parse(res.body);
 

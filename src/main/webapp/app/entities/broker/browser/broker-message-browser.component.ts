@@ -1,10 +1,21 @@
 import { Component, OnInit, OnDestroy, TemplateRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal, NgbNavChangeEvent, NgbNavModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import { CodemirrorModule } from '@ctrl/ngx-codemirror';
+
+import { SortDirective, SortByDirective, SortState } from 'app/shared/sort';
+
+import { BrokerMessageBrowserRowComponent } from './broker-message-browser-row.component';
+import { MessageSearchByMessageIdPipe } from '../message.searchbymessageid.pipe';
+import { MessageSortByHeaderPipePipe } from '../message.sortbyheader.pipe';
 
 import { IMessage } from 'app/shared/model/message.model';
 import { AccountService } from 'app/core/auth/account.service';
@@ -20,9 +31,21 @@ import { ViewChild } from '@angular/core'
 import { CodemirrorComponent } from "@ctrl/ngx-codemirror";
 
 @Component({
-  standalone: false,
   selector: 'jhi-broker-message-browser',
   templateUrl: './broker-message-browser.component.html',
+  imports: [
+    CommonModule,
+    FormsModule,
+    FontAwesomeModule,
+    NgbNavModule,
+    InfiniteScrollModule,
+    CodemirrorModule,
+    SortDirective,
+    SortByDirective,
+    BrokerMessageBrowserRowComponent,
+    MessageSearchByMessageIdPipe,
+    MessageSortByHeaderPipePipe,
+  ],
 })
 export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
 
@@ -48,8 +71,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   itemsPerPage: number;
   links: any;
 
-  predicate: any;
-  reverse: any;
+  sortState: SortState = { predicate: 'name', order: 'asc' };
   totalItems = -1;
 
   page: any;
@@ -62,7 +84,6 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   searchText = '';
   active = '0';
   descending = false;
-  ascending = true;
   subtitle: string;
 
   editorMode: any = 'text';
@@ -86,8 +107,6 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     this.links = {
       last: 0,
     };
-    this.predicate = 'name';
-    this.reverse = true;
   }
 
   ngOnInit() {

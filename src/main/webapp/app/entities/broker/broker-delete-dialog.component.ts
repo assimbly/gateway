@@ -2,15 +2,17 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AlertError } from 'app/shared/alert';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
 import { IBroker } from 'app/shared/model/broker.model';
 import { BrokerService } from './broker.service';
 
 @Component({
-    standalone: false,
     selector: 'jhi-broker-delete-dialog',
-    templateUrl: './broker-delete-dialog.component.html'
+    templateUrl: './broker-delete-dialog.component.html',
+    imports: [FontAwesomeModule, AlertError],
 })
 export class BrokerDeleteDialogComponent {
     broker: IBroker;

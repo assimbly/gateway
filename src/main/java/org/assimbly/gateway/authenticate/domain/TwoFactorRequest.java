@@ -5,7 +5,9 @@ public class TwoFactorRequest {
     private String email;
     private Integer token;
 
-    public TwoFactorRequest() {}
+    public TwoFactorRequest() {
+        // Empty constructor
+    }
 
     public String getEmail() {
         return email;

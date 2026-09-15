@@ -16,7 +16,7 @@ import { QueueSearchByNamePipe } from './queue.searchbyname.pipe';
 import { QueueClearDialogComponent } from 'app/entities/queue/queue-clear-dialog.component';
 
 @NgModule({
-  imports: [SharedModule, SortDirective, SortByDirective, RouterModule.forChild(queueRoute), ReactiveFormsModule, PopoverModule.forRoot()],
+  imports: [SharedModule, SortDirective, SortByDirective, RouterModule.forChild(queueRoute), ReactiveFormsModule, PopoverModule],
   declarations: [
     QueueComponent,
     QueueDetailComponent,

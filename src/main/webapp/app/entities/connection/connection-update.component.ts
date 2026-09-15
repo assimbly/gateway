@@ -1,6 +1,13 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AlertError } from 'app/shared/alert';
+import { ForbiddenConnectionNamesValidatorDirective } from './connection-validation.directive';
+import { ForbiddenConnectionKeysValidatorDirective } from './connection-keys-validation.directive';
 
 import { Observable } from 'rxjs';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
@@ -14,9 +21,9 @@ import { RequiredConnectionKey } from '../connection-keys/connection-keys.compon
 import { Connections } from '../../shared/camel/connections';
 
 @Component({
-  standalone: false,
   selector: 'jhi-connection-update',
   templateUrl: './connection-update.component.html',
+  imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, ForbiddenConnectionNamesValidatorDirective, ForbiddenConnectionKeysValidatorDirective],
 })
 export class ConnectionUpdateComponent implements OnInit {
   connection: IConnection;

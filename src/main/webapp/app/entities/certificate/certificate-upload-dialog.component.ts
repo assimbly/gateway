@@ -1,4 +1,6 @@
 import { Component, OnInit, OnDestroy, AfterContentInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -9,9 +11,9 @@ import { DATE_TIME_FORMAT } from 'app/config/input.constants';
 import dayjs from 'dayjs/esm';
 
 @Component({
-  standalone: false,
   selector: 'jhi-certificate-upload-dialog',
   templateUrl: './certificate-upload-dialog.component.html',
+  imports: [CommonModule, FormsModule],
 })
 export class CertificateUploadDialogComponent implements AfterContentInit {
   certificate: ICertificate;

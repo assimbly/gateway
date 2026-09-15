@@ -1,9 +1,15 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import { SortDirective, SortByDirective, SortState } from 'app/shared/sort';
+import { HasAnyAuthorityDirective } from 'app/shared/auth';
 
 import { IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
 import { EnvironmentVariablesDeleteDialogComponent } from './environment-variables-delete-dialog.component';
@@ -11,9 +17,9 @@ import { AccountService } from 'app/core/auth/account.service';
 import { EnvironmentVariablesService } from './environment-variables.service';
 
 @Component({
-    standalone: false,
     selector: 'jhi-environment-variables',
-    templateUrl: './environment-variables.component.html'
+    templateUrl: './environment-variables.component.html',
+    imports: [CommonModule, RouterModule, FontAwesomeModule, InfiniteScrollModule, SortDirective, SortByDirective, HasAnyAuthorityDirective],
 })
 export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
     environmentVariables: IEnvironmentVariables[];
@@ -21,8 +27,7 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
     eventSubscriber: Subscription;
 
     // sorting
-    predicate: any;
-    reverse: any;
+    sortState: SortState = { predicate: 'key', order: 'asc' };
     page: any;
     last: any = 100;
 
@@ -34,8 +39,6 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
         protected accountService: AccountService
     ) {
         this.page = 0;
-        this.predicate = 'key';
-        this.reverse = true;
     }
 
     loadAll() {
@@ -111,9 +114,10 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
       );
 	}
 
-    sort() {
-        const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
-        if (this.predicate !== 'key') {
+    sort(): string[] {
+        const { predicate, order } = this.sortState;
+        const result = [predicate + ',' + order];
+        if (predicate !== 'key') {
             result.push('key');
         }
         return result;

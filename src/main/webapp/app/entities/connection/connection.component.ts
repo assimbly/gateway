@@ -1,8 +1,13 @@
 import { Component, OnInit, OnDestroy, SimpleChanges, OnChanges } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 import { IConnection, Connection } from 'app/shared/model/connection.model';
 import { ConnectionKeys } from 'app/shared/model/connection-keys.model';
@@ -14,9 +19,9 @@ import { Connections } from '../../shared/camel/connections';
 import { Observable } from 'rxjs';
 
 @Component({
-    standalone: false,
     selector: 'jhi-connection',
     templateUrl: './connection.component.html',
+    imports: [CommonModule, FormsModule, RouterModule, FontAwesomeModule, NgSelectModule, ConnectionKeysComponent],
 })
 export class ConnectionComponent implements OnInit, OnDestroy, OnChanges {
     [x: string]: any;
