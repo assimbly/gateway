@@ -1,5 +1,5 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { ApplicationConfig, LOCALE_ID, inject } from '@angular/core';
+import { ApplicationConfig, LOCALE_ID, inject, provideZoneChangeDetection } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import {
   NavigationError,
@@ -49,6 +49,7 @@ if (environment.DEBUG_INFO_ENABLED) {
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideZoneChangeDetection({ eventCoalescing: true }),
     provideTranslation(),
     provideRouter(routes, ...routerFeatures),
     // Set this to true to enable service worker (PWA)

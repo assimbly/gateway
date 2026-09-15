@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -103,7 +103,8 @@ export class FlowRowComponent implements OnInit {
     private modalService: NgbModal,
     private router: Router,
     private eventManager: EventManager,
-	  private collectors: Collectors
+	  private collectors: Collectors,
+    private changeDetector: ChangeDetectorRef
   ) {
 
     this.router.routeReuseStrategy.shouldReuseRoute = function () {
@@ -144,7 +145,7 @@ export class FlowRowComponent implements OnInit {
     this.isFlowStatusOK = true;
     this.flowStatus = 'unconfigured';
     this.lastError = '';
-    this.setFlowStatus(this.flowStatus);
+    this.setFlowStatus(this.flowStatus, false);
   }
 
   getFlowStatus(id: number) {
@@ -154,7 +155,7 @@ export class FlowRowComponent implements OnInit {
     });
   }
 
-  setFlowStatus(status: string): void {
+  setFlowStatus(status: string, refreshView = true): void {
 
     switch (status) {
       case '':
@@ -220,6 +221,9 @@ export class FlowRowComponent implements OnInit {
         this.flowStatusButton = `Unknown`;
         this.setErrorMessage(unknownStatus,this.statusMessage);
         break;
+    }
+    if (refreshView) {
+      this.changeDetector.detectChanges();
     }
   }
 
@@ -644,15 +648,15 @@ export class FlowRowComponent implements OnInit {
           this.flowService.start(this.flow.id).subscribe(
             response => {
               this.statusMessage = JSON.parse(response.body);
-   			      this.setFlowStatus(this.statusMessage.flow.event);
               this.disableActionBtns = false;
+   			      this.setFlowStatus(this.statusMessage.flow.event);
             },
             err => {
               this.statusMessage = JSON.parse(err.error);
+              this.disableActionBtns = false;
      			    this.setFlowStatus('error');
               this.flowStatusError = `Flow with id=${this.flow.id} is not started.`;
               this.isFlowStatusOK = false;
-              this.disableActionBtns = false;
             }
           );
         });
@@ -673,14 +677,14 @@ export class FlowRowComponent implements OnInit {
     this.flowService.pause(this.flow.id).subscribe(
       response => {
         this.statusMessage = JSON.parse(response.body);
-	      this.setFlowStatus(this.statusMessage.flow.event);
         this.disableActionBtns = false;
+	      this.setFlowStatus(this.statusMessage.flow.event);
       },
       err => {
+        this.disableActionBtns = false;
 		    this.setFlowStatus('error');
         this.isFlowStatusOK = false;
         this.flowStatusError = `Flow with id=${this.flow.id} is not paused`;
-        this.disableActionBtns = false;
       }
     );
   }
@@ -696,14 +700,14 @@ export class FlowRowComponent implements OnInit {
           this.flowService.resume(this.flow.id).subscribe(
             response => {
               this.statusMessage = JSON.parse(response.body);
-   			      this.setFlowStatus(this.statusMessage.flow.event);
               this.disableActionBtns = false;
+   			      this.setFlowStatus(this.statusMessage.flow.event);
             },
             err => {
+              this.disableActionBtns = false;
      			    this.setFlowStatus('error');
               this.isFlowStatusOK = false;
               this.flowStatusError = `Flow with id=${this.flow.id} is not resumed.`;
-              this.disableActionBtns = false;
             }
           );
         });
@@ -731,14 +735,14 @@ export class FlowRowComponent implements OnInit {
           this.flowService.restart(this.flow.id).subscribe(
             response => {
               this.statusMessage = JSON.parse(response.body);
-   			      this.setFlowStatus(this.statusMessage.flow.event);
               this.disableActionBtns = false;
+   			      this.setFlowStatus(this.statusMessage.flow.event);
             },
             err => {
+              this.disableActionBtns = false;
      			    this.setFlowStatus('error');
               this.isFlowStatusOK = false;
               this.flowStatusError = `Flow with id=${this.flow.id} is not started.`;
-              this.disableActionBtns = false;
             }
           );
         });
@@ -760,14 +764,14 @@ export class FlowRowComponent implements OnInit {
     this.flowService.stop(this.flow.id).subscribe(
       response => {
         this.statusMessage = JSON.parse(response.body);
-	      this.setFlowStatus(this.statusMessage.flow.event);
         this.disableActionBtns = false;
+	      this.setFlowStatus(this.statusMessage.flow.event);
       },
       err => {
+        this.disableActionBtns = false;
 		    this.setFlowStatus('error');
         this.isFlowStatusOK = false;
         this.flowStatusError = `Flow with id=${this.flow.id} is not stopped.`;
-        this.disableActionBtns = false;
       }
     );
   }

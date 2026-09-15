@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -77,7 +77,8 @@ export class FlowComponent implements OnInit, OnDestroy {
     protected parseLinks: ParseLinks,
     protected accountService: AccountService,
     protected integrationService: IntegrationService,
-    protected router: Router
+    protected router: Router,
+    protected changeDetector: ChangeDetectorRef
   ) {
     this.flows = [];
     this.itemsPerPage = ITEMS_PER_PAGE + 5;
@@ -254,6 +255,7 @@ export class FlowComponent implements OnInit, OnDestroy {
       this.flows.push(data[i]);
     }
     this.totalItems = headers.get('X-Total-Count');
+    this.changeDetector.detectChanges();
   }
 
   protected onError(errorMessage: string) {
