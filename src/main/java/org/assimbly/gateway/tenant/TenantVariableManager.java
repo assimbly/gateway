@@ -6,7 +6,8 @@ import org.assimbly.gateway.variables.domain.EnvironmentValue;
 import org.assimbly.gateway.variables.domain.TenantVariable;
 import org.assimbly.util.EncryptionUtil;
 
-import java.util.Date;
+import java.time.Instant;
+import java.util.Optional;
 
 public class TenantVariableManager {
 
@@ -67,20 +68,24 @@ public class TenantVariableManager {
             tenantVariable.set_type(tenantVarType.getType());
         }
 
-        if (!tenantVariable.find(environment).isPresent()) {
+        if (tenantVariable.find(environment).isEmpty()) {
             tenantVariable.put(new EnvironmentValue(environment));
         }
 
-        EnvironmentValue envValue = tenantVariable.find(environment).get();
 
-        if (encrypt) {
-            value = encrypt(value);
+        Optional<EnvironmentValue> environmentOptional = tenantVariable.find(environment);
+
+        if(environmentOptional.isPresent()) {
+            EnvironmentValue envValue = environmentOptional.get();
+
+            if (encrypt) {
+                value = encrypt(value);
+            }
+
+            envValue.setEncrypted(encrypt);
+            envValue.setValue(value);
+            envValue.setLastUpdate(Instant.now().toEpochMilli());
         }
-
-        envValue.setEncrypted(encrypt);
-        envValue.setValue(value);
-        envValue.setLastUpdate(new Date().getTime());
-
         MongoDao.updateTenantVariable(tenantVariable, tenant, tenantVariableExists);
     }
 

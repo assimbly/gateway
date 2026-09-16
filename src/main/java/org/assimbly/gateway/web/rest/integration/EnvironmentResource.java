@@ -55,8 +55,7 @@ public class EnvironmentResource {
         	confImport.convertConfigurationToDB(integrationid, contentType, configuration);
         	return ResponseUtil.createSuccessResponse(integrationid, mediaType, "setConfiguration", "Gateway configuration set");
    		} catch (Exception e) {
-       		log.error("Import of configuration failed: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Import of configuration failed: {}", e.getMessage(), e);
             return ResponseUtil.createFailureResponse(integrationid, mediaType, "setConfiguration", e.getMessage());
    		}
 
@@ -82,14 +81,13 @@ public class EnvironmentResource {
        	try {
 			configuration = confExport.convertDBToConfiguration(integrationid, mediaType,isPlaceholderReplacement);
 			if(configuration.startsWith("Error")||configuration.startsWith("Warning")) {
-				log.error("Failed to get configuration: " + configuration);
+                log.error("Failed to get configuration: {}", configuration);
 				return ResponseUtil.createFailureResponse(integrationid, mediaType, "getGatewayConfiguration", configuration);
 			}
 			return ResponseUtil.createSuccessResponse(integrationid, mediaType, "getGatewayConfiguration", configuration, true);
 
    		} catch (Exception e) {
-            log.error("Failed to get configuration: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Failed to get configuration: {}", e.getMessage(), e);
    			return ResponseUtil.createFailureResponse(integrationid, mediaType, "getGatewayConfiguration", e.getMessage());
    		}
 
@@ -122,8 +120,7 @@ public class EnvironmentResource {
 			return ResponseUtil.createSuccessResponse(integrationid, mediaType, "getConfigurationByFlowids", configuration, true);
 
    		} catch (Exception e) {
-            log.error("Failed to get configuration by flowids: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Failed to get configuration by flowids: {}", e.getMessage(), e);
    			return ResponseUtil.createFailureResponse(integrationid, mediaType, "getConfigurationByFlowids", e.getMessage());
    		}
 
@@ -152,8 +149,7 @@ public class EnvironmentResource {
        		confImport.convertFlowConfigurationToDB(integrationid, flowid, mediaType, configuration);
 			return ResponseUtil.createSuccessResponse(integrationid, mediaType, "setFlowConfiguration", "Flow configuration set");
    		} catch (Exception e) {
-            log.error("Failed to set configuration: " + e.getMessage() + " for flowid=" + flowid);
-            e.printStackTrace();
+            log.error("Failed to set configuration: {} for flowid={}", e.getMessage(), flowid, e);
    			return ResponseUtil.createFailureResponse(integrationid, mediaType, "setFlowConfiguration", e.getMessage());
    		}
     }
@@ -183,8 +179,7 @@ public class EnvironmentResource {
 			}
 			return ResponseUtil.createSuccessResponse(integrationid, mediaType, "getFlowConfiguration", configuration, true);
    		} catch (Exception e) {
-            log.error("Failed to get configuration: " + e.getMessage() + " for flowid=" + flowid);
-            e.printStackTrace();
+            log.error("Failed to get configuration: {} for flowid={}", e.getMessage(), flowid, e);
    			return ResponseUtil.createFailureResponse(integrationid, mediaType, "getFlowConfiguration", e.getMessage());
    		}
     }

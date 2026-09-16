@@ -108,7 +108,7 @@
           <div class="col-8">
             <input
               style="border: 2px solid lightgrey; border-radius: 4px;font-weight:bold; font-size: 24px; margin-bottom: 1.5em; min-width: 866px;"
-              type="text" class="form-control" id="name" placeholder="Type flowname..." *ngIf="flow"
+              type="text" class="form-control" id="name" #flowNameInput placeholder="Type flowname..." *ngIf="flow"
               formControlName="name"/>
             <div
               *ngIf="editFlowForm['controls'].name.errors && (editFlowForm['controls'].name.dirty || editFlowForm['controls'].name.touched)">
@@ -336,17 +336,26 @@
                                              bindValue="name" [addTag]="addOptionTag" formControlName="key"
                                              [ngStyle]="{'text-align' : 'left'}"
                                              id="field_options-key-{{idx}}"
-                                             (change)="changeOptionSelection(selectedOptions[index][idx], index,idx, step)">
+                                             (change)="changeOptionSelection(selectedOptions[index][idx], index,idx, step)"
+                                             (close)="clearOptionHover(index)">
                                     <ng-template ng-option-tmp let-item="item">
-                                      <div [ngbTooltip]="optionTooltip" tooltipClass="option-tooltip"
-                                           placement="bottom" container="body">{{item.displayName}}
+                                      <div (mouseenter)="onOptionHover(index, item)">{{item.displayName}}</div>
+                                    </ng-template>
+                                    <ng-template ng-footer-tmp>
+                                      <div class="option-desc-footer">
+                                        <ng-container *ngIf="hoveredOptionByStep[index] as opt; else optionDescPlaceholder">
+                                          <div class="option-desc-footer-title">{{opt.displayName}}</div>
+                                          <div class="option-desc-footer-body">{{opt.description}}</div>
+                                          <div class="option-desc-footer-meta">
+                                            <span><b>Group:</b> {{opt.group}}</span>
+                                            <span><b>Type:</b> {{opt.type}}</span>
+                                            <span *ngIf="opt.hasOwnProperty('defaultValue')"><b>Default:</b> {{opt.defaultValue}}</span>
+                                          </div>
+                                        </ng-container>
+                                        <ng-template #optionDescPlaceholder>
+                                          <div class="option-desc-footer-placeholder">Hover an option to see its description</div>
+                                        </ng-template>
                                       </div>
-                                      <ng-template #optionTooltip>
-                                        <div>
-                                          <b>Description: </b>{{item.description}}<br/><br/><b>Group: </b>{{item.group}}<br/><b>DataType: </b>{{item.type}}<br/><span
-                                          *ngIf="item.hasOwnProperty('defaultValue')"><b>DefaultValue:</b> {{item.defaultValue}}</span>
-                                        </div>
-                                      </ng-template>
                                     </ng-template>
                                   </ng-select>
                                 </div>

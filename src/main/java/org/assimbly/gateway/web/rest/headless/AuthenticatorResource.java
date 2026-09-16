@@ -27,12 +27,12 @@ public class AuthenticatorResource {
 
     private static final GoogleAuthenticator authenticator = new GoogleAuthenticator();
 
-    private MongoDao mongoDao;
-    private String database = ConfigHelper.get("baseDatabaseName");
+    private final MongoDao mongoDao;
 
     private final Logger log = LoggerFactory.getLogger(AuthenticatorResource.class);
 
     public AuthenticatorResource(){
+        String database = ConfigHelper.get("baseDatabaseName");
         authenticator.setCredentialRepository(new GoogleCredentialsRepository(database));
         mongoDao = new MongoDao(database);
     }
@@ -43,13 +43,13 @@ public class AuthenticatorResource {
      */
     @GetMapping("/authentication/register")
     public ResponseEntity<String> registerTwoFactorAuthentication(
-        @RequestHeader(value = "Authorization") String Authorization,
+        @RequestHeader(value = "Authorization") String authorization,
         @RequestHeader(value = "domainName") String domainName
     ) {
         log.debug("REST request to register two-factor authentication");
         try {
 
-            String userEmail = JwtValidator.decode(Authorization).get("name", String.class);
+            String userEmail = JwtValidator.decode(authorization).get("name", String.class);
             User user = mongoDao.findUserByEmail(userEmail);
 
             String issuer = "Fluxygen - %s".formatted(CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, domainName));
@@ -99,10 +99,10 @@ public class AuthenticatorResource {
      * @return boolean (true=valid)
      */
     @DeleteMapping(path = "/authentication/remove")
-    public ResponseEntity<String> removeTwoFactorAuthentication(@RequestHeader String Authorization) {
+    public ResponseEntity<String> removeTwoFactorAuthentication(@RequestHeader String authorization) {
         log.debug("REST request to delete two-factor authentication");
         try {
-            String userEmail = JwtValidator.decode(Authorization).get("name", String.class);
+            String userEmail = JwtValidator.decode(authorization).get("name", String.class);
             User user = mongoDao.findUserByEmail(userEmail);
 
             mongoDao.removeAuthenticatorSettings(user);

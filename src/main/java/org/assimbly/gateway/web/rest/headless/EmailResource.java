@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.UUID;
@@ -146,7 +145,7 @@ public class EmailResource {
     }
 
     // converts serviceAccount Map into a InputStream
-    private static InputStream convertServiceAccountToInputStream(ServiceAccount serviceAccount) throws IOException {
+    private static InputStream convertServiceAccountToInputStream(ServiceAccount serviceAccount) {
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonString = objectMapper.writeValueAsString(serviceAccount);
         return new ByteArrayInputStream(jsonString.getBytes());

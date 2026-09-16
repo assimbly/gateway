@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
-import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AlertError } from 'app/shared/alert';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
@@ -12,7 +12,7 @@ import { BrokerService } from './broker.service';
 @Component({
     selector: 'jhi-broker-delete-dialog',
     templateUrl: './broker-delete-dialog.component.html',
-    imports: [FontAwesomeModule, AlertError],
+    imports: [FormsModule, FontAwesomeModule, AlertError],
 })
 export class BrokerDeleteDialogComponent {
     broker: IBroker;
@@ -25,8 +25,8 @@ export class BrokerDeleteDialogComponent {
 
     confirmDelete(id: number) {
         this.brokerService.delete(id).subscribe(response => {
-			this.eventManager.broadcast(new EventWithContent('brokerListModification', 'Deleted an broker'));
-            this.activeModal.dismiss(true);
+            this.eventManager.broadcast(new EventWithContent('brokerListModification', 'Deleted an broker'));
+            this.activeModal.close('deleted');
         });
     }
 }

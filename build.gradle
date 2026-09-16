@@ -1,5 +1,6 @@
 buildscript {
     repositories {
+
         mavenLocal()
         mavenCentral()
         gradlePluginPortal()
@@ -40,8 +41,8 @@ plugins {
     id "org.liquibase.gradle"
     id "io.spring.nohttp"
     id 'de.undercouch.download' version '5.7.0'
-    id "io.github.ben-manes.versions" version "0.61.0"
-    id 'org.graalvm.buildtools.native' version '1.1.11'
+    id "io.github.ben-manes.versions" version "0.63.1"
+    id 'org.graalvm.buildtools.native' version '1.1.13'
     //id("org.openrewrite.rewrite") version("latest.release")
 }
 
@@ -349,6 +350,8 @@ dependencies {
     //force version 12.9 (same as mapforce)
     implementation 'net.sf.saxon:Saxon-HE:12.9'
 
+    implementation("io.github.assimbly:docconverter:3.0.1")
+
     implementation 'com.warrenstrange:googleauth'
 
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
@@ -358,9 +361,14 @@ dependencies {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
     }
 
-    // Add these to silence the hibernate metamodel warnings
+    // HibernateProcessor inspects @Resource / @Transactional defaults; interceptor + CDI APIs are required to resolve them.
     annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
+    annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
     annotationProcessor 'jakarta.transaction:jakarta.transaction-api'
+    annotationProcessor 'jakarta.interceptor:jakarta.interceptor-api:2.2.0'
+    annotationProcessor 'jakarta.enterprise:jakarta.enterprise.cdi-api:4.1.0'
+    compileOnly 'jakarta.interceptor:jakarta.interceptor-api:2.2.0'
+    compileOnly 'jakarta.enterprise:jakarta.enterprise.cdi-api:4.1.0'
 
     testImplementation "org.springframework.boot:spring-boot-test"
     testImplementation "org.assertj:assertj-core:${assertj_version}"
@@ -374,7 +382,7 @@ dependencies {
     liquibaseRuntime "com.h2database:h2"
     liquibaseRuntime "com.mysql:mysql-connector-j"
 
-    runtimeOnly "com.h2database:h2:2.4.240"
+    runtimeOnly "com.h2database:h2:2.5.250"
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 

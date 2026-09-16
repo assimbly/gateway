@@ -272,7 +272,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         this.uriPopoverMessages[stepFormIndex] = type.description;
 
         // set options keys
-        this.getComponentOptions(camelComponentType).subscribe(data => {
+        this.getComponentOptions(camelComponentType, step.stepType).subscribe(data => {
             const componentOptions = data.properties;
 
             this.componentOptions[0] = Object.keys(componentOptions).map(key => ({ ...componentOptions[key], ...{ name: key } }));
@@ -388,8 +388,9 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         });
     }
 
-    getComponentOptions(componentType: String): any {
-        return this.flowService.getComponentOptions(componentType).pipe(
+    getComponentOptions(componentType: String, stepType?: String): any {
+        const type = stepType != null ? stepType.toString().toLowerCase() : undefined;
+        return this.flowService.getComponentOptions(componentType, type).pipe(
             map(options => {
                 return options.body;
             })

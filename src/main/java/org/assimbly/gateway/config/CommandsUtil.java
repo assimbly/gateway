@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Utility class to parse and handle custom command line arguments
@@ -51,45 +53,47 @@ public final class CommandsUtil {
 
         try {
             cmd = parser.parse(options, arguments, true);
+
+            String baseDirectoryParam = cmd.getOptionValue("application.gateway.base-directory");
+            String cleanParam = cmd.getOptionValue("clean");
+            String cleandbParam = cmd.getOptionValue("cleandb");
+            String backupDirectoryParam = cmd.getOptionValue("backup");
+            String restoreDirectoryParam = cmd.getOptionValue("restore");
+
+            if(baseDirectoryParam == null || baseDirectoryParam.equalsIgnoreCase("default")){
+                baseDirectoryParam = USER_HOME_DIR;
+            }
+
+            System.setProperty("user.home",baseDirectoryParam);
+
+            String assimblyDirectory = baseDirectoryParam + "/.assimbly";
+
+            if(cleanParam!=null && cleanParam.equalsIgnoreCase("true")){
+                clean(assimblyDirectory);
+                return false;
+            }
+
+            if(cleandbParam!=null && cleandbParam.equalsIgnoreCase("true")){
+                cleandb(assimblyDirectory);
+                return false;
+            }
+
+            if(backupDirectoryParam!=null){
+                backup(assimblyDirectory, backupDirectoryParam);
+                return false;
+            }
+
+            if(restoreDirectoryParam!=null){
+                restore(restoreDirectoryParam, assimblyDirectory);
+                return false;
+            }
+
+            return true;
+
         } catch (ParseException _) {
-            //
-        }
-
-        String baseDirectoryParam = cmd.getOptionValue("application.gateway.base-directory");
-        String cleanParam = cmd.getOptionValue("clean");
-        String cleandbParam = cmd.getOptionValue("cleandb");
-        String backupDirectoryParam = cmd.getOptionValue("backup");
-        String restoreDirectoryParam = cmd.getOptionValue("restore");
-
-        if(baseDirectoryParam == null || baseDirectoryParam.equalsIgnoreCase("default")){
-            baseDirectoryParam = USER_HOME_DIR;
-        }
-
-        System.setProperty("user.home",baseDirectoryParam);
-
-        String assimblyDirectory = baseDirectoryParam + "/.assimbly";
-
-        if(cleanParam!=null && cleanParam.equalsIgnoreCase("true")){
-            clean(assimblyDirectory);
             return false;
         }
 
-        if(cleandbParam!=null && cleandbParam.equalsIgnoreCase("true")){
-            cleandb(assimblyDirectory);
-            return false;
-        }
-
-        if(backupDirectoryParam!=null){
-            backup(assimblyDirectory, backupDirectoryParam);
-            return false;
-        }
-
-        if(restoreDirectoryParam!=null){
-            restore(restoreDirectoryParam, assimblyDirectory);
-            return false;
-        }
-
-        return true;
     }
 
     private static void clean(String sourceDirectory) {
@@ -129,10 +133,10 @@ public final class CommandsUtil {
             File destinationDirectoryFile = new File(destinationDirectory);
             FileUtils.copyDirectory(sourceDirectoryFile, destinationDirectoryFile);
             log.info("Backuped gateway.");
-            log.info("Backup-Directory=" + destinationDirectory);
-            log.info("Base-Directory=" + sourceDirectory);
+            log.info("Backup-Directory={}", destinationDirectory);
+            log.info("Base-Directory={}", sourceDirectory);
         }catch (IOException e) {
-            log.error("Error backup gateway: " + e.getCause());
+            log.error("Error backup gateway: {}", String.valueOf(e.getCause()));
         }
     }
 
@@ -143,62 +147,30 @@ public final class CommandsUtil {
             FileUtils.deleteDirectory(destinationDirectoryFile);
             FileUtils.copyDirectory(sourceDirectoryFile, destinationDirectoryFile);
             log.info("Restored gateway.");
-            log.info("Restore-Directory=" + sourceDirectory);
-            log.info("Base-Directory=" + destinationDirectory);
+            log.info("Restore-Directory={}", sourceDirectory);
+            log.info("Base-Directory={}", destinationDirectory);
         }catch (IOException e) {
-            log.error("Error restore gateway: " + e.getCause());
+            log.error("Error restore gateway: {}", String.valueOf(e.getCause()));
         }
-    }
-
-    public static boolean isWindows()
-    {
-        String operationSystem = System.getProperty("os.name");
-        return operationSystem.startsWith("Windows");
     }
 
     private static String[] getArguments(String[] args) {
+        List<String> arguments = Arrays.stream(args)
+            .filter(CommandsUtil::isRelevantArgument)
+            .toList();
 
-        String[] arguments = null;
-        StringBuilder argumentList = null;
+        return arguments.isEmpty() ? null : arguments.toArray(String[]::new);
+    }
 
-        for(String arg: args) {
-            if(arg.startsWith("-d=")|| arg.startsWith("--application.gateway.base-directory=")) {
-                if(argumentList==null) {
-                    argumentList = new StringBuilder(arg);
-                }else {
-                    argumentList.append(',').append(arg);
-                }
-            }else if(arg.startsWith("-c=")|| arg.startsWith("--clean=")) {
-                if(argumentList==null) {
-                    argumentList = new StringBuilder(arg);
-                }else {
-                    argumentList.append(',').append(arg);
-                }
-            }else if(arg.startsWith("-b=")|| arg.startsWith("--backup=")) {
-                if(argumentList==null) {
-                    argumentList = new StringBuilder(arg);
-                }else {
-                    argumentList.append(',').append(arg);
-                }
-            }else if(arg.startsWith("-r=")|| arg.startsWith("--restore=")) {
-                if(argumentList==null) {
-                    argumentList = new StringBuilder(arg);
-                }else {
-                    argumentList.append(',').append(arg);
-                }
-            }
-        }
-
-        if(argumentList!=null) {
-            if(argumentList.toString().contains(",")) {
-                arguments = argumentList.toString().split(",");
-            }else {
-                arguments =  new String [] {argumentList.toString()};
-            }
-        }
-
-        return arguments;
-
+    private static boolean isRelevantArgument(String arg) {
+        return arg.startsWith("-d=")
+            || arg.startsWith("--application.gateway.base-directory=")
+            || arg.startsWith("-c=")
+            || arg.startsWith("--clean=")
+            || arg.startsWith("-b=")
+            || arg.startsWith("--backup=")
+            || arg.startsWith("-r=")
+            || arg.startsWith("--restore=");
     }
 
 }

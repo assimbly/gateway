@@ -1,5 +1,5 @@
 import { Service, inject } from '@angular/core';
-import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, Observer, Subscription } from 'rxjs';
 
 import { serverApiUrl } from 'app/config';
@@ -140,8 +140,12 @@ export class FlowService {
 
   }
 
-  getComponentOptions(componentType: String): Observable<any> {
-    return this.http.get(`${this.integrationUrl}/flow/schema/` + componentType, { observe: 'response' });
+  getComponentOptions(componentType: String, stepType?: String): Observable<any> {
+    let params = new HttpParams();
+    if (stepType) {
+      params = params.set('type', stepType.toString());
+    }
+    return this.http.get(`${this.integrationUrl}/flow/schema/` + componentType, { observe: 'response', params });
   }
 
   getWikiDocUrl(): Observable<HttpResponse<any>> {

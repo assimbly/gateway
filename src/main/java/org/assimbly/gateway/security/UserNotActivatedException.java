@@ -16,7 +16,4 @@ public class UserNotActivatedException extends AuthenticationException {
         super(message);
     }
 
-    public UserNotActivatedException(String message, Throwable t) {
-        super(message, t);
-    }
 }

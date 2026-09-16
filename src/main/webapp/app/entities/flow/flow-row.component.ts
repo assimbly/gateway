@@ -137,7 +137,7 @@ export class FlowRowComponent implements OnInit {
       if (flowStatus.body != 'unconfigured') {
         this.setFlowStatus(flowStatus.body);
       }
-      this.setFlowNumberOfAlerts(flowAlertsNumber.body);
+      this.setFlowNumberOfAlertsString(flowAlertsNumber.body);
     });
   }
 
@@ -350,21 +350,22 @@ export class FlowRowComponent implements OnInit {
   }
 
   setFlowNumberOfAlerts(numberOfAlerts: number): void {
+    const count = Number(numberOfAlerts) || 0;
 
-    if (numberOfAlerts == 0) {
+    if (count === 0) {
       this.flowAlerts = `false`;
-      this.numberOfAlerts = `0`;
+      this.numberOfAlerts = 0;
       this.showNumberOfItems = 3;
     } else {
       this.flowAlerts = `true`;
-      this.numberOfAlerts = numberOfAlerts;
-      if (numberOfAlerts < 4) {
-        this.showNumberOfItems = numberOfAlerts;
+      this.numberOfAlerts = count;
+      if (count < 4) {
+        this.showNumberOfItems = count;
       } else {
         this.showNumberOfItems = 3;
       }
     }
-
+    this.changeDetector.detectChanges();
   }
 
   navigateToFlowEditor(mode: string) {
@@ -496,6 +497,7 @@ export class FlowRowComponent implements OnInit {
 
         `;
     }
+    this.changeDetector.detectChanges();
 
   }
 

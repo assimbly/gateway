@@ -11,6 +11,8 @@ public final class RandomUtil {
 
     private static final int DEF_COUNT = 20;
 
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
     private RandomUtil() {
     }
 
@@ -21,10 +23,9 @@ public final class RandomUtil {
      */
     public static String generatePassword() {
         final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        SecureRandom random = new SecureRandom();
 
         return IntStream.range(0, DEF_COUNT)
-            .map(_ -> random.nextInt(CHARACTERS.length()))
+            .map(_ -> SECURE_RANDOM.nextInt(CHARACTERS.length()))
             .mapToObj(CHARACTERS::charAt)
             .map(String::valueOf)
             .collect(Collectors.joining());
@@ -36,10 +37,8 @@ public final class RandomUtil {
      * @return the generated activation key
      */
     public static String generateActivationKey() {
-        SecureRandom random = new SecureRandom();
-
         return IntStream.range(0, DEF_COUNT)
-            .map(_ -> random.nextInt(10)) // Generates a number between 0-9
+            .map(_ -> SECURE_RANDOM.nextInt(10)) // Generates a number between 0-9
             .mapToObj(String::valueOf)
             .collect(Collectors.joining());
     }
@@ -50,10 +49,8 @@ public final class RandomUtil {
      * @return the generated reset key
      */
     public static String generateResetKey() {
-        SecureRandom random = new SecureRandom();
-
         return IntStream.range(0, DEF_COUNT)
-            .map(_ -> random.nextInt(10)) // Generates a number between 0-9
+            .map(_ -> SECURE_RANDOM.nextInt(10)) // Generates a number between 0-9
             .mapToObj(String::valueOf)
             .collect(Collectors.joining());
     }
@@ -66,10 +63,9 @@ public final class RandomUtil {
      */
     public static String generateSeriesData() {
         final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        SecureRandom random = new SecureRandom();
 
         return IntStream.range(0, DEF_COUNT)
-            .map(_ -> random.nextInt(CHARACTERS.length()))
+            .map(_ -> SECURE_RANDOM.nextInt(CHARACTERS.length()))
             .mapToObj(CHARACTERS::charAt)
             .map(String::valueOf)
             .collect(Collectors.joining());
@@ -82,10 +78,9 @@ public final class RandomUtil {
      */
     public static String generateTokenData() {
         final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        SecureRandom random = new SecureRandom();
 
         return IntStream.range(0, DEF_COUNT)
-            .map(_ -> random.nextInt(CHARACTERS.length()))
+            .map(_ -> SECURE_RANDOM.nextInt(CHARACTERS.length()))
             .mapToObj(CHARACTERS::charAt)
             .map(String::valueOf)
             .collect(Collectors.joining());

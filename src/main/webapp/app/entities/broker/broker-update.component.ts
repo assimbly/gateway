@@ -9,7 +9,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AlertError } from 'app/shared/alert';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { PopoverModule } from 'ngx-bootstrap/popover';
-import { CodemirrorModule } from '@ctrl/ngx-codemirror';
+import { CodemirrorComponent, CodemirrorModule } from '@ctrl/ngx-codemirror';
 
 import { IBroker } from 'app/shared/model/broker.model';
 import { BrokerService } from './broker.service';
@@ -24,6 +24,7 @@ import 'codemirror/addon/edit/closetag';
     imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, NgbModule, PopoverModule, CodemirrorModule],
 })
 export class BrokerUpdateComponent implements OnInit {
+    @ViewChild('codeEditor') private codeEditor?: CodemirrorComponent;
 
     broker: IBroker;
     brokerConfiguration: string;
@@ -50,13 +51,22 @@ export class BrokerUpdateComponent implements OnInit {
             this.broker = broker;
             if (this.broker.id !== undefined) {
                 this.brokerService.getBrokerConfiguration(this.broker.id, this.broker.type).subscribe(brokerConfiguration => {
+                    const body = brokerConfiguration.body ?? '';
                     if (this.broker.type === 'artemis') {
-                        this.artemisConfiguration = brokerConfiguration.body;
-                        this.brokerConfiguration = brokerConfiguration.body;
+                        this.artemisConfiguration = body;
+                        this.brokerConfiguration = body;
                     } else {
-                        this.activemqConfiguration = brokerConfiguration.body;
-                        this.brokerConfiguration = brokerConfiguration.body;
+                        this.activemqConfiguration = body;
+                        this.brokerConfiguration = body;
                     }
+                    // Force CodeMirror to pick up late-loaded content (ngModel does not update CM after init).
+                    setTimeout(() => {
+                        const cm = this.codeEditor?.codeMirror as { setValue?: (v: string) => void; refresh?: () => void } | undefined;
+                        if (cm?.setValue) {
+                            cm.setValue(body);
+                            cm.refresh?.();
+                        }
+                    }, 0);
                 });
             } else {
                 this.broker.autoStart = true;

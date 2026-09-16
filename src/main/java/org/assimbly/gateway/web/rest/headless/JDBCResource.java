@@ -4,6 +4,8 @@ import org.assimbly.gateway.jdbc.adapter.DatabaseAdapter;
 import org.assimbly.gateway.jdbc.domain.ConnectionType;
 import org.assimbly.gateway.jdbc.domain.JDBCConnection;
 import org.assimbly.util.error.ValidationErrorMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +22,8 @@ import java.sql.SQLException;
 @RestController
 @RequestMapping("/api")
 public class JDBCResource {
+
+    private final Logger log = LoggerFactory.getLogger(JDBCResource.class);
 
     /**
      * GET  /validation/jdbc : test jdbc
@@ -78,7 +82,7 @@ public class JDBCResource {
         try {
             connection.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.warn("Failed to close database connection", e);
         }
     }
 

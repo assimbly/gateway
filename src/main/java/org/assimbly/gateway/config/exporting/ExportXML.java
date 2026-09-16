@@ -2,7 +2,6 @@ package org.assimbly.gateway.config.exporting;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xerces.dom.DocumentImpl;
-import org.assimbly.docconverter.DocConverter;
 import org.assimbly.docconverter.StringConverter;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.domain.*;

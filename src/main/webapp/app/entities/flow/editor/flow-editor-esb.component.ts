@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, TemplateRef, ViewEncapsulation } from "@angular/core";
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, TemplateRef, ViewChild, ViewEncapsulation } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
@@ -44,6 +44,7 @@ import { FlowService } from "../flow.service";
 export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 	flow: IFlow;
+	@ViewChild('flowNameInput') flowNameInput?: ElementRef<HTMLInputElement>;
 	routes: Route[];
 	messages: IMessage[];
 	connections: Connection[];
@@ -112,6 +113,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	selectedOptions: Array<Array<any>> = [[]];
 	componentOptions: Array<any> = [];
 	customOptions: Array<any> = [];
+	/** Option currently hovered in an open Options ng-select (shown in dropdown footer). */
+	hoveredOptionByStep: Array<any> = [];
 
 	componentTypeAssimblyLinks: Array<string> = new Array<string>();
 	componentTypeCamelLinks: Array<string> = new Array<string>();
@@ -275,6 +278,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
                   this.finished = true;
                   this.cdr.detectChanges();
+                  this.focusFlowNameIfEmpty();
 
 								},
 							);
@@ -323,6 +327,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 								this.finished = true;
 								this.cdr.detectChanges();
+								this.focusFlowNameIfEmpty();
 					}
 
 					this.active = "0";
@@ -400,19 +405,45 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
   }
 
   findNextStep(current: any): any | undefined {
-    const outLinkName = current.links
+    const loadedIds = new Set((this.steps || []).map((s: any) => s.id));
+    const links = current?.links || [];
+    const outLinkName = links
       .filter((l: any) => l.bound === 'out')
       .map((l: any) => l.name);
 
-    return this.flow.steps.find(s =>
-      s.links.some((l: any) => l.bound === 'in' && outLinkName.includes(l.name))
+    // Primary: follow SOURCE/ACTION out → next in
+    let next = this.flow.steps.find(s =>
+      !loadedIds.has(s.id) &&
+      s.stepType !== 'ERROR' &&
+      (s.links || []).some((l: any) => l.bound === 'in' && outLinkName.includes(l.name))
     );
+
+    // Fallback: expected link name {flowId}-{currentId} on any link (legacy / partial link data)
+    if (!next && current?.id != null && this.flow?.id != null) {
+      const expectedName = this.flow.id + '-' + current.id;
+      next = this.flow.steps.find(s =>
+        !loadedIds.has(s.id) &&
+        s.stepType !== 'ERROR' &&
+        (s.links || []).some((l: any) => l.name === expectedName)
+      );
+    }
+
+    // Fallback: orphaned steps with missing links — continue by id among remaining non-ERROR
+    if (!next) {
+      const remaining = this.flow.steps
+        .filter(s => !loadedIds.has(s.id) && s.stepType !== 'ERROR')
+        .sort((a, b) => a.id - b.id);
+      next = remaining[0];
+    }
+
+    return next;
   }
 
   createNewStep(stepType: StepType, defaultComponentType: string, index: number){
 
 		this.steps.splice(index, 0, new Step());
     this.stepsOptions.splice(index, 0, [new Option()]);
+    this.componentOptions.splice(index, 0, []);
 
 		this.numberOfSteps = this.numberOfSteps + 1;
 
@@ -426,7 +457,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			this.initializeStepData(newStep),
 		);
 
-    this.setTypeLinks(newStep, index);
+    // Pass component type as change event so options load for the default component
+    this.setTypeLinks(newStep, index, defaultComponentType as any);
 
     const optionArray: Array<string> = [];
     optionArray.splice(0, 0, '');
@@ -492,7 +524,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
         // set options keys
         if (typeof e !== 'undefined' && camelComponentType) {
-          this.setComponentOptions(step, camelComponentType).subscribe(data => {
+          this.setComponentOptions(step, camelComponentType, stepFormIndex).subscribe(data => {
             // add custom options if available
             this.customOptions.forEach(customOption => {
               if (customOption.componentType === camelComponentType) {
@@ -574,6 +606,15 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			},
 			16,
 		);
+	}
+
+	private focusFlowNameIfEmpty(): void {
+		const el = this.flowNameInput?.nativeElement;
+		if (!el || el.value) {
+			return;
+		}
+		el.focus();
+		el.select();
 	}
 
   setStepComponent(step: any, stepFormIndex: number, stepType: any): void {
@@ -756,6 +797,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 		this.steps.splice(newIndex, 0, new Step());
     this.stepsOptions.splice(newIndex, 0, [new Option()]);
+    this.componentOptions.splice(newIndex, 0, []);
 
 		this.numberOfSteps = this.numberOfSteps + 1;
 
@@ -777,7 +819,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			this.initializeStepData(newStep),
 		);
 
-    this.setTypeLinks(newStep, newIndex);
+    // Pass component type as change event so options load for the default component (e.g. log)
+    this.setTypeLinks(newStep, newIndex, newStep.componentType as any);
 
     this.enableConnection[newIndex] = false;
     this.enableMessage[newIndex] = false;
@@ -820,6 +863,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		const i = this.steps.indexOf(step);
 		this.steps.splice(i, 1);
 		this.stepsOptions.splice(i, 1);
+		this.componentOptions.splice(i, 1);
+		this.selectedOptions.splice(i, 1);
 		this.editFlowForm.removeControl(index);
 		(<FormArray>this.editFlowForm.controls.stepsData).removeAt(i);
 
@@ -835,22 +880,24 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	     this.enableMessage[index] = true;
 	}
 
-  setComponentOptions(step: Step, componentType: string): Observable<any> {
+  setComponentOptions(step: Step, componentType: string, stepFormIndex?: number): Observable<any> {
     return from(
       new Promise<void>((resolve, reject) => {
         setTimeout(() => {
-          this.getComponentOptions(componentType).subscribe(data => {
+          this.getComponentOptions(componentType, step.stepType).subscribe(data => {
 
             const componentOptions = data.properties;
+            const stepIndex = typeof stepFormIndex === 'number' ? stepFormIndex : this.steps.indexOf(step);
 
-            this.componentOptions[this.steps.indexOf(step)] = Object.keys(componentOptions).map(key => ({
+            this.componentOptions[stepIndex] = Object.keys(componentOptions).map(key => ({
               ...componentOptions[key],
               ...{ name: key },
             }));
-            this.componentOptions[this.steps.indexOf(step)].sort(function (a, b) {
+            this.componentOptions[stepIndex].sort(function (a, b) {
               return a.displayName.toLowerCase().localeCompare(b.displayName.toLowerCase());
             });
 
+            this.cdr.detectChanges();
             resolve();
           });
         }, 10);
@@ -858,8 +905,9 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     );
   }
 
-  getComponentOptions(componentType: string): any {
-    return this.flowService.getComponentOptions(componentType).pipe(
+  getComponentOptions(componentType: string, stepType?: string | StepType): any {
+    const type = stepType != null ? stepType.toString().toLowerCase() : undefined;
+    return this.flowService.getComponentOptions(componentType, type).pipe(
       map(options => options.body)
     );
   }
@@ -878,7 +926,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     // set options keys
     if(camelComponentType){
 
-      this.setComponentOptions(step, camelComponentType).subscribe(data => {
+      this.setComponentOptions(step, camelComponentType, index).subscribe(data => {
 
           let options: Array<string> = [];
 
@@ -938,6 +986,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
           stepOptions.push(o);
         });
+
+        this.cdr.detectChanges();
 
       });
 
@@ -1144,6 +1194,16 @@ splitOptions4(options: string): string[] {
 
   addOptionTag(name): any {
     return { name, displayName: name, description: 'Custom option', group: 'custom', type: 'string', componentType: 'file' };
+  }
+
+  onOptionHover(stepIndex: number, item: any): void {
+    this.hoveredOptionByStep[stepIndex] = item;
+    this.cdr.detectChanges();
+  }
+
+  clearOptionHover(stepIndex: number): void {
+    this.hoveredOptionByStep[stepIndex] = null;
+    this.cdr.detectChanges();
   }
 
   // this filters connections not of the correct type

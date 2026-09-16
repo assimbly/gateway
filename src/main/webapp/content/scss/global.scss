@@ -650,12 +650,60 @@ ng-dropdown-panel > div {
   display: none;
 }
 
+.option-tooltip {
+  /* Legacy class (message sender); cannot sit above ng-select v24 top-layer dropdown */
+  z-index: 10000 !important;
+}
+
 .option-tooltip .tooltip-inner {
   max-width: 400px;
   width: 400px;
   text-align: left;
-  position: relative;
-  z-index: 1000 !important;
+}
+
+/* Option details in ng-select footer: fixed height so hover does not resize the panel */
+.option-desc-footer {
+  box-sizing: border-box;
+  height: 88px;
+  padding: 8px 12px;
+  border-top: 1px solid #dee2e6;
+  font-size: 12px;
+  line-height: 1.35;
+  text-align: left;
+  white-space: normal;
+  max-width: 100%;
+  background: #f8f9fa;
+  overflow: hidden;
+}
+
+.option-desc-footer-title {
+  font-weight: 600;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.option-desc-footer-body {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.option-desc-footer-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: #6c757d;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.option-desc-footer-placeholder {
+  color: #6c757d;
+  padding-top: 20px;
 }
 
 //Set half collumn size
