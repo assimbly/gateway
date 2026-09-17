@@ -15,7 +15,6 @@ public final class JDBCConnection {
     private final String database;
     private final boolean isSecure;
     private final String enabledTLSProtocols;
-    private final boolean escapeChars;
 
     private JDBCConnection(Builder builder) {
         this.username = builder.username;
@@ -26,7 +25,6 @@ public final class JDBCConnection {
         this.database = builder.database;
         this.isSecure = builder.isSecure;
         this.enabledTLSProtocols = builder.enabledTLSProtocols;
-        this.escapeChars = builder.escapeChars;
     }
 
     public Connection connect(DatabaseAdapter adapter) throws SQLException {
@@ -63,8 +61,6 @@ public final class JDBCConnection {
 
     public String getEnabledTLSProtocols() { return enabledTLSProtocols; }
 
-    public boolean getEscapeChars() { return escapeChars; }
-
     public static Builder builder() {
         return new Builder();
     }
@@ -79,7 +75,6 @@ public final class JDBCConnection {
         private String database;
         private boolean isSecure;
         private String enabledTLSProtocols;
-        private boolean escapeChars;
 
         public JDBCConnection build() {
             return new JDBCConnection(this);
@@ -122,11 +117,6 @@ public final class JDBCConnection {
 
         public Builder setEnabledTLSProtocols(String enabledTLSProtocols) {
             this.enabledTLSProtocols = enabledTLSProtocols;
-            return this;
-        }
-
-        public Builder setEscapeChars(boolean escapeChars) {
-            this.escapeChars = escapeChars;
             return this;
         }
     }

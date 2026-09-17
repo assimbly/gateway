@@ -41,7 +41,6 @@ public class JDBCResource {
         @RequestParam("port") int port,
         @RequestParam("useSSL") boolean useSSL,
         @RequestParam("enabledTLSProtocols") String enabledTLSProtocols,
-        @RequestParam("escapeChars") boolean escapeChars,
         @RequestParam("database") String database
     ) {
         Connection connection = null;
@@ -57,7 +56,6 @@ public class JDBCResource {
                 .setPort(port)
                 .setSecure(useSSL)
                 .setEnabledTLSProtocols(enabledTLSProtocols)
-                .setEscapeChars(escapeChars)
                 .setDatabase(database)
                 .build();
 
