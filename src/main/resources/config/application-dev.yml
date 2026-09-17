@@ -31,7 +31,8 @@ management:
 spring:
   devtools:
     restart:
-      enabled: true
+      # H2 file DB + DevTools classloader restart drops recent commits (e.g. newly created flows).
+      enabled: false
       additional-exclude: .h2.server.properties
     livereload:
       enabled: true # we use Webpack dev server + BrowserSync for livereload
@@ -40,7 +41,7 @@ spring:
       indent-output: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:h2:file:${user.home}/.assimbly/db/gateway;DB_CLOSE_DELAY=-1;CASE_INSENSITIVE_IDENTIFIERS=TRUE;NON_KEYWORDS=VALUE
+    url: jdbc:h2:file:${user.home}/.assimbly/db/gateway;DB_CLOSE_ON_EXIT=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE;NON_KEYWORDS=VALUE;WRITE_DELAY=0
     username: gateway
     password:
     hikari:

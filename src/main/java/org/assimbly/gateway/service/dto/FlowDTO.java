@@ -1,6 +1,5 @@
 package org.assimbly.gateway.service.dto;
 
-import org.assimbly.gateway.domain.Step;
 import org.assimbly.gateway.domain.enumeration.LogLevelType;
 
 import java.io.Serializable;
@@ -43,7 +42,7 @@ public class FlowDTO implements Serializable {
 
     private Long integrationId;
 
-    private Set<Step> steps;
+    private Set<StepDTO> steps;
 
     public Long getId() {
         return id;
@@ -161,11 +160,11 @@ public class FlowDTO implements Serializable {
 
     public void setIntegrationId(Long integrationId) { this.integrationId = integrationId; }
 
-    public Set<Step> getSteps() {
+    public Set<StepDTO> getSteps() {
         return steps;
     }
 
-    public void setSteps(Set<Step> steps) {
+    public void setSteps(Set<StepDTO> steps) {
         this.steps = steps;
     }
 

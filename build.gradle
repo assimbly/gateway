@@ -384,7 +384,7 @@ dependencies {
 
     runtimeOnly "com.h2database:h2:2.5.250"
 
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    // developmentOnly 'org.springframework.boot:spring-boot-devtools' // disabled: H2 file DB loses recent commits on DevTools RestartClassLoader
 
 }
 

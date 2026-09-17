@@ -1,5 +1,5 @@
 dependencies {
-    developmentOnly "org.springframework.boot:spring-boot-devtools:${spring_boot_version}"
+    // developmentOnly "org.springframework.boot:spring-boot-devtools:${spring_boot_version}" // disabled: breaks H2 file durability
     implementation "com.h2database:h2"
 }
 
