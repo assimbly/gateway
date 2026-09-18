@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, TemplateRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, TemplateRef, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NgbModal, NgbNavChangeEvent, NgbNavModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbNavChangeEvent, NgbNavModule, NgbModalRef, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { CodemirrorModule } from '@ctrl/ngx-codemirror';
@@ -38,6 +38,7 @@ import { CodemirrorComponent } from "@ctrl/ngx-codemirror";
     FormsModule,
     FontAwesomeModule,
     NgbNavModule,
+    NgbDropdownModule,
     InfiniteScrollModule,
     CodemirrorModule,
     SortDirective,
@@ -91,6 +92,8 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   objectKeys = Object.keys;
 
   modalRef: NgbModalRef | null;
+
+  private readonly changeDetector = inject(ChangeDetectorRef);
 
   constructor(
     private brokerService: BrokerService,
@@ -215,6 +218,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
 
       this.totalItems = this.numberOfMessages;
     }
+    this.changeDetector.detectChanges();
   }
 
   private onSuccessCount(data, headers) {
@@ -227,6 +231,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     } else {
       this.subtitle = this.messagesCount.toString() + ' messages on ' + this.endpointType + ' ' + this.endpointName;
     }
+    this.changeDetector.detectChanges();
   }
 
   private onSuccessBrowse(data, headers) {
@@ -243,6 +248,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
         this.selectedMessage.body = this.getBody(message);
         this.selectedMessage.fileType = this.getFileType(this.selectedMessage.body);
       }
+      this.changeDetector.detectChanges();
     }
   }
 
@@ -286,6 +292,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
 
   private onError(errorMessage: string) {
     this.isLoading = false;
+    this.changeDetector.detectChanges();
 	this.alertService.addAlert({
 	  type: 'danger',
 	  message: errorMessage,
@@ -414,17 +421,22 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   }
 
   getFileType(doc) {
+    if (typeof doc !== 'string' || !doc.trim()) {
+      return 'txt';
+    }
     try {
-      // try to parse via json
-      const a = JSON.parse(doc);
+      JSON.parse(doc);
       return 'json';
     } catch (e) {
+      const trimmed = doc.trim();
+      if (!trimmed.startsWith('<')) {
+        return 'txt';
+      }
       try {
-        // try xml parsing
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(doc, 'application/xml');
-        if (xmlDoc.documentElement.nodeName == '' || xmlDoc.documentElement.nodeName == 'parsererror') return 'txt';
-        else return 'xml';
+        if (xmlDoc.getElementsByTagName('parsererror').length > 0) return 'txt';
+        return 'xml';
       } catch (e) {
         return 'txt';
       }
