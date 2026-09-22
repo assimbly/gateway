@@ -1,76 +1,17 @@
-<ng-template #statsTemplate>
-  <div class="flow-stats">
-    <p *ngIf="flowStatsLoading" class="flow-stats-empty">Loading stats…</p>
-    <p *ngIf="!flowStatsLoading && flowStatsEmpty" class="flow-stats-empty">There are no stats yet.</p>
-    <ng-container *ngIf="!flowStatsLoading && !flowStatsEmpty">
-      <section *ngFor="let section of flowStatsSections" class="flow-stats-section">
-        <h6>{{ section.title }}</h6>
-        <p *ngIf="section.note" class="flow-stats-note">{{ section.note }}</p>
-        <table *ngIf="section.rows.length > 0">
-          <tbody>
-            <tr *ngFor="let row of section.rows">
-              <th scope="row">{{ row.label }}</th>
-              <td>{{ row.value }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-    </ng-container>
-  </div>
-</ng-template>
-<ng-template #errorModal let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title">Install error</h4>
-    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
-  </div>
-  <div class="modal-body">
-    <p class="mb-3">{{ flow.name }}</p>
-    <div class="flow-error-detail" [innerHtml]="flowErrorButton"></div>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-fx btn-fx-secondary" (click)="modal.dismiss()">Close</button>
-  </div>
-</ng-template>
-<ng-template #alertsModal let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title">Alerts</h4>
-    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
-  </div>
-  <div class="modal-body">
-    <p class="mb-3">{{ flow.name }}</p>
-    <p *ngIf="alertsLoading" class="mb-0">Loading alerts…</p>
-    <p *ngIf="!alertsLoading && alertMessages.length === 0" class="mb-0">No alerts.</p>
-    <ol *ngIf="!alertsLoading && alertMessages.length > 0" class="flow-alert-list" (scroll)="onAlertsScroll($event)">
-      <li *ngFor="let message of alertMessages">{{ message }}</li>
-      <li *ngIf="alertsLoadingMore" class="flow-alert-status">Loading more…</li>
-    </ol>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-fx btn-fx-secondary" (click)="modal.dismiss()">Close</button>
-  </div>
-</ng-template>
-
 <td class="table-fx-identity">
   <div class="d-flex align-items-center gap-2 min-w-0">
     <jhi-truncate class="flex-grow-1" [text]="flow.name" />
-    <button
-      type="button"
-      class="badge bg-danger text-white border-0"
-      *ngIf="flowError"
-      (click)="openError(errorModal)"
-    >
-      <fa-icon icon="exclamation-triangle"></fa-icon>
-      Error
-    </button>
-    <button
-      type="button"
-      class="badge bg-warning text-dark border-0"
-      *ngIf="numberOfAlerts > 0"
-      (click)="openAlerts(alertsModal)"
-    >
-      <fa-icon icon="exclamation-triangle"></fa-icon>
-      Alert ({{ numberOfAlerts }})
-    </button>
+    <jhi-flow-row-alerts
+      [flowName]="flow.name"
+      [flowError]="flowError"
+      [flowErrorButton]="flowErrorButton"
+      [numberOfAlerts]="numberOfAlerts"
+      [alertsLoading]="alertsLoading"
+      [alertsLoadingMore]="alertsLoadingMore"
+      [alertMessages]="alertMessages"
+      (alertsOpen)="onAlertsOpen()"
+      (alertsScroll)="onAlertsScroll($event)"
+    />
   </div>
 </td>
 <td class="text-end table-fx-numeric">{{ formatMetric(completedCount) }}</td>
@@ -87,23 +28,13 @@
       <fa-icon icon="edit"></fa-icon>
       <span class="d-none d-md-inline">Edit</span>
     </button>
-    <button
+    <jhi-flow-row-stats
       jhiPrimaryAction
-      type="button"
-      class="btn btn-fx btn-fx-sm btn-fx-ghost"
-      (mouseenter)="getFlowStatistic(flow)"
-      [ngbPopover]="statsTemplate"
-      popoverTitle="Source stats"
-      popoverClass="flow-stats-popover"
-      placement="left"
-      container="body"
-      triggers="click"
-      [autoClose]="'outside'"
-      aria-label="Stats"
-    >
-      <fa-icon icon="chart-bar"></fa-icon>
-      <span class="d-none d-md-inline">Stats</span>
-    </button>
+      [loading]="flowStatsLoading"
+      [empty]="flowStatsEmpty"
+      [sections]="flowStatsSections"
+      (load)="getFlowStatistic(flow)"
+    />
     <button jhiOverflowAction type="button" ngbDropdownItem class="btn-fx-dropdown-item" (click)="navigateToFlowEditor('clone')">
       <fa-icon icon="clone"></fa-icon>
       <span>Clone</span>

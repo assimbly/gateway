@@ -36,9 +36,7 @@ export class MessagePopupService {
 
     messageModalRef(component: any, message: Message): NgbModalRef {
         const modalRef = this.modalService.open(component, { size: 'xl', backdrop: 'static' });
-        if (typeof component as Component) {
-            modalRef.componentInstance.message = message;
-        }
+        modalRef.componentInstance.message = message;
         return modalRef;
     }
 }

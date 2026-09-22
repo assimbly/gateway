@@ -1,4 +1,4 @@
-<form *ngIf="address" name="deleteForm" (ngSubmit)="confirmDelete(address.name!)">
+<form *ngIf="address" (submit)="$event.preventDefault()">
     <div class="modal-header">
         <h4 class="modal-title">Confirm delete operation</h4>
         <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" (click)="cancel()"></button>
@@ -15,7 +15,7 @@
             <fa-icon icon="ban"></fa-icon><span>Cancel</span>
         </button>
 
-        <button id="jhi-confirm-delete-queue" type="submit" class="btn btn-fx btn-fx-danger" [disabled]="disableDelete">
+        <button id="jhi-confirm-delete-queue" type="button" class="btn btn-fx btn-fx-danger" [disabled]="disableDelete" (click)="confirmDelete(address.name!)">
             <fa-icon icon="times"></fa-icon><span>Delete</span>
         </button>
     </div>

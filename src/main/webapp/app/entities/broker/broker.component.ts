@@ -6,7 +6,7 @@ import { EventManager, EventWithContent } from 'app/core/util/event-manager.serv
 import { AlertService } from 'app/core/util/alert.service';
 import { NgbDropdownModule, NgbModal, NgbModalRef, NgbModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { SearchToolbar } from 'app/shared/filter';
 import { SortState } from 'app/shared/sort';
 import { DataTable, DataTableColumn, OverflowActionDirective, PrimaryActionDirective, RowActions, StatusControls, StatusControlsTone, Truncate } from 'app/shared/table';
@@ -97,12 +97,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
         protected eventManager: EventManager,
         protected accountService: AccountService,
 		protected modalService: NgbModal,
-        protected router: Router
-    ) {
-        this.router.routeReuseStrategy.shouldReuseRoute = function() {
-            return false;
-        };
-    }
+    ) {}
 
     ngOnInit() {
         this.setBrokerStatusDefaults();

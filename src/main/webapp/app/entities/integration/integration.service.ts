@@ -39,11 +39,11 @@ export class IntegrationService {
         return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 
-    start(id: number): Observable<HttpResponse<any>> {
+    start(id: number): Observable<HttpResponse<string>> {
         return this.http.get(`${this.integrationUrl}/start`, { observe: 'response', responseType: 'text' });
     }
 
-    stop(id: number): Observable<HttpResponse<any>> {
+    stop(id: number): Observable<HttpResponse<string>> {
         return this.http.get(`${this.integrationUrl}/stop`, { observe: 'response', responseType: 'text' });
     }
 

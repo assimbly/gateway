@@ -7,7 +7,6 @@ import { filter, map } from 'rxjs/operators';
 import { IFlow, Flow } from 'app/shared/model/flow.model';
 import { FlowService } from './flow.service';
 import { FlowComponent } from './flow.component';
-import { FlowDetailComponent } from './flow-detail.component';
 import { FlowUpdateComponent } from './flow-update.component';
 import { FlowEditorComponent } from './editor/flow-editor.component';
 import { FlowMessageSenderComponent } from './sender/flow-message-sender.component';

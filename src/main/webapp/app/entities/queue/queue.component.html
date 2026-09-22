@@ -31,10 +31,11 @@
     ariaLabel="Queues"
   >
     <tr
-      jhi-queue-row
+      jhi-address-row
       *ngFor="let address of filteredAddresses; trackBy: trackId"
       [address]="address"
       [brokerType]="brokerType"
+      endpointType="queue"
     ></tr>
   </jhi-data-table>
 </div>

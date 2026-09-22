@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
@@ -23,7 +23,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './flow-detail.component.html',
   imports: [CommonModule, RouterModule, AlertError],
 })
-export class FlowDetailComponent implements OnInit {
+export class FlowDetailComponent implements OnInit, OnDestroy {
   flow: IFlow;
   integration: Integration;
   steps: Array<Step>;
@@ -52,7 +52,7 @@ export class FlowDetailComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.activatedRoute.data.subscribe(({ flow }) => {
+    this.subscription = this.activatedRoute.data.subscribe(({ flow }) => {
       this.flow = flow;
     });
   }
@@ -96,8 +96,10 @@ export class FlowDetailComponent implements OnInit {
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe();
-    this.eventManager.destroy(this.eventSubscriber);
+    this.subscription?.unsubscribe();
+    if (this.eventSubscriber) {
+      this.eventManager.destroy(this.eventSubscriber);
+    }
   }
 
   registerChangeInFlows() {

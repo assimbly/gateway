@@ -6,7 +6,7 @@ import { EventManager, EventWithContent } from 'app/core/util/event-manager.serv
 import { AlertService } from 'app/core/util/alert.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
-import { SortDirective, SortByDirective, SortState } from 'app/shared/sort';
+import { SortDirective, SortByDirective, SortState, sortParams } from 'app/shared/sort';
 
 import { MessageDeleteDialogComponent } from './message-delete-dialog.component';
 import { MessageService } from './message.service';
@@ -42,12 +42,7 @@ export class MessageAllComponent implements OnInit, OnDestroy {
   }
 
   sort(): string[] {
-    const { predicate, order } = this.sortState;
-    const result = [predicate + ',' + order];
-    if (predicate !== 'name') {
-      result.push('name');
-    }
-    return result;
+    return sortParams(this.sortState);
   }
 
   reset() {

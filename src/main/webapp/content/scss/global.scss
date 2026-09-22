@@ -41,6 +41,8 @@ a.btn {
 
 a:hover {
   color: var(--app-primary);
+  /* make sure browsers use the pointer cursor for anchors, even with no href */
+  cursor: pointer;
 }
 
 /* override hover color for dropdown-item forced by bootstrap to all a:not([href]):not([tabindex]) elements in _reboot.scss */
@@ -51,11 +53,6 @@ a:not([href]):not([tabindex]):hover.dropdown-item {
 /* override .dropdown-item.active background-color on hover */
 .dropdown-item.active:hover {
   background-color: var(--app-active);
-}
-
-a:hover {
-  /* make sure browsers use the pointer cursor for anchors, even with no href */
-  cursor: pointer;
 }
 
 .dropdown-item:hover {
@@ -103,6 +100,9 @@ Generic styles
   caret-color: transparent;
   min-width: 0;
   max-width: 100%;
+  flex: 1;
+  min-height: 0;
+  height: auto;
 }
 
 .jh-card input,
@@ -1098,16 +1098,6 @@ ng-dropdown-panel > div {
     flex-direction: column;
     justify-content: space-between;
     display: table;
-}
-
-.jh-card {
-    background-color: var(--app-surface);
-    color: var(--app-text);
-    flex: 1;
-    min-width: 0;
-    max-width: 100%;
-    min-height: 0;
-    height: auto;
 }
 
 .editor-nav {

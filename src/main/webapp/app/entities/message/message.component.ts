@@ -56,12 +56,12 @@ export class MessageComponent implements OnInit, OnDestroy {
         this.accountService.identity().subscribe(account => {
             this.currentAccount = account;
         });
-        if (this.header !== undefined) {
-            this.eventManager.subscribe('headerDeleted', res => this.updateHeader(parseInt(res.toString())));
-        } else {
-            this.eventManager.subscribe('headerDeleted', res => res);
-        }
         this.registerChangeInMessages();
+        if (this.header !== undefined) {
+            this.eventSubscriber.add(
+                this.eventManager.subscribe('headerDeleted', res => this.updateHeader(parseInt(res.toString()))),
+            );
+        }
         this.selectOption();
     }
 

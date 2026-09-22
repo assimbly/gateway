@@ -83,7 +83,6 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   fileExtension: string;
   isLoading = false;
   finished = false;
-  test: any;
   searchText = '';
   active = '0';
   descending = false;

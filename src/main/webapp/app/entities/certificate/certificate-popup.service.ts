@@ -36,19 +36,17 @@ export class CertificatePopupService {
 
     gatewayModalRef(component: any, certificate: Certificate): NgbModalRef {
         const modalRef = this.modalService.open(component, { size: 'lg', backdrop: 'static' });
-        if (typeof component as Component) {
-            modalRef.componentInstance.certificate = certificate;
-            modalRef.result.then(
-                result => {
-                    this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
-                    this.ngbModalRef = null;
-                },
-                reason => {
-                    this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
-                    this.ngbModalRef = null;
-                }
-            );
-        }
+        modalRef.componentInstance.certificate = certificate;
+        modalRef.result.then(
+            result => {
+                this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                this.ngbModalRef = null;
+            },
+            reason => {
+                this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                this.ngbModalRef = null;
+            }
+        );
         return modalRef;
     }
 }

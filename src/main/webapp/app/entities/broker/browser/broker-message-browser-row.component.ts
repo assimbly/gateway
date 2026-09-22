@@ -1,7 +1,6 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Message } from 'app/shared/model/message.model';
 
 @Component({
@@ -9,19 +8,8 @@ import { Message } from 'app/shared/model/message.model';
   templateUrl: './broker-message-browser-row.component.html',
   imports: [RouterModule],
 })
-export class BrokerMessageBrowserRowComponent implements OnInit, OnDestroy {
+export class BrokerMessageBrowserRowComponent {
   @Input() message: Message;
 
   messageRowID: string;
-
-  public previousState: string;
-  public p = false;
-
-  modalRef: NgbModalRef | null;
-
-  constructor() {}
-
-  ngOnInit() {}
-
-  ngOnDestroy() {}
 }

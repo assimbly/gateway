@@ -164,7 +164,6 @@
                 </thead>
                 <tbody infinite-scroll>
                 <tr
-                  jhi-queue-row
                   *ngFor="let header of this.selectedMessage.headers | keyvalue | MessageSortByHeaderPipe: (sortState.order === 'asc'):sortState.predicate"
                 >
                   <td>{{ header.key }}</td>
@@ -186,7 +185,6 @@
           </thead>
           <tbody infinite-scroll>
           <tr
-            jhi-queue-row
             *ngFor="let jmsheader of this.selectedMessage.jmsHeaders | keyvalue | MessageSortByHeaderPipe: (sortState.order === 'asc'):sortState.predicate"
           >
             <td>{{ jmsheader.key }}</td>

@@ -2,11 +2,11 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angula
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Subscription, interval } from 'rxjs';
-import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { EventManager } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { SortState } from 'app/shared/sort';
+import { SortState, sortParams } from 'app/shared/sort';
 
 import { AccountService } from 'app/core/auth/account.service';
 
@@ -19,19 +19,19 @@ import { QueueDeleteDialogComponent } from './queue-delete-dialog.component';
 import { IBroker } from 'app/shared/model/broker.model';
 import { SearchToolbar } from 'app/shared/filter';
 import { DataTable, DataTableColumn } from 'app/shared/table';
-import { QueueRowComponent } from './queue-row.component';
-import { QueueSearchByNamePipe } from './queue.searchbyname.pipe';
+import { AddressRowComponent } from 'app/entities/broker/address-row.component';
+import { filterAddresses } from 'app/shared/util/address-filter';
 
 @Component({
   selector: 'jhi-queue',
   templateUrl: './queue.component.html',
-  imports: [CommonModule, RouterModule, FontAwesomeModule, SearchToolbar, DataTable, QueueRowComponent],
+  imports: [CommonModule, RouterModule, FontAwesomeModule, SearchToolbar, DataTable, AddressRowComponent],
 })
 export class QueueComponent implements OnInit, OnDestroy {
   queues: IQueue[] = [];
   addresses: IAddress[] = [];
   brokers: IBroker[] = [];
-  eventSubscriber?: Subscription;
+  eventSubscriber = new Subscription();
   currentAccount: any;
   itemsPerPage: number;
   links: any;
@@ -48,7 +48,6 @@ export class QueueComponent implements OnInit, OnDestroy {
     { key: 'numberOfMessages', header: 'Messages', sortable: true, numeric: true },
     { key: 'actions', header: 'Actions', align: 'end' },
   ];
-  private readonly searchPipe = new QueueSearchByNamePipe();
 
   private readonly changeDetector = inject(ChangeDetectorRef);
 
@@ -92,14 +91,12 @@ export class QueueComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.eventSubscriber) {
-      this.eventManager.destroy(this.eventSubscriber);
-    }
+    this.eventSubscriber.unsubscribe();
     this.timeInterval.unsubscribe();
   }
 
   get filteredAddresses(): IAddress[] {
-    return this.searchPipe.transform(this.addresses ?? [], this.searchQueueText, this.sortState.order === 'asc', this.sortState.predicate);
+    return filterAddresses(this.addresses, this.searchQueueText, this.sortState.order === 'asc', this.sortState.predicate ?? 'name');
   }
 
   trackId(index: number, item: IAddress): number {
@@ -107,7 +104,7 @@ export class QueueComponent implements OnInit, OnDestroy {
   }
 
   registerChangeInQueues(): void {
-    this.eventSubscriber = this.eventManager.subscribe('queueListModification', () => this.reset());
+    this.eventSubscriber.add(this.eventManager.subscribe('queueListModification', () => this.updateAllQueues()));
   }
 
   poll(): void {
@@ -117,9 +114,11 @@ export class QueueComponent implements OnInit, OnDestroy {
   }
 
   registerDeletedQueues() {
-    this.eventManager.subscribe('queueDeleted', res => {
-      this.getBrokerType();
-    });
+    this.eventSubscriber.add(
+      this.eventManager.subscribe('queueDeleted', () => {
+        this.getBrokerType();
+      }),
+    );
   }
 
   delete(queue: IQueue): void {
@@ -128,12 +127,7 @@ export class QueueComponent implements OnInit, OnDestroy {
   }
 
   sort(): string[] {
-    const { predicate, order } = this.sortState;
-    const result = [predicate + ',' + order];
-    if (predicate !== 'name') {
-      result.push('name');
-    }
-    return result;
+    return sortParams(this.sortState);
   }
 
   getBrokerType() {

@@ -36,10 +36,8 @@ export class RoutePopupService {
 
     routeModalRef(component: any, route: Route, type?: string): NgbModalRef {
         const modalRef = this.modalService.open(component, { windowClass: 'fullscreen-modal'});
-        if (typeof component as Component) {
-            modalRef.componentInstance.route = route;
-            modalRef.componentInstance.type = type;
-        }
+        modalRef.componentInstance.route = route;
+        modalRef.componentInstance.type = type;
         return modalRef;
     }
 }

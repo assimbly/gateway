@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, TemplateRef, ViewChild, ViewEncapsulation, inject } from "@angular/core";
+import { ChangeDetectorRef, Component, DestroyRef, ElementRef, OnDestroy, OnInit, TemplateRef, ViewChild, ViewEncapsulation, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
@@ -25,8 +25,9 @@ import { IMessage } from 'app/shared/model/message.model';
 import { Route } from "app/shared/model/route.model";
 import { Connection } from 'app/shared/model/connection.model';
 import dayjs from "dayjs/esm";
-import { from, forkJoin, Observable, Subscription } from "rxjs";
-import { map } from 'rxjs/operators';
+import { from, forkJoin, Observable, of, Subscription } from "rxjs";
+import { map, switchMap } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LinkService } from "../../link/link.service";
 import { StepService } from "../../step/step.service";
 import { MessageService } from '../../message/message.service';
@@ -190,6 +191,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	private wikiDocUrl: string;
 	private camelDocUrl: string;
 
+	private readonly destroyRef = inject(DestroyRef);
+
 	constructor(
 		private eventManager: EventManager,
 		private integrationService: IntegrationService,
@@ -205,7 +208,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		public connectionsList: Connections,
 		public components: Components,
 		private modalService: NgbModal,
-		private MessagePopupService: MessagePopupService,
+		private messagePopupService: MessagePopupService,
 		private routePopupService: RoutePopupService,
     private connectionPopupService: ConnectionPopupService,
 		private cdr: ChangeDetectorRef,
@@ -384,7 +387,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
                     this.createNewStep(StepType.ERROR,this.integrations[0].defaultErrorComponentType,2);
                 }else if(this.activeEditor === 'route'){
                     this.createNewStep(StepType.ROUTE,'',0);
-                    this.createNewStep(StepType.ERROR,this.integrations[0].defaultErrorComponentType || 'file',1);
+                    this.createNewStep(StepType.ERROR,'',1);
                 }
 
 								this.finished = true;
@@ -415,7 +418,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
   }
 
-  loadStep(step: any, index: number){
+  loadStep(step: IStep, index: number){
 
         this.numberOfSteps = this.numberOfSteps + 1;
 
@@ -466,18 +469,18 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
   }
 
-  findNextStep(current: any): any | undefined {
-    const loadedIds = new Set((this.steps || []).map((s: any) => s.id));
+  findNextStep(current: IStep): IStep | undefined {
+    const loadedIds = new Set((this.steps || []).map(s => s.id));
     const links = current?.links || [];
     const outLinkName = links
-      .filter((l: any) => l.bound === 'out')
-      .map((l: any) => l.name);
+      .filter(l => l.bound === 'out')
+      .map(l => l.name);
 
     // Primary: follow SOURCE/ACTION out → next in
     let next = this.flow.steps.find(s =>
       !loadedIds.has(s.id) &&
       s.stepType !== 'ERROR' &&
-      (s.links || []).some((l: any) => l.bound === 'in' && outLinkName.includes(l.name))
+      (s.links || []).some(l => l.bound === 'in' && outLinkName.includes(l.name))
     );
 
     // Fallback: expected link name {flowId}-{currentId} on any link (legacy / partial link data)
@@ -486,7 +489,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
       next = this.flow.steps.find(s =>
         !loadedIds.has(s.id) &&
         s.stepType !== 'ERROR' &&
-        (s.links || []).some((l: any) => l.name === expectedName)
+        (s.links || []).some(l => l.name === expectedName)
       );
     }
 
@@ -494,7 +497,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     if (!next) {
       const remaining = this.flow.steps
         .filter(s => !loadedIds.has(s.id) && s.stepType !== 'ERROR')
-        .sort((a, b) => a.id - b.id);
+        .sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
       next = remaining[0];
     }
 
@@ -690,7 +693,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		this.stepEditorRegistry.refresh();
 	}
 
-  setStepComponent(step: any, stepFormIndex: number, stepType: any): void {
+  setStepComponent(step: IStep, stepFormIndex: number, stepType: string): void {
 
     const stepForm = <FormGroup>(<FormArray>this.editFlowForm.controls.stepsData).controls[stepFormIndex];
 
@@ -835,7 +838,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	updateStepData(step: any, stepData: FormControl): void {
+	updateStepData(step: IStep, stepData: FormControl): void {
 		stepData.patchValue({
 			id: step.id,
 			componentType: step.componentType,
@@ -1244,9 +1247,9 @@ splitOptions4(options: string): string[] {
    let modalRef;
 
     if (typeof step.messageId === 'undefined' || step.messageId === null || !step.messageId) {
-      modalRef  = this.MessagePopupService.open(MessageDialogComponent as Component);
+      modalRef  = this.messagePopupService.open(MessageDialogComponent as Component);
     }else{
-      modalRef  = this.MessagePopupService.open(MessageDialogComponent as Component, step.messageId);
+      modalRef  = this.messagePopupService.open(MessageDialogComponent as Component, step.messageId);
     }
 
     modalRef.then(res => {
@@ -1472,170 +1475,103 @@ splitOptions4(options: string): string[] {
 	}
 
   updateFlow(){
-   this.steps.forEach(
-      (step) => {
-        step.flowId = this.flow.id;
-      },
-    );
+   this.steps.forEach(step => {
+     step.flowId = this.flow.id;
+   });
 
-    this.flowService
-      .update(this.flow)
-      .subscribe(
-        (flow) => {
+   const stepDeletes = this.stepsToDelete
+     .filter(step => step.id != null)
+     .map(step => this.stepService.delete(step.id));
 
-          this.flow = flow.body;
-
-          //delete removed steps
-          this.stepsToDelete.forEach((step) => {
-            this.stepService.delete(step.id).subscribe((results) => {});
-          });
-
-          //update steps
-          const updateSteps = this.stepService.updateMultiple(
-            this.steps,
-          );
-
-          updateSteps.subscribe(
-            (results) => {
-
-              this.steps = results.body.concat();
-
-              this.updateForm();
-
-              this.updateLinks();
-
-              this.stepService
-                .findByFlowId(this.flow.id)
-                .subscribe(
-                  (data) => {
-                    let steps = data.body;
-
-                    steps =
-                      steps.filter(
-                        (e) => {
-                          const s = this.steps.find((t) => t.id === e.id);
-                          if (typeof s === "undefined") {
-                            return true;
-                          } else {
-                            return s.id !== e.id;
-                          }
-                        },
-                      );
-                  },
-                );
-
-              this.savingFlowSuccess = true;
-              this.isSaving = false;
-              this.router.navigate(["/"]);
-            },
-          );
-        },
-      );
-
+   this.flowService
+     .update(this.flow)
+     .pipe(
+       takeUntilDestroyed(this.destroyRef),
+       switchMap(flow => {
+         this.flow = flow.body;
+         return stepDeletes.length ? forkJoin(stepDeletes) : of([]);
+       }),
+       switchMap(() => this.stepService.updateMultiple(this.steps)),
+       switchMap(results => {
+         this.steps = results.body.concat();
+         this.updateForm();
+         return this.updateLinks$();
+       }),
+       switchMap(() => this.stepService.findByFlowId(this.flow.id)),
+     )
+     .subscribe(() => {
+       this.savingFlowSuccess = true;
+       this.isSaving = false;
+       this.router.navigate(['/']);
+     });
   }
 
   createFlow(){
-
 		this.flow.integrationId = this.integrations[0].id;
 
-			this.flowService
-				.create(this.flow)
-				.subscribe(
-					(flowUpdated) => {
-						this.flow = flowUpdated.body;
-
-              let previousStepId = 0;
-
-						this.steps.forEach(
-							(step) => {
-								step.flowId = this.flow.id;
-							},
-						);
-
-						this.stepService
-							.createMultiple(this.steps)
-							.subscribe(
-								(toRes) => {
-									this.steps = toRes.body;
-									this.createLinks();
-									this.updateForm();
-									this.finished = true;
-									this.savingFlowSuccess = true;
-									this.isSaving = false;
-									this.router.navigate(["/"]);
-								},
-								() => {
-									this.handleErrorWhileCreatingFlow(
-										this.flow.id,
-										this.step.id,
-									);
-								},
-							);
-					},
-					() => {
-						this.handleErrorWhileCreatingFlow(this.flow.id, this.step.id);
-					},
-				);
-  }
-
-  createLinks(){
-
-        let previousStepId = 0;
-
-        this.steps.forEach(
-          (step) => {
-
-              if(step.stepType === 'ACTION' || step.stepType === 'SOURCE' || step.stepType === 'ROUTE'){
-                  const linkName = this.flow.id + '-' + step.id;
-                  const outLink = this.setLink(linkName, step.id, 'out');
-
-                  this.linkService.create(outLink).subscribe((result) => {
-                      //console.log(result);
-                    },
-                  );
-              }
-
-              if(step.stepType === 'ACTION' || step.stepType === 'SINK' || step.stepType === 'ROUTE'){
-                  const linkName = this.flow.id + '-' + previousStepId;
-                  const inLink = this.setLink(linkName, step.id, 'in');
-                  if(previousStepId!=0){
-                    this.linkService.create(inLink).subscribe((result) => {
-                        //console.log(result);
-                      },
-                    );
-                  }
-              }
-
-            previousStepId = step.id;
-
-          },
-        );
-
-  }
-
-  updateLinks(){
-      this.deleteLinks();
-      this.createLinks();
-  }
-
-  deleteLinks(){
-
-      this.stepsToDelete.forEach((step) => {
-             this.linkService.deleteByStepId(step.id).subscribe((result) => {
-               //console.log('X deleteByStepId',result);
-            });
-          },
-        );
-
-
-      //delete original links
-      this.steps.forEach((step) => {
-           console.log('deleteLinks stepId=',step.id);
-           this.linkService.deleteByStepId(step.id).subscribe((result) => {
-             //console.log('deleteByStepId',result);
+    this.flowService
+      .create(this.flow)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        switchMap(flowUpdated => {
+          this.flow = flowUpdated.body;
+          this.steps.forEach(step => {
+            step.flowId = this.flow.id;
           });
+          return this.stepService.createMultiple(this.steps);
+        }),
+        switchMap(toRes => {
+          this.steps = toRes.body;
+          return this.createLinks$();
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.updateForm();
+          this.finished = true;
+          this.savingFlowSuccess = true;
+          this.isSaving = false;
+          this.router.navigate(['/']);
         },
-      );
+        error: () => {
+          this.handleErrorWhileCreatingFlow(this.flow.id, this.step.id);
+        },
+      });
+  }
+
+  private createLinks$(): Observable<unknown> {
+    const requests: Observable<unknown>[] = [];
+    let previousStepId = 0;
+
+    this.steps.forEach(step => {
+      if (step.stepType === 'ACTION' || step.stepType === 'SOURCE' || step.stepType === 'ROUTE') {
+        const linkName = this.flow.id + '-' + step.id;
+        requests.push(this.linkService.create(this.setLink(linkName, step.id, 'out')));
+      }
+
+      if (step.stepType === 'ACTION' || step.stepType === 'SINK' || step.stepType === 'ROUTE') {
+        const linkName = this.flow.id + '-' + previousStepId;
+        if (previousStepId != 0) {
+          requests.push(this.linkService.create(this.setLink(linkName, step.id, 'in')));
+        }
+      }
+
+      previousStepId = step.id;
+    });
+
+    return requests.length ? forkJoin(requests) : of(null);
+  }
+
+  private updateLinks$(): Observable<unknown> {
+    return this.deleteLinks$().pipe(switchMap(() => this.createLinks$()));
+  }
+
+  private deleteLinks$(): Observable<unknown> {
+    const requests = [
+      ...this.stepsToDelete.filter(step => step.id != null).map(step => this.linkService.deleteByStepId(step.id)),
+      ...this.steps.filter(step => step.id != null).map(step => this.linkService.deleteByStepId(step.id)),
+    ];
+    return requests.length ? forkJoin(requests) : of(null);
   }
 
 	setDataFromForm(): void {

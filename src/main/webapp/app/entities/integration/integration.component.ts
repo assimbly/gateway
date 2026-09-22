@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, OnDestroy, TemplateRef, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, TemplateRef, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
@@ -59,14 +59,12 @@ export class IntegrationComponent implements OnInit, OnDestroy {
         protected accountService: AccountService,
         private router: Router,
         private modalService: NgbModal,
-        private changeDetector: ChangeDetectorRef
     ) {}
 
     loadAll() {
         this.integrationService.query().subscribe(
             (res: HttpResponse<IIntegration[]>) => {
                 this.integrations.set(res.body ?? []);
-                this.changeDetector.detectChanges();
             },
             (res: HttpErrorResponse) => this.onError(res.message)
         );

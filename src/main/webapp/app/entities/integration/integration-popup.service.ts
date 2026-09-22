@@ -36,9 +36,7 @@ export class IntegrationPopupService {
 
     integrationModalRef(component: any, integration: Integration): NgbModalRef {
         const modalRef = this.modalService.open(component, { size: 'lg', backdrop: 'static' });
-        if (typeof component as Component) {
-            modalRef.componentInstance.integration = integration;
-        }
+        modalRef.componentInstance.integration = integration;
         return modalRef;
     }
 }

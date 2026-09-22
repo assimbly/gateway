@@ -8,7 +8,7 @@ import { AlertService } from 'app/core/util/alert.service';
 import { ParseLinks } from 'app/core/util/parse-links.service';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { SortState } from 'app/shared/sort';
+import { SortState, sortParams } from 'app/shared/sort';
 import { SearchToolbar } from 'app/shared/filter';
 import { DataTable, DataTableColumn, OverflowActionDirective, PrimaryActionDirective, RowActions, Truncate } from 'app/shared/table';
 
@@ -149,12 +149,7 @@ export class CertificateComponent implements OnInit, OnDestroy {
   }
 
   sort(): string[] {
-    const { predicate, order } = this.sortState;
-    const result = [predicate + ',' + order];
-    if (predicate !== 'id') {
-      result.push('id');
-    }
-    return result;
+    return sortParams(this.sortState, 'id');
   }
 
   uploadCertificate() {

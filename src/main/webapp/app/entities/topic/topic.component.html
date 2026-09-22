@@ -31,10 +31,11 @@
     ariaLabel="Topics"
   >
     <tr
-      jhi-topic-row
+      jhi-address-row
       *ngFor="let address of filteredAddresses; trackBy: trackId"
       [address]="address"
       [brokerType]="brokerType"
+      endpointType="topic"
     ></tr>
   </jhi-data-table>
 </div>

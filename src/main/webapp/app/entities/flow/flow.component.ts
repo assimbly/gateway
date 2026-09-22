@@ -1,15 +1,15 @@
-import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy, QueryList, ViewChildren } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
-import { Subscription, forkJoin } from 'rxjs';
+import { Subscription, forkJoin, interval } from 'rxjs';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { RouterModule } from '@angular/router';
 
-import { SortState } from 'app/shared/sort';
+import { SortState, sortParams } from 'app/shared/sort';
 
-import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { EventManager } from 'app/core/util/event-manager.service';
 import { ParseLinks } from 'app/core/util/parse-links.service';
 import { AlertService } from 'app/core/util/alert.service';
 
@@ -36,7 +36,6 @@ export class FlowComponent implements OnInit, OnDestroy {
   flows: IFlow[] = [];
   flow: IFlow;
   currentAccount: any;
-  eventSubscriber: Subscription;
   itemsPerPage: number;
   links: any;
   page: any;
@@ -67,6 +66,10 @@ export class FlowComponent implements OnInit, OnDestroy {
     { key: 'status', header: 'Status', align: 'end' },
   ];
   private readonly searchPipe = new FlowSearchByNamePipe();
+  private readonly eventSubscriptions = new Subscription();
+  private readonly polls = new Subscription();
+
+  @ViewChildren(FlowRowComponent) private flowRows: QueryList<FlowRowComponent>;
 
   constructor(
     protected flowService: FlowService,
@@ -138,6 +141,8 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.registerChangeInFlows();
     this.registerChangeCreatedIntegration();
     this.registerDeletedFlows();
+    this.polls.add(interval(15000).subscribe(() => this.flowRows?.forEach(row => row.pollMessages())));
+    this.polls.add(interval(10000).subscribe(() => this.flowRows?.forEach(row => row.pollAlerts())));
   }
 
   ngAfterViewInit() {
@@ -147,7 +152,8 @@ export class FlowComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.eventManager.destroy(this.eventSubscriber);
+    this.eventSubscriptions.unsubscribe();
+    this.polls.unsubscribe();
   }
 
   getIntegrations(): void {
@@ -214,29 +220,28 @@ export class FlowComponent implements OnInit, OnDestroy {
   }
 
   registerChangeInFlows() {
-    this.eventSubscriber = this.eventManager.subscribe('flowListModification', response => this.reset());
+    this.eventSubscriptions.add(this.eventManager.subscribe('flowListModification', () => this.reset()));
   }
 
   sort(): string[] {
-    const { predicate, order } = this.sortState;
-    const result = [predicate + ',' + order];
-    if (predicate !== 'name') {
-      result.push('name');
-    }
-    return result;
+    return sortParams(this.sortState);
   }
 
   registerChangeCreatedIntegration() {
-    this.eventSubscriber = this.eventManager.subscribe('integrationCreated', response => {
-      this.integrationExists = false;
-      this.getIntegrations();
-    });
+    this.eventSubscriptions.add(
+      this.eventManager.subscribe('integrationCreated', () => {
+        this.integrationExists = false;
+        this.getIntegrations();
+      }),
+    );
   }
 
   registerDeletedFlows() {
-    this.eventManager.subscribe('flowDeleted', res => {
-      this.loadFlows();
-    });
+    this.eventSubscriptions.add(
+      this.eventManager.subscribe('flowDeleted', () => {
+        this.loadFlows();
+      }),
+    );
   }
 
   trigerAction(selectedAction: string) {

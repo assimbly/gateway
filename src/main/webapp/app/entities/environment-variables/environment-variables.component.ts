@@ -7,7 +7,7 @@ import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { SortState } from 'app/shared/sort';
+import { SortState, sortParams } from 'app/shared/sort';
 import { HasAnyAuthorityDirective } from 'app/shared/auth';
 import { SearchToolbar } from 'app/shared/filter';
 import { DataTable, DataTableColumn, OverflowActionDirective, PrimaryActionDirective, RowActions, Truncate } from 'app/shared/table';
@@ -144,12 +144,7 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
 	}
 
     sort(): string[] {
-        const { predicate, order } = this.sortState;
-        const result = [predicate + ',' + order];
-        if (predicate !== 'key') {
-            result.push('key');
-        }
-        return result;
+        return sortParams(this.sortState, 'key');
     }
 
     reset() {
