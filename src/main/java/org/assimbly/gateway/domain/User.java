@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.apache.commons.lang3.StringUtils;
 import org.assimbly.gateway.config.Constants;
+import org.assimbly.gateway.domain.enumeration.ThemePreference;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -73,6 +74,11 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Size(max = 256)
     @Column(name = "image_url", length = 256)
     private String imageUrl;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "theme_preference", length = 20, nullable = false)
+    private ThemePreference themePreference = ThemePreference.SYSTEM;
 
     @Size(max = 20)
     @Column(name = "activation_key", length = 20)
@@ -195,6 +201,14 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
         this.langKey = langKey;
     }
 
+    public ThemePreference getThemePreference() {
+        return themePreference;
+    }
+
+    public void setThemePreference(ThemePreference themePreference) {
+        this.themePreference = ThemePreference.fromNullable(themePreference);
+    }
+
     public Set<Authority> getAuthorities() {
         return authorities;
     }
@@ -231,6 +245,7 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
             ", imageUrl='" + imageUrl + '\'' +
             ", activated='" + activated + '\'' +
             ", langKey='" + langKey + '\'' +
+            ", themePreference='" + themePreference + '\'' +
             ", activationKey='" + activationKey + '\'' +
             "}";
     }

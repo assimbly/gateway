@@ -60,7 +60,7 @@ Custom page styles
 }
 
 h1 {
-  color: #353d47;
+  color: var(--app-text);
   font-family: 'Raleway', sans-serif;
   font-size: 62px;
   font-weight: 800;
@@ -71,7 +71,7 @@ h1 {
 }
 
 h3 {
-  color: #676767;
+  color: var(--app-text-muted);
   font-family: 'Raleway', sans-serif;
   font-size: 24px;
   font-weight: 600;
@@ -81,7 +81,7 @@ h3 {
 }
 
 p {
-  color: #676767;
+  color: var(--app-text-muted);
   font-family: 'Raleway', sans-serif;
   font-size: 18px;
   font-weight: 500;

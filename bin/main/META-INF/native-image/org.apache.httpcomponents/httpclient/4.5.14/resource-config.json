@@ -1,0 +1,18 @@
+{
+  "resources": [
+      {
+        "glob": "\\\\Qmozilla/public-suffix-list.txt\\\\E",
+        "condition": {
+          "typeReachable": "org.apache.http.conn.util.PublicSuffixMatcherLoader"
+        }
+      },
+      {
+        "glob": "\\\\Qorg/apache/http/client/version.properties\\\\E",
+        "condition": {
+          "typeReachable": "org.apache.http.util.VersionInfo"
+        }
+      }
+    ],
+  "bundles": [
+  ]
+}

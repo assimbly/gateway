@@ -25,6 +25,20 @@ describe('Main', () => {
   let document: Document;
 
   beforeEach(waitForAsync(() => {
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      configurable: true,
+      value: (query: string) => ({
+        matches: true,
+        media: query,
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        dispatchEvent: jest.fn(),
+      }),
+    });
     TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot(), RouterTestingModule, Main],
       providers: [Title, AccountService, { provide: TitleStrategy, useClass: AppPageTitleStrategy }],

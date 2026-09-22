@@ -1,15 +1,13 @@
 import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription, forkJoin } from 'rxjs';
 
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { RouterModule } from '@angular/router';
 
-import { SortDirective, SortByDirective, SortState } from 'app/shared/sort';
+import { SortState } from 'app/shared/sort';
 
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { ParseLinks } from 'app/core/util/parse-links.service';
@@ -22,29 +20,20 @@ import { ITEMS_PER_PAGE } from 'app/config/pagination.constants';
 import { FlowService } from './flow.service';
 import { IIntegration, GatewayType, EnvironmentType } from 'app/shared/model/integration.model';
 import { IntegrationService } from 'app/entities/integration/integration.service';
+import { SearchToolbar } from 'app/shared/filter';
+import { DataTable, DataTableColumn } from 'app/shared/table';
 import { FlowRowComponent } from './flow-row.component';
 import { FlowSearchByNamePipe } from './flow.searchbyname.pipe';
 
 @Component({
   selector: 'jhi-flow',
   templateUrl: './flow.component.html',
-  imports: [
-    CommonModule,
-    FormsModule,
-    RouterModule,
-    NgbDropdownModule,
-    FontAwesomeModule,
-    InfiniteScrollModule,
-    SortDirective,
-    SortByDirective,
-    FlowRowComponent,
-    FlowSearchByNamePipe,
-  ],
+  imports: [CommonModule, RouterModule, FontAwesomeModule, NgbDropdownModule, SearchToolbar, DataTable, FlowRowComponent],
 })
 export class FlowComponent implements OnInit, OnDestroy {
   integrations: IIntegration[];
   integration: IIntegration;
-  flows: IFlow[];
+  flows: IFlow[] = [];
   flow: IFlow;
   currentAccount: any;
   eventSubscriber: Subscription;
@@ -69,6 +58,15 @@ export class FlowComponent implements OnInit, OnDestroy {
   selectedAction: string;
   test: any;
   searchText = '';
+  flowsLoading = true;
+  readonly columns: DataTableColumn[] = [
+    { key: 'name', header: 'Name', sortable: true },
+    { key: 'completed', header: 'Completed', numeric: true },
+    { key: 'failed', header: 'Failed', numeric: true },
+    { key: 'actions', header: 'Actions', align: 'end' },
+    { key: 'status', header: 'Status', align: 'end' },
+  ];
+  private readonly searchPipe = new FlowSearchByNamePipe();
 
   constructor(
     protected flowService: FlowService,
@@ -77,7 +75,6 @@ export class FlowComponent implements OnInit, OnDestroy {
     protected parseLinks: ParseLinks,
     protected accountService: AccountService,
     protected integrationService: IntegrationService,
-    protected router: Router,
     protected changeDetector: ChangeDetectorRef
   ) {
     this.flows = [];
@@ -122,6 +119,7 @@ export class FlowComponent implements OnInit, OnDestroy {
   reset() {
     this.page = 0;
     this.flows = [];
+    this.flowsLoading = true;
     this.loadFlows();
   }
 
@@ -176,6 +174,7 @@ export class FlowComponent implements OnInit, OnDestroy {
           this.singleIntegrationName = integration.body.name;
           this.singleIntegrationId = integration.body.id;
           this.singleIntegrationStage = integration.body.stage ? integration.body.stage.toString().toLowerCase() : '';
+          this.flowsLoading = false;
         });
       } else {
         this.loadFlows();
@@ -199,13 +198,15 @@ export class FlowComponent implements OnInit, OnDestroy {
       this.multipleIntegrations = false;
       this.configuredIntegration = integrations.find(integration => integration.name === integrationName);
       this.indexIntegration = integrations.findIndex(integration => integration.name == integrationName);
-      if (this.indexIntegration > 0) {
-        this.integrationExists = true;
-      } else {
-        this.integrationExists = false;
+      this.integrationExists = this.indexIntegration >= 0;
+      if (!this.integrationExists) {
         this.indexIntegration = 0;
       }
     }
+  }
+
+  get filteredFlows(): IFlow[] {
+    return this.searchPipe.transform(this.flows ?? [], this.searchText, this.sortState.order === 'asc', this.sortState.predicate);
   }
 
   trackId(index: number, item: IFlow) {
@@ -242,10 +243,6 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.eventManager.broadcast({ name: 'trigerAction', content: selectedAction });
   }
 
-  navigateToFlowEditor(mode: string, editorType: string): void {
-	  this.router.navigate(['/flow/editor'], {queryParams: { mode: mode, editor: editorType }});
-  }
-
   private onSuccess(data, headers) {
     if (this.integrations.length === 1) {
       this.links = this.parseLinks.parse(headers.get('link'));
@@ -255,10 +252,12 @@ export class FlowComponent implements OnInit, OnDestroy {
       this.flows.push(data[i]);
     }
     this.totalItems = headers.get('X-Total-Count');
+    this.flowsLoading = false;
     this.changeDetector.detectChanges();
   }
 
   protected onError(errorMessage: string) {
+    this.flowsLoading = false;
 		this.alertService.addAlert({
 		  type: 'danger',
 		  message: errorMessage,

@@ -1,9 +1,10 @@
 import { HttpHeaders } from '@angular/common/http';
-import { Component, effect, inject, signal, untracked } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Data, ParamMap, Router, RouterLink } from '@angular/router';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap/modal';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap/pagination';
 import { combineLatest, filter, map, tap } from 'rxjs';
@@ -12,9 +13,11 @@ import { DEFAULT_SORT_DATA, ITEMS_PER_PAGE, ITEM_DELETED_EVENT, PAGE_HEADER, SOR
 import { AccountService } from 'app/core/auth';
 import { Alert, AlertError } from 'app/shared/alert';
 import { FormatMediumDatetimePipe } from 'app/shared/date';
+import { SearchToolbar } from 'app/shared/filter';
 import { TranslateDirective } from 'app/shared/language';
 import { ItemCount } from 'app/shared/pagination';
-import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
+import { SortService, type SortState, sortStateSignal } from 'app/shared/sort';
+import { DataTable, DataTableColumn, OverflowActionDirective, PrimaryActionDirective, RowActions, Truncate } from 'app/shared/table';
 import { UserManagementDeleteDialog } from '../delete/user-management-delete-dialog';
 import { UserManagementService } from '../service/user-management.service';
 import { IUserManagement } from '../user-management.model';
@@ -25,20 +28,47 @@ import { IUserManagement } from '../user-management.model';
   imports: [
     RouterLink,
     FontAwesomeModule,
+    NgbDropdownModule,
     AlertError,
     Alert,
-    SortDirective,
-    SortByDirective,
     TranslateDirective,
     FormatMediumDatetimePipe,
     NgbPagination,
     ItemCount,
+    SearchToolbar,
+    DataTable,
+    RowActions,
+    PrimaryActionDirective,
+    OverflowActionDirective,
+    Truncate,
   ],
 })
 export class UserManagement {
   readonly userManagements = signal<IUserManagement[]>([]);
+  readonly searchText = signal('');
 
   sortState = sortStateSignal({});
+  readonly columns: DataTableColumn[] = [
+    { key: 'login', header: 'Login', sortable: true },
+    { key: 'email', header: 'Email', sortable: true },
+    { key: 'activated', header: '' },
+    { key: 'createdDate', header: 'Created date', sortable: true },
+    { key: 'lastModifiedBy', header: 'Modified by', sortable: true },
+    { key: 'lastModifiedDate', header: 'Modified date', sortable: true },
+    { key: 'profiles', header: 'Profiles' },
+    { key: 'actions', header: 'Actions', align: 'end' },
+  ];
+
+  readonly filteredUsers = computed(() => {
+    const query = this.searchText().toLocaleLowerCase();
+    const users = this.userManagements();
+    if (!query) {
+      return users;
+    }
+    return users.filter(
+      user => user.login.toLocaleLowerCase().includes(query) || (user.email ?? '').toLocaleLowerCase().includes(query),
+    );
+  });
 
   readonly itemsPerPage = signal(ITEMS_PER_PAGE);
   readonly totalItems = signal(0);

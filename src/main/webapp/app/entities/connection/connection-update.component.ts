@@ -19,11 +19,12 @@ import { ConnectionKeysService } from '../connection-keys/connection-keys.servic
 import { RequiredConnectionKey } from '../connection-keys/connection-keys.component';
 
 import { Connections } from '../../shared/camel/connections';
+import { FieldTabDirective } from 'app/shared/form/field-tab.directive';
 
 @Component({
   selector: 'jhi-connection-update',
   templateUrl: './connection-update.component.html',
-  imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, ForbiddenConnectionNamesValidatorDirective, ForbiddenConnectionKeysValidatorDirective],
+  imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, ForbiddenConnectionNamesValidatorDirective, ForbiddenConnectionKeysValidatorDirective, FieldTabDirective],
 })
 export class ConnectionUpdateComponent implements OnInit {
   connection: IConnection;

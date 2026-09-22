@@ -1,6 +1,3 @@
-// All @use rules must be at the top
-@use 'sass:color';
-
 // Keep the bootstrap imports as @import to avoid dependency issues (maybe sold in bootstrap v6)
 @import 'bootstrap-variables';
 @import 'bootstrap/scss/functions';
@@ -9,6 +6,11 @@
 // Import CSS files using @import (CSS files can't be used with @use)
 @import "~@ng-select/ng-select/themes/default.theme.css";
 @import '~codemirror/lib/codemirror.css';
+@import '~codemirror/theme/material-darker.css';
+@import 'theme-tokens';
+@import 'buttons';
+@import 'tables';
+@import 'ng_select';
 
 /* ==============================================================
 Bootstrap tweaks
@@ -22,24 +24,33 @@ h4 {
   font-weight: 300;
 }
 
-/* Increase contrast of links to get 100% on Lighthouse Accessibility Audit. Override this color if you want to change the link color, or use a Bootswatch theme */
+/* Increase contrast of links. Sidebar/header links override this locally. */
 a {
-  color: #533f03;
+  color: var(--app-primary-accessible);
   font-weight: bold;
 }
 
+a.btn {
+  font-weight: var(--bs-btn-font-weight, 400);
+}
+
+.table-entities .btn-group > .btn {
+  display: inline-flex;
+  align-items: center;
+}
+
 a:hover {
-  color: #533f03;
+  color: var(--app-primary);
 }
 
 /* override hover color for dropdown-item forced by bootstrap to all a:not([href]):not([tabindex]) elements in _reboot.scss */
 a:not([href]):not([tabindex]):hover.dropdown-item {
-  color: $dropdown-link-hover-color;
+  color: var(--app-text);
 }
 
 /* override .dropdown-item.active background-color on hover */
 .dropdown-item.active:hover {
-  background-color: color.mix($dropdown-link-hover-bg, $dropdown-link-active-bg, 50%);
+  background-color: var(--app-active);
 }
 
 a:hover {
@@ -48,7 +59,8 @@ a:hover {
 }
 
 .dropdown-item:hover {
-  color: $dropdown-link-hover-color;
+  color: var(--app-text);
+  background-color: var(--app-hover);
 }
 
 /* ==========================================================================
@@ -68,11 +80,16 @@ Generic styles
 /* Error highlight on input fields */
 .ng-valid[required],
 .ng-valid.required {
-  border-left: 5px solid green;
+  border-left: 5px solid var(--app-success);
 }
 
 .ng-invalid:not(form) {
-  border-left: 5px solid red;
+  border-left: 5px solid var(--app-danger);
+}
+
+.form-fx-validate:not(.form-submitted) .ng-invalid:not(form) {
+  border-left-color: var(--app-border);
+  border-left-width: 1px;
 }
 
 /* other generic styles */
@@ -80,12 +97,26 @@ Generic styles
 .jh-card {
   padding: 1.5%;
   margin-top: 20px;
-  border: none;
+  border: 1px solid var(--app-border);
+  background-color: var(--app-surface);
+  color: var(--app-text);
+  caret-color: transparent;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.jh-card input,
+.jh-card textarea,
+.jh-card select,
+.jh-card [contenteditable],
+.jh-card .CodeMirror,
+.jh-card .CodeMirror-cursor {
+  caret-color: var(--app-text);
 }
 
 .error {
-  color: white;
-  background-color: red;
+  color: var(--app-primary-contrast);
+  background-color: var(--app-danger);
 }
 
 .pad {
@@ -105,17 +136,36 @@ Generic styles
   word-break: break-all;
 }
 
-.form-control {
-  background-color: #fff;
+.form-control,
+.form-select {
+  background-color: var(--app-surface);
+  color: var(--app-text);
+  border-color: var(--app-border);
+}
+
+.form-control:focus,
+.form-select:focus {
+  background-color: var(--app-surface);
+  color: var(--app-text);
+  border-color: var(--app-focus);
+}
+
+.form-control:disabled,
+.form-control[readonly],
+.form-select:disabled {
+  background-color: var(--app-disabled-bg);
+  color: var(--app-disabled-text);
 }
 
 .readonly {
-  background-color: #eee;
+  background-color: var(--app-disabled-bg);
+  color: var(--app-disabled-text);
   opacity: 1;
 }
 
 .footer {
-  border-top: 1px solid rgba(0, 0, 0, 0.125);
+  border-top: 1px solid var(--app-border);
+  color: var(--app-text-muted);
 }
 
 .hand,
@@ -151,11 +201,17 @@ Custom alerts for notification
       right: 5px;
     }
     &.top {
-      top: 55px;
+      top: 0.75rem;
     }
     &.bottom {
       bottom: 55px;
     }
+  }
+}
+
+@media screen and (max-width: 991.98px) {
+  .alerts .jhi-toast.top {
+    top: 3.5rem;
   }
 }
 
@@ -195,7 +251,7 @@ entity detail page css
       padding: 0.5em 0;
     }
     dd {
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid var(--app-border);
       padding: 0.5em 0;
       margin-left: 0;
     }
@@ -254,9 +310,10 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 #toTab1.active,
 #toTab2.active,
 #errorTab.active {
-  background-color: crimson;
-  border-color: white;
-  color: white;
+  background-color: var(--app-primary);
+  border-color: var(--app-primary);
+  color: var(--app-primary-contrast);
+  font-weight: 600;
 }
 
 #fromTab,
@@ -265,17 +322,17 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 #toTab1,
 #toTab2,
 #errorTab {
-  background-color: grey;
-  border-color: white;
-  color: white;
+  background-color: var(--app-hover);
+  border-color: var(--app-border);
+  color: var(--app-text);
 }
 
 #tabBackground {
-  background-color: whitesmoke;
-  border-color: black;
+  background-color: var(--app-bg);
+  border-color: var(--app-border);
   margin-top: 10px;
   margin-bottom: 10px;
-  border-bottom: 3px solid whitesmoke;
+  border-bottom: 3px solid var(--app-bg);
 }
 
 .detailsTable {
@@ -283,7 +340,7 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 }
 
 .lastItemBorder {
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid var(--app-border);
 }
 
 .btn {
@@ -397,13 +454,108 @@ ng-dropdown-panel > div {
 }
 */
 
-.alert-popover {
-  min-width: 200px;
-  max-width: 60%;
+.popover.flow-stats-popover {
+  max-width: 28rem;
 }
 
-.alert-popover .popover-body {
+.popover.flow-stats-popover .popover-body {
+  max-height: 70vh;
+  overflow: auto;
+}
+
+.flow-stats-empty {
+  margin: 0;
+  color: var(--app-text-muted);
+}
+
+.flow-stats-section + .flow-stats-section {
+  margin-top: 0.85rem;
+}
+
+.flow-stats-note {
+  margin: 0;
+  font-size: 0.84rem;
+  word-break: break-all;
+}
+
+.flow-stats-section h6 {
+  margin: 0 0 0.35rem;
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--app-text-muted);
+}
+
+.flow-stats-section table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.flow-stats-section th,
+.flow-stats-section td {
+  padding: 0.22rem 0;
+  font-size: 0.84rem;
+  font-weight: 450;
+  vertical-align: baseline;
+}
+
+.flow-stats-section th {
+  color: var(--app-text-muted);
+  text-align: left;
+  padding-right: 1rem;
+  white-space: nowrap;
+}
+
+.flow-stats-section td {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  word-break: break-word;
+}
+
+.flow-alert-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: block;
+  max-height: 24rem;
+  overflow-y: auto;
+  text-align: left;
+}
+
+.flow-alert-list li {
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin-bottom: 0.75rem;
+}
+
+.invalid-field-message {
+  margin-top: 0.25rem;
+  margin-bottom: 0;
+  color: var(--app-danger);
+  line-height: 1.3;
+}
+
+.flow-alert-list .flow-alert-status {
+  list-style: none;
+  margin-left: -1.25rem;
+  color: var(--bs-secondary-color);
+}
+
+.flow-error-detail {
+  max-height: 60vh;
+  overflow: auto;
+  text-align: left;
+}
+
+.flow-error-detail table td:first-child {
+  white-space: nowrap;
+  width: 1%;
+  min-width: 5.5rem;
+  padding-right: 1rem;
+}
+
+.flow-error-detail table td:last-child {
+  overflow-wrap: anywhere;
 }
 
 
@@ -482,17 +634,138 @@ ng-dropdown-panel > div {
 }
 
 .highlight {
-  background-color: #0275d8 !important;
-  color: green;
-  font-weight: bold
+  background-color: var(--app-primary);
+  color: var(--app-primary-contrast);
+  font-weight: bold;
 }
 
 .btn-primary {
-  color: white !important;
+  --bs-btn-color: var(--app-primary-contrast);
+  --bs-btn-bg: var(--app-primary);
+  --bs-btn-border-color: var(--app-primary);
+  --bs-btn-disabled-color: var(--app-primary-contrast);
+  --bs-btn-disabled-bg: var(--app-primary);
+  --bs-btn-disabled-border-color: var(--app-primary);
+  --bs-btn-disabled-opacity: 1;
+  color: var(--app-primary-contrast);
+  background-color: var(--app-primary);
+  border-color: var(--app-primary);
 }
 
 .btn-info {
-  color: white !important;
+  --bs-btn-color: var(--app-primary-contrast);
+  --bs-btn-bg: var(--app-info);
+  --bs-btn-border-color: var(--app-info);
+  --bs-btn-disabled-color: var(--app-primary-contrast);
+  --bs-btn-disabled-bg: var(--app-info);
+  --bs-btn-disabled-border-color: var(--app-info);
+  --bs-btn-disabled-opacity: 1;
+  color: var(--app-primary-contrast);
+  background-color: var(--app-info);
+  border-color: var(--app-info);
+}
+
+.btn-success {
+  --bs-btn-color: var(--app-primary-contrast);
+  --bs-btn-bg: var(--app-success);
+  --bs-btn-border-color: var(--app-success);
+  --bs-btn-disabled-color: var(--app-primary-contrast);
+  --bs-btn-disabled-bg: var(--app-success);
+  --bs-btn-disabled-border-color: var(--app-success);
+  --bs-btn-disabled-opacity: 1;
+  color: var(--app-primary-contrast);
+  background-color: var(--app-success);
+  border-color: var(--app-success);
+}
+
+.btn-danger {
+  --bs-btn-color: var(--app-primary-contrast);
+  --bs-btn-bg: var(--app-danger);
+  --bs-btn-border-color: var(--app-danger);
+  --bs-btn-disabled-color: var(--app-primary-contrast);
+  --bs-btn-disabled-bg: var(--app-danger);
+  --bs-btn-disabled-border-color: var(--app-danger);
+  --bs-btn-disabled-opacity: 1;
+  color: var(--app-primary-contrast);
+  background-color: var(--app-danger);
+  border-color: var(--app-danger);
+}
+
+.btn-warning {
+  --bs-btn-color: var(--app-warning-contrast);
+  --bs-btn-bg: var(--app-warning);
+  --bs-btn-border-color: var(--app-warning);
+  --bs-btn-disabled-color: var(--app-warning-contrast);
+  --bs-btn-disabled-bg: var(--app-warning);
+  --bs-btn-disabled-border-color: var(--app-warning);
+  --bs-btn-disabled-opacity: 1;
+  color: var(--app-warning-contrast);
+  background-color: var(--app-warning);
+  border-color: var(--app-warning);
+}
+
+.btn-outline-primary {
+  color: var(--app-primary);
+  border-color: var(--app-primary);
+}
+
+.btn-outline-primary:hover {
+  color: var(--app-primary-contrast);
+  background-color: var(--app-primary);
+}
+
+.btn-primary [style*='color: white'],
+.btn-info [style*='color: white'],
+.btn-danger [style*='color: white'],
+.btn-success [style*='color: white'] {
+  color: var(--app-primary-contrast) !important;
+}
+
+.btn:disabled,
+.btn.disabled {
+  background-color: var(--bs-btn-disabled-bg, var(--app-disabled-bg));
+  border-color: var(--bs-btn-disabled-border-color, var(--app-border));
+  color: var(--bs-btn-disabled-color, var(--app-disabled-text));
+}
+
+.btn-primary:disabled,
+.btn-primary.disabled {
+  background-color: var(--app-primary);
+  border-color: var(--app-primary);
+  color: var(--app-primary-contrast);
+  opacity: 1;
+}
+
+.btn-success:disabled,
+.btn-success.disabled {
+  background-color: var(--app-success);
+  border-color: var(--app-success);
+  color: var(--app-primary-contrast);
+  opacity: 1;
+}
+
+.btn-info:disabled,
+.btn-info.disabled {
+  background-color: var(--app-info);
+  border-color: var(--app-info);
+  color: var(--app-primary-contrast);
+  opacity: 1;
+}
+
+.btn-danger:disabled,
+.btn-danger.disabled {
+  background-color: var(--app-danger);
+  border-color: var(--app-danger);
+  color: var(--app-primary-contrast);
+  opacity: 1;
+}
+
+.btn-warning:disabled,
+.btn-warning.disabled {
+  background-color: var(--app-warning);
+  border-color: var(--app-warning);
+  color: var(--app-warning-contrast);
+  opacity: 1;
 }
 
 
@@ -666,13 +939,13 @@ ng-dropdown-panel > div {
   box-sizing: border-box;
   height: 88px;
   padding: 8px 12px;
-  border-top: 1px solid #dee2e6;
+  border-top: 1px solid var(--app-border);
   font-size: 12px;
   line-height: 1.35;
   text-align: left;
   white-space: normal;
   max-width: 100%;
-  background: #f8f9fa;
+  background: var(--app-hover);
   overflow: hidden;
 }
 
@@ -696,13 +969,13 @@ ng-dropdown-panel > div {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  color: #6c757d;
+  color: var(--app-text-muted);
   white-space: nowrap;
   overflow: hidden;
 }
 
 .option-desc-footer-placeholder {
-  color: #6c757d;
+  color: var(--app-text-muted);
   padding-top: 20px;
 }
 
@@ -828,26 +1101,113 @@ ng-dropdown-panel > div {
 }
 
 .jh-card {
-    background-color: white;
-    min-height: calc(100vh - 118px);
-    height: 100%;
+    background-color: var(--app-surface);
+    color: var(--app-text);
+    flex: 1;
+    min-width: 0;
+    max-width: 100%;
+    min-height: 0;
+    height: auto;
 }
 
 .editor-nav {
-    background-color: #E0E0E0;
+    background-color: var(--app-hover);
     min-height: 70rem;
     width: 54rem;
 }
 
 .CodeMirror {
- border: 1px solid #eee;
+ border: 1px solid var(--app-border);
  height: 500px;
  width: 100%;
+ background: var(--app-code-bg);
+ color: var(--app-text);
+ text-align: left;
+}
+
+.CodeMirror-lines,
+.CodeMirror-line,
+.CodeMirror pre {
+  text-align: left !important;
+}
+
+.CodeMirror-gutters {
+  position: absolute;
+  left: 0;
+  z-index: 3;
+  background-color: var(--app-hover);
+  border-right: 1px solid var(--app-border);
+}
+
+.CodeMirror-gutter-wrapper {
+  position: absolute;
+  z-index: 4;
+}
+
+.CodeMirror-linenumber {
+  padding: 0 0.45rem 0 0.35rem;
+  min-width: 1.6rem;
+  text-align: right;
+  white-space: nowrap;
+  color: var(--app-text-muted);
+}
+
+.script-codemirror,
+.notes-codemirror {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  text-align: left;
+}
+
+.script-codemirror .CodeMirror {
+  height: 12.5rem;
+}
+
+.notes-codemirror .CodeMirror {
+  height: 40rem;
+}
+
+.response-body-readonly {
+  position: relative;
+}
+
+.response-body-readonly .CodeMirror {
+  background: var(--app-disabled-bg);
+  cursor: default;
+}
+
+.response-body-readonly .CodeMirror-cursor {
+  display: none !important;
+}
+
+.response-body-readonly__hint {
+  display: none;
+  position: absolute;
+  z-index: 4;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 0.15rem;
+  background: var(--app-surface-elevated);
+  color: var(--app-text-muted);
+  font-size: 0.75rem;
+  line-height: 1.2;
+  pointer-events: none;
+}
+
+.response-body-readonly:hover .response-body-readonly__hint,
+.response-body-readonly:focus-within .response-body-readonly__hint {
+  display: block;
+}
+
+.script-codemirror-full .CodeMirror {
+  height: calc(100vh - 12rem);
 }
 
 #messageBrowserEditor
 .CodeMirror {
- border: 1px solid #eee;
+ border: 1px solid var(--app-border);
  height: auto;
  width: 100%;
 }
@@ -857,3 +1217,148 @@ ng-dropdown-panel > div {
     height: auto;
     max-height:300px;
 }
+
+.table {
+  --bs-table-bg: var(--app-surface);
+  --bs-table-color: var(--app-text);
+  --bs-table-border-color: var(--app-border);
+  --bs-table-striped-bg: color-mix(in srgb, var(--app-hover) 70%, var(--app-surface));
+  --bs-table-hover-bg: var(--app-hover);
+  --bs-table-striped-color: var(--app-text);
+  --bs-table-hover-color: var(--app-text);
+}
+
+.text-muted {
+  color: var(--app-text-muted) !important;
+}
+
+.bg-light {
+  background-color: var(--app-hover) !important;
+  color: var(--app-text);
+}
+
+.card {
+  background-color: var(--app-surface);
+  border-color: var(--app-border);
+  color: var(--app-text);
+}
+
+.modal-content {
+  background-color: var(--app-surface-elevated);
+  color: var(--app-text);
+  border-color: var(--app-border);
+}
+
+.modal-header,
+.modal-footer {
+  border-color: var(--app-border);
+}
+
+[data-bs-theme='dark'] .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.list-group-item {
+  background-color: var(--app-surface);
+  color: var(--app-text);
+  border-color: var(--app-border);
+}
+
+.page-link {
+  background-color: var(--app-surface);
+  color: var(--app-primary-accessible);
+  border-color: var(--app-border);
+}
+
+.page-link:hover {
+  background-color: var(--app-hover);
+  color: var(--app-text);
+}
+
+.page-item.active .page-link {
+  background-color: var(--app-primary);
+  border-color: var(--app-primary);
+  color: var(--app-primary-contrast);
+}
+
+.page-item.disabled .page-link {
+  background-color: var(--app-disabled-bg);
+  color: var(--app-disabled-text);
+  border-color: var(--app-border);
+}
+
+.breadcrumb-item.active {
+  color: var(--app-text-muted);
+}
+
+.spinner-border,
+.spinner-grow {
+  color: var(--app-primary);
+}
+
+.form-check-input:checked {
+  background-color: var(--app-primary);
+  border-color: var(--app-primary);
+}
+
+.form-check-input:focus {
+  border-color: var(--app-focus);
+  box-shadow: 0 0 0 0.15rem color-mix(in srgb, var(--app-focus) 25%, transparent);
+}
+
+.tooltip-inner {
+  background-color: var(--app-text);
+  color: var(--app-surface);
+}
+
+.popover {
+  background-color: var(--app-surface-elevated);
+  border-color: var(--app-border);
+  color: var(--app-text);
+}
+
+.popover-header {
+  background-color: var(--app-hover);
+  color: var(--app-text);
+  border-bottom-color: var(--app-border);
+}
+
+hr {
+  border-color: var(--app-border);
+  opacity: 1;
+}
+
+pre,
+code {
+  background-color: var(--app-code-bg);
+  color: var(--app-text);
+}
+
+.nav-tabs .nav-link {
+  color: var(--app-text-muted);
+}
+
+.nav-tabs .nav-link.active {
+  background-color: var(--app-surface);
+  color: var(--app-text);
+  border-color: var(--app-border);
+}
+
+.alert {
+  border-color: var(--app-border);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--app-surface) inset;
+  -webkit-text-fill-color: var(--app-text);
+  caret-color: var(--app-text);
+}
+
+.dropdown-menu {
+  background-color: var(--app-surface-elevated);
+  border-color: var(--app-border);
+  color: var(--app-text);
+}
+

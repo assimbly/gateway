@@ -1,3 +1,5 @@
+import { ThemePreference } from 'app/core/theme/theme.model';
+
 export class Account {
   constructor(
     public activated: boolean,
@@ -8,5 +10,6 @@ export class Account {
     public lastName: string | null,
     public login: string,
     public imageUrl: string | null,
+    public themePreference: ThemePreference = 'SYSTEM',
   ) {}
 }

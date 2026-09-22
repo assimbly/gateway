@@ -10,11 +10,14 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 import static org.assimbly.gateway.security.SecurityUtils.AUTHORITIES_KEY;
 import static org.assimbly.gateway.security.SecurityUtils.JWT_ALGORITHM;
@@ -53,12 +56,20 @@ public class SecurityJwtConfiguration {
 
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        grantedAuthoritiesConverter.setAuthorityPrefix("");
-        grantedAuthoritiesConverter.setAuthoritiesClaimName(AUTHORITIES_KEY);
-
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwt -> {
+            Object claim = jwt.getClaim(AUTHORITIES_KEY);
+            if (claim == null) {
+                return java.util.List.of();
+            }
+            String authorities = claim instanceof Collection<?> collection
+                ? collection.stream().map(String::valueOf).collect(Collectors.joining(" "))
+                : claim.toString();
+            return Arrays.stream(authorities.split("[,\\s]+"))
+                .filter(authority -> !authority.isBlank())
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+        });
         return jwtAuthenticationConverter;
     }
 

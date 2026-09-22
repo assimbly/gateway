@@ -5,8 +5,26 @@ import { provideTranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 
 import { Account, AccountService } from 'app/core/auth';
+import { ThemeService } from 'app/core/theme';
 
 import Settings from './settings';
+
+function stubMatchMedia(matches = false): void {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    configurable: true,
+    value: (query: string) => ({
+      matches,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }),
+  });
+}
 
 describe('Settings', () => {
   let comp: Settings;
@@ -21,9 +39,12 @@ describe('Settings', () => {
     login: 'john',
     authorities: [],
     imageUrl: '',
+    themePreference: 'SYSTEM',
   };
 
   beforeEach(() => {
+    stubMatchMedia(false);
+    localStorage.removeItem(ThemeService.STORAGE_KEY);
     TestBed.configureTestingModule({
       providers: [
         provideTranslateService(),

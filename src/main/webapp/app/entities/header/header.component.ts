@@ -32,7 +32,7 @@ export class HeaderComponent implements OnInit, OnChanges {
     isSaving: boolean;
     header: IHeader;
     headerId: number;
-    languageHeader: string[] = ['constant', 'groovy', 'jsonpath', 'csimple', 'simple', 'spel', 'xpath'];
+    languageHeader: string[] = ['constant', 'simple', 'groovy', 'jsonpath', 'xpath'];
     typeHeader: string[] = ['header', 'property'];
     eventSubscriber: Subscription;
 

@@ -1,0 +1,11 @@
+{
+  "bundles": [],
+  "resources": [
+      {
+        "condition": {
+          "typeReachable": "org.h2.util.Utils"
+        },
+        "glob": "\\\\Qorg/h2/util/data.zip\\\\E"
+      }
+    ]
+}

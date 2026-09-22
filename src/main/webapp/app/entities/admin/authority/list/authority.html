@@ -1,24 +1,20 @@
 <div>
-  <h2 id="page-heading" data-cy="AuthorityHeading">
-    <span jhiTranslate="jhipsterGradleSampleApplicationApp.adminAuthority.home.title">Authorities</span>
+  <div class="d-flex justify-content-end">
+    <button class="btn btn-fx btn-fx-secondary me-2" type="button" (click)="load()" [disabled]="isLoading()" aria-label="Refresh list">
+      <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined"></fa-icon>
+      <span jhiTranslate="jhipsterGradleSampleApplicationApp.adminAuthority.home.refreshListLabel">Refresh list</span>
+    </button>
 
-    <div class="d-flex justify-content-end">
-      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
-        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
-        <span jhiTranslate="jhipsterGradleSampleApplicationApp.adminAuthority.home.refreshListLabel">Refresh list</span>
-      </button>
-
-      <button
-        id="jh-create-entity"
-        data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-authority"
-        [routerLink]="['/authority/new']"
-      >
-        <fa-icon icon="plus" />
-        <span jhiTranslate="jhipsterGradleSampleApplicationApp.adminAuthority.home.createLabel">Create a new Authority</span>
-      </button>
-    </div>
-  </h2>
+    <button
+      id="jh-create-entity"
+      data-cy="entityCreateButton"
+      class="btn btn-primary jh-create-entity create-authority"
+      [routerLink]="['/authority/new']"
+    >
+      <fa-icon icon="plus" />
+      <span jhiTranslate="jhipsterGradleSampleApplicationApp.adminAuthority.home.createLabel">Create a new Authority</span>
+    </button>
+  </div>
 
   <jhi-alert-error />
 
@@ -30,7 +26,7 @@
     </div>
   } @else {
     <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
+      <table class="table table-striped" aria-label="Authorities">
         <thead>
           <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
             <th scope="col" jhiSortBy="name">

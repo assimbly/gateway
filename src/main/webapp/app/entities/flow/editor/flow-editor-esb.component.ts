@@ -1,12 +1,12 @@
-import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, TemplateRef, ViewChild, ViewEncapsulation } from "@angular/core";
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, TemplateRef, ViewChild, ViewEncapsulation, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { NgbModal, NgbModalRef, NgbModule } from "@ng-bootstrap/ng-bootstrap";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { NgSelectModule } from "@ng-select/ng-select";
 import { PopoverModule } from "ngx-bootstrap/popover";
 import { AlertService } from "app/core/util/alert.service";
+import { FlowEditorStepComponent, StepEditorRegistry } from "./flow-editor-step.component";
 import { AlertError } from "app/shared/alert";
 import { EventManager, EventWithContent } from "app/core/util/event-manager.service";
 import { MessageDialogComponent } from 'app/entities/message/message-dialog.component';
@@ -34,16 +34,51 @@ import { IntegrationService } from "../../integration/integration.service";
 import { RouteService } from "../../route/route.service";
 import { ConnectionService } from '../../connection/connection.service';
 import { FlowService } from "../flow.service";
+import { FieldTabDirective } from "app/shared/form/field-tab.directive";
+import { CodemirrorModule } from "@ctrl/ngx-codemirror";
+import { ThemeService } from "app/core/theme";
 
 @Component({
   selector: 'jhi-flow-editor-esb',
   templateUrl: './flow-editor-esb.component.html',
   encapsulation: ViewEncapsulation.None,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, NgbModule, FontAwesomeModule, NgSelectModule, PopoverModule, AlertError],
+  providers: [StepEditorRegistry],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, NgbModule, FontAwesomeModule, PopoverModule, AlertError, FlowEditorStepComponent, FieldTabDirective, CodemirrorModule],
 })
 export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
+	private readonly themeService = inject(ThemeService);
+	private notesOptionsTheme = '';
+	private notesOptionsCache: Record<string, unknown> | null = null;
 	flow: IFlow;
+
+	notesEditorOptions(): Record<string, unknown> {
+		const theme = this.themeService.editorTheme();
+		if (this.notesOptionsCache && this.notesOptionsTheme === theme) {
+			return this.notesOptionsCache;
+		}
+		this.notesOptionsTheme = theme;
+		this.notesOptionsCache = {
+			lineNumbers: true,
+			gutters: ['CodeMirror-linenumbers'],
+			lineWrapping: true,
+			mode: 'text',
+			theme,
+		};
+		return this.notesOptionsCache;
+	}
+
+	refreshCodeMirror(editor: { codeMirror?: { refresh: () => void } }): void {
+		const codeMirror = editor?.codeMirror;
+		if (!codeMirror) {
+			return;
+		}
+		const refresh = () => codeMirror.refresh();
+		requestAnimationFrame(() => {
+			refresh();
+			setTimeout(refresh);
+		});
+	}
 	@ViewChild('flowNameInput') flowNameInput?: ElementRef<HTMLInputElement>;
 	routes: Route[];
 	messages: IMessage[];
@@ -57,7 +92,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	step: IStep;
 
   public stepTypes = ["SOURCE", "ACTION", "SINK", "ROUTE", "SCRIPT", "CONNECTION", "ERROR"];
-  public languageComponentsNames: Array<any> = ['groovy','java','javascript','jslt','python','simple','xslt'];
+  public languageComponentsNames: Array<any> = ['groovy', 'python', 'javascript', 'simple', 'jslt','xslt'];
   public componentsWithConnection: Array<any> = ['activemq','amazonmq','amqp','amqps','jms','sjms','sjms2','sql','ibmmq','spring-rabbitmq'];
 
 	public logLevelListType = [
@@ -81,6 +116,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	savingCheckSteps = true;
 
 	finished = false;
+	nameFieldReady = false;
+	formSubmitted = false;
 
 	integrations: Integration[];
 	configuredIntegration: Integration;
@@ -113,8 +150,6 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	selectedOptions: Array<Array<any>> = [[]];
 	componentOptions: Array<any> = [];
 	customOptions: Array<any> = [];
-	/** Option currently hovered in an open Options ng-select (shown in dropdown footer). */
-	hoveredOptionByStep: Array<any> = [];
 
 	componentTypeAssimblyLinks: Array<string> = new Array<string>();
 	componentTypeCamelLinks: Array<string> = new Array<string>();
@@ -174,6 +209,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		private routePopupService: RoutePopupService,
     private connectionPopupService: ConnectionPopupService,
 		private cdr: ChangeDetectorRef,
+		private stepEditorRegistry: StepEditorRegistry,
 	) {}
 
 	ngOnInit(): void {
@@ -188,8 +224,15 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		this.subscription =
 			this.route.queryParams.subscribe(
 				(params) => {
+					const nextEditor = params["editor"];
+					const editorChanged = !params["id"] && !!this.activeEditor && this.activeEditor !== nextEditor;
+
 					this.activeStep = params["stepid"];
-					this.activeEditor = params["editor"];
+					this.activeEditor = nextEditor;
+
+					if (editorChanged) {
+						this.resetNewFlowEditor();
+					}
 
 					if (params["mode"] === "clone") {
 						this.load(params["id"], true);
@@ -201,6 +244,25 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 		this.registerChangeInFlows();
 
+	}
+
+	private resetNewFlowEditor(): void {
+		this.finished = false;
+		this.nameFieldReady = false;
+		this.formSubmitted = false;
+		this.steps = [];
+		this.stepsOptions = [[]];
+		this.componentOptions = [];
+		this.selectedOptions = [[]];
+		this.numberOfSteps = 0;
+		this.componentTypeCamelLinks = [];
+		this.componentTypeAssimblyLinks = [];
+		this.uriPlaceholders = [];
+		this.uriPopoverMessages = [];
+		this.enableConnection = [];
+		this.enableMessage = [];
+		this.URIList = [[]];
+		this.filterConnection = [[]];
 	}
 
 	load(id, isCloning?: boolean): void {
@@ -322,7 +384,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
                     this.createNewStep(StepType.ERROR,this.integrations[0].defaultErrorComponentType,2);
                 }else if(this.activeEditor === 'route'){
                     this.createNewStep(StepType.ROUTE,'',0);
-                    this.createNewStep(StepType.ERROR,'',1);
+                    this.createNewStep(StepType.ERROR,this.integrations[0].defaultErrorComponentType || 'file',1);
                 }
 
 								this.finished = true;
@@ -512,10 +574,11 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     const componentType = step.componentType.toString().toLowerCase();
     const camelComponentType = this.components.getCamelComponentType(componentType);
 
-    if(step.stepType === 'SOURCE' || step.stepType === 'ACTION' || step.stepType === 'SINK' || step.stepType === 'ROUTER'){
+    if(step.stepType === 'SOURCE' || step.stepType === 'ACTION' || step.stepType === 'SINK' || step.stepType === 'ROUTER' || step.stepType === 'ERROR'){
 
         const type = this.components.types.find(component => component.name === componentType);
 
+        if (type) {
         this.componentTypeAssimblyLinks[stepFormIndex] = this.wikiDocUrl + '/component-' + componentType;
         this.componentTypeCamelLinks[stepFormIndex] = this.camelDocUrl + '/' + camelComponentType + '-component.html';
 
@@ -545,6 +608,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
           this.filterConnections(componentType, stepFormIndex);
         }else{
           this.enableConnection[stepFormIndex] = false;
+        }
+
         }
 
     }
@@ -609,12 +674,20 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	}
 
 	private focusFlowNameIfEmpty(): void {
-		const el = this.flowNameInput?.nativeElement;
-		if (!el || el.value) {
-			return;
-		}
-		el.focus();
-		el.select();
+		setTimeout(() => {
+			const el = this.flowNameInput?.nativeElement;
+			if (el && !el.value) {
+				el.focus();
+			}
+			this.editFlowForm?.controls.name.markAsPristine();
+			this.editFlowForm?.controls.name.markAsUntouched();
+			this.nameFieldReady = true;
+			this.cdr.detectChanges();
+		});
+	}
+
+	private refreshStepEditors(): void {
+		this.stepEditorRegistry.refresh();
 	}
 
   setStepComponent(step: any, stepFormIndex: number, stepType: any): void {
@@ -644,9 +717,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		this.logLevelPopoverMessage = `Logs messages for each step to the console/log file`;
 		this.notesPopoverMessage = `Notes to document the flow.`;
 
-    this.componentPopoverMessage = `The Apache Camel scheme to use. Click on the Apache Camel or Assimbly button for online documentation on the selected scheme.`;
-    this.optionsPopoverMessage = `Options for the selected component. You can add one or more key/value pairs.<br/><br/>
-                                     Click on the Apache Camel button to view documation on the valid options.`;
+    this.componentPopoverMessage = `The component to use (scheme). Click on the docs icon for online documentation.`;
+    this.optionsPopoverMessage = `Options for the selected component. Hover the option for more information.`;
     this.optionsPopoverMessage = ``;
     this.messagePopoverMessage = `A group of key/value pairs to add to the message header.<br/><br/> Use the button on the right to create or edit a header.`;
     this.routePopoverMessage = `A Camel route defined in XML.<br/><br/>`;
@@ -697,6 +769,10 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 				integration: new FormControl(flow.integrationId),
 				stepsData: new FormArray([]),
 			});
+	}
+
+	stepFormAt(index: number): FormGroup {
+		return (this.editFlowForm.get('stepsData') as FormArray).at(index) as FormGroup;
 	}
 
 	initializeStepData(step: Step): FormGroup {
@@ -898,6 +974,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
             });
 
             this.cdr.detectChanges();
+            this.refreshStepEditors();
             resolve();
           });
         }, 10);
@@ -988,6 +1065,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
         });
 
         this.cdr.detectChanges();
+        this.refreshStepEditors();
 
       });
 
@@ -1123,12 +1201,6 @@ splitOptions4(options: string): string[] {
     });
   }
 
-  addOption(options: Array<Option>, stepIndex): void {
-    this.selectOptions(stepIndex).push(this.initializeOption());
-
-    options.push(new Option());
-  }
-
   removeOption(options: Array<Option>, option: Option, stepIndex): void {
     const optionIndex = options.indexOf(option);
     const formOptions: FormArray = this.selectOptions(stepIndex);
@@ -1145,65 +1217,6 @@ splitOptions4(options: string): string[] {
   selectOptions(stepIndex): FormArray {
     const stepData = (<FormArray>this.editFlowForm.controls.stepsData).controls[stepIndex];
     return <FormArray>(<FormGroup>stepData).controls.options;
-  }
-
-  changeOptionSelection(selectedOption, index, optionIndex, step): void {
-    let defaultValue;
-    const componentOption = this.componentOptions[index].filter(option => option.name === selectedOption);
-
-    if (componentOption[0]) {
-      defaultValue = componentOption[0].defaultValue;
-    } else {
-      const customOption = new Option();
-      customOption.key = selectedOption;
-
-      const componentType = step.componentType.toLowerCase();
-      const camelComponentType = this.components.getCamelComponentType(componentType);
-
-      const optionArray: Array<string> = [];
-      optionArray.splice(optionIndex, 0, customOption.key);
-
-      this.componentOptions[index].push({
-        name: selectedOption,
-        displayName: selectedOption,
-        description: 'Custom option',
-        group: 'custom',
-        type: 'string',
-        componentType: camelComponentType,
-      });
-
-      this.customOptions.push({
-        name: selectedOption,
-        displayName: selectedOption,
-        description: 'Custom option',
-        group: 'custom',
-        type: 'string',
-        componentType: camelComponentType,
-      });
-    }
-
-    const stepData = (<FormArray>this.editFlowForm.controls.stepsData).controls[index];
-    const formOptions = <FormArray>(<FormGroup>stepData).controls.options;
-
-    if (defaultValue) {
-      (<FormGroup>formOptions.controls[optionIndex]).controls.defaultValue.patchValue('Default Value: ' + defaultValue);
-    } else {
-      (<FormGroup>formOptions.controls[optionIndex]).controls.defaultValue.patchValue('');
-    }
-  }
-
-  addOptionTag(name): any {
-    return { name, displayName: name, description: 'Custom option', group: 'custom', type: 'string', componentType: 'file' };
-  }
-
-  onOptionHover(stepIndex: number, item: any): void {
-    this.hoveredOptionByStep[stepIndex] = item;
-    this.cdr.detectChanges();
-  }
-
-  clearOptionHover(stepIndex: number): void {
-    this.hoveredOptionByStep[stepIndex] = null;
-    this.cdr.detectChanges();
   }
 
   // this filters connections not of the correct type
@@ -1224,7 +1237,7 @@ splitOptions4(options: string): string[] {
 
   }
 
-  createOrEditMessage(step, formMessage: FormControl): void {
+  createOrEditMessage(step, formMessage: AbstractControl): void {
 
     step.messageId = formMessage.value;
 
@@ -1251,7 +1264,7 @@ splitOptions4(options: string): string[] {
 
   }
 
-  setMessage(step, id, formMessage: FormControl): void {
+  setMessage(step, id, formMessage: AbstractControl): void {
 
     this.messageService
       .getAllMessages()
@@ -1267,7 +1280,7 @@ splitOptions4(options: string): string[] {
     );
   }
 
-	createOrEditRoute(step, formRoute: FormControl): void {
+	createOrEditRoute(step, formRoute: AbstractControl): void {
 		step.routeId = formRoute.value;
 
 		if (
@@ -1314,7 +1327,7 @@ splitOptions4(options: string): string[] {
 		}
 	}
 
-	setRoute(step, id, formRoute: FormControl): void {
+	setRoute(step, id, formRoute: AbstractControl): void {
 		this.routeService
 			.getAllRoutes()
 			.subscribe(
@@ -1322,17 +1335,14 @@ splitOptions4(options: string): string[] {
 					this.routes = res.body;
 					this.routeCreated = this.routes.length > 0;
 					step.routeId = id;
-
-					if (formRoute.value === null) {
-						formRoute.patchValue(id);
-					}
+					formRoute.patchValue(id);
 					step = null;
 				},
 				(res) => this.onError(res.body),
 			);
 	}
 
-  createOrEditConnection(step, connectionType: string, formConnection: FormControl): void {
+  createOrEditConnection(step, connectionType: string, formConnection: AbstractControl): void {
 
     step.connectionId = formConnection.value;
 
@@ -1363,7 +1373,7 @@ splitOptions4(options: string): string[] {
 
   }
 
-  setConnection(step, id, formConnection: FormControl): void {
+  setConnection(step, id, formConnection: AbstractControl): void {
     this.connectionService.getAllConnections().subscribe(
       res => {
         this.connections = res.body;
@@ -1392,8 +1402,53 @@ splitOptions4(options: string): string[] {
 		this.isSaving = false;
 	}
 
+	private focusFirstInvalid(switchedTab = false): void {
+		setTimeout(() => {
+			const form = document.querySelector('form.form-fx-validate');
+			if (!form) {
+				return;
+			}
+			const invalid = Array.from(
+				form.querySelectorAll<HTMLElement>(
+					'input.ng-invalid, textarea.ng-invalid, select.ng-invalid, ng-select.ng-invalid, ngx-codemirror.ng-invalid'
+				)
+			).find(element => {
+				let node: HTMLElement | null = element;
+				while (node && node !== form) {
+					if (node.hasAttribute('hidden')) {
+						return false;
+					}
+					const style = getComputedStyle(node);
+					if (style.display === 'none' || style.visibility === 'hidden') {
+						return false;
+					}
+					node = node.parentElement;
+				}
+				return true;
+			});
+			if (!invalid) {
+				if (!switchedTab && this.active2 !== 'STEPS') {
+					this.active2 = 'STEPS';
+					this.focusFirstInvalid(true);
+				}
+				return;
+			}
+			const target =
+				(invalid.matches('ng-select') ? invalid.querySelector('input') : null) ??
+				(invalid.matches('ngx-codemirror') ? invalid.querySelector('textarea') : null) ??
+				invalid;
+			const rect = target.getBoundingClientRect();
+			const inView = rect.top >= 0 && rect.bottom <= window.innerHeight && rect.height > 0;
+			if (!inView) {
+				target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+			}
+			target.focus();
+		});
+	}
+
 	save(): any {
 
+		this.formSubmitted = true;
 		this.savingFlowFailed = false;
 		this.savingFlowSuccess = false;
 		const goToOverview = true;
@@ -1404,6 +1459,7 @@ splitOptions4(options: string): string[] {
     this.checkForm();
 
 		if (!this.editFlowForm.valid || this.savingFlowFailed) {
+			this.focusFirstInvalid();
 			return;
 		}
 
@@ -1672,10 +1728,6 @@ splitOptions4(options: string): string[] {
 	openModal(templateRef: TemplateRef<any>): void {
 		this.modalRef = this.modalService.open(templateRef);
 	}
-
-	openFullScreenModal(templateRef: TemplateRef<any>): void {
-  		this.modalRef = this.modalService.open(templateRef, { windowClass: 'fullscreen-modal'});
-  }
 
 	cancelModal(): void {
 		this.modalRef.dismiss();

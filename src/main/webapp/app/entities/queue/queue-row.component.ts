@@ -8,14 +8,15 @@ import { EventManager, EventWithContent } from 'app/core/util/event-manager.serv
 
 import { NavigationEnd, Router } from '@angular/router';
 import { Observable, Observer, Subscription } from 'rxjs';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { QueueDeleteDialogComponent } from 'app/entities/queue/queue-delete-dialog.component';
 import { QueueClearDialogComponent } from 'app/entities/queue/queue-clear-dialog.component';
+import { OverflowActionDirective, PrimaryActionDirective, RowActions, Truncate } from 'app/shared/table';
 
 @Component({
   selector: '[jhi-queue-row]',
   templateUrl: './queue-row.component.html',
-  imports: [RouterModule, FontAwesomeModule],
+  imports: [RouterModule, FontAwesomeModule, NgbDropdownModule, RowActions, PrimaryActionDirective, OverflowActionDirective, Truncate],
 })
 export class QueueRowComponent implements OnInit, OnDestroy {
   @Input() address: Address;

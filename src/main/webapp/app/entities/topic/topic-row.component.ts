@@ -9,14 +9,15 @@ import { EventManager, EventWithContent } from 'app/core/util/event-manager.serv
 
 import { NavigationEnd, Router } from '@angular/router';
 import { Observable, Observer, Subscription } from 'rxjs';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { TopicDeleteDialogComponent } from 'app/entities/topic/topic-delete-dialog.component';
 import { TopicClearDialogComponent } from 'app/entities/topic/topic-clear-dialog.component';
+import { OverflowActionDirective, PrimaryActionDirective, RowActions, Truncate } from 'app/shared/table';
 
 @Component({
   selector: '[jhi-topic-row]',
   templateUrl: './topic-row.component.html',
-  imports: [CommonModule, RouterModule, FontAwesomeModule],
+  imports: [CommonModule, RouterModule, FontAwesomeModule, NgbDropdownModule, RowActions, PrimaryActionDirective, OverflowActionDirective, Truncate],
 })
 export class TopicRowComponent implements OnInit, OnDestroy {
   mySubscription: Subscription;

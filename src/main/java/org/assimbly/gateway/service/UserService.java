@@ -3,6 +3,7 @@ package org.assimbly.gateway.service;
 import org.assimbly.gateway.config.Constants;
 import org.assimbly.gateway.domain.Authority;
 import org.assimbly.gateway.domain.User;
+import org.assimbly.gateway.domain.enumeration.ThemePreference;
 import org.assimbly.gateway.repository.AuthorityRepository;
 import org.assimbly.gateway.repository.UserRepository;
 import org.assimbly.gateway.security.AuthoritiesConstants;
@@ -123,6 +124,7 @@ public class UserService {
         }
         newUser.setImageUrl(userDTO.getImageUrl());
         newUser.setLangKey(userDTO.getLangKey());
+        newUser.setThemePreference(ThemePreference.fromNullable(userDTO.getThemePreference()));
         // new user is not active
         newUser.setActivated(false);
         // new user gets registration key
@@ -160,6 +162,7 @@ public class UserService {
         } else {
             user.setLangKey(userDTO.getLangKey());
         }
+        user.setThemePreference(ThemePreference.fromNullable(userDTO.getThemePreference()));
         String encryptedPassword = passwordEncoder.encode(RandomUtil.generatePassword());
         user.setPassword(encryptedPassword);
         user.setResetKey(RandomUtil.generateResetKey());
@@ -202,6 +205,9 @@ public class UserService {
                 user.setImageUrl(userDTO.getImageUrl());
                 user.setActivated(userDTO.isActivated());
                 user.setLangKey(userDTO.getLangKey());
+                if (userDTO.getThemePreference() != null) {
+                    user.setThemePreference(userDTO.getThemePreference());
+                }
                 Set<Authority> managedAuthorities = user.getAuthorities();
                 managedAuthorities.clear();
                 userDTO
@@ -229,15 +235,16 @@ public class UserService {
     }
 
     /**
-     * Update basic information (first name, last name, email, language) for the current user.
+     * Update basic information (first name, last name, email, language, theme) for the current user.
      *
      * @param firstName first name of user.
      * @param lastName  last name of user.
      * @param email     email id of user.
      * @param langKey   language key.
      * @param imageUrl  image URL of user.
+     * @param themePreference appearance preference.
      */
-    public void updateUser(String firstName, String lastName, String email, String langKey, String imageUrl) {
+    public void updateUser(String firstName, String lastName, String email, String langKey, String imageUrl, ThemePreference themePreference) {
         SecurityUtils
             .getCurrentUserLogin()
             .flatMap(userRepository::findOneByLogin)
@@ -249,6 +256,7 @@ public class UserService {
                 }
                 user.setLangKey(langKey);
                 user.setImageUrl(imageUrl);
+                user.setThemePreference(ThemePreference.fromNullable(themePreference));
                 userRepository.save(user);
                 this.clearUserCaches(user);
                 log.debug("Changed Information for User: {}", user);

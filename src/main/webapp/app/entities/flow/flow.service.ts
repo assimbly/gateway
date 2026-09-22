@@ -113,6 +113,24 @@ export class FlowService {
     return this.http.get(`${this.integrationUrl}/flow/${flowId}/status`, { observe: 'response', responseType: 'text' });
   }
 
+  getFlowMessages(flowId: number): Observable<HttpResponse<{ completedTransactions: number; failedTransactions: number }>> {
+    return this.http.get<{ completedTransactions: number; failedTransactions: number }>(
+      `${this.integrationUrl}/flow/${flowId}/messages`,
+      {
+        headers: new HttpHeaders({ Accept: 'application/json', IncludeSteps: 'false' }),
+        observe: 'response',
+      }
+    );
+  }
+
+  getFlowAlertsPage(flowId: number, offset: number, limit: number): Observable<HttpResponse<{ total: number; messages: string[] }>> {
+    const params = new HttpParams().set('offset', offset).set('limit', limit);
+    return this.http.get<{ total: number; messages: string[] }>(`${this.resourceUrl}/${flowId}/alerts`, {
+      params,
+      observe: 'response',
+    });
+  }
+
   getFlowAlerts(flowId: number): Observable<any> {
     return this.http.get(`${this.integrationUrl}/flow/${flowId}/alerts`, { observe: 'response', responseType: 'text' });
   }

@@ -1,12 +1,15 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
-import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbModal, NgbModalRef, NgbModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { Router, RouterModule } from '@angular/router';
+import { SearchToolbar } from 'app/shared/filter';
+import { SortState } from 'app/shared/sort';
+import { DataTable, DataTableColumn, OverflowActionDirective, PrimaryActionDirective, RowActions, StatusControls, StatusControlsTone, Truncate } from 'app/shared/table';
 
 import { IBroker } from 'app/shared/model/broker.model';
 import { AccountService } from 'app/core/auth/account.service';
@@ -23,11 +26,38 @@ enum Status {
 @Component({
     selector: 'jhi-broker',
     templateUrl: './broker.component.html',
-    imports: [CommonModule, RouterModule, FontAwesomeModule, NgbModule],
+    imports: [
+        CommonModule,
+        RouterModule,
+        FontAwesomeModule,
+        NgbModule,
+        NgbDropdownModule,
+        NgbPopoverModule,
+        SearchToolbar,
+        DataTable,
+        RowActions,
+        PrimaryActionDirective,
+        OverflowActionDirective,
+        StatusControls,
+        Truncate,
+    ],
 })
 export class BrokerComponent implements OnInit, OnDestroy {
     brokers: IBroker[] = [];
+    brokersLoading = true;
     broker: IBroker;
+    searchText = '';
+    sortState: SortState = { predicate: 'name', order: 'asc' };
+    readonly columns: DataTableColumn[] = [
+        { key: 'name', header: 'Name', sortable: true },
+        { key: 'consumers', header: 'Consumers', numeric: true },
+        { key: 'messages', header: 'Messages', numeric: true },
+        { key: 'actions', header: 'Actions', align: 'end' },
+        { key: 'status', header: 'Status', align: 'end' },
+    ];
+    totalConsumers: number | null = null;
+    totalMessages: number | null = null;
+    modalRef: NgbModalRef | null = null;
 
     currentAccount: any;
     eventSubscriber: Subscription;
@@ -48,6 +78,16 @@ export class BrokerComponent implements OnInit, OnDestroy {
     public brokerStatusButton: string;
 
     lastError: string;
+
+    get statusTone(): StatusControlsTone {
+        if (this.brokerStatus === Status.activeError || this.brokerStatus === Status.inactiveError || this.brokerStatus === 'inactiveError') {
+            return 'failed';
+        }
+        if (this.isBrokerStarted) {
+            return 'started';
+        }
+        return 'default';
+    }
 
     private readonly changeDetector = inject(ChangeDetectorRef);
 
@@ -81,15 +121,18 @@ export class BrokerComponent implements OnInit, OnDestroy {
     }
 
     loadAll() {
+        this.brokersLoading = true;
         this.brokerService.query().subscribe(
             (res: HttpResponse<IBroker[]>) => {
                 this.brokers = res.body ?? [];
+                this.brokersLoading = false;
                 // Http callback was not refreshing *ngIf views; force CD so Create/table appears.
                 this.changeDetector.detectChanges();
 
                 if (this.brokers[0]) {
                     this.broker = this.brokers[0];
                     this.getbrokerStatus(this.broker.id);
+                    this.getBrokerInfo(this.broker.id);
                 } else {
                     this.setbrokerStatus('unconfigured');
                 }
@@ -181,6 +224,8 @@ export class BrokerComponent implements OnInit, OnDestroy {
     }
 
     setBrokerInfo(info: String) {
+        this.totalConsumers = null;
+        this.totalMessages = null;
         if (info.startsWith('no info')) {
             this.brokerInfo = `Currently there are no statistics for this flow.`;
         } else {
@@ -195,6 +240,9 @@ export class BrokerComponent implements OnInit, OnDestroy {
             const version = infoSplitted[6].split('=')[1];
             const type = infoSplitted[7].split('=')[1];
 
+            this.totalConsumers = totalConsumers ? Number(totalConsumers) : null;
+            this.totalMessages = totalMessages ? Number(totalMessages) : null;
+
             this.brokerInfo = `
                <br/>
                <b>Broker type:</b> ${type}<br/>
@@ -208,6 +256,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
                <b>Total Consumers:</b> ${totalConsumers}<br/>
                <b>Total Messages:</b> ${totalMessages}<br/>`;
         }
+        this.changeDetector.detectChanges();
     }
 
 	delete(broker: IBroker): void {
@@ -302,6 +351,33 @@ export class BrokerComponent implements OnInit, OnDestroy {
         `;
     }
 
+    openInfoModal(templateRef: TemplateRef<any>) {
+        this.getBrokerDetails();
+        this.modalRef = this.modalService.open(templateRef);
+    }
+
+    cancelModal(): void {
+        if (this.modalRef) {
+            this.modalRef.dismiss();
+            this.modalRef = null;
+        } else {
+            this.modalService.dismissAll();
+        }
+    }
+
+    formatMetric(value: number | null): string {
+        return value == null || Number.isNaN(value) ? '—' : String(value);
+    }
+
+    get filteredBrokers(): IBroker[] {
+        const query = this.searchText?.toLocaleLowerCase() ?? '';
+        let result = [...(this.brokers ?? [])];
+        if (query) {
+            result = result.filter(item => (item.name ?? '').toLocaleLowerCase().includes(query));
+        }
+        return result;
+    }
+
     trackId(index: number, item: IBroker) {
         return item.id;
     }
@@ -311,6 +387,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
     }
 
     protected onError(errorMessage: string) {
+        this.brokersLoading = false;
    		this.alertService.addAlert({
 		  type: 'danger',
 		  message: errorMessage,

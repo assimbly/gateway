@@ -39,6 +39,8 @@
             "assets": [
               "src/main/webapp/content",
               "src/main/webapp/favicon.ico",
+              "src/main/webapp/logo_lightmode.svg",
+              "src/main/webapp/logo_darkmode.svg",
               "src/main/webapp/manifest.webapp",
               "src/main/webapp/robots.txt",
               {

@@ -60,7 +60,10 @@
       </div>
     </div>
     <div class="d-inline-block">
-      <button class="btn btn-primary" (click)="refreshMessages()"><span class="fa fa-refresh"></span> <span>Refresh</span></button>
+      <button class="btn btn-fx btn-fx-secondary" type="button" (click)="refreshMessages()" aria-label="Refresh">
+        <fa-icon icon="sync"></fa-icon>
+        <span>Refresh</span>
+      </button>
     </div>
   </div>
 </div>
@@ -139,7 +142,7 @@
                   [options]="{
                   lineNumbers: true,
                   height: 'auto',
-                  theme: 'default',
+                  theme: themeService.editorTheme(),
                   mode: editorMode
                   }"
             ></ngx-codemirror>

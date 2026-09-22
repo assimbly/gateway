@@ -1,18 +1,14 @@
-<div class="background-parent">
-  @if (account()) {
+@if (account()) {
   @if (TYPE === 'INTEGRATION' || TYPE === 'FULL') {
-  <div>
     <jhi-flow>Loading flows...</jhi-flow>
-  </div>
   }
   @if (TYPE === 'BROKER') {
-  <div>
     <jhi-broker>Loading broker...</jhi-broker>
-  </div>
   }
-  } @else {
-  <div style="margin-top: 1.5em;">
-    <jhi-login></jhi-login>
+} @else {
+  <div class="background-parent">
+    <div style="margin-top: 1.5em;">
+      <jhi-login></jhi-login>
+    </div>
   </div>
-  }
-</div>
+}

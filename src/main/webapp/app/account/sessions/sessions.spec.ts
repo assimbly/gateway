@@ -22,6 +22,7 @@ describe('Sessions', () => {
     login: 'john',
     authorities: [],
     imageUrl: '',
+    themePreference: 'SYSTEM',
   };
 
   beforeEach(() => {

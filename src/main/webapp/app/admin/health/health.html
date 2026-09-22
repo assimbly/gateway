@@ -1,14 +1,13 @@
 <div>
-  <h2>
-    <span id="health-page-heading" data-cy="healthPageHeading" jhiTranslate="health.title">Health Checks</span>
-
-    <button class="btn btn-primary float-end" (click)="refresh()">
-      <fa-icon icon="sync" /> <span jhiTranslate="health.refresh.button">Refresh</span>
+  <div class="d-flex justify-content-end mb-3">
+    <button class="btn btn-fx btn-fx-secondary" type="button" (click)="refresh()" aria-label="Refresh">
+      <fa-icon icon="sync"></fa-icon>
+      <span jhiTranslate="health.refresh.button">Refresh</span>
     </button>
-  </h2>
+  </div>
 
   <div class="table-responsive">
-    <table id="healthCheck" class="table table-striped" aria-describedby="health-page-heading">
+    <table id="healthCheck" class="table table-striped" aria-label="Health Checks">
       <thead>
         <tr>
           <th scope="col" jhiTranslate="health.table.service">Service name</th>

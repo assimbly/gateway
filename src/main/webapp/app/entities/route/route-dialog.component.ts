@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -17,6 +17,7 @@ import { RouteService } from './route.service';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
 import { RoutePopupService } from 'app/entities/route/route-popup.service';
+import { ThemeService } from 'app/core/theme';
 
 import 'codemirror/addon/edit/closetag';
 
@@ -26,6 +27,9 @@ import 'codemirror/addon/edit/closetag';
     imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, AlertError, CodemirrorModule, ForbiddenRouteNamesValidatorDirective],
 })
 export class RouteDialogComponent implements OnInit {
+    readonly themeService = inject(ThemeService);
+    private routeOptionsTheme = '';
+    private routeOptionsCache: Record<string, unknown> | null = null;
     route: IRoute;
     routes: IRoute[];
     routeNames: Array<string> = [];
@@ -51,6 +55,34 @@ export class RouteDialogComponent implements OnInit {
         private router: Router,
         private fb: FormBuilder
     ) {}
+
+    routeEditorOptions(): Record<string, unknown> {
+        const theme = this.themeService.editorTheme();
+        if (this.routeOptionsCache && this.routeOptionsTheme === theme) {
+            return this.routeOptionsCache;
+        }
+        this.routeOptionsTheme = theme;
+        this.routeOptionsCache = {
+            lineNumbers: true,
+            gutters: ['CodeMirror-linenumbers'],
+            theme,
+            mode: 'xml',
+            autoCloseTags: true,
+        };
+        return this.routeOptionsCache;
+    }
+
+    refreshCodeMirror(editor: { codeMirror?: { refresh: () => void } }): void {
+        const codeMirror = editor?.codeMirror;
+        if (!codeMirror) {
+            return;
+        }
+        const refresh = () => codeMirror.refresh();
+        requestAnimationFrame(() => {
+            refresh();
+            setTimeout(refresh);
+        });
+    }
 
     ngOnInit() {
 

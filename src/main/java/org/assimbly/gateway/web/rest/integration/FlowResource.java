@@ -2,7 +2,9 @@ package org.assimbly.gateway.web.rest.integration;
 
 import org.assimbly.gateway.config.EncryptionProperties;
 import org.assimbly.gateway.repository.FlowRepository;
+import org.assimbly.gateway.service.FlowAlertLogService;
 import org.assimbly.gateway.service.FlowService;
+import org.assimbly.gateway.service.dto.FlowAlertsPageDTO;
 import org.assimbly.gateway.service.dto.FlowDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
@@ -48,6 +50,9 @@ public class FlowResource {
 
     @Autowired
     EncryptionProperties encryptionProperties;
+
+    @Autowired
+    private FlowAlertLogService flowAlertLogService;
 
     @Value("${server.port}")
     private int serverPort;
@@ -139,6 +144,24 @@ public class FlowResource {
         Optional<FlowDTO> flowDTO = flowService.findOne(id);
 
         return ResponseUtil.wrapOrNotFound(flowDTO);
+    }
+
+    /**
+     * GET /flows/:id/alerts : alert log lines for a flow, newest first.
+     *
+     * @param id the flow id
+     * @param offset number of newest alerts to skip
+     * @param limit page size, capped at 10. Zero returns only the total.
+     * @return the page of alert messages and the total number of alerts
+     */
+    @GetMapping("/flows/{id}/alerts")
+    public ResponseEntity<FlowAlertsPageDTO> getFlowAlerts(
+        @PathVariable(value = "id") Long id,
+        @RequestParam(value = "offset", defaultValue = "0") int offset,
+        @RequestParam(value = "limit", defaultValue = "10") int limit
+    ) {
+        log.debug("REST request to get alerts for Flow : {}", id);
+        return ResponseEntity.ok(flowAlertLogService.page(id, offset, limit));
     }
 
     /**

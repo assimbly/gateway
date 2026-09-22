@@ -34,7 +34,7 @@ export class MessageDialogComponent implements OnInit {
   headerArray: Array<string> = [];
   isSaving: boolean;
   public typeHeader: string[] = ['header', 'property'];
-  public languageHeader: string[] = ['constant', 'groovy', 'jsonpath', 'csimple', 'simple', 'spel', 'xpath'];
+  public languageHeader: string[] = ['constant', 'simple', 'groovy', 'jsonpath', 'xpath'];
 
   constructor(
     public activeModal: NgbActiveModal,

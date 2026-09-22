@@ -1,0 +1,67 @@
+<div class="d-inline-flex align-items-center gap-1 table-fx-status">
+  @if (showStart()) {
+    <button
+      type="button"
+      class="btn btn-fx btn-fx-sm btn-fx-icon"
+      [ngClass]="statusClass()"
+      (click)="start.emit()"
+      [disabled]="busy() || startDisabled()"
+      ngbTooltip="Start"
+      aria-label="Start"
+    >
+      <fa-icon icon="play"></fa-icon>
+    </button>
+  }
+  @if (showPause()) {
+    <button
+      type="button"
+      class="btn btn-fx btn-fx-sm btn-fx-icon"
+      [ngClass]="statusClass()"
+      (click)="pause.emit()"
+      [disabled]="busy() || pauseDisabled()"
+      ngbTooltip="Pause"
+      aria-label="Pause"
+    >
+      <fa-icon icon="pause"></fa-icon>
+    </button>
+  }
+  @if (showResume()) {
+    <button
+      type="button"
+      class="btn btn-fx btn-fx-sm btn-fx-icon"
+      [ngClass]="statusClass()"
+      (click)="resume.emit()"
+      [disabled]="busy() || resumeDisabled()"
+      ngbTooltip="Resume"
+      aria-label="Resume"
+    >
+      <fa-icon icon="step-forward"></fa-icon>
+    </button>
+  }
+  @if (showStop()) {
+    <button
+      type="button"
+      class="btn btn-fx btn-fx-sm btn-fx-icon"
+      [ngClass]="statusClass()"
+      (click)="stop.emit()"
+      [disabled]="busy() || stopDisabled()"
+      ngbTooltip="Stop"
+      aria-label="Stop"
+    >
+      <fa-icon icon="stop"></fa-icon>
+    </button>
+  }
+  @if (showRestart()) {
+    <button
+      type="button"
+      class="btn btn-fx btn-fx-sm btn-fx-icon"
+      [ngClass]="statusClass()"
+      (click)="restart.emit()"
+      [disabled]="busy() || restartDisabled()"
+      ngbTooltip="Restart"
+      aria-label="Restart"
+    >
+      <fa-icon icon="sync"></fa-icon>
+    </button>
+  }
+</div>

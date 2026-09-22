@@ -2,7 +2,7 @@
   "logs": {
     "title": "Logs",
     "nbloggers": "There are {{ total }} loggers.",
-    "filter": "Filter",
+    "filter": "Filter loggers",
     "table": {
       "name": "Name",
       "level": "Level"

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, TemplateRef, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, TemplateRef, ViewEncapsulation, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -38,6 +38,7 @@ import { ConnectionDialogComponent } from 'app/entities/connection/connection-di
 
 import { MessagePopupService } from 'app/entities/message/message-popup.service';
 import { ConnectionPopupService } from 'app/entities/connection/connection-popup.service';
+import { ThemeService } from 'app/core/theme';
 
 import dayjs from 'dayjs/esm';
 
@@ -48,6 +49,7 @@ import dayjs from 'dayjs/esm';
     imports: [CommonModule, ReactiveFormsModule, RouterModule, NgbModule, FontAwesomeModule, NgSelectModule, PopoverModule, CodemirrorModule, Alert],
 })
 export class FlowMessageSenderComponent implements OnInit, OnDestroy {
+    readonly themeService = inject(ThemeService);
 
     flows: IFlow[];
     connections: Connection[];
@@ -78,7 +80,6 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
 
     panelCollapsed: any = 'uno';
     public isCollapsed = true;
-    active;
     disabled = true;
     activeStep: any;
 
@@ -117,6 +118,8 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
 
     selectedOption: Array<any> = [];
     componentOptions: Array<any> = [];
+    customOptions: Array<any> = [];
+    hoveredOptionByStep: Array<any> = [];
 
     consumerComponentsNames: Array<any> = [];
     producerComponentsNames: Array<any> = [];
@@ -205,6 +208,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
             (<FormArray>this.messageSenderForm.controls.stepsData).push(this.initializeStepData(this.requestStep));
 
             this.stepsOptions[0] = [new Option()];
+            this.hoveredOptionByStep[0] = null;
 
             this.setTypeLinks(this.requestStep, 0);
 
@@ -288,14 +292,20 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         this.setURIlist();
     }
 
+    openComponentDocs(index: number): void {
+        const url = this.componentTypeCamelLinks[index];
+        if (url) {
+            window.open(url, '_blank', 'noopener,noreferrer');
+        }
+    }
+
     setPopoverMessages() {
         this.namePopoverMessage = `Name of the flow. Usually the name of the message type like <i>order</i>.<br/><br>Displayed on the <i>flows</i> page.`;
         this.stepPopoverMessage = `The uris that can be selected in the request`;
-        this.exchangePatternPopoverMessage = `Fire and Forget (InOnly) or Request and Reply (InOut)`;
+        this.exchangePatternPopoverMessage = `Communication pattern. Either Request and Reply (InOut) or Fire and Forget (InOnly)`;
         this.numberOfTimesPopoverMessage = `Number of messages send (1 by default). This setting is only for FireAndForget pattern`;
-        this.componentPopoverMessage = `The Apache Camel scheme to use. Click on the Apache Camel or Assimbly button for online documentation on the selected scheme.`;
-        this.optionsPopoverMessage = `Options for the selected component. You can add one or more key/value pairs.<br/><br/>
-                                     Click on the Apache Camel button to view documation on the valid options.`;
+        this.componentPopoverMessage = `The component to use (scheme). Click on docs icon for online documentation.`;
+        this.optionsPopoverMessage = `Options for the selected component. Hover the option for more information.`;
         this.messagePopoverMessage = `A group of key/value pairs to add to the message header.<br/><br/> Use the button on the right to create or edit a header.`;
         this.connectionPopoverMessage = `If available then a connection can be selected. For example a connection that sets up a database connection.<br/><br/>
                                      Use the button on the right to create or edit connections.`;
@@ -353,7 +363,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
             uri: new FormControl(step.uri),
             options: new FormArray([this.initializeOption()]),
             message: new FormControl(step.messageId),
-            exchangepattern: new FormControl('FireAndForget'),
+            exchangepattern: new FormControl('RequestAndReply'),
             numberoftimes: new FormControl('1'),
             connection: new FormControl(step.connectionId, Validators.required),
             requestbody: new FormControl('')
@@ -483,10 +493,38 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     }
 
     changeOptionSelection(selectedOption, index, optionIndex) {
-        const componentOption = this.componentOptions[index].filter(option => option.name === selectedOption);
-        const defaultValue = componentOption[0].defaultValue;
+        const selectedName = typeof selectedOption === 'string' ? selectedOption : selectedOption?.name;
+        if (!selectedName) {
+            return;
+        }
 
-        const stepData = (<FormArray>this.messageSenderForm.controls.stepsData).controls[0];
+        let defaultValue;
+        const componentOption = this.componentOptions[index].filter(option => option.name === selectedName);
+
+        if (componentOption[0]) {
+            defaultValue = componentOption[0].defaultValue;
+        } else {
+            const componentType = (this.requestStep?.componentType || 'file').toLowerCase();
+            const camelComponentType = this.components.getCamelComponentType(componentType);
+            this.componentOptions[index].push({
+                name: selectedName,
+                displayName: selectedName,
+                description: 'Custom option',
+                group: 'custom',
+                type: 'string',
+                componentType: camelComponentType,
+            });
+            this.customOptions.push({
+                name: selectedName,
+                displayName: selectedName,
+                description: 'Custom option',
+                group: 'custom',
+                type: 'string',
+                componentType: camelComponentType,
+            });
+        }
+
+        const stepData = (<FormArray>this.messageSenderForm.controls.stepsData).controls[index];
         const formOptions = <FormArray>(<FormGroup>stepData).controls.options;
 
         if (defaultValue) {
@@ -494,6 +532,20 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         } else {
             (<FormGroup>formOptions.controls[optionIndex]).controls.defaultValue.patchValue('');
         }
+    }
+
+    addOptionTag(name): any {
+        return { name, displayName: name, description: 'Custom option', group: 'custom', type: 'string', componentType: 'file' };
+    }
+
+    onOptionHover(stepIndex: number, item: any): void {
+        this.hoveredOptionByStep[stepIndex] = item;
+        this.cdr.detectChanges();
+    }
+
+    clearOptionHover(stepIndex: number): void {
+        this.hoveredOptionByStep[stepIndex] = null;
+        this.cdr.detectChanges();
     }
 
     openModal(templateRef: TemplateRef<any>) {
@@ -725,7 +777,8 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         this.requestComponentType = stepForm.controls.componentType.value;
         this.requestUri = this.requestStep.uri;
         this.requestExchangePattern = stepForm.controls.exchangepattern.value.toString();
-        this.requestNumberOfTimes = stepForm.controls.numberoftimes.value == null ? 1 : stepForm.controls.numberoftimes.value.toString();
+        stepForm.controls.numberoftimes.setValue('1');
+        this.requestNumberOfTimes = '1';
         this.requestConnectionId = stepForm.controls.connection.value == null ? '' : stepForm.controls.connection.value.toString();
         this.requestHeaderId = stepForm.controls.message.value == null ? '' : stepForm.controls.message.value.toString();
         this.requestBody = stepForm.controls.requestbody.value == null ? '0' : stepForm.controls.requestbody.value.toString();
@@ -754,7 +807,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         if (showResponse) {
             this.setEditorMode(body);
             this.responseBody = body;
-            this.active = '1';
+            this.messageSenderForm.controls.responsebody.setValue(body);
         } else {
             this.responseBody = body;
         }
@@ -768,7 +821,10 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
           message: 'Send failed',
         });
         this.responseBody = body;
-        this.active = '1';
+        if (typeof body === 'string') {
+            this.setEditorMode(body);
+        }
+        this.messageSenderForm.controls.responsebody.setValue(body);
     }
 
     save() {

@@ -1,5 +1,6 @@
 package org.assimbly.gateway.service.impl;
 
+import org.assimbly.gateway.config.database.H2CommitSync;
 import org.assimbly.gateway.domain.Broker;
 import org.assimbly.gateway.repository.BrokerRepository;
 import org.assimbly.gateway.service.BrokerService;
@@ -9,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -28,9 +31,12 @@ public class BrokerServiceImpl implements BrokerService {
 
     private final BrokerMapper brokerMapper;
 
-    public BrokerServiceImpl(BrokerRepository brokerRepository, BrokerMapper brokerMapper) {
+    private final H2CommitSync h2CommitSync;
+
+    public BrokerServiceImpl(BrokerRepository brokerRepository, BrokerMapper brokerMapper, H2CommitSync h2CommitSync) {
         this.brokerRepository = brokerRepository;
         this.brokerMapper = brokerMapper;
+        this.h2CommitSync = h2CommitSync;
     }
 
     /**
@@ -45,6 +51,21 @@ public class BrokerServiceImpl implements BrokerService {
 
         Broker broker = brokerMapper.toEntity(brokerDTO);
         broker = brokerRepository.save(broker);
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    h2CommitSync.checkpointOnCurrentConnection();
+                }
+
+                @Override
+                public void afterCompletion(int status) {
+                    if (status == STATUS_COMMITTED) {
+                        h2CommitSync.evictPoolAndForceFile();
+                    }
+                }
+            });
+        }
         return brokerMapper.toDto(broker);
     }
 

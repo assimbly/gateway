@@ -1,0 +1,16 @@
+:host {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.table-fx-shell {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.table-fx-scroll {
+  max-width: 100%;
+  max-height: calc(100vh - 12rem);
+  overflow: auto;
+}

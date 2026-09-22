@@ -1,0 +1,25 @@
+{
+  "resources": [
+      {
+        "glob": "\\\\QMETA-INF/services/org/apache/activemq/transport/tcp\\\\E",
+        "condition": {
+          "typeReachable": "org.apache.activemq.transport.TransportFactory"
+        }
+      },
+      {
+        "glob": "\\\\QMETA-INF/services/org/apache/activemq/wireformat/default\\\\E",
+        "condition": {
+          "typeReachable": "org.apache.activemq.transport.tcp.TcpTransportFactory"
+        }
+      },
+      {
+        "glob": "\\\\Qorg/apache/activemq/version.txt\\\\E",
+        "condition": {
+          "typeReachable": "org.apache.activemq.broker.BrokerService"
+        }
+      }
+    ],
+  "bundles": [
+
+  ]
+}

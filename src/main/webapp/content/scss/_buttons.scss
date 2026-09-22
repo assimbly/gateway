@@ -1,0 +1,461 @@
+/*
+ * Fluxygen button system
+ *
+ * Semantic classes on top of Bootstrap `.btn`. Existing `.btn-primary`,
+ * `.btn-info`, `.btn-success`, etc. are unchanged so unmigrated screens
+ * keep working.
+ *
+ * Usage:
+ *   <button class="btn btn-fx btn-fx-primary">Save</button>
+ *   <button class="btn btn-fx btn-fx-secondary">Cancel</button>
+ *   <button class="btn btn-fx btn-fx-ghost">Browse</button>
+ *   <button class="btn btn-fx btn-fx-danger">Delete</button>
+ *   <button class="btn btn-fx btn-fx-warning">Clear</button>
+ *   <button class="btn btn-fx btn-fx-sm btn-fx-icon btn-fx-ghost" aria-label="Edit">
+ *
+ * Hierarchy: Primary > Secondary > Ghost.
+ * Danger and Warning are semantic exceptions, not alternative primaries.
+ * Color communicates meaning; do not assign a unique color to every action.
+ * Do not use success/info (green/blue) for ordinary Add/Edit/Browse actions.
+ */
+
+/* --------------------------------------------------------------------------
+ * Shared layout
+ * -------------------------------------------------------------------------- */
+
+.btn.btn-fx {
+  --bs-btn-font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--app-btn-gap);
+  box-sizing: border-box;
+  height: var(--app-btn-height);
+  min-height: var(--app-btn-height);
+  padding: 0 var(--app-btn-padding-x);
+  border-width: 1px;
+  border-style: solid;
+  border-radius: var(--app-btn-radius);
+  font-size: var(--app-btn-font-size);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  vertical-align: middle;
+  text-decoration: none;
+  box-shadow: none;
+
+  &:link,
+  &:visited {
+    color: var(--bs-btn-color);
+    text-decoration: none;
+  }
+
+  fa-icon,
+  .svg-inline--fa,
+  .fa {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: var(--app-btn-icon-size);
+    height: var(--app-btn-icon-size);
+    font-size: var(--app-btn-icon-size);
+    line-height: 1;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--app-focus);
+    outline-offset: 2px;
+    box-shadow: none;
+  }
+
+  &:disabled,
+  &.disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+.btn.btn-fx-sm {
+  height: var(--app-btn-height-sm);
+  min-height: var(--app-btn-height-sm);
+  padding: 0 var(--app-btn-padding-x-sm);
+  font-size: var(--app-btn-font-size-sm);
+  gap: 6px;
+
+  fa-icon,
+  .svg-inline--fa,
+  .fa {
+    width: var(--app-btn-icon-size-sm);
+    height: var(--app-btn-icon-size-sm);
+    font-size: var(--app-btn-icon-size-sm);
+  }
+}
+
+.btn.btn-fx-lg {
+  height: var(--app-btn-height-lg);
+  min-height: var(--app-btn-height-lg);
+  padding: 0 var(--app-btn-padding-x-lg);
+}
+
+/* Square icon-only control. Pair with a semantic class and an accessible name. */
+.btn.btn-fx-icon {
+  width: var(--app-btn-height);
+  min-width: var(--app-btn-height);
+  padding-inline: 0;
+}
+
+.btn.btn-fx-icon.btn-fx-sm {
+  width: var(--app-btn-height-sm);
+  min-width: var(--app-btn-height-sm);
+}
+
+.btn.btn-fx-icon.btn-fx-lg {
+  width: var(--app-btn-height-lg);
+  min-width: var(--app-btn-height-lg);
+}
+
+/* Let grid columns and input-groups stretch icon buttons without losing min size. */
+[class*='col-'].btn.btn-fx-icon,
+.input-group > .btn.btn-fx-icon {
+  width: auto;
+}
+
+/* --------------------------------------------------------------------------
+ * 1. Primary — filled brand color; one main action per screen
+ *    Examples: Create Queue, Add, Save, Deploy
+ * -------------------------------------------------------------------------- */
+
+.btn.btn-fx-primary {
+  --bs-btn-color: var(--app-primary-contrast);
+  --bs-btn-bg: var(--app-primary);
+  --bs-btn-border-color: var(--app-primary);
+  --bs-btn-hover-color: var(--app-primary-contrast);
+  --bs-btn-hover-bg: var(--app-primary);
+  --bs-btn-active-color: var(--app-primary-contrast);
+  --bs-btn-disabled-color: var(--app-primary-contrast);
+  --bs-btn-disabled-bg: var(--app-primary);
+  color: var(--app-primary-contrast);
+  background-color: var(--app-primary);
+  border-color: var(--app-primary);
+
+  &:hover:not(:disabled):not(.disabled) {
+    color: var(--app-primary-contrast);
+    background-color: color-mix(in srgb, var(--app-primary) 88%, var(--app-text));
+    border-color: color-mix(in srgb, var(--app-primary) 88%, var(--app-text));
+  }
+
+  &:active:not(:disabled):not(.disabled),
+  &.active {
+    color: var(--app-primary-contrast);
+    background-color: color-mix(in srgb, var(--app-primary) 76%, var(--app-text));
+    border-color: color-mix(in srgb, var(--app-primary) 76%, var(--app-text));
+  }
+
+  &:disabled,
+  &.disabled {
+    color: var(--app-primary-contrast);
+    background-color: var(--app-primary);
+    border-color: var(--app-primary);
+  }
+}
+
+/* --------------------------------------------------------------------------
+ * 2. Secondary — neutral supporting actions
+ *    Examples: Refresh, Cancel, Close, Docs
+ * -------------------------------------------------------------------------- */
+
+.btn.btn-fx-secondary {
+  --bs-btn-color: var(--app-btn-secondary-color);
+  --bs-btn-bg: var(--app-btn-secondary-bg);
+  --bs-btn-border-color: var(--app-btn-secondary-border);
+  --bs-btn-hover-color: var(--app-text);
+  --bs-btn-disabled-color: var(--app-disabled-text);
+  color: var(--app-btn-secondary-color);
+  background-color: var(--app-btn-secondary-bg);
+  border-color: var(--app-btn-secondary-border);
+
+  &:hover:not(:disabled):not(.disabled) {
+    color: var(--app-text);
+    background-color: var(--app-hover);
+    border-color: var(--app-border);
+  }
+
+  &:active:not(:disabled):not(.disabled),
+  &.active {
+    color: var(--app-text);
+    background-color: var(--app-active);
+    border-color: var(--app-border);
+  }
+
+  &:disabled,
+  &.disabled {
+    color: var(--app-disabled-text);
+    background-color: var(--app-disabled-bg);
+    border-color: var(--app-border);
+  }
+}
+
+/* --------------------------------------------------------------------------
+ * 3. Ghost / tertiary — minimal contextual actions
+ *    Examples: Browse, Edit, View details, overflow trigger
+ * -------------------------------------------------------------------------- */
+
+.btn.btn-fx-ghost-danger {
+  --bs-btn-color: var(--app-danger);
+  --bs-btn-bg: transparent;
+  --bs-btn-border-color: transparent;
+  color: var(--app-danger);
+  background-color: transparent;
+  border-color: transparent;
+
+  &:hover:not(:disabled):not(.disabled) {
+    color: var(--app-danger);
+    background-color: color-mix(in srgb, var(--app-danger) 14%, var(--app-hover));
+    border-color: transparent;
+  }
+
+  &:active:not(:disabled):not(.disabled),
+  &.active {
+    color: var(--app-danger);
+    background-color: color-mix(in srgb, var(--app-danger) 20%, var(--app-hover));
+    border-color: transparent;
+  }
+
+  &:disabled,
+  &.disabled {
+    color: var(--app-disabled-text);
+    background-color: transparent;
+    border-color: transparent;
+  }
+}
+
+/* Compact log-level toggles: unused levels are muted grey, not white. */
+.btn.btn-fx-log {
+  height: 26px;
+  min-height: 26px;
+  padding: 0 0.45rem;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  flex-shrink: 0;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: var(--app-btn-radius);
+  box-shadow: none;
+}
+
+.btn.btn-fx-log-idle {
+  color: var(--app-text-muted);
+  background-color: var(--app-hover);
+  border-color: var(--app-border);
+
+  &:hover:not(:disabled) {
+    color: var(--app-text);
+    background-color: var(--app-active);
+    border-color: var(--app-border);
+  }
+}
+
+.btn.btn-fx-ghost {
+  --bs-btn-color: var(--app-btn-ghost-color);
+  --bs-btn-bg: transparent;
+  --bs-btn-border-color: transparent;
+  --bs-btn-hover-color: var(--app-text);
+  --bs-btn-disabled-color: var(--app-disabled-text);
+  color: var(--app-btn-ghost-color);
+  background-color: transparent;
+  border-color: transparent;
+
+  &:hover:not(:disabled):not(.disabled) {
+    color: var(--app-text);
+    background-color: var(--app-btn-ghost-hover-bg);
+    border-color: transparent;
+  }
+
+  &:active:not(:disabled):not(.disabled),
+  &.active {
+    color: var(--app-text);
+    background-color: var(--app-active);
+    border-color: transparent;
+  }
+
+  &:disabled,
+  &.disabled {
+    color: var(--app-disabled-text);
+    background-color: transparent;
+    border-color: transparent;
+  }
+}
+
+/* --------------------------------------------------------------------------
+ * 4. Success — positive start / running state
+ *    Examples: Start, Resume
+ * -------------------------------------------------------------------------- */
+
+.btn.btn-fx-success {
+  --bs-btn-color: var(--app-primary-contrast);
+  --bs-btn-bg: var(--app-success);
+  --bs-btn-border-color: var(--app-success);
+  --bs-btn-hover-color: var(--app-primary-contrast);
+  --bs-btn-disabled-color: var(--app-primary-contrast);
+  color: var(--app-primary-contrast);
+  background-color: var(--app-success);
+  border-color: var(--app-success);
+
+  &:hover:not(:disabled):not(.disabled) {
+    color: var(--app-primary-contrast);
+    background-color: color-mix(in srgb, var(--app-success) 88%, var(--app-text));
+    border-color: color-mix(in srgb, var(--app-success) 88%, var(--app-text));
+  }
+
+  &:active:not(:disabled):not(.disabled),
+  &.active {
+    color: var(--app-primary-contrast);
+    background-color: color-mix(in srgb, var(--app-success) 76%, var(--app-text));
+    border-color: color-mix(in srgb, var(--app-success) 76%, var(--app-text));
+  }
+
+  &:disabled,
+  &.disabled {
+    color: var(--app-primary-contrast);
+    background-color: var(--app-success);
+    border-color: var(--app-success);
+  }
+}
+
+/* --------------------------------------------------------------------------
+ * 5. Danger — destructive actions only
+ *    Examples: Delete, Remove, Stop
+ * -------------------------------------------------------------------------- */
+
+.btn.btn-fx-danger {
+  --bs-btn-color: var(--app-primary-contrast);
+  --bs-btn-bg: var(--app-danger);
+  --bs-btn-border-color: var(--app-danger);
+  --bs-btn-hover-color: var(--app-primary-contrast);
+  --bs-btn-disabled-color: var(--app-primary-contrast);
+  color: var(--app-primary-contrast);
+  background-color: var(--app-danger);
+  border-color: var(--app-danger);
+
+  &:hover:not(:disabled):not(.disabled) {
+    color: var(--app-primary-contrast);
+    background-color: color-mix(in srgb, var(--app-danger) 88%, var(--app-text));
+    border-color: color-mix(in srgb, var(--app-danger) 88%, var(--app-text));
+  }
+
+  &:active:not(:disabled):not(.disabled),
+  &.active {
+    color: var(--app-primary-contrast);
+    background-color: color-mix(in srgb, var(--app-danger) 76%, var(--app-text));
+    border-color: color-mix(in srgb, var(--app-danger) 76%, var(--app-text));
+  }
+
+  &:disabled,
+  &.disabled {
+    color: var(--app-primary-contrast);
+    background-color: var(--app-danger);
+    border-color: var(--app-danger);
+  }
+}
+
+/* --------------------------------------------------------------------------
+ * 6. Warning — exceptional / potentially destructive operations
+ *    Examples: Clear, Reset, Pause
+ * -------------------------------------------------------------------------- */
+
+.btn.btn-fx-warning {
+  --bs-btn-color: var(--app-warning-contrast);
+  --bs-btn-bg: var(--app-warning);
+  --bs-btn-border-color: var(--app-warning);
+  --bs-btn-hover-color: var(--app-warning-contrast);
+  --bs-btn-disabled-color: var(--app-warning-contrast);
+  color: var(--app-warning-contrast);
+  background-color: var(--app-warning);
+  border-color: var(--app-warning);
+
+  &:hover:not(:disabled):not(.disabled) {
+    color: var(--app-warning-contrast);
+    background-color: color-mix(in srgb, var(--app-warning) 88%, var(--app-text));
+    border-color: color-mix(in srgb, var(--app-warning) 88%, var(--app-text));
+  }
+
+  &:active:not(:disabled):not(.disabled),
+  &.active {
+    color: var(--app-warning-contrast);
+    background-color: color-mix(in srgb, var(--app-warning) 76%, var(--app-text));
+    border-color: color-mix(in srgb, var(--app-warning) 76%, var(--app-text));
+  }
+
+  &:disabled,
+  &.disabled {
+    color: var(--app-warning-contrast);
+    background-color: var(--app-warning);
+    border-color: var(--app-warning);
+  }
+}
+
+/* --------------------------------------------------------------------------
+ * Overflow / dropdown items for actions moved out of a button cluster
+ * -------------------------------------------------------------------------- */
+
+.dropdown-item.btn-fx-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: var(--app-btn-gap);
+
+  fa-icon,
+  .svg-inline--fa,
+  .fa {
+    width: var(--app-btn-icon-size-sm);
+    height: var(--app-btn-icon-size-sm);
+    font-size: var(--app-btn-icon-size-sm);
+  }
+}
+
+.btn.btn-fx-icon.dropdown-toggle {
+  padding-inline: 0;
+}
+
+.btn.btn-fx-icon.dropdown-toggle::after {
+  display: none;
+}
+
+.dropdown-item.btn-fx-dropdown-danger {
+  color: var(--app-danger);
+
+  &:hover,
+  &:focus,
+  &:active,
+  &.active {
+    color: var(--app-danger);
+    background-color: color-mix(in srgb, var(--app-danger) 14%, var(--app-hover));
+  }
+}
+
+.dropdown-item.btn-fx-dropdown-warning {
+  color: var(--app-warning);
+
+  &:hover,
+  &:focus,
+  &:active,
+  &.active {
+    color: var(--app-warning);
+    background-color: color-mix(in srgb, var(--app-warning) 16%, var(--app-hover));
+  }
+}
+
+.form-fx-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.broker-actions--embedded {
+  margin-top: 3rem;
+}

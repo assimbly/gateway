@@ -6,6 +6,7 @@ import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AlertService } from 'app/core/util/alert.service';
 import { AlertError } from 'app/shared/alert';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 import { EnvironmentVariables, IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
 import { EnvironmentVariablesService } from './environment-variables.service';
@@ -17,7 +18,7 @@ import { forbiddenEnvironmentKeysValidator } from './environment-variables-valid
 @Component({
     selector: 'jhi-environment-variables-update',
     templateUrl: './environment-variables-update.component.html',
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, AlertError],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, FontAwesomeModule, AlertError],
 })
 export class EnvironmentVariablesUpdateComponent implements OnInit {
     environmentVariables: IEnvironmentVariables = new EnvironmentVariables();
@@ -25,7 +26,7 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
 
     integrations: IIntegration[] = [];
     environmentVariablesForm: FormGroup;
-    private allEnvironmentVariablesKeys: Array<string> = [];
+    private knownVariables: IEnvironmentVariables[] = [];
 
     constructor(
         protected alertService: AlertService,
@@ -40,19 +41,22 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
 
         this.isSaving = false;
         this.activatedRoute.data.subscribe(({ environmentVariables }) => {
-            this.environmentVariables = environmentVariables;
-        });
-
-        if (!this.environmentVariables.encrypted) {
-            this.environmentVariables.encrypted = false;
-        }
-
-        if (this.activatedRoute.fragment['value'] === 'clone') {
-            this.environmentVariables.id = null;
+            this.environmentVariables = environmentVariables ?? new EnvironmentVariables();
+            if (!this.environmentVariables.encrypted) {
+                this.environmentVariables.encrypted = false;
+            }
+            if (this.activatedRoute.snapshot.fragment === 'clone') {
+                this.environmentVariables.id = null;
+            }
             this.environmentVariablesForm.patchValue({
-                id: null
+                id: this.environmentVariables.id,
+                key: this.environmentVariables.key,
+                value: this.environmentVariables.value,
+                encrypted: this.environmentVariables.encrypted,
+                integrationId: this.environmentVariables.integrationId,
             });
-        }
+            this.applyUniqueKeyValidator();
+        });
 
         this.integrationService.query().subscribe(
             (res: HttpResponse<IIntegration[]>) => {
@@ -88,10 +92,8 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
     }
 
     save() {
-        if (this.environmentVariables.id === undefined && this.environmentVariables.id === null) {
-            this.environmentVariablesForm.controls.key.updateValueAndValidity();
-            this.environmentVariablesForm.controls.key.markAsTouched();
-        }
+        this.applyUniqueKeyValidator();
+        this.environmentVariablesForm.markAllAsTouched();
         this.environmentVariablesForm.updateValueAndValidity();
         if (this.environmentVariablesForm.invalid) {
             this.isSaving = false;
@@ -108,12 +110,22 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
 
     private getAllEnvironmentVariablesKeys() {
         this.environmentVariablesService.query().subscribe(res => {
-            this.allEnvironmentVariablesKeys = res.body.map(res2 => res2.key);
-            this.environmentVariablesForm.controls.key.setValidators([
-                Validators.required,
-                forbiddenEnvironmentKeysValidator(this.allEnvironmentVariablesKeys)
-            ]);
+            this.knownVariables = res.body ?? [];
+            this.applyUniqueKeyValidator();
         });
+    }
+
+    private applyUniqueKeyValidator(): void {
+        const currentId = this.environmentVariables?.id;
+        const keys = this.knownVariables
+            .filter(item => item.id !== currentId)
+            .map(item => item.key)
+            .filter((key): key is string => !!key);
+        this.environmentVariablesForm.controls.key.setValidators([
+            Validators.required,
+            forbiddenEnvironmentKeysValidator(keys),
+        ]);
+        this.environmentVariablesForm.controls.key.updateValueAndValidity({ emitEvent: false });
     }
 
     navigateToEnvironmentVariables() {

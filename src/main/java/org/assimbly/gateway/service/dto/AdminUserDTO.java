@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import org.assimbly.gateway.config.Constants;
 import org.assimbly.gateway.domain.Authority;
 import org.assimbly.gateway.domain.User;
+import org.assimbly.gateway.domain.enumeration.ThemePreference;
 
 import java.time.Instant;
 import java.util.Set;
@@ -42,6 +43,8 @@ public class AdminUserDTO {
     @Size(min = 2, max = 10)
     private String langKey;
 
+    private ThemePreference themePreference;
+
     private String createdBy;
 
     private Instant createdDate;
@@ -65,6 +68,7 @@ public class AdminUserDTO {
         this.activated = user.isActivated();
         this.imageUrl = user.getImageUrl();
         this.langKey = user.getLangKey();
+        this.themePreference = ThemePreference.fromNullable(user.getThemePreference());
         this.createdBy = user.getCreatedBy();
         this.createdDate = user.getCreatedDate();
         this.lastModifiedBy = user.getLastModifiedBy();
@@ -136,6 +140,14 @@ public class AdminUserDTO {
         this.langKey = langKey;
     }
 
+    public ThemePreference getThemePreference() {
+        return themePreference;
+    }
+
+    public void setThemePreference(ThemePreference themePreference) {
+        this.themePreference = themePreference;
+    }
+
     public String getCreatedBy() {
         return createdBy;
     }
@@ -187,6 +199,7 @@ public class AdminUserDTO {
             ", imageUrl='" + imageUrl + '\'' +
             ", activated=" + activated +
             ", langKey='" + langKey + '\'' +
+            ", themePreference='" + themePreference + '\'' +
             ", createdBy=" + createdBy +
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +

@@ -1,10 +1,172 @@
-/* ==========================================================================
-Navbar
-========================================================================== */
+:host {
+  display: none;
+  flex-shrink: 0;
+  width: 16rem;
+  color: var(--app-text);
+}
 
-.navbar-version {
-  font-size: 0.65em;
-  color: var(--bs-navbar-color, rgba(255, 255, 255, 0.55));
+:host.app-sidebar--visible {
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  align-self: flex-start;
+}
+
+.app-sidebar__panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  background: var(--app-sidebar-bg);
+  border-right: 1px solid var(--app-sidebar-border);
+  overflow: hidden;
+}
+
+.app-sidebar__header {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  height: 3.5rem;
+  padding: 0 0.5rem 0 0.75rem;
+  border-bottom: 1px solid var(--app-sidebar-border);
+}
+
+.app-sidebar__brand {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  gap: 0.75rem;
+  height: 2.5rem;
+  color: var(--app-text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.app-sidebar__brand:hover,
+.app-sidebar__brand:focus-visible {
+  color: var(--app-text);
+  background: var(--app-sidebar-hover);
+  border-radius: 0.15rem;
+}
+
+.app-sidebar__brand-icon {
+  display: block;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.app-sidebar__brand-full {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-sidebar__icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0.15rem;
+  background: transparent;
+  color: var(--app-text-muted);
+}
+
+.app-sidebar__icon-btn:hover,
+.app-sidebar__icon-btn:focus-visible {
+  color: var(--app-text);
+  background: var(--app-sidebar-hover);
+}
+
+.app-sidebar__nav {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 0.5rem 0;
+  overflow-y: auto;
+}
+
+.app-sidebar__account {
+  margin-top: auto;
+  padding: 0.5rem 0 0.75rem;
+  border-top: 1px solid var(--app-sidebar-border);
+}
+
+.app-sidebar__group--divided {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--app-sidebar-border);
+}
+
+.app-sidebar__link,
+.app-sidebar__group-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 0;
+  border-left: 3px solid transparent;
+  background: transparent;
+  color: var(--app-text);
+  font-size: 0.875rem;
+  font-weight: 400;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.app-sidebar__link:hover,
+.app-sidebar__group-toggle:hover,
+.app-sidebar__link:focus-visible,
+.app-sidebar__group-toggle:focus-visible {
+  color: var(--app-text);
+  background: var(--app-sidebar-hover);
+}
+
+.app-sidebar__link.active,
+.app-sidebar__group-toggle.active,
+.dropdown-item.active {
+  border-left-color: var(--app-primary);
+  background: var(--app-sidebar-active);
+  color: var(--app-text);
+  font-weight: 600;
+}
+
+.app-sidebar__label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-sidebar__chevron {
+  margin-left: auto;
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.app-sidebar__link--nested {
+  padding-left: 1.75rem;
+  min-height: 2.25rem;
+}
+
+.app-sidebar__subnav {
+  display: flex;
+  flex-direction: column;
+}
+
+.app-sidebar__subnav.app-sidebar__subnav--collapsed {
+  display: none;
 }
 
 .profile-image {
@@ -12,22 +174,73 @@ Navbar
   width: 1.75em;
 }
 
-.navbar {
-  padding: 0.2rem 1rem;
+:host.app-sidebar--collapsed {
+  width: 4.5rem;
 
-  a.nav-link {
-    font-weight: 400;
+  .app-sidebar__header {
+    justify-content: center;
+    padding: 0 0.5rem;
+  }
+
+  .app-sidebar__brand {
+    flex: 0;
+    justify-content: center;
+  }
+
+  .app-sidebar__brand-full,
+  .app-sidebar__label,
+  .app-sidebar__chevron {
+    display: none;
+  }
+
+  .app-sidebar__link,
+  .app-sidebar__group-toggle {
+    justify-content: center;
+    gap: 0;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .app-sidebar__subnav {
+    display: none;
+  }
+
+  .dropdown-toggle::after {
+    display: none;
   }
 }
 
-/* ==========================================================================
-Logo styles
-========================================================================== */
-.logo-img {
-  height: 45px;
-  width: 45px;
-  display: inline-block;
-  vertical-align: middle;
-  background: url('/content/images/logo-jhipster.png') no-repeat center center;
-  background-size: contain;
+@media (max-width: 991.98px) {
+  :host.app-sidebar--visible {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1040;
+    width: 16rem;
+    transform: translateX(-100%);
+    transition: transform 180ms ease;
+    box-shadow: none;
+  }
+
+  :host.app-sidebar--visible.app-sidebar--mobile-open {
+    transform: translateX(0);
+    box-shadow: 0.25rem 0 1rem var(--app-overlay);
+  }
+
+  .app-sidebar__panel {
+    min-height: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host.app-sidebar--visible {
+    transition: none;
+  }
+}
+
+@media print {
+  :host {
+    display: none !important;
+  }
 }

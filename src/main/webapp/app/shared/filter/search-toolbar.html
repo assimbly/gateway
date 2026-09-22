@@ -1,0 +1,26 @@
+<div class="search-toolbar d-flex align-items-center gap-2 flex-wrap">
+  <div class="input-group search-toolbar-input">
+    <span class="input-group-text" aria-hidden="true">
+      <fa-icon icon="search" />
+    </span>
+    <input
+      type="text"
+      class="form-control"
+      [id]="inputId()"
+      [placeholder]="placeholder()"
+      [attr.aria-label]="ariaLabel() ?? placeholder()"
+      [value]="query()"
+      (input)="onInput($event)"
+      (keydown)="onKeydown($event)"
+    />
+    @if (query()) {
+      <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-icon" (click)="clear()" aria-label="Clear filter">
+        <fa-icon icon="times" />
+      </button>
+    }
+  </div>
+  <ng-content select="[extras]" />
+  <div class="search-toolbar-actions ms-auto d-flex align-items-center gap-2">
+    <ng-content select="[actions]" />
+  </div>
+</div>

@@ -4,22 +4,24 @@ import { IAddress } from 'app/shared/model/address.model';
 @Pipe({ name: 'QueueSearchByName' })
 export class QueueSearchByNamePipe implements PipeTransform {
     transform(addresses: IAddress[], searchText: string, ascending: boolean, predicate: string) {
+        if (!addresses) {
+            return [];
+        }
+
         const asc: number = ascending ? 1 : -1;
+        let result = [...addresses];
 
         if (predicate == 'name') {
-            addresses = addresses.sort((a, b) => (a.name.toLocaleLowerCase() < b.name.toLocaleLowerCase() ? asc : asc * -1));
+            result = result.sort((a, b) => ((a.name ?? '').toLocaleLowerCase() < (b.name ?? '').toLocaleLowerCase() ? asc : asc * -1));
         } else if (predicate == 'numberOfConsumers') {
-            addresses = addresses.sort((a, b) => (a.numberOfConsumers <= b.numberOfConsumers ? asc : asc * -1));
+            result = result.sort((a, b) => ((a.numberOfConsumers ?? 0) <= (b.numberOfConsumers ?? 0) ? asc : asc * -1));
         } else if (predicate == 'numberOfMessages') {
-            addresses = addresses.sort((a, b) => (a.numberOfMessages <= b.numberOfMessages ? asc : asc * -1));
+            result = result.sort((a, b) => ((a.numberOfMessages ?? 0) <= (b.numberOfMessages ?? 0) ? asc : asc * -1));
         }
 
         if (searchText) {
-            localStorage.setItem('searchQueueText', searchText);
-            return addresses.filter(address => address.name.toLocaleLowerCase().includes(searchText.toLocaleLowerCase()));
-        } else {
-            localStorage.setItem('searchQueueText', '');
-            return addresses;
+            return result.filter(address => (address.name ?? '').toLocaleLowerCase().includes(searchText.toLocaleLowerCase()));
         }
+        return result;
     }
 }

@@ -1,0 +1,56 @@
+<div class="table-fx-shell">
+  @if (errorMessage()) {
+    <div class="alert alert-warning" id="no-result" role="status">{{ errorMessage() }}</div>
+  } @else if (loading() && !hasRows()) {
+    <div class="table-responsive table-fx-scroll">
+      <table class="table table-striped table-hover table-fx" [attr.aria-label]="ariaLabel()" aria-busy="true">
+        <thead>
+          <tr>
+            @for (column of columns(); track column.key) {
+              <th scope="col" [class.text-end]="isEnd(column)">
+                <span>{{ column.header }}</span>
+              </th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of skeletonIndexes(); track row) {
+            <tr class="table-fx-skeleton-row">
+              @for (column of columns(); track column.key) {
+                <td [class.text-end]="isEnd(column)" [class.table-fx-numeric]="column.numeric">
+                  <span class="table-fx-skeleton"></span>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else if (!hasRows()) {
+    <div class="alert alert-warning" id="no-result" role="status">{{ emptyMessage() }}</div>
+  } @else {
+    <div class="table-responsive table-fx-scroll">
+      <table class="table table-striped table-hover table-fx" [attr.aria-label]="ariaLabel()">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="onSortChange($event)">
+            @for (column of columns(); track column.key) {
+              @if (column.sortable) {
+                <th scope="col" [jhiSortBy]="column.key" [class.text-end]="isEnd(column)">
+                  <span>{{ column.header }}</span>
+                  <fa-icon icon="sort" />
+                </th>
+              } @else {
+                <th scope="col" [class.text-end]="isEnd(column)">
+                  <span>{{ column.header }}</span>
+                </th>
+              }
+            }
+          </tr>
+        </thead>
+        <tbody>
+          <ng-content />
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

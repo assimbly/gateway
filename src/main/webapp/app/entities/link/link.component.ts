@@ -31,7 +31,7 @@ export class LinkComponent implements OnInit, OnChanges {
     isSaving: boolean;
     link: ILink;
     linkId: number;
-    typeHeader: string[] = ['constant', 'groovy', 'jsonpath', 'csimple', 'simple', 'spel', 'xpath'];
+    typeHeader: string[] = ['constant', 'simple', 'groovy', 'jsonpath', 'xpath'];
     eventSubscriber: Subscription;
 
     constructor(

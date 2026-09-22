@@ -2,15 +2,18 @@ import { ChangeDetectorRef, Component, OnInit, ViewChild, ElementRef, inject } f
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
+import { SearchToolbar } from 'app/shared/filter';
 import { LogViewerService } from './logviewer.service';
 import { LogViewerLineValidationDirective } from './logviewer-line-validation.directive';
 
 @Component({
-  standalone: true,
-  selector: 'jhi-logviewer',
-  templateUrl: './logviewer.component.html',
-  imports: [RouterModule, FormsModule, LogViewerLineValidationDirective],
+    standalone: true,
+    selector: 'jhi-logviewer',
+    templateUrl: './logviewer.component.html',
+    styleUrl: './logviewer.component.scss',
+    imports: [RouterModule, FormsModule, FontAwesomeModule, LogViewerLineValidationDirective, SearchToolbar],
 })
 export default class LogViewerComponent implements OnInit {
   @ViewChild('logArea', { static: false }) private logArea: ElementRef;

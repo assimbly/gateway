@@ -1,0 +1,115 @@
+{
+  "groups": [
+    {
+      "name": "application",
+      "type": "org.assimbly.gateway.config.ApplicationProperties",
+      "sourceType": "org.assimbly.gateway.config.ApplicationProperties"
+    },
+    {
+      "name": "application.deploy-directory",
+      "type": "org.assimbly.gateway.config.ApplicationProperties$DeployDirectory",
+      "sourceType": "org.assimbly.gateway.config.ApplicationProperties",
+      "sourceMethod": "public org.assimbly.gateway.config.ApplicationProperties.DeployDirectory getDeployDirectory() "
+    },
+    {
+      "name": "application.documentation",
+      "type": "org.assimbly.gateway.config.ApplicationProperties$Documentation",
+      "sourceType": "org.assimbly.gateway.config.ApplicationProperties",
+      "sourceMethod": "public org.assimbly.gateway.config.ApplicationProperties.Documentation getDocumentation() "
+    },
+    {
+      "name": "application.gateway",
+      "type": "org.assimbly.gateway.config.ApplicationProperties$Gateway",
+      "sourceType": "org.assimbly.gateway.config.ApplicationProperties",
+      "sourceMethod": "public org.assimbly.gateway.config.ApplicationProperties.Gateway getGateway() "
+    },
+    {
+      "name": "application.info",
+      "type": "org.assimbly.gateway.config.ApplicationProperties$Info",
+      "sourceType": "org.assimbly.gateway.config.ApplicationProperties",
+      "sourceMethod": "public org.assimbly.gateway.config.ApplicationProperties.Info getInfo() "
+    },
+    {
+      "name": "encryption",
+      "type": "org.assimbly.gateway.config.EncryptionProperties",
+      "sourceType": "org.assimbly.gateway.config.EncryptionProperties"
+    },
+    {
+      "name": "encryption.jasypt",
+      "type": "org.assimbly.gateway.config.EncryptionProperties$Jasypt",
+      "sourceType": "org.assimbly.gateway.config.EncryptionProperties",
+      "sourceMethod": "public org.assimbly.gateway.config.EncryptionProperties.Jasypt getJasypt() "
+    }
+  ],
+  "properties": [
+    {
+      "name": "application.deploy-directory.deploy-on-change",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.assimbly.gateway.config.ApplicationProperties$DeployDirectory"
+    },
+    {
+      "name": "application.deploy-directory.deploy-on-start",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.assimbly.gateway.config.ApplicationProperties$DeployDirectory"
+    },
+    {
+      "name": "application.documentation.camel-url",
+      "type": "java.lang.String",
+      "sourceType": "org.assimbly.gateway.config.ApplicationProperties$Documentation"
+    },
+    {
+      "name": "application.documentation.url",
+      "type": "java.lang.String",
+      "sourceType": "org.assimbly.gateway.config.ApplicationProperties$Documentation"
+    },
+    {
+      "name": "application.gateway.base-directory",
+      "type": "java.lang.String",
+      "sourceType": "org.assimbly.gateway.config.ApplicationProperties$Gateway"
+    },
+    {
+      "name": "application.gateway.cache",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.assimbly.gateway.config.ApplicationProperties$Gateway"
+    },
+    {
+      "name": "application.gateway.debugging",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.assimbly.gateway.config.ApplicationProperties$Gateway"
+    },
+    {
+      "name": "application.gateway.name",
+      "type": "java.lang.String",
+      "sourceType": "org.assimbly.gateway.config.ApplicationProperties$Gateway"
+    },
+    {
+      "name": "application.gateway.tracing",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.assimbly.gateway.config.ApplicationProperties$Gateway"
+    },
+    {
+      "name": "application.info.version",
+      "type": "java.lang.String",
+      "sourceType": "org.assimbly.gateway.config.ApplicationProperties$Info"
+    },
+    {
+      "name": "encryption.jasypt.algorithm",
+      "type": "java.lang.String",
+      "sourceType": "org.assimbly.gateway.config.EncryptionProperties$Jasypt"
+    },
+    {
+      "name": "encryption.jasypt.password",
+      "type": "java.lang.String",
+      "sourceType": "org.assimbly.gateway.config.EncryptionProperties$Jasypt"
+    },
+    {
+      "name": "encryption.properties",
+      "type": "java.util.Properties",
+      "sourceType": "org.assimbly.gateway.config.EncryptionProperties"
+    }
+  ],
+  "hints": [],
+  "ignored": {
+    "properties": []
+  }
+}

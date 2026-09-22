@@ -1,11 +1,10 @@
 <div>
-  <h2>
-    <span id="metrics-page-heading" data-cy="metricsPageHeading" jhiTranslate="metrics.title">Application Metrics</span>
-
-    <button class="btn btn-primary float-end" (click)="refresh()">
-      <fa-icon icon="sync"></fa-icon> <span jhiTranslate="metrics.refresh.button">Refresh</span>
+  <div class="d-flex justify-content-end">
+    <button class="btn btn-fx btn-fx-secondary" type="button" (click)="refresh()" aria-label="Refresh">
+      <fa-icon icon="sync"></fa-icon>
+      <span jhiTranslate="metrics.refresh.button">Refresh</span>
     </button>
-  </h2>
+  </div>
 
   <h3 jhiTranslate="metrics.jvm.title">JVM Metrics</h3>
 

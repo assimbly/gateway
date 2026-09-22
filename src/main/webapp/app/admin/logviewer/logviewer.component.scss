@@ -1,0 +1,24 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 5.75rem);
+  min-height: 20rem;
+}
+
+.logviewer-toolbar {
+  flex-shrink: 0;
+}
+
+.logviewer-output {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-bottom: 0;
+  padding: 0.75rem 1rem;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background-color: var(--app-hover);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-btn-radius, 0.25rem);
+  color: var(--app-text);
+}

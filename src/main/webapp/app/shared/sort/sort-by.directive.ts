@@ -1,4 +1,4 @@
-import { Directive, contentChild, effect, inject, input } from '@angular/core';
+import { Directive, computed, contentChild, effect, inject, input } from '@angular/core';
 
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { IconDefinition, faSort, faSortDown, faSortUp } from '@fortawesome/free-solid-svg-icons';
@@ -9,6 +9,9 @@ import { SortDirective } from './sort.directive';
   selector: '[jhiSortBy]',
   host: {
     '(click)': 'onClick()',
+    '[attr.aria-sort]': 'ariaSort()',
+    '[class.table-fx-th-sortable]': 'true',
+    '[class.table-fx-th-sorted]': 'isSorted()',
   },
 })
 export class SortByDirective {
@@ -21,6 +24,18 @@ export class SortByDirective {
   protected sortDescIcon = faSortDown;
 
   private readonly sort = inject(SortDirective, { host: true });
+
+  readonly isSorted = computed(() => {
+    const { predicate, order } = this.sort.sortState();
+    return predicate === this.jhiSortBy() && order !== undefined;
+  });
+
+  readonly ariaSort = computed(() => {
+    if (!this.isSorted()) {
+      return 'none';
+    }
+    return this.sort.sortState().order === 'asc' ? 'ascending' : 'descending';
+  });
 
   constructor() {
     effect(() => {
