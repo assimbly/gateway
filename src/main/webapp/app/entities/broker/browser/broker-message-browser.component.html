@@ -36,31 +36,38 @@
 </div>
 
 <div class="row">
-  <div class="col-10">
+  <div class="col-9">
     <h4 style="margin-left: 0.7em">
       <b
         ><i>{{ subtitle }}</i></b
       >
     </h4>
   </div>
-  <div class="col-2 text-right">
+  <div class="col-3 d-flex justify-content-end gap-2">
     <div ngbDropdown class="d-inline-block" *ngIf="messages?.length > 0">
-      <button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle><fa-icon icon="bars"></fa-icon></button>
+      <button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle>
+        <fa-icon icon="bars"></fa-icon>
+      </button>
       <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
         <button ngbDropdownItem (click)="openModal(moveMessageModal)">Move</button>
         <button ngbDropdownItem (click)="deleteMessage(selectedMessage)">Delete</button>
       </div>
     </div>
+
     <div ngbDropdown class="d-inline-block" *ngIf="messages?.length > 0">
-      <button class="btn btn-outline-primary" id="dropdownMenuActions2" ngbDropdownToggle><fa-icon icon="download"></fa-icon></button>
+      <button class="btn btn-outline-primary" id="dropdownMenuActions2" ngbDropdownToggle>
+        <fa-icon icon="download"></fa-icon>
+      </button>
       <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
-        <button ngbDropdownItem (click)="saveMessage(selectedMessage, true)" *ngIf="messages?.length > 0">Body</button>
-        <button ngbDropdownItem (click)="saveMessage(selectedMessage, false)" *ngIf="messages?.length > 0">Message</button>
-        <button ngbDropdownItem (click)="saveAllMessages()" *ngIf="messages?.length > 0">All Messages</button>
+        <button ngbDropdownItem (click)="saveMessage(selectedMessage, true)">Body</button>
+        <button ngbDropdownItem (click)="saveMessage(selectedMessage, false)">Message</button>
+        <button ngbDropdownItem (click)="saveAllMessages()">All Messages</button>
       </div>
     </div>
-    <div class="d-inline-block">
-      <button class="btn btn-fx btn-fx-secondary" type="button" (click)="refreshMessages()" aria-label="Refresh">
+
+    <div>
+      <button class="btn btn-fx btn-fx-secondary" type="button"
+              (click)="refreshMessages()" aria-label="Refresh">
         <fa-icon icon="sync"></fa-icon>
         <span>Refresh</span>
       </button>

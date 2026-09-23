@@ -77,13 +77,15 @@ export class TopicService {
 
   deleteTopic(name: string, brokerType: string): Observable<HttpResponse<string>> {
     return this.http.delete(`${this.brokersResourceUrl}/${brokerType}/topic/${name}`, {
+      headers: new HttpHeaders({ Accept: 'application/json' }),
       observe: 'response',
       responseType: 'text',
     });
   }
 
   clearTopic(name: string, brokerType: string): Observable<HttpResponse<string>> {
-    return this.http.post(`${this.brokersResourceUrl}/${brokerType}/topic/${name}/clear`, null, {
+    return this.http.post(`${this.brokersResourceUrl}/${brokerType}/topic/${name}/clear`, '', {
+      headers: new HttpHeaders({ Accept: 'application/json' }),
       observe: 'response',
       responseType: 'text',
     });
