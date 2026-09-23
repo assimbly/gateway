@@ -9,6 +9,7 @@ import { serverApiUrl } from 'app/config';
 
 import { Account } from './account.model';
 import { StateStorageService } from './state-storage.service';
+import { ThemeService } from 'app/core/theme/theme.service';
 
 @Service()
 export class AccountService {
@@ -21,6 +22,7 @@ export class AccountService {
   private readonly http = inject(HttpClient);
   private readonly stateStorageService = inject(StateStorageService);
   private readonly router = inject(Router);
+  private readonly themeService = inject(ThemeService);
 
   save(account: Account): Observable<{}> {
     return this.http.post(`${serverApiUrl}api/account`, account);
@@ -56,6 +58,8 @@ export class AccountService {
           if (account.langKey && !this.stateStorageService.getLocale()) {
             this.translateService.use(account.langKey);
           }
+
+          this.themeService.syncFromAccount(account);
 
           this.navigateToStoredUrl();
         }),

@@ -76,13 +76,15 @@ export class QueueService {
 
   deleteQueue(name: string, brokerType: string): Observable<HttpResponse<string>> {
     return this.http.delete(`${this.brokersResourceUrl}/${brokerType}/queue/${name}`, {
+      headers: new HttpHeaders({ Accept: 'application/json' }),
       observe: 'response',
       responseType: 'text',
     });
   }
 
   clearQueue(name: string, brokerType: string): Observable<HttpResponse<string>> {
-    return this.http.post(`${this.brokersResourceUrl}/${brokerType}/queue/${name}/clear`, null, {
+    return this.http.post(`${this.brokersResourceUrl}/${brokerType}/queue/${name}/clear`, '', {
+      headers: new HttpHeaders({ Accept: 'application/json' }),
       observe: 'response',
       responseType: 'text',
     });

@@ -1,0 +1,96 @@
+:root,
+[data-bs-theme='light'],
+[data-bs-theme='dark'] {
+  --ng-select-bg: var(--app-surface);
+  --ng-select-primary-text: var(--app-text);
+  --ng-select-input-text: var(--app-text);
+  --ng-select-value-text: var(--app-text);
+  --ng-select-placeholder: var(--app-text-muted);
+  --ng-select-border: var(--app-border);
+  --ng-select-dropdown-bg: var(--app-surface-elevated);
+  --ng-select-dropdown-border: var(--app-border);
+  --ng-select-dropdown-option-bg: var(--app-surface-elevated);
+  --ng-select-dropdown-option-text: var(--app-text);
+  --ng-select-marked: var(--app-hover);
+  --ng-select-marked-text: var(--app-text);
+  --ng-select-selected: var(--app-active);
+  --ng-select-selected-text: var(--app-text);
+  --ng-select-disabled-text: var(--app-disabled-bg);
+  --ng-select-arrow: var(--app-text-muted);
+}
+
+.ng-select {
+  .ng-select-container {
+    background-color: var(--app-surface);
+    border-color: var(--app-border);
+    color: var(--app-text);
+
+    .ng-value,
+    .ng-placeholder,
+    .ng-input > input {
+      background: transparent;
+      color: var(--app-text);
+    }
+
+    .ng-placeholder {
+      color: var(--app-text-muted);
+    }
+  }
+
+  &.ng-select-opened > .ng-select-container {
+    background: var(--app-surface);
+    color: var(--app-text);
+  }
+
+  &.ng-select-focused:not(.ng-select-opened) > .ng-select-container {
+    border-color: var(--app-focus);
+    box-shadow: 0 0 0 0.15rem color-mix(in srgb, var(--app-focus) 25%, transparent);
+  }
+
+  &.ng-select-disabled > .ng-select-container {
+    background-color: var(--app-disabled-bg);
+    color: var(--app-disabled-text);
+  }
+
+  .ng-select-container .ng-value-container .ng-input > input {
+    background-color: transparent;
+    color: var(--app-text);
+  }
+}
+
+.ng-dropdown-panel {
+  background-color: var(--app-surface-elevated);
+  border-color: var(--app-border);
+  color: var(--app-text);
+
+  .ng-dropdown-panel-items .ng-option {
+    background-color: var(--app-surface-elevated);
+    color: var(--app-text);
+
+    &.ng-option-marked {
+      background-color: var(--app-hover);
+      color: var(--app-text);
+    }
+
+    &.ng-option-selected,
+    &.ng-option-selected.ng-option-marked {
+      background-color: var(--app-active);
+      color: var(--app-text);
+    }
+
+    &.ng-option-disabled {
+      color: var(--app-disabled-text);
+    }
+  }
+}
+
+.option-desc-footer {
+  border-top-color: var(--app-border);
+  background: var(--app-hover);
+  color: var(--app-text);
+}
+
+.option-desc-footer-meta,
+.option-desc-footer-placeholder {
+  color: var(--app-text-muted);
+}

@@ -37,7 +37,7 @@ export class BrokerService {
         return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 
-    start(id: number, brokerType: string, brokerConfigurationType: string): Observable<HttpResponse<any>> {
+    start(id: number, brokerType: string, brokerConfigurationType: string): Observable<HttpResponse<string>> {
         return this.http.get(`${this.resourceUrl}/${id}/start`, {
             observe: 'response',
             responseType: 'text',
@@ -45,7 +45,7 @@ export class BrokerService {
         });
     }
 
-    restart(id: number, brokerType: string, brokerConfigurationType: string): Observable<HttpResponse<any>> {
+    restart(id: number, brokerType: string, brokerConfigurationType: string): Observable<HttpResponse<string>> {
         return this.http.get(`${this.resourceUrl}/${id}/restart`, {
             observe: 'response',
             responseType: 'text',
@@ -53,7 +53,7 @@ export class BrokerService {
         });
     }
 
-    stop(id: number, brokerType: string, brokerConfigurationType: string): Observable<HttpResponse<any>> {
+    stop(id: number, brokerType: string, brokerConfigurationType: string): Observable<HttpResponse<string>> {
         return this.http.get(`${this.resourceUrl}/${id}/stop`, {
             observe: 'response',
             responseType: 'text',
@@ -68,7 +68,7 @@ export class BrokerService {
         });
     }
 
-    getBrokerStatus(id: number, brokerType: string): Observable<any> {
+    getBrokerStatus(id: number, brokerType: string): Observable<HttpResponse<string>> {
         return this.http.get(`${this.resourceUrl}/${id}/status`, {
             observe: 'response',
             responseType: 'text',
@@ -76,11 +76,11 @@ export class BrokerService {
         });
     }
 
-    getBrokerType(id: number): Observable<any> {
+    getBrokerType(id: number): Observable<HttpResponse<string>> {
         return this.http.get(`${this.resourceUrl}/${id}/type`, { observe: 'response', responseType: 'text' });
     }
 
-    getBrokerInfo(id: number, brokerType: string): Observable<any> {
+    getBrokerInfo(id: number, brokerType: string): Observable<HttpResponse<string>> {
         return this.http.get(`${this.resourceUrl}/${id}/info`, {
             observe: 'response',
             responseType: 'text',
@@ -88,7 +88,7 @@ export class BrokerService {
         });
     }
 
-    getBrokerConfiguration(id: number, brokerType: string): Observable<any> {
+    getBrokerConfiguration(id: number, brokerType: string): Observable<HttpResponse<string>> {
         return this.http.get(`${this.resourceUrl}/${id}/configure`, {
             observe: 'response',
             responseType: 'text',
@@ -101,7 +101,7 @@ export class BrokerService {
         brokerType: string,
         brokerConfigurationType: string,
         brokerConfiguration: String
-    ): Observable<HttpResponse<any>> {
+    ): Observable<HttpResponse<string>> {
         const options = {};
         return this.http.post(`${this.resourceUrl}/${id}/configure`, brokerConfiguration, {
             observe: 'response',
@@ -147,7 +147,7 @@ export class BrokerService {
         });
     }
 
-    sendMessage(brokerType: string, endpointName: string, messageHeaders: string, messageBody: string): Observable<any> {
+    sendMessage(brokerType: string, endpointName: string, messageHeaders: string, messageBody: string): Observable<HttpResponse<string>> {
         return this.http.post(`${this.resourceUrl}/${brokerType}/message/${endpointName}/send`, messageBody, {
             observe: 'response',
             responseType: 'text',

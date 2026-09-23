@@ -19,6 +19,7 @@ import { MessageSortByHeaderPipePipe } from '../message.sortbyheader.pipe';
 
 import { IMessage } from 'app/shared/model/message.model';
 import { AccountService } from 'app/core/auth/account.service';
+import { ThemeService } from 'app/core/theme';
 import { ITEMS_PER_PAGE } from 'app/config/pagination.constants';
 import { BrokerService } from 'app/entities/broker/broker.service';
 
@@ -49,6 +50,7 @@ import { CodemirrorComponent } from "@ctrl/ngx-codemirror";
   ],
 })
 export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
+  readonly themeService = inject(ThemeService);
 
   @ViewChild('codeEditor') private codeEditor: CodemirrorComponent;
 
@@ -81,7 +83,6 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   fileExtension: string;
   isLoading = false;
   finished = false;
-  test: any;
   searchText = '';
   active = '0';
   descending = false;

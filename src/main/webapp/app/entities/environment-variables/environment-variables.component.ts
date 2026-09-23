@@ -1,15 +1,16 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { InfiniteScrollModule } from 'ngx-infinite-scroll';
-import { SortDirective, SortByDirective, SortState } from 'app/shared/sort';
+import { SortState, sortParams } from 'app/shared/sort';
 import { HasAnyAuthorityDirective } from 'app/shared/auth';
+import { SearchToolbar } from 'app/shared/filter';
+import { DataTable, DataTableColumn, OverflowActionDirective, PrimaryActionDirective, RowActions, Truncate } from 'app/shared/table';
 
 import { IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
 import { EnvironmentVariablesDeleteDialogComponent } from './environment-variables-delete-dialog.component';
@@ -19,29 +20,49 @@ import { EnvironmentVariablesService } from './environment-variables.service';
 @Component({
     selector: 'jhi-environment-variables',
     templateUrl: './environment-variables.component.html',
-    imports: [CommonModule, RouterModule, FontAwesomeModule, InfiniteScrollModule, SortDirective, SortByDirective, HasAnyAuthorityDirective],
+    imports: [
+        CommonModule,
+        RouterModule,
+        FontAwesomeModule,
+        NgbDropdownModule,
+        HasAnyAuthorityDirective,
+        SearchToolbar,
+        DataTable,
+        RowActions,
+        PrimaryActionDirective,
+        OverflowActionDirective,
+        Truncate,
+    ],
 })
 export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
-    environmentVariables: IEnvironmentVariables[];
+    environmentVariables: IEnvironmentVariables[] = [];
     currentAccount: any;
     eventSubscriber: Subscription;
+    searchText = '';
 
-    // sorting
     sortState: SortState = { predicate: 'key', order: 'asc' };
     page: any;
     last: any = 100;
+    private loadRequest = 0;
+    readonly columns: DataTableColumn[] = [
+        { key: 'key', header: 'Key', sortable: true },
+        { key: 'value', header: 'Value' },
+        { key: 'actions', header: 'Actions', align: 'end' },
+    ];
 
     constructor(
         protected environmentVariablesService: EnvironmentVariablesService,
         protected alertService: AlertService,
         protected eventManager: EventManager,
     		protected modalService: NgbModal,
-        protected accountService: AccountService
+        protected accountService: AccountService,
+        protected cdr: ChangeDetectorRef
     ) {
         this.page = 0;
     }
 
     loadAll() {
+        const requestId = ++this.loadRequest;
         this.environmentVariablesService
             .query({
                 page: this.page,
@@ -49,15 +70,20 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
             })
             .subscribe(
                 (res: HttpResponse<IEnvironmentVariables[]>) => {
-                    if (this.environmentVariables) {
-                        this.environmentVariables.push(...res.body);
+                    if (requestId !== this.loadRequest) {
+                        return;
+                    }
+                    const body = res.body || [];
+                    if (this.page > 0) {
+                        this.environmentVariables = [...this.environmentVariables, ...body];
                     } else {
-                        this.environmentVariables = res.body;
+                        this.environmentVariables = body;
                     }
 
-                    if (res.body.length < 20) {
+                    if (body.length < 20) {
                         this.last = this.page;
                     }
+                    this.cdr.detectChanges();
                 },
                 (res: HttpErrorResponse) => this.onError(res.message)
             );
@@ -80,6 +106,17 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
         this.eventManager.destroy(this.eventSubscriber);
     }
 
+    get filteredVariables(): IEnvironmentVariables[] {
+        const query = this.searchText?.toLocaleLowerCase() ?? '';
+        let result = this.environmentVariables ?? [];
+        if (query) {
+            result = result.filter(
+                item => (item.key ?? '').toLocaleLowerCase().includes(query) || (item.value ?? '').toLocaleLowerCase().includes(query)
+            );
+        }
+        return result;
+    }
+
     trackId(index: number, item: IEnvironmentVariables) {
         return item.id;
     }
@@ -98,34 +135,25 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
 	delete(environmentVariables: IEnvironmentVariables): void {
 		const modalRef = this.modalService.open(EnvironmentVariablesDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
 		modalRef.componentInstance.environmentVariables = environmentVariables;
-		// unsubscribe not needed because closed completes on modal close
-
-		modalRef.result.then(
-        result => {
-           if (result) {
-                this.environmentVariables = [];
-           }
-        },
-        reason => {
-           if (reason) {
-                this.environmentVariables = [];
-           }
-        }
-      );
+		modalRef.closed.subscribe(result => {
+			if (result === 'deleted') {
+				this.environmentVariables = this.environmentVariables.filter(item => item.id !== environmentVariables.id);
+				this.reset();
+			}
+		});
 	}
 
     sort(): string[] {
-        const { predicate, order } = this.sortState;
-        const result = [predicate + ',' + order];
-        if (predicate !== 'key') {
-            result.push('key');
-        }
-        return result;
+        return sortParams(this.sortState, 'key');
     }
 
     reset() {
         this.page = 0;
         this.environmentVariables = [];
         this.loadAll();
+    }
+
+    onSortChange() {
+        this.reset();
     }
 }

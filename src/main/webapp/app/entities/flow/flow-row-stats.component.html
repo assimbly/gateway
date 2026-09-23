@@ -1,0 +1,37 @@
+<ng-template #statsTemplate>
+  <div class="flow-stats">
+    <p *ngIf="loading" class="flow-stats-empty">Loading stats…</p>
+    <p *ngIf="!loading && empty" class="flow-stats-empty">There are no stats yet.</p>
+    <ng-container *ngIf="!loading && !empty">
+      <section *ngFor="let section of sections" class="flow-stats-section">
+        <h6>{{ section.title }}</h6>
+        <p *ngIf="section.note" class="flow-stats-note">{{ section.note }}</p>
+        <table *ngIf="section.rows.length > 0">
+          <tbody>
+            <tr *ngFor="let row of section.rows">
+              <th scope="row">{{ row.label }}</th>
+              <td>{{ row.value }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </ng-container>
+  </div>
+</ng-template>
+
+<button
+  type="button"
+  class="btn btn-fx btn-fx-sm btn-fx-ghost"
+  (mouseenter)="load.emit()"
+  [ngbPopover]="statsTemplate"
+  popoverTitle="Source stats"
+  popoverClass="flow-stats-popover"
+  placement="left"
+  container="body"
+  triggers="click"
+  [autoClose]="'outside'"
+  aria-label="Stats"
+>
+  <fa-icon icon="chart-bar"></fa-icon>
+  <span class="d-none d-md-inline">Stats</span>
+</button>

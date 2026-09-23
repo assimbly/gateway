@@ -4,7 +4,7 @@
     <form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
       <div class="row">
         <div class="col-10">
-          <h2 id="jhi-broker-heading">Create or edit a Broker</h2>
+          <h2 id="jhi-broker-heading">Broker</h2>
         </div>
         <div class="col-2">
           <a role="button" class="btn btn-sm right-border-radius-0 activemq-link activemq-broker-img"
@@ -99,7 +99,7 @@
               [(ngModel)]="brokerConfiguration"
               [options]="{
 							lineNumbers: true,
-							theme: 'default',
+							theme: themeService.editorTheme(),
 							mode: 'xml',
               autoCloseTags: true
 						  }"
@@ -110,12 +110,14 @@
 
       </div>
 
-      <div>
-        <button type="button" id="cancel-save" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span>Cancel</span>
+      <div class="form-fx-actions" [class.broker-actions--embedded]="broker.configurationType === 'embedded'">
+        <button type="button" id="cancel-save" class="btn btn-fx btn-fx-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>
+          <span>Cancel</span>
         </button>
-        <button type="submit" id="save-entity" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
-          <fa-icon [icon]="'save'"></fa-icon>&nbsp;<span>Save</span>
+        <button type="submit" id="save-entity" [disabled]="editForm.form.invalid || isSaving" class="btn btn-fx btn-fx-primary">
+          <fa-icon icon="save"></fa-icon>
+          <span>Save</span>
         </button>
       </div>
       <br/>

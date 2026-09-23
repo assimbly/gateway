@@ -1,17 +1,18 @@
 @defer (when loggers() && !isLoading()) {
   <div class="table-responsive">
-    <h2 id="logs-page-heading" data-cy="logsPageHeading" jhiTranslate="logs.title">Logs</h2>
-
     <p jhiTranslate="logs.nbloggers" [translateValues]="{ total: loggers()?.length }">There are {{ loggers()?.length }} loggers.</p>
 
-    <label for="logs-filter" jhiTranslate="logs.filter">Filter</label>
-    <input id="logs-filter" type="text" [ngModel]="filter()" (ngModelChange)="filter.set($event)" class="form-control" />
+    <jhi-search-toolbar [(query)]="filter" placeholder="Filter loggers" inputId="logs-filter" />
 
-    <table class="table table-sm table-striped table-bordered" aria-describedby="logs-page-heading">
+    <table class="table table-sm table-striped table-bordered logs-table" aria-label="Logs">
+      <colgroup>
+        <col class="logs-col-name" />
+        <col class="logs-col-level" />
+      </colgroup>
       <thead>
         <tr jhiSort [(sortState)]="sortState">
-          <th jhiSortBy="name" scope="col"><span jhiTranslate="logs.table.name">Name</span> <fa-icon icon="sort" /></th>
-          <th jhiSortBy="level" scope="col"><span jhiTranslate="logs.table.level">Level</span> <fa-icon icon="sort" /></th>
+          <th jhiSortBy="name" scope="col" class="logs-col-name"><span jhiTranslate="logs.table.name">Name</span> <fa-icon icon="sort" /></th>
+          <th jhiSortBy="level" scope="col" class="logs-col-level"><span jhiTranslate="logs.table.level">Level</span> <fa-icon icon="sort" /></th>
         </tr>
       </thead>
 
@@ -22,53 +23,61 @@
               <small>{{ logger.name | slice: 0 : 140 }}</small>
             </td>
             <td>
+              <div class="d-flex flex-nowrap gap-1">
               <button
+                type="button"
                 (click)="changeLevel(logger.name, 'TRACE')"
-                [class]="logger.level === 'TRACE' ? 'btn-primary' : 'btn-light'"
-                class="btn btn-sm"
+                class="btn btn-fx-log"
+                [ngClass]="logger.level === 'TRACE' ? 'btn-primary' : 'btn-fx-log-idle'"
               >
                 TRACE
               </button>
 
               <button
+                type="button"
                 (click)="changeLevel(logger.name, 'DEBUG')"
-                [class]="logger.level === 'DEBUG' ? 'btn-success' : 'btn-light'"
-                class="btn btn-sm"
+                class="btn btn-fx-log"
+                [ngClass]="logger.level === 'DEBUG' ? 'btn-success' : 'btn-fx-log-idle'"
               >
                 DEBUG
               </button>
 
               <button
+                type="button"
                 (click)="changeLevel(logger.name, 'INFO')"
-                [class]="logger.level === 'INFO' ? 'btn-info' : 'btn-light'"
-                class="btn btn-sm"
+                class="btn btn-fx-log"
+                [ngClass]="logger.level === 'INFO' ? 'btn-info' : 'btn-fx-log-idle'"
               >
                 INFO
               </button>
 
               <button
+                type="button"
                 (click)="changeLevel(logger.name, 'WARN')"
-                [class]="logger.level === 'WARN' ? 'btn-warning' : 'btn-light'"
-                class="btn btn-sm"
+                class="btn btn-fx-log"
+                [ngClass]="logger.level === 'WARN' ? 'btn-warning' : 'btn-fx-log-idle'"
               >
                 WARN
               </button>
 
               <button
+                type="button"
                 (click)="changeLevel(logger.name, 'ERROR')"
-                [class]="logger.level === 'ERROR' ? 'btn-danger' : 'btn-light'"
-                class="btn btn-sm"
+                class="btn btn-fx-log"
+                [ngClass]="logger.level === 'ERROR' ? 'btn-danger' : 'btn-fx-log-idle'"
               >
                 ERROR
               </button>
 
               <button
+                type="button"
                 (click)="changeLevel(logger.name, 'OFF')"
-                [class]="logger.level === 'OFF' ? 'btn-secondary' : 'btn-light'"
-                class="btn btn-sm"
+                class="btn btn-fx-log"
+                [ngClass]="logger.level === 'OFF' ? 'btn-secondary' : 'btn-fx-log-idle'"
               >
                 OFF
               </button>
+              </div>
             </td>
           </tr>
         }

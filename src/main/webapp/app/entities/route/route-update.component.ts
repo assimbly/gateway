@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpResponse } from '@angular/common/http';
@@ -12,6 +12,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { IRoute, Route } from 'app/shared/model/route.model';
 import { RouteService } from './route.service';
+import { ThemeService } from 'app/core/theme';
 // import { AlertError } from 'app/shared/alert/alert-error.model';
 
 @Component({
@@ -22,6 +23,9 @@ import { RouteService } from './route.service';
 export class RouteUpdateComponent implements OnInit {
     isSaving = false;
     showType = false;
+    readonly themeService = inject(ThemeService);
+    private routeOptionsTheme = '';
+    private routeOptionsCache: Record<string, unknown> | null = null;
 
     editForm = this.fb.group({
         id: [],
@@ -29,6 +33,33 @@ export class RouteUpdateComponent implements OnInit {
         type: [],
         content: []
     });
+
+    routeEditorOptions(): Record<string, unknown> {
+        const theme = this.themeService.editorTheme();
+        if (this.routeOptionsCache && this.routeOptionsTheme === theme) {
+            return this.routeOptionsCache;
+        }
+        this.routeOptionsTheme = theme;
+        this.routeOptionsCache = {
+            lineNumbers: true,
+            gutters: ['CodeMirror-linenumbers'],
+            theme,
+            mode: 'xml',
+        };
+        return this.routeOptionsCache;
+    }
+
+    refreshCodeMirror(editor: { codeMirror?: { refresh: () => void } }): void {
+        const codeMirror = editor?.codeMirror;
+        if (!codeMirror) {
+            return;
+        }
+        const refresh = () => codeMirror.refresh();
+        requestAnimationFrame(() => {
+            refresh();
+            setTimeout(refresh);
+        });
+    }
 
     constructor(
         protected dataUtils: DataUtils,

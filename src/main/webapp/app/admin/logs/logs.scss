@@ -1,0 +1,22 @@
+.logs-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.logs-col-name {
+  width: 70%;
+}
+
+.logs-col-level {
+  width: 30%;
+}
+
+.logs-table td:first-child {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.logs-table td:last-child {
+  white-space: nowrap;
+  vertical-align: middle;
+}

@@ -1,13 +1,46 @@
-<jhi-page-ribbon></jhi-page-ribbon>
+<router-outlet name="navbar"></router-outlet>
 
-<div>
-  <router-outlet name="navbar"></router-outlet>
-</div>
+@if (layout.mobileOpen()) {
+  <button type="button" class="app-backdrop" aria-label="Close navigation" (click)="layout.closeMobile()"></button>
+}
 
-<div class="container-fluid">
-  <div class="card jh-card">
-    <router-outlet></router-outlet>
+<div class="app-main" [inert]="layout.mobileOpen()" [attr.aria-hidden]="layout.mobileOpen() ? true : null">
+  <jhi-page-ribbon></jhi-page-ribbon>
+
+  <header class="app-topbar" [class.app-topbar--always]="!sidebarVisible()">
+    @if (sidebarVisible()) {
+      <button
+        #menuToggle
+        type="button"
+        class="app-topbar__toggle"
+        [attr.aria-expanded]="layout.mobileOpen()"
+        aria-controls="app-sidebar"
+        aria-label="Toggle navigation"
+        (click)="layout.toggleMobile()"
+      >
+        <fa-icon icon="bars" />
+      </button>
+    }
+    <a class="app-topbar__brand" routerLink="/" (click)="layout.closeMobile()">
+      <span jhiTranslate="global.title">Gateway</span>
+    </a>
+    @if (!sidebarVisible()) {
+      <div class="app-topbar__actions">
+        <a class="app-topbar__link" routerLink="/login" id="login" data-cy="login">
+          <span jhiTranslate="global.menu.account.login">Sign in</span>
+        </a>
+        <a class="app-topbar__link" routerLink="/account/register" data-cy="register">
+          <span jhiTranslate="global.menu.account.register">Register</span>
+        </a>
+      </div>
+    }
+  </header>
+
+  <div class="container-fluid app-content">
+    <div class="card jh-card">
+      <router-outlet></router-outlet>
+    </div>
+
+    <jhi-footer></jhi-footer>
   </div>
-
-  <jhi-footer></jhi-footer>
 </div>

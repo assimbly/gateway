@@ -1,7 +1,7 @@
 <div>
     <h2 id="page-heading">
         <span>Connections</span>
-        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-connection" [routerLink]="['/connection/new']">
+        <button type="button" id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-connection" [routerLink]="['/connection/new']">
             <fa-icon [icon]="'plus'"></fa-icon>
             <span >Create Connection</span>
         </button>
@@ -21,7 +21,7 @@
                 <ng-select [items]="connectionsLists.connectionsList" bindLabel="type" bindValue="type" labelForId="field_connection_type" [(ngModel)]="selectedConnection.type" [disabled]="disabledConnectionType"></ng-select>
             </div>
             <div class="col-md-1 text-right">
-              	<button type="submit" [routerLink]="['../connection', selectedConnection.id ]" class="btn btn-info" [disabled]="!selectedConnection.id">
+              	<button type="button" aria-label="View connection" [routerLink]="['../connection', selectedConnection.id ]" class="btn btn-info" [disabled]="!selectedConnection.id">
 	            	<span class="fa fa-eye"></span>
         		</button>
             </div>

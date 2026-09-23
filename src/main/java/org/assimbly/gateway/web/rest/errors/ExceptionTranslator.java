@@ -4,8 +4,6 @@ import java.util.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
-import java.nio.file.AccessDeniedException;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.Nullable;
@@ -173,12 +171,14 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     }
 
     private HttpStatus toStatus(final Throwable throwable) {
-        // Let the ErrorResponse take this responsibility
-        if (throwable instanceof ErrorResponse err) return HttpStatus.valueOf(err.getBody().getStatus());
-
-        return Optional.ofNullable(getMappedStatus(throwable)).orElse(
-            Optional.ofNullable(resolveResponseStatus(throwable)).map(ResponseStatus::value).orElse(HttpStatus.INTERNAL_SERVER_ERROR)
-        );
+        HttpStatus mapped = getMappedStatus(throwable);
+        if (mapped != null) {
+            return mapped;
+        }
+        if (throwable instanceof ErrorResponse err && err.getBody().getStatus() > 0) {
+            return HttpStatus.valueOf(err.getBody().getStatus());
+        }
+        return Optional.ofNullable(resolveResponseStatus(throwable)).map(ResponseStatus::value).orElse(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private @Nullable ResponseStatus extractResponseStatus(final Throwable throwable) {
@@ -222,7 +222,9 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     private @Nullable HttpStatus getMappedStatus(Throwable err) {
         // Where we disagree with Spring defaults
         return switch (err) {
-            case AccessDeniedException _ -> HttpStatus.FORBIDDEN;
+            case java.nio.file.AccessDeniedException _ -> HttpStatus.FORBIDDEN;
+            case org.springframework.security.authorization.AuthorizationDeniedException _ -> HttpStatus.FORBIDDEN;
+            case org.springframework.security.access.AccessDeniedException _ -> HttpStatus.FORBIDDEN;
             case ConcurrencyFailureException _ -> HttpStatus.CONFLICT;
             case BadCredentialsException _ -> HttpStatus.UNAUTHORIZED;
             default -> null;

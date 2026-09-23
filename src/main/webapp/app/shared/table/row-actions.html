@@ -1,0 +1,17 @@
+<div class="d-inline-flex align-items-center gap-1 table-fx-actions">
+  <ng-content select="[jhiPrimaryAction]" />
+  <div class="table-fx-overflow" [class.d-none]="!hasOverflow()" ngbDropdown container="body" placement="bottom-end">
+    <button
+      type="button"
+      class="btn btn-fx btn-fx-sm btn-fx-icon btn-fx-ghost"
+      ngbDropdownToggle
+      ngbTooltip="More actions"
+      aria-label="More actions"
+    >
+      <fa-icon icon="ellipsis-vertical"></fa-icon>
+    </button>
+    <div ngbDropdownMenu>
+      <ng-content select="[jhiOverflowAction]" />
+    </div>
+  </div>
+</div>

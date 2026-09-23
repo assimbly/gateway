@@ -1,8 +1,8 @@
-<form name="editForm" role="form" novalidate (ngSubmit)="save(false)" #editForm="ngForm" autocomplete="off">
+<form name="editForm" role="form" novalidate (ngSubmit)="save(false)" #editForm="ngForm" autocomplete="off" jhiFieldTab>
 
     <div class="modal-header">
         <h4 class="modal-title" id="myConnectionLabel">Create or edit a Connection</h4>
-        <button type="button" class="btn-close" data-dismiss="modal" aria-hidden="true" (click)="clear()"></button>
+        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" (click)="clear()"></button>
     </div>
     <div class="modal-body">
         <jhi-alert-error></jhi-alert-error>

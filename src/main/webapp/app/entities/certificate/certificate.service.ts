@@ -64,7 +64,7 @@ export class CertificateService {
     return this.http.post<any>(`${this.resourceUrl}/remove`, url, { observe: 'response' });
   }
 
-  getCertificateDetails(certificateName: string): Observable<HttpResponse<any>> {
+  getCertificateDetails(certificateName: string): Observable<HttpResponse<string>> {
     return this.http.get(`${this.resourceUrl}/details/${certificateName}`, { observe: 'response', responseType: 'text' });
   }
 
@@ -77,7 +77,7 @@ export class CertificateService {
         return this.http.post(`${this.resourceUrl}/syncTrustore`, '', { observe: 'response', responseType: 'text' });
     }*/
 
-  updateTruststore(url: string): Observable<HttpResponse<any>> {
+  updateTruststore(url: string): Observable<HttpResponse<string>> {
     const options = new HttpHeaders({
       keystoreName: 'keystore.jks',
       keystorePassword: environment.KEYSTORE_PWD,
@@ -86,7 +86,7 @@ export class CertificateService {
     return this.http.post(`${this.resourceUrl}/update`, url, { observe: 'response', responseType: 'text' });
   }
 
-  uploadCertificate(keystoreName, certificate, fileType): Observable<HttpResponse<any>> {
+  uploadCertificate(keystoreName, certificate, fileType): Observable<HttpResponse<string>> {
     const options = new HttpHeaders({
       keystoreName,
       keystorePassword: environment.KEYSTORE_PWD,
@@ -99,7 +99,7 @@ export class CertificateService {
     });
   }
 
-  uploadP12Certificate(keystoreName, certificate, fileType, password): Observable<HttpResponse<any>> {
+  uploadP12Certificate(keystoreName, certificate, fileType, password): Observable<HttpResponse<string>> {
     const options = new HttpHeaders({
       keystoreName,
       keystorePassword: environment.KEYSTORE_PWD,
@@ -114,7 +114,7 @@ export class CertificateService {
     });
   }
 
-  generateCertificate(keystoreName, cn): Observable<HttpResponse<any>> {
+  generateCertificate(keystoreName, cn): Observable<HttpResponse<string>> {
     const options = new HttpHeaders({
       keystoreName,
       keystorePassword: environment.KEYSTORE_PWD,
@@ -128,7 +128,7 @@ export class CertificateService {
     });
   }
 
-  importCertificate(url, keystoreName, keystorePassword): Observable<HttpResponse<any>> {
+  importCertificate(url, keystoreName, keystorePassword): Observable<HttpResponse<string>> {
     const options = new HttpHeaders({
       keystoreName,
       keystorePassword,
@@ -141,7 +141,7 @@ export class CertificateService {
     });
   }
 
-  deleteCertificate(certificateName: String): Observable<HttpResponse<any>> {
+  deleteCertificate(certificateName: String): Observable<HttpResponse<string>> {
     const options = new HttpHeaders({
       keystoreName: 'keystore.jks',
       keystorePassword: environment.KEYSTORE_PWD,

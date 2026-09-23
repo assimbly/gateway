@@ -16,7 +16,8 @@ import java.sql.Statement;
 /**
  * H2 stores DB_CLOSE_DELAY in the database file. Databases created with DB_CLOSE_DELAY=-1
  * keep that setting even after it is removed from the JDBC URL, which can drop recent
- * commits (new flows/steps) on JVM stop while older rows survive.
+ * commits (broker type, new flows/steps) on JVM stop while older rows survive.
+ * WRITE_DELAY=0 is also applied on every connection; H2CommitSync fsyncs after each write.
  */
 @Component
 @Order(0)

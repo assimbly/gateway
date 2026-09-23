@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -13,6 +13,7 @@ import { CodemirrorComponent, CodemirrorModule } from '@ctrl/ngx-codemirror';
 
 import { IBroker } from 'app/shared/model/broker.model';
 import { BrokerService } from './broker.service';
+import { ThemeService } from 'app/core/theme';
 
 import { artemisBrokerConfiguration, activemqBrokerConfiguration } from './broker-configuration';
 
@@ -25,6 +26,7 @@ import 'codemirror/addon/edit/closetag';
 })
 export class BrokerUpdateComponent implements OnInit {
     @ViewChild('codeEditor') private codeEditor?: CodemirrorComponent;
+    readonly themeService = inject(ThemeService);
 
     broker: IBroker;
     brokerConfiguration: string;
@@ -135,11 +137,11 @@ export class BrokerUpdateComponent implements OnInit {
     }
 
     setPopoverMessages() {
-        this.namePopoverMessage = `Name of the broker. Usually the same as the integration name.`;
-        this.autostartPopoverMessage = `If true then the broker starts automatically when the integration starts.`;
-        this.typePopoverMessage = `The ActiveMQ broker to use. Either ActiveMQ Classic (5.x) or ActiveMQ Artemis. Artemis is default`;
+        this.namePopoverMessage = `Name of the broker.`;
+        this.autostartPopoverMessage = `If true then the broker starts automatically when the gateway starts.`;
+        this.typePopoverMessage = `The ActiveMQ broker to use. Either ActiveMQ Classic or Artemis. Artemis is default`;
         this.configurationTypePopoverMessage = `The type of configuration. Embedded starts a broker as localhost (for quick testing), File is default.`;
-        this.brokerConfigurationPopoverMessage = `The broker file (activemq.xml for Classic and broker.xml for Artemis). When the configuration is empty than a default file is created. Check the ActiveMQ documentation how to configure the brokers.`;
+        this.brokerConfigurationPopoverMessage = `The broker file (activemq.xml for Classic and broker.xml for Artemis). When the configuration is empty than a default file is created. Check the ActiveMQ or Artemis documentation how to configure the brokers.`;
     }
 
     protected subscribeToSaveResponse(result: Observable<HttpResponse<IBroker>>) {

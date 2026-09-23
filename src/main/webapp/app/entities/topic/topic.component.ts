@@ -1,17 +1,12 @@
-import { Component, OnInit, OnDestroy, TrackByFunction, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { Subscription, interval } from 'rxjs';
-import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { EventManager } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { InfiniteScrollModule } from 'ngx-infinite-scroll';
-
-import { SortDirective, SortByDirective, SortState } from 'app/shared/sort';
-import { ASC, DESC, SORT, ITEM_DELETED_EVENT, DEFAULT_SORT_DATA } from 'app/config/navigation.constants';
-import { SortService } from 'app/shared/sort/sort.service';
+import { SortState, sortParams } from 'app/shared/sort';
 
 import { AccountService } from 'app/core/auth/account.service';
 
@@ -22,31 +17,22 @@ import { ITEMS_PER_PAGE } from 'app/config/pagination.constants';
 import { TopicService } from './topic.service';
 import { TopicDeleteDialogComponent } from './topic-delete-dialog.component';
 import { IBroker } from 'app/shared/model/broker.model';
-import { startWith, switchMap } from 'rxjs/operators';
-import { TopicRowComponent } from './topic-row.component';
-import { TopicSearchByNamePipe } from './topic.searchbyname.pipe';
+import { SearchToolbar } from 'app/shared/filter';
+import { DataTable, DataTableColumn } from 'app/shared/table';
+import { AddressRowComponent } from 'app/entities/broker/address-row.component';
+import { filterAddresses } from 'app/shared/util/address-filter';
 
 @Component({
   selector: 'jhi-topic',
   templateUrl: './topic.component.html',
-  imports: [
-    CommonModule,
-    FormsModule,
-    RouterModule,
-    FontAwesomeModule,
-    InfiniteScrollModule,
-    SortDirective,
-    SortByDirective,
-    TopicRowComponent,
-    TopicSearchByNamePipe,
-  ],
+  imports: [CommonModule, RouterModule, FontAwesomeModule, SearchToolbar, DataTable, AddressRowComponent],
 })
 export class TopicComponent implements OnInit, OnDestroy {
 
-  topics: ITopic[];
-  addresses: IAddress[];
-  brokers: IBroker[];
-  eventSubscriber?: Subscription;
+  topics: ITopic[] = [];
+  addresses: IAddress[] = [];
+  brokers: IBroker[] = [];
+  eventSubscriber = new Subscription();
   currentAccount: any;
   itemsPerPage: number;
   links: any;
@@ -54,10 +40,16 @@ export class TopicComponent implements OnInit, OnDestroy {
   sortState: SortState = { predicate: 'name', order: 'desc' };
 
   timeInterval: Subscription;
-  isBroker: boolean;
+  isBroker: boolean | undefined;
 
   searchTopicText: string = '';
   brokerType = '';
+  readonly columns: DataTableColumn[] = [
+    { key: 'name', header: 'Name', sortable: true },
+    { key: 'numberOfConsumers', header: 'Consumers', sortable: true, numeric: true },
+    { key: 'numberOfMessages', header: 'Messages', sortable: true, numeric: true },
+    { key: 'actions', header: 'Actions', align: 'end' },
+  ];
 
   private readonly changeDetector = inject(ChangeDetectorRef);
 
@@ -78,9 +70,6 @@ export class TopicComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-
-	this.setSearchBox();
-
     this.registerChangeInTopics();
     this.registerDeletedTopics();
 
@@ -97,40 +86,31 @@ export class TopicComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.eventSubscriber) {
-      this.eventManager.destroy(this.eventSubscriber);
-    }
+    this.eventSubscriber.unsubscribe();
     this.timeInterval.unsubscribe();
   }
 
 
   reset(): void {
     this.page = 0;
-    this.setSearchBox();
     this.getBrokerType();
   }
 
   loadPage(page: number): void {
     this.page = page;
-	this.setSearchBox();
     this.getBrokerType();
   }
 
-   setSearchBox(){
-    const searchText = localStorage.getItem('searchTopicText');
-	if(searchText){
-		this.searchTopicText = searchText;
-	}else{
-		this.searchTopicText = '';
-	}
-   }
+  get filteredAddresses(): IAddress[] {
+    return filterAddresses(this.addresses, this.searchTopicText, this.sortState.order === 'asc', this.sortState.predicate ?? 'name', true);
+  }
 
   trackId(index: number, item: IAddress): number {
     return item.id!;
   }
 
   registerChangeInTopics(): void {
-    this.eventSubscriber = this.eventManager.subscribe('topicListModification', () => this.reset());
+    this.eventSubscriber.add(this.eventManager.subscribe('topicListModification', () => this.reset()));
   }
 
   poll(): void {
@@ -140,9 +120,11 @@ export class TopicComponent implements OnInit, OnDestroy {
   }
 
   registerDeletedTopics() {
-    this.eventManager.subscribe('topicDeleted', res => {
-      this.getBrokerType();
-    });
+    this.eventSubscriber.add(
+      this.eventManager.subscribe('topicDeleted', () => {
+        this.getBrokerType();
+      }),
+    );
   }
 
   delete(topic: ITopic): void {
@@ -151,12 +133,7 @@ export class TopicComponent implements OnInit, OnDestroy {
   }
 
   sort(): string[] {
-    const { predicate, order } = this.sortState;
-    const result = [predicate + ',' + order];
-    if (predicate !== 'name') {
-      result.push('name');
-    }
-    return result;
+    return sortParams(this.sortState);
   }
 
   getBrokerType() {

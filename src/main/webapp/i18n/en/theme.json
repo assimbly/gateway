@@ -1,0 +1,10 @@
+{
+  "theme": {
+    "selector": {
+      "label": "Color theme"
+    },
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark"
+  }
+}

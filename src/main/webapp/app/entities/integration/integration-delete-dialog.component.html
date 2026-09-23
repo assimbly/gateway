@@ -1,11 +1,11 @@
 <form name="deleteForm" (ngSubmit)="confirmDelete(integration.id)">
     <div class="modal-header">
         <h4 class="modal-title">Confirm delete operation</h4>
-        <button type="button" class="btn-close" data-dismiss="modal" aria-hidden="true" (click)="clear()"></button>
+        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" (click)="clear()"></button>
     </div>
     <div class="modal-body">
         <jhi-alert-error></jhi-alert-error>
-        <p id="jhi-delete-integration-heading">Are you sure you want to delete this Integration?</p>
+        <p id="jhi-delete-integration-heading">Are you sure you want to delete this Gateway?</p>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">

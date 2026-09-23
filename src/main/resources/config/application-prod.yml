@@ -44,6 +44,8 @@ spring:
     password:
     hikari:
       auto-commit: false
+      minimum-idle: 0
+      connection-init-sql: SET WRITE_DELAY 0
   jpa:
     database: H2
     show-sql: false

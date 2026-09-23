@@ -1,71 +1,50 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AlertError } from 'app/shared/alert';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
-import { ActivatedRoute, Router } from '@angular/router';
 
-import { IQueue } from 'app/shared/model/queue.model';
-import { QueueService } from './queue.service';
 import { IAddress } from 'app/shared/model/address.model';
-import { IBroker } from 'app/shared/model/broker.model';
+import { QueueService } from './queue.service';
 
 @Component({
-  templateUrl: './queue-delete-dialog.component.html',
-  imports: [CommonModule, FontAwesomeModule, AlertError],
+    templateUrl: './queue-delete-dialog.component.html',
+    imports: [CommonModule, FontAwesomeModule, AlertError],
 })
 export class QueueDeleteDialogComponent {
-    queue?: IQueue;
     address?: IAddress;
-
     brokerType = '';
-    brokers: IBroker[];
 
     message = 'Are you sure you want to delete this queue?';
-    disableDelete: boolean;
+    disableDelete = false;
 
     constructor(
         protected queueService: QueueService,
         public activeModal: NgbActiveModal,
         protected eventManager: EventManager,
-        protected router: Router
-    ) {
-        this.brokers = [];
-        this.getBrokerType();
-        this.disableDelete = false;
-    }
+    ) {}
 
     cancel(): void {
         this.activeModal.dismiss();
     }
 
     confirmDelete(name: string): void {
-        if (this.address.numberOfConsumers > 0) {
+        if (this.address?.numberOfConsumers > 0) {
             this.message = 'Cannot delete queue because there is at least one active consumer';
             this.disableDelete = true;
-        } else if (this.address.numberOfMessages > 0) {
+            return;
+        }
+        if (this.address?.numberOfMessages > 0) {
             this.message = 'Cannot delete queue because there is at least one message on the queue. Please clear the queue before deleting';
             this.disableDelete = true;
-        } else {
-            this.queueService.deleteQueue(name, this.brokerType).subscribe(() => {
-				this.eventManager.broadcast(new EventWithContent('queueListModification', 'deleted'));
-                 this.activeModal.dismiss(true);
-            });
+            return;
         }
-    }
 
-    getBrokerType(): void {
-        this.queueService.getBrokers().subscribe(
-            data => {
-                if (data) {
-                    for (const broker of data.body) {
-                        this.brokers.push(broker);
-                        this.brokerType = broker.type;
-                    }
-                }
-            },
-            error => console.log(error)
-        );
+        this.disableDelete = true;
+        this.queueService.deleteQueue(name, this.brokerType).subscribe(() => {
+            this.eventManager.broadcast(new EventWithContent('queueListModification', 'deleted'));
+            this.activeModal.dismiss();
+        });
     }
 }

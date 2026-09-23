@@ -10,6 +10,7 @@ public final class Constants {
 
     public static final String SYSTEM = "system";
     public static final String DEFAULT_LANGUAGE = "en";
+    public static final String DEFAULT_THEME_PREFERENCE = "SYSTEM";
 
     private Constants() {}
 }

@@ -1,0 +1,51 @@
+---
+description: Frontend code quality principles for the Angular app
+globs: src/main/webapp/**/*.{ts,html,scss}
+alwaysApply: false
+---
+
+# Frontend Code Quality
+
+This is an existing Angular application. Prefer simple, readable code that follows existing Angular patterns.
+
+## Prefer
+
+- Simple code over clever code
+- Readable code over highly abstract code
+- Small cohesive components and minimal abstractions
+- Strong TypeScript typing
+- Deriving state rather than duplicating it
+- Declarative Angular templates and straightforward RxJS
+- Reuse when it genuinely reduces duplication
+
+## Avoid
+
+- Unnecessary wrapper components, services, abstractions, helper functions, or generic utilities
+- Excessive defensive programming
+- Duplicate state, unnecessary RxJS subjects, and unnecessary subscriptions
+- `any`
+- Premature optimization
+- Patterns added only because they are fashionable
+- New code when existing code can be reused
+- Rewriting working functionality without a concrete benefit
+
+## Changing existing code
+
+1. Understand the existing implementation first.
+2. Make the smallest change that solves the problem.
+3. Preserve existing behavior.
+4. Prefer deletion over adding another abstraction.
+5. Do not increase complexity without a clear reason.
+
+Before creating a component, service, utility, interface, abstraction, or state container, check whether existing code can be reused. Unnecessary code is technical debt.
+
+```typescript
+// ❌ BAD — new subject and subscription for state the template can derive
+readonly items$ = new BehaviorSubject<Item[]>([]);
+ngOnInit(): void {
+  this.service.load().subscribe(items => this.items$.next(items));
+}
+
+// ✅ GOOD — expose the existing stream and derive in the template
+readonly items$ = this.service.load();
+```

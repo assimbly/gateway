@@ -139,6 +139,11 @@
             </div>
           }
 
+          <div class="mb-3">
+            <label class="form-label" id="themePreferenceLabel" jhiTranslate="settings.form.theme">Theme</label>
+            <jhi-theme-selector />
+          </div>
+
           <button
             type="submit"
             [disabled]="settingsForm.invalid"

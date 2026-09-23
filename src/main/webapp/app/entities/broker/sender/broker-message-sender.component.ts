@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, AfterContentInit, ViewEncapsulation, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, AfterContentInit, ViewEncapsulation, ViewChild, ElementRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormArray, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -14,6 +14,7 @@ import { Components } from 'app//shared/camel/component-type';
 
 import { IntegrationService } from 'app/entities/integration/integration.service';
 import { BrokerService } from 'app/entities/broker/broker.service';
+import { ThemeService } from 'app/core/theme';
 
 import dayjs from 'dayjs/esm';
 
@@ -25,6 +26,7 @@ import dayjs from 'dayjs/esm';
 })
 export class BrokerMessageSenderComponent implements OnInit {
     @ViewChild('editor', { read: ElementRef, static: false }) editor: ElementRef;
+    readonly themeService = inject(ThemeService);
 
     messages: IMessage[];
     message: IMessage;

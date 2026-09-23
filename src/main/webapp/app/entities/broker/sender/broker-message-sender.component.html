@@ -1,26 +1,30 @@
-<div class="row mt-3" style="margin-left: 0.3em">
-  <h2>Send Messages</h2>
-  <br />
-</div>
-
 <div class="row">
   <div class="col-9-5">
     <h5 style="margin-left: 0.6em">
       <i>{{ subtitle }}</i>
     </h5>
   </div>
-  <div class="col-2-5 text-right">
-    <button class="btn btn-primary" (click)="send(true)">
-      <fa-icon icon="envelope"></fa-icon><span class="d-none d-md-inline"> Send</span>
-    </button>
-
-    <div ngbDropdown class="d-inline-block">
-      <button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle style="min-width: 160px"><fa-icon icon="upload"></fa-icon></button>
-      <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
-        <label ngbDropdownItem class="btn btn-default">Upload File<input type="file" hidden (change)="openFile($event)" /></label>
-        <label ngbDropdownItem class="btn btn-default"
-        >Upload Directory<input type="file" webkitdirectory mozdirectory directory multiple hidden (change)="openDirectory($event)"
-        /></label>
+  <div class="col-2-5">
+    <div class="d-flex align-items-center justify-content-end gap-2">
+      <button type="button" class="btn btn-fx btn-fx-primary" (click)="send(true)">
+        <fa-icon icon="envelope"></fa-icon><span class="d-none d-md-inline"> Send</span>
+      </button>
+      <div ngbDropdown class="d-inline-block" placement="bottom-end">
+        <button
+          type="button"
+          class="btn btn-fx btn-fx-icon btn-fx-secondary"
+          id="dropdownMenuActions"
+          ngbDropdownToggle
+          aria-label="Upload"
+        >
+          <fa-icon icon="upload"></fa-icon>
+        </button>
+        <div ngbDropdownMenu aria-labelledby="dropdownMenuActions">
+          <label ngbDropdownItem class="btn btn-default">Upload File<input type="file" hidden (change)="openFile($event)" /></label>
+          <label ngbDropdownItem class="btn btn-default"
+            >Upload Directory<input type="file" webkitdirectory mozdirectory directory multiple hidden (change)="openDirectory($event)"
+          /></label>
+        </div>
       </div>
     </div>
   </div>
@@ -47,14 +51,14 @@
             <a ngbNavLink>Body</a>
             <br />
             <ng-template ngbNavContent>
-				<div style="min-height: 500px !important; border:1px solid black;">
+				<div style="min-height: 500px !important; border:1px solid var(--app-border);">
 					<ngx-codemirror
 						[formControl]="$any(messageSenderForm.controls['requestbody'])"
 						name="codemirror"
 						[(ngModel)]="requestBody"
 						[options]="{
 							lineNumbers: true,
-							theme: 'default',
+							theme: themeService.editorTheme(),
 							mode: requestEditorMode
 						  }"
             [autoFocus]= "true"

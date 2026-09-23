@@ -1,83 +1,41 @@
 <div>
-  <div class="row mt-3">
-    <h2>Topics</h2>
-    <br />
-  </div>
-
-  <div class="row" *ngIf="isBroker && addresses?.length === 0">
-    <div class="col-10"></div>
-    <div class="col-2 text-right" >
-      <button class="btn btn-primary" type="submit" [routerLink]="['/topic/new']">
-        <fa-icon icon="plus"></fa-icon><span class="d-none d-md-inline">Create Topic</span>
+  <jhi-search-toolbar
+    [(query)]="searchTopicText"
+    placeholder="Filter by topic name"
+    persistKey="searchTopicText"
+    inputId="searchTextId"
+  >
+    <ng-container actions>
+      <button *ngIf="isBroker" class="btn btn-fx btn-fx-primary" type="button" [routerLink]="['/topic/new']" aria-label="Add">
+        <fa-icon icon="plus"></fa-icon><span class="d-none d-md-inline"> Add</span>
       </button>
-    </div>
-  </div>
-
-    <div class="row" *ngIf="isBroker && addresses?.length > 0">
-      <div class="col-9-5"></div>
-      <div class="col-2-5 text-right" *ngIf="isBroker && addresses?.length > 0">
-        <button class="btn btn-primary" type="submit" [routerLink]="['/topic/new']">
-          <fa-icon icon="plus"></fa-icon><span class="d-none d-md-inline"> Create Topic</span>
-        </button>
-        <button class="btn btn-primary" type="submit" (click)="updateAllTopics()" style="margin-right: -2em">
-          <fa-icon icon="sync"></fa-icon><span class="d-none d-md-inline"> Refresh</span>
-        </button>
-      </div>
-
-  </div>
-
-  <div>
-    <div class="col-4" style="margin-bottom: 15px">
-      <input
-        type="text"
-        align="left"
-        style="margin-left: 0.3em"
-        [(ngModel)]="searchTopicText"
-        id="searchTextId"
-        name="searchText"
-        placeholder="Filter By Topic Name"
-      />
-    </div>
-    <div class="col-1"></div>
-  </div>
-
-  <div class="alert alert-warning" id="no-result" *ngIf="!isBroker">
-    <span>No running broker found</span>
-  </div>
-
-  <div class="alert alert-warning" id="no-result" *ngIf="isBroker && addresses?.length === 0">
-    <span>No topics found</span>
-  </div>
-
-  <div class="table-responsive" id="entities" *ngIf="addresses?.length > 0">
-    <table class="table table-striped" aria-describedby="page-heading">
-      <thead>
-      <tr jhiSort [(sortState)]="sortState" (sortChange)="sort()">
-          <th scope="col" jhiSortBy="name"><span>Address</span> <fa-icon icon="sort"></fa-icon></th>
-          <th scope="col" jhiSortBy="numberOfConsumers"><span>Name</span> <fa-icon icon="sort"></fa-icon></th>
-          <th scope="col" jhiSortBy="numberOfConsumers"><span>Consumers</span> <fa-icon icon="sort"></fa-icon></th>
-          <th scope="col" jhiSortBy="numberOfMessages"><span>Messages</span> <fa-icon icon="sort"></fa-icon></th>
-          <th scope="col" class="text-right"><span>Actions</span></th>
-        </tr>
-      </thead>
-
-      <tbody
-        *ngIf="addresses"
-        infinite-scroll
-        (scrolled)="loadPage(page + 1)"
-        (scrolledUp)="loadPage(page - 1)"
-        [infiniteScrollDisabled]="page >= links['last']"
-        [infiniteScrollDistance]="0"
-        [infiniteScrollUpDistance]="0"
+      <button
+        *ngIf="isBroker && addresses?.length > 0"
+        class="btn btn-fx btn-fx-secondary"
+        type="button"
+        (click)="updateAllTopics()"
+        aria-label="Refresh"
       >
-        <tr
-          jhi-topic-row
-          *ngFor="let address of addresses | TopicSearchByName: searchTopicText:(sortState.order === 'asc'):sortState.predicate; trackBy: trackId"
-          [address]="address"
-          [brokerType]="brokerType"
-          ng-init="$last && finished()"
-        ></tr>
-      </tbody>
-    </table>
-  </div>
+        <fa-icon icon="sync"></fa-icon><span class="d-none d-md-inline"> Refresh</span>
+      </button>
+    </ng-container>
+  </jhi-search-toolbar>
+
+  <jhi-data-table
+    [columns]="columns"
+    [(sortState)]="sortState"
+    [loading]="isBroker === undefined"
+    [hasRows]="!!filteredAddresses.length"
+    [errorMessage]="isBroker === false ? 'No running broker found' : ''"
+    [emptyMessage]="'No topics found'"
+    ariaLabel="Topics"
+  >
+    <tr
+      jhi-address-row
+      *ngFor="let address of filteredAddresses; trackBy: trackId"
+      [address]="address"
+      [brokerType]="brokerType"
+      endpointType="topic"
+    ></tr>
+  </jhi-data-table>
 </div>

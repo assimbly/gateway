@@ -26,13 +26,10 @@
                 <div class="form-group">
                     <label class="form-control-label" for="field_content">Content</label>
 					<ngx-codemirror
-						class="form-control" name="content" id="field_content"
+						class="route-codemirror" name="content" id="field_content"
 							formControlName="content"
-						  [options]="{
-						lineNumbers: true,
-						theme: 'default',
-						mode: 'xml'
-					  }"
+						  [options]="routeEditorOptions()"
+						  (codeMirrorLoaded)="refreshCodeMirror($event)"
 						>
 					</ngx-codemirror>
                 </div>

@@ -28,9 +28,15 @@ export class EnvironmentVariablesDeleteDialogComponent {
     }
 
     confirmDelete(id: number) {
-        this.environmentVariablesService.delete(id).subscribe(response => {
-		    this.eventManager.broadcast(new EventWithContent('environmentVariablesListModification', 'Deleted an environmentVariables'));
-            this.activeModal.dismiss(true);
+        if (id == null) {
+            return;
+        }
+        this.environmentVariablesService.delete(id).subscribe({
+            next: () => {
+                this.eventManager.broadcast(new EventWithContent('environmentVariablesListModification', 'Deleted an environmentVariables'));
+                this.activeModal.close('deleted');
+            },
+            error: () => undefined,
         });
     }
 }

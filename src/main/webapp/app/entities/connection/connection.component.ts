@@ -70,12 +70,12 @@ export class ConnectionComponent implements OnInit, OnDestroy, OnChanges {
         this.accountService.identity().subscribe(account => {
             this.currentAccount = account;
         });
-        if (this.connectionKey !== undefined) {
-            this.eventManager.subscribe('connectionKeyDeleted', res => this.updateConnectionKeys(parseInt(res.toString())));
-        } else {
-            this.eventManager.subscribe('connectionKeyDeleted', res => res);
-        }
         this.registerChangeInServices();
+        if (this.connectionKey !== undefined) {
+            this.eventSubscriber.add(
+                this.eventManager.subscribe('connectionKeyDeleted', res => this.updateConnectionKeys(parseInt(res.toString()))),
+            );
+        }
     }
     updateConnectionKeys(id: number) {
         this.connectionKeys = this.connectionKeys.filter(x => x.id === id);

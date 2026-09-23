@@ -1,0 +1,210 @@
+:root,
+[data-bs-theme='light'] {
+  --app-bg: #f6f7f9;
+  --app-surface: #ffffff;
+  --app-surface-elevated: #ffffff;
+  --app-header-bg: #ffffff;
+  --app-sidebar-bg: #f1f3f5;
+  --app-sidebar-border: #dee2e6;
+  --app-sidebar-hover: #e5e7eb;
+  --app-sidebar-active: #dde3ea;
+  --app-text: #212529;
+  --app-text-muted: #6c757d;
+  --app-border: #dee2e6;
+  --app-hover: #e5e7eb;
+  --app-active: #dde3ea;
+  --app-primary: #3e8acc;
+  --app-primary-contrast: #ffffff;
+  --app-primary-accessible: #1f5f94;
+  --app-success: #198754;
+  --app-warning: #b58105;
+  --app-warning-contrast: #212529;
+  --app-danger: #dc3545;
+  --app-info: #0d6efd;
+  --app-focus: #3e8acc;
+  --app-disabled-bg: #e9ecef;
+  --app-disabled-text: #6c757d;
+  --app-overlay: rgba(0, 0, 0, 0.45);
+  --app-code-bg: #f8f9fa;
+  --app-btn-secondary-bg: var(--app-surface);
+  --app-btn-secondary-border: var(--app-border);
+  --app-btn-secondary-color: var(--app-text);
+  --app-btn-ghost-color: var(--app-text);
+  --app-btn-ghost-hover-bg: var(--app-hover);
+}
+
+[data-bs-theme='dark'] {
+  --app-bg: #181a1d;
+  --app-surface: #222529;
+  --app-surface-elevated: #2a2e33;
+  --app-header-bg: #1d2023;
+  --app-sidebar-bg: #141618;
+  --app-sidebar-border: #30343a;
+  --app-sidebar-hover: #25292d;
+  --app-sidebar-active: #30363d;
+  --app-text: #e8eaed;
+  --app-text-muted: #a9b0b8;
+  --app-border: #343a40;
+  --app-hover: #25292d;
+  --app-active: #30363d;
+  --app-primary: #6ba3d4;
+  --app-primary-contrast: #ffffff;
+  --app-primary-accessible: #8bb8dc;
+  --app-success: #3dd68c;
+  --app-warning: #f0c14a;
+  --app-warning-contrast: #181a1d;
+  --app-danger: #f08080;
+  --app-info: #6ea8fe;
+  --app-focus: #8bb8dc;
+  --app-disabled-bg: #2a2e33;
+  --app-disabled-text: #8b929a;
+  --app-overlay: rgba(0, 0, 0, 0.55);
+  --app-code-bg: #1d2023;
+  --app-btn-secondary-bg: var(--app-surface);
+  --app-btn-secondary-border: var(--app-border);
+  --app-btn-secondary-color: var(--app-text);
+  --app-btn-ghost-color: var(--app-text);
+  --app-btn-ghost-hover-bg: var(--app-hover);
+}
+
+:root,
+[data-bs-theme='light'],
+[data-bs-theme='dark'] {
+  --bs-body-bg: var(--app-bg);
+  --bs-body-bg-rgb: 246, 247, 249;
+  --bs-body-color: var(--app-text);
+  --bs-body-color-rgb: 33, 37, 41;
+  --bs-secondary-color: var(--app-text-muted);
+  --bs-tertiary-bg: var(--app-hover);
+  --bs-border-color: var(--app-border);
+  --bs-border-color-translucent: var(--app-border);
+  --bs-emphasis-color: var(--app-text);
+  --bs-primary: var(--app-primary);
+  --bs-primary-rgb: 62, 138, 204;
+  --bs-success: var(--app-success);
+  --bs-info: var(--app-info);
+  --bs-warning: var(--app-warning);
+  --bs-danger: var(--app-danger);
+  --bs-link-color: var(--app-primary-accessible);
+  --bs-link-hover-color: var(--app-primary);
+  --bs-focus-ring-color: color-mix(in srgb, var(--app-focus) 40%, transparent);
+  --bs-heading-color: var(--app-text);
+  --bs-secondary-bg: var(--app-hover);
+  --bs-light: var(--app-hover);
+  --bs-light-rgb: 245, 247, 249;
+  --bs-dark: var(--app-text);
+  --bs-code-color: var(--app-primary-accessible);
+
+  --bs-card-bg: var(--app-surface);
+  --bs-card-cap-bg: var(--app-surface);
+  --bs-card-border-color: var(--app-border);
+  --bs-card-color: var(--app-text);
+
+  --bs-modal-bg: var(--app-surface-elevated);
+  --bs-modal-color: var(--app-text);
+  --bs-modal-border-color: var(--app-border);
+  --bs-modal-header-border-color: var(--app-border);
+  --bs-modal-footer-border-color: var(--app-border);
+
+  --bs-dropdown-bg: var(--app-surface-elevated);
+  --bs-dropdown-color: var(--app-text);
+  --bs-dropdown-border-color: var(--app-border);
+  --bs-dropdown-link-color: var(--app-text);
+  --bs-dropdown-link-hover-color: var(--app-text);
+  --bs-dropdown-link-hover-bg: var(--app-hover);
+  --bs-dropdown-link-active-color: var(--app-text);
+  --bs-dropdown-link-active-bg: var(--app-active);
+  --bs-dropdown-link-disabled-color: var(--app-disabled-text);
+  --bs-dropdown-header-color: var(--app-text-muted);
+  --bs-dropdown-divider-bg: var(--app-border);
+
+  --bs-form-control-bg: var(--app-surface);
+  --bs-form-control-disabled-bg: var(--app-disabled-bg);
+  --bs-form-valid-color: var(--app-success);
+  --bs-form-invalid-color: var(--app-danger);
+
+  --bs-table-bg: var(--app-surface);
+  --bs-table-color: var(--app-text);
+  --bs-table-border-color: var(--app-border);
+  --bs-table-striped-bg: color-mix(in srgb, var(--app-hover) 65%, var(--app-surface));
+  --bs-table-hover-bg: var(--app-hover);
+  --bs-table-striped-color: var(--app-text);
+  --bs-table-hover-color: var(--app-text);
+
+  --bs-pagination-bg: var(--app-surface);
+  --bs-pagination-color: var(--app-text);
+  --bs-pagination-border-color: var(--app-border);
+  --bs-pagination-hover-bg: var(--app-hover);
+  --bs-pagination-hover-color: var(--app-text);
+  --bs-pagination-hover-border-color: var(--app-border);
+  --bs-pagination-active-bg: var(--app-primary);
+  --bs-pagination-active-color: var(--app-primary-contrast);
+  --bs-pagination-active-border-color: var(--app-primary);
+  --bs-pagination-disabled-bg: var(--app-disabled-bg);
+  --bs-pagination-disabled-color: var(--app-disabled-text);
+
+  --bs-nav-tabs-border-color: var(--app-border);
+  --bs-nav-tabs-link-hover-border-color: var(--app-border);
+  --bs-nav-tabs-link-active-bg: var(--app-surface);
+  --bs-nav-tabs-link-active-color: var(--app-text);
+  --bs-nav-tabs-link-active-border-color: var(--app-border);
+  --bs-nav-pills-link-active-bg: var(--app-primary);
+  --bs-nav-pills-link-active-color: var(--app-primary-contrast);
+
+  --bs-list-group-bg: var(--app-surface);
+  --bs-list-group-color: var(--app-text);
+  --bs-list-group-border-color: var(--app-border);
+  --bs-list-group-hover-bg: var(--app-hover);
+  --bs-list-group-action-hover-color: var(--app-text);
+  --bs-list-group-active-bg: var(--app-active);
+  --bs-list-group-active-color: var(--app-text);
+  --bs-list-group-action-active-bg: var(--app-active);
+  --bs-list-group-disabled-bg: var(--app-surface);
+  --bs-list-group-disabled-color: var(--app-disabled-text);
+
+  --bs-tooltip-bg: var(--app-text);
+  --bs-tooltip-color: var(--app-surface);
+  --bs-popover-bg: var(--app-surface-elevated);
+  --bs-popover-border-color: var(--app-border);
+  --bs-popover-header-bg: var(--app-hover);
+  --bs-popover-body-color: var(--app-text);
+
+  --bs-breadcrumb-divider-color: var(--app-text-muted);
+  --bs-breadcrumb-item-active-color: var(--app-text-muted);
+
+  /* Fluxygen button sizing — theme-independent, matches ng-select 38px and $border-radius */
+  --app-btn-height: 38px;
+  --app-btn-height-sm: 32px;
+  --app-btn-height-lg: 44px;
+  --app-btn-font-size: 14px;
+  --app-btn-font-size-sm: 13px;
+  --app-btn-icon-size: 16px;
+  --app-btn-icon-size-sm: 14px;
+  --app-btn-gap: 8px;
+  --app-btn-padding-x: 16px;
+  --app-btn-padding-x-sm: 12px;
+  --app-btn-padding-x-lg: 18px;
+  --app-btn-radius: 0.15rem;
+
+  --app-table-header-bg: var(--app-surface-elevated);
+  --app-table-row-height: 3rem;
+  --app-table-cell-padding-y: 0.65rem;
+  --app-table-cell-padding-x: 0.85rem;
+}
+
+[data-bs-theme='dark'] {
+  --bs-body-bg-rgb: 24, 26, 29;
+  --bs-body-color-rgb: 232, 234, 237;
+  --bs-primary-rgb: 107, 163, 212;
+}
+
+html,
+body {
+  background-color: var(--app-bg);
+  color: var(--app-text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--app-focus);
+  outline-offset: 2px;
+}

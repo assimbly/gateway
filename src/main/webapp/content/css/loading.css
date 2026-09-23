@@ -93,6 +93,19 @@
   align-items: center;
   justify-content: center;
   top: 10em;
+  color: #212529;
+}
+
+html[data-bs-theme='dark'] .app-loading {
+  color: #e8eaed;
+}
+
+html {
+  background-color: #f6f7f9;
+}
+
+html[data-bs-theme='dark'] {
+  background-color: #181a1d;
 }
 .app-loading p {
   display: block;

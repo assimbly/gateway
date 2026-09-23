@@ -3,12 +3,14 @@ import { CommonModule } from '@angular/common';
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
-import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';import { AlertService } from 'app/core/util/alert.service';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { AlertService } from 'app/core/util/alert.service';
 import { ParseLinks } from 'app/core/util/parse-links.service';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { InfiniteScrollModule } from 'ngx-infinite-scroll';
-import { SortDirective, SortByDirective, SortState } from 'app/shared/sort';
+import { SortState, sortParams } from 'app/shared/sort';
+import { SearchToolbar } from 'app/shared/filter';
+import { DataTable, DataTableColumn, OverflowActionDirective, PrimaryActionDirective, RowActions, Truncate } from 'app/shared/table';
 
 import { ICertificate } from 'app/shared/model/certificate.model';
 import { AccountService } from 'app/core/auth/account.service';
@@ -22,25 +24,40 @@ import { CertificateUploadDialogComponent } from './certificate-upload-dialog.co
 import { CertificateUploadP12DialogComponent } from './certificate-uploadp12-dialog.component';
 import { CertificateSelfSignDialogComponent } from './certificate-self-sign-dialog.component';
 
-import { faDownload } from '@fortawesome/free-solid-svg-icons';
-
 import { saveAs } from 'file-saver/FileSaver';
 
 @Component({
   selector: 'jhi-certificate',
   templateUrl: './certificate.component.html',
-  imports: [CommonModule, RouterModule, FontAwesomeModule, NgbModule, InfiniteScrollModule, SortDirective, SortByDirective],
+  imports: [
+    CommonModule,
+    RouterModule,
+    FontAwesomeModule,
+    NgbModule,
+    SearchToolbar,
+    DataTable,
+    RowActions,
+    PrimaryActionDirective,
+    OverflowActionDirective,
+    Truncate,
+  ],
 })
 export class CertificateComponent implements OnInit, OnDestroy {
-  securities: ICertificate[];
+  securities: ICertificate[] = [];
   currentAccount: any;
   eventSubscriber: Subscription;
   itemsPerPage: number;
   links: any;
   page: any;
-  sortState: SortState = { predicate: 'id', order: 'asc' };
+  sortState: SortState = { predicate: 'certificateName', order: 'asc' };
   totalItems: number;
-  faDownload = faDownload;
+  searchText = '';
+  readonly columns: DataTableColumn[] = [
+    { key: 'certificateName', header: 'Name', sortable: true },
+    { key: 'url', header: 'URL', sortable: true },
+    { key: 'certificateExpiry', header: 'Expiry', sortable: true },
+    { key: 'actions', header: 'Actions', align: 'end' },
+  ];
 
   constructor(
     protected certificateService: CertificateService,
@@ -111,17 +128,28 @@ export class CertificateComponent implements OnInit, OnDestroy {
     return item.id;
   }
 
+  get filteredCertificates(): ICertificate[] {
+    const query = this.searchText?.toLocaleLowerCase() ?? '';
+    let result = this.securities ?? [];
+    if (query) {
+      result = result.filter(
+        item =>
+          (item.certificateName ?? '').toLocaleLowerCase().includes(query) || (item.url ?? '').toLocaleLowerCase().includes(query)
+      );
+    }
+    return result;
+  }
+
+  onSortChange() {
+    this.reset();
+  }
+
   registerChangeInSecurities() {
     this.eventSubscriber = this.eventManager.subscribe('certificateListModification', response => this.reset());
   }
 
   sort(): string[] {
-    const { predicate, order } = this.sortState;
-    const result = [predicate + ',' + order];
-    if (predicate !== 'id') {
-      result.push('id');
-    }
-    return result;
+    return sortParams(this.sortState, 'id');
   }
 
   uploadCertificate() {

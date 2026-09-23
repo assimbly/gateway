@@ -41,9 +41,7 @@ export class ConnectionPopupService {
 
     connectionModalRef(component: any, connection: Connection): NgbModalRef {
         const modalRef = this.modalService.open(component, { size: 'lg', backdrop: 'static' });
-        if (typeof component as Component) {
-            modalRef.componentInstance.connection = connection;
-        }
+        modalRef.componentInstance.connection = connection;
         return modalRef;
     }
 }

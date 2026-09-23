@@ -1,72 +1,50 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AlertError } from 'app/shared/alert';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
-import { ActivatedRoute, Router } from '@angular/router';
 
-import { ITopic } from 'app/shared/model/topic.model';
-import { TopicService } from './topic.service';
 import { IAddress } from 'app/shared/model/address.model';
-import { IBroker } from 'app/shared/model/broker.model';
+import { TopicService } from './topic.service';
 
 @Component({
-  templateUrl: './topic-delete-dialog.component.html',
-  imports: [CommonModule, FontAwesomeModule, AlertError],
+    templateUrl: './topic-delete-dialog.component.html',
+    imports: [CommonModule, FontAwesomeModule, AlertError],
 })
 export class TopicDeleteDialogComponent {
-    topic?: ITopic;
     address?: IAddress;
-
     brokerType = '';
-    brokers: IBroker[];
 
     message = 'Are you sure you want to delete this topic?';
-    disableDelete: boolean;
+    disableDelete = false;
 
     constructor(
         protected topicService: TopicService,
         public activeModal: NgbActiveModal,
         protected eventManager: EventManager,
-        protected router: Router
-    ) {
-        this.brokers = [];
-        this.getBrokerType();
-        this.disableDelete = false;
-    }
+    ) {}
 
     cancel(): void {
         this.activeModal.dismiss();
     }
 
     confirmDelete(name: string): void {
-        if (this.address.numberOfConsumers > 0) {
+        if (this.address?.numberOfConsumers > 0) {
             this.message = 'Cannot delete topic because there is at least one active consumer';
             this.disableDelete = true;
-        } else if (this.address.numberOfMessages > 0) {
+            return;
+        }
+        if (this.address?.numberOfMessages > 0) {
             this.message = 'Cannot delete topic because there is at least one message on the topic. Please clear the topic before deleting';
             this.disableDelete = true;
-        } else {
-            this.topicService.deleteTopic(name, this.brokerType).subscribe(() => {
-				this.eventManager.broadcast(new EventWithContent('topicListModification', 'Deleted'));
-                this.router.navigate(['/topic']);
-                this.activeModal.dismiss(true);
-            });
+            return;
         }
-    }
 
-    getBrokerType(): void {
-        this.topicService.getBrokers().subscribe(
-            data => {
-                if (data) {
-                    for (const broker of data.body) {
-                        this.brokers.push(broker);
-                        this.brokerType = broker.type;
-                    }
-                }
-            },
-            error => console.log(error)
-        );
+        this.disableDelete = true;
+        this.topicService.deleteTopic(name, this.brokerType).subscribe(() => {
+            this.eventManager.broadcast(new EventWithContent('topicListModification', 'deleted'));
+            this.activeModal.dismiss();
+        });
     }
 }

@@ -2,9 +2,7 @@
   <ng-template #restartIntegrationModal>
     <div class="modal-header">
       <h4 class="modal-title">Restart Integration</h4>
-      <button type="button" class="close" aria-label="Close" (click)="cancelModal()" style="color: white;">
-        <span aria-hidden="true">&times;</span>
-      </button>
+      <button type="button" class="btn-close" aria-label="Close" (click)="cancelModal()"></button>
     </div>
     <div class="modal-body">
       <div class="row">
@@ -13,152 +11,121 @@
       <div [innerHtml]="restartIntegrationMessage"></div>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" (click)="cancelModal()">Close</button>
-      <button type="button" class="btn btn-primary" (click)="restartIntegration(1)">Restart</button>
+      <button type="button" class="btn btn-fx btn-fx-secondary" (click)="cancelModal()">Close</button>
+      <button type="button" class="btn btn-fx btn-fx-primary" (click)="restartIntegration(1)">Restart</button>
     </div>
   </ng-template>
-  <div class="row">
-    <div class="col-6">
-      <h2>
-        <span>Settings</span>
-      </h2>
-    </div>
-    <div class="col-6" *ngIf="integrations.length > 0">
-    </div>
-    <div class="col-6" *ngIf="integrations.length === 0">
-      <button
-        type="submit"
-        class="btn btn-primary float-right jh-create-entity create-integration"
-        id="newButton"
-        [routerLink]="['/integration/new']"
-        *jhiHasAnyAuthority="'ROLE_ADMIN'"
-      >
-        <fa-icon [icon]="'plus'"></fa-icon>
-        <span>Create Gateway</span>
-      </button>
-    </div>
-  </div>
-  <hr />
-  <div class="d-block pull-right">
-    <button
-      type="button"
-      (click)="openRestartIntegrationModal(restartIntegrationModal)"
-      style="margin-right: 5px; color: white;"
-      class="btn btn-info btn-sm mb-3"
-    >
-      <span class="fa fa-refresh"></span>
-      <span class="d-none d-md-inline">Restart</span>
-    </button>
-  </div>
 
-  <!-- <jhi-alert></jhi-alert>-->
-  <div class="table-responsive" *ngIf="integrations">
-    <table class="table table-bordered table-sm" *ngFor="let integration of integrations; trackBy: trackId" style="margin-bottom: 30px">
-      <thead>
-        <tr>
-          <th class="bg-secondary text-white font-weight-bold" colspan="2">
-            <span>
-              <h4>General</h4>
-            </span>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="w-25">
-            <span class="font-weight-bold">ID:</span>
-          </td>
-          <td class="w-75">
-            {{ integration.id }}
-          </td>
-        </tr>
-        <tr>
-          <td lass="w-25">
-            <span class="font-weight-bold">Name:</span>
-          </td>
-          <td class="w-75">
-            {{ integration.name }}
-          </td>
-        </tr>
-        <tr>
-          <td lass="w-25">
-            <span class="font-weight-bold">Type:</span>
-          </td>
-          <td class="w-75">
-            {{ integration.type }}
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <span class="font-weight-bold">Environment Name:</span>
-          </td>
-          <td>
-            {{ integration.environmentName }}
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <span class="font-weight-bold">Stage:</span>
-          </td>
-          <td>
-            {{ integration.stage }}
-          </td>
-        </tr>
-        <tr>
-          <td class="bg-secondary text-white font-weight-bold" colspan="2">
-            <span><h5>Step defaults</h5></span>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <span class="font-weight-bold">Source:</span>
-          </td>
-          <td>
-            {{ integration.defaultFromComponentType }}
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <span class="font-weight-bold">Sink:</span>
-          </td>
-          <td>
-            {{ integration.defaultToComponentType }}
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <span class="font-weight-bold">Error:</span>
-          </td>
-          <td>
-            {{ integration.defaultErrorComponentType }}
-          </td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="2">
-            <div class="d-block pull-right">
-              <button
-                type="submit"
-                [routerLink]="['/integration', integration.id, 'edit']"
-                queryParamsHandling="merge"
-                class="btn btn-primary btn-sm"
-              >
-                <fa-icon [icon]="'pencil-alt'"></fa-icon>
-                <span class="d-none d-md-inline">Edit</span>
-              </button>
-              <button
-                type="submit"
-                 (click)="delete(integration)"
-                class="btn btn-danger btn-sm"
-              >
-                <fa-icon [icon]="'times'"></fa-icon>
-                <span class="d-none d-md-inline">Delete</span>
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tfoot>
-    </table>
-  </div>
+  <ng-template #infoIntegrationModal>
+    <div class="modal-header">
+      <h4 class="modal-title">Gateway info</h4>
+      <button type="button" class="btn-close" aria-label="Close" (click)="cancelModal()"></button>
+    </div>
+    <div class="modal-body" *ngIf="infoIntegration">
+      <dl class="row mb-0">
+        <dt class="col-sm-4">ID</dt>
+        <dd class="col-sm-8">{{ infoIntegration.id }}</dd>
+        <dt class="col-sm-4">Name</dt>
+        <dd class="col-sm-8">{{ infoIntegration.name }}</dd>
+        <dt class="col-sm-4">Type</dt>
+        <dd class="col-sm-8">{{ infoIntegration.type }}</dd>
+        <dt class="col-sm-4">Environment Name</dt>
+        <dd class="col-sm-8">{{ infoIntegration.environmentName }}</dd>
+        <dt class="col-sm-4">Stage</dt>
+        <dd class="col-sm-8">{{ infoIntegration.stage }}</dd>
+        <dt class="col-sm-4">Connector</dt>
+        <dd class="col-sm-8">{{ infoIntegration.connectorType }}</dd>
+      </dl>
+      <h5 class="mt-3">Step defaults</h5>
+      <dl class="row mb-0">
+        <dt class="col-sm-4">Source</dt>
+        <dd class="col-sm-8">{{ infoIntegration.defaultFromComponentType }}</dd>
+        <dt class="col-sm-4">Sink</dt>
+        <dd class="col-sm-8">{{ infoIntegration.defaultToComponentType }}</dd>
+        <dt class="col-sm-4">Error</dt>
+        <dd class="col-sm-8">{{ infoIntegration.defaultErrorComponentType }}</dd>
+      </dl>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-fx btn-fx-secondary" (click)="cancelModal()">Close</button>
+    </div>
+  </ng-template>
+
+  <jhi-search-toolbar [(query)]="searchText" placeholder="Filter by name" persistKey="searchGatewayText" inputId="searchGatewayId">
+    <ng-container actions>
+      <ng-container *jhiHasAnyAuthority="'ROLE_ADMIN'">
+        <button
+          *ngIf="integrations().length === 0"
+          type="button"
+          class="btn btn-fx btn-fx-primary jh-create-entity create-integration"
+          id="newButton"
+          [routerLink]="['/integration/new']"
+          aria-label="Create Gateway"
+        >
+          <fa-icon icon="plus"></fa-icon>
+          <span class="d-none d-md-inline"> Create Gateway</span>
+        </button>
+      </ng-container>
+      <button
+        type="button"
+        (click)="openRestartIntegrationModal(restartIntegrationModal)"
+        class="btn btn-fx btn-fx-secondary"
+        aria-label="Restart"
+      >
+        <fa-icon icon="sync"></fa-icon>
+        <span class="d-none d-md-inline"> Restart</span>
+      </button>
+    </ng-container>
+  </jhi-search-toolbar>
+
+  <jhi-data-table
+    [columns]="columns"
+    [(sortState)]="sortState"
+    [hasRows]="!!filteredIntegrations.length"
+    [emptyMessage]="'No gateway found'"
+    ariaLabel="Gateway"
+  >
+    <tr *ngFor="let integration of filteredIntegrations; trackBy: trackId">
+      <td class="table-fx-identity">
+        <jhi-truncate [text]="integration.name" />
+      </td>
+      <td>{{ integration.type }}</td>
+      <td>{{ integration.stage }}</td>
+      <td class="text-end">
+        <jhi-row-actions>
+          <button
+            jhiPrimaryAction
+            type="button"
+            class="btn btn-fx btn-fx-sm btn-fx-ghost"
+            [routerLink]="['/integration', integration.id, 'edit']"
+            queryParamsHandling="merge"
+            aria-label="Edit"
+          >
+            <fa-icon icon="pencil-alt"></fa-icon>
+            <span class="d-none d-md-inline">Edit</span>
+          </button>
+          <button
+            jhiPrimaryAction
+            type="button"
+            class="btn btn-fx btn-fx-sm btn-fx-ghost"
+            (click)="openInfoModal(infoIntegrationModal, integration)"
+            aria-label="Info"
+          >
+            <fa-icon icon="info"></fa-icon>
+            <span class="d-none d-md-inline">Info</span>
+          </button>
+          <button
+            jhiOverflowAction
+            type="button"
+            ngbDropdownItem
+            class="btn-fx-dropdown-item btn-fx-dropdown-danger"
+            (click)="delete(integration)"
+          >
+            <fa-icon icon="times"></fa-icon>
+            <span>Remove</span>
+          </button>
+        </jhi-row-actions>
+      </td>
+    </tr>
+  </jhi-data-table>
 </div>

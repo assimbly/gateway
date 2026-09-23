@@ -30,7 +30,7 @@ export default class PasswordStrengthBar {
           if (i < c.idx) {
             this.renderer.setStyle(lis[i], 'backgroundColor', c.color);
           } else {
-            this.renderer.setStyle(lis[i], 'backgroundColor', '#DDD');
+            this.renderer.setStyle(lis[i], 'backgroundColor', 'var(--app-border)');
           }
         }
       }

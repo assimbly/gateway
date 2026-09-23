@@ -164,3 +164,13 @@ src/main/resources/.h2.server.properties
 package-lock.json
 activemq-data/**
 *.lock
+
+######################
+# Spring AOT cache
+######################
+/bin/aot/
+/bin/aotTest/
+/bin/main/
+/bin/test/
+/bin/generated-sources/
+/bin/default/

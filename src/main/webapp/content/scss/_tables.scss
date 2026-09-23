@@ -1,0 +1,121 @@
+/* ==========================================================================
+Entity list tables — Queues pattern
+========================================================================== */
+
+.table.table-fx {
+  --bs-table-bg: var(--app-surface);
+  --bs-table-color: var(--app-text);
+  --bs-table-border-color: var(--app-border);
+  --bs-table-striped-bg: color-mix(in srgb, var(--app-hover) 70%, var(--app-surface));
+  --bs-table-hover-bg: var(--app-hover);
+  --bs-table-striped-color: var(--app-text);
+  --bs-table-hover-color: var(--app-text);
+  margin-bottom: 0;
+}
+
+.table.table-fx > :not(caption) > * > * {
+  padding: var(--app-table-cell-padding-y) var(--app-table-cell-padding-x);
+  vertical-align: middle;
+  height: var(--app-table-row-height);
+  border-bottom-color: var(--app-border);
+}
+
+.table.table-fx thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: var(--app-table-header-bg);
+  color: var(--app-text-muted);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  box-shadow: inset 0 -1px 0 var(--app-border);
+}
+
+.table.table-fx-th-sortable,
+th.table-fx-th-sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.table.table-fx thead th.table-fx-th-sorted,
+th.table-fx-th-sorted {
+  color: var(--app-text);
+}
+
+.table.table-fx thead th.table-fx-th-sorted fa-icon,
+.table.table-fx thead th.table-fx-th-sorted .svg-inline--fa,
+th.table-fx-th-sorted fa-icon,
+th.table-fx-th-sorted .svg-inline--fa {
+  color: var(--app-primary);
+}
+
+.table.table-fx thead th fa-icon,
+.table.table-fx thead th .svg-inline--fa {
+  margin-left: 0.35rem;
+  color: var(--app-text-muted);
+}
+
+.table-fx-numeric {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+  white-space: nowrap;
+}
+
+.table-fx-identity {
+  max-width: 18rem;
+  min-width: 8rem;
+}
+
+.table-fx-identity .d-flex {
+  min-width: 0;
+}
+
+.table-fx-truncate {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.table-fx-actions,
+.table-fx-status {
+  white-space: nowrap;
+}
+
+.table-fx-skeleton {
+  display: inline-block;
+  width: 70%;
+  height: 0.75rem;
+  border-radius: var(--app-btn-radius);
+  background: color-mix(in srgb, var(--app-text-muted) 22%, var(--app-surface));
+  animation: table-fx-pulse 1.2s ease-in-out infinite;
+}
+
+.table-fx-skeleton-row td:last-child .table-fx-skeleton {
+  width: 40%;
+  margin-left: auto;
+}
+
+@keyframes table-fx-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .table-fx-skeleton {
+    animation: none;
+  }
+
+  .fa-spin,
+  .svg-inline--fa.fa-spin,
+  .fa-spin-pulse {
+    animation: none !important;
+  }
+}

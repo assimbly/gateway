@@ -6,7 +6,6 @@ import { Observable, of } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { Message } from 'app/shared/model/message.model';
 import { MessageService } from './message.service';
-import { MessageComponent } from './message.component';
 import { MessageDetailComponent } from './message-detail.component';
 import { MessageUpdateComponent } from './message-update.component';
 import { IMessage } from 'app/shared/model/message.model';

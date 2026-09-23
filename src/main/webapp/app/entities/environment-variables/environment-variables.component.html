@@ -1,81 +1,73 @@
 <div>
-  <div class="row">
-    <div class="col-12">
-      <h2>
-        <span>Environment Variables</span>
-      </h2>
-    </div>
-  </div>
-  <br />
-  <div class="row">
-    <div class="col-10"></div>
-    <div class="col-2">
+  <jhi-search-toolbar [(query)]="searchText" placeholder="Filter by key" persistKey="searchVariablesText" inputId="searchVariablesId">
+    <ng-container actions>
       <button
         id="jh-create-entity"
-        class="btn btn-primary float-right jh-create-entity create-environment-variables"
+        class="btn btn-fx btn-fx-primary jh-create-entity create-environment-variables"
         [routerLink]="['/environment-variables/new']"
+        aria-label="Add variable"
       >
-        <fa-icon [icon]="'plus'"></fa-icon>
-        <span> Create Variable</span>
+        <fa-icon icon="plus"></fa-icon>
+        <span class="d-none d-md-inline"> Add</span>
       </button>
-    </div>
-  </div>
-  <br />
-  <div class="table-responsive" *ngIf="environmentVariables">
-    <table class="table table-striped">
-      <thead>
-        <tr jhiSort [(sortState)]="sortState">
-          <th [style.display]="'none'"><span>ID</span></th>
-          <th jhiSortBy="key"><span>Key</span> <fa-icon></fa-icon></th>
-          <th><span>Value</span></th>
-          <th [style.display]="'none'"><span>Integration</span></th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= last" [infiniteScrollDistance]="0">
-        <tr *ngFor="let environmentVariables of environmentVariables; trackBy: trackId">
-          <td [style.display]="'none'">
-            <a [routerLink]="['/environment-variables', environmentVariables.id, 'view']">{{ environmentVariables.id }}</a>
-          </td>
-          <td>{{ environmentVariables.key }}</td>
-          <td>{{ environmentVariables.value }}</td>
-          <td [style.display]="'none'">
-            <div *ngIf="environmentVariables.integrationId">
-              <a [routerLink]="['../integration', environmentVariables.integrationId, 'view']">{{ environmentVariables.integrationId }}</a>
-            </div>
-          </td>
-          <td class="text-right">
-            <div class="btn-group flex-btn-group-container" *jhiHasAnyAuthority="'ROLE_ADMIN'">
-              <button
-                type="submit"
-                [routerLink]="['/environment-variables', environmentVariables.id, 'edit']"
-                class="btn btn-primary btn-sm"
-              >
-                <fa-icon [icon]="'pencil-alt'"></fa-icon>
-                <span class="d-none d-md-inline">Edit</span>
-              </button>
-              <button
-                type="submit"
-                [routerLink]="['/environment-variables', environmentVariables.id, 'edit']"
-                fragment="clone"
-                queryParamsHandling="merge"
-                class="btn btn-info btn-sm"
-              >
-              <fa-icon [icon]="'clone'"></fa-icon>
-			  <span class="d-none d-md-inline">Clone</span>
-              </button>
-              <button
-                type="submit"
-                (click)="delete(environmentVariables)"
-                class="btn btn-danger btn-sm"
-              >
-                <fa-icon [icon]="'times'"></fa-icon>
-                <span class="d-none d-md-inline">Delete</span>
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+      <button class="btn btn-fx btn-fx-secondary" type="button" (click)="reset()" aria-label="Refresh">
+        <fa-icon icon="sync"></fa-icon>
+        <span class="d-none d-md-inline"> Refresh</span>
+      </button>
+    </ng-container>
+  </jhi-search-toolbar>
+
+  <jhi-data-table
+    [columns]="columns"
+    [(sortState)]="sortState"
+    (sortChange)="onSortChange()"
+    [hasRows]="!!filteredVariables.length"
+    [emptyMessage]="'No variables found'"
+    ariaLabel="Variables"
+  >
+    <tr *ngFor="let environmentVariables of filteredVariables; trackBy: trackId">
+      <td class="table-fx-identity">
+        <jhi-truncate [text]="environmentVariables.key" />
+      </td>
+      <td class="table-fx-identity">
+        <jhi-truncate [text]="environmentVariables.value" />
+      </td>
+      <td class="text-end">
+        <jhi-row-actions *jhiHasAnyAuthority="'ROLE_ADMIN'">
+          <button
+            jhiPrimaryAction
+            type="button"
+            class="btn btn-fx btn-fx-sm btn-fx-ghost"
+            [routerLink]="['/environment-variables', environmentVariables.id, 'edit']"
+            aria-label="Edit"
+          >
+            <fa-icon icon="pencil-alt"></fa-icon>
+            <span class="d-none d-md-inline">Edit</span>
+          </button>
+          <button
+            jhiPrimaryAction
+            type="button"
+            class="btn btn-fx btn-fx-sm btn-fx-ghost"
+            [routerLink]="['/environment-variables', environmentVariables.id, 'edit']"
+            fragment="clone"
+            queryParamsHandling="merge"
+            aria-label="Clone"
+          >
+            <fa-icon icon="clone"></fa-icon>
+            <span class="d-none d-md-inline">Clone</span>
+          </button>
+          <button
+            jhiOverflowAction
+            type="button"
+            ngbDropdownItem
+            class="btn-fx-dropdown-item btn-fx-dropdown-danger"
+            (click)="delete(environmentVariables)"
+          >
+            <fa-icon icon="times"></fa-icon>
+            <span>Delete</span>
+          </button>
+        </jhi-row-actions>
+      </td>
+    </tr>
+  </jhi-data-table>
 </div>

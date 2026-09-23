@@ -1,9 +1,8 @@
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { PopoverModule } from 'ngx-bootstrap/popover';
-import { NgbModal, NgbModalRef, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { Flow, IFlow, LogLevelType } from 'app/shared/model/flow.model';
 import { FlowService } from './flow.service';
@@ -15,11 +14,15 @@ import { IntegrationService } from '../integration/integration.service';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
 import { Collectors } from 'app/shared/collect/collectors';
+import { OverflowActionDirective, PrimaryActionDirective, RowActions, StatusControls, StatusControlsTone, Truncate } from 'app/shared/table';
+import { FlowRowAlerts } from './flow-row-alerts.component';
+import { FlowRowStats, FlowStatsSection } from './flow-row-stats.component';
 
-import { NavigationEnd, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import dayjs from 'dayjs/esm';
 
-import { forkJoin, Observable, Observer, Subscription, ReplaySubject, Subject } from 'rxjs';
+import { HttpResponse } from '@angular/common/http';
+import { forkJoin, Observable, Subscription, switchMap, tap } from 'rxjs';
 
 enum Status {
   active = 'active',
@@ -31,11 +34,22 @@ enum Status {
 @Component({
   selector: '[jhi-flow-row]',
   templateUrl: './flow-row.component.html',
-  imports: [CommonModule, RouterModule, FontAwesomeModule, PopoverModule, NgbPopoverModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    FontAwesomeModule,
+    NgbDropdownModule,
+    RowActions,
+    PrimaryActionDirective,
+    OverflowActionDirective,
+    StatusControls,
+    Truncate,
+    FlowRowAlerts,
+    FlowRowStats,
+  ],
 })
-export class FlowRowComponent implements OnInit {
+export class FlowRowComponent implements OnInit, OnDestroy {
   sslUrl: any;
-  mySubscription: Subscription;
 
   @Input() flow: Flow;
 
@@ -58,7 +72,9 @@ export class FlowRowComponent implements OnInit {
   public flowStatus: string;
   public flowStatusError: string;
   public isFlowStatusOK: boolean;
-  public flowStatistic: string;
+  public flowStatsLoading = false;
+  public flowStatsEmpty = false;
+  public flowStatsSections: FlowStatsSection[] = [];
   public flowStatusButton: string;
   public flowStartTime: any;
   public clickButton = false;
@@ -67,9 +83,15 @@ export class FlowRowComponent implements OnInit {
   public flowErrorButton: string;
 
   public flowAlerts: string;
-  public flowAlertsButton: string;
   public numberOfAlerts: any;
+  public alertMessages: string[] = [];
+  public alertsTotal = 0;
+  public alertsLoading = false;
+  public alertsLoadingMore = false;
+  private readonly alertPageSize = 10;
   public showNumberOfItems: number;
+  public completedCount: number | null = null;
+  public failedCount: number | null = null;
 
   fromStepTooltips: Array<string> = [];
   toStepsTooltips: Array<string> = [];
@@ -87,14 +109,12 @@ export class FlowRowComponent implements OnInit {
 
   statusMessage: any;
 
-  statsTableRows: Array<string> = [];
-
   intervalTime: any;
 
-  alreadyConnectedOnce = false;
-  private subscription: Subscription;
+  private destroyed = false;
+  private readonly subscriptions = new Subscription();
 
-  modalRef: NgbModalRef | null;
+  alreadyConnectedOnce = false;
 
   constructor(
     private flowService: FlowService,
@@ -105,18 +125,19 @@ export class FlowRowComponent implements OnInit {
     private eventManager: EventManager,
 	  private collectors: Collectors,
     private changeDetector: ChangeDetectorRef
-  ) {
+  ) {}
 
-    this.router.routeReuseStrategy.shouldReuseRoute = function () {
-      return false;
-    };
-
-    this.mySubscription = this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        // Trick the Router into believing it's last link wasn't previously loaded
-        this.router.navigated = false;
-      }
-    });
+  get statusTone(): StatusControlsTone {
+    switch (this.statusFlow) {
+      case Status.active:
+        return 'started';
+      case Status.paused:
+        return 'paused';
+      case Status.inactiveError:
+        return 'failed';
+      default:
+        return 'default';
+    }
   }
 
   ngOnInit() {
@@ -130,15 +151,47 @@ export class FlowRowComponent implements OnInit {
 
   }
 
+  ngOnDestroy(): void {
+    this.destroyed = true;
+    this.subscriptions.unsubscribe();
+  }
+
+  pollMessages(): void {
+    if (this.destroyed || this.statusFlow !== Status.active) {
+      return;
+    }
+    this.loadFlowMessages();
+  }
+
+  pollAlerts(): void {
+    if (this.destroyed || !this.isFlowStarted) {
+      return;
+    }
+    this.getFlowNumberOfAlerts(this.flow.id);
+  }
+
+  onAlertsOpen(): void {
+    this.alertMessages = [];
+    this.alertsTotal = 0;
+    this.alertsLoading = true;
+    this.alertsLoadingMore = false;
+    this.loadAlertPage();
+  }
+
   getStatus(id: number) {
     this.clickButton = true;
 
-    forkJoin(this.flowService.getFlowStatus(id), this.flowService.getFlowNumberOfAlerts(id)).subscribe(([flowStatus, flowAlertsNumber]) => {
-      if (flowStatus.body != 'unconfigured') {
-        this.setFlowStatus(flowStatus.body);
-      }
-      this.setFlowNumberOfAlertsString(flowAlertsNumber.body);
-    });
+    this.subscriptions.add(
+      forkJoin(this.flowService.getFlowStatus(id), this.flowService.getFlowAlertsPage(id, 0, 0)).subscribe(([flowStatus, flowAlertsPage]) => {
+        if (this.destroyed) {
+          return;
+        }
+        if (flowStatus.body != 'unconfigured') {
+          this.setFlowStatus(flowStatus.body);
+        }
+        this.setFlowNumberOfAlerts(flowAlertsPage.body?.total ?? 0);
+      }),
+    );
   }
 
   setFlowStatusDefaults() {
@@ -150,9 +203,13 @@ export class FlowRowComponent implements OnInit {
 
   getFlowStatus(id: number) {
     this.clickButton = true;
-    this.flowService.getFlowStatus(id).subscribe(response => {
-      this.setFlowStatus(response.body);
-    });
+    this.subscriptions.add(
+      this.flowService.getFlowStatus(id).subscribe(response => {
+        if (!this.destroyed) {
+          this.setFlowStatus(response.body);
+        }
+      }),
+    );
   }
 
   setFlowStatus(status: string, refreshView = true): void {
@@ -225,6 +282,12 @@ export class FlowRowComponent implements OnInit {
     if (refreshView) {
       this.changeDetector.detectChanges();
     }
+    if (this.statusFlow === Status.active || this.statusFlow === Status.paused) {
+      this.loadFlowMessages();
+    } else {
+      this.completedCount = null;
+      this.failedCount = null;
+    }
   }
 
   setErrorMessage(action: string, errorReport: any){
@@ -287,66 +350,75 @@ export class FlowRowComponent implements OnInit {
 
   }
 
-  async getFlowAlertsPoll() {
-
+  getFlowAlertsPoll(): void {
+    if (this.destroyed) {
+      return;
+    }
     this.getFlowNumberOfAlerts(this.flow.id);
-
-    if(this.isFlowStarted) {
-      setTimeout(() => {
-        this.getFlowAlertsPoll();
-      }, 10000);
-    }
-
   }
 
-  getFlowAlerts(id: number) {
-
-    this.clickButton = true;
-    this.flowService.getFlowAlerts(id).subscribe(response => {
-      this.setFlowAlerts(response.body);
-    });
+  onAlertsScroll(event: Event): void {
+    if (this.alertsLoading || this.alertsLoadingMore || this.alertMessages.length >= this.alertsTotal) {
+      return;
+    }
+    const element = event.target as HTMLElement;
+    const distanceFromBottom = element.scrollHeight - element.scrollTop - element.clientHeight;
+    if (distanceFromBottom <= 48) {
+      this.alertsLoadingMore = true;
+      this.loadAlertPage();
+    }
   }
 
-  setFlowAlerts(flowAlertsItems: string): void {
-
-    if (flowAlertsItems !== null && flowAlertsItems!== '0') {
-
-	    const flowAlertsList = flowAlertsItems.split(',');
-      const flowAlertLength = flowAlertsList.length;
-
-      let alertStartItem;
-      let alertEndItem;
-
-      if (flowAlertsList.length < 4) {
-        alertStartItem = flowAlertLength - 1;
-        alertEndItem = 0;
-      } else {
-        alertStartItem = flowAlertLength - 1;
-        alertEndItem = flowAlertLength - 3;
-      }
-
-      let i;
-      let alertItems = '';
-      for (i = alertStartItem; i >= alertEndItem; i--) {
-        alertItems += `<a class="list-group-item"><h5 class="mb-1">` + flowAlertsList[i] + `</h5></a>`;
-      }
-
-      this.flowAlertsButton = `<div class="list-group">` + alertItems + `</div>`;
-
+  private loadMoreAlertsIfNeeded(): void {
+    if (this.alertsLoading || this.alertsLoadingMore || this.alertMessages.length >= this.alertsTotal) {
+      return;
     }
+    const list = document.querySelector('.flow-alert-list') as HTMLElement | null;
+    if (list && list.scrollHeight <= list.clientHeight + 1) {
+      this.alertsLoadingMore = true;
+      this.loadAlertPage();
+    }
+  }
+
+  private loadAlertPage(): void {
+    const offset = this.alertMessages.length;
+    this.subscriptions.add(
+      this.flowService.getFlowAlertsPage(this.flow.id, offset, this.alertPageSize).subscribe({
+        next: response => {
+          if (this.destroyed) {
+            return;
+          }
+          const page = response.body;
+          this.alertsTotal = page?.total ?? 0;
+          this.alertMessages = this.alertMessages.concat(page?.messages ?? []);
+          this.alertsLoading = false;
+          this.alertsLoadingMore = false;
+          this.setFlowNumberOfAlerts(this.alertsTotal);
+          this.changeDetector.detectChanges();
+          setTimeout(() => this.loadMoreAlertsIfNeeded());
+        },
+        error: () => {
+          if (this.destroyed) {
+            return;
+          }
+          this.alertsLoading = false;
+          this.alertsLoadingMore = false;
+          this.changeDetector.detectChanges();
+        },
+      }),
+    );
   }
 
   getFlowNumberOfAlerts(id: number) {
     this.clickButton = true;
 
-    this.flowService.getFlowNumberOfAlerts(id).subscribe(response => {
-      this.setFlowNumberOfAlertsString(response.body);
-    });
-  }
-
-  setFlowNumberOfAlertsString(numberOfAlertsString: string): void {
-    let numberOfAlerts = parseInt(numberOfAlertsString, 10);
-    this.setFlowNumberOfAlerts(numberOfAlerts);
+    this.subscriptions.add(
+      this.flowService.getFlowAlertsPage(id, 0, 0).subscribe(response => {
+        if (!this.destroyed) {
+          this.setFlowNumberOfAlerts(response.body?.total ?? 0);
+        }
+      }),
+    );
   }
 
   setFlowNumberOfAlerts(numberOfAlerts: number): void {
@@ -381,22 +453,11 @@ export class FlowRowComponent implements OnInit {
         case 'clone':
           this.router.navigate(['../../flow/editor', this.flow.id], {queryParams: { mode: mode, editor: this.flow.type, id: this.flow.id }});
           break;
-        case 'delete':
-          let modalRef = this.modalService.open(FlowDeleteDialogComponent as any);
-          if (typeof FlowDeleteDialogComponent as Component) {
-            modalRef.componentInstance.flow = this.flow;
-            modalRef.result.then(
-              result => {
-                this.eventManager.broadcast({ name: 'flowDeleted', content: this.flow });
-                modalRef = null;
-              },
-              reason => {
-                this.eventManager.broadcast({ name: 'flowDeleted', content: this.flow });
-                modalRef = null;
-              }
-            );
-          }
+        case 'delete': {
+          const modalRef = this.modalService.open(FlowDeleteDialogComponent);
+          modalRef.componentInstance.flow = this.flow;
           break;
+        }
         default:
           break;
       }
@@ -427,90 +488,175 @@ export class FlowRowComponent implements OnInit {
   }
 
   getFlowStatistic(flow: IFlow) {
+    this.flowStatsLoading = true;
+    this.flowStatsEmpty = false;
+    this.flowStatsSections = [];
 
-    this.flowStatistic = ``;
-    this.statsTableRows = [];
-
-    for (const step of flow.steps) {
-
-      if (step.stepType === StepType.SOURCE) {
-        this.flowService.getFlowStats(flow.id, step.id).subscribe(res => {
-          this.setFlowStatistic(res.body, step.componentType.toString() + '://' + step.uri, step.stepType);
-        });
-      }else if(step.stepType === StepType.SCRIPT || step.stepType === StepType.ROUTE ){
-        this.flowService.getFlowStats(flow.id, step.id).subscribe(res => {
-          this.setFlowStatistic(res.body, flow.id + '-' + step.id, step.stepType);
-        });
-
-      }
+    const steps = flow.steps ?? [];
+    const step =
+      steps.find(item => item.stepType === StepType.SOURCE) ??
+      steps.find(item => item.stepType === StepType.SCRIPT) ??
+      steps.find(item => item.stepType === StepType.ROUTE);
+    if (!step?.id) {
+      this.flowStatsLoading = false;
+      this.flowStatsEmpty = true;
+      return;
     }
 
+    const source =
+      step.stepType === StepType.SOURCE ? `${step.componentType}://${step.uri}` : `${flow.id}-${step.id}`;
+    this.subscriptions.add(
+      this.flowService.getFlowStats(flow.id, step.id).subscribe({
+        next: res => {
+          if (!this.destroyed) {
+            this.applyFlowStats(res.body, source);
+          }
+        },
+        error: () => {
+          if (this.destroyed) {
+            return;
+          }
+          this.flowStatsLoading = false;
+          this.flowStatsEmpty = true;
+          this.changeDetector.detectChanges();
+        },
+      }),
+    );
   }
 
- /* Example of available stats
-  *
-  * "maxProcessingTime": 1381,
-    "lastProcessingTime": 1146,
-    "meanProcessingTime": 1262,
-    "lastExchangeFailureExchangeId": "",
-    "firstExchangeFailureTimestamp": "1970-01-01T00:59:59.999+0100",
-    "firstExchangeCompletedExchangeId": "ID-win81-1553585873482-0-1",
-    "lastExchangeCompletedTimestamp": "2019-03-26T08:44:04.510+0100",
-    "exchangesCompleted": 3,
-    "deltaProcessingTime": -114,
-    "firstExchangeCompletedTimestamp": "2019-03-26T08:44:01.955+0100",
-    "externalRedeliveries": 0,
-    "firstExchangeFailureExchangeId": "",
-    "lastExchangeCompletedExchangeId": "ID-win81-1553585873482-0-9",
-    "lastExchangeFailureTimestamp": "1970-01-01T00:59:59.999+0100",
-    "exchangesFailed": 0,
-    "redeliveries": 0,
-    "minProcessingTime": 1146,
-    "resetTimestamp": "2019-03-26T08:43:59.201+0100",
-    "failuresHandled": 3,
-    "totalProcessingTime": 3787,
-    "startTimestamp": "2019-03-26T08:43:59.201+0100"
- */
-  setFlowStatistic(res, uri, stepType) {
-
-    if (res.step.status != 'Started') {
-      this.flowStatistic = `There are no stats yet.`;
-    } else {
-
-      const step = this.capitalizeFirstLetter(stepType);
-      const now = dayjs();
-      const start = dayjs(res.step.stats.startTimestamp);
-      const flowRuningTime = dayjs.duration(now.diff(start));
-      const hours = Math.floor(flowRuningTime.asHours());
-      const minutes = flowRuningTime.minutes();
-      const completed = parseInt(res.step.stats.exchangesCompleted) - parseInt(res.step.stats.failuresHandled);
-      const failures = parseInt(res.step.stats.exchangesFailed) + parseInt(res.step.stats.failuresHandled);
-
-      this.flowStatistic =
-        `
-          <b>${step}:</b> ${uri}<br/>
-          <b>Start time:</b> ${this.checkDate(res.step.stats.startTimestamp)}<br/>
-          <b>Running:</b> ${hours} hours ${minutes} ${minutes > 1 ? 'minutes' : 'minute'}<br/><br/>
-          <b>Last message:</b> ${this.checkDate(res.step.stats.lastExchangeCompletedTimestamp)}<br/>
-          <b>Completed:</b> ${completed}<br/>
-          <b>Failed:</b> ${failures}<br/>
-
-        `;
+  private applyFlowStats(res, source: string): void {
+    const step = res?.step;
+    const stats = step?.stats;
+    if (!step || step.status !== 'Started' || !stats) {
+      this.flowStatsLoading = false;
+      this.flowStatsEmpty = true;
+      this.flowStatsSections = [];
+      this.changeDetector.detectChanges();
+      return;
     }
+
+    const pending = stats.pending ?? stats.exchangesInflight ?? 0;
+    const failuresHandled = Number(stats.failuresHandled);
+    const handled = Number.isFinite(failuresHandled) ? failuresHandled : 0;
+    const completed = Number(stats.exchangesCompleted) - handled;
+    const failed = Number(stats.exchangesFailed) + handled;
+    this.flowStatsSections = [
+      {
+        title: 'Runtime',
+        rows: [
+          { label: 'Status', value: String(step.status) },
+          { label: 'Started', value: this.formatStatsTimestamp(stats.startTimestamp) },
+          { label: 'Running for', value: this.formatStatsDuration(step.uptimeMilliseconds ?? stats.uptimeMilliseconds) },
+          { label: 'Idle for', value: this.formatStatsDuration(stats.idleSince) },
+        ],
+      },
+      {
+        title: 'Performance',
+        rows: [
+          { label: 'Average processing', value: this.formatProcessingTime(stats.meanProcessingTime) },
+          { label: 'Minimum', value: this.formatProcessingTime(stats.minProcessingTime) },
+          { label: 'Maximum', value: this.formatProcessingTime(stats.maxProcessingTime) },
+          { label: 'Last', value: this.formatProcessingTime(stats.lastProcessingTime) },
+        ],
+      },
+      {
+        title: 'Messages',
+        rows: [
+          { label: 'Total', value: this.formatCount(stats.exchangesTotal) },
+          { label: 'Completed', value: this.formatCount(completed) },
+          { label: 'Pending', value: this.formatCount(pending) },
+          { label: 'Failed', value: this.formatCount(failed) },
+        ],
+      },
+      {
+        title: 'Activity',
+        rows: [
+          { label: 'First completed', value: this.formatStatsTimestamp(stats.firstExchangeCompletedTimestamp) },
+          { label: 'Last completed', value: this.formatStatsTimestamp(stats.lastExchangeCompletedTimestamp) },
+          { label: 'First failed', value: this.formatStatsTimestamp(stats.firstExchangeFailureTimestamp) },
+          { label: 'Last failed', value: this.formatStatsTimestamp(stats.lastExchangeFailureTimestamp) },
+        ],
+      },
+      {
+        title: 'Source',
+        rows: [],
+        note: source,
+      },
+    ];
+    this.flowStatsLoading = false;
+    this.flowStatsEmpty = false;
     this.changeDetector.detectChanges();
-
   }
 
-    capitalizeFirstLetter(string) {
-      return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  private formatStatsTimestamp(value: unknown): string {
+    if (value == null || value === '') {
+      return '—';
     }
+    const numeric = Number(value);
+    if (Number.isFinite(numeric)) {
+      if (numeric <= 0) {
+        return '—';
+      }
+      const date = dayjs(numeric);
+      return date.isValid() ? date.format('YYYY-MM-DD HH:mm:ss') : '—';
+    }
+    const date = dayjs(String(value));
+    return date.isValid() && date.year() > 1970 ? date.format('YYYY-MM-DD HH:mm:ss') : '—';
+  }
 
-  checkDate(r) {
-    if (r) {
-      return dayjs(r).format('YYYY-MM-DD HH:mm:ss');
-    } else {
-      return '-';
+  private formatStatsDuration(value: unknown): string {
+    const milliseconds = Number(value);
+    if (!Number.isFinite(milliseconds) || milliseconds < 0) {
+      return '—';
     }
+    const totalSeconds = Math.round(milliseconds / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    const parts: string[] = [];
+    if (hours > 0) {
+      parts.push(`${hours} hour${hours === 1 ? '' : 's'}`);
+    }
+    if (minutes > 0) {
+      parts.push(`${minutes} minute${minutes === 1 ? '' : 's'}`);
+    }
+    if (seconds > 0 || parts.length === 0) {
+      parts.push(`${seconds} second${seconds === 1 ? '' : 's'}`);
+    }
+    return parts.join(' ');
+  }
+
+  private formatProcessingTime(value: unknown): string {
+    const milliseconds = Number(value);
+    return Number.isFinite(milliseconds) && milliseconds >= 0 ? `${milliseconds} ms` : '—';
+  }
+
+  private formatCount(value: unknown): string {
+    const count = Number(value);
+    return Number.isFinite(count) ? String(count) : '0';
+  }
+
+  private loadFlowMessages(): void {
+    if (!this.flow?.id || this.destroyed) {
+      return;
+    }
+    this.subscriptions.add(
+      this.flowService.getFlowMessages(this.flow.id).subscribe({
+        next: response => {
+          if (this.destroyed || (this.statusFlow !== Status.active && this.statusFlow !== Status.paused)) {
+            return;
+          }
+          const body = response.body;
+          this.completedCount = body?.completedTransactions ?? null;
+          this.failedCount = body?.failedTransactions ?? null;
+          this.changeDetector.detectChanges();
+        },
+      }),
+    );
+  }
+
+  formatMetric(value: number | null): string {
+    return value == null || Number.isNaN(value) ? '—' : String(value);
   }
 
   flowConfigurationNotObtained(id) {
@@ -600,7 +746,7 @@ export class FlowRowComponent implements OnInit {
   }
 
   registerTriggeredAction() {
-    this.eventManager.subscribe('trigerAction', (response: EventWithContent<unknown>) => {
+    this.subscriptions.add(this.eventManager.subscribe('trigerAction', (response: EventWithContent<unknown>) => {
       switch (response.content as string) {
         case 'start':
           if (this.statusFlow === Status.inactive) {
@@ -630,7 +776,7 @@ export class FlowRowComponent implements OnInit {
         default:
           break;
       }
-    });
+    }));
   }
 
   start() {
@@ -644,31 +790,26 @@ export class FlowRowComponent implements OnInit {
       this.enableTracing();
     }
 
-    this.flowService.getConfiguration(this.flow.id).subscribe(
-      data => {
-        this.flowService.setConfiguration(this.flow.id, data.body, 'true').subscribe(data2 => {
-          this.flowService.start(this.flow.id).subscribe(
-            response => {
-              this.statusMessage = JSON.parse(response.body);
-              this.disableActionBtns = false;
-   			      this.setFlowStatus(this.statusMessage.flow.event);
-            },
-            err => {
-              this.statusMessage = JSON.parse(err.error);
-              this.disableActionBtns = false;
-     			    this.setFlowStatus('error');
-              this.flowStatusError = `Flow with id=${this.flow.id} is not started.`;
-              this.isFlowStatusOK = false;
-            }
-          );
-        });
+    this.configureAndRun(
+      this.flowService.start(this.flow.id),
+      body => {
+        this.statusMessage = JSON.parse(body);
+        this.disableActionBtns = false;
+        this.setFlowStatus(this.statusMessage.flow.event);
       },
       err => {
+        this.statusMessage = JSON.parse(err.error);
+        this.disableActionBtns = false;
+        this.setFlowStatus('error');
+        this.flowStatusError = `Flow with id=${this.flow.id} is not started.`;
+        this.isFlowStatusOK = false;
+      },
+      () => {
         this.flowStatusError = `Flow with id=${this.flow.id} is not started.`;
         this.flowConfigurationNotObtained(this.flow.id);
         this.isFlowStatusOK = false;
         this.disableActionBtns = false;
-      }
+      },
     );
   }
 
@@ -676,18 +817,26 @@ export class FlowRowComponent implements OnInit {
     this.flowStatus = 'Pausing';
     this.isFlowStatusOK = true;
     this.disableActionBtns = true;
-    this.flowService.pause(this.flow.id).subscribe(
-      response => {
-        this.statusMessage = JSON.parse(response.body);
-        this.disableActionBtns = false;
-	      this.setFlowStatus(this.statusMessage.flow.event);
-      },
-      err => {
-        this.disableActionBtns = false;
-		    this.setFlowStatus('error');
-        this.isFlowStatusOK = false;
-        this.flowStatusError = `Flow with id=${this.flow.id} is not paused`;
-      }
+    this.subscriptions.add(
+      this.flowService.pause(this.flow.id).subscribe(
+        response => {
+          if (this.destroyed) {
+            return;
+          }
+          this.statusMessage = JSON.parse(response.body);
+          this.disableActionBtns = false;
+          this.setFlowStatus(this.statusMessage.flow.event);
+        },
+        err => {
+          if (this.destroyed) {
+            return;
+          }
+          this.disableActionBtns = false;
+          this.setFlowStatus('error');
+          this.isFlowStatusOK = false;
+          this.flowStatusError = `Flow with id=${this.flow.id} is not paused`;
+        },
+      ),
     );
   }
 
@@ -696,28 +845,24 @@ export class FlowRowComponent implements OnInit {
     this.isFlowStatusOK = true;
     this.disableActionBtns = true;
 
-    this.flowService.getConfiguration(this.flow.id).subscribe(
-      data => {
-        this.flowService.setConfiguration(this.flow.id, data.body, 'true').subscribe(data2 => {
-          this.flowService.resume(this.flow.id).subscribe(
-            response => {
-              this.statusMessage = JSON.parse(response.body);
-              this.disableActionBtns = false;
-   			      this.setFlowStatus(this.statusMessage.flow.event);
-            },
-            err => {
-              this.disableActionBtns = false;
-     			    this.setFlowStatus('error');
-              this.isFlowStatusOK = false;
-              this.flowStatusError = `Flow with id=${this.flow.id} is not resumed.`;
-            }
-          );
-        });
+    this.configureAndRun(
+      this.flowService.resume(this.flow.id),
+      body => {
+        this.statusMessage = JSON.parse(body);
+        this.disableActionBtns = false;
+        this.setFlowStatus(this.statusMessage.flow.event);
       },
       err => {
+        this.statusMessage = JSON.parse(err.error);
+        this.disableActionBtns = false;
+        this.setFlowStatus('error');
+        this.isFlowStatusOK = false;
+        this.flowStatusError = `Flow with id=${this.flow.id} is not resumed.`;
+      },
+      () => {
         this.flowConfigurationNotObtained(this.flow.id);
         this.disableActionBtns = false;
-      }
+      },
     );
   }
 
@@ -731,28 +876,24 @@ export class FlowRowComponent implements OnInit {
       this.disableTracing();
     }
 
-    this.flowService.getConfiguration(this.flow.id).subscribe(
-      data => {
-        this.flowService.setConfiguration(this.flow.id, data.body, 'true').subscribe(data2 => {
-          this.flowService.restart(this.flow.id).subscribe(
-            response => {
-              this.statusMessage = JSON.parse(response.body);
-              this.disableActionBtns = false;
-   			      this.setFlowStatus(this.statusMessage.flow.event);
-            },
-            err => {
-              this.disableActionBtns = false;
-     			    this.setFlowStatus('error');
-              this.isFlowStatusOK = false;
-              this.flowStatusError = `Flow with id=${this.flow.id} is not started.`;
-            }
-          );
-        });
+    this.configureAndRun(
+      this.flowService.restart(this.flow.id),
+      body => {
+        this.statusMessage = JSON.parse(body);
+        this.disableActionBtns = false;
+        this.setFlowStatus(this.statusMessage.flow.event);
       },
       err => {
+        this.statusMessage = JSON.parse(err.error);
+        this.disableActionBtns = false;
+        this.setFlowStatus('error');
+        this.isFlowStatusOK = false;
+        this.flowStatusError = `Flow with id=${this.flow.id} is not started.`;
+      },
+      () => {
         this.flowConfigurationNotObtained(this.flow.id);
         this.disableActionBtns = false;
-      }
+      },
     );
   }
 
@@ -763,18 +904,63 @@ export class FlowRowComponent implements OnInit {
 
     this.disableTracing();
 
-    this.flowService.stop(this.flow.id).subscribe(
-      response => {
-        this.statusMessage = JSON.parse(response.body);
-        this.disableActionBtns = false;
-	      this.setFlowStatus(this.statusMessage.flow.event);
-      },
-      err => {
-        this.disableActionBtns = false;
-		    this.setFlowStatus('error');
-        this.isFlowStatusOK = false;
-        this.flowStatusError = `Flow with id=${this.flow.id} is not stopped.`;
-      }
+    this.subscriptions.add(
+      this.flowService.stop(this.flow.id).subscribe(
+        response => {
+          if (this.destroyed) {
+            return;
+          }
+          this.statusMessage = JSON.parse(response.body);
+          this.disableActionBtns = false;
+          this.setFlowStatus(this.statusMessage.flow.event);
+        },
+        err => {
+          if (this.destroyed) {
+            return;
+          }
+          this.disableActionBtns = false;
+          this.setFlowStatus('error');
+          this.isFlowStatusOK = false;
+          this.flowStatusError = `Flow with id=${this.flow.id} is not stopped.`;
+        },
+      ),
+    );
+  }
+
+  private configureAndRun(
+    action: Observable<HttpResponse<string>>,
+    onSuccess: (body: string) => void,
+    onActionError: (err: { error?: string }) => void,
+    onConfigureError: () => void,
+  ): void {
+    let configured = false;
+    this.subscriptions.add(
+      this.flowService
+        .getConfiguration(this.flow.id)
+        .pipe(
+          switchMap(data => this.flowService.setConfiguration(this.flow.id, data.body, 'true')),
+          tap(() => {
+            configured = true;
+          }),
+          switchMap(() => action),
+        )
+        .subscribe({
+          next: response => {
+            if (!this.destroyed) {
+              onSuccess(response.body);
+            }
+          },
+          error: err => {
+            if (this.destroyed) {
+              return;
+            }
+            if (configured) {
+              onActionError(err);
+            } else {
+              onConfigureError();
+            }
+          },
+        }),
     );
   }
 

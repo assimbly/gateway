@@ -333,11 +333,9 @@ export class Connections {
     } else if (componentType === 'amqp') {
       return 'AMQP';
     } else if (componentType === 'amqps') {
-      return 'AMQP';
+      return 'AMQPS';
     } else if (componentType === 'ibmmq') {
       return 'IBMMQ';
-    } else if (componentType === 'sonicmq') {
-      return 'SonicMQ';
     } else if (componentType === 'sql') {
       return 'JDBC';
     } else if (componentType === 'jms') {

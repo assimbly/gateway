@@ -1,9 +1,6 @@
 @if (allBeans()) {
   <div>
-    <h2 id="configuration-page-heading" data-cy="configurationPageHeading" jhiTranslate="configuration.title">Configuration</h2>
-
-    <label for="configuration-filter" jhiTranslate="configuration.filter">Filter (by prefix)</label>
-    <input id="configuration-filter" type="text" [ngModel]="beansFilter()" (ngModelChange)="beansFilter.set($event)" class="form-control" />
+    <jhi-search-toolbar [(query)]="beansFilter" placeholder="Filter by prefix" inputId="configuration-filter" />
 
     <h3 id="spring-configuration">Spring configuration</h3>
 

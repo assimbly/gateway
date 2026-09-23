@@ -2,6 +2,7 @@ package org.assimbly.gateway.service.mapper;
 
 import org.assimbly.gateway.domain.Authority;
 import org.assimbly.gateway.domain.User;
+import org.assimbly.gateway.domain.enumeration.ThemePreference;
 import org.assimbly.gateway.service.dto.AdminUserDTO;
 import org.assimbly.gateway.service.dto.UserDTO;
 import org.mapstruct.BeanMapping;
@@ -55,6 +56,7 @@ public class UserMapper {
             user.setImageUrl(userDTO.getImageUrl());
             user.setActivated(userDTO.isActivated());
             user.setLangKey(userDTO.getLangKey());
+            user.setThemePreference(ThemePreference.fromNullable(userDTO.getThemePreference()));
             Set<Authority> authorities = this.authoritiesFromStrings(userDTO.getAuthorities());
             user.setAuthorities(authorities);
             return user;

@@ -1,0 +1,25 @@
+:host {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  margin-bottom: 0.75rem;
+}
+
+.search-toolbar {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.search-toolbar-input {
+  min-width: 0;
+  flex: 1 1 12rem;
+  max-width: 22rem;
+}
+
+.search-toolbar-actions {
+  flex-shrink: 0;
+}
+
+.search-toolbar-actions:empty {
+  display: none;
+}

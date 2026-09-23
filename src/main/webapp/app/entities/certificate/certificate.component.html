@@ -1,75 +1,83 @@
 <div>
-  <div class="row">
-    <div class="col-12">
-      <h2>
-        <span>Certificates</span>
-      </h2>
-    </div>
-  </div>
-  <br />
-  <div class="row">
-    <div class="col-8"></div>
-    <div class="col-3-5 text-right">
-      <div ngbDropdown class="d-inline-block">
-        <button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle style="min-width: 160px">Actions</button>
-        <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
-          <!--<button ngbDropdownItem [routerLink]="['/certificate/new']">Manage Whitelist</button>-->
-          <button ngbDropdownItem (click)="generateCertificate()">Self-Sign</button>
+  <jhi-search-toolbar [(query)]="searchText" placeholder="Filter by name or URL" persistKey="searchCertificateText" inputId="searchCertificateId">
+    <ng-container actions>
+      <div ngbDropdown class="d-inline-block" placement="bottom-end">
+        <button
+          type="button"
+          class="btn btn-fx btn-fx-primary"
+          id="dropdownMenuCertificates"
+          ngbDropdownToggle
+          aria-label="Add certificate"
+        >
+          <fa-icon icon="plus"></fa-icon>
+          <span class="d-none d-md-inline"> Add</span>
+        </button>
+        <div ngbDropdownMenu aria-labelledby="dropdownMenuCertificates">
+          <h6 class="dropdown-header">Actions</h6>
+          <button type="button" ngbDropdownItem (click)="generateCertificate()">Self-Sign</button>
+          <div class="dropdown-divider"></div>
+          <h6 class="dropdown-header">Upload</h6>
+          <button type="button" ngbDropdownItem (click)="uploadCertificate()">Client Certificate (.cer)</button>
+          <button type="button" ngbDropdownItem (click)="uploadP12Certificate()">Server Certificate (.p12)</button>
         </div>
       </div>
+      <button class="btn btn-fx btn-fx-secondary" type="button" (click)="reset()" aria-label="Refresh">
+        <fa-icon icon="sync"></fa-icon>
+        <span class="d-none d-md-inline"> Refresh</span>
+      </button>
+    </ng-container>
+  </jhi-search-toolbar>
 
-      <div ngbDropdown class="d-inline-block">
-        <button class="btn btn-outline-primary" id="dropdownMenuActions2" ngbDropdownToggle style="min-width: 160px">Upload</button>
-        <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
-          <button ngbDropdownItem (click)="uploadCertificate()">Client Certificate (.cer)</button>
-          <button ngbDropdownItem (click)="uploadP12Certificate()">Server Certificate (.p12)</button>
-        </div>
-      </div>
-    </div>
-    <div class="col-0-5"></div>
-  </div>
-  <br />
-  <div class="table-responsive" *ngIf="securities">
-    <table class="table table-striped">
-      <thead>
-        <tr jhiSort [(sortState)]="sortState">
-          <th jhiSortBy="id" [style.display]="'none'"><span>ID</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-          <th jhiSortBy="url"><span>Url</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-          <th jhiSortBy="certificateName"><span>Certificate Name</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-          <th jhiSortBy="certificateExpiry"><span>Certificate Expiry</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0">
-        <tr *ngFor="let certificate of securities; trackBy: trackId">
-          <td [style.display]="'none'">
-            <a [routerLink]="['/certificate', certificate.id, 'view']">{{ certificate.id }}</a>
-          </td>
-          <td>{{ certificate.url }}</td>
-          <td>{{ certificate.certificateName }}</td>
-          <td>{{ certificate.certificateExpiry }}</td>
-          <td class="text-right">
-            <div class="btn-group flex-btn-group-container">
-              <button type="submit" [routerLink]="['/certificate', certificate.id, 'view']" class="btn btn-info btn-sm">
-                <fa-icon [icon]="'eye'"></fa-icon>
-                <span class="d-none d-md-inline">View</span>
-              </button>
-              <button (click)="exportCertificate(certificate.id)" class="btn btn-primary btn-sm">
-                <fa-icon [icon]="faDownload"></fa-icon>
-                <span class="d-none d-md-inline">Export</span>
-              </button>
-              <button
-                type="submit"
-				(click)="delete(certificate)"
-                class="btn btn-danger btn-sm"
-              >
-                <fa-icon [icon]="'times'"></fa-icon>
-                <span class="d-none d-md-inline">Delete</span>
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <jhi-data-table
+    [columns]="columns"
+    [(sortState)]="sortState"
+    (sortChange)="onSortChange()"
+    [hasRows]="!!filteredCertificates.length"
+    [emptyMessage]="'No certificates found'"
+    ariaLabel="Certificates"
+  >
+    <tr *ngFor="let certificate of filteredCertificates; trackBy: trackId">
+      <td class="table-fx-identity">
+        <jhi-truncate [text]="certificate.certificateName" />
+      </td>
+      <td class="table-fx-identity">
+        <jhi-truncate [text]="certificate.url" />
+      </td>
+      <td>{{ certificate.certificateExpiry }}</td>
+      <td class="text-end">
+        <jhi-row-actions>
+          <button
+            jhiPrimaryAction
+            type="button"
+            class="btn btn-fx btn-fx-sm btn-fx-ghost"
+            [routerLink]="['/certificate', certificate.id, 'view']"
+            aria-label="View"
+          >
+            <fa-icon icon="eye"></fa-icon>
+            <span class="d-none d-md-inline">View</span>
+          </button>
+          <button
+            jhiOverflowAction
+            type="button"
+            ngbDropdownItem
+            class="btn-fx-dropdown-item"
+            (click)="exportCertificate(certificate.id)"
+          >
+            <fa-icon icon="download"></fa-icon>
+            <span>Export</span>
+          </button>
+          <button
+            jhiOverflowAction
+            type="button"
+            ngbDropdownItem
+            class="btn-fx-dropdown-item btn-fx-dropdown-danger"
+            (click)="delete(certificate)"
+          >
+            <fa-icon icon="times"></fa-icon>
+            <span>Remove</span>
+          </button>
+        </jhi-row-actions>
+      </td>
+    </tr>
+  </jhi-data-table>
 </div>
