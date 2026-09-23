@@ -1224,20 +1224,13 @@ splitOptions4(options: string): string[] {
 
   // this filters connections not of the correct type
   filterConnections(componentType: string, index: number): void {
+    const mappedType = this.connectionsList.getConnectionType(componentType);
 
-    const filteredConnections: Connection[] = [];
-    for (const connection of this.connections) {
-      if(connection.type.toLowerCase() === componentType.toLowerCase()) {
-        filteredConnections.push(connection);
-      }else if(connection.type.toLowerCase() === 'rabbitmq' && componentType.toLowerCase() === 'spring-rabbitmq') {
-        filteredConnections.push(connection);
-      }else if(connection.type.toLowerCase() === 'jdbc' && componentType.toLowerCase() === 'sql') {
-        filteredConnections.push(connection);
-      }
-    }
+    const filteredConnections: Connection[] = this.connections.filter(
+      connection => connection.type.toLowerCase() === mappedType.toLowerCase()
+    );
 
     this.filterConnection[index] = filteredConnections;
-
   }
 
   createOrEditMessage(step, formMessage: AbstractControl): void {
