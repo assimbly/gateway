@@ -117,12 +117,7 @@ export class CertificateComponent implements OnInit, OnDestroy {
   	delete(certificate: ICertificate): void {
 		const modalRef = this.modalService.open(CertificateDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
 		modalRef.componentInstance.certificate = certificate;
-		// unsubscribe not needed because closed completes on modal close
-		modalRef.closed.subscribe(reason => {
-		  if (reason === 'deleted') {
-			this.loadAll();
-		  }
-		});
+		// the dialog broadcasts 'certificateListModification' after deleting, which reloads the list
 	}
 
 

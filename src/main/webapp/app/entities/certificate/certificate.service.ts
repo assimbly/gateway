@@ -141,9 +141,10 @@ export class CertificateService {
     });
   }
 
-  deleteCertificate(certificateName: String): Observable<HttpResponse<string>> {
+  deleteCertificate(certificateName: string, certificateStore?: string): Observable<HttpResponse<string>> {
     const options = new HttpHeaders({
-      keystoreName: 'keystore.jks',
+      // older records have no certificateStore; downloaded certificates live in the outbound truststore
+      keystoreName: certificateStore || 'outbound-truststore.p12',
       keystorePassword: environment.KEYSTORE_PWD,
     });
 
