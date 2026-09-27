@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -58,6 +58,8 @@ export class CertificateComponent implements OnInit, OnDestroy {
     { key: 'certificateExpiry', header: 'Expiry', sortable: true },
     { key: 'actions', header: 'Actions', align: 'end' },
   ];
+
+  private readonly changeDetector = inject(ChangeDetectorRef);
 
   constructor(
     protected certificateService: CertificateService,
@@ -153,18 +155,15 @@ export class CertificateComponent implements OnInit, OnDestroy {
   }
 
   uploadCertificate() {
-    console.log('Upload certificate');
-	this.certificatePopupService.open(CertificateUploadDialogComponent as Component);
+	    this.certificatePopupService.open(CertificateUploadDialogComponent as Component);
   }
 
   uploadP12Certificate() {
-    console.log('Upload P12 certificate');
-	this.certificatePopupService.open(CertificateUploadP12DialogComponent as Component);
+  	this.certificatePopupService.open(CertificateUploadP12DialogComponent as Component);
   }
 
   generateCertificate() {
-    console.log('Generate self-signed certificate');
-	this.certificatePopupService.open(CertificateSelfSignDialogComponent as Component);
+    	this.certificatePopupService.open(CertificateSelfSignDialogComponent as Component);
   }
 
   exportCertificate(id) {
@@ -190,9 +189,13 @@ export class CertificateComponent implements OnInit, OnDestroy {
   protected paginateSecurities(data: ICertificate[], headers: HttpHeaders) {
     this.links = this.parseLinks.parse(headers.get('link'));
     this.totalItems = parseInt(headers.get('X-Total-Count'), 10);
-    for (let i = 0; i < data.length; i++) {
-      this.securities.push(data[i]);
+    const body = data ?? [];
+    if (this.page > 0) {
+      this.securities = [...this.securities, ...body];
+    } else {
+      this.securities = body;
     }
+    this.changeDetector.detectChanges();
   }
 
   protected onError(errorMessage: string) {

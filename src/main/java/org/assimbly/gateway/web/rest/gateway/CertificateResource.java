@@ -156,7 +156,7 @@ public class CertificateResource {
     public ResponseEntity<CertificateDTO> getCertificate(@PathVariable(value = "id") Long id){
         log.debug("REST request to get Certificate : {}", id);
         Optional<CertificateDTO> certificateDTO = certificateService.findOne(id);
-        return ResponseEntity.ok().body(certificateDTO.get());
+        return ResponseEntity.of(certificateDTO);
     }
 
     @GetMapping("/certificates/details/{certificateName}")
@@ -169,9 +169,14 @@ public class CertificateResource {
         }
 
         Optional<Certificate> certificate = certificateService.findByCertificateName(certificateName);
-        String certificateFile = certificate.get().getCertificateFile();
+        if (certificate.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
 
-        X509Certificate real = convertPemToX509Certificate(certificateFile);
+        X509Certificate real = convertPemToX509Certificate(certificate.get().getCertificateFile());
+        if (real == null) {
+            return ResponseEntity.notFound().build();
+        }
 
         String certificateString = "Type=" + real.getType() + ";Signing Algorithm=" + real.getSigAlgName() + ";IssuerDN Principal=" + real.getIssuerX500Principal() + ";SubjectDN Principal=" + real.getSubjectX500Principal();
 

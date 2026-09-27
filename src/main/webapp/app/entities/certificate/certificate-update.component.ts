@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { forkJoin } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 import dayjs from 'dayjs/esm';
 import { DATE_TIME_FORMAT } from 'app/config/input.constants';
 import { environment } from 'environments/environment';
@@ -11,8 +10,9 @@ import { environment } from 'environments/environment';
 import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AlertError } from 'app/shared/alert';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
-import { ICertificate } from 'app/shared/model/certificate.model';
+import { ICertificate, Certificate } from 'app/shared/model/certificate.model';
 import { CertificateService } from './certificate.service';
 
 // import { faSync } from '@fortawesome/free-solid-svg-icons';
@@ -27,7 +27,12 @@ export class CertificateUpdateComponent implements OnInit {
   isSaving: boolean;
   certificateExpiry: string;
 
-  constructor(protected certificateService: CertificateService, protected activatedRoute: ActivatedRoute, protected router: Router,) {}
+  constructor(
+    protected certificateService: CertificateService,
+    protected activatedRoute: ActivatedRoute,
+    protected router: Router,
+    protected eventManager: EventManager,
+  ) {}
 
   ngOnInit() {
     this.isSaving = false;
@@ -46,23 +51,40 @@ export class CertificateUpdateComponent implements OnInit {
 
     this.certificate.certificateExpiry = this.certificateExpiry != null ? dayjs(this.certificateExpiry, DATE_TIME_FORMAT) : null;
 
-    this.certificateService.importCertificate(this.certificate.url, 'truststore.jks', environment.KEYSTORE_PWD).subscribe(
+    this.certificateService.downloadCertificate(this.certificate.url, 'outbound-truststore.p12', environment.KEYSTORE_PWD).subscribe(
       res => {
         const json = JSON.parse(res.body);
+        const certificates = json.certificates.certificate;
+        const saves: Observable<HttpResponse<ICertificate>>[] = [];
 
-        for (let i = 0; i < json.certificates.certificate.length; i++) {
-          const certificate = json.certificates.certificate[i];
-          this.certificate.certificateName = certificate.certificateName;
-          this.certificate.certificateFile = certificate.certificateFile;
-          this.certificate.certificateExpiry = dayjs(certificate.certificateExpiry, DATE_TIME_FORMAT);
-          if (this.certificate.id !== undefined) {
-            this.subscribeToAddResponse(this.certificateService.update(this.certificate));
-          } else {
-            this.subscribeToAddResponse(this.certificateService.create(this.certificate));
-          }
+        for (let i = 0; i < certificates.length; i++) {
+          const downloaded = certificates[i];
+          const toSave: ICertificate = {
+            ...new Certificate(),
+            id: this.certificate.id,
+            url: this.certificate.url,
+            certificateName: downloaded.certificateName,
+            certificateFile: downloaded.certificateFile,
+            certificateExpiry: dayjs(downloaded.certificateExpiry, DATE_TIME_FORMAT),
+            certificateStore: downloaded.certificateStore,
+          };
+
+          saves.push(
+            toSave.id !== undefined
+              ? this.certificateService.update(toSave)
+              : this.certificateService.create(toSave)
+          );
         }
+
+        forkJoin(saves).subscribe(
+          () => this.onSaveSuccess(),
+          () => this.onSaveError()
+        );
       },
-      err => console.log(err)
+      err => {
+        console.log(err);
+        this.onSaveError();
+      }
     );
   }
 
@@ -133,7 +155,9 @@ export class CertificateUpdateComponent implements OnInit {
 
   protected onSaveSuccess() {
     this.isSaving = false;
-    this.router.navigate(['/certificate']);
+    this.router.navigate(['/certificate']).then(() => {
+      this.eventManager.broadcast(new EventWithContent('certificateListModification', 'OK'));
+    });
   }
 
   protected onSaveError() {

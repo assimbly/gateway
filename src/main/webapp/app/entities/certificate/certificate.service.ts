@@ -128,7 +128,7 @@ export class CertificateService {
     });
   }
 
-  importCertificate(url, keystoreName, keystorePassword): Observable<HttpResponse<string>> {
+  downloadCertificate(url, keystoreName, keystorePassword): Observable<HttpResponse<string>> {
     const options = new HttpHeaders({
       keystoreName,
       keystorePassword,
