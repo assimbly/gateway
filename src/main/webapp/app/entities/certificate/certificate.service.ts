@@ -128,13 +128,13 @@ export class CertificateService {
     });
   }
 
-  downloadCertificate(url, keystoreName, keystorePassword): Observable<HttpResponse<string>> {
+  downloadCertificates(url, keystoreName, keystorePassword): Observable<HttpResponse<string>> {
     const options = new HttpHeaders({
       keystoreName,
       keystorePassword,
     });
 
-    return this.http.post(`${this.resourceUrl}/import`, url, {
+    return this.http.post(`${this.resourceUrl}/download`, url, {
       headers: options,
       observe: 'response',
       responseType: 'text',

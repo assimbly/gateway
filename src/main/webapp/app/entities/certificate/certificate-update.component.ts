@@ -51,7 +51,7 @@ export class CertificateUpdateComponent implements OnInit {
 
     this.certificate.certificateExpiry = this.certificateExpiry != null ? dayjs(this.certificateExpiry, DATE_TIME_FORMAT) : null;
 
-    this.certificateService.downloadCertificate(this.certificate.url, 'outbound-truststore.p12', environment.KEYSTORE_PWD).subscribe(
+    this.certificateService.downloadCertificates(this.certificate.url, 'outbound-truststore.p12', environment.KEYSTORE_PWD).subscribe(
       res => {
         const json = JSON.parse(res.body);
         const certificates = json.certificates.certificate;
