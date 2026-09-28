@@ -163,6 +163,9 @@ Desktop.ini
 src/main/resources/.h2.server.properties
 package-lock.json
 activemq-data/**
+# ActiveMQ Artemis broker runtime data (bindings, journal)
+/data/bindings/
+/data/journal/
 *.lock
 
 ######################
