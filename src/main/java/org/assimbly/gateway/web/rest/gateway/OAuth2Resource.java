@@ -1,5 +1,7 @@
 package org.assimbly.gateway.web.rest.gateway;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.*;
 
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 /**
  * REST controller for managing oauth2 (Open Authorization v2).
  */
+@Tag(name = "OAuth2", description = "OAuth2 token exchange")
 @RestController
 @RequestMapping("/api/oauth2token")
 public class OAuth2Resource {
@@ -59,6 +62,7 @@ public class OAuth2Resource {
      * GET  /info : requests oauth2 access token info
      * @return Map token information
      */
+    @Operation(summary = "Exchange an authorization code for token info")
     @GetMapping(
         path = "/info",
         produces = {MediaType.APPLICATION_JSON_VALUE}

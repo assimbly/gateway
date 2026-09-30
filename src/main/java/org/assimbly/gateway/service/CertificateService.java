@@ -5,7 +5,6 @@ import org.assimbly.gateway.service.dto.CertificateDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,8 +49,6 @@ public interface CertificateService {
 	
 	List<Certificate> findAllByUrl(String url);
 
-	List<Certificate> findAllByCertificateExpiryBetween(Instant dateNow, Instant dateOfExpiry);
-	
 	Optional<Certificate> findByCertificateName(String certificateName);
 
 

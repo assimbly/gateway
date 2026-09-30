@@ -1,5 +1,7 @@
 package org.assimbly.gateway.web.rest.integration;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.assimbly.gateway.domain.Connection;
 import org.assimbly.gateway.domain.ConnectionKeys;
 import org.assimbly.gateway.repository.ConnectionRepository;
@@ -29,6 +31,7 @@ import java.util.TreeMap;
 /**
  * REST controller for managing Connection.
  */
+@Tag(name = "Connections", description = "Manage connections (services)")
 @RestController
 @RequestMapping("/api")
 public class ConnectionResource {
@@ -53,6 +56,7 @@ public class ConnectionResource {
      * @return the ResponseEntity with status 201 (Created) and with body the new connectionDTO, or with status 400 (Bad Request) if the connection has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Create a connection")
     @PostMapping("/connections")
     public ResponseEntity<ConnectionDTO> createConnection(@RequestBody ConnectionDTO connectionDTO) throws URISyntaxException {
         log.debug("REST request to save Connection : {}", connectionDTO);
@@ -75,6 +79,7 @@ public class ConnectionResource {
      * or with status 500 (Internal Server Error) if the connectionDTO couldn't be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Update a connection")
     @PutMapping("/connections")
     public ResponseEntity<ConnectionDTO> updateConnection(@RequestBody ConnectionDTO connectionDTO) throws URISyntaxException {
         log.debug("REST request to update Connection : {}", connectionDTO);
@@ -90,6 +95,7 @@ public class ConnectionResource {
      *
      * @return the ResponseEntity with status 200 (OK) and the list of connections in body
      */
+    @Operation(summary = "List connections (paged)")
     @GetMapping("/connections")
     public ResponseEntity<List<ConnectionDTO>> getAllConnections(Pageable pageable) {
         log.debug("REST request to get all Connections");
@@ -98,6 +104,7 @@ public class ConnectionResource {
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
+    @Operation(summary = "List all connections")
     @GetMapping("/connections/getallconnections")
     @Transactional(readOnly = true)
     public ResponseEntity<List<ConnectionDTO>> getAllConnections() {
@@ -112,6 +119,7 @@ public class ConnectionResource {
      * @param id the id of the connectionDTO to retrieve
      * @return the ResponseEntity with status 200 (OK) and with body the connectionDTO, or with status 404 (Not Found)
      */
+    @Operation(summary = "Get a connection")
     @GetMapping("/connections/{id}")
     public ResponseEntity<ConnectionDTO> getConnection(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get Connection : {}", id);
@@ -125,6 +133,7 @@ public class ConnectionResource {
      * @param id the id of the connectionsKeys to retrieve
      * @return the Treemap (JSON Object)
      */
+    @Operation(summary = "List the keys of a connection")
     @GetMapping("/connections/{id}/keys")
     public TreeMap<String, String> getConnectionKeys(@PathVariable(value = "id") Long id) {
 
@@ -141,6 +150,7 @@ public class ConnectionResource {
      * @param id the id of the connectionDTO to delete
      * @return the ResponseEntity with status 200 (OK)
      */
+    @Operation(summary = "Delete a connection")
     @DeleteMapping("/connections/{id}")
     public ResponseEntity<Void> deleteConnection(@PathVariable(value = "id") Long id) {
         log.debug("REST request to delete Connection : {}", id);

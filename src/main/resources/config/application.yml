@@ -179,8 +179,9 @@ springdoc:
     tryItOutEnabled: true
     doc-expansion: none
     disable-swagger-default-url: true
-    config-url: /v3/api-docs/swagger-config
-    url: /v3/api-docs
+    # Don't set config-url: springdoc then skips adding the group urls to /v3/api-docs/swagger-config
+    # Groups of OpenApiGroupsConfiguration are selectable in the top bar, ordered by SwaggerUiGroupsOrderAdvice
+    groups-order: ASC
   api-docs:
     resolve-schema-properties: true
   default-flat-param-object: false

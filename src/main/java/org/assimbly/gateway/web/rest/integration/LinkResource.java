@@ -1,5 +1,7 @@
 package org.assimbly.gateway.web.rest.integration;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.assimbly.gateway.service.LinkService;
 import org.assimbly.gateway.service.dto.LinkDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
@@ -18,6 +20,7 @@ import java.util.Optional;
 /**
  * REST controller for managing Link.
  */
+@Tag(name = "Links", description = "Manage the links between steps")
 @RestController
 @RequestMapping("/api")
 public class LinkResource {
@@ -39,6 +42,7 @@ public class LinkResource {
      * @return the ResponseEntity with status 201 (Created) and with body the new linkDTO, or with status 400 (Bad Request) if the link has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Create a link")
     @PostMapping("/link")
     public ResponseEntity<LinkDTO> createLink(@RequestBody LinkDTO linkDTO) throws URISyntaxException {
         log.debug("REST request to save Link : {}", linkDTO);
@@ -63,6 +67,7 @@ public class LinkResource {
      * or with status 500 (Internal Server Error) if the linkDTO couldn't be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Update a link")
     @PutMapping("/link")
     public ResponseEntity<LinkDTO> updateLink(@RequestBody LinkDTO linkDTO) throws URISyntaxException {
         log.debug("REST request to update Link : {}", linkDTO);
@@ -78,6 +83,7 @@ public class LinkResource {
      *
      * @return the ResponseEntity with status 200 (OK) and the list of link in body
      */
+    @Operation(summary = "List links")
     @GetMapping("/link")
     public List<LinkDTO> getAllLink() {
         log.debug("REST request to get all Link");
@@ -90,6 +96,7 @@ public class LinkResource {
      * @param id the id of the linkDTO to retrieve
      * @return the ResponseEntity with status 200 (OK) and with body the linkDTO, or with status 404 (Not Found)
      */
+    @Operation(summary = "Get a link")
     @GetMapping("/link/{id}")
     public ResponseEntity<LinkDTO> getLink(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get Link : {}", id);
@@ -103,6 +110,7 @@ public class LinkResource {
      * @param id the id of the linkDTO to delete
      * @return the ResponseEntity with status 200 (OK)
      */
+    @Operation(summary = "Delete a link")
     @DeleteMapping("/link/{id}")
     public ResponseEntity<Void> deleteLink(@PathVariable(value = "id") Long id) {
         log.debug("REST request to delete Link : {}", id);
@@ -117,6 +125,7 @@ public class LinkResource {
      * @param stepid the stepId of the linkDTO to delete
      * @return the ResponseEntity with status 200 (OK)
      */
+    @Operation(summary = "Delete the links of a step")
     @DeleteMapping("/link/bystepid/{stepid}")
     public ResponseEntity<Void> deleteLinkByStepId(@PathVariable(value = "stepid") Long stepid) {
         log.debug("REST request to delete Link by StepId : {}", stepid);

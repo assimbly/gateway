@@ -1,5 +1,7 @@
 package org.assimbly.gateway.web.rest.broker;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.assimbly.gateway.service.TopicService;
 import org.assimbly.gateway.service.dto.TopicDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
@@ -23,6 +25,7 @@ import java.util.Optional;
 /**
  * REST controller for managing {@link org.assimbly.gateway.domain.Topic}.
  */
+@Tag(name = "Topics", description = "Manage the topic page settings")
 @RestController
 @RequestMapping("/api")
 public class TopicResource {
@@ -46,6 +49,7 @@ public class TopicResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new topicDTO, or with status {@code 400 (Bad Request)} if the topic has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @Operation(summary = "Create topic settings")
     @PostMapping("/topics")
     public ResponseEntity<TopicDTO> createTopic(@RequestBody TopicDTO topicDTO) throws URISyntaxException {
         log.debug("REST request to save Topic : {}", topicDTO);
@@ -68,6 +72,7 @@ public class TopicResource {
      * or with status {@code 500 (Internal Server Error)} if the topicDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @Operation(summary = "Update topic settings")
     @PutMapping("/topics")
     public ResponseEntity<TopicDTO> updateTopic(@RequestBody TopicDTO topicDTO) throws URISyntaxException {
         log.debug("REST request to update Topic : {}", topicDTO);
@@ -87,6 +92,7 @@ public class TopicResource {
      * @param pageable the pagination information.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of topics in body.
      */
+    @Operation(summary = "List topic settings")
     @GetMapping("/topics")
     public ResponseEntity<List<TopicDTO>> getAllTopics(Pageable pageable) {
         log.debug("REST request to get a page of Topics");
@@ -101,6 +107,7 @@ public class TopicResource {
      * @param id the id of the topicDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the topicDTO, or with status {@code 404 (Not Found)}.
      */
+    @Operation(summary = "Get topic settings")
     @GetMapping("/topics/{id}")
     public ResponseEntity<TopicDTO> getTopic(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get Topic : {}", id);
@@ -114,6 +121,7 @@ public class TopicResource {
      * @param id the id of the topicDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
+    @Operation(summary = "Delete topic settings")
     @DeleteMapping("/topics/{id}")
     public ResponseEntity<Void> deleteTopic(@PathVariable("id") Long id) {
         log.debug("REST request to delete Topic : {}", id);

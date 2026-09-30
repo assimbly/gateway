@@ -1,5 +1,7 @@
 package org.assimbly.gateway.web.rest.integration;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.assimbly.gateway.config.EncryptionProperties;
 import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.service.FlowAlertLogService;
@@ -31,6 +33,7 @@ import java.util.Optional;
 /**
  * REST controller for managing flow.
  */
+@Tag(name = "Flows", description = "Manage flows")
 @Component
 @RestController
 @RequestMapping("/api")
@@ -68,6 +71,7 @@ public class FlowResource {
      * @return the ResponseEntity with status 201 (Created) and with body the new flowDTO, or with status 400 (Bad Request) if the flow has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Create a flow")
     @PostMapping("/flows")
     public ResponseEntity<FlowDTO> createFlow(@RequestBody FlowDTO flowDTO) throws URISyntaxException {
         log.debug("REST request to save Flow : {}", flowDTO);
@@ -90,6 +94,7 @@ public class FlowResource {
      * or with status 500 (Internal Server Error) if the flowDTO couldn't be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Update a flow")
     @PutMapping("/flows")
     public ResponseEntity<FlowDTO> updateFlow(@RequestBody FlowDTO flowDTO) throws URISyntaxException {
         log.debug("REST request to update Flow : {}", flowDTO);
@@ -106,6 +111,7 @@ public class FlowResource {
      * @param pageable the pagination information
      * @return the ResponseEntity with status 200 (OK) and the list of flows in body
      */
+    @Operation(summary = "List flows")
     @GetMapping("/flows")
     public ResponseEntity<List<FlowDTO>> getAllFlows(Pageable pageable) {
         log.debug("REST request to get a page of Flows");
@@ -120,6 +126,7 @@ public class FlowResource {
      * @param integrationid
      * @return the ResponseEntity with status 200 (OK) and the list of flows in body
      */
+    @Operation(summary = "List the flows of an integration")
     @GetMapping("/flows/byintegrationid/{integrationid}")
     public ResponseEntity<List<FlowDTO>> getAllflowsByGatewayId(
         @SortDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable,
@@ -138,6 +145,7 @@ public class FlowResource {
      * @param id the id of the flowDTO to retrieve
      * @return the ResponseEntity with status 200 (OK) and with body the flowDTO, or with status 404 (Not Found)
      */
+    @Operation(summary = "Get a flow")
     @GetMapping("/flows/{id}")
     public ResponseEntity<FlowDTO> getFlow(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get Flow : {}", id);
@@ -154,6 +162,7 @@ public class FlowResource {
      * @param limit page size, capped at 10. Zero returns only the total.
      * @return the page of alert messages and the total number of alerts
      */
+    @Operation(summary = "List the alerts of a flow")
     @GetMapping("/flows/{id}/alerts")
     public ResponseEntity<FlowAlertsPageDTO> getFlowAlerts(
         @PathVariable(value = "id") Long id,
@@ -170,6 +179,7 @@ public class FlowResource {
      * @param id the id of the flowDTO to delete
      * @return the ResponseEntity with status 200 (OK)
      */
+    @Operation(summary = "Delete a flow")
     @DeleteMapping("/flows/{id}")
     public ResponseEntity<Void> deleteFlow(@PathVariable(value = "id") Long id) {
         log.debug("REST request to delete Flow : {}", id);

@@ -1,5 +1,7 @@
 package org.assimbly.gateway.web.rest.broker;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.assimbly.gateway.service.QueueService;
 import org.assimbly.gateway.service.dto.QueueDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
@@ -23,6 +25,7 @@ import java.util.Optional;
 /**
  * REST controller for managing {@link org.assimbly.gateway.domain.Queue}.
  */
+@Tag(name = "Queues", description = "Manage the queue page settings")
 @RestController
 @RequestMapping("/api")
 public class QueueResource {
@@ -46,6 +49,7 @@ public class QueueResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new queueDTO, or with status {@code 400 (Bad Request)} if the queue has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @Operation(summary = "Create queue settings")
     @PostMapping("/queues")
     public ResponseEntity<QueueDTO> createQueue(@RequestBody QueueDTO queueDTO) throws URISyntaxException {
         log.debug("REST request to save Queue : {}", queueDTO);
@@ -68,6 +72,7 @@ public class QueueResource {
      * or with status {@code 500 (Internal Server Error)} if the queueDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @Operation(summary = "Update queue settings")
     @PutMapping("/queues")
     public ResponseEntity<QueueDTO> updateQueue(@RequestBody QueueDTO queueDTO) throws URISyntaxException {
         log.debug("REST request to update Queue : {}", queueDTO);
@@ -87,6 +92,7 @@ public class QueueResource {
      * @param pageable the pagination information.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of queues in body.
      */
+    @Operation(summary = "List queue settings")
     @GetMapping("/queues")
     public ResponseEntity<List<QueueDTO>> getAllQueues(Pageable pageable) {
         log.debug("REST request to get a page of Queues");
@@ -101,6 +107,7 @@ public class QueueResource {
      * @param id the id of the queueDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the queueDTO, or with status {@code 404 (Not Found)}.
      */
+    @Operation(summary = "Get queue settings")
     @GetMapping("/queues/{id}")
     public ResponseEntity<QueueDTO> getQueue(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get Queue : {}", id);
@@ -114,6 +121,7 @@ public class QueueResource {
      * @param id the id of the queueDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
+    @Operation(summary = "Delete queue settings")
     @DeleteMapping("/queues/{id}")
     public ResponseEntity<Void> deleteQueue(@PathVariable("id") Long id) {
         log.debug("REST request to delete Queue : {}", id);

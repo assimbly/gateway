@@ -1,41 +1,29 @@
-import { Component, OnInit, OnDestroy, AfterContentInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { switchMap } from 'rxjs/operators';
 
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
-import { CertificateService } from './certificate.service';
-import { ICertificate } from 'app/shared/model/certificate.model';
-import { DATE_TIME_FORMAT } from 'app/config/input.constants';
-import dayjs from 'dayjs/esm';
+import { CertificateService, CERTIFICATE_NAME_PATTERN, TRUSTSTORE, toCertificateName } from './certificate.service';
 
 @Component({
   selector: 'jhi-certificate-upload-dialog',
   templateUrl: './certificate-upload-dialog.component.html',
   imports: [CommonModule, FormsModule],
 })
-export class CertificateUploadDialogComponent implements AfterContentInit {
-  certificate: ICertificate;
-  certificateId: number;
-  securities: Array<ICertificate> = [];
-  certificateFile: any;
-  certificateStore = 'truststore';
+export class CertificateUploadDialogComponent {
+  readonly truststore = TRUSTSTORE;
+  readonly namePattern = CERTIFICATE_NAME_PATTERN;
+  name = '';
+  certificateFile: string;
   fileName = 'Choose file';
   fileNameWithoutExtension: string;
-  fileType: string;
-  password: string;
+  isSaving = false;
   uploadError = false;
   uploadErrorMessage: String;
 
   constructor(private eventManager: EventManager, private certificateService: CertificateService, public activeModal: NgbActiveModal) {}
-
-  ngAfterContentInit() {
-    this.certificateService.query().subscribe(res => {
-      this.securities = res.body;
-      this.certificateId = this.securities[0].id;
-    });
-  }
 
   clear() {
     this.activeModal.dismiss('cancel');
@@ -44,51 +32,35 @@ export class CertificateUploadDialogComponent implements AfterContentInit {
   openFile(event) {
     const reader = new FileReader();
     reader.onload = () => {
-      this.certificateFile = reader.result;
+      // as data URL (base64), so binary DER files arrive intact
+      this.certificateFile = reader.result as string;
     };
-    reader.readAsBinaryString(event.target.files[0]);
+    reader.readAsDataURL(event.target.files[0]);
 
     this.fileName = event.target.files[0].name;
     this.fileNameWithoutExtension = this.fileName.split('.').slice(0, -1).join('.');
-    this.fileType = this.fileName.substring(this.fileName.lastIndexOf('.') + 1);
+    if (!this.name) {
+      this.name = toCertificateName(this.fileNameWithoutExtension);
+    }
   }
 
-  uploadCertificate() {
-    this.certificateService.uploadCertificate(this.certificateStore + '.jks', this.certificateFile, this.fileType).subscribe(
-      data => {
-        const json = JSON.parse(data.body);
-
-        const certificate = json.certificates.certificate[0];
-
-        this.certificate.certificateName = certificate.certificateName;
-
-        console.log('this.certificate.certificateName=' + this.certificate.certificateName);
-
-        this.certificate.certificateFile = certificate.certificateFile;
-        this.certificate.certificateName = certificate.certificateName;
-        this.certificate.certificateStore = certificate.certificateStore;
-        this.certificate.certificateExpiry = dayjs(certificate.certificateExpiry, DATE_TIME_FORMAT);
-        this.certificate.url = 'Generic (' + this.fileNameWithoutExtension + ')';
-
-        this.certificateService.create(this.certificate).subscribe(
-          res => {
-            this.uploadError = false;
-            this.activeModal.dismiss(true);
-		    this.eventManager.broadcast(new EventWithContent('certificateListModification', 'OK'));
-          },
-          err => {
-            this.uploadError = true;
-            this.uploadErrorMessage = err.error;
-            console.log(err);
-          }
-        );
-      },
-      err => {
-        this.uploadError = true;
-        this.uploadErrorMessage = err.error;
-        console.log(err);
-      }
-    );
+  importCertificates() {
+    this.isSaving = true;
+    this.certificateService
+      .importTrustedCertificates(this.name, this.certificateFile)
+      .pipe(switchMap(res => this.certificateService.createFromRuntimeResponse(res.body, 'Trusted (' + this.fileNameWithoutExtension + ')')))
+      .subscribe(
+        () => {
+          this.uploadError = false;
+          this.activeModal.dismiss(true);
+          this.eventManager.broadcast(new EventWithContent('certificateListModification', 'OK'));
+        },
+        err => {
+          this.isSaving = false;
+          this.uploadError = true;
+          this.uploadErrorMessage = err.error;
+          console.log(err);
+        },
+      );
   }
-
 }

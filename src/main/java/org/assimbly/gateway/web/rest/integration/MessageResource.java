@@ -1,5 +1,7 @@
 package org.assimbly.gateway.web.rest.integration;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.assimbly.gateway.domain.Header;
 import org.assimbly.gateway.domain.Message;
 import org.assimbly.gateway.repository.MessageRepository;
@@ -29,6 +31,7 @@ import java.util.TreeMap;
 /**
  * REST controller for managing Message.
  */
+@Tag(name = "Messages", description = "Manage messages")
 @RestController
 @RequestMapping("/api")
 public class MessageResource {
@@ -53,6 +56,7 @@ public class MessageResource {
      * @return the ResponseEntity with status 201 (Created) and with body the new messageDTO, or with status 400 (Bad Request) if the message has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Create a message")
     @PostMapping("/messages")
     public ResponseEntity<MessageDTO> createMessage(@RequestBody MessageDTO messageDTO) throws URISyntaxException {
         log.debug("REST request to save Message : {}", messageDTO);
@@ -75,6 +79,7 @@ public class MessageResource {
      * or with status 500 (Internal Server Error) if the messageDTO couldn't be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Update a message")
     @PutMapping("/messages")
     public ResponseEntity<MessageDTO> updateMessage(@RequestBody MessageDTO messageDTO) throws URISyntaxException {
         log.debug("REST request to update Message : {}", messageDTO);
@@ -90,6 +95,7 @@ public class MessageResource {
      *
      * @return the ResponseEntity with status 200 (OK) and the list of messages in body
      */
+    @Operation(summary = "List messages (paged)")
     @GetMapping("/messages")
     public ResponseEntity<List<MessageDTO>> getAllMessages(Pageable pageable) {
         log.debug("REST request to get all Messages");
@@ -104,6 +110,7 @@ public class MessageResource {
      * @return the ResponseEntity with status 200 (OK) and the list of messages in body
      */
 
+    @Operation(summary = "List all messages")
     @GetMapping("/messages/getallmessages")
     @Transactional(readOnly = true)
     public ResponseEntity<List<MessageDTO>> getAllMessages() {
@@ -118,6 +125,7 @@ public class MessageResource {
      * @param id the id of the messageDTO to retrieve
      * @return the ResponseEntity with status 200 (OK) and with body the messageDTO, or with status 404 (Not Found)
      */
+    @Operation(summary = "Get a message")
     @GetMapping("/messages/{id}")
     public ResponseEntity<MessageDTO> getMessage(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get Message : {}", id);
@@ -131,6 +139,7 @@ public class MessageResource {
      * @param id the id of the messageDTO to delete
      * @return the ResponseEntity with status 200 (OK)
      */
+    @Operation(summary = "Delete a message")
     @DeleteMapping("/messages/{id}")
     public ResponseEntity<Void> deleteMessage(@PathVariable(value = "id") Long id) {
         log.debug("REST request to delete Message : {}", id);
@@ -144,6 +153,7 @@ public class MessageResource {
      * @param id the id of the header to retrieve
      * @return the Treemap (JSON Object)
      */
+    @Operation(summary = "List the headers of a message")
     @GetMapping("/messages/{id}/headers")
     public TreeMap<String, Object> getHeaders(@PathVariable(value = "id") Long id) {
 

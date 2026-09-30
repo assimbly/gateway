@@ -3,6 +3,8 @@ package org.assimbly.gateway.web.rest.gateway;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.assimbly.gateway.web.rest.customvm.LoggerVM;
 import org.assimbly.gateway.web.rest.util.LogUtil;
 import org.assimbly.gateway.web.rest.util.ResponseUtil;
@@ -19,10 +21,12 @@ import java.util.List;
 /**
  * Controller for view and managing Log Level at runtime.
  */
+@Tag(name = "Logging", description = "View and change loggers")
 @RestController
 @RequestMapping("/management")
 public class LogsResource {
 
+    @Operation(summary = "List loggers")
     @GetMapping("/logs")
     public List<LoggerVM> getList() {
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
@@ -32,6 +36,7 @@ public class LogsResource {
             .toList();
     }
 
+    @Operation(summary = "Change the level of a logger")
     @PutMapping("/logs")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void changeLevel(@RequestBody LoggerVM jsonLogger) {
@@ -46,6 +51,7 @@ public class LogsResource {
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Get the last lines of the integration log")
     @GetMapping(
         path = "/logs/{integrationid}/log/{lines}",
         produces = {MediaType.TEXT_PLAIN_VALUE}

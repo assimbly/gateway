@@ -147,8 +147,6 @@ export class FlowComponent implements OnInit, OnDestroy {
 
   ngAfterViewInit() {
     this.finished = true;
-	// Uncomment when to sync local certifcates in keystore.jks with certificates in the database
-    // this.certificateService.syncTrustore().subscribe(res => {});
   }
 
   ngOnDestroy() {
@@ -181,6 +179,7 @@ export class FlowComponent implements OnInit, OnDestroy {
           this.singleIntegrationId = integration.body.id;
           this.singleIntegrationStage = integration.body.stage ? integration.body.stage.toString().toLowerCase() : '';
           this.flowsLoading = false;
+          this.changeDetector.detectChanges();
         });
       } else {
         this.loadFlows();
@@ -263,6 +262,7 @@ export class FlowComponent implements OnInit, OnDestroy {
 
   protected onError(errorMessage: string) {
     this.flowsLoading = false;
+    this.changeDetector.detectChanges();
 		this.alertService.addAlert({
 		  type: 'danger',
 		  message: errorMessage,

@@ -1,5 +1,7 @@
 package org.assimbly.gateway.web.rest.integration;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.assimbly.gateway.service.RouteService;
 import org.assimbly.gateway.service.dto.RouteDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
@@ -19,6 +21,7 @@ import java.util.Optional;
 /**
  * REST controller for managing {@link org.assimbly.gateway.domain.Route}.
  */
+@Tag(name = "Routes", description = "Manage routes")
 @RestController
 @RequestMapping("/api")
 public class RouteResource {
@@ -40,6 +43,7 @@ public class RouteResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new routeDTO, or with status {@code 400 (Bad Request)} if the route has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @Operation(summary = "Create a route")
     @PostMapping("/routes")
     public ResponseEntity<RouteDTO> createRoute(@RequestBody RouteDTO routeDTO) throws URISyntaxException {
         log.debug("REST request to save Route : {}", routeDTO);
@@ -63,6 +67,7 @@ public class RouteResource {
      * or with status {@code 500 (Internal Server Error)} if the routeDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @Operation(summary = "Update a route")
     @PutMapping("/routes")
     public ResponseEntity<RouteDTO> updateRoute(@RequestBody RouteDTO routeDTO) throws URISyntaxException {
         log.debug("REST request to update Route : {}", routeDTO);
@@ -81,12 +86,14 @@ public class RouteResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of routes in body.
      */
+    @Operation(summary = "List routes")
     @GetMapping("/routes")
     public List<RouteDTO> getAllRoutes() {
         log.debug("REST request to get all Routes");
         return routeService.findAll();
     }
 
+    @Operation(summary = "List all routes")
     @GetMapping("/routes/getallroutes")
     @Transactional(readOnly = true)
     public ResponseEntity<List<RouteDTO>> getAllServices2() {
@@ -101,6 +108,7 @@ public class RouteResource {
      * @param id the id of the routeDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the routeDTO, or with status {@code 404 (Not Found)}.
      */
+    @Operation(summary = "Get a route")
     @GetMapping("/routes/{id}")
     public ResponseEntity<RouteDTO> getRoute(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get Route : {}", id);
@@ -114,6 +122,7 @@ public class RouteResource {
      * @param id the id of the routeDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
+    @Operation(summary = "Delete a route")
     @DeleteMapping("/routes/{id}")
     public ResponseEntity<Void> deleteRoute(@PathVariable(value = "id") Long id) {
         log.debug("REST request to delete Route : {}", id);

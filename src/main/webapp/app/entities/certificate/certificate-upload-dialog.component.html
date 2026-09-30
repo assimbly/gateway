@@ -1,25 +1,26 @@
 <form name="importForm">
     <div class="modal-header">
-        <h4 class="modal-title" id="uploadCertificateLabel">Upload certificate</h4>
+        <h4 class="modal-title" id="uploadCertificateLabel">Import trusted certificate</h4>
         <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" (click)="clear()"></button>
     </div>
     <div class="modal-body">
     	<div class="alert alert-danger" *ngIf="uploadError">
-            <strong>Upload error!</strong>{{uploadErrorMessage}}
+            <strong>Import error!</strong> {{uploadErrorMessage}}
         </div>
-        <div class="form-group">
-            <label class="form-control-label font-weight-bold" for="certificate_store" style="margin-bottom: 4px;">Certificate Store</label>
-            <select
-                type="text" id="field_certificateStore" name="certificateStore" class="form-control form-select" [(ngModel)]="certificateStore">
-                <option value="keystore">keystore</option>
-                <option value="truststore">truststore</option>
-            </select>
-        </div>
+        <p class="text-muted">
+            A CA certificate (.pem, .crt or .cer; a PEM bundle may contain several) to trust for outbound TLS connections.
+            It is stored in {{truststore}}.
+        </p>
         <div class="form-group" style="margin-top: 8px;">
             <label class="form-control-label font-weight-bold" style="margin-bottom: 4px;">Certificate File</label>
             <div class="custom-file">
-                <input type="file" id="file" class="custom-file-input" (change)='openFile($event)'>
+                <input type="file" id="file" class="custom-file-input" accept=".pem,.crt,.cer,.der" (change)='openFile($event)'>
             </div>
+        </div>
+        <div class="form-group" style="margin-top: 8px;">
+            <label for="name" class="form-control-label font-weight-bold" style="margin-bottom: 4px;">Name</label>
+            <input type="text" id="name" name="name" class="form-control" [(ngModel)]="name" #nameField="ngModel" required [pattern]="namePattern" placeholder="Example: my-root-ca">
+            <small class="form-text text-muted">Lowercase letters, digits, '.', '_' and '-'. Further certificates of a bundle get -2, -3, ...</small>
         </div>
     </div>
     <div class="modal-footer">
@@ -27,9 +28,9 @@
             <span class="fa fa-ban"></span>&nbsp;
             <span>Cancel</span>
         </button>
-        <button type="button" class="btn btn-primary" [disabled]="!certificateFile" (click)="uploadCertificate()">
+        <button type="button" class="btn btn-primary" [disabled]="!certificateFile || nameField.invalid || isSaving" (click)="importCertificates()">
             <span class="fa fa-upload"></span>&nbsp;
-            <span>Upload</span>
+            <span>Import</span>
         </button>
     </div>
 </form>

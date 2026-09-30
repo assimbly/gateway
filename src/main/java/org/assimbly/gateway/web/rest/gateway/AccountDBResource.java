@@ -1,5 +1,7 @@
 package org.assimbly.gateway.web.rest.gateway;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import org.assimbly.gateway.authenticate.domain.Status;
 import org.assimbly.gateway.authenticate.domain.Tenant;
@@ -22,6 +24,7 @@ import java.util.Objects;
 /**
  * REST controller for managing the current user's account.
  */
+@Tag(name = "Authentication", description = "Log in and check the current session")
 @RestController
 @RequestMapping("/api/db")
 public class AccountDBResource {
@@ -43,6 +46,7 @@ public class AccountDBResource {
      * @param request the HTTP request.
      * @return the token if the user is authenticated.
      */
+    @Operation(summary = "Check if the user is authenticated")
     @GetMapping("/authenticate")
     public ResponseEntity<String> isAuthenticated(HttpServletRequest request) {
         log.debug("REST request to check if the current user is authenticated");

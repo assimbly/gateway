@@ -1,27 +1,25 @@
-<form name="importForm" [formGroup]="importForm">
+<form name="importForm">
     <div class="modal-header">
-        <h4 class="modal-title" id="myGatewayLabel">Upload P12 certificate (PKCS12)</h4>
+        <h4 class="modal-title" id="myGatewayLabel">Import server identity (PKCS12)</h4>
         <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" (click)="clear()"></button>
     </div>
     <div class="modal-body">
     	<div class="alert alert-danger" *ngIf="uploadError">
-            <strong>Upload error!</strong>{{uploadErrorMessage}}
+            <strong>Import error!</strong> {{uploadErrorMessage}}
         </div>
-        <div class="form-group">
-            <label class="form-control-label font-weight-bold" for="certificate_store" style="margin-bottom: 4px;">Certificate Store</label>
-            <select
-                type="text" id="field_certificateStore" class="form-control form-select" formControlName="certificateStore">
-                <option value="keystore">keystore</option>
-                <option value="truststore">truststore</option>
-            </select>
-        </div>
+        <p class="text-muted">
+            A .p12 or .pfx file with the private key and certificate chain of the server. It is stored in {{identityStore}}.
+        </p>
         <div class="form-group" style="margin-top: 8px;">
             <label for="password" class="form-control-label font-weight-bold" style="margin-bottom: 4px;">Password</label>
-            <input type="password" id="password" formControlName="password" class="form-control" placeholder="Password">            
+            <input type="password" id="password" name="password" [(ngModel)]="password" class="form-control" placeholder="Password of the .p12 file">
             <label class="form-control-label font-weight-bold" style="margin-top: 8px;">Certificate File</label>
             <div class="custom-file">
-                <input type="file" id="file" class="custom-file-input" (change)='openFile($event)'>
+                <input type="file" id="file" class="custom-file-input" accept=".p12,.pfx" (change)='openFile($event)'>
             </div>
+            <label for="name" class="form-control-label font-weight-bold" style="margin-top: 8px;">Name</label>
+            <input type="text" id="name" name="name" class="form-control" [(ngModel)]="name" #nameField="ngModel" required [pattern]="namePattern" placeholder="Example: my-server">
+            <small class="form-text text-muted">Lowercase letters, digits, '.', '_' and '-'.</small>
         </div>
     </div>
     <div class="modal-footer">
@@ -29,9 +27,9 @@
             <span class="fa fa-ban"></span>&nbsp;
             <span>Cancel</span>
         </button>
-        <button type="button" class="btn btn-primary" [disabled]="!certificateFile" (click)="uploadP12Certificate()">
+        <button type="button" class="btn btn-primary" [disabled]="!certificateFile || nameField.invalid || isSaving" (click)="importIdentity()">
             <span class="fa fa-upload"></span>&nbsp;
-            <span>Upload</span>
+            <span>Import</span>
         </button>
     </div>
 </form>

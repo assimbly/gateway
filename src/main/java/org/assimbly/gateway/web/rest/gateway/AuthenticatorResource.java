@@ -1,5 +1,7 @@
 package org.assimbly.gateway.web.rest.gateway;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import tools.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * REST controller for managing authentication (two factor-authentication).
  */
+@Tag(name = "Two-factor authentication", description = "Register and validate two-factor authentication")
 @RestController
 @RequestMapping("/api")
 public class AuthenticatorResource {
@@ -41,6 +44,7 @@ public class AuthenticatorResource {
      * GET  /authentication/register : registers two-factor authentication by email (using GoogleAuthenticator).
      * @return the ResponseEntity with the location of the QR code to register
      */
+    @Operation(summary = "Register two-factor authentication")
     @GetMapping("/authentication/register")
     public ResponseEntity<String> registerTwoFactorAuthentication(
         @RequestHeader(value = "Authorization") String Authorization,
@@ -75,6 +79,7 @@ public class AuthenticatorResource {
      * POST  /authentication/validate : validates the two-factor authentication code
      * @return boolean (true=valid)
      */
+    @Operation(summary = "Validate a two-factor token")
     @PostMapping(
         path = "/authentication/validate",
         consumes = {MediaType.APPLICATION_JSON_VALUE}
@@ -97,6 +102,7 @@ public class AuthenticatorResource {
      * POST  /authentication/remove : unregister for 2 factor authentication at Google validates the two-factor authentication code
      * @return boolean (true=valid)
      */
+    @Operation(summary = "Remove two-factor authentication")
     @DeleteMapping(path = "/authentication/remove")
     public ResponseEntity<String> removeTwoFactorAuthentication(@RequestHeader String Authorization) {
         log.debug("REST request to delete two-factor authentication");
