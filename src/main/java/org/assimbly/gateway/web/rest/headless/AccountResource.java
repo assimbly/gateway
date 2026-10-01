@@ -1,5 +1,7 @@
 package org.assimbly.gateway.web.rest.headless;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,6 +15,7 @@ import java.security.Principal;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Tag(name = "Account", description = "Register and manage the current user")
 @RestController
 @RequestMapping("/api")
 public class AccountResource {
@@ -34,6 +37,7 @@ public class AccountResource {
      * @return the current user.
      * @throws AccountResourceException {@code 500 (Internal Server Error)} if the user couldn't be returned.
      */
+    @Operation(summary = "Get the current user")
     @GetMapping("/account")
     public UserVM getAccount(Principal principal) {
         if (principal instanceof AbstractAuthenticationToken token) {

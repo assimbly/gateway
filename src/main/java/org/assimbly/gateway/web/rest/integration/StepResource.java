@@ -1,5 +1,7 @@
 package org.assimbly.gateway.web.rest.integration;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.assimbly.gateway.domain.Step;
 import org.assimbly.gateway.repository.StepRepository;
 import org.assimbly.gateway.service.StepService;
@@ -22,6 +24,7 @@ import java.util.Optional;
 /**
  * REST controller for managing Step.
  */
+@Tag(name = "Steps", description = "Manage the steps of a flow")
 @RestController
 @RequestMapping("/api")
 public class StepResource {
@@ -49,6 +52,7 @@ public class StepResource {
      * @return the ResponseEntity with status 201 (Created) and with body the new stepDTO, or with status 400 (Bad Request) if the step has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Create a step")
     @PostMapping("/step")
     public ResponseEntity<StepDTO> createStep(@RequestBody StepDTO stepDTO) throws URISyntaxException {
         log.debug("REST request to save Step : {}", stepDTO);
@@ -70,6 +74,7 @@ public class StepResource {
      * @return the ResponseEntity with status 201 (Created) and with body the new stepDTO, or with status 400 (Bad Request) if the step has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Create steps")
     @PostMapping("/steps")
     public ResponseEntity<List<StepDTO>> createSteps(@RequestBody List<StepDTO> stepsDTO) throws URISyntaxException {
         log.debug("REST request to save List<Step> : {}", stepsDTO);
@@ -89,6 +94,7 @@ public class StepResource {
      * or with status 500 (Internal Server Error) if the stepDTO couldn't be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Update a step")
     @PutMapping("/step")
     public ResponseEntity<StepDTO> updateStep(@RequestBody StepDTO stepDTO) throws URISyntaxException {
         log.debug("REST request to update Step : {}", stepDTO);
@@ -108,6 +114,7 @@ public class StepResource {
      * or with status 500 (Internal Server Error) if the stepsDTO couldn't be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Update steps")
     @PutMapping("/steps")
     public ResponseEntity<List<StepDTO>> updateSteps(@RequestBody List<StepDTO> stepsDTO) throws URISyntaxException {
         log.debug("REST request to update Steps : {}", stepsDTO);
@@ -124,6 +131,7 @@ public class StepResource {
      *
      * @return the ResponseEntity with status 200 (OK) and the list of steps in body
      */
+    @Operation(summary = "List steps")
     @GetMapping("/steps")
     public List<StepDTO> getAllSteps() {
         log.debug("REST request to get all Steps");
@@ -136,6 +144,7 @@ public class StepResource {
      * @param id the id of the stepDTO to retrieve
      * @return the ResponseEntity with status 200 (OK) and with body the stepDTO, or with status 404 (Not Found)
      */
+    @Operation(summary = "List the steps of a flow")
     @GetMapping("/steps/byflowid/{id}")
     public List<StepDTO> getStepByFlowID(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get Steps by flowId " + id);
@@ -149,6 +158,7 @@ public class StepResource {
      * @param id the id of the stepDTO to retrieve
      * @return the ResponseEntity with status 200 (OK) and with body the stepDTO, or with status 404 (Not Found)
      */
+    @Operation(summary = "Get a step")
     @GetMapping("/step/{id}")
     public ResponseEntity<StepDTO> getStepID(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get Step : {}", id);
@@ -162,6 +172,7 @@ public class StepResource {
      * @param id the id of the stepDTO to delete
      * @return the ResponseEntity with status 200 (OK)
      */
+    @Operation(summary = "Delete a step")
     @DeleteMapping("/steps/{id}")
     public ResponseEntity<Void> deleteStep(@PathVariable(value = "id") Long id) {
         log.debug("REST request to delete Step : {}", id);
@@ -175,6 +186,7 @@ public class StepResource {
      * @param list of stepsDTO's to delete
      * @return the ResponseEntity with status 200 (OK)
      */
+    @Operation(summary = "Delete steps")
     @DeleteMapping("/steps")
     public ResponseEntity<Void> deleteSteps(@RequestBody List<StepDTO> stepsDTO) {
 

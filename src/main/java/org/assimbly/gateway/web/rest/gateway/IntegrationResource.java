@@ -1,6 +1,8 @@
 package org.assimbly.gateway.web.rest.gateway;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.assimbly.gateway.repository.IntegrationRepository;
 import org.assimbly.gateway.service.IntegrationService;
 import org.assimbly.gateway.service.dto.IntegrationDTO;
@@ -25,6 +27,7 @@ import java.util.Optional;
 /**
  * REST controller for managing Integration.
  */
+@Tag(name = "Integrations", description = "Manage integrations")
 @RestController
 @RequestMapping("/api")
 public class IntegrationResource {
@@ -52,6 +55,7 @@ public class IntegrationResource {
      * @return the ResponseEntity with status 201 (Created) and with body the new integrationDTO, or with status 400 (Bad Request) if the integration has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Create an integration")
     @PostMapping("/integrations")
     public ResponseEntity<IntegrationDTO> createIntegration(@RequestBody IntegrationDTO integrationDTO) throws URISyntaxException {
         log.debug("REST request to save Integration : {}", integrationDTO);
@@ -74,6 +78,7 @@ public class IntegrationResource {
      * or with status 500 (Internal Server Error) if the integrationDTO couldn't be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Update an integration")
     @PutMapping("/integrations")
     public ResponseEntity<IntegrationDTO> updateIntegration(@RequestBody IntegrationDTO integrationDTO) throws URISyntaxException {
         log.debug("REST request to update Integration : {}", integrationDTO);
@@ -91,6 +96,7 @@ public class IntegrationResource {
      *
      * @return the ResponseEntity with status 200 (OK) and the list of integrations in body
      */
+    @Operation(summary = "List integrations")
     @GetMapping("/integrations")
     public List<IntegrationDTO> getAllIntegrations() {
         log.debug("REST request to get all Integrations");
@@ -103,6 +109,7 @@ public class IntegrationResource {
      * @param id the id of the integrationDTO to retrieve
      * @return the ResponseEntity with status 200 (OK) and with body the integrationDTO, or with status 404 (Not Found)
      */
+    @Operation(summary = "Get an integration")
     @GetMapping("/integrations/{id}")
     public ResponseEntity<IntegrationDTO> getIntegration(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get Integration : {}", id);
@@ -116,6 +123,7 @@ public class IntegrationResource {
      * @param id the id of the integrationDTO to delete
      * @return the ResponseEntity with status 200 (OK)
      */
+    @Operation(summary = "Delete an integration")
     @DeleteMapping("/integrations/{id}")
     public ResponseEntity<Void> deleteIntegration(@PathVariable("id") Long id) {
         log.debug("REST request to delete Integration : {}", id);
@@ -131,6 +139,7 @@ public class IntegrationResource {
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Get the last lines of the integration log")
     @GetMapping(
         path = "/logs/{integrationid}/log/{lines}",
         produces = {MediaType.TEXT_PLAIN_VALUE}

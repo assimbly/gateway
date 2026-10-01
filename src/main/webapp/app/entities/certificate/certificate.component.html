@@ -7,18 +7,18 @@
           class="btn btn-fx btn-fx-primary"
           id="dropdownMenuCertificates"
           ngbDropdownToggle
-          aria-label="Add certificate"
-        >
+          aria-label="Add certificate">
           <fa-icon icon="plus"></fa-icon>
           <span class="d-none d-md-inline"> Add</span>
         </button>
         <div ngbDropdownMenu aria-labelledby="dropdownMenuCertificates">
           <h6 class="dropdown-header">Actions</h6>
-          <button type="button" ngbDropdownItem (click)="generateCertificate()">Self-Sign</button>
+          <button type="button" ngbDropdownItem id="jh-create-entity" [routerLink]="['/certificate/new']">Download certificate</button>
+          <button type="button" ngbDropdownItem (click)="generateCertificate()">Self-signed identity</button>
           <div class="dropdown-divider"></div>
-          <h6 class="dropdown-header">Upload</h6>
-          <button type="button" ngbDropdownItem (click)="uploadCertificate()">Client Certificate (.cer)</button>
-          <button type="button" ngbDropdownItem (click)="uploadP12Certificate()">Server Certificate (.p12)</button>
+          <h6 class="dropdown-header">Import</h6>
+          <button type="button" ngbDropdownItem (click)="uploadCertificate()">Trusted certificate (.pem, .crt, .cer)</button>
+          <button type="button" ngbDropdownItem (click)="uploadP12Certificate()">Server identity (.p12, .pfx)</button>
         </div>
       </div>
       <button class="btn btn-fx btn-fx-secondary" type="button" (click)="reset()" aria-label="Refresh">

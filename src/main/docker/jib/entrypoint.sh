@@ -36,6 +36,8 @@ file_env 'SPRING_LIQUIBASE_USER'
 file_env 'SPRING_LIQUIBASE_PASSWORD'
 file_env 'JHIPSTER_REGISTRY_PASSWORD'
 
+/bin/bash /migrate_jks_to_pkcs12.sh /data/.assimbly/security
+
 # exploded
 exec java ${JAVA_OPTS} -Djdk.tls.useExtendedMasterSecret=false -XX:+UnlockDiagnosticVMOptions -XX:NativeMemoryTracking=summary -XX:+AlwaysPreTouch -Djava.security.egd=file:/dev/./urandom --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED -cp /app/resources/:/app/classes/:/app/libs/* "org.assimbly.gateway.GatewayApp"  "$@" --application.gateway.base-directory=/data/ --server.port=8088
 

@@ -1,5 +1,7 @@
 package org.assimbly.gateway.web.rest.integration;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.assimbly.gateway.config.EncryptionProperties;
 import org.assimbly.gateway.service.ConnectionKeysService;
 import org.assimbly.gateway.service.dto.ConnectionKeysDTO;
@@ -22,6 +24,7 @@ import java.util.Properties;
 /**
  * REST controller for managing ConnectionKeys.
  */
+@Tag(name = "Connection keys", description = "Manage the properties of connections")
 @RestController
 @RequestMapping("/api")
 public class ConnectionKeysResource {
@@ -46,6 +49,7 @@ public class ConnectionKeysResource {
      * @return the ResponseEntity with status 201 (Created) and with body the new connectionKeysDTO, or with status 400 (Bad Request) if the connectionKeys has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Create a connection key")
     @PostMapping("/connection-keys")
     public ResponseEntity<ConnectionKeysDTO> createConnectionKeys(@RequestBody ConnectionKeysDTO connectionKeysDTO) throws URISyntaxException {
         log.debug("REST request to save ConnectionKeys : {}", connectionKeysDTO);
@@ -76,6 +80,7 @@ public class ConnectionKeysResource {
      * or with status 500 (Internal Server Error) if the connectionKeysDTO couldn't be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Update a connection key")
     @PutMapping("/connection-keys")
     public ResponseEntity<ConnectionKeysDTO> updateConnectionKeys(@RequestBody ConnectionKeysDTO connectionKeysDTO) throws URISyntaxException {
         log.debug("REST request to update ConnectionKeys : {}", connectionKeysDTO);
@@ -101,6 +106,7 @@ public class ConnectionKeysResource {
      *
      * @return the ResponseEntity with status 200 (OK) and the list of connectionKeys in body
      */
+    @Operation(summary = "List connection keys")
     @GetMapping("/connection-keys")
     public List<ConnectionKeysDTO> getAllConnectionKeys() {
         log.debug("REST request to get all ConnectionKeys");
@@ -113,6 +119,7 @@ public class ConnectionKeysResource {
      * @param id the id of the connectionKeysDTO to retrieve
      * @return the ResponseEntity with status 200 (OK) and with body the connectionKeysDTO, or with status 404 (Not Found)
      */
+    @Operation(summary = "Get a connection key")
     @GetMapping("/connection-keys/{id}")
     public ResponseEntity<ConnectionKeysDTO> getConnectionKeys(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get ConnectionKeys : {}", id);
@@ -126,6 +133,7 @@ public class ConnectionKeysResource {
      * @param id the id of the connectionKeysDTO to delete
      * @return the ResponseEntity with status 200 (OK)
      */
+    @Operation(summary = "Delete a connection key")
     @DeleteMapping("/connection-keys/{id}")
     public ResponseEntity<Void> deleteConnectionKeys(@PathVariable(value = "id") Long id) {
         log.debug("REST request to delete ConnectionKeys : {}", id);

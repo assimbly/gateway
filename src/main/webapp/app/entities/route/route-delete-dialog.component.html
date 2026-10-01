@@ -1,4 +1,4 @@
-<form *ngIf="route" name="deleteForm" (ngSubmit)="confirmDelete(route.id!)">
+<form *ngIf="route" name="deleteForm" (submit)="$event.preventDefault()">
     <div class="modal-header">
         <h4 class="modal-title">Confirm delete operation</h4>
         <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" (click)="cancel()"></button>		
@@ -15,7 +15,7 @@
             <fa-icon icon="ban"></fa-icon>&nbsp;<span>Cancel</span>
         </button>
 
-        <button id="jhi-confirm-delete-route" type="submit" class="btn btn-danger">
+        <button id="jhi-confirm-delete-route" type="button" (click)="confirmDelete(route.id!)" class="btn btn-danger">
             <fa-icon icon="times"></fa-icon>&nbsp;<span>Delete</span>
         </button>
     </div>

@@ -12,7 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -95,10 +94,6 @@ public class CertificateServiceImpl implements CertificateService {
 
     public List<Certificate> findAllByUrl(String url) {
 		return certificateRepository.findAllByUrl(url);
-	}
-
-    public List<Certificate> findAllByCertificateExpiryBetween(Instant dateNow, Instant dateOfExpiry) {
-		return certificateRepository.findAllByCertificateExpiryBetween(dateNow, dateOfExpiry);
 	}
 
     public Optional<Certificate> findByCertificateName(String certificateName) {

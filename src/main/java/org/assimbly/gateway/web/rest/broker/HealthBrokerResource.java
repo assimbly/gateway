@@ -2,6 +2,8 @@ package org.assimbly.gateway.web.rest.broker;
 
 import tools.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.assimbly.brokerrest.ManagedBrokerRuntime;
 import org.assimbly.gateway.service.HealthService;
 import org.assimbly.gateway.service.response.BackendResponse;
@@ -27,6 +29,7 @@ import java.util.Map;
 /**
  * REST controller for getting the {@link AuditEvent}s.
  */
+@Tag(name = "Broker health", description = "Health of the broker")
 @RestController
 @RequestMapping("/health/broker")
 public class HealthBrokerResource {
@@ -44,6 +47,7 @@ public class HealthBrokerResource {
 
     private boolean plainResponse;
 
+    @Operation(summary = "Get broker statistics")
     @GetMapping(
         path = "/engine",
         produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE}
@@ -68,6 +72,7 @@ public class HealthBrokerResource {
         }
     }
 
+    @Operation(summary = "Get broker JVM statistics")
     @GetMapping(
         path = "/jvm",
         produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE}

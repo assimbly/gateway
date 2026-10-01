@@ -1,5 +1,7 @@
 package org.assimbly.gateway.web.rest.gateway;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.DefaultProfileUtil;
 import org.springframework.core.env.Environment;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Resource to return information about the currently running Spring profiles.
  */
+@Tag(name = "Application info", description = "Information about the gateway")
 @RestController
 @RequestMapping("/api")
 public class ProfileInfoResource {
@@ -23,12 +26,14 @@ public class ProfileInfoResource {
         this.documentation = applicationProperties.getDocumentation();
     }
 
+    @Operation(summary = "Get the active profiles")
     @GetMapping("/profile-info")
     public ProfileInfoVM getActiveProfiles() {
         String[] activeProfiles = DefaultProfileUtil.getActiveProfiles(env);
         return new ProfileInfoVM(activeProfiles);
     }
 
+    @Operation(summary = "Get the documentation URL")
     @GetMapping("/documentation/url")
     public String getUrl() {
         return documentation.getCamelUrl();

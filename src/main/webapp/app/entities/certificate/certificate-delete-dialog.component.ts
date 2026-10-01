@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component } from '@angular/core';
+import { switchMap } from 'rxjs';
 
-import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AlertError } from 'app/shared/alert';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
@@ -16,6 +16,7 @@ import { CertificateService } from './certificate.service';
 })
 export class CertificateDeleteDialogComponent {
     certificate: ICertificate;
+    isDeleting = false;
 
     constructor(protected certificateService: CertificateService, public activeModal: NgbActiveModal, protected eventManager: EventManager) {}
 
@@ -24,11 +25,16 @@ export class CertificateDeleteDialogComponent {
     }
 
     confirmDelete(id: number) {
-        this.certificateService.deleteCertificate(this.certificate.certificateName).subscribe(res => {
-            this.certificateService.delete(id).subscribe(response => {
-			    this.eventManager.broadcast(new EventWithContent('certificateListModification', 'Deleted an certificate'));
-                this.activeModal.dismiss(true);
+        this.isDeleting = true;
+        this.certificateService
+            .deleteCertificate(this.certificate.certificateName, this.certificate.certificateStore)
+            .pipe(switchMap(() => this.certificateService.delete(id)))
+            .subscribe({
+                next: () => {
+                    this.eventManager.broadcast(new EventWithContent('certificateListModification', 'Deleted a certificate'));
+                    this.activeModal.dismiss(true);
+                },
+                error: () => (this.isDeleting = false),
             });
-        });
     }
 }

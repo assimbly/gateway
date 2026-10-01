@@ -1,5 +1,7 @@
 package org.assimbly.gateway.web.rest.gateway;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.assimbly.gateway.jdbc.adapter.DatabaseAdapter;
 import org.assimbly.gateway.jdbc.domain.ConnectionType;
 import org.assimbly.gateway.jdbc.domain.JDBCConnection;
@@ -19,6 +21,7 @@ import java.sql.SQLException;
 /**
  * REST controller for testing jdbc connections
  */
+@Tag(name = "JDBC", description = "Test database connections")
 @RestController
 @RequestMapping("/api")
 public class JDBCResource {
@@ -28,6 +31,7 @@ public class JDBCResource {
     /**
      * GET  /validation/jdbc : test jdbc
      */
+    @Operation(summary = "Validate a JDBC connection")
     @GetMapping(
         path = "/validation/jdbc",
         produces = {MediaType.APPLICATION_JSON_VALUE}

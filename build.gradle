@@ -149,6 +149,7 @@ jib {
         }
         permissions = [
             '/entrypoint.sh': '755',
+            '/migrate_jks_to_pkcs12.sh': '755',
             '/data/**': '775',
             '/data/**/*': '775',
         ]

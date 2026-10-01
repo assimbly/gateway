@@ -1,5 +1,7 @@
 package org.assimbly.gateway.web.rest.gateway;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.assimbly.gateway.service.AuditEventService;
 import org.springframework.boot.actuate.audit.AuditEvent;
 import org.springframework.data.domain.Page;
@@ -20,6 +22,7 @@ import java.util.List;
 /**
  * REST controller for getting the {@link AuditEvent}s.
  */
+@Tag(name = "Audits", description = "Audit events")
 @RestController
 @RequestMapping("/management/audits")
 public class AuditResource {
@@ -36,6 +39,7 @@ public class AuditResource {
      * @param pageable the pagination information.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of {@link AuditEvent}s in body.
      */
+    @Operation(summary = "List audit events")
     @GetMapping
     public ResponseEntity<List<AuditEvent>> getAll(Pageable pageable) {
         Page<AuditEvent> page = auditEventService.findAll(pageable);
@@ -51,6 +55,7 @@ public class AuditResource {
      * @param pageable the pagination information.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of {@link AuditEvent} in body.
      */
+    @Operation(summary = "List audit events in a date range")
     @GetMapping(params = { "fromDate", "toDate" })
     public ResponseEntity<List<AuditEvent>> getByDates(
         @RequestParam(value = "fromDate") LocalDate fromDate,
@@ -71,6 +76,7 @@ public class AuditResource {
      * @param id the id of the entity to get.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the {@link AuditEvent} in body, or status {@code 404 (Not Found)}.
      */
+    @Operation(summary = "Get an audit event")
     @GetMapping("/{id:.+}")
     public ResponseEntity<AuditEvent> get(@PathVariable(value = "id") Long id) {
         return ResponseUtil.wrapOrNotFound(auditEventService.find(id));

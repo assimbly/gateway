@@ -1,5 +1,7 @@
 package org.assimbly.gateway.web.rest.gateway;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.assimbly.gateway.domain.Certificate;
 import org.assimbly.gateway.service.CertificateService;
 import org.assimbly.gateway.service.dto.CertificateDTO;
@@ -28,6 +30,7 @@ import static org.assimbly.util.CertificatesUtil.convertPemToX509Certificate;
 /**
  * REST controller for managing Certifcate.
  */
+@Tag(name = "Certificate resources", description = "Manage the certificate records of the gateway")
 @RestController
 @RequestMapping("/api")
 public class CertificateResource {
@@ -44,13 +47,14 @@ public class CertificateResource {
 
 
     /**
-     * POST  /certificates : Create a new certificate.
+     * POST  /certificate-resources : Create a new certificate.
      *
      * @param certificateDTO the certificateDTO to create
      * @return the ResponseEntity with status 201 (Created) and with body the new certificateDTO, or with status 400 (Bad Request) if the certificate has already an ID
      * @throws Exception
      */
-    @PostMapping("/certificates")
+    @Operation(summary = "Create a certificate")
+    @PostMapping("/certificate-resources")
     public ResponseEntity<CertificateDTO> createCertificate(@RequestBody CertificateDTO certificateDTO) throws Exception {
         log.debug("REST request to save Certificate : {}", certificateDTO);
 
@@ -73,7 +77,7 @@ public class CertificateResource {
     }
 
     /**
-     * PUT  /certificates : Updates an existing certificate.
+     * PUT  /certificate-resources : Updates an existing certificate.
      *
      * @param certificateDTO the certificateDTO to update
      * @return the ResponseEntity with status 200 (OK) and with body the updated certificateDTO,
@@ -81,7 +85,8 @@ public class CertificateResource {
      * or with status 500 (Internal Server Error) if the certificateDTO couldn't be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @PutMapping("/certificates")
+    @Operation(summary = "Update a certificate")
+    @PutMapping("/certificate-resources")
     public ResponseEntity<CertificateDTO> updateCertificate(@RequestBody CertificateDTO certificateDTO) throws URISyntaxException {
         log.debug("REST request to update Certificate : {}", certificateDTO);
         if (certificateDTO.getId() == null) {
@@ -94,25 +99,27 @@ public class CertificateResource {
     }
 
     /**
-     * GET  /certificates : get all the certificates.
+     * GET  /certificate-resources : get all the certificates.
      *
      * @param pageable the pagination information
      * @return the ResponseEntity with status 200 (OK) and the list of certificates in body
      */
-    @GetMapping("/certificates")
+    @Operation(summary = "List certificates (paged)")
+    @GetMapping("/certificate-resources")
     public ResponseEntity<List<CertificateDTO>> getAllCertificates(Pageable pageable) {
         log.debug("REST request to get a page of Certificates");
         Page<CertificateDTO> page = certificateService.findAll(pageable);
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/certificates");
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/certificate-resources");
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
     /**
-     * Remote  /certificates/all : get all certificates
+     * Remote  /certificate-resources/all : get all certificates
      *
      * @return the ResponseEntity with status 200 (OK)
      */
-    @GetMapping("/certificates/all")
+    @Operation(summary = "List all certificates")
+    @GetMapping("/certificate-resources/all")
     public ResponseEntity<String> getAllCertificates() throws Exception {
         log.debug("REST request to get all certificates");
 
@@ -129,12 +136,13 @@ public class CertificateResource {
 
 
     /**
-     * Remote /certificates/byurl:url : delete the "url" certificate.
+     * Remote /certificate-resources/byurl:url : delete the "url" certificate.
      *
      * @param url the url to get the certificates
      * @return the ResponseEntity with status 200 (OK)
      */
-    @PostMapping("/certificates/byurl")
+    @Operation(summary = "Get the certificates of a URL")
+    @PostMapping("/certificate-resources/byurl")
     public ResponseEntity<String> getCertificatesByUrl(@RequestBody String url) throws Exception {
 
         log.debug("REST request to get all certificates by url {}", url);
@@ -147,19 +155,21 @@ public class CertificateResource {
     }
 
     /**
-     * GET  /certificates/:id : get the "id" certificate.
+     * GET  /certificate-resources/:id : get the "id" certificate.
      *
      * @param id the id of the certificateDTO to retrieve
      * @return the ResponseEntity with status 200 (OK) and with body the certificateDTO, or with status 404 (Not Found)
      */
-    @GetMapping("/certificates/{id}")
+    @Operation(summary = "Get a certificate")
+    @GetMapping("/certificate-resources/{id}")
     public ResponseEntity<CertificateDTO> getCertificate(@PathVariable(value = "id") Long id){
         log.debug("REST request to get Certificate : {}", id);
         Optional<CertificateDTO> certificateDTO = certificateService.findOne(id);
-        return ResponseEntity.ok().body(certificateDTO.get());
+        return ResponseEntity.of(certificateDTO);
     }
 
-    @GetMapping("/certificates/details/{certificateName}")
+    @Operation(summary = "Get the details of a certificate")
+    @GetMapping("/certificate-resources/details/{certificateName}")
     public ResponseEntity<String> getCertificateDetails(@PathVariable(value = "certificateName") String certificateName) throws Exception{
 
         log.debug("REST request to get certificate details for certificate: " + certificateName);
@@ -169,9 +179,14 @@ public class CertificateResource {
         }
 
         Optional<Certificate> certificate = certificateService.findByCertificateName(certificateName);
-        String certificateFile = certificate.get().getCertificateFile();
+        if (certificate.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
 
-        X509Certificate real = convertPemToX509Certificate(certificateFile);
+        X509Certificate real = convertPemToX509Certificate(certificate.get().getCertificateFile());
+        if (real == null) {
+            return ResponseEntity.notFound().build();
+        }
 
         String certificateString = "Type=" + real.getType() + ";Signing Algorithm=" + real.getSigAlgName() + ";IssuerDN Principal=" + real.getIssuerX500Principal() + ";SubjectDN Principal=" + real.getSubjectX500Principal();
 
@@ -180,12 +195,13 @@ public class CertificateResource {
     }
 
     /**
-     * DELETE  /certificates/:id : delete the "id" certificate.
+     * DELETE  /certificate-resources/:id : delete the "id" certificate.
      *
      * @param id the id of the certificateDTO to delete
      * @return the ResponseEntity with status 200 (OK)
      */
-    @DeleteMapping("/certificates/{id}")
+    @Operation(summary = "Delete a certificate")
+    @DeleteMapping("/certificate-resources/{id}")
     public ResponseEntity<Void> deleteCertificate(@PathVariable("id") Long id) throws Exception {
         log.debug("REST request to delete Certificate : {}", id);
         Optional<CertificateDTO> certificateDTO = certificateService.findOne(id);
@@ -204,12 +220,13 @@ public class CertificateResource {
     }
 
     /**
-     * Remote  /certificates/:id : delete the "url" certificate.
+     * Remote  /certificate-resources/:id : delete the "url" certificate.
      *
      * @param url the url of the certificateDTO to delete
      * @return the ResponseEntity with status 200 (OK)
      */
-    @PostMapping("/certificates/remove")
+    @Operation(summary = "Remove the certificates of a URL")
+    @PostMapping("/certificate-resources/remove")
     public ResponseEntity<Void> removeByUrl(@RequestBody String url) {
         log.debug("REST request to remove certificates in truststore for url {}", url);
         List<Certificate> certificates = certificateService.findAllByUrl(url);
@@ -219,23 +236,6 @@ public class CertificateResource {
         }
 
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, "delete")).build();
-    }
-
-    @GetMapping("/certificates/isexpired/{withinNumberOfDays}")
-    public ResponseEntity<Boolean> isExpired(@PathVariable(value = "withinNumberOfDays") int withinNumberOfDays) {
-
-        log.debug("REST request returns if a certificate will expire with the given days: " + withinNumberOfDays);
-
-        boolean isExpired;
-        Instant dateNow = Instant.now();
-        Instant dateOfExpiry = Instant.now().plusSeconds(withinNumberOfDays * 86400L);
-
-        List<Certificate> listExpired = certificateService.findAllByCertificateExpiryBetween(dateNow, dateOfExpiry);
-
-        isExpired = !listExpired.isEmpty();
-
-        return ResponseEntity.ok().body(isExpired);
-
     }
 
     private String certificatesAsJSon2(List<Certificate> certificates) throws CertificateException {

@@ -1,5 +1,7 @@
 package org.assimbly.gateway.web.rest.gateway;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
 import org.assimbly.gateway.security.jwt.JWTFilter;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Controller to authenticate users.
  */
+@Tag(name = "Authentication", description = "Log in and check the current session")
 @RestController
 @RequestMapping("/api")
 public class UserJWTController {
@@ -33,6 +36,7 @@ public class UserJWTController {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
     }
 
+    @Operation(summary = "Log in and get a JWT")
     @PostMapping("/authenticate")
     public ResponseEntity<JWTToken> authorize(@Valid @RequestBody LoginVM loginVM) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(

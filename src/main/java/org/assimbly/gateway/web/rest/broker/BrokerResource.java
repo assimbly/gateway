@@ -1,5 +1,7 @@
 package org.assimbly.gateway.web.rest.broker;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.context.annotation.Lazy;
 import jakarta.annotation.PostConstruct;
 import org.assimbly.brokerrest.ManagedBrokerRuntime;
@@ -22,6 +24,7 @@ import java.util.Optional;
 /**
  * REST controller for managing Broker.
  */
+@Tag(name = "Brokers", description = "Manage the broker configurations")
 @Lazy(false)
 @RestController
 @RequestMapping("/api")
@@ -47,6 +50,7 @@ public class BrokerResource {
      * @return the ResponseEntity with status 201 (Created) and with body the new brokerDTO, or with status 400 (Bad Request) if the broker has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Create a broker")
     @PostMapping("/brokers")
     public ResponseEntity<BrokerDTO> createBroker(@RequestBody BrokerDTO brokerDTO) throws URISyntaxException {
         log.debug("REST request to save Broker : {}", brokerDTO);
@@ -69,6 +73,7 @@ public class BrokerResource {
      * or with status 500 (Internal Server Error) if the brokerDTO couldn't be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Update a broker")
     @PutMapping("/brokers")
     public ResponseEntity<BrokerDTO> updateBroker(@RequestBody BrokerDTO brokerDTO) throws URISyntaxException {
         log.debug("REST request to update Broker : {}", brokerDTO);
@@ -85,6 +90,7 @@ public class BrokerResource {
      * @param id the id of the brokerDTO to delete
      * @return the ResponseEntity with status 200 (OK)
      */
+    @Operation(summary = "Delete a broker")
     @DeleteMapping("/brokers/{id}")
     public ResponseEntity<Void> deleteBroker(@PathVariable(value = "id") Long id) {
         log.debug("REST request to delete Broker : {}", id);
@@ -97,6 +103,7 @@ public class BrokerResource {
      *
      * @return the ResponseEntity with status 200 (OK) and the list of brokers in body
      */
+    @Operation(summary = "List brokers")
     @GetMapping("/brokers")
     public List<BrokerDTO> getAllBrokers() {
         log.debug("REST request to get all Brokers");
@@ -109,6 +116,7 @@ public class BrokerResource {
      * @param id the id of the brokerDTO to retrieve
      * @return the ResponseEntity with status 200 (OK) and with body the brokerDTO, or with status 404 (Not Found)
      */
+    @Operation(summary = "Get a broker")
     @GetMapping("/brokers/{id}")
     public ResponseEntity<BrokerDTO> getBroker(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get Broker : {}", id);
@@ -122,6 +130,7 @@ public class BrokerResource {
      * @param id, the id of the broker to retrieve
      * @return the brokerType (artemis or classic) with status 200 (OK) or with status 404 (Not Found)
      */
+    @Operation(summary = "Get the type of a broker")
     @GetMapping("/brokers/{id}/type")
     public String getBrokerType(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get type of Broker : {}", id);

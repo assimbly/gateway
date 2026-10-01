@@ -1,5 +1,7 @@
 package org.assimbly.gateway.web.rest.headless;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
 import jakarta.ws.rs.core.Response;
@@ -29,6 +31,7 @@ import java.util.UUID;
 /**
  * REST controller for managing oauth2 (Open Authorization v2).
  */
+@Tag(name = "Email", description = "Send email")
 @RestController
 @RequestMapping("/api/email")
 public class EmailResource {
@@ -45,6 +48,7 @@ public class EmailResource {
      * GET  /info : requests oauth2 access token info
      * @return Map token information
      */
+    @Operation(summary = "Send an email")
     @PostMapping(
         path = "/send",
         produces = {MediaType.APPLICATION_JSON_VALUE}

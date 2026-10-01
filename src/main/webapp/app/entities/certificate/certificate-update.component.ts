@@ -1,21 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { forkJoin } from 'rxjs';
-import dayjs from 'dayjs/esm';
+import { switchMap } from 'rxjs/operators';
 import { DATE_TIME_FORMAT } from 'app/config/input.constants';
-import { environment } from 'environments/environment';
 
 import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AlertError } from 'app/shared/alert';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
 import { ICertificate } from 'app/shared/model/certificate.model';
 import { CertificateService } from './certificate.service';
-
-// import { faSync } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'jhi-certificate-update',
@@ -26,8 +23,15 @@ export class CertificateUpdateComponent implements OnInit {
   certificate: ICertificate;
   isSaving: boolean;
   certificateExpiry: string;
+  certificateType = 'root';
+  errorMessage: string;
 
-  constructor(protected certificateService: CertificateService, protected activatedRoute: ActivatedRoute, protected router: Router,) {}
+  constructor(
+    protected certificateService: CertificateService,
+    protected activatedRoute: ActivatedRoute,
+    protected router: Router,
+    protected eventManager: EventManager,
+  ) {}
 
   ngOnInit() {
     this.isSaving = false;
@@ -41,107 +45,65 @@ export class CertificateUpdateComponent implements OnInit {
     window.history.back();
   }
 
+  /** Downloads the certificates of the url's domain; fails when they were added before (use Renew). */
   add() {
-    this.isSaving = true;
-
-    this.certificate.certificateExpiry = this.certificateExpiry != null ? dayjs(this.certificateExpiry, DATE_TIME_FORMAT) : null;
-
-    this.certificateService.importCertificate(this.certificate.url, 'truststore.jks', environment.KEYSTORE_PWD).subscribe(
-      res => {
-        const json = JSON.parse(res.body);
-
-        for (let i = 0; i < json.certificates.certificate.length; i++) {
-          const certificate = json.certificates.certificate[i];
-          this.certificate.certificateName = certificate.certificateName;
-          this.certificate.certificateFile = certificate.certificateFile;
-          this.certificate.certificateExpiry = dayjs(certificate.certificateExpiry, DATE_TIME_FORMAT);
-          if (this.certificate.id !== undefined) {
-            this.subscribeToAddResponse(this.certificateService.update(this.certificate));
-          } else {
-            this.subscribeToAddResponse(this.certificateService.create(this.certificate));
-          }
-        }
-      },
-      err => console.log(err)
+    this.run(
+      this.certificateService
+        .addDomainCertificates(this.domain(), this.certificateType)
+        .pipe(switchMap(res => this.certificateService.createFromRuntimeResponse(res.body, this.certificate.url))),
     );
   }
 
+  /** Removes the certificates of the url's domain from the truststore, and their records. */
   remove() {
-    this.isSaving = true;
-    this.certificate.certificateExpiry = this.certificateExpiry != null ? dayjs(this.certificateExpiry, DATE_TIME_FORMAT) : null;
-
-    this.certificateService.findByUrl(this.certificate.url).subscribe(
-      res => {
-        const json = res.body;
-
-        const observables: Observable<any>[] = [];
-
-        for (let i = 0; i < json.certificates.certificate.length; i++) {
-          const certificate = json.certificates.certificate[i];
-
-          observables.push(this.certificateService.deleteCertificate(certificate.certificateName));
-        }
-
-        forkJoin(observables).subscribe(dataArray => {
-          // All observables in `observables` array have resolved and `dataArray` is an array of result of each observable
-        });
-
-        this.subscribeToRemoveResponse(this.certificateService.remove(this.certificate.url));
-      },
-      err => console.log(err)
+    this.run(
+      this.certificateService
+        .deleteDomainCertificates(this.domain())
+        .pipe(switchMap(() => this.certificateService.remove(this.certificate.url))),
     );
   }
 
+  /** Downloads the certificates of the url's domain again and replaces the stored ones, and their records. */
   renew() {
+    this.run(
+      this.certificateService.renewDomainCertificates(this.domain(), this.certificateType).pipe(
+        switchMap(res =>
+          this.certificateService
+            .remove(this.certificate.url)
+            .pipe(switchMap(() => this.certificateService.createFromRuntimeResponse(res.body, this.certificate.url))),
+        ),
+      ),
+    );
+  }
+
+  /** The host (with a non-default port) of the url, which identifies its certificates in the truststore. */
+  protected domain(): string {
+    return new URL(this.certificate.url).host;
+  }
+
+  protected run(action: Observable<any>) {
     this.isSaving = true;
-    this.certificate.certificateExpiry = this.certificateExpiry != null ? dayjs(this.certificateExpiry, DATE_TIME_FORMAT) : null;
-    this.certificateService.findByUrl(this.certificate.url).subscribe(
-      res => {
-        const json = res.body;
-
-        const observables: Observable<any>[] = [];
-
-        for (let i = 0; i < json.certificates.certificate.length; i++) {
-          const certificate = json.certificates.certificate[i];
-
-          observables.push(this.certificateService.deleteCertificate(certificate.certificateName));
-        }
-
-        forkJoin(observables).subscribe(dataArray => {
-          this.certificateService.remove(this.certificate.url).subscribe(res2 => {
-            this.add();
-          });
-        });
-      },
-      err => console.log(err)
-    );
-  }
-
-  protected subscribeToAddResponse(result: Observable<HttpResponse<ICertificate>>) {
-    result.subscribe(
-      (res: HttpResponse<ICertificate>) => this.onSaveSuccess(),
-      (res: HttpErrorResponse) => this.onSaveError()
-    );
-  }
-
-  protected subscribeToRemoveResponse(result: Observable<HttpResponse<ICertificate>>) {
-    result.subscribe(
-      (res: HttpResponse<ICertificate>) => this.onSaveSuccess(),
-      (res: HttpErrorResponse) => this.onSaveError()
+    this.errorMessage = null;
+    action.subscribe(
+      () => this.onSaveSuccess(),
+      (err: HttpErrorResponse) => this.onSaveError(err),
     );
   }
 
   protected onSaveSuccess() {
     this.isSaving = false;
-    this.router.navigate(['/certificate']);
+    this.router.navigate(['/certificate']).then(() => {
+      this.eventManager.broadcast(new EventWithContent('certificateListModification', 'OK'));
+    });
   }
 
-  protected onSaveError() {
+  protected onSaveError(err: HttpErrorResponse) {
     this.isSaving = false;
+    this.errorMessage = err.status === 409 ? 'The certificates of this url were already added, use Renew to download them again.' : err.error || err.message;
+    console.log(err);
   }
 
   protected goBack() {
-      window.history.back();
+    window.history.back();
   }
-
 }

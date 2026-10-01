@@ -42,30 +42,32 @@
         };
 
         const baseUrl = 'v3/api-docs';
+        // Groups of OpenApiGroupsConfiguration, in dropdown order. Unknown groups are added at the end.
+        const groupLabels = {
+          integration: 'Integration runtime',
+          broker: 'Broker runtime',
+          configuration: 'Configuration',
+          resources: 'Resources',
+          observability: 'Observability',
+          springdocDefault: 'All endpoints',
+          management: 'Management (actuator)',
+        };
+        const groupOrder = Object.keys(groupLabels);
+        const rank = group => (groupOrder.includes(group) ? groupOrder.indexOf(group) : groupOrder.length);
         let urls;
 
         if (!urls || urls.length === 0) {
           const response = await axios.get('/management/jhiopenapigroups', axiosConfig);
           if (Array.isArray(response.data)) {
-            urls = response.data.map(({ group, description }) => ({ name: description, url: `${serverBaseUri}${baseUrl}/${group}` }));
+            urls = response.data
+              .slice()
+              .sort((a, b) => rank(a.group) - rank(b.group) || a.description.localeCompare(b.description))
+              .map(({ group, description }) => ({ name: groupLabels[group] || description, url: `${serverBaseUri}${baseUrl}/${group}` }));
           } else {
             urls = [{ name: 'default', url: `${serverBaseUri}${baseUrl}` }];
           }
         }
         console.log(`Swagger urls`, urls);
-
-        if (urls) {
-          urls.sort(function (a, b) {
-            var x = a.name.toLowerCase(),
-              y = b.name.toLowerCase();
-            if (x.includes('(default)')) return -1;
-            if (y.includes('(default)')) return 1;
-            if (x.includes('(management)')) return -1;
-            if (y.includes('(management)')) return 1;
-            if (x < y) return -1;
-            return x > y ? 1 : 0;
-          });
-        }
 
         // Build a system
         var ui = SwaggerUIBundle({

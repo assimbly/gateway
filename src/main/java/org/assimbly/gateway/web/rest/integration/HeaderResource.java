@@ -1,5 +1,7 @@
 package org.assimbly.gateway.web.rest.integration;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.assimbly.gateway.service.HeaderService;
 import org.assimbly.gateway.service.dto.HeaderDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
@@ -18,6 +20,7 @@ import java.util.Optional;
 /**
  * REST controller for managing Header.
  */
+@Tag(name = "Headers", description = "Manage message headers")
 @RestController
 @RequestMapping("/api")
 public class HeaderResource {
@@ -39,6 +42,7 @@ public class HeaderResource {
      * @return the ResponseEntity with status 201 (Created) and with body the new headerDTO, or with status 400 (Bad Request) if the header has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Create a header")
     @PostMapping("/header")
     public ResponseEntity<HeaderDTO> createHeader(@RequestBody HeaderDTO headerDTO) throws URISyntaxException {
         log.debug("REST request to save Header : {}", headerDTO);
@@ -63,6 +67,7 @@ public class HeaderResource {
      * or with status 500 (Internal Server Error) if the headerDTO couldn't be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Update a header")
     @PutMapping("/header")
     public ResponseEntity<HeaderDTO> updateHeader(@RequestBody HeaderDTO headerDTO) throws URISyntaxException {
         log.debug("REST request to update Header : {}", headerDTO);
@@ -78,6 +83,7 @@ public class HeaderResource {
      *
      * @return the ResponseEntity with status 200 (OK) and the list of header in body
      */
+    @Operation(summary = "List headers")
     @GetMapping("/header")
     public List<HeaderDTO> getAllHeader() {
         log.debug("REST request to get all Header");
@@ -90,6 +96,7 @@ public class HeaderResource {
      * @param id the id of the headerDTO to retrieve
      * @return the ResponseEntity with status 200 (OK) and with body the headerDTO, or with status 404 (Not Found)
      */
+    @Operation(summary = "Get a header")
     @GetMapping("/header/{id}")
     public ResponseEntity<HeaderDTO> getHeader(@PathVariable(value = "id") Long id) {
         log.debug("REST request to get Header : {}", id);
@@ -103,6 +110,7 @@ public class HeaderResource {
      * @param id the id of the headerDTO to delete
      * @return the ResponseEntity with status 200 (OK)
      */
+    @Operation(summary = "Delete a header")
     @DeleteMapping("/header/{id}")
     public ResponseEntity<Void> deleteHeader(@PathVariable(value = "id") Long id) {
         log.debug("REST request to delete Header : {}", id);

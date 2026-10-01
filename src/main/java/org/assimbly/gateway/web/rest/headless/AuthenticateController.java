@@ -1,5 +1,7 @@
 package org.assimbly.gateway.web.rest.headless;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -31,6 +33,7 @@ import static org.assimbly.gateway.security.SecurityUtils.JWT_ALGORITHM;
 /**
  * Controller to authenticate users.
  */
+@Tag(name = "Authentication", description = "Log in and check the current session")
 @RestController
 @RequestMapping("/api")
 public class AuthenticateController {
@@ -52,6 +55,7 @@ public class AuthenticateController {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
     }
 
+    @Operation(summary = "Log in and get a JWT")
     @PostMapping("/authenticate")
     public ResponseEntity<JWTToken> authorize(@Valid @RequestBody LoginVM loginVM) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
@@ -73,6 +77,7 @@ public class AuthenticateController {
      * @param request the HTTP request.
      * @return the login if the user is authenticated.
      */
+    @Operation(summary = "Check if the user is authenticated")
     @GetMapping("/authenticate")
     public String isAuthenticated(HttpServletRequest request) {
         log.debug("REST request to check if the current user is authenticated");

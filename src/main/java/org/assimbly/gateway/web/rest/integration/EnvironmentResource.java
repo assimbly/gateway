@@ -1,6 +1,8 @@
 package org.assimbly.gateway.web.rest.integration;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.assimbly.gateway.config.exporting.Export;
 import org.assimbly.gateway.config.importing.Import;
 import org.assimbly.gateway.web.rest.util.ResponseUtil;
@@ -16,6 +18,7 @@ import java.net.URISyntaxException;
 /**
  * Resource to return information about the currently running Spring profiles.
  */
+@Tag(name = "Configuration", description = "Import and export the configuration of integrations and flows")
 @RestController
 @RequestMapping("/api")
 public class EnvironmentResource {
@@ -38,6 +41,7 @@ public class EnvironmentResource {
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Import the configuration of an integration")
     @PostMapping(
         path = "/environment/{integrationid}",
         consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE},
@@ -68,6 +72,7 @@ public class EnvironmentResource {
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Export the configuration of an integration")
     @GetMapping(
         path = "/environment/{integrationid}",
         produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE}
@@ -100,6 +105,7 @@ public class EnvironmentResource {
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Export the configuration of the given flows")
     @PostMapping(
         path = "/environment/{integrationid}/byflowids",
         consumes = {MediaType.TEXT_PLAIN_VALUE},
@@ -134,6 +140,7 @@ public class EnvironmentResource {
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Import the configuration of a flow")
     @PostMapping(
         path = "/environment/{integrationid}/flow/{flowid}",
         consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE},
@@ -161,6 +168,7 @@ public class EnvironmentResource {
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
+    @Operation(summary = "Export the configuration of a flow")
     @GetMapping(
         path = "/environment/{integrationid}/flow/{flowid}",
         produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE}
