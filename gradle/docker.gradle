@@ -17,7 +17,10 @@ jib {
     }
     extraDirectories {
       paths = file("src/main/docker/jib")
-      permissions = ["/entrypoint.sh": "755"]
+      permissions = [
+        "/entrypoint.sh": "755",
+        "/migrate_jks_to_pkcs12.sh": "755"
+      ]
     }
 }
 
