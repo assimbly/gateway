@@ -299,6 +299,8 @@ public class ExportXML {
         confUri = createUri(confUri, confComponentType, confMessage);
         setElement("uri", confUri, step);
 
+        setCoordinates(stepDB, step);
+
         if (confOptions != null && !confOptions.isEmpty()) {
             Element options =  setElement("options", null, step);
 
@@ -383,6 +385,20 @@ public class ExportXML {
 
     }
 
+    public void setCoordinates(Step stepDB, Element step) {
+
+        if (stepDB.getCoordinateX() != null && stepDB.getCoordinateY() != null) {
+            Element coordinates = setElement("coordinates", null, step);
+            setElement("x", formatCoordinate(stepDB.getCoordinateX()), coordinates);
+            setElement("y", formatCoordinate(stepDB.getCoordinateY()), coordinates);
+        }
+
+    }
+
+    private String formatCoordinate(Double coordinate) {
+        return java.math.BigDecimal.valueOf(coordinate).stripTrailingZeros().toPlainString();
+    }
+
     public void setLinks(Step stepDB, Element step) {
 
         Set<Link> confLinks = stepDB.getLinks();
@@ -395,6 +411,10 @@ public class ExportXML {
                 setElement("id", confLink.getName(), link);
                 setElement("transport", confLink.getTransport(), link);
                 setElement("bound", confLink.getBound(), link);
+                setOptionalElement("pattern", confLink.getPattern(), link);
+                setOptionalElement("rule", confLink.getRule(), link);
+                setOptionalElement("language", confLink.getLanguage(), link);
+                setOptionalElement("expression", confLink.getExpression(), link);
             }
 
         }
@@ -630,6 +650,12 @@ public class ExportXML {
         }
 
         return componentType;
+    }
+
+    private void setOptionalElement(String elementName, String elementValue, Element parent){
+        if(elementValue != null && !elementValue.isEmpty()){
+            setElement(elementName, elementValue, parent);
+        }
     }
 
     private Element setElement(String elementName, String elementValue, Element parent){

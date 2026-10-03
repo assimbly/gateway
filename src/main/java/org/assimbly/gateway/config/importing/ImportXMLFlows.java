@@ -43,6 +43,9 @@ public class ImportXMLFlows {
     @Autowired
     private LinkRepository linkRepository;
 
+    @Autowired
+    private StepRepository stepRepository;
+
     private Set<Step> steps;
 
 	public void setFlowsFromXML(Document doc, Long integrationId) throws Exception {
@@ -151,6 +154,9 @@ public class ImportXMLFlows {
 
             flow = flowRepository.save(flow);
 
+            // Steps are not cascaded on persist, and Links are named after Step ids
+            flow.setSteps(new HashSet<>(stepRepository.saveAll(flow.getSteps())));
+
             flow = setLinks(doc, flowId, flow);
 
             flowRepository.save(flow);
@@ -214,6 +220,8 @@ public class ImportXMLFlows {
 		String messageId = xPath.evaluate(stepXPath + "blocks/block[type='message']/id", doc);
         String responseIdAsString = xPath.evaluate(stepXPath + "blocks/blockk[type='response']/id", doc);
         String routeIdAsString = xPath.evaluate(stepXPath + "blocks/block[type='route']/id", doc);
+        String coordinateX = xPath.evaluate(stepXPath + "coordinates/x", doc);
+        String coordinateY = xPath.evaluate(stepXPath + "coordinates/y", doc);
 
         // get type
 		StepType stepType = StepType.valueOf(type.toUpperCase());
@@ -309,6 +317,8 @@ public class ImportXMLFlows {
         step.setUri(uri);
 		step.setFlow(flow);
 		step.setOptions(options.toString());
+        step.setCoordinateX(parseCoordinate(coordinateX));
+        step.setCoordinateY(parseCoordinate(coordinateY));
 
 
 
@@ -335,53 +345,42 @@ public class ImportXMLFlows {
 
 	}
 
+    /**
+     * Links are named {flowId}-{downstreamStepId}: every Step has at most one inbound Link,
+     * so the name is unique per Link, also for the Branches of a Router.
+     * A Link without both ends in this Flow (for example to another Flow) keeps its DIL id.
+     */
     public Flow setLinks(Document doc, String flowId, Flow flow) throws XPathExpressionException {
 
         steps = flow.getSteps();
-        Map<String,String> linkidMap = new ConcurrentHashMap<>();
+        XPath xPath = XPathFactory.newInstance().newXPath();
 
+        Map<String, Step> downstreamStepByLinkId = new HashMap<>();
+        Set<String> outboundLinkIds = new HashSet<>();
 
-        //fill the map
-        for(Step step: steps) {
-
-            String stepXPath = "/dil/integrations/integration/flows/flow[id='" + flowId + "']/steps/step[id='" + step.getName() + "']/";
-
-            XPath xPath = XPathFactory.newInstance().newXPath();
+        for (Step step : steps) {
+            String stepXPath = getStepXPath(xPath, doc, flowId, step);
             int numberOfLinks = Integer.parseInt(xPath.evaluate("count(" + stepXPath + "links/link)", doc));
 
-            numberOfLinks = numberOfLinks + 1;
-
-            for (int i = 1; i < numberOfLinks; i++) {
-
-                String linkIndex = Integer.toString(i);
-                String linkXpath =  stepXPath + "links/link[" + linkIndex + "]/";
-
+            for (int i = 1; i <= numberOfLinks; i++) {
+                String linkXpath = stepXPath + "links/link[" + i + "]/";
                 String linkBound = xPath.evaluate(linkXpath + "bound", doc);
                 String linkId = xPath.evaluate(linkXpath + "id", doc);
 
-                if(linkBound.equals("out")){
-                    linkidMap.put(linkId,flow.getId() + "-" + step.getId());
+                if (linkBound.equals("in")) {
+                    downstreamStepByLinkId.put(linkId, step);
+                } else if (linkBound.equals("out")) {
+                    outboundLinkIds.add(linkId);
                 }
-
             }
-
-
         }
-
 
         for(Step step: steps) {
 
             // set links
             Set<Link> links = new HashSet<>();
 
-            XPath xPath = XPathFactory.newInstance().newXPath();
-
-            String stepXPath = "/dil/integrations/integration/flows/flow[id='" + flowId + "']/steps/step[name='" + step.getName() + "']";
-
-            int name = Integer.parseInt(xPath.evaluate("count(" + stepXPath + ")", doc));
-            if(name == 0){
-                stepXPath = "/dil/integrations/integration/flows/flow[id='" + flowId + "']/steps/step[id='" + step.getName() + "']/";
-            }
+            String stepXPath = getStepXPath(xPath, doc, flowId, step);
 
             int numberOfLinks = Integer.parseInt(xPath.evaluate("count(" + stepXPath + "links/link)", doc));
 
@@ -394,6 +393,7 @@ public class ImportXMLFlows {
                 String linkPattern = xPath.evaluate(linkXpath + "pattern", doc);
                 String linkRule = xPath.evaluate(linkXpath + "rule", doc);
                 String linkExpression = xPath.evaluate(linkXpath + "expression", doc);
+                String linkLanguage = xPath.evaluate(linkXpath + "language", doc);
                 String linkTransport = xPath.evaluate(linkXpath + "transport", doc);
                 String linkFormat = xPath.evaluate(linkXpath + "format", doc);
                 String linkPoint = xPath.evaluate(linkXpath + "point", doc);
@@ -401,12 +401,9 @@ public class ImportXMLFlows {
                 String linkId = xPath.evaluate(linkXpath + "id", doc);
                 String linkName = linkId;
 
-                if(flow.getId() != null){
-                    if(linkBound.equals("in")){
-                        linkName = linkidMap.get(linkId);
-                    }else{
-                        linkName = flow.getId() + "-" + step.getId();
-                    }
+                Step downstreamStep = downstreamStepByLinkId.get(linkId);
+                if (flow.getId() != null && downstreamStep != null && outboundLinkIds.contains(linkId)) {
+                    linkName = flow.getId() + "-" + downstreamStep.getId();
                 }
 
                 Optional<Set<Link>> linkSet = linkRepository.findByName(linkName);
@@ -432,6 +429,7 @@ public class ImportXMLFlows {
                 link.setPattern(linkPattern);
                 link.setRule(linkRule);
                 link.setExpression(linkExpression);
+                link.setLanguage(linkLanguage);
                 link.transport(linkTransport);
                 link.setPoint(linkPoint);
                 link.setFormat(linkFormat);
@@ -446,6 +444,23 @@ public class ImportXMLFlows {
 
         return flow;
 
+    }
+
+    private Double parseCoordinate(String coordinate) {
+        try {
+            return coordinate.isEmpty() ? null : Double.valueOf(coordinate);
+        } catch (NumberFormatException _) {
+            return null;
+        }
+    }
+
+    private String getStepXPath(XPath xPath, Document doc, String flowId, Step step) throws XPathExpressionException {
+        String stepsXPath = "/dil/integrations/integration/flows/flow[id='" + flowId + "']/steps/";
+        int stepsWithName = Integer.parseInt(xPath.evaluate("count(" + stepsXPath + "step[name='" + step.getName() + "'])", doc));
+        if (stepsWithName > 0) {
+            return stepsXPath + "step[name='" + step.getName() + "']/";
+        }
+        return stepsXPath + "step[id='" + step.getName() + "']/";
     }
 
 }

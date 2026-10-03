@@ -185,6 +185,9 @@ tasks.register('integrationTest', Test) {
     useJUnitPlatform()
     description = "Execute integration tests."
     group = "verification"
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    environment "ASSIMBLY_ENCRYPTION_SECRET", System.getenv('ASSIMBLY_ENCRYPTION_SECRET') ?: 'integration-test-secret'
     include "**/*IT*", "**/*IntTest*"
 
     testLogging {
@@ -380,6 +383,7 @@ dependencies {
     testImplementation "com.mattbertolini:liquibase-slf4j"
     testImplementation "org.hamcrest:hamcrest:3.0"
     testImplementation "org.mockito:mockito-junit-jupiter:5.23.0"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 
     liquibaseRuntime "org.springframework.boot:spring-boot-starter-liquibase"
     liquibaseRuntime "org.liquibase.ext:liquibase-hibernate6:${liquibase_version}"

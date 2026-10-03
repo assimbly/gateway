@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <!-- The language of a Router Branch's Condition (the expression is already stored on the Link) -->
+    <changeSet id="20261003120000-1" author="gateway">
+        <addColumn tableName="link">
+            <column name="language" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <!-- Where a Step is placed on the visual designer's canvas -->
+    <changeSet id="20261003120000-2" author="gateway">
+        <addColumn tableName="step">
+            <column name="coordinate_x" type="double"/>
+            <column name="coordinate_y" type="double"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

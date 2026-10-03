@@ -28,6 +28,10 @@ public class StepDTO implements Serializable {
 
     private Integer routeId;
 
+    private Double coordinateX;
+
+    private Double coordinateY;
+
     private Integer responseId;
 
     private Long connectionId;
@@ -98,6 +102,22 @@ public class StepDTO implements Serializable {
 
     public void setRouteId(Integer routeId) {
         this.routeId = routeId;
+    }
+
+    public Double getCoordinateX() {
+        return coordinateX;
+    }
+
+    public void setCoordinateX(Double coordinateX) {
+        this.coordinateX = coordinateX;
+    }
+
+    public Double getCoordinateY() {
+        return coordinateY;
+    }
+
+    public void setCoordinateY(Double coordinateY) {
+        this.coordinateY = coordinateY;
     }
 
     public Integer getResponseId() {

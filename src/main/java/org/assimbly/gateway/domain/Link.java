@@ -40,6 +40,9 @@ public class Link implements Serializable {
 
     @Column(name = "expression")
     private String expression;
+
+    @Column(name = "language")
+    private String language;
     @Column(name = "point")
     private String point;
 
@@ -127,6 +130,19 @@ public class Link implements Serializable {
         this.expression = expression;
     }
 
+    public String getLanguage() {
+        return language;
+    }
+
+    public Link language(String language) {
+        this.language = language;
+        return this;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
     public String getPoint() {
         return point;
     }
@@ -210,6 +226,7 @@ public class Link implements Serializable {
             ", transport='" + getTransport() + "'" +
             ", rule='" + getRule() + "'" +
             ", expression='" + getExpression() + "'" +
+            ", language='" + getLanguage() + "'" +
             ", point='" + getPoint() + "'" +
             ", format='" + getFormat() + "'" +
             ", pattern='" + getPattern() + "'" +

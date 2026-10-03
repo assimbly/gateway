@@ -20,6 +20,8 @@ public class LinkDTO implements Serializable {
 
     private String expression;
 
+    private String language;
+
     private String point;
 
     private String format;
@@ -73,6 +75,14 @@ public class LinkDTO implements Serializable {
 
     public void setExpression(String expression) {
         this.expression = expression;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
     }
 
     public String getPoint() {
@@ -138,6 +148,7 @@ public class LinkDTO implements Serializable {
             ", transport='" + getTransport() + "'" +
             ", rule=" + getRule() +
             ", expression=" + getExpression() +
+            ", language=" + getLanguage() +
             ", point='" + getPoint() + "'" +
             ", format=" + getFormat() +
             ", pattern=" + getPattern() +
