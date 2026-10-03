@@ -77,7 +77,9 @@
     "browser-sync": "3.0.4",
     "webpack": "5.109.2",
     "@babel/core": "^7.29.7",
-    "eslint-webpack-plugin": { "eslint": "$eslint" }
+    "eslint-webpack-plugin": {
+      "eslint": "$eslint"
+    }
   },
   "dependencies": {
     "@angular/animations": "22.1.7",
@@ -90,6 +92,7 @@
     "@angular/platform-browser-dynamic": "22.1.7",
     "@angular/router": "22.1.7",
     "@ctrl/ngx-codemirror": "7.0.0",
+    "@foblex/flow": "19.3.0",
     "@fortawesome/angular-fontawesome": "5.1.0",
     "@fortawesome/fontawesome-svg-core": "7.3.1",
     "@fortawesome/free-solid-svg-icons": "7.3.1",

@@ -31,6 +31,11 @@ enum Status {
   inactiveError = 'inactiveError',
 }
 
+import { isDraft, loadFlowGraph } from './designer/flow-graph';
+
+/** Script and Route Flows are edited with forms, not on the visual designer's canvas. */
+const isDesignedFlow = (flow: IFlow): boolean => flow.type !== 'script' && flow.type !== 'route';
+
 @Component({
   selector: '[jhi-flow-row]',
   templateUrl: './flow-row.component.html',
@@ -67,6 +72,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
   public isFlowStopped: boolean;
   public disableActionBtns: boolean;
+  /** A Flow designed on the canvas that is still incomplete; it can't be started. */
+  public isDraft = false;
 
   public flowDetails: string;
   public flowStatus: string;
@@ -146,6 +153,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
     this.steps = this.flow.steps;
     this.getSteps();
+    this.isDraft = isDesignedFlow(this.flow) && isDraft(loadFlowGraph(this.flow));
 
     this.registerTriggeredAction();
 
@@ -749,7 +757,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.subscriptions.add(this.eventManager.subscribe('trigerAction', (response: EventWithContent<unknown>) => {
       switch (response.content as string) {
         case 'start':
-          if (this.statusFlow === Status.inactive) {
+          if (this.statusFlow === Status.inactive && !this.isDraft) {
             this.start();
           }
           break;

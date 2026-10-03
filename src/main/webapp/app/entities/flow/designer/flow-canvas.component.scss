@@ -1,0 +1,149 @@
+:host {
+  display: block;
+  height: 100%;
+  min-height: 36rem;
+}
+
+.flow-canvas {
+  display: block;
+  height: 100%;
+  min-height: 36rem;
+  border-radius: 8px;
+  background: var(--app-bg, #f8f9fb);
+}
+
+.flow-step {
+  width: 168px;
+  min-height: 72px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--app-border, #d0d5dd);
+  border-left: 4px solid var(--flow-kind-color, #98a2b3);
+  background: var(--app-surface, #fff);
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.12);
+  text-align: left;
+  cursor: pointer;
+  user-select: none;
+}
+
+.flow-step-source {
+  --flow-kind-color: #12b76a;
+}
+
+.flow-step-action {
+  --flow-kind-color: #2e90fa;
+}
+
+.flow-step-router {
+  --flow-kind-color: #9e77ed;
+}
+
+.flow-step-sink {
+  --flow-kind-color: #f79009;
+}
+
+.flow-step-selected {
+  outline: 2px solid var(--flow-kind-color);
+  outline-offset: 2px;
+}
+
+.flow-step-problem {
+  border-color: var(--app-danger, #f04438);
+}
+
+.flow-step-kind {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--flow-kind-color);
+}
+
+.flow-step-label {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--app-text, #101828);
+}
+
+.flow-step-warning {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  color: var(--app-danger, #f04438);
+}
+
+.flow-connector {
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: var(--flow-kind-color);
+}
+
+.flow-connector-in {
+  left: -6px;
+}
+
+.flow-connector-out {
+  right: -6px;
+}
+
+.flow-plus {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--app-border, #d0d5dd);
+  background: var(--app-surface, #fff);
+  font-size: 0.7rem;
+  line-height: 1;
+  color: var(--app-text, #344054);
+
+  &::after {
+    display: none;
+  }
+
+  &:hover {
+    border-color: var(--app-primary, #2e90fa);
+    color: var(--app-primary, #2e90fa);
+  }
+}
+
+.flow-add-branch {
+  position: absolute;
+  right: -11px;
+  bottom: -11px;
+}
+
+.flow-link-content {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.flow-link-label {
+  max-width: 180px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--app-border, #d0d5dd);
+  background: var(--app-surface, #fff);
+  font-size: 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--app-text, #344054);
+}
+
+:host ::ng-deep {
+  .flow-link-problem .flow-link-label {
+    border-color: var(--app-danger, #f04438);
+    color: var(--app-danger, #f04438);
+  }
+
+  .flow-link-selected .f-connection-path {
+    stroke: var(--app-primary, #2e90fa);
+  }
+}

@@ -1,0 +1,88 @@
+// Layout of the visual designer on the Flow editor page (the editor component uses ViewEncapsulation.None).
+
+.flow-designer-page {
+  max-width: 1600px;
+}
+
+.flow-designer {
+  margin-bottom: 1rem;
+}
+
+.flow-designer-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+
+  .btn span {
+    margin-left: 0.35rem;
+  }
+}
+
+.flow-draft-badge {
+  margin-left: auto;
+  padding: 0.4rem 0.75rem;
+  background: var(--app-warning, #f79009);
+  color: var(--app-warning-contrast, #fff);
+}
+
+.flow-designer-body {
+  display: flex;
+  gap: 1rem;
+  align-items: stretch;
+  min-height: 40rem;
+}
+
+// Foblex Flow's default theme, mapped onto the app's light and dark theme colours.
+.flow-designer-canvas .f-flow {
+  --ff-canvas-background-color: var(--app-bg);
+  --ff-background-dot-color: var(--app-border);
+  --ff-connection-color: var(--app-text-muted);
+  --ff-connection-hover-color: var(--app-primary);
+  --ff-connection-selected-color: var(--app-primary);
+  --ff-connection-content-background-color: transparent;
+  --ff-connection-content-border-color: transparent;
+  --ff-connection-content-color: var(--app-text);
+
+  .f-canvas,
+  .f-connection-content {
+    background: transparent;
+  }
+
+  .flow-step .flow-connector.f-connector {
+    background: var(--flow-kind-color);
+    border: none;
+  }
+}
+
+.flow-designer-canvas {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 70vh;
+  min-height: 36rem;
+  border: 1px solid var(--app-border, #d0d5dd);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.flow-designer-panel {
+  flex: 0 0 26rem;
+  max-height: 70vh;
+  overflow-y: auto;
+
+  .form-group.container {
+    padding: 0;
+  }
+}
+
+@media (max-width: 1100px) {
+  .flow-designer-body {
+    flex-direction: column;
+  }
+
+  .flow-designer-panel {
+    flex-basis: auto;
+    max-height: none;
+  }
+}

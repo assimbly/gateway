@@ -82,7 +82,7 @@
   <div class="col-12"></div>
 </div>
 
-<div class="container">
+<div [ngClass]="useCanvas ? 'container-fluid flow-designer-page' : 'container'">
 
   <div class="row">
 
@@ -110,6 +110,132 @@
           <div class="col-4"></div>
         </div>
       </div>
+
+      <ng-template #stepEditor let-index>
+        <jhi-flow-editor-step
+          [step]="steps[index]"
+          [index]="index"
+          [stepForm]="stepFormAt(index)"
+          [activeEditor]="'flow'"
+          [onCanvas]="true"
+          [formSubmitted]="formSubmitted"
+          [sourceComponentsNames]="sourceComponentsNames"
+          [sinkComponentsNames]="sinkComponentsNames"
+          [actionComponentsNames]="actionComponentsNames"
+          [languageComponentsNames]="languageComponentsNames"
+          [routes]="routes"
+          [messages]="messages"
+          [connections]="connections"
+          [routeCreated]="routeCreated"
+          [messageCreated]="messageCreated"
+          [connectionCreated]="connectionCreated"
+          [uriPlaceholder]="uriPlaceholders[index]"
+          [uriPopoverMessage]="uriPopoverMessages[index]"
+          [uriList]="URIList[index]"
+          [componentOptions]="componentOptions[index]"
+          [stepOptions]="stepsOptions[index]"
+          [selectedOptions]="selectedOptions[index]"
+          [componentTypeCamelLink]="componentTypeCamelLinks[index]"
+          [enableMessage]="enableMessage[index]"
+          [enableConnection]="enableConnection[index]"
+          [filterConnection]="filterConnection[index]"
+          [connectionType]="connectionType[index]"
+          [errorHandlerPopoverMessage]="errorHandlerPopoverMessage"
+          [optionsPopoverMessage]="optionsPopoverMessage"
+          [customOptions]="customOptions"
+          (removeStep)="onDeleteStep(stepKeys[$event.index])"
+          (addConnection)="addConnection($event.step, $event.index)"
+          (componentTypeChange)="setTypeLinks($event.step, $event.index, $event.componentType)"
+          (createOrEditRoute)="createOrEditRoute($event.step, $event.control)"
+          (createOrEditMessage)="createOrEditMessage($event.step, $event.control)"
+          (createOrEditConnection)="createOrEditConnection($event.step, $event.connectionType, $event.control)"
+        ></jhi-flow-editor-step>
+      </ng-template>
+
+      @if (useCanvas) {
+        <div class="flow-designer">
+          <div class="flow-designer-toolbar">
+            <button type="button" class="btn btn-fx btn-fx-ghost" (click)="undo()" [disabled]="!designer?.canUndo" title="Undo (Ctrl+Z)">
+              <fa-icon icon="undo"></fa-icon><span>Undo</span>
+            </button>
+            <button type="button" class="btn btn-fx btn-fx-ghost" (click)="redo()" [disabled]="!designer?.canRedo" title="Redo (Ctrl+Y)">
+              <fa-icon icon="redo"></fa-icon><span>Redo</span>
+            </button>
+            <button type="button" class="btn btn-fx btn-fx-ghost" (click)="autoArrangeCanvas()" [disabled]="!!canvasGraph?.readOnlyReason"
+                    title="Lay the Flow out from left to right">
+              <fa-icon icon="sitemap"></fa-icon><span>Auto-arrange</span>
+            </button>
+            <button type="button" class="btn btn-fx btn-fx-ghost" (click)="onSelectionChange({ type: 'flow' })">
+              <fa-icon icon="cogs"></fa-icon><span>Flow settings</span>
+            </button>
+            @if (flowIsDraft) {
+              <span class="badge flow-draft-badge" title="This Flow is incomplete. It can be saved, but not started.">Draft</span>
+            }
+          </div>
+          @if (designerNotice) {
+            <div class="alert alert-warning py-2 mb-2">{{ designerNotice }}</div>
+          }
+          @if (designerMessage) {
+            <div class="alert alert-info py-2 mb-2">{{ designerMessage }}</div>
+          }
+          <div class="flow-designer-body">
+            <div class="flow-designer-canvas">
+              @if (canvasGraph) {
+                <jhi-flow-canvas
+                  [graph]="canvasGraph"
+                  [problems]="canvasProblems"
+                  [selection]="selection"
+                  [readOnly]="!!canvasGraph.readOnlyReason"
+                  (selectionChange)="onSelectionChange($event)"
+                  (insertStep)="onInsertStep($event)"
+                  (addBranch)="onAddBranch($event)"
+                  (moveStep)="onMoveStep($event)"
+                ></jhi-flow-canvas>
+              }
+            </div>
+            <aside class="flow-designer-panel">
+              @if (selection.type === 'step' && selectedStepIndex >= 0) {
+                <ng-container *ngTemplateOutlet="stepEditor; context: { $implicit: selectedStepIndex }"></ng-container>
+              } @else if (selectedLink; as link) {
+                <jhi-link-editor
+                  [graph]="canvasGraph!"
+                  [link]="link"
+                  [readOnly]="!!canvasGraph?.readOnlyReason"
+                  [problem]="selectedLinkProblem"
+                  (linkChange)="onLinkChange($event)"
+                  (deleteBranch)="onDeleteBranch(link.to)"
+                ></jhi-link-editor>
+              } @else {
+                <div class="card bg-light text-start mb-3">
+                  <div class="card-body">
+                    <h5 class="border-bottom">FLOW</h5>
+                    <div class="mb-3">
+                      <label class="form-control-label" for="field_logLevel">Log level</label>
+                      <select class="form-select" id="field_logLevel" formControlName="logLevel">
+                        @for (level of logLevelListType; track level) {
+                          <option [value]="level">{{ level }}</option>
+                        }
+                      </select>
+                    </div>
+                    <label class="form-control-label" for="field_notes">Notes</label>
+                    <ngx-codemirror
+                      *ngIf="flow"
+                      class="notes-codemirror"
+                      id="field_notes"
+                      formControlName="notes"
+                      [options]="notesEditorOptions()"
+                      (codeMirrorLoaded)="refreshCodeMirror($event)">
+                    </ngx-codemirror>
+                  </div>
+                </div>
+                @if (errorStepIndex >= 0) {
+                  <ng-container *ngTemplateOutlet="stepEditor; context: { $implicit: errorStepIndex }"></ng-container>
+                }
+              }
+            </aside>
+          </div>
+        </div>
+      } @else {
 
       <div class="card text-center" style="width: 54rem; background-color: var(--app-hover);">
         <div class="card-header">
@@ -193,6 +319,8 @@
           <div [ngbNavOutlet]="nav" class="ml-4"></div>
         </div>
       </div>
+
+      }
 
       <div class="form-fx-actions" style="max-width: 54rem;">
         <button type="button" class="btn btn-fx btn-fx-secondary" [routerLink]="['/']">

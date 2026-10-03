@@ -38,6 +38,8 @@ export class FlowEditorStepComponent implements OnDestroy {
   @Input({ required: true }) index: number;
   @Input({ required: true }) stepForm: FormGroup;
   @Input() activeEditor: string;
+  /** On the visual designer's canvas, Steps are added there instead of through this form. */
+  @Input() onCanvas = false;
   @Input() formSubmitted = false;
 
   @Input() sourceComponentsNames: Array<any> = [];

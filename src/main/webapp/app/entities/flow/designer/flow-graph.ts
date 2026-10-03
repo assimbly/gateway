@@ -66,6 +66,9 @@ const ROUTER_SHAPES: Record<string, RouterShape> = {
   link: { slots: 'list', hasDefault: false },
 };
 
+/** The kinds of Router that can be inserted on the canvas. */
+export const ROUTER_KINDS = Object.keys(ROUTER_SHAPES);
+
 /** The kind of Router a Step is, such as 'if' or 'content'. Imported Steps keep it in the uri. */
 export function routerKind(step: Pick<DesignStep, 'componentType' | 'uri'>): string {
   return (step.componentType || step.uri || '').toLowerCase().replace(/:.*$/, '');
@@ -106,17 +109,20 @@ export function loadFlowGraph(flow: IFlow): FlowGraph {
 function withPlaceholders(steps: DesignStep[]): DesignStep[] {
   const result = [...steps];
   if (!result.some(s => s.kind === 'SOURCE')) {
-    result.unshift({ key: nextKey(result), kind: 'SOURCE' });
+    result.unshift({ key: nextKey(), kind: 'SOURCE' });
   }
   if (!result.some(s => s.kind === 'SINK')) {
-    result.push({ key: nextKey(result), kind: 'SINK' });
+    result.push({ key: nextKey(), kind: 'SINK' });
   }
   return result;
 }
 
-function nextKey(steps: DesignStep[]): string {
-  const used = steps.map(s => /^new-(\d+)$/.exec(s.key)).map(m => (m ? Number(m[1]) : 0));
-  return `new-${Math.max(0, ...used) + 1}`;
+let lastKey = 0;
+
+/** Keys of new Steps are never reused, not even after undo, so the editor can keep each Step's form by key. */
+function nextKey(): string {
+  lastKey++;
+  return `new-${lastKey}`;
 }
 
 /** Joins an outbound Link and an inbound Link with the same name into one Link. */
@@ -195,7 +201,7 @@ export function insertStep(graph: FlowGraph, linkTo: string, kind: 'ACTION' | 'R
   const from = graph.steps.find(s => s.key === link.from)!;
   const to = graph.steps.find(s => s.key === linkTo)!;
   const inserted: DesignStep = {
-    key: nextKey(graph.steps),
+    key: nextKey(),
     kind,
     componentType,
     ...freePosition(graph.steps, midpoint(from.x, to.x), midpoint(from.y, to.y)),
@@ -205,7 +211,7 @@ export function insertStep(graph: FlowGraph, linkTo: string, kind: 'ACTION' | 'R
 
   const shape = kind === 'ROUTER' ? routerShape(inserted) : undefined;
   if (shape?.slots === 'fixed') {
-    const sink: DesignStep = { key: nextKey(steps), kind: 'SINK', ...branchEndPosition(steps, inserted) };
+    const sink: DesignStep = { key: nextKey(), kind: 'SINK', ...branchEndPosition(steps, inserted) };
     steps = [...steps, sink];
     links = [...links, { ...plainLink(inserted.key, sink.key), rule: shape.branch }];
   }
@@ -224,7 +230,7 @@ export function addBranch(graph: FlowGraph, routerKey: string): EditResult {
     return rejected(`An ${routerKind(router)} Router has a fixed set of Branches.`);
   }
 
-  const sink: DesignStep = { key: nextKey(graph.steps), kind: 'SINK', ...branchEndPosition(graph.steps, router) };
+  const sink: DesignStep = { key: nextKey(), kind: 'SINK', ...branchEndPosition(graph.steps, router) };
   const branch = plainLink(router.key, sink.key);
   if (shape.hasDefault) {
     branch.rule = unusedBranchName(graph, router.key);
@@ -382,14 +388,20 @@ export interface Problem {
 /** Router kinds whose named Branches decide on a Condition. */
 const CONDITIONAL_ROUTERS = ['content', 'if', 'split', 'splitwithnamespace', 'splitandaggregate', 'splitandaggregatewithnamespace', 'loop', 'dowhile'];
 
+/** Whether the Link to `linkTo` is a named Branch of a Router that decides on a Condition. */
+export function takesCondition(graph: FlowGraph, linkTo: string): boolean {
+  const link = graph.links.find(l => l.to === linkTo);
+  const router = graph.steps.find(s => s.key === link?.from && s.kind === 'ROUTER');
+  return !!link?.rule && !!router && CONDITIONAL_ROUTERS.includes(routerKind(router));
+}
+
 export function problems(graph: FlowGraph): Problem[] {
   const stepProblems: Problem[] = graph.steps
     .filter(s => !(s.componentType || s.uri))
     .map(s => ({ stepKey: s.key, message: 'Choose a component for this Step.' }));
 
   const linkProblems: Problem[] = graph.links
-    .filter(l => l.rule && !l.expression)
-    .filter(l => CONDITIONAL_ROUTERS.includes(routerKind(graph.steps.find(s => s.key === l.from)!)))
+    .filter(l => !l.expression && takesCondition(graph, l.to))
     .map(l => ({ linkTo: l.to, message: `Give the ${l.rule} Branch a Condition.` }));
 
   return [...stepProblems, ...linkProblems];
@@ -475,13 +487,19 @@ function branchEndPosition(steps: DesignStep[], router: DesignStep): Pick<Design
   return router.x === undefined || router.y === undefined ? {} : freePosition(steps, router.x + COLUMN_WIDTH, router.y + ROW_HEIGHT);
 }
 
-/** The first position at or below (x, y) that no Step occupies; nothing when (x, y) isn't known. */
+/** The room a Step takes on the canvas, with some space around it. */
+const STEP_WIDTH = 200;
+const STEP_HEIGHT = 100;
+
+/** The first position at or below (x, y) where a Step overlaps no other Step; nothing when (x, y) isn't known. */
 function freePosition(steps: DesignStep[], x: number | undefined, y: number | undefined): Pick<DesignStep, 'x' | 'y'> {
   if (x === undefined || y === undefined) {
     return {};
   }
+  const overlaps = (atY: number): boolean =>
+    steps.some(s => s.x !== undefined && s.y !== undefined && Math.abs(s.x - x) < STEP_WIDTH && Math.abs(s.y - atY) < STEP_HEIGHT);
   let freeY = y;
-  while (steps.some(s => s.x === x && s.y === freeY)) {
+  while (overlaps(freeY)) {
     freeY += ROW_HEIGHT;
   }
   return { x, y: freeY };

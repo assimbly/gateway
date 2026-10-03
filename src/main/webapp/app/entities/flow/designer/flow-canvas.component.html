@@ -1,0 +1,72 @@
+<f-flow fDraggable class="flow-canvas" (fSelectionChange)="onSelectionChange($event)" (fMoveNodes)="onMoveNodes($event)"
+        (fNodesRendered)="fitToScreen()">
+  <f-background>
+    <f-circle-pattern></f-circle-pattern>
+  </f-background>
+  <f-canvas fZoom>
+    <ng-container ngProjectAs="[fConnections]">
+      @for (link of graph.links; track link.to) {
+        <f-connection [fConnectionId]="'link-' + link.to" [fSourceId]="'out-' + link.from" [fTargetId]="'in-' + link.to"
+                      fType="segment" fBehavior="fixed" [fRadius]="12" [fReassignDisabled]="true"
+                      class="flow-link" [class.flow-link-problem]="linkHasProblem(link)" [class.flow-link-selected]="isLinkSelected(link)">
+          <f-connection-marker-arrow [type]="endMarker"></f-connection-marker-arrow>
+          <div fConnectionContent [position]="0.5" class="flow-link-content">
+            @if (branchLabel(link); as text) {
+              <button type="button" fDragBlocker class="flow-link-label" [title]="text"
+                      (click)="selectionChange.emit({ type: 'link', to: link.to })">{{ text }}</button>
+            }
+            @if (!readOnly) {
+              <div ngbDropdown container="body" class="d-inline-block" fDragBlocker>
+                <button type="button" class="flow-plus" ngbDropdownToggle aria-label="Insert a Step here" title="Insert a Step here">
+                  <fa-icon icon="plus"></fa-icon>
+                </button>
+                <div ngbDropdownMenu class="flow-insert-menu">
+                  <button type="button" ngbDropdownItem (click)="insertStep.emit({ linkTo: link.to, kind: 'ACTION', componentType: 'log' })">
+                    Action
+                  </button>
+                  <div class="dropdown-divider"></div>
+                  <h6 class="dropdown-header">Router</h6>
+                  @for (kind of routerKinds; track kind) {
+                    <button type="button" ngbDropdownItem (click)="insertStep.emit({ linkTo: link.to, kind: 'ROUTER', componentType: kind })">
+                      {{ kind }}
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </f-connection>
+      }
+    </ng-container>
+
+    <ng-container ngProjectAs="[fNodes]">
+      @for (step of graph.steps; track step.key) {
+        <div fNode fDragHandle [fNodeId]="step.key" [fNodePosition]="{ x: step.x ?? 0, y: step.y ?? 0 }"
+             [fNodeDraggingDisabled]="readOnly"
+             class="flow-step" [ngClass]="'flow-step-' + step.kind.toLowerCase()"
+             [class.flow-step-problem]="hasProblem(step)" [class.flow-step-selected]="isSelected(step)"
+             (click)="selectionChange.emit({ type: 'step', key: step.key })">
+          @if (step.kind !== 'SOURCE') {
+            <div fConnector fConnectorType="target" [fConnectorId]="'in-' + step.key" [fConnectorDisabled]="true"
+                 class="flow-connector flow-connector-in"></div>
+          }
+          <div class="flow-step-kind">{{ step.kind }}</div>
+          <div class="flow-step-label" [title]="label(step)">{{ label(step) }}</div>
+          @if (hasProblem(step)) {
+            <span class="flow-step-warning" title="This Step is incomplete"><fa-icon icon="exclamation-triangle"></fa-icon></span>
+          }
+          @if (canAddBranch(step) && !readOnly) {
+            <button type="button" fDragBlocker class="flow-plus flow-add-branch" title="Add a Branch" aria-label="Add a Branch"
+                    (click)="$event.stopPropagation(); addBranch.emit(step.key)">
+              <fa-icon icon="plus"></fa-icon>
+            </button>
+          }
+          @if (step.kind !== 'SINK') {
+            <div fConnector fConnectorType="source" [fConnectorId]="'out-' + step.key" [fConnectorMultiple]="step.kind === 'ROUTER'"
+                 [fConnectorDisabled]="true" class="flow-connector flow-connector-out"></div>
+          }
+        </div>
+      }
+    </ng-container>
+  </f-canvas>
+</f-flow>

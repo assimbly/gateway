@@ -1,0 +1,66 @@
+<div class="card bg-light text-start">
+  <div class="card-body">
+    <h5 class="border-bottom">{{ router ? 'BRANCH' : 'LINK' }}</h5>
+    <p class="text-muted small mb-3">{{ fromLabel }} → {{ toLabel }}</p>
+
+    @if (router) {
+      <div class="mb-3">
+        <label class="form-control-label" for="branch-name">Branch name</label>
+        @if (isDefaultBranch) {
+          <input id="branch-name" class="form-control" value="default" readonly />
+        } @else {
+          <input id="branch-name" class="form-control" [readonly]="!canRename" [ngModel]="link.rule"
+                 (change)="update({ rule: $any($event.target).value || undefined })" />
+        }
+      </div>
+
+      @if (hasCondition) {
+        <div class="mb-3">
+          <label class="form-control-label" for="condition-language">Condition language</label>
+          <select id="condition-language" class="form-select" [disabled]="readOnly" [ngModel]="link.language ?? ''"
+                  (ngModelChange)="update({ language: $event || undefined })">
+            <option value=""></option>
+            @for (language of languages; track language) {
+              <option [value]="language">{{ language }}</option>
+            }
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-control-label" for="condition-expression">Condition</label>
+          <textarea id="condition-expression" class="form-control" rows="3" [readonly]="readOnly" [ngModel]="link.expression"
+                    [class.is-invalid]="!!problem"
+                    (change)="update({ expression: $any($event.target).value || undefined })"></textarea>
+          @if (problem) {
+            <div class="invalid-feedback d-block">{{ problem }}</div>
+          }
+        </div>
+      }
+    }
+
+    <details class="mb-3">
+      <summary>Advanced</summary>
+      <div class="mt-2 mb-2">
+        <label class="form-control-label" for="link-transport">Transport</label>
+        <select id="link-transport" class="form-select" [disabled]="readOnly" [ngModel]="link.transport"
+                (ngModelChange)="update({ transport: $event })">
+          @for (transport of transports; track transport) {
+            <option [value]="transport">{{ transport }}</option>
+          }
+        </select>
+      </div>
+      <div>
+        <label class="form-control-label" for="link-pattern">Exchange pattern</label>
+        <select id="link-pattern" class="form-select" [disabled]="readOnly" [ngModel]="link.pattern ?? ''"
+                (ngModelChange)="update({ pattern: $event || undefined })">
+          @for (pattern of patterns; track pattern) {
+            <option [value]="pattern">{{ pattern || '(default)' }}</option>
+          }
+        </select>
+      </div>
+    </details>
+
+    @if (canDelete) {
+      <button type="button" class="btn btn-fx btn-fx-secondary" (click)="deleteBranch.emit()">Delete this Branch</button>
+    }
+  </div>
+</div>

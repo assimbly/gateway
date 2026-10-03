@@ -455,18 +455,21 @@ describe('Flow graph', () => {
       expectTidyLayout(contentRouterFlow());
     });
 
-    it('places new Steps without moving the Steps the user already placed', () => {
-      const placed = edited(moveStep(edited(moveStep(sourceToSink(), 'step-10', 0, 0)), 'step-11', 600, 0));
+    it('places new Steps without moving the Steps the user already placed, and without overlapping them', () => {
+      const placed = edited(moveStep(edited(moveStep(sourceToSink(), 'step-10', 0, 0)), 'step-11', 260, 0));
 
       const graph = edited(insertStep(placed, 'step-11', 'ROUTER', 'if'));
 
       expect(graph.steps.find(s => s.key === 'step-10')).toMatchObject({ x: 0, y: 0 });
-      expect(graph.steps.find(s => s.key === 'step-11')).toMatchObject({ x: 600, y: 0 });
+      expect(graph.steps.find(s => s.key === 'step-11')).toMatchObject({ x: 260, y: 0 });
       for (const s of graph.steps) {
         expect(typeof s.x).toBe('number');
         expect(typeof s.y).toBe('number');
       }
-      expect(new Set(graph.steps.map(s => `${s.x},${s.y}`)).size).toBe(graph.steps.length);
+      const overlapping = graph.steps.filter((a, i) =>
+        graph.steps.some((b, j) => i !== j && Math.abs(a.x! - b.x!) < 200 && Math.abs(a.y! - b.y!) < 100),
+      );
+      expect(overlapping.map(s => s.key)).toEqual([]);
     });
   });
 });
