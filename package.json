@@ -45,7 +45,7 @@
     "java:war": "./gradlew bootWar -Pwar -x test -x integrationTest",
     "java:war:dev": "npm run java:war -- -Pdev,webapp",
     "java:war:prod": "npm run java:war -- -Pprod",
-    "jest": "jest --coverage --logHeapUsage --maxWorkers=2 --config jest.conf.js",
+    "jest": "jest --coverage --logHeapUsage --maxWorkers=2 --config jest.conf.cjs",
     "lint": "eslint . --ext .js,.ts",
     "lint:fix": "npm run lint -- --fix",
     "prepare": "husky",

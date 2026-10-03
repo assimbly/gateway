@@ -109,7 +109,7 @@
         "test": {
           "builder": "@angular-builders/jest:run",
           "options": {
-            "configPath": "jest.conf.js",
+            "configPath": "jest.conf.cjs",
             "tsConfig": "tsconfig.spec.json"
           }
         }

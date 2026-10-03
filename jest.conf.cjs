@@ -3,20 +3,31 @@ const { pathsToModuleNameMapper } = require('ts-jest');
 const {
   compilerOptions: { paths = {}, baseUrl = './' },
 } = require('./tsconfig.json');
-const environment = require('./webpack/environment');
+// webpack/environment.js is CommonJS inside an ES module package, so it can't be required here
+const environment = {
+  I18N_HASH: 'generated_hash',
+  SERVER_API_URL: '',
+  __VERSION__: 'test',
+  __DEBUG_INFO_ENABLED__: false,
+};
 
 module.exports = {
   transformIgnorePatterns: ['node_modules/(?!.*\\.mjs$|dayjs/esm)'],
-  resolver: 'jest-preset-angular/build/resolvers/ng-jest-resolver.js',
+  preset: 'jest-preset-angular',
+  setupFilesAfterEnv: ['<rootDir>/src/main/webapp/setup-jest.ts'],
   globals: {
     ...environment,
   },
   roots: ['<rootDir>', `<rootDir>/${baseUrl}`],
-  modulePaths: [`<rootDir>/${baseUrl}`],
+  // 'app/...' imports resolve from the webapp root; the catch-all '*' tsconfig path would also capture relative imports
+  modulePaths: ['<rootDir>/src/main/webapp'],
   setupFiles: ['jest-date-mock'],
   cacheDirectory: '<rootDir>/target/jest-cache',
   coverageDirectory: '<rootDir>/target/test-results/',
-  moduleNameMapper: pathsToModuleNameMapper(paths, { prefix: `<rootDir>/${baseUrl}/` }),
+  moduleNameMapper: pathsToModuleNameMapper(
+    Object.fromEntries(Object.entries(paths).filter(([alias]) => alias !== '*')),
+    { prefix: `<rootDir>/${baseUrl}/` },
+  ),
   reporters: [
     'default',
     ['jest-junit', { outputDirectory: '<rootDir>/target/test-results/', outputName: 'TESTS-results-jest.xml' }],

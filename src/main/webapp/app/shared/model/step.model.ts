@@ -29,6 +29,8 @@ export interface IStep {
     messageId?: number;
     routeId?: number;
     responseId?: number;
+    coordinateX?: number;
+    coordinateY?: number;
     links?: ILink[];
 }
 
