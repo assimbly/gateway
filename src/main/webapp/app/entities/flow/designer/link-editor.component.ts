@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { defaultBranch, DesignLink, FlowGraph, LinkSettings, routerKind, routerShape, takesCondition } from './flow-graph';
+import { canDeleteBranch, canRenameBranch, defaultBranch, DesignLink, FlowGraph, LinkSettings, routerKind, routerOf, takesCondition } from './flow-graph';
 
 /** Edits the Link leading to a Step: its Branch name and Condition (on a Router) and its transport settings. */
 @Component({
@@ -25,7 +25,7 @@ export class LinkEditorComponent {
   readonly patterns = ['', 'InOnly', 'InOut'];
 
   get router() {
-    return this.graph.steps.find(s => s.key === this.link.from && s.kind === 'ROUTER');
+    return routerOf(this.graph, this.link);
   }
 
   get fromLabel(): string {
@@ -43,10 +43,8 @@ export class LinkEditorComponent {
     return !!router && this.link === defaultBranch(this.graph, router);
   }
 
-  /** Branch names can be edited on List Routers only, and never on the Default branch. */
   get canRename(): boolean {
-    const router = this.router;
-    return !!router && routerShape(router).slots === 'list' && !this.isDefaultBranch && !this.readOnly;
+    return !this.readOnly && canRenameBranch(this.graph, this.link.to);
   }
 
   get hasCondition(): boolean {
@@ -54,8 +52,7 @@ export class LinkEditorComponent {
   }
 
   get canDelete(): boolean {
-    const router = this.router;
-    return !!router && routerShape(router).slots === 'list' && !this.isDefaultBranch && !this.readOnly;
+    return !this.readOnly && canDeleteBranch(this.graph, this.link.to);
   }
 
   update(settings: Partial<LinkSettings>): void {

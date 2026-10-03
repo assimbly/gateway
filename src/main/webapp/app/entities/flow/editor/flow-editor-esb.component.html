@@ -195,6 +195,19 @@
             </div>
             <aside class="flow-designer-panel">
               @if (selection.type === 'step' && selectedStepIndex >= 0) {
+                @if (selectedRouterKind) {
+                  <div class="mb-2 text-start">
+                    <label class="form-control-label" for="field_router_kind_swap">Router kind</label>
+                    <select class="form-select" id="field_router_kind_swap" [value]="selectedRouterKind"
+                            [disabled]="swappableRouterKinds.length < 2 || !!canvasGraph?.readOnlyReason"
+                            title="A Router can only change to a kind with the same Branches"
+                            (change)="onRouterKindChange($any($event.target).value)">
+                      @for (kind of swappableRouterKinds; track kind) {
+                        <option [value]="kind" [selected]="kind === selectedRouterKind">{{ kind }}</option>
+                      }
+                    </select>
+                  </div>
+                }
                 <ng-container *ngTemplateOutlet="stepEditor; context: { $implicit: selectedStepIndex }"></ng-container>
               } @else if (selectedLink; as link) {
                 <jhi-link-editor
@@ -217,6 +230,15 @@
                         }
                       </select>
                     </div>
+                    <div class="form-check mb-1">
+                      <input class="form-check-input" type="checkbox" id="field_autoStart" formControlName="autoStart" />
+                      <label class="form-check-label" for="field_autoStart">Start automatically when the Gateway starts</label>
+                    </div>
+                    @if (flowIsDraft) {
+                      <p class="text-muted small mb-3">This Flow is a Draft, so it is saved with auto-start off until it is complete.</p>
+                    } @else {
+                      <div class="mb-3"></div>
+                    }
                     <label class="form-control-label" for="field_notes">Notes</label>
                     <ngx-codemirror
                       *ngIf="flow"

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dil>
+  <integrations>
+    <integration>
+      <id>1</id>
+      <name>roundtrip</name>
+      <type>FULL</type>
+      <options>
+        <environment>test</environment>
+        <stage>TEST</stage>
+      </options>
+      <flows>
+        <flow>
+          <id>empty-flow</id>
+          <name>EmptyFlow</name>
+          <type>esb</type>
+          <steps>
+            <step>
+              <id>error</id>
+              <type>error</type>
+              <uri>failedexchange</uri>
+            </step>
+          </steps>
+        </flow>
+      </flows>
+    </integration>
+  </integrations>
+  <core/>
+</dil>

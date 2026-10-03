@@ -4,13 +4,10 @@ import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { EFMarkerType, FCanvasComponent, FFlowModule, FMoveNodesEvent, FSelectionChangeEvent } from '@foblex/flow';
 
-import { defaultBranch, DesignLink, DesignStep, FlowGraph, Problem, ROUTER_KINDS, routerKind, routerShape } from './flow-graph';
+import { defaultBranch, DesignLink, DesignStep, FlowGraph, Problem, ROUTER_KINDS, routerKind, routerOf, routerShape } from './flow-graph';
 
 /** What the right-hand panel shows: a Step, the Link leading to a Step, or the Flow settings. */
 export type DesignerSelection = { type: 'step'; key: string } | { type: 'link'; to: string } | { type: 'flow' };
-
-/** Router kinds whose named Branch hands its result back to the Router. */
-const CALL_OUT_ROUTERS = ['enrich', 'split', 'loop', 'dowhile'];
 
 /**
  * The visual designer's canvas: draws a Flow graph and reports what the user does with it.
@@ -45,12 +42,12 @@ export class FlowCanvasComponent {
 
   /** The Branch name (or "default") and Condition shown on a Router's Link; nothing on other Links. */
   branchLabel(link: DesignLink): string | undefined {
-    const router = this.graph.steps.find(s => s.key === link.from && s.kind === 'ROUTER');
+    const router = routerOf(this.graph, link);
     if (!router) {
       return undefined;
     }
     const name = link === defaultBranch(this.graph, router) ? 'default' : link.rule;
-    const returns = link.rule && CALL_OUT_ROUTERS.some(kind => routerKind(router).startsWith(kind)) ? ' ↩' : '';
+    const returns = link.rule && routerShape(router).returnsToRouter ? ' ↩' : '';
     const text = [name, link.expression].filter(Boolean).join(': ');
     return text ? text + returns : undefined;
   }

@@ -140,8 +140,6 @@
                        formControlName="componentType" id="field_component_type"
                        (change)="onComponentTypeChange($event)"
                        style="text-align: left;"></ng-select>
-            <input *ngIf="stepType==='ROUTER'" type="text" class="form-control" id="field_router_kind" readonly
-                   [value]="stepForm.get('componentType')?.value || stepForm.get('uri')?.value"/>
             <ng-select *ngIf="stepType==='ERROR'"
                        [items]="sinkComponentsNames" [clearable]="false"
                        formControlName="componentType" id="field_component_type"

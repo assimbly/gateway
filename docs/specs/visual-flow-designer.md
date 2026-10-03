@@ -51,8 +51,8 @@ Replace the form-based editor with a **visual designer**: a canvas, built on Fob
 15. As an integration developer, I want a newly inserted Recipient list Router (which has no Default branch) to turn the downstream part of the Flow into its first Branch, so that nothing is lost.
 16. As an integration developer, I want a Fixed-slot Router (if, split, enrich, wiretap, loop…) to get all its Branches, each ending in a new Sink, as soon as I add it, so that its required Branches are never missing.
 17. As an integration developer, I want a **+** on a List Router (recipient, content, …) that adds a Branch ending in a new Sink, so that I can route to as many destinations as I need.
-18. As an integration developer, I want to drag from one Step's outbound Link end to another Step's inbound Link end to connect them, so that I can wire Steps the way NiFi lets me.
-19. As an integration developer, I want the canvas to refuse a connection that would break the Step rules (a second inbound Link, a loop, an outbound Link from a Sink, an inbound Link into the Source), with a short reason, so that I can't create a Flow the runtime can't run.
+18. ~~As an integration developer, I want to drag from one Step's outbound Link end to another Step's inbound Link end to connect them.~~ *Dropped: see Further Notes.*
+19. As an integration developer, I want the canvas to never let me create a Flow that breaks the Step rules (a second inbound Link, a loop, an outbound Link from a Sink, an inbound Link into the Source), so that I can't create a Flow the runtime can't run.
 20. As an integration developer, I want to drag nodes anywhere on the canvas and have their positions saved with the Flow, so that my layout is still there next time.
 21. As an integration developer, I want to pan and zoom the canvas, so that I can work on large Flows.
 22. As an integration developer, I want to swap a Step's component for another one of the same kind (for example one Action for another), so that I can change what a Step does without rebuilding its surroundings.
@@ -106,7 +106,9 @@ Replace the form-based editor with a **visual designer**: a canvas, built on Fob
   - Router: 1 inbound, plus its Branches.
   - Sink: 1 inbound, 0 outbound.
 - **The Error Step is not a node.** It's edited in the Flow settings and has no Links.
-- **The canvas only places Source, Action, Router and Sink.** A Flow with any other Step type opens read-only.
+- **The canvas only places Source, Action, Router and Sink.** A Flow with any other Step type opens read-only, and is never a Draft.
+- **Older Router Flows.** Imports made before this change gave all Branches of a Router one Link name. When those Branches have different settings, it can't be known which settings belong to which Step, so the Flow opens read-only and asks for its DIL to be imported again.
+- **A Flow's Links must form a valid tree on load:** one Source reaching every Step, and every Step with the Links its kind needs. Otherwise the Links are rebuilt as a chain, and every Fixed-slot Router gets its named Branch back with a new Sink.
 - **Router kinds have a branch shape**, held in a small table in the frontend:
   - **Fixed-slot:** one named Branch plus the Default branch. Kinds: if, split, splitandaggregate (and the namespace variants), enrich, wiretap, loop, dowhile.
   - **List with a Default branch:** content, dynamic.
@@ -117,7 +119,8 @@ Replace the form-based editor with a **visual designer**: a canvas, built on Fob
   - The Default branch is the outbound Link with no `rule`.
   - A Condition is the Link's `language` and `expression`. It always lives on the Link, never in the Router's options.
 - **Call-out Branches** (enrich, split, splitandaggregate, loop, dowhile) end in a Sink like any other Branch. The canvas only labels them as returning.
-- **Draft is derived, not stored.** A Flow is a Draft when any Step is missing its required configuration, or a Router Link is missing a required Condition. While it's a Draft, start and auto-start are disabled. Export still works.
+- **Draft is derived, not stored.** A Flow is a Draft when any Step is missing its required configuration, or a Router Link is missing a required Condition. While it's a Draft, start is disabled and the Flow is saved with auto-start off (the Gateway itself does not know about Drafts). The Auto-start setting is shown in the Flow settings so it can be switched on again once the Flow is complete. Export still works.
+- **Branch names** are unique per Router, and a named Branch of a Router with a Default branch can't lose its name.
 
 ### Frontend
 
@@ -128,7 +131,6 @@ Replace the form-based editor with a **visual designer**: a canvas, built on Fob
     - insert Action into a Link
     - insert Router into a Link
     - add Branch to a List Router
-    - connect two Link ends
     - delete Step
     - delete Branch
     - change a Step's component (same kind only)
@@ -138,7 +140,7 @@ Replace the form-based editor with a **visual designer**: a canvas, built on Fob
     - edit Flow settings
     - auto-arrange
   - **Every operation** either returns the new graph or rejects with a reason. The graph is never left in an invalid shape.
-  - **Undo and redo** cover all of these operations.
+  - **Undo and redo** cover all of these operations. Edits made in a Step's form (its component, path and options) are not part of undo/redo.
   - **Queries:** Draft status and the list of validation problems per Step and Link.
   - **Output:** serialize to the Steps and Links to save.
 - **New canvas component.** It's built on Foblex Flow and replaces the current form-based editor inside the existing Flows → Design → Editor route. It only renders the graph model and sends user gestures to it: drag, connect, the **+** menus, delete, select.
@@ -149,7 +151,8 @@ Replace the form-based editor with a **visual designer**: a canvas, built on Fob
 - **Auto-arrange** lays the tree out left to right, from the Source on the left to the Sinks on the right, in the n8n style.
 - **An unsaved-changes guard** runs when the user navigates away from the designer.
 - **Start actions check Draft status.** The start and auto-start actions on the Flow overview disable themselves for a Draft.
-- **The form-based editor is removed** once the designer replaces it. `flow.type` stays `esb`, so DIL output is unchanged.
+- **The form-based editor stays for Script and Route Flows**, which are built from SCRIPT and ROUTE Steps that the canvas doesn't place. Every other Flow opens on the canvas. `flow.type` is unchanged, so DIL output is unchanged.
+- **Unsaved changes:** leaving the editor (in the app or by closing the tab) asks for confirmation.
 
 ### Saving
 
@@ -196,6 +199,9 @@ Replace the form-based editor with a **visual designer**: a canvas, built on Fob
 - Changes to the Flow overview beyond disabling start and auto-start for Drafts.
 
 ## Further Notes
+
+- **Drag-to-connect was dropped (story 18).** In a Flow that follows ADR 0001 every Step except the Source already has its one inbound Link, so any Link drawn by hand would be refused. Links are only created by inserting Steps and adding Branches; connectors on the canvas are not draggable.
+- **The backend test setup** was made runnable against the current setup: the test configuration mirrors the application configuration, including no Hibernate schema validation (the application doesn't validate either). The old JHipster-generated tests are not maintained; new tests are written against the DIL format, the Liquibase schema and the current configuration.
 
 - These decisions come from a grilling session on the `visual-designer` branch. Its last round (where Conditions live, empty Flows, deletion rules, kind changes, storing positions, undo and unsaved changes, the ADR) was accepted as recommended.
 - The 159 reference Flows in the uncommitted `examples/` folder all follow the tree rule. The Router kinds actually used are content, if, split, splitandaggregate, enrich, recipient and wiretap.

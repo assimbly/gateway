@@ -44,6 +44,7 @@ import { FlowGraphHistory } from "../designer/flow-graph-history";
 import {
   addBranch,
   autoArrange,
+  changeComponent,
   deleteBranch,
   deleteStep,
   DesignLink,
@@ -55,9 +56,13 @@ import {
   linksToSave,
   loadFlowGraph,
   moveStep,
+  opensOnCanvas,
   Problem,
   problems,
+  ROUTER_KINDS,
   routerKind,
+  routerShape,
+  sameBranches,
   stepsToSave,
   updateLink,
 } from "../designer/flow-graph";
@@ -1609,6 +1614,7 @@ splitOptions4(options: string): string[] {
 		this.flow.name = flowControls.name.value;
 		this.flow.logLevel = flowControls.logLevel.value;
 		this.flow.notes = flowControls.notes.value;
+		this.flow.autoStart = flowControls.autoStart.value;
 		this.flow.integrationId = flowControls.integration.value;
 
 		(<FormArray>flowControls.stepsData).controls.forEach(
@@ -1732,7 +1738,37 @@ splitOptions4(options: string): string[] {
 
 	/** Script and Route Flows keep the form editor; every other Flow is designed on the canvas. */
 	get useCanvas(): boolean {
-		return this.activeEditor !== 'script' && this.activeEditor !== 'route';
+		return opensOnCanvas(this.activeEditor);
+	}
+
+	/** Kinds the selected Router can be changed to without changing its Branches. */
+	get swappableRouterKinds(): string[] {
+		const selection = this.selection;
+		const router = selection.type === 'step' ? this.canvasGraph?.steps.find(s => s.key === selection.key && s.kind === 'ROUTER') : undefined;
+		if (!router) {
+			return [];
+		}
+		const alternatives = ROUTER_KINDS.filter(kind => sameBranches(routerShape(router), routerShape({ componentType: kind })));
+		return [...new Set([routerKind(router), ...alternatives])];
+	}
+
+	get selectedRouterKind(): string | undefined {
+		const selection = this.selection;
+		const router = selection.type === 'step' ? this.canvasGraph?.steps.find(s => s.key === selection.key && s.kind === 'ROUTER') : undefined;
+		return router ? routerKind(router) : undefined;
+	}
+
+	onRouterKindChange(kind: string): void {
+		const selection = this.selection;
+		if (selection.type !== 'step') {
+			return;
+		}
+		this.edit(changeComponent(this.designer!.current, selection.key, kind));
+		const index = this.stepKeys.indexOf(selection.key);
+		if (this.designer!.current.steps.find(s => s.key === selection.key)?.componentType === kind) {
+			this.steps[index].componentType = kind;
+			this.stepFormAt(index).patchValue({ componentType: kind, uri: null });
+		}
 	}
 
 	get selectedStepIndex(): number {
@@ -1985,8 +2021,8 @@ splitOptions4(options: string): string[] {
 	}
 
 	/**
-	 * Saves the whole Flow: the Flow itself, the Steps still in the graph (deleting the others),
-	 * then all Links again, named after the Step they lead to.
+	 * Saves the whole Flow: the Flow itself, then the Steps still in the graph, then all Links again
+	 * (named after the Step they lead to), and finally deletes the Steps that were removed.
 	 */
 	private saveDesigner(): void {
 		const graph = this.syncedGraph();
@@ -2007,6 +2043,7 @@ splitOptions4(options: string): string[] {
 			target.coordinateY = step.coordinateY;
 		});
 
+		// A Draft can't run, so it is never started automatically; the setting can be switched on again once it is complete.
 		if (isDraft(graph)) {
 			this.flow.autoStart = false;
 		}
@@ -2020,18 +2057,18 @@ splitOptions4(options: string): string[] {
 				switchMap(flow => {
 					this.flow = flow.body;
 					stepsInGraph.forEach(step => (step.flowId = this.flow.id));
-					const linkDeletes = [...stepsInGraph, ...removedSteps]
-						.filter(step => step.id != null)
-						.map(step => this.linkService.deleteByStepId(step.id));
-					return linkDeletes.length ? forkJoin(linkDeletes) : of([]);
+					return this.stepService.updateMultiple(stepsInGraph);
 				}),
-				switchMap(() => {
-					const stepDeletes = removedSteps.map(step => this.stepService.delete(step.id));
-					return stepDeletes.length ? forkJoin(stepDeletes) : of([]);
-				}),
-				switchMap(() => this.stepService.updateMultiple(stepsInGraph)),
 				switchMap(saved => {
 					const stepIds = new Map<string, number>(keys.map((key, i) => [key, saved.body[i].id]));
+					const linkDeletes = [...saved.body, ...removedSteps].map(step => this.linkService.deleteByStepId(step.id));
+					return forkJoin(linkDeletes).pipe(map(() => stepIds));
+				}),
+				switchMap(stepIds => {
+					const stepDeletes = removedSteps.map(step => this.stepService.delete(step.id));
+					return (stepDeletes.length ? forkJoin(stepDeletes) : of([])).pipe(map(() => stepIds));
+				}),
+				switchMap(stepIds => {
 					const links = linksToSave(graph, this.flow.id, stepIds).map(link => this.linkService.create(link));
 					return links.length ? forkJoin(links) : of([]);
 				}),

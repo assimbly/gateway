@@ -15,6 +15,8 @@ import {
   loadFlowGraph,
   moveStep,
   problems,
+  ROUTER_KINDS,
+  routerShape,
   stepsToSave,
   updateLink,
   updateStep,
@@ -114,6 +116,45 @@ describe('Flow graph', () => {
       expect(graph.repaired).toBe(true);
     });
 
+    it('repairs a Flow whose Links break the Step rules, such as an Action with two outbound Links', () => {
+      const graph = loadFlowGraph(
+        flow([
+          step(10, 'SOURCE', [outbound('1-11')]),
+          step(11, 'ACTION', [inbound('1-11'), outbound('1-12'), outbound('1-13')]),
+          step(12, 'SINK', [inbound('1-12')]),
+          step(13, 'SINK', [inbound('1-13')]),
+        ]),
+      );
+
+      expect(graph.repaired).toBe(true);
+    });
+
+    it('repairs a Flow with a loop that never reaches the Source', () => {
+      const graph = loadFlowGraph(
+        flow([
+          step(10, 'SOURCE', [outbound('1-13')]),
+          step(11, 'ACTION', [inbound('1-12'), outbound('1-11')]),
+          step(12, 'ACTION', [inbound('1-11'), outbound('1-12')]),
+          step(13, 'SINK', [inbound('1-13')]),
+        ]),
+      );
+
+      expect(graph.repaired).toBe(true);
+      expect(linkIds(graph)).toEqual([
+        [10, 11],
+        [11, 12],
+        [12, 13],
+      ]);
+    });
+
+    it('gives a Fixed-slot Router its named Branch when repairing, so the Flow keeps a valid shape', () => {
+      const graph = loadFlowGraph(flow([step(10, 'SOURCE'), step(11, 'ROUTER', [], { componentType: 'if' }), step(12, 'SINK')]));
+
+      const ifBranch = graph.links.find(l => l.from === 'step-11' && l.rule === 'if')!;
+      expect(graph.steps.find(s => s.key === ifBranch.to)!.kind).toBe('SINK');
+      expect(graph.links.find(l => l.from === 'step-11' && !l.rule)!.to).toBe('step-12');
+    });
+
     it('does not mark a Flow with complete Links as repaired', () => {
       const graph = loadFlowGraph(flow([step(10, 'SOURCE', [outbound('1-11')]), step(11, 'SINK', [inbound('1-11')])]));
 
@@ -125,6 +166,13 @@ describe('Flow graph', () => {
 
       expect(graph.readOnlyReason).toContain('FROM');
       expect(graph.readOnlyReason).toContain('TO');
+    });
+
+    it('does not add placeholders to a read-only Flow, and never counts it as a Draft', () => {
+      const graph = loadFlowGraph(flow([step(10, 'FROM', [outbound('1-11')]), step(11, 'TO', [inbound('1-11')])]));
+
+      expect(graph.steps).toEqual([]);
+      expect(isDraft(graph)).toBe(false);
     });
 
     it('opens a Flow with only supported Step types as editable', () => {
@@ -143,6 +191,56 @@ describe('Flow graph', () => {
       expect(graph.links).toEqual([expect.objectContaining({ from: graph.steps[0].key, to: graph.steps[1].key })]);
       expect(graph.errorStep?.id).toBe(9);
       expect(graph.repaired).toBe(false);
+    });
+
+    it('opens an older Router Flow read-only when its Branches share one Link name but have different settings', () => {
+      const graph = loadFlowGraph(
+        flow([
+          step(10, 'SOURCE', [outbound('1-10')]),
+          step(11, 'ROUTER', [inbound('1-10'), outbound('1-11'), outbound('1-11', { rule: 'check', language: 'simple', expression: 'x' })], {
+            componentType: '',
+            uri: 'content',
+          }),
+          step(12, 'SINK', [inbound('1-11')]),
+          step(13, 'SINK', [inbound('1-11')]),
+        ]),
+      );
+
+      expect(graph.readOnlyReason).toContain('import');
+    });
+
+    it('opens an older Router Flow normally when its Branches share one Link name but have the same settings', () => {
+      const graph = loadFlowGraph(
+        flow([
+          step(10, 'SOURCE', [outbound('1-10')]),
+          step(11, 'ROUTER', [inbound('1-10'), outbound('1-11'), outbound('1-11')], { componentType: '', uri: 'recipient' }),
+          step(12, 'SINK', [inbound('1-11')]),
+          step(13, 'SINK', [inbound('1-11')]),
+        ]),
+      );
+
+      expect(graph.readOnlyReason).toBeUndefined();
+      expect(linkIds(graph)).toEqual([
+        [10, 11],
+        [11, 12],
+        [11, 13],
+      ]);
+    });
+
+    it.each(ROUTER_KINDS)('loads a saved %s Router with its Branches without repairing it', kind => {
+      const shape = routerShape({ componentType: kind });
+      const namedBranch = shape.slots === 'fixed' ? shape.branch : 'first';
+      const graph = loadFlowGraph(
+        flow([
+          step(10, 'SOURCE', [outbound('1-11')]),
+          step(11, 'ROUTER', [inbound('1-11'), outbound('1-12'), outbound('1-13', { rule: namedBranch, expression: 'x' })], { componentType: kind }),
+          step(12, 'SINK', [inbound('1-12')]),
+          step(13, 'SINK', [inbound('1-13')]),
+        ]),
+      );
+
+      expect(graph.repaired).toBe(false);
+      expect(graph.links.find(l => l.to === 'step-13')!.rule).toBe(namedBranch);
     });
 
     it('keeps saved coordinates', () => {
@@ -167,6 +265,14 @@ describe('Flow graph', () => {
       const action = graph.steps.find(s => s.kind === 'ACTION')!;
       expect(action.componentType).toBe('setbody');
       expect(linkKeys(graph)).toEqual([`${action.key} → step-11`, `step-10 → ${action.key}`]);
+    });
+
+    it('makes the existing downstream the first Branch of a new Recipient list Router, without adding a Sink', () => {
+      const graph = edited(insertStep(sourceToSink(), 'step-11', 'ROUTER', 'recipient'));
+
+      const router = graph.steps.find(s => s.kind === 'ROUTER')!;
+      expect(graph.links.filter(l => l.from === router.key).map(l => [l.to, l.rule])).toEqual([['step-11', undefined]]);
+      expect(graph.steps.filter(s => s.kind === 'SINK')).toHaveLength(1);
     });
 
     it('keeps the Branch name and Condition on the Router side when inserting into a Branch', () => {
@@ -356,6 +462,18 @@ describe('Flow graph', () => {
       expect(edited(updateLink(ifRouter, ifBranch.to, { expression: '${body} == 1' })).links.find(l => l.rule === 'if')!.expression).toBe(
         '${body} == 1',
       );
+    });
+
+    it('refuses to clear the name of a Branch, which would make it a second Default branch', () => {
+      expect(updateLink(contentRouterFlow(), 'step-13', { rule: undefined }).outcome).toBe('rejected');
+      expect(updateLink(contentRouterFlow(), 'step-13', { rule: '' }).outcome).toBe('rejected');
+    });
+
+    it('refuses to give a Branch the name of another Branch of the same Router', () => {
+      const graph = edited(addBranch(contentRouterFlow(), 'step-11'));
+      const newBranch = graph.links.find(l => l.rule === 'branch2')!;
+
+      expect(updateLink(graph, newBranch.to, { rule: 'check' })).toEqual({ outcome: 'rejected', reason: expect.stringContaining('check') });
     });
 
     it('refuses to give the Default branch a name', () => {

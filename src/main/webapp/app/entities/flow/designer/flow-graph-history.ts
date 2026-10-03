@@ -46,8 +46,7 @@ export class FlowGraphHistory {
     }
   }
 
-  markSaved(graph: FlowGraph = this.current): void {
-    this.current = graph;
-    this.saved = graph;
+  markSaved(): void {
+    this.saved = this.current;
   }
 }

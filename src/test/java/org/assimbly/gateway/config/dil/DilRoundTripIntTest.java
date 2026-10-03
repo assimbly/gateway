@@ -9,6 +9,8 @@ import org.assimbly.gateway.domain.enumeration.GatewayType;
 import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.repository.IntegrationRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -97,6 +99,62 @@ class DilRoundTripIntTest {
         assertThat(xPath.evaluate("coordinates/x", step(exported, "router"))).isEqualTo("280.5");
         assertThat(xPath.evaluate("coordinates/y", step(exported, "router"))).isEqualTo("120");
         assertThat(xPath.evaluate("coordinates", stepByUri(exported, "log:check"), XPathConstants.NODE)).isNull();
+    }
+
+    @ParameterizedTest
+    @CsvSource(delimiter = '|', value = {
+        "if-router.xml        | IfRouterFlow        | if      | log:sink-if   | simple | ${body} contains 'Test'",
+        "split-router.xml     | SplitRouterFlow     | split   | log:sink-part | xpath  | /persons/person",
+        "enrich-router.xml    | EnrichRouterFlow    | enrich  | log:sink-enrich |      | ",
+    })
+    void fixedSlotRouterKeepsItsNamedBranchAndDefaultBranch(String fixture, String flowName, String branch, String branchSink,
+                                                             String language, String expression) throws Exception {
+
+        Document exported = roundTrip(fixture, flowName);
+
+        Element router = step(exported, "router");
+        assertThat(links(router, "out").getLength()).isEqualTo(2);
+
+        Element namedBranch = (Element) xPath.evaluate("links/link[bound='out' and rule='" + branch + "']", router, XPathConstants.NODE);
+        assertThat(namedBranch).isNotNull();
+        assertThat(text(namedBranch, "language")).isEqualTo(language == null ? "" : language);
+        assertThat(text(namedBranch, "expression")).isEqualTo(expression == null ? "" : expression);
+        assertThat(stepsWithInLink(exported, text(namedBranch, "id"))).containsExactly(branchSink);
+
+        String defaultBranchId = xPath.evaluate("links/link[bound='out' and not(rule)]/id", router);
+        assertThat(stepsWithInLink(exported, defaultBranchId)).hasSize(1).doesNotContain(branchSink);
+    }
+
+    @Test
+    void recipientListBranchesStayDistinctAndKeepTheirPatterns() throws Exception {
+
+        Document exported = roundTrip("recipient-router.xml", "RecipientRouterFlow");
+
+        Element router = step(exported, "router");
+        NodeList branches = links(router, "out");
+        assertThat(branches.getLength()).isEqualTo(3);
+
+        java.util.Map<String, String> patternBySink = new java.util.HashMap<>();
+        for (int i = 0; i < branches.getLength(); i++) {
+            Element branch = (Element) branches.item(i);
+            assertThat(xPath.evaluate("rule", branch, XPathConstants.NODE)).isNull();
+            patternBySink.put(stepsWithInLink(exported, text(branch, "id")).getFirst(), text(branch, "pattern"));
+        }
+        assertThat(patternBySink).containsOnly(
+            java.util.Map.entry("log:sink-a", "InOnly"),
+            java.util.Map.entry("log:sink-b", "InOnly"),
+            java.util.Map.entry("log:sink-c", "InOut"));
+    }
+
+    @Test
+    void flowWithOnlyAnErrorStepStaysEmpty() throws Exception {
+
+        Document exported = roundTrip("empty-flow.xml", "EmptyFlow");
+
+        NodeList steps = (NodeList) xPath.evaluate("//flow/steps/step", exported, XPathConstants.NODESET);
+        assertThat(steps.getLength()).isEqualTo(1);
+        assertThat(text((Element) steps.item(0), "type")).isEqualTo("error");
+        assertThat(xPath.evaluate("//flow/steps/step/links", exported, XPathConstants.NODE)).isNull();
     }
 
     private java.util.List<String> stepsWithInLink(Document doc, String linkId) throws Exception {

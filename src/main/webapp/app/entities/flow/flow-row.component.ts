@@ -5,6 +5,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { Flow, IFlow, LogLevelType } from 'app/shared/model/flow.model';
+import { isDraft, loadFlowGraph, opensOnCanvas } from './designer/flow-graph';
 import { FlowService } from './flow.service';
 import { FlowDeleteDialogComponent } from 'app/entities/flow/flow-delete-dialog.component';
 
@@ -30,11 +31,6 @@ enum Status {
   inactive = 'inactive',
   inactiveError = 'inactiveError',
 }
-
-import { isDraft, loadFlowGraph } from './designer/flow-graph';
-
-/** Script and Route Flows are edited with forms, not on the visual designer's canvas. */
-const isDesignedFlow = (flow: IFlow): boolean => flow.type !== 'script' && flow.type !== 'route';
 
 @Component({
   selector: '[jhi-flow-row]',
@@ -153,7 +149,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
     this.steps = this.flow.steps;
     this.getSteps();
-    this.isDraft = isDesignedFlow(this.flow) && isDraft(loadFlowGraph(this.flow));
+    this.isDraft = opensOnCanvas(this.flow.type) && isDraft(loadFlowGraph(this.flow));
 
     this.registerTriggeredAction();
 

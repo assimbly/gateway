@@ -1,5 +1,6 @@
 package org.assimbly.gateway.config.exporting;
 
+import java.math.BigDecimal;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xerces.dom.DocumentImpl;
 import org.assimbly.docconverter.StringConverter;
@@ -396,7 +397,7 @@ public class ExportXML {
     }
 
     private String formatCoordinate(Double coordinate) {
-        return java.math.BigDecimal.valueOf(coordinate).stripTrailingZeros().toPlainString();
+        return BigDecimal.valueOf(coordinate).stripTrailingZeros().toPlainString();
     }
 
     public void setLinks(Step stepDB, Element step) {
