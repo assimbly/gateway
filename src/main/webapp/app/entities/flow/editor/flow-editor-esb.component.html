@@ -93,30 +93,15 @@
         <input type="text" class="form-control" id="id" *ngIf="flow" readonly formControlName="id"/>
       </div>
 
-      <div class="form-group">
-        <div class="form-group row">
-          <div class="col-8">
-            <input
-              style="border: 2px solid lightgrey; border-radius: 4px;font-weight:bold; font-size: 24px; margin-bottom: 0; min-width: 866px;"
-              type="text" class="form-control" id="name" #flowNameInput placeholder="Type flowname..." *ngIf="flow"
-              formControlName="name"/>
-            <div
-              *ngIf="formSubmitted && editFlowForm['controls'].name.errors">
-              <div *ngIf="editFlowForm['controls'].name.errors.required" class="invalid-field-message"
-                   style="color: red;">*Flowname is required.
-              </div>
-            </div>
-          </div>
-          <div class="col-4 text-end">
-            @if (useCanvas) {
-              <button type="button" class="btn btn-fx btn-fx-primary" (click)="save()" [disabled]="isSaving || (formSubmitted && editFlowForm.invalid)">
-                <fa-icon icon="save"></fa-icon>
-                <span>Save</span>
-              </button>
-            }
-          </div>
-        </div>
-      </div>
+      <jhi-flow-editor-header
+        [nameControl]="nameControl"
+        [flowId]="flow?.id"
+        [draftReason]="draftReason"
+        [sourceComponent]="sourceComponent"
+        [saving]="isSaving"
+        (save)="save()"
+        (saveAndStart)="save(true)"
+      />
 
       <ng-template #stepEditor let-index>
         <jhi-flow-editor-step
@@ -178,9 +163,6 @@
               <fa-icon icon="cogs"></fa-icon><span>Flow settings</span>
             </button>
             <div class="flow-designer-toolbar-end">
-              @if (flowIsDraft) {
-                <span class="badge flow-draft-badge" title="This Flow is incomplete. It can be saved, but not started.">Draft</span>
-              }
               <button type="button" class="btn btn-fx btn-fx-ghost" (click)="togglePanel()" aria-controls="flow-designer-panel"
                       [attr.aria-expanded]="!sidePanelCollapsed">
                 <fa-icon [icon]="sidePanelCollapsed ? 'chevron-left' : 'chevron-right'"></fa-icon>
@@ -373,17 +355,6 @@
       }
 
       @if (!useCanvas) {
-      <div class="form-fx-actions" style="max-width: 54rem;">
-        <button type="button" class="btn btn-fx btn-fx-secondary" [routerLink]="['/']">
-          <fa-icon icon="ban"></fa-icon>
-          <span>Cancel</span>
-        </button>
-        <button type="button" class="btn btn-fx btn-fx-primary" (click)="save()" [disabled]="isSaving || (formSubmitted && editFlowForm.invalid)">
-          <fa-icon icon="save"></fa-icon>
-          <span>Save</span>
-        </button>
-      </div>
-      <br/>
       <div *ngIf="savingFlowSuccess">
         <span class="text-success">*{{savingFlowSuccessMessage}}</span>
       </div>

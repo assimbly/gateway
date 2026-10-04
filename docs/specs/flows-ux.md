@@ -98,7 +98,7 @@ Small changes that work with any Camel component, no rewrite. They target the **
 
 - One header component is shared by the canvas editor and the Script/Route form editor. It replaces the canvas's name input row and the forms' bottom Cancel/Save buttons. Cancel becomes the breadcrumb's back link, which goes through the existing unsaved-changes guard.
 - Save & start saves, then starts. If the start fails, the Flow stays saved and the status shows Error.
-- Send test message navigates to the Test message page with the Flow's id in the query. The page reads the Flow's Source (component, path, options) and prefills its Endpoint. The button is enabled only while the Flow is Running and its Source's component isn't `producerOnly`.
+- Send test message navigates to the Test message page with the Flow's id in the query. The page reads the Flow's Source (component, path, options) and prefills its Endpoint. The button is enabled only while the Flow is Running and its Source's component isn't `consumerOnly`: a test message is sent *to* the Source's Endpoint, so its component has to accept messages (a Scheduler or Timer Source can't).
 
 ### Import from file
 

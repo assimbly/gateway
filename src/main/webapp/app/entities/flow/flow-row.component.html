@@ -63,6 +63,18 @@
       <fa-icon [icon]="menuIcons[action]"></fa-icon>
       <span>{{ menuLabels[action] }}</span>
     </button>
+    <button
+      jhiOverflowAction
+      type="button"
+      ngbDropdownItem
+      class="btn-fx-dropdown-item"
+      [disabled]="testMessageBlocked !== null"
+      [title]="testMessageBlocked ?? ''"
+      (click)="sendTestMessage()"
+    >
+      <fa-icon icon="paper-plane"></fa-icon>
+      <span>Send test message</span>
+    </button>
     <button jhiOverflowAction type="button" ngbDropdownItem class="btn-fx-dropdown-item" (click)="navigateToFlowEditor('edit')">
       <fa-icon icon="edit"></fa-icon>
       <span>Edit</span>

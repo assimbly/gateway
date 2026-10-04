@@ -1,0 +1,73 @@
+<header class="flow-editor-header">
+  <nav class="flow-editor-header__crumbs" aria-label="Breadcrumb">
+    <a routerLink="/">Flows</a>
+    <span class="flow-editor-header__separator" aria-hidden="true">/</span>
+    <input
+      #nameInput
+      type="text"
+      class="flow-editor-header__name"
+      [class.is-invalid]="nameControl().invalid && nameControl().touched"
+      [formControl]="nameControl()"
+      aria-label="Flow name"
+      placeholder="Name this Flow"
+      required
+    />
+  </nav>
+
+  <div class="flow-editor-header__status">
+    @if (state().draft) {
+      <jhi-flow-status-pill label="Draft" [ngbTooltip]="draftReason()" />
+    } @else if (flowId()) {
+      <jhi-flow-status-pill [label]="state().label" [tone]="state().tone" />
+    }
+    @if (flowId()) {
+      <span class="flow-editor-header__counter"
+        >Completed <strong>{{ completedLabel() }}</strong></span
+      >
+      <span class="flow-editor-header__counter"
+        >Failed <strong>{{ failedLabel() }}</strong></span
+      >
+      @if (alerts() > 0) {
+        <span class="badge text-bg-warning"><fa-icon icon="exclamation-triangle" /> Alert ({{ alerts() }})</span>
+      }
+    }
+  </div>
+
+  <div class="flow-editor-header__actions">
+    <span [ngbTooltip]="testMessageBlocked() ?? ''">
+      <button type="button" class="btn btn-fx btn-fx-ghost" [disabled]="testMessageBlocked() !== null" (click)="sendTestMessage()">
+        <fa-icon icon="paper-plane" /><span>Send test message</span>
+      </button>
+    </span>
+    @if (running()) {
+      <button type="button" class="btn btn-fx btn-fx-secondary" [disabled]="busy()" (click)="stop()">
+        <fa-icon icon="stop" /><span>Stop</span>
+      </button>
+    } @else {
+      <span [ngbTooltip]="startBlocked() ?? ''">
+        <button type="button" class="btn btn-fx btn-fx-secondary" [disabled]="busy() || startBlocked() !== null" (click)="start()">
+          <fa-icon icon="play" /><span>Start</span>
+        </button>
+      </span>
+    }
+    <div class="btn-group" ngbDropdown placement="bottom-end" container="body">
+      <button type="button" class="btn btn-fx btn-fx-primary" [disabled]="saving()" (click)="save.emit()">
+        <fa-icon icon="save" /><span>Save</span>
+      </button>
+      <button
+        type="button"
+        class="btn btn-fx btn-fx-primary btn-fx-icon flow-editor-header__save-menu"
+        ngbDropdownToggle
+        [disabled]="saving()"
+        aria-label="More save options"
+      >
+        <fa-icon icon="chevron-down" />
+      </button>
+      <div ngbDropdownMenu>
+        <span [ngbTooltip]="draftReason() ? 'This Flow is a Draft: ' + draftReason() : ''">
+          <button type="button" ngbDropdownItem [disabled]="draftReason() !== null" (click)="saveAndStart.emit()">Save &amp; start</button>
+        </span>
+      </div>
+    </div>
+  </div>
+</header>

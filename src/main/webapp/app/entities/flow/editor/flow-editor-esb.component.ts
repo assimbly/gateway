@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, DestroyRef, ElementRef, HostListener, OnDestroy, OnInit, TemplateRef, ViewChild, ViewEncapsulation, inject } from "@angular/core";
-import { CommonModule } from "@angular/common";
+import { CommonModule, Location } from "@angular/common";
 import { AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { NgbModal, NgbModalRef, NgbModule } from "@ng-bootstrap/ng-bootstrap";
@@ -39,6 +39,7 @@ import { FieldTabDirective } from "app/shared/form/field-tab.directive";
 import { CodemirrorModule } from "@ctrl/ngx-codemirror";
 import { ThemeService } from "app/core/theme";
 import { FlowCanvasComponent, DesignerSelection } from "../designer/flow-canvas.component";
+import { FlowEditorHeaderComponent } from "./flow-editor-header.component";
 import { LinkEditorComponent } from "../designer/link-editor.component";
 import { FlowGraphHistory } from "../designer/flow-graph-history";
 import {
@@ -71,7 +72,7 @@ import {
   styleUrl: '../designer/flow-designer.scss',
   encapsulation: ViewEncapsulation.None,
   providers: [StepEditorRegistry],
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, NgbModule, FontAwesomeModule, PopoverModule, AlertError, FlowEditorStepComponent, FieldTabDirective, CodemirrorModule, FlowCanvasComponent, LinkEditorComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, NgbModule, FontAwesomeModule, PopoverModule, AlertError, FlowEditorStepComponent, FieldTabDirective, CodemirrorModule, FlowCanvasComponent, LinkEditorComponent, FlowEditorHeaderComponent],
 })
 export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
@@ -107,7 +108,10 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			setTimeout(refresh);
 		});
 	}
-	@ViewChild('flowNameInput') flowNameInput?: ElementRef<HTMLInputElement>;
+	@ViewChild(FlowEditorHeaderComponent) header?: FlowEditorHeaderComponent;
+	/** Set by Save & start: start the Flow once it is saved. */
+	private startAfterSave = false;
+	private readonly location = inject(Location);
 	routes: Route[];
 	messages: IMessage[];
 	connections: Connection[];
@@ -711,9 +715,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 	private focusFlowNameIfEmpty(): void {
 		setTimeout(() => {
-			const el = this.flowNameInput?.nativeElement;
-			if (el && !el.value) {
-				el.focus();
+			if (!this.editFlowForm?.controls.name.value) {
+				this.header?.focusName();
 			}
 			this.editFlowForm?.controls.name.markAsPristine();
 			this.editFlowForm?.controls.name.markAsUntouched();
@@ -1475,8 +1478,9 @@ splitOptions4(options: string): string[] {
 		});
 	}
 
-	save(): any {
+	save(startAfterSave = false): any {
 
+		this.startAfterSave = startAfterSave;
 		this.formSubmitted = true;
 		this.savingFlowFailed = false;
 		this.savingFlowSuccess = false;
@@ -1488,6 +1492,7 @@ splitOptions4(options: string): string[] {
     this.checkForm();
 
 		if (!this.editFlowForm.valid || this.savingFlowFailed) {
+			this.editFlowForm.markAllAsTouched();
 			this.focusFirstInvalid();
 			return;
 		}
@@ -1527,11 +1532,7 @@ splitOptions4(options: string): string[] {
        }),
        switchMap(() => this.stepService.findByFlowId(this.flow.id)),
      )
-     .subscribe(() => {
-       this.savingFlowSuccess = true;
-       this.isSaving = false;
-       this.router.navigate(['/']);
-     });
+     .subscribe(() => this.afterSave());
   }
 
   createFlow(){
@@ -1557,9 +1558,7 @@ splitOptions4(options: string): string[] {
         next: () => {
           this.updateForm();
           this.finished = true;
-          this.savingFlowSuccess = true;
-          this.isSaving = false;
-          this.router.navigate(['/']);
+          this.afterSave();
         },
         error: () => {
           this.handleErrorWhileCreatingFlow(this.flow.id, this.step.id);
@@ -2057,7 +2056,39 @@ splitOptions4(options: string): string[] {
 
 	/** True while the Flow has edits that are not saved; used to warn before leaving the designer. */
 	get hasUnsavedChanges(): boolean {
-		return !this.savingFlowSuccess && (!!this.designer?.hasUnsavedChanges || !!this.editFlowForm?.dirty);
+		return !!this.designer?.hasUnsavedChanges || !!this.editFlowForm?.dirty;
+	}
+
+	/**
+	 * Stays in the editor after a save: the URL gets the Flow's id (a new Flow only has one now), and the Flow is
+	 * loaded again so every Step has its saved id. Save & start then starts it; a failed start shows as Error.
+	 */
+	private afterSave(): void {
+		this.savingFlowSuccess = true;
+		this.isSaving = false;
+		this.editFlowForm.markAsPristine();
+		const url = this.router.createUrlTree(['/flow/editor', this.flow.id], {
+			queryParams: { mode: 'edit', editor: this.activeEditor, id: this.flow.id },
+		});
+		this.location.replaceState(this.router.serializeUrl(url));
+		this.load(this.flow.id);
+		if (this.startAfterSave) {
+			this.startAfterSave = false;
+			this.header?.start(this.flow.id);
+		}
+	}
+
+	get nameControl(): FormControl<string> {
+		return this.editFlowForm.controls.name as FormControl<string>;
+	}
+
+	/** Why the Flow is a Draft, or null. Only a Visual Flow can be a Draft. */
+	get draftReason(): string | null {
+		return this.useCanvas && this.canvasProblems.length > 0 ? this.canvasProblems[0].message : null;
+	}
+
+	get sourceComponent(): string | undefined {
+		return this.steps?.find(step => step.stepType === StepType.SOURCE)?.componentType;
 	}
 
 	@HostListener('window:beforeunload', ['$event'])
@@ -2123,9 +2154,7 @@ splitOptions4(options: string): string[] {
 			.subscribe({
 				next: () => {
 					this.designer!.markSaved();
-					this.savingFlowSuccess = true;
-					this.isSaving = false;
-					this.router.navigate(['/']);
+					this.afterSave();
 				},
 				error: () => {
 					this.savingFlowFailed = true;

@@ -212,7 +212,33 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
 
             this.setTypeLinks(this.requestStep, 0);
 
+            const flowId = Number(this.route.snapshot.queryParamMap.get('flowId'));
+            if (flowId) {
+                this.prefillFromFlowSource(flowId);
+            }
+
             this.finished = true;
+            this.cdr.detectChanges();
+        });
+    }
+
+    /** Sends the test message to the Flow's Source: its Component, path, Options and Connection. */
+    private prefillFromFlowSource(flowId: number): void {
+        this.flowService.find(flowId).subscribe(response => {
+            const source = response.body?.steps?.find(step => step.stepType === StepType.SOURCE || step.stepType === StepType.FROM);
+            if (!source?.componentType) {
+                return;
+            }
+            const stepForm = <FormGroup>(<FormArray>this.messageSenderForm.controls.stepsData).controls[0];
+            this.requestStep.uri = source.uri;
+            this.requestStep.options = source.options;
+            this.setTypeLinks(this.requestStep, 0, source.componentType);
+            stepForm.controls.uri.setValue(source.uri);
+            this.stepsOptions[0] = [];
+            this.getOptions(this.requestStep, stepForm, this.stepsOptions[0]);
+            if (source.connectionId) {
+                stepForm.controls.connection.setValue(source.connectionId);
+            }
             this.cdr.detectChanges();
         });
     }
@@ -242,7 +268,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         this.consumerComponentsNames.sort();
     }
 
-    setTypeLinks(step: any, stepFormIndex?, e?: Event) {
+    setTypeLinks(step: any, stepFormIndex?, e?: string) {
         const stepForm = <FormGroup>(<FormArray>this.messageSenderForm.controls.stepsData).controls[stepFormIndex];
 
         if (typeof e !== 'undefined') {

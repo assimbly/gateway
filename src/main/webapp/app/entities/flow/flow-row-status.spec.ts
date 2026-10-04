@@ -1,4 +1,4 @@
-import { countLabel, flowTypeLabel, hasRun, rowStatus } from './flow-row-status';
+import { countLabel, flowTypeLabel, hasRun, rowStatus, runtimeStatusOf, testMessageBlocked } from './flow-row-status';
 
 describe('Flows list row status', () => {
   it.each([
@@ -33,6 +33,36 @@ describe('Flows list row status', () => {
     ['error', true],
   ])('counts a Flow whose runtime status is "%s" as having run: %s', (runtimeStatus, ran) => {
     expect(hasRun(runtimeStatus)).toBe(ran);
+  });
+
+  it.each([
+    ['started', 'active'],
+    ['resumed', 'active'],
+    ['restarted', 'active'],
+    ['suspended', 'paused'],
+    ['paused', 'paused'],
+    ['stopped', 'inactive'],
+    ['unconfigured', 'inactive'],
+    ['error', 'inactiveError'],
+    ['failed', 'inactiveError'],
+  ])('reads the runtime status "%s" as %s', (reported, status) => {
+    expect(runtimeStatusOf(reported)).toBe(status);
+  });
+
+  it('lets a test message go to the Source of a running Flow', () => {
+    expect(testMessageBlocked('active', { name: 'file', title: 'File', consumerOnly: false })).toBeNull();
+  });
+
+  it.each(['inactive', 'paused', 'inactiveError'] as const)('blocks a test message while the Flow is %s', status => {
+    expect(testMessageBlocked(status, { name: 'file', title: 'File', consumerOnly: false })).toBe(
+      'Start the Flow to send it a test message.',
+    );
+  });
+
+  it('blocks a test message to a Source whose Component only receives, such as a Scheduler', () => {
+    expect(testMessageBlocked('active', { name: 'scheduler', title: 'Scheduler', consumerOnly: true })).toBe(
+      "A test message can't be sent to a Scheduler Source.",
+    );
   });
 
   it.each([

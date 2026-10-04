@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -19,7 +19,8 @@ import { Collectors } from 'app/shared/collect/collectors';
 import { OverflowActionDirective, PrimaryActionDirective, RowActions, StatusControls, StatusControlsTone, Truncate } from 'app/shared/table';
 import { FlowRowAlerts } from './flow-row-alerts.component';
 import { FlowRowStats, FlowStatsSection } from './flow-row-stats.component';
-import { FlowAction, RowStatus, countLabel, flowTypeLabel, hasRun, rowStatus } from './flow-row-status';
+import { FlowAction, RowStatus, countLabel, flowTypeLabel, hasRun, rowStatus, testMessageBlocked } from './flow-row-status';
+import { Components } from 'app/shared/camel/component-type';
 import { FlowStatusPillComponent } from './flow-status-pill.component';
 
 import { Router } from '@angular/router';
@@ -120,6 +121,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
   intervalTime: any;
 
+  private readonly components = inject(Components);
   private destroyed = false;
   private readonly subscriptions = new Subscription();
 
@@ -154,6 +156,16 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
   get state(): RowStatus {
     return rowStatus(this.statusFlow, this.isDraft);
+  }
+
+  /** Why the ⋮ menu's Send test message is unavailable, or null when it can be sent. */
+  get testMessageBlocked(): string | null {
+    const source = this.flow.steps?.find(step => step.stepType === StepType.SOURCE || step.stepType === StepType.FROM);
+    return testMessageBlocked(this.statusFlow, this.components.types.find(type => type.name === source?.componentType));
+  }
+
+  sendTestMessage(): void {
+    this.router.navigate(['/flow/message-sender'], { queryParams: { flowId: this.flow.id } });
   }
 
   get typeLabel(): string {

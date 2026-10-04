@@ -1,6 +1,6 @@
 import { Service, inject } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable, Observer, Subscription } from 'rxjs';
+import { Observable, Observer, Subscription, switchMap } from 'rxjs';
 
 import { serverApiUrl } from 'app/config';
 
@@ -101,6 +101,14 @@ export class FlowService {
       headers: new HttpHeaders({ Accept: 'application/xml' }),
     };
     return this.http.get<any>(`${this.validationUrl}/uri`, options);
+  }
+
+  /** Sends the Flow's saved configuration to the runtime, then starts it. */
+  configureAndStart(flowId: number): Observable<HttpResponse<string>> {
+    return this.getConfiguration(flowId).pipe(
+      switchMap(configuration => this.setConfiguration(flowId, configuration.body, 'true')),
+      switchMap(() => this.start(flowId)),
+    );
   }
 
   start(flowId: number): Observable<HttpResponse<string>> {

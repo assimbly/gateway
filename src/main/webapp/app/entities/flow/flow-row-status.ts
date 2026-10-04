@@ -3,6 +3,29 @@ import { StatusControlsTone } from 'app/shared/table';
 /** The runtime state the Flows list tracks for a row. */
 export type RuntimeStatus = 'active' | 'paused' | 'inactive' | 'inactiveError';
 
+/** Reads a status or event word the runtime reports, such as `started` or `suspend`. */
+export function runtimeStatusOf(reported: string | null | undefined): RuntimeStatus {
+  switch (reported) {
+    case 'started':
+    case 'start':
+    case 'resumed':
+    case 'resume':
+    case 'restarted':
+    case 'restart':
+      return 'active';
+    case 'suspended':
+    case 'suspend':
+    case 'paused':
+    case 'pause':
+      return 'paused';
+    case 'error':
+    case 'failed':
+      return 'inactiveError';
+    default:
+      return 'inactive';
+  }
+}
+
 export type FlowAction = 'start' | 'stop' | 'resume' | 'pause' | 'restart';
 
 export interface RowStatus {
@@ -55,4 +78,21 @@ export function flowTypeLabel(type: string | undefined): 'Visual' | 'Script' | '
     default:
       return 'Visual';
   }
+}
+
+/**
+ * Why a test message can't be sent to the Flow's Source now, or null when it can. A test message is sent to the
+ * Source's Endpoint, so the Flow has to be running and the Source's Component has to accept messages sent to it.
+ */
+export function testMessageBlocked(
+  status: RuntimeStatus,
+  sourceComponent: { name: string; title?: string; consumerOnly?: boolean } | undefined,
+): string | null {
+  if (status !== 'active') {
+    return 'Start the Flow to send it a test message.';
+  }
+  if (sourceComponent?.consumerOnly) {
+    return `A test message can't be sent to a ${sourceComponent.title ?? sourceComponent.name} Source.`;
+  }
+  return null;
 }
