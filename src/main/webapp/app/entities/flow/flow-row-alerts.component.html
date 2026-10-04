@@ -11,24 +11,6 @@
     <button type="button" class="btn btn-fx btn-fx-secondary" (click)="modal.dismiss()">Close</button>
   </div>
 </ng-template>
-<ng-template #alertsModal let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title">Alerts</h4>
-    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
-  </div>
-  <div class="modal-body">
-    <p class="mb-3">{{ flowName }}</p>
-    <p *ngIf="alertsLoading" class="mb-0">Loading alerts…</p>
-    <p *ngIf="!alertsLoading && alertMessages.length === 0" class="mb-0">No alerts.</p>
-    <ol *ngIf="!alertsLoading && alertMessages.length > 0" class="flow-alert-list" (scroll)="alertsScroll.emit($event)">
-      <li *ngFor="let message of alertMessages">{{ message }}</li>
-      <li *ngIf="alertsLoadingMore" class="flow-alert-status">Loading more…</li>
-    </ol>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-fx btn-fx-secondary" (click)="modal.dismiss()">Close</button>
-  </div>
-</ng-template>
 
 <button
   type="button"
@@ -43,7 +25,7 @@
   type="button"
   class="badge bg-warning text-dark border-0"
   *ngIf="numberOfAlerts > 0"
-  (click)="openAlerts(alertsModal)"
+  (click)="alertsOpen.emit()"
 >
   <fa-icon icon="exclamation-triangle"></fa-icon>
   Alert ({{ numberOfAlerts }})

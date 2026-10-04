@@ -8,9 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -29,6 +31,9 @@ public class FlowAlertLogService {
     private static final Logger log = LoggerFactory.getLogger(FlowAlertLogService.class);
 
     private static final String ALERT_LOG_SUFFIX = "_alerts.log";
+
+    /** Where cleared alert logs go, inside the flow's alert directory. {@link #page} doesn't look into it. */
+    static final String CLEARED_DIR = "cleared";
 
     private final Path alertsRoot;
 
@@ -54,15 +59,50 @@ public class FlowAlertLogService {
         return page;
     }
 
-    private List<String> readNewestFirst(long flowId) {
+    /**
+     * Clears a flow's alerts for everyone by moving its alert logs into the {@value #CLEARED_DIR} folder of the
+     * flow's alert directory. Nothing is deleted. A log the runtime still holds open is copied there and emptied.
+     *
+     * @throws UncheckedIOException when an alert log can't be moved aside
+     */
+    public void clear(long flowId) {
+        List<Path> files = alertLogs(flowId);
+        if (files.isEmpty()) {
+            return;
+        }
+        Path clearedDir = alertsRoot.resolve(Long.toString(flowId)).resolve(CLEARED_DIR);
+        try {
+            Files.createDirectories(clearedDir);
+            for (Path file : files) {
+                Path target = unusedName(clearedDir, file.getFileName().toString());
+                try {
+                    Files.move(file, target);
+                } catch (IOException moveFailed) {
+                    Files.copy(file, target);
+                    Files.newOutputStream(file, StandardOpenOption.TRUNCATE_EXISTING).close();
+                }
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException("Could not clear the alerts of flow " + flowId, e);
+        }
+    }
+
+    /** The name in the cleared folder: the log's own name, or with a number added when a log of that name was cleared before. */
+    private static Path unusedName(Path dir, String fileName) {
+        Path target = dir.resolve(fileName);
+        for (int i = 1; Files.exists(target); i++) {
+            target = dir.resolve(fileName + "." + i);
+        }
+        return target;
+    }
+
+    private List<Path> alertLogs(long flowId) {
         Path flowDir = alertsRoot.resolve(Long.toString(flowId));
         if (!Files.isDirectory(flowDir)) {
             return List.of();
         }
-
-        List<Path> files;
         try (Stream<Path> listing = Files.list(flowDir)) {
-            files = listing
+            return listing
                 .filter(path -> Files.isRegularFile(path) && path.getFileName().toString().endsWith(ALERT_LOG_SUFFIX))
                 .sorted(Comparator.comparing((Path path) -> path.getFileName().toString()).reversed())
                 .toList();
@@ -70,6 +110,10 @@ public class FlowAlertLogService {
             log.warn("Could not list alert logs for flow {}", flowId, e);
             return List.of();
         }
+    }
+
+    private List<String> readNewestFirst(long flowId) {
+        List<Path> files = alertLogs(flowId);
 
         List<String> lines = new ArrayList<>();
         for (Path file : files) {

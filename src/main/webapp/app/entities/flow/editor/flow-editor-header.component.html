@@ -28,7 +28,9 @@
         >Failed <strong>{{ failedLabel() }}</strong></span
       >
       @if (alerts() > 0) {
-        <span class="badge text-bg-warning"><fa-icon icon="exclamation-triangle" /> Alert ({{ alerts() }})</span>
+        <button type="button" class="badge text-bg-warning border-0" (click)="openAlerts()">
+          <fa-icon icon="exclamation-triangle" /> Alert ({{ alerts() }})
+        </button>
       }
     }
   </div>

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
-import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 
 import { Flow, IFlow, LogLevelType } from 'app/shared/model/flow.model';
 import { isDraft, loadFlowGraph, opensOnCanvas } from './designer/flow-graph';
@@ -23,6 +23,7 @@ import { FlowAction, RowStatus, countLabel, flowTypeLabel, hasRun, rowStatus, te
 import { Components } from 'app/shared/camel/component-type';
 import { ComponentSchemas } from 'app/shared/camel/component-schemas.service';
 import { FlowStatusPillComponent } from './flow-status-pill.component';
+import { FlowAlertsDrawerComponent } from './flow-alerts-drawer.component';
 
 import { Router } from '@angular/router';
 import dayjs from 'dayjs/esm';
@@ -95,11 +96,6 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
   public flowAlerts: string;
   public numberOfAlerts: any;
-  public alertMessages: string[] = [];
-  public alertsTotal = 0;
-  public alertsLoading = false;
-  public alertsLoadingMore = false;
-  private readonly alertPageSize = 10;
   public showNumberOfItems: number;
   public completedCount: number | null = null;
   public failedCount: number | null = null;
@@ -124,6 +120,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
   private readonly components = inject(Components);
   private readonly schemas = inject(ComponentSchemas);
+  private readonly offcanvas = inject(NgbOffcanvas);
   private destroyed = false;
   private readonly subscriptions = new Subscription();
 
@@ -237,12 +234,12 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.getFlowNumberOfAlerts(this.flow.id);
   }
 
-  onAlertsOpen(): void {
-    this.alertMessages = [];
-    this.alertsTotal = 0;
-    this.alertsLoading = true;
-    this.alertsLoadingMore = false;
-    this.loadAlertPage();
+  /** Opens the Alerts drawer; once they are cleared the row's count goes to zero. */
+  openAlerts(): void {
+    FlowAlertsDrawerComponent.open(this.offcanvas, { id: this.flow.id!, name: this.flow.name, type: this.flow.type }, () => {
+      this.setFlowNumberOfAlerts(0);
+      this.changeDetector.detectChanges();
+    });
   }
 
   getStatus(id: number) {
@@ -423,58 +420,6 @@ export class FlowRowComponent implements OnInit, OnDestroy {
       return;
     }
     this.getFlowNumberOfAlerts(this.flow.id);
-  }
-
-  onAlertsScroll(event: Event): void {
-    if (this.alertsLoading || this.alertsLoadingMore || this.alertMessages.length >= this.alertsTotal) {
-      return;
-    }
-    const element = event.target as HTMLElement;
-    const distanceFromBottom = element.scrollHeight - element.scrollTop - element.clientHeight;
-    if (distanceFromBottom <= 48) {
-      this.alertsLoadingMore = true;
-      this.loadAlertPage();
-    }
-  }
-
-  private loadMoreAlertsIfNeeded(): void {
-    if (this.alertsLoading || this.alertsLoadingMore || this.alertMessages.length >= this.alertsTotal) {
-      return;
-    }
-    const list = document.querySelector('.flow-alert-list') as HTMLElement | null;
-    if (list && list.scrollHeight <= list.clientHeight + 1) {
-      this.alertsLoadingMore = true;
-      this.loadAlertPage();
-    }
-  }
-
-  private loadAlertPage(): void {
-    const offset = this.alertMessages.length;
-    this.subscriptions.add(
-      this.flowService.getFlowAlertsPage(this.flow.id, offset, this.alertPageSize).subscribe({
-        next: response => {
-          if (this.destroyed) {
-            return;
-          }
-          const page = response.body;
-          this.alertsTotal = page?.total ?? 0;
-          this.alertMessages = this.alertMessages.concat(page?.messages ?? []);
-          this.alertsLoading = false;
-          this.alertsLoadingMore = false;
-          this.setFlowNumberOfAlerts(this.alertsTotal);
-          this.changeDetector.detectChanges();
-          setTimeout(() => this.loadMoreAlertsIfNeeded());
-        },
-        error: () => {
-          if (this.destroyed) {
-            return;
-          }
-          this.alertsLoading = false;
-          this.alertsLoadingMore = false;
-          this.changeDetector.detectChanges();
-        },
-      }),
-    );
   }
 
   getFlowNumberOfAlerts(id: number) {

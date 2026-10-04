@@ -145,6 +145,11 @@ export class FlowService {
     );
   }
 
+  /** Clears the Flow's Alerts for everyone. */
+  clearFlowAlerts(flowId: number): Observable<HttpResponse<void>> {
+    return this.http.delete<void>(`${this.resourceUrl}/${flowId}/alerts`, { observe: 'response' });
+  }
+
   getFlowAlertsPage(flowId: number, offset: number, limit: number): Observable<HttpResponse<{ total: number; messages: string[] }>> {
     const params = new HttpParams().set('offset', offset).set('limit', limit);
     return this.http.get<{ total: number; messages: string[] }>(`${this.resourceUrl}/${flowId}/alerts`, {

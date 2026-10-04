@@ -14,20 +14,11 @@ export class FlowRowAlerts {
   @Input() flowError = false;
   @Input() flowErrorButton: string;
   @Input() numberOfAlerts = 0;
-  @Input() alertsLoading = false;
-  @Input() alertsLoadingMore = false;
-  @Input() alertMessages: string[] = [];
   readonly alertsOpen = output<void>();
-  readonly alertsScroll = output<Event>();
 
   constructor(private modalService: NgbModal) {}
 
   openError(content: TemplateRef<unknown>): void {
-    this.modalService.open(content, { centered: true, size: 'lg' });
-  }
-
-  openAlerts(content: TemplateRef<unknown>): void {
-    this.alertsOpen.emit();
     this.modalService.open(content, { centered: true, size: 'lg' });
   }
 }

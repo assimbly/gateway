@@ -187,6 +187,20 @@ public class FlowResource {
     }
 
     /**
+     * DELETE /flows/:id/alerts : clear a flow's alerts for everyone. The alert logs are moved aside, not deleted.
+     *
+     * @param id the flow id
+     * @return the ResponseEntity with status 204 (No Content)
+     */
+    @Operation(summary = "Clear the alerts of a flow")
+    @DeleteMapping("/flows/{id}/alerts")
+    public ResponseEntity<Void> clearFlowAlerts(@PathVariable(value = "id") Long id) {
+        log.debug("REST request to clear alerts for Flow : {}", id);
+        flowAlertLogService.clear(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
      * DELETE  /flows/:id : delete the "id" flow.
      *
      * @param id the id of the flowDTO to delete

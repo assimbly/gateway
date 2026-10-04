@@ -5,7 +5,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { NgbDropdownModule, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbOffcanvas, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { EMPTY, Observable, Subject, catchError, forkJoin, map, merge, of, switchMap, timer } from 'rxjs';
 
 import { Components } from 'app/shared/camel/component-type';
@@ -13,6 +13,7 @@ import { Components } from 'app/shared/camel/component-type';
 import { FlowService } from '../flow.service';
 import { RuntimeStatus, countLabel, hasRun, rowStatus, runtimeStatusOf, testMessageBlocked } from '../flow-row-status';
 import { FlowStatusPillComponent } from '../flow-status-pill.component';
+import { FlowAlertsDrawerComponent } from '../flow-alerts-drawer.component';
 
 const POLL_INTERVAL = 10000;
 
@@ -70,6 +71,7 @@ export class FlowEditorHeaderComponent {
   private readonly flowService = inject(FlowService);
   private readonly components = inject(Components);
   private readonly router = inject(Router);
+  private readonly offcanvas = inject(NgbOffcanvas);
   private readonly nameInput = viewChild<ElementRef<HTMLInputElement>>('nameInput');
   private readonly refresh = new Subject<void>();
 
@@ -98,6 +100,13 @@ export class FlowEditorHeaderComponent {
     const id = this.flowId();
     if (id) {
       this.run(this.flowService.stop(id));
+    }
+  }
+
+  openAlerts(): void {
+    const id = this.flowId();
+    if (id) {
+      FlowAlertsDrawerComponent.open(this.offcanvas, { id, name: this.nameControl().value }, () => this.alerts.set(0));
     }
   }
 

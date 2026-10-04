@@ -9,11 +9,7 @@
       [flowError]="flowError"
       [flowErrorButton]="flowErrorButton"
       [numberOfAlerts]="numberOfAlerts"
-      [alertsLoading]="alertsLoading"
-      [alertsLoadingMore]="alertsLoadingMore"
-      [alertMessages]="alertMessages"
-      (alertsOpen)="onAlertsOpen()"
-      (alertsScroll)="onAlertsScroll($event)"
+      (alertsOpen)="openAlerts()"
     />
   </div>
 </td>

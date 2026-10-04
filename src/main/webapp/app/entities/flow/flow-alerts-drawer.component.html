@@ -1,0 +1,55 @@
+<div class="offcanvas-header">
+  <div>
+    <h4 class="offcanvas-title" id="flow-alerts-title">Alerts</h4>
+    <div class="text-muted">{{ flowName }}</div>
+  </div>
+  <button type="button" class="btn-close" aria-label="Close" (click)="activeOffcanvas.dismiss()"></button>
+</div>
+
+<div class="flow-alerts-drawer__actions">
+  <button type="button" class="btn btn-fx btn-fx-secondary" (click)="openFlow()"><fa-icon icon="edit" /><span>Open Flow</span></button>
+  <button
+    type="button"
+    class="btn btn-fx btn-fx-warning"
+    [disabled]="clearing() || total() === 0"
+    (click)="clear()"
+    title="Clear these alerts for everyone"
+  >
+    <fa-icon icon="check" /><span>Clear</span>
+  </button>
+</div>
+
+<div class="offcanvas-body flow-alerts-drawer__body" (scroll)="onScroll($event)">
+  @if (failed(); as message) {
+    <div class="alert alert-danger py-2" role="alert">{{ message }}</div>
+  }
+  @if (alerts().length) {
+    <ol class="flow-alerts-drawer__list">
+      @for (alert of alerts(); track $index) {
+        <li class="flow-alerts-drawer__alert">
+          @if (alert.at) {
+            <time class="flow-alerts-drawer__time" [attr.datetime]="alert.at.toISOString()" [title]="timestamp(alert)">{{
+              relative(alert)
+            }}</time>
+          }
+          <button
+            type="button"
+            class="flow-alerts-drawer__message"
+            [class.flow-alerts-drawer__message--expanded]="expanded().has($index)"
+            [attr.aria-expanded]="expanded().has($index)"
+            (click)="toggle($index)"
+          >
+            {{ alert.message }}
+          </button>
+        </li>
+      }
+    </ol>
+  } @else if (!loading()) {
+    <p class="text-muted mb-0">No alerts.</p>
+  }
+  @if (loading()) {
+    <p class="text-muted mb-0" role="status">Loading alerts…</p>
+  } @else if (hasMore) {
+    <button type="button" class="btn btn-fx btn-fx-ghost w-100" (click)="loadMore()">Show more ({{ total() - alerts().length }})</button>
+  }
+</div>
