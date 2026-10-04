@@ -48,6 +48,10 @@ public class ImportXMLMessages {
         messagesIdMap = new HashMap<>();
 
         for (String messageId : messageIds) {
+            // A Response's message is generated on export; the Response Step keeps its own settings.
+            if (ImportXMLFlows.isResponseMessage(messageId)) {
+                continue;
+            }
 			setMessageFromXML(doc, messageId);
 		}
 

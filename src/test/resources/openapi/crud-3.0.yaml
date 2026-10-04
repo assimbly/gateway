@@ -1,0 +1,79 @@
+openapi: 3.0.3
+info:
+  title: Customers
+  version: 2.1.0
+  description: Manage customers.
+servers:
+  - url: https://api.example.com/customers
+paths:
+  /:
+    get:
+      operationId: listCustomers
+      summary: List customers
+      parameters:
+        - name: limit
+          in: query
+          description: At most this many
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: The customers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+    post:
+      operationId: createCustomer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+      responses:
+        '201':
+          description: Created
+  /{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The customer
+        schema:
+          type: integer
+    get:
+      operationId: getCustomer
+      parameters:
+        - name: X-Request-Id
+          in: header
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+        '404':
+          description: Not found
+    delete:
+      responses:
+        '204':
+          description: Deleted

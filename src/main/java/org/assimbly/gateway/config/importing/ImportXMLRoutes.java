@@ -57,6 +57,10 @@ public class ImportXMLRoutes {
         routesIdMap = new HashMap<>();
 
 		for (String routeId : routeIds) {
+            // A Handler Flow's problem Route configuration is generated on export, not kept.
+            if (routeId.startsWith("apiproblem")) {
+                continue;
+            }
 			setRouteFromXML(doc, routeId);
 		}
 

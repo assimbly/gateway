@@ -360,6 +360,11 @@ dependencies {
 
     implementation("io.github.assimbly:docconverter:3.0.2")
 
+    // reads OpenAPI 3.0 and 3.1 documents for the REST API builder's import; swagger-core comes as swagger-core-jakarta
+    implementation("io.swagger.parser.v3:swagger-parser-v3:2.1.45") {
+        exclude group: "io.swagger.core.v3", module: "swagger-core"
+    }
+
     implementation 'com.warrenstrange:googleauth'
 
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"

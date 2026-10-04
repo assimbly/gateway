@@ -5,14 +5,17 @@ import org.assimbly.gateway.domain.*;
 import org.assimbly.gateway.domain.enumeration.LogLevelType;
 import org.assimbly.gateway.domain.enumeration.StepType;
 import org.assimbly.gateway.repository.*;
+import org.assimbly.gateway.service.api.ResponseSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.time.Instant;
@@ -241,6 +244,13 @@ public class ImportXMLFlows {
 			}
 		}
 
+        // A Response exported for the runtime: its settings come back from its generated message.
+        ResponseSettings response = responseSettings(doc, uri);
+        if (response != null) {
+            componentType = "setmessage";
+            uri = response.body();
+        }
+
         // get options
 		Map<String, String> optionsMap = ImportXMLUtil.getMap(doc, stepXPath + "options/*");
 
@@ -316,7 +326,7 @@ public class ImportXMLFlows {
         step.responseId(responseId);
         step.setUri(uri);
 		step.setFlow(flow);
-		step.setOptions(options.toString());
+		step.setOptions(response != null ? response.toOptions() : options.toString());
         step.setCoordinateX(parseCoordinate(coordinateX));
         step.setCoordinateY(parseCoordinate(coordinateY));
 
@@ -444,6 +454,40 @@ public class ImportXMLFlows {
 
         return flow;
 
+    }
+
+    /** Whether a message is one the export generated for a Response, named response{stepId}. */
+    public static boolean isResponseMessage(String messageId) {
+        return messageId != null && messageId.matches("response\\d+");
+    }
+
+    /**
+     * The settings of a Response, from the message the export generated for it ({@code message:response{stepId}}),
+     * or null for any other Step.
+     */
+    private ResponseSettings responseSettings(Document doc, String path) throws XPathExpressionException {
+        String messageName = StringUtils.substringAfter(path, "message:");
+        if (!path.startsWith("message:") || !isResponseMessage(messageName)) {
+            return null;
+        }
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        String messageXPath = "/dil/core/messages/message[name='" + messageName + "']/";
+        String status = ResponseSettings.DEFAULT_STATUS;
+        Map<String, String> headers = new LinkedHashMap<>();
+        NodeList headerNodes = (NodeList) xPath.evaluate(messageXPath + "headers/header", doc, XPathConstants.NODESET);
+        for (int i = 0; i < headerNodes.getLength(); i++) {
+            String name = xPath.evaluate("name", headerNodes.item(i));
+            String value = xPath.evaluate("value", headerNodes.item(i));
+            if (name.equals("CamelHttpResponseCode")) {
+                status = value;
+            } else {
+                headers.put(name, value);
+            }
+        }
+        boolean hasBody = (Boolean) xPath.evaluate("boolean(" + messageXPath + "body)", doc, XPathConstants.BOOLEAN);
+        String body = hasBody ? xPath.evaluate(messageXPath + "body/content", doc) : null;
+        String language = hasBody ? xPath.evaluate(messageXPath + "body/language", doc) : null;
+        return new ResponseSettings(status, body == null || body.isEmpty() ? null : body, language == null || language.isEmpty() ? null : language, headers);
     }
 
     private Double parseCoordinate(String coordinate) {

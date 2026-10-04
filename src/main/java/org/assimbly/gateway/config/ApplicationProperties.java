@@ -77,6 +77,26 @@ public class ApplicationProperties {
     	private boolean tracing;
     	private boolean debugging;
         private boolean cache;
+        /** The tenant whose REST paths get the {@code /_<tenant>} prefix; none by default. */
+        private String tenant;
+        /** Where the runtime serves REST Sources: Try it calls Operations there, and an OpenAPI export names its port. */
+        private String restListenerUrl = "https://localhost:9001";
+
+        public String getTenant() {
+            return tenant;
+        }
+
+        public void setTenant(String tenant) {
+            this.tenant = tenant;
+        }
+
+        public String getRestListenerUrl() {
+            return restListenerUrl;
+        }
+
+        public void setRestListenerUrl(String restListenerUrl) {
+            this.restListenerUrl = restListenerUrl;
+        }
 
         public String getName() {
             return name;
