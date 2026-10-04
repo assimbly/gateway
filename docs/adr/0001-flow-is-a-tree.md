@@ -4,6 +4,6 @@ A Flow designed on the canvas is a tree. It starts at exactly one Source, it onl
 
 ## Consequences
 
-- The canvas enforces this after every edit. A Draft can be incomplete in its Step configuration, but never in its shape.
+- The canvas enforces this after every edit. A Draft can be incomplete in its Step configuration, and it can be unfinished at its ends: a Source or Action without a next Step yet. It never has a join, a loop or a dangling Link, and it stays a Draft until every Branch ends in a Sink.
 - Deleting a Step or Branch removes, or reconnects, whatever the tree requires. The user never fixes up dangling Links by hand.
 - Allowing joins or loops later would mean changing the canvas rules, the deletion rules, the DIL export and the runtime transpiler together.

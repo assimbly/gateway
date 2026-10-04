@@ -4,7 +4,9 @@ import { IStep } from 'app/shared/model/step.model';
 
 import {
   addBranch,
+  appendStep,
   autoArrange,
+  canDeleteStep,
   changeComponent,
   deleteStep,
   EditResult,
@@ -14,6 +16,7 @@ import {
   linksToSave,
   loadFlowGraph,
   moveStep,
+  openEnds,
   problems,
   ROUTER_KINDS,
   routerShape,
@@ -181,16 +184,22 @@ describe('Flow graph', () => {
       expect(graph.readOnlyReason).toBeUndefined();
     });
 
-    it('opens a Flow without a Source like a new Flow: a placeholder Source linked to a placeholder Sink', () => {
+    it('opens a Flow without a Source like a new Flow: only a placeholder Source, for the user to add Steps after', () => {
       const graph = loadFlowGraph(flow([step(9, 'ERROR')]));
 
-      expect(graph.steps.map(s => [s.kind, s.id])).toEqual([
-        ['SOURCE', undefined],
-        ['SINK', undefined],
-      ]);
-      expect(graph.links).toEqual([expect.objectContaining({ from: graph.steps[0].key, to: graph.steps[1].key })]);
+      expect(graph.steps.map(s => [s.kind, s.id])).toEqual([['SOURCE', undefined]]);
+      expect(graph.links).toEqual([]);
+      expect(openEnds(graph)).toEqual(graph.steps);
       expect(graph.errorStep?.id).toBe(9);
       expect(graph.repaired).toBe(false);
+    });
+
+    it('opens a saved Draft that ends in an open end as it is, without repairing it', () => {
+      const graph = loadFlowGraph(flow([step(10, 'SOURCE', [outbound('1-11')]), step(11, 'ACTION', [inbound('1-11')])]));
+
+      expect(graph.repaired).toBe(false);
+      expect(linkIds(graph)).toEqual([[10, 11]]);
+      expect(openEnds(graph).map(s => s.key)).toEqual(['step-11']);
     });
 
     it('opens an older Router Flow read-only when its Branches share one Link name but have different settings', () => {
@@ -303,6 +312,64 @@ describe('Flow graph', () => {
     });
   });
 
+  describe('adding the next Step after an open end', () => {
+    const newFlow = (): FlowGraph => loadFlowGraph(flow([]));
+
+    it('adds an Action with the chosen component after the Source, which leaves the Action as the open end', () => {
+      const start = newFlow();
+      const source = start.steps[0];
+
+      const graph = edited(appendStep(start, source.key, 'ACTION', 'setbody'));
+
+      const action = graph.steps.find(s => s.kind === 'ACTION')!;
+      expect(action.componentType).toBe('setbody');
+      expect(linkKeys(graph)).toEqual([`${source.key} → ${action.key}`]);
+      expect(openEnds(graph)).toEqual([action]);
+    });
+
+    it('ends the Flow with a Sink, after which there is no open end', () => {
+      const start = newFlow();
+
+      const graph = edited(appendStep(start, start.steps[0].key, 'SINK', 'file'));
+
+      expect(graph.steps.find(s => s.kind === 'SINK')!.componentType).toBe('file');
+      expect(openEnds(graph)).toEqual([]);
+    });
+
+    it('places the next Step one column to the right', () => {
+      const start = newFlow();
+      const placed = edited(moveStep(start, start.steps[0].key, 0, 0));
+
+      const graph = edited(appendStep(placed, placed.steps[0].key, 'ACTION', 'log'));
+
+      expect(graph.steps.find(s => s.kind === 'ACTION')).toMatchObject({ x: 200, y: 0 });
+    });
+
+    it.each([
+      ['if', [undefined, 'if']],
+      ['content', [undefined]],
+      ['recipient', [undefined]],
+    ])('gives a new %s Router the Branches its kind needs, each ending in a new Sink', (kind, rules) => {
+      const start = newFlow();
+
+      const graph = edited(appendStep(start, start.steps[0].key, 'ROUTER', kind as string));
+
+      const router = graph.steps.find(s => s.kind === 'ROUTER')!;
+      const branches = graph.links.filter(l => l.from === router.key);
+      expect(branches.map(l => l.rule)).toEqual(rules);
+      expect(branches.map(l => graph.steps.find(s => s.key === l.to)!.kind)).toEqual(branches.map(() => 'SINK'));
+      expect(openEnds(graph)).toEqual([]);
+    });
+
+    it('refuses to add a Step after a Step that already has a next Step', () => {
+      expect(appendStep(sourceToSink(), 'step-10', 'ACTION', 'log').outcome).toBe('rejected');
+    });
+
+    it('refuses to add a Step after a Sink', () => {
+      expect(appendStep(sourceToSink(), 'step-11', 'ACTION', 'log').outcome).toBe('rejected');
+    });
+  });
+
   describe('adding a Branch', () => {
     it('adds a Branch ending in a new Sink to a List Router', () => {
       const graph = edited(addBranch(contentRouterFlow(), 'step-11'));
@@ -375,27 +442,56 @@ describe('Flow graph', () => {
       expect(linkKeys(graph)).toEqual(['step-10 → step-11']);
     });
 
-    it('removes the whole Branch when the Sink of a List Router Branch is deleted', () => {
-      const withAction = edited(insertStep(contentRouterFlow(), 'step-13', 'ACTION', 'setbody'));
-
-      const graph = edited(deleteStep(withAction, 'step-13'));
+    it('removes the whole Branch when the only Step of a List Router Branch is deleted', () => {
+      const graph = edited(deleteStep(contentRouterFlow(), 'step-13'));
 
       expect(graph.steps.map(s => s.key)).toEqual(['step-10', 'step-11', 'step-12']);
       expect(linkKeys(graph)).toEqual(['step-10 → step-11', 'step-11 → step-12']);
     });
 
-    it('refuses to delete the Sink of a Default branch', () => {
-      expect(deleteStep(contentRouterFlow(), 'step-12')).toEqual({ outcome: 'rejected', reason: expect.stringContaining('Sink') });
+    it('deletes the Sink after an Action in a Branch on its own, leaving the Action as an open end', () => {
+      const withAction = edited(insertStep(contentRouterFlow(), 'step-13', 'ACTION', 'setbody'));
+      const action = withAction.steps.find(s => s.kind === 'ACTION')!;
+
+      const graph = edited(deleteStep(withAction, 'step-13'));
+
+      expect(graph.steps.some(s => s.key === 'step-13')).toBe(false);
+      expect(openEnds(graph).map(s => s.key)).toEqual([action.key]);
     });
 
-    it('refuses to delete a Sink that is not at the end of a List Router Branch', () => {
-      expect(deleteStep(sourceToSink(), 'step-11').outcome).toBe('rejected');
+    it('deletes the Sink after the Source, leaving the Source as an open end', () => {
+      const graph = edited(deleteStep(sourceToSink(), 'step-11'));
+
+      expect(graph.steps.map(s => s.key)).toEqual(['step-10']);
+      expect(graph.links).toEqual([]);
+    });
+
+    it('deletes an Action that is an open end, leaving the Step before it as the open end', () => {
+      const start = loadFlowGraph(flow([]));
+      const withAction = edited(appendStep(start, start.steps[0].key, 'ACTION', 'log'));
+      const action = withAction.steps.find(s => s.kind === 'ACTION')!;
+
+      const graph = edited(deleteStep(withAction, action.key));
+
+      expect(graph.steps.map(s => s.key)).toEqual([start.steps[0].key]);
+      expect(graph.links).toEqual([]);
+    });
+
+    it('refuses to delete the Sink of a Default branch', () => {
+      expect(deleteStep(contentRouterFlow(), 'step-12')).toEqual({ outcome: 'rejected', reason: expect.stringContaining('Default branch') });
     });
 
     it('refuses to delete the Sink of the last Branch of a Recipient list Router', () => {
       const recipient = edited(insertStep(sourceToSink(), 'step-11', 'ROUTER', 'recipient'));
 
       expect(deleteStep(recipient, 'step-11').outcome).toBe('rejected');
+    });
+
+    it('tells which Steps can be deleted, so only those offer it', () => {
+      expect(canDeleteStep(sourceToSink(), 'step-11')).toBe(true);
+      expect(canDeleteStep(contentRouterFlow(), 'step-13')).toBe(true);
+      expect(canDeleteStep(contentRouterFlow(), 'step-12')).toBe(false);
+      expect(canDeleteStep(sourceToSink(), 'step-10')).toBe(false);
     });
 
     it('refuses to delete the Source', () => {
@@ -488,10 +584,17 @@ describe('Flow graph', () => {
     });
 
     it('is a Draft while a Step has no component', () => {
-      const graph = loadFlowGraph(flow([]));
+      const graph = loadFlowGraph(flow([step(10, 'SOURCE', [outbound('1-11')]), step(11, 'SINK', [inbound('1-11')], { componentType: '', uri: '' })]));
 
       expect(isDraft(graph)).toBe(true);
-      expect(problems(graph).map(p => p.stepKey)).toEqual(graph.steps.map(s => s.key));
+      expect(problems(graph)).toEqual([{ stepKey: 'step-11', message: expect.stringContaining('component') }]);
+    });
+
+    it('is a Draft while a Branch does not end in a Sink yet', () => {
+      const graph = edited(deleteStep(sourceToSink(), 'step-11'));
+
+      expect(isDraft(graph)).toBe(true);
+      expect(problems(graph)).toEqual([{ stepKey: 'step-10', message: expect.stringContaining('next Step') }]);
     });
 
     it('is a Draft while a named Branch of a content Router has no Condition', () => {
@@ -573,19 +676,20 @@ describe('Flow graph', () => {
       expectTidyLayout(contentRouterFlow());
     });
 
-    it('places new Steps without moving the Steps the user already placed, and without overlapping them', () => {
-      const placed = edited(moveStep(edited(moveStep(sourceToSink(), 'step-10', 0, 0)), 'step-11', 260, 0));
+    it('puts an inserted Step in the place of the Step after it, which moves one column right with everything after it', () => {
+      const placed = edited(moveStep(edited(moveStep(sourceToSink(), 'step-10', 0, 0)), 'step-11', 200, 0));
 
       const graph = edited(insertStep(placed, 'step-11', 'ROUTER', 'if'));
 
       expect(graph.steps.find(s => s.key === 'step-10')).toMatchObject({ x: 0, y: 0 });
-      expect(graph.steps.find(s => s.key === 'step-11')).toMatchObject({ x: 260, y: 0 });
+      expect(graph.steps.find(s => s.kind === 'ROUTER')).toMatchObject({ x: 200, y: 0 });
+      expect(graph.steps.find(s => s.key === 'step-11')).toMatchObject({ x: 400, y: 0 });
       for (const s of graph.steps) {
         expect(typeof s.x).toBe('number');
         expect(typeof s.y).toBe('number');
       }
       const overlapping = graph.steps.filter((a, i) =>
-        graph.steps.some((b, j) => i !== j && Math.abs(a.x! - b.x!) < 200 && Math.abs(a.y! - b.y!) < 100),
+        graph.steps.some((b, j) => i !== j && Math.abs(a.x! - b.x!) < 150 && Math.abs(a.y! - b.y!) < 120),
       );
       expect(overlapping.map(s => s.key)).toEqual([]);
     });

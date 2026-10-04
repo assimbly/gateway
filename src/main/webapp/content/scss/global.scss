@@ -1195,6 +1195,20 @@ ng-dropdown-panel > div {
   height: calc(100vh - 12rem);
 }
 
+.path-codemirror {
+  display: block;
+  width: 100%;
+  text-align: left;
+}
+
+.path-codemirror .CodeMirror {
+  height: 60vh;
+}
+
+.path-codemirror .CodeMirror-placeholder {
+  color: var(--app-text-muted);
+}
+
 #messageBrowserEditor
 .CodeMirror {
  border: 1px solid var(--app-border);

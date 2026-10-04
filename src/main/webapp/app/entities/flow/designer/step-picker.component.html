@@ -1,0 +1,28 @@
+<div ngbDropdown container="body" placement="bottom-start bottom-end top-start top-end" autoClose="outside" class="d-inline-block"
+     (openChange)="onOpenChange($event)">
+  <button type="button" class="flow-plus" ngbDropdownToggle [attr.aria-label]="title" [title]="title">
+    <fa-icon icon="plus"></fa-icon>
+  </button>
+  <div ngbDropdownMenu class="step-picker">
+    <input #search type="search" class="form-control form-control-sm" placeholder="Search components…" aria-label="Search components"
+           [(ngModel)]="filter" (keydown.enter)="$event.preventDefault(); pickFirstMatch()" />
+    <div class="step-picker-kinds" role="tablist">
+      @for (k of kinds; track k) {
+        <button type="button" role="tab" class="step-picker-kind" [class.active]="k === kind" [attr.aria-selected]="k === kind"
+                (click)="activeKind = k; search.focus({ preventScroll: true })">
+          {{ labels[k] }}
+          @if (filter) {
+            <span class="step-picker-count">{{ matches(k).length }}</span>
+          }
+        </button>
+      }
+    </div>
+    <div class="step-picker-list" role="listbox" [attr.aria-label]="labels[kind] + ' components'">
+      @for (name of matches(kind); track name) {
+        <button type="button" role="option" class="step-picker-item" (click)="pick(kind, name)">{{ name }}</button>
+      } @empty {
+        <div class="step-picker-empty">No {{ labels[kind] | lowercase }} matches "{{ filter }}".</div>
+      }
+    </div>
+  </div>
+</div>

@@ -118,7 +118,10 @@ export function loadFlowGraph(flow: IFlow): FlowGraph {
   return arrangedIfUnplaced(repaired);
 }
 
-/** Whether the Links form a tree from the Source in which every Step has the Links its kind needs (ADR 0001). */
+/**
+ * Whether the Links form a tree from the Source in which every Step has the Links its kind needs (ADR 0001).
+ * A Source or Action may still be an open end, without its outbound Link.
+ */
 function isValidTree(graph: FlowGraph): boolean {
   const inbound = (key: string): number => graph.links.filter(l => l.to === key).length;
   const outbound = (step: DesignStep): DesignLink[] => graph.links.filter(l => l.from === step.key);
@@ -127,9 +130,9 @@ function isValidTree(graph: FlowGraph): boolean {
     const out = outbound(step);
     switch (step.kind) {
       case 'SOURCE':
-        return inbound(step.key) === 0 && out.length === 1;
+        return inbound(step.key) === 0 && out.length <= 1;
       case 'ACTION':
-        return inbound(step.key) === 1 && out.length === 1;
+        return inbound(step.key) === 1 && out.length <= 1;
       case 'SINK':
         return inbound(step.key) === 1 && out.length === 0;
       case 'ROUTER': {
@@ -183,16 +186,9 @@ function arrangedIfUnplaced(graph: FlowGraph): FlowGraph {
   return graph.steps.every(s => s.x !== undefined && s.y !== undefined) ? graph : autoArrange(graph);
 }
 
-/** A Flow always has a Source and at least one Sink; missing ones are added unconfigured. */
+/** A Flow always has a Source; a missing one is added unconfigured. The user adds the Steps after it. */
 function withPlaceholders(steps: DesignStep[]): DesignStep[] {
-  const result = [...steps];
-  if (!result.some(s => s.kind === 'SOURCE')) {
-    result.unshift({ key: nextKey(), kind: 'SOURCE' });
-  }
-  if (!result.some(s => s.kind === 'SINK')) {
-    result.push({ key: nextKey(), kind: 'SINK' });
-  }
-  return result;
+  return steps.some(s => s.kind === 'SOURCE') ? steps : [{ key: nextKey(), kind: 'SOURCE' }, ...steps];
 }
 
 let lastKey = 0;
@@ -269,6 +265,7 @@ const plainLink = (from: string, to: string): DesignLink => ({ from, to, transpo
 /**
  * Inserts a new Action or Router into the Link that leads to `linkTo`.
  * The upstream part of the Link (its Branch name, Condition and settings) now leads to the new Step.
+ * The new Step takes the place of the downstream Step, which moves one column to the right with everything after it.
  */
 export function insertStep(graph: FlowGraph, linkTo: string, kind: 'ACTION' | 'ROUTER', componentType: string): EditResult {
   const link = graph.links.find(l => l.to === linkTo);
@@ -276,15 +273,10 @@ export function insertStep(graph: FlowGraph, linkTo: string, kind: 'ACTION' | 'R
     return rejected('There is no Link to insert into.');
   }
 
-  const from = graph.steps.find(s => s.key === link.from)!;
   const to = graph.steps.find(s => s.key === linkTo)!;
-  const inserted: DesignStep = {
-    key: nextKey(),
-    kind,
-    componentType,
-    ...freePosition(graph.steps, midpoint(from.x, to.x), midpoint(from.y, to.y)),
-  };
-  let steps = [...graph.steps, inserted];
+  const inserted: DesignStep = { key: nextKey(), kind, componentType, x: to.x, y: to.y };
+  const shifted = shiftRight(graph, linkTo);
+  let steps = [...shifted.steps, inserted];
   let links = graph.links.filter(l => l !== link).concat({ ...link, to: inserted.key }, plainLink(inserted.key, linkTo));
 
   const shape = kind === 'ROUTER' ? routerShape(inserted) : undefined;
@@ -292,6 +284,50 @@ export function insertStep(graph: FlowGraph, linkTo: string, kind: 'ACTION' | 'R
     const sink: DesignStep = { key: nextKey(), kind: 'SINK', ...branchEndPosition(steps, inserted) };
     steps = [...steps, sink];
     links = [...links, { ...plainLink(inserted.key, sink.key), rule: shape.branch }];
+  }
+
+  return accepted({ ...graph, steps, links });
+}
+
+/** Moves a Step and every Step downstream of it one column to the right. */
+function shiftRight(graph: FlowGraph, key: string): FlowGraph {
+  const moved = new Set(downstreamKeys(graph, key));
+  return {
+    ...graph,
+    steps: graph.steps.map(s => (moved.has(s.key) && s.x !== undefined ? { ...s, x: s.x + COLUMN_WIDTH } : s)),
+  };
+}
+
+/** Source and Action Steps that have no next Step yet. The Flow stays a Draft until each of them leads to a Sink. */
+export function openEnds(graph: FlowGraph): DesignStep[] {
+  if (graph.readOnlyReason) {
+    return [];
+  }
+  return graph.steps.filter(s => (s.kind === 'SOURCE' || s.kind === 'ACTION') && !graph.links.some(l => l.from === s.key));
+}
+
+/**
+ * Adds the next Step after an open end. A new Router gets the Branches its kind needs, each ending in a new Sink:
+ * the Default branch (when it has one), its named Branch (on a Fixed-slot Router), or a first Branch (on a Recipient list Router).
+ */
+export function appendStep(graph: FlowGraph, afterKey: string, kind: 'ACTION' | 'ROUTER' | 'SINK', componentType: string): EditResult {
+  const after = graph.steps.find(s => s.key === afterKey);
+  if (!after || !openEnds(graph).includes(after)) {
+    return rejected('A Step can only be added after a Source or Action that has no next Step yet.');
+  }
+
+  const appended: DesignStep = { key: nextKey(), kind, componentType, ...nextColumnPosition(graph.steps, after) };
+  let steps = [...graph.steps, appended];
+  let links = [...graph.links, plainLink(after.key, appended.key)];
+
+  if (kind === 'ROUTER') {
+    const shape = routerShape(appended);
+    const branchRules = shape.slots === 'fixed' ? [undefined, shape.branch] : [undefined];
+    for (const rule of branchRules) {
+      const sink: DesignStep = { key: nextKey(), kind: 'SINK', ...nextColumnPosition(steps, appended) };
+      steps = [...steps, sink];
+      links = [...links, { ...plainLink(appended.key, sink.key), rule }];
+    }
   }
 
   return accepted({ ...graph, steps, links });
@@ -344,17 +380,16 @@ export function deleteStep(graph: FlowGraph, key: string): EditResult {
     return rejected("The Source can't be deleted: every Flow starts with one.");
   }
 
-  if (target.kind === 'SINK') {
-    let branchStart = key;
-    let upstream = inbound;
-    while (upstream && graph.steps.find(s => s.key === upstream!.from)?.kind === 'ACTION') {
-      branchStart = upstream.from;
-      upstream = graph.links.find(l => l.to === branchStart);
-    }
-    const result = deleteBranch(graph, branchStart);
-    return result.outcome === 'accepted'
-      ? result
-      : rejected(`This Sink can't be deleted: every Branch ends in a Sink. ${result.reason}`);
+  // The last Step after a Source or Action goes on its own, which leaves its upstream Step as an open end.
+  const upstream = inbound && graph.steps.find(s => s.key === inbound.from);
+  if ((target.kind === 'SINK' || target.kind === 'ACTION') && outbound.length === 0 && upstream?.kind !== 'ROUTER') {
+    return accepted({ ...graph, steps: graph.steps.filter(s => s !== target), links: graph.links.filter(l => l !== inbound) });
+  }
+
+  // The only Step of a Branch goes together with the Branch.
+  if (target.kind === 'SINK' || (target.kind === 'ACTION' && outbound.length === 0)) {
+    const result = deleteBranch(graph, key);
+    return result.outcome === 'accepted' ? result : rejected(`This Step can't be deleted: it is all that is left of its Branch. ${result.reason}`);
   }
 
   if (target.kind === 'ROUTER' && inbound) {
@@ -367,6 +402,11 @@ export function deleteStep(graph: FlowGraph, key: string): EditResult {
   }
 
   return rejected('This Step cannot be deleted.');
+}
+
+/** Whether the Step can be deleted, so the editor only offers to delete it then. */
+export function canDeleteStep(graph: FlowGraph, key: string): boolean {
+  return deleteStep(graph, key).outcome === 'accepted';
 }
 
 /** Deletes the Branch of a List Router that starts with the Link to `linkTo`, with all its Steps. */
@@ -526,11 +566,13 @@ export function problems(graph: FlowGraph): Problem[] {
     .filter(s => !(s.componentType || s.uri))
     .map(s => ({ stepKey: s.key, message: 'Choose a component for this Step.' }));
 
+  const openEndProblems: Problem[] = openEnds(graph).map(s => ({ stepKey: s.key, message: 'Add the next Step: the Flow ends in a Sink.' }));
+
   const linkProblems: Problem[] = graph.links
     .filter(l => !l.expression && takesCondition(graph, l.to))
     .map(l => ({ linkTo: l.to, message: `Give the ${l.rule} Branch a Condition.` }));
 
-  return [...stepProblems, ...linkProblems];
+  return [...stepProblems, ...openEndProblems, ...linkProblems];
 }
 
 /** A Flow is a Draft while anything in it is incomplete. A Draft can be saved but not started. */
@@ -589,7 +631,8 @@ export function linksToSave(graph: FlowGraph, flowId: number, stepIds: Map<strin
   });
 }
 
-const COLUMN_WIDTH = 260;
+// Steps are drawn as 96px squares (flow-canvas.component.scss); the rest is room for the Links and their labels.
+const COLUMN_WIDTH = 200;
 const ROW_HEIGHT = 140;
 
 /** Lays the tree out left to right: each Step one column right of its upstream Step, Branches stacked below each other. */
@@ -610,8 +653,10 @@ export function autoArrange(graph: FlowGraph): FlowGraph {
   return { ...graph, steps: graph.steps.map(s => ({ ...s, ...positions.get(s.key) })) };
 }
 
-const midpoint = (a: number | undefined, b: number | undefined): number | undefined =>
-  a === undefined || b === undefined ? undefined : (a + b) / 2;
+/** Where the next Step after `step` goes: one column to its right, below any Steps already there. */
+function nextColumnPosition(steps: DesignStep[], step: DesignStep): Pick<DesignStep, 'x' | 'y'> {
+  return step.x === undefined || step.y === undefined ? {} : freePosition(steps, step.x + COLUMN_WIDTH, step.y);
+}
 
 /** Where a new Branch's Sink goes: one column right of its Router, below the Steps already there. */
 function branchEndPosition(steps: DesignStep[], router: DesignStep): Pick<DesignStep, 'x' | 'y'> {
@@ -619,8 +664,8 @@ function branchEndPosition(steps: DesignStep[], router: DesignStep): Pick<Design
 }
 
 /** The room a Step takes on the canvas, with some space around it. */
-const STEP_WIDTH = 200;
-const STEP_HEIGHT = 100;
+const STEP_WIDTH = 150;
+const STEP_HEIGHT = 120;
 
 /** The first position at or below (x, y) where a Step overlaps no other Step; nothing when (x, y) isn't known. */
 function freePosition(steps: DesignStep[], x: number | undefined, y: number | undefined): Pick<DesignStep, 'x' | 'y'> {

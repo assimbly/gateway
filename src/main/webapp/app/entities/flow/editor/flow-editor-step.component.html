@@ -77,8 +77,12 @@
       </button>
     </div>
     <div class="modal-body">
-      <textarea class="form-control" formControlName="uri" placeholder="{{uriPlaceholder}}" rows="5"
-                [value]="uriValue"></textarea>
+      <ngx-codemirror
+        class="path-codemirror"
+        formControlName="uri"
+        [options]="pathEditorOptions()"
+        (codeMirrorLoaded)="refreshCodeMirror($event)">
+      </ngx-codemirror>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-fx btn-fx-secondary" (click)="cancelModal()">Close</button>
@@ -96,7 +100,7 @@
             <h5 class="border-bottom">{{step.stepType}}</h5></div>
         </div>
         <div class="col-2" *ngIf="canRemoveStep">
-          <button title="Remove step" type="button" *ngIf="index > 0"
+          <button title="Remove step" type="button" *ngIf="onCanvas || index > 0"
                   class="btn btn-close" aria-label="Close"
                   (click)="onRemoveStep()">
           </button>
@@ -145,6 +149,9 @@
                        formControlName="componentType" id="field_component_type"
                        (change)="onComponentTypeChange($event)"
                        style="text-align: left;"></ng-select>
+            <input *ngIf="stepType==='ROUTER'" type="text" class="form-control" id="field_component_type"
+                   readonly [value]="routerKind ?? ''"
+                   title="A Router keeps its kind. To use another kind, delete this Router and add a new one."/>
             <div *ngIf="formSubmitted && componentTypeErrors">
               <div *ngIf="componentTypeErrors.required"
                    class="invalid-field-message">*ComponentType is required. Please select one.
@@ -183,7 +190,7 @@
             </div>
           </div>
           <button type="button" class="col-2 btn btn-fx btn-fx-ghost btn-fx-icon"
-                  title="Edit path" aria-label="Edit path" (click)="openModal(uriEditor)">
+                  title="Edit path" aria-label="Edit path" (click)="openPathModal(uriEditor)">
             <fa-icon icon="edit"></fa-icon>
           </button>
         </div>

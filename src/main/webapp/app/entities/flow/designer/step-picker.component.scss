@@ -1,0 +1,59 @@
+.step-picker {
+  width: 18rem;
+  padding: 0.5rem;
+}
+
+.step-picker-kinds {
+  display: flex;
+  gap: 0.25rem;
+  margin: 0.5rem 0;
+}
+
+.step-picker-kind {
+  flex: 1 1 0;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--app-border, #d0d5dd);
+  border-radius: 6px;
+  background: transparent;
+  font-size: 0.8rem;
+  color: var(--app-text, #344054);
+
+  &.active {
+    border-color: var(--app-primary, #2e90fa);
+    background: var(--app-primary, #2e90fa);
+    color: #fff;
+  }
+}
+
+.step-picker-count {
+  margin-left: 0.25rem;
+  opacity: 0.75;
+}
+
+.step-picker-list {
+  max-height: 16rem;
+  overflow-y: auto;
+}
+
+.step-picker-item {
+  display: block;
+  width: 100%;
+  padding: 0.25rem 0.5rem;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  text-align: left;
+  font-size: 0.875rem;
+  color: var(--app-text, #344054);
+
+  &:hover,
+  &:focus {
+    background: var(--app-hover, #f2f4f7);
+  }
+}
+
+.step-picker-empty {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  color: var(--app-text-muted, #667085);
+}

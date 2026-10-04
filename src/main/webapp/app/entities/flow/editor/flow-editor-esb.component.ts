@@ -43,8 +43,9 @@ import { LinkEditorComponent } from "../designer/link-editor.component";
 import { FlowGraphHistory } from "../designer/flow-graph-history";
 import {
   addBranch,
+  appendStep,
   autoArrange,
-  changeComponent,
+  canDeleteStep,
   deleteBranch,
   deleteStep,
   DesignLink,
@@ -59,10 +60,7 @@ import {
   opensOnCanvas,
   Problem,
   problems,
-  ROUTER_KINDS,
   routerKind,
-  routerShape,
-  sameBranches,
   stepsToSave,
   updateLink,
 } from "../designer/flow-graph";
@@ -1736,39 +1734,43 @@ splitOptions4(options: string): string[] {
 	designerNotice?: string;
 	designerMessage?: string;
 
+	@ViewChild(FlowCanvasComponent) flowCanvas?: FlowCanvasComponent;
+
+	private designerBody?: HTMLElement;
+
+	/** The canvas and its panel reach down to the bottom of the window. */
+	@ViewChild('designerBody') set designerBodyRef(ref: ElementRef<HTMLElement> | undefined) {
+		this.designerBody = ref?.nativeElement;
+		this.fitDesignerToWindow();
+	}
+
+	@HostListener('window:resize')
+	fitDesignerToWindow(): void {
+		const body = this.designerBody;
+		if (body) {
+			const setHeight = (height: number) => (body.style.height = `${Math.max(Math.floor(height), DESIGNER_MIN_HEIGHT)}px`);
+			const top = body.getBoundingClientRect().top + window.scrollY;
+			setHeight(window.innerHeight - top);
+			// The page's own padding below the designer would still make the window scroll; take that off too.
+			setHeight(window.innerHeight - top - (document.documentElement.scrollHeight - window.innerHeight));
+		}
+	}
+
 	/** Script and Route Flows keep the form editor; every other Flow is designed on the canvas. */
 	get useCanvas(): boolean {
 		return opensOnCanvas(this.activeEditor);
 	}
 
-	/** Kinds the selected Router can be changed to without changing its Branches. */
-	get swappableRouterKinds(): string[] {
-		const selection = this.selection;
-		const router = selection.type === 'step' ? this.canvasGraph?.steps.find(s => s.key === selection.key && s.kind === 'ROUTER') : undefined;
-		if (!router) {
-			return [];
-		}
-		const alternatives = ROUTER_KINDS.filter(kind => sameBranches(routerShape(router), routerShape({ componentType: kind })));
-		return [...new Set([routerKind(router), ...alternatives])];
-	}
-
+	/** The kind of the selected Router, shown read-only as its component. */
 	get selectedRouterKind(): string | undefined {
 		const selection = this.selection;
 		const router = selection.type === 'step' ? this.canvasGraph?.steps.find(s => s.key === selection.key && s.kind === 'ROUTER') : undefined;
 		return router ? routerKind(router) : undefined;
 	}
 
-	onRouterKindChange(kind: string): void {
+	get selectedStepDeletable(): boolean {
 		const selection = this.selection;
-		if (selection.type !== 'step') {
-			return;
-		}
-		this.edit(changeComponent(this.designer!.current, selection.key, kind));
-		const index = this.stepKeys.indexOf(selection.key);
-		if (this.designer!.current.steps.find(s => s.key === selection.key)?.componentType === kind) {
-			this.steps[index].componentType = kind;
-			this.stepFormAt(index).patchValue({ componentType: kind, uri: null });
-		}
+		return selection.type === 'step' && !!this.designer && !this.designer.current.readOnlyReason && canDeleteStep(this.designer.current, selection.key);
 	}
 
 	get selectedStepIndex(): number {
@@ -1913,6 +1915,33 @@ splitOptions4(options: string): string[] {
 			.forEach(step => this.addNewStepForm(step.kind as StepType, this.defaultComponentType(step.kind, step.componentType), step.key));
 	}
 
+	/** Whether the side panel is hidden, to give the canvas the whole width. Hidden by default; remembered in this browser. */
+	sidePanelCollapsed = readPanelCollapsed();
+
+	togglePanel(): void {
+		this.setPanelCollapsed(!this.sidePanelCollapsed);
+	}
+
+	/** A double-click on a Step shows it in the side panel when the panel is hidden, and hides the panel when it is shown. */
+	toggleStepEditor(key: string): void {
+		this.onSelectionChange({ type: 'step', key });
+		this.setPanelCollapsed(!this.sidePanelCollapsed);
+	}
+
+	openFlowSettings(): void {
+		this.onSelectionChange({ type: 'flow' });
+		this.setPanelCollapsed(false);
+	}
+
+	private setPanelCollapsed(collapsed: boolean): void {
+		this.sidePanelCollapsed = collapsed;
+		try {
+			localStorage.setItem(PANEL_COLLAPSED_KEY, String(collapsed));
+		} catch {
+			// Without storage the panel is simply hidden again next time.
+		}
+	}
+
 	onSelectionChange(selection: DesignerSelection): void {
 		this.selection = selection;
 		this.cdr.markForCheck();
@@ -1924,6 +1953,17 @@ splitOptions4(options: string): string[] {
 		const inserted = this.designer!.current.steps.find(s => !before.has(s.key) && s.kind === event.kind);
 		if (inserted) {
 			this.selection = { type: 'step', key: inserted.key };
+			this.flowCanvas?.reveal(inserted.key);
+		}
+	}
+
+	onAppendStep(event: { after: string; kind: 'ACTION' | 'ROUTER' | 'SINK'; componentType: string }): void {
+		const before = new Set(this.designer!.current.steps.map(s => s.key));
+		this.edit(appendStep(this.designer!.current, event.after, event.kind, event.componentType));
+		const appended = this.designer!.current.steps.find(s => !before.has(s.key) && s.kind === event.kind);
+		if (appended) {
+			this.selection = { type: 'step', key: appended.key };
+			this.flowCanvas?.reveal(appended.key);
 		}
 	}
 
@@ -1985,6 +2025,13 @@ splitOptions4(options: string): string[] {
 	onDesignerKeydown(event: KeyboardEvent): void {
 		const target = event.target as HTMLElement;
 		if (!this.designer || target.closest('input, textarea, select, [contenteditable], .CodeMirror')) {
+			return;
+		}
+		// Space adds a Step, like the + that fits the selection. On a focused button or link, Space keeps its usual meaning.
+		if (event.key === ' ' && !event.ctrlKey && !event.metaKey && !event.altKey && !target.closest('button, a')) {
+			if (this.flowCanvas?.openStepPicker(this.selection)) {
+				event.preventDefault();
+			}
 			return;
 		}
 		if (event.key === 'Delete' && !event.ctrlKey && !event.metaKey) {
@@ -2110,6 +2157,19 @@ splitOptions4(options: string): string[] {
 
 /** The graph key of a Flow's Error Step, which lives in the Flow settings rather than on the canvas. */
 const ERROR_STEP_KEY = 'error';
+
+const PANEL_COLLAPSED_KEY = 'flow-designer.panel-collapsed';
+
+function readPanelCollapsed(): boolean {
+	try {
+		return localStorage.getItem(PANEL_COLLAPSED_KEY) !== 'false';
+	} catch {
+		return true;
+	}
+}
+
+/** The height in pixels the designer never shrinks below, however small the window. */
+const DESIGNER_MIN_HEIGHT = 400;
 
 export class Option {
   constructor(public key?: string, public value?: string) {}

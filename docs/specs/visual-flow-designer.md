@@ -16,7 +16,7 @@ Integration developers build Flows on the **Flows → Design → Editor** page b
 
 Replace the form-based editor with a **visual designer**: a canvas, built on Foblex Flow, where each Step is a square node and each Link is an arrow. It looks modern (like n8n) and behaves like Apache NiFi: nodes can be dragged anywhere, their positions are saved, and Links can be drawn by dragging from one Step to another.
 
-- **A new Flow** starts with a Source and a Sink joined by one Link. A **+** on any Link inserts an Action or a Router there. A **+** on a List Router adds a Branch. Every new Branch gets its own new Sink, so the Flow is always a complete tree.
+- **A new Flow** starts with only a Source, at the left of the canvas. A **+** after the last Step adds the next one: an Action, a Router or a Sink, with its component chosen in the same searchable menu. A **+** on any Link inserts an Action or a Router there, and the Steps after it move one column to the right. A **+** on a List Router adds a Branch. Every new Branch gets its own new Sink. **Space** opens the **+** that fits the selection: after a selected last Step, on a selected Link or the Link out of a selected Step, or after the last Step when nothing is selected.
 - **Clicking a node** opens that Step's editor (scheme, path, options) in a panel on the right. Clicking another node switches the panel to that Step. **Clicking a Link** opens the Link editor: Branch name, Condition, and advanced settings (transport, pattern). **Clicking the empty canvas** shows the Flow settings, including the Error Step.
 - **The canvas enforces the Step rules** after every edit:
   - A Source has one outbound Link.
@@ -24,7 +24,7 @@ Replace the form-based editor with a **visual designer**: a canvas, built on Fob
   - A Router has one inbound Link and its Branches.
   - A Sink has one inbound Link.
   - A Flow has exactly one Source, and no Step has more than one inbound Link.
-- **Saving.** The whole Flow is saved at once. A Flow whose Step configuration is still incomplete can be saved as a **Draft**: invalid nodes are marked, and the Flow can't be started until they're fixed.
+- **Saving.** The whole Flow is saved at once, with one Save button at the top right. A Flow that is still incomplete (a Step without its configuration, or a Branch that doesn't end in a Sink yet) can be saved as a **Draft**: invalid nodes are marked, and the Flow can't be started until they're fixed.
 - **Existing Flows** open on the canvas. Flows without saved positions are laid out automatically, and broken Links are repaired by the next save.
 
 ## User Stories
@@ -32,8 +32,8 @@ Replace the form-based editor with a **visual designer**: a canvas, built on Fob
 ### Opening and creating Flows
 
 1. As an integration developer, I want the Flows → Design → Editor page to open a visual canvas instead of the list of forms, so that I can see the structure of my Flow at a glance.
-2. As an integration developer, I want a new Flow to start with a Source and a Sink joined by a Link, so that I begin from a minimal valid Flow.
-3. As an integration developer, I want a Flow that has only an Error Step (and no Source) to open like a new Flow, with a placeholder Source and Sink, so that empty Flows saved in the past can be finished.
+2. As an integration developer, I want a new Flow to start with only a Source, and to add each next Step (Action, Router or Sink) with a **+** that lets me search for its component, so that I build the Flow in the order messages travel.
+3. As an integration developer, I want a Flow that has only an Error Step (and no Source) to open like a new Flow, with a placeholder Source, so that empty Flows saved in the past can be finished.
 4. As an integration developer, I want my existing straight-line Flows to open on the canvas as a chain of nodes, so that the new designer doesn't lock me out of my existing work.
 5. As an integration developer, I want existing Flows that contain Routers to open with all their Branches drawn, so that I can finally see and edit the Branches the old editor hid.
 6. As an integration developer, I want Flows without saved positions to be laid out automatically as a readable tree, so that I don't have to place every node myself the first time I open an old or imported Flow.
@@ -119,7 +119,7 @@ Replace the form-based editor with a **visual designer**: a canvas, built on Fob
   - The Default branch is the outbound Link with no `rule`.
   - A Condition is the Link's `language` and `expression`. It always lives on the Link, never in the Router's options.
 - **Call-out Branches** (enrich, split, splitandaggregate, loop, dowhile) end in a Sink like any other Branch. The canvas only labels them as returning.
-- **Draft is derived, not stored.** A Flow is a Draft when any Step is missing its required configuration, or a Router Link is missing a required Condition. While it's a Draft, start is disabled and the Flow is saved with auto-start off (the Gateway itself does not know about Drafts). The Auto-start setting is shown in the Flow settings so it can be switched on again once the Flow is complete. Export still works.
+- **Draft is derived, not stored.** A Flow is a Draft when any Step is missing its required configuration, a Router Link is missing a required Condition, or a Source or Action has no next Step yet (an open end). While it's a Draft, start is disabled and the Flow is saved with auto-start off (the Gateway itself does not know about Drafts). The Auto-start setting is shown in the Flow settings so it can be switched on again once the Flow is complete. Export still works.
 - **Branch names** are unique per Router, and a named Branch of a Router with a Default branch can't lose its name.
 
 ### Frontend
@@ -145,7 +145,8 @@ Replace the form-based editor with a **visual designer**: a canvas, built on Fob
   - **Output:** serialize to the Steps and Links to save.
 - **New canvas component.** It's built on Foblex Flow and replaces the current form-based editor inside the existing Flows → Design → Editor route. It only renders the graph model and sends user gestures to it: drag, connect, the **+** menus, delete, select.
 - **Right-hand panel.** It has three modes:
-  - **Step editor:** reuses today's per-Step form (component, scheme/path, options, Connection, Message, Route), cut down to edit one Step at a time.
+  - **Step editor:** reuses today's per-Step form (component, scheme/path, options, Connection, Message, Route), cut down to edit one Step at a time. A Router shows its kind as its component, read-only: changing it means deleting the Router and adding another.
+  - **Minimap:** below the editor, a minimap of the whole Flow. Clicking or dragging on it moves the view of the canvas.
   - **Link editor:** Branch name, Condition, and advanced transport and pattern.
   - **Flow settings:** name, notes, log level, Integration, Error Step.
 - **Auto-arrange** lays the tree out left to right, from the Source on the left to the Sinks on the right, in the n8n style.

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
-import { faExclamationTriangle, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faCodeBranch, faCogs, faExclamationTriangle, faPlus, faSignInAlt, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 
 import { IFlow } from 'app/shared/model/flow.model';
 import { IStep } from 'app/shared/model/step.model';
@@ -40,7 +40,7 @@ describe('Flow canvas', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({ imports: [FlowCanvasComponent] });
-    TestBed.inject(FaIconLibrary).addIcons(faPlus, faExclamationTriangle);
+    TestBed.inject(FaIconLibrary).addIcons(faPlus, faExclamationTriangle, faSignInAlt, faCogs, faCodeBranch, faSignOutAlt);
     fixture = TestBed.createComponent(FlowCanvasComponent);
     const graph = loadFlowGraph(contentRouterFlow);
     fixture.componentRef.setInput('graph', graph);
@@ -60,6 +60,31 @@ describe('Flow canvas', () => {
     const labels = Array.from(fixture.nativeElement.querySelectorAll('.flow-link-label')).map((l: any) => l.textContent.trim());
 
     expect(labels).toEqual(['default', 'check: x']);
+  });
+
+  it('offers to add the next Step only after an open end', () => {
+    expect(fixture.nativeElement.querySelectorAll('.flow-append')).toHaveLength(0);
+
+    fixture.componentRef.setInput('graph', loadFlowGraph({ id: 2, steps: [] }));
+    fixture.detectChanges();
+
+    const steps: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('.flow-step'));
+    expect(steps).toHaveLength(1);
+    expect(steps[0].querySelector('.flow-append')).not.toBeNull();
+  });
+
+  it('opens the + that fits the selection with the keyboard, and none after a Sink', () => {
+    const canvas = fixture.componentInstance;
+
+    expect(canvas.openStepPicker({ type: 'link', to: 'step-13' })).toBe(true);
+    expect(canvas.openStepPicker({ type: 'step', key: 'step-10' })).toBe(true);
+    expect(canvas.openStepPicker({ type: 'step', key: 'step-12' })).toBe(false);
+    expect(canvas.openStepPicker({ type: 'flow' })).toBe(false);
+
+    fixture.componentRef.setInput('graph', loadFlowGraph({ id: 2, steps: [] }));
+    fixture.detectChanges();
+
+    expect(canvas.openStepPicker({ type: 'flow' })).toBe(true);
   });
 
   it('reports which Step was clicked', () => {

@@ -18,6 +18,7 @@ import 'codemirror/mode/groovy/groovy';
 import 'codemirror/mode/clike/clike';
 import 'codemirror/mode/python/python';
 import 'codemirror/mode/xml/xml';
+import 'codemirror/addon/display/placeholder';
 
 @Injectable()
 export class StepEditorRegistry {
@@ -40,6 +41,10 @@ export class FlowEditorStepComponent implements OnDestroy {
   @Input() activeEditor: string;
   /** On the visual designer's canvas, Steps are added there instead of through this form. */
   @Input() onCanvas = false;
+  /** On the canvas, the kind of the Router being edited; it is shown as its component and can't be changed here. */
+  @Input() routerKind?: string;
+  /** On the canvas, whether the Flow keeps a valid shape without this Step; the canvas decides which Steps can go. */
+  @Input() deletable = false;
   @Input() formSubmitted = false;
 
   @Input() sourceComponentsNames: Array<any> = [];
@@ -80,6 +85,8 @@ export class FlowEditorStepComponent implements OnDestroy {
   readonly themeService = inject(ThemeService);
   private scriptOptionsKey = '';
   private scriptOptionsCache: Record<string, unknown> | null = null;
+  private pathOptionsKey = '';
+  private pathOptionsCache: Record<string, unknown> | null = null;
 
   @ViewChild('scriptEditor')
   set scriptEditor(editor: CodemirrorComponent | undefined) {
@@ -164,6 +171,9 @@ export class FlowEditorStepComponent implements OnDestroy {
   }
 
   get canRemoveStep(): boolean {
+    if (this.onCanvas) {
+      return this.deletable;
+    }
     return this.stepType === 'ACTION' || this.stepType === 'ROUTER' || this.stepType === 'SCRIPT' || this.stepType === 'ROUTE';
   }
 
@@ -248,6 +258,25 @@ export class FlowEditorStepComponent implements OnDestroy {
     return this.scriptOptionsCache;
   }
 
+  pathEditorOptions(): Record<string, unknown> {
+    const theme = this.themeService.editorTheme();
+    const placeholder = this.uriPlaceholder ?? '';
+    const key = `${theme}|${placeholder}`;
+    if (this.pathOptionsCache && this.pathOptionsKey === key) {
+      return this.pathOptionsCache;
+    }
+    this.pathOptionsKey = key;
+    this.pathOptionsCache = {
+      lineNumbers: true,
+      gutters: ['CodeMirror-linenumbers'],
+      lineWrapping: true,
+      theme,
+      mode: 'text',
+      placeholder,
+    };
+    return this.pathOptionsCache;
+  }
+
   private scriptEditorMode(componentType: string): string {
     switch ((componentType || '').toLowerCase()) {
       case 'javascript':
@@ -267,6 +296,10 @@ export class FlowEditorStepComponent implements OnDestroy {
 
   openModal(templateRef: TemplateRef<any>): void {
     this.modalRef = this.modalService.open(templateRef);
+  }
+
+  openPathModal(templateRef: TemplateRef<any>): void {
+    this.modalRef = this.modalService.open(templateRef, { size: 'xl' });
   }
 
   openFullScreenModal(templateRef: TemplateRef<any>): void {

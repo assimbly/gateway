@@ -9,7 +9,10 @@ A unit of integration logic: a tree of Steps joined by Links, starting at exactl
 _Avoid_: Route (a Route is a separate thing: a hand-written Camel route a Step can refer to)
 
 **Draft**:
-A Flow that has been saved but is not yet complete enough to run.
+A Flow that has been saved but is not yet complete enough to run: a Step still needs its configuration, or a Branch doesn't end in a Sink yet.
+
+**Open end**:
+A Source or Action that has no next Step yet. A new Flow is a single open end: its Source.
 
 **Step**:
 One node in a Flow that does a single job: receiving, transforming, routing or delivering a message.
