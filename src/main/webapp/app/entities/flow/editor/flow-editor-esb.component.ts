@@ -40,6 +40,7 @@ import { CodemirrorModule } from "@ctrl/ngx-codemirror";
 import { ThemeService } from "app/core/theme";
 import { FlowCanvasComponent, DesignerSelection } from "../designer/flow-canvas.component";
 import { FlowEditorHeaderComponent } from "./flow-editor-header.component";
+import { ComponentSchemas } from "app/shared/camel/component-schemas.service";
 import { LinkEditorComponent } from "../designer/link-editor.component";
 import { FlowGraphHistory } from "../designer/flow-graph-history";
 import {
@@ -112,6 +113,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	/** Set by Save & start: start the Flow once it is saved. */
 	private startAfterSave = false;
 	private readonly location = inject(Location);
+	private readonly schemas = inject(ComponentSchemas);
 	routes: Route[];
 	messages: IMessage[];
 	connections: Connection[];
@@ -1893,8 +1895,16 @@ splitOptions4(options: string): string[] {
 			return;
 		}
 		this.canvasGraph = this.syncedGraph();
-		this.canvasProblems = problems(this.canvasGraph);
-		this.cdr.markForCheck();
+		this.checkCanvas();
+		// Required path parts are known once a Component's schema is read; check again when new ones arrive.
+		this.schemas.load(this.canvasGraph.steps.map(step => step.componentType)).subscribe(() => this.checkCanvas());
+	}
+
+	private checkCanvas(): void {
+		if (this.canvasGraph) {
+			this.canvasProblems = problems(this.canvasGraph, this.schemas.pathRule);
+			this.cdr.markForCheck();
+		}
 	}
 
 	/** Applies an edit of the Flow graph; a rejected edit is explained to the user and changes nothing. */

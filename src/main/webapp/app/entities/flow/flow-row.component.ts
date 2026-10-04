@@ -21,6 +21,7 @@ import { FlowRowAlerts } from './flow-row-alerts.component';
 import { FlowRowStats, FlowStatsSection } from './flow-row-stats.component';
 import { FlowAction, RowStatus, countLabel, flowTypeLabel, hasRun, rowStatus, testMessageBlocked } from './flow-row-status';
 import { Components } from 'app/shared/camel/component-type';
+import { ComponentSchemas } from 'app/shared/camel/component-schemas.service';
 import { FlowStatusPillComponent } from './flow-status-pill.component';
 
 import { Router } from '@angular/router';
@@ -122,6 +123,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   intervalTime: any;
 
   private readonly components = inject(Components);
+  private readonly schemas = inject(ComponentSchemas);
   private destroyed = false;
   private readonly subscriptions = new Subscription();
 
@@ -197,7 +199,20 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
     this.steps = this.flow.steps;
     this.getSteps();
-    this.isDraft = opensOnCanvas(this.flow.type) && isDraft(loadFlowGraph(this.flow));
+    if (opensOnCanvas(this.flow.type)) {
+      const graph = loadFlowGraph(this.flow);
+      this.isDraft = isDraft(graph);
+      // A Step with an empty required path part also makes a Draft, once its Component's schema is read.
+      this.subscriptions.add(
+        this.schemas.load(graph.steps.map(step => step.componentType)).subscribe(() => {
+          const draft = isDraft(graph, this.schemas.pathRule);
+          if (draft !== this.isDraft) {
+            this.isDraft = draft;
+            this.changeDetector.markForCheck();
+          }
+        }),
+      );
+    }
 
     this.registerTriggeredAction();
 

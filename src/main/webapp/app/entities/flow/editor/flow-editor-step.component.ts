@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, inject, Injectable, Input, OnDestroy, Output, TemplateRef, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, inject, Injectable, Input, OnChanges, OnDestroy, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -7,6 +7,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { PopoverModule } from 'ngx-bootstrap/popover';
 import { CodemirrorComponent, CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { Components } from 'app/shared/camel/component-type';
+import { EndpointRole } from 'app/shared/camel/catalogue';
+import { OptionSchema, PathPart, ValueField, groupOptions, pathRule, requiredOptions, valueFieldOf } from 'app/shared/camel/endpoint';
 import { IStep } from 'app/shared/model/step.model';
 import { IMessage } from 'app/shared/model/message.model';
 import { Route } from 'app/shared/model/route.model';
@@ -34,7 +36,7 @@ export class StepEditorRegistry {
   templateUrl: './flow-editor-step.component.html',
   imports: [CommonModule, ReactiveFormsModule, NgbModule, FontAwesomeModule, NgSelectModule, PopoverModule, CodemirrorModule],
 })
-export class FlowEditorStepComponent implements OnDestroy {
+export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   @Input({ required: true }) step: IStep;
   @Input({ required: true }) index: number;
   @Input({ required: true }) stepForm: FormGroup;
@@ -113,6 +115,103 @@ export class FlowEditorStepComponent implements OnDestroy {
     private stepEditorRegistry: StepEditorRegistry,
   ) {
     this.stepEditorRegistry.editors.push(this);
+  }
+
+  private choicesCache?: { options: unknown[]; length: number; role: EndpointRole; choices: OptionSchema[] };
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['componentOptions'] && this.componentOptions?.length) {
+      this.addRequiredOptions();
+    }
+  }
+
+  /** A Source receives messages; every other Step sends them. */
+  get role(): EndpointRole {
+    return this.stepType === 'SOURCE' ? 'consumer' : 'producer';
+  }
+
+  /** The Options this Step can set, under Common, Advanced and Security. Cached so the key list keeps its items. */
+  get optionChoices(): OptionSchema[] {
+    const options = this.componentOptions ?? [];
+    const cache = this.choicesCache;
+    if (!cache || cache.options !== options || cache.length !== options.length || cache.role !== this.role) {
+      this.choicesCache = { options, length: options.length, role: this.role, choices: groupOptions(options, this.role) };
+    }
+    return this.choicesCache!.choices;
+  }
+
+  /** The Component's path parts, from its syntax, for the Path field's hint. */
+  get pathParts(): PathPart[] {
+    return this.uriPlaceholder ? pathRule(this.uriPlaceholder, this.componentOptions ?? []).parts : [];
+  }
+
+  optionSchema(idx: number): OptionSchema | undefined {
+    const key = (this.stepForm.get('options') as FormArray)?.at(idx)?.get('key')?.value;
+    return key ? (this.componentOptions ?? []).find(option => option.name === key) : undefined;
+  }
+
+  valueField(idx: number): ValueField {
+    return valueFieldOf(this.optionSchema(idx));
+  }
+
+  isRequiredOption(idx: number): boolean {
+    return !!this.optionSchema(idx)?.required;
+  }
+
+  switchOn(idx: number): boolean {
+    const value = this.optionValue(idx);
+    return value === '' ? this.optionSchema(idx)?.defaultValue === true : value === 'true';
+  }
+
+  setSwitch(idx: number, on: boolean): void {
+    const control = (this.stepForm.get('options') as FormArray).at(idx).get('value')!;
+    control.setValue(String(on));
+    control.markAsDirty();
+  }
+
+  /** The enum values, plus a value typed earlier that the catalogue doesn't list, such as a placeholder. */
+  choicesOf(idx: number): readonly string[] {
+    const values = this.optionSchema(idx)?.enum ?? [];
+    const value = this.optionValue(idx);
+    return value && !values.includes(value) ? [...values, value] : values;
+  }
+
+  /** The required Options that have no value yet. They don't block: a Connection may supply them. */
+  get missingRequiredOptions(): string[] {
+    const formOptions = (this.stepForm.get('options') as FormArray)?.controls ?? [];
+    const filled = new Set(formOptions.filter(option => `${option.get('value')?.value ?? ''}`.trim()).map(option => option.get('key')?.value));
+    return requiredOptions(this.componentOptions ?? [], this.role)
+      .filter(name => !filled.has(name))
+      .map(name => this.componentOptions.find(option => option.name === name)?.displayName ?? name);
+  }
+
+  private optionValue(idx: number): string {
+    return `${(this.stepForm.get('options') as FormArray)?.at(idx)?.get('value')?.value ?? ''}`;
+  }
+
+  /**
+   * Adds an empty row for each required Option of a Step that has no Options yet. A saved Step's own Options are
+   * filled in after its schema arrives, so they are left alone.
+   */
+  private addRequiredOptions(): void {
+    const formOptions = this.stepForm?.get('options') as FormArray | null;
+    if (!formOptions || this.step?.options) {
+      return;
+    }
+    const present = new Set(formOptions.controls.map(option => option.get('key')?.value));
+    requiredOptions(this.componentOptions, this.role)
+      .filter(name => !present.has(name))
+      .forEach(name => {
+        const emptyRow = formOptions.controls.findIndex(option => !option.get('key')?.value && !option.get('value')?.value);
+        if (emptyRow < 0) {
+          this.addOption();
+        }
+        const row = emptyRow < 0 ? formOptions.length - 1 : emptyRow;
+        formOptions.at(row).get('key')!.setValue(name);
+        if (this.stepOptions[row]) {
+          this.stepOptions[row].key = name;
+        }
+      });
   }
 
   ngOnDestroy(): void {

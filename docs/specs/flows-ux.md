@@ -81,7 +81,8 @@ Small changes that work with any Camel component, no rewrite. They target the **
 
 - Everything the picker and the Step editor show comes from the Camel catalogue at runtime: `title`, `description`, `label`, `syntax`, `consumerOnly` / `producerOnly` per component (all already in `shared/camel/component-type.ts`), and each Option's `kind`, `displayName`, `group`, `type`, `enum`, `defaultValue`, `required`, `secret` and `description` from the component schema the backend serves (`/flow/schema/{component}`).
 - No component gets custom UI, and there's no hand-maintained mapping table (categories, "common" lists or groupings). **Recently used** is the only list that isn't from the catalogue. It's kept per browser in `localStorage` and works without it.
-- The schema's `group` values are folded into three headings: `common` → Common; groups containing `security` → Security; everything else → Advanced. Options that only apply to consumers or producers are filtered by the Step's role.
+- The schema's `group` values are folded into three headings: `common`, and the role's own `consumer` or `producer` group, → Common; groups containing `security` → Security; everything else → Advanced. Options that only apply to consumers or producers (by `group` or `label`) are filtered by the Step's role. The schema endpoint doesn't filter them itself.
+- A number value is a text field with a numeric keyboard and an enum value keeps any value it already has, so property placeholders keep working.
 
 ### Flow type
 

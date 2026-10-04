@@ -1,6 +1,7 @@
 import { IFlow } from 'app/shared/model/flow.model';
 import { ILink } from 'app/shared/model/link.model';
 import { IStep } from 'app/shared/model/step.model';
+import { PathRule, missingPathParts } from 'app/shared/camel/endpoint';
 
 export type StepKind = 'SOURCE' | 'ACTION' | 'ROUTER' | 'SINK';
 
@@ -558,7 +559,10 @@ export function takesCondition(graph: FlowGraph, linkTo: string): boolean {
   return !!link?.rule && !!router && routerShape(router).takesCondition;
 }
 
-export function problems(graph: FlowGraph): Problem[] {
+/** The path syntax of a Component, when its schema has been read; without it a Step's path isn't checked. */
+export type PathRules = (componentType: string) => PathRule | undefined;
+
+export function problems(graph: FlowGraph, pathRules?: PathRules): Problem[] {
   if (graph.readOnlyReason) {
     return [];
   }
@@ -566,18 +570,24 @@ export function problems(graph: FlowGraph): Problem[] {
     .filter(s => !(s.componentType || s.uri))
     .map(s => ({ stepKey: s.key, message: 'Choose a component for this Step.' }));
 
+  const pathProblems: Problem[] = graph.steps.flatMap(s => {
+    const rule = s.componentType ? pathRules?.(s.componentType) : undefined;
+    const missing = rule ? missingPathParts(rule, s.uri) : [];
+    return missing.length ? [{ stepKey: s.key, message: `Fill in the ${missing.join(' and ')} in the path.` }] : [];
+  });
+
   const openEndProblems: Problem[] = openEnds(graph).map(s => ({ stepKey: s.key, message: 'Add the next Step: the Flow ends in a Sink.' }));
 
   const linkProblems: Problem[] = graph.links
     .filter(l => !l.expression && takesCondition(graph, l.to))
     .map(l => ({ linkTo: l.to, message: `Give the ${l.rule} Branch a Condition.` }));
 
-  return [...stepProblems, ...openEndProblems, ...linkProblems];
+  return [...stepProblems, ...pathProblems, ...openEndProblems, ...linkProblems];
 }
 
 /** A Flow is a Draft while anything in it is incomplete. A Draft can be saved but not started. */
-export function isDraft(graph: FlowGraph): boolean {
-  return problems(graph).length > 0;
+export function isDraft(graph: FlowGraph, pathRules?: PathRules): boolean {
+  return problems(graph, pathRules).length > 0;
 }
 
 /** The Steps to create or update, keyed so their new ids can be matched back for `linksToSave`. */

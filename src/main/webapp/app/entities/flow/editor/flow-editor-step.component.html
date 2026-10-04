@@ -46,7 +46,12 @@
   <div style="min-width:200px; overflow-y: auto;" [innerHtml]="uriPopoverMessage"></div>
 </ng-template>
 <ng-template #pathPopover let-message="message">
-  <div style="min-width:300px;">{{uriPlaceholder}}</div>
+  <div style="min-width:300px;">
+    <div class="font-monospace mb-1">{{uriPlaceholder}}</div>
+    @for (part of pathParts; track part.name) {
+      <div><b>{{part.displayName}}</b>@if (part.required) { (required)}@if (part.description) {: {{part.description}}}</div>
+    }
+  </div>
 </ng-template>
 
 <ng-template #uriFullscreenEditor>
@@ -179,10 +184,14 @@
             </i>
           </div>
           <div class="col-10">
-            <input type="text" class="d-inline-block form-control" list="urilist" formControlName="uri" [value]="uriValue" />
+            <input type="text" class="d-inline-block form-control" list="urilist" formControlName="uri" [value]="uriValue"
+                   aria-describedby="field_uri_syntax" />
             <datalist id="urilist">
               <option *ngFor="let uriStep of uriList" [value]="uriStep.uri">{{uriStep.uri}}</option>
             </datalist>
+            @if (uriPlaceholder) {
+              <small class="form-text text-muted d-block text-start font-monospace" id="field_uri_syntax">{{uriPlaceholder}}</small>
+            }
             <div *ngIf="formSubmitted && uriErrors">
               <div *ngIf="uriErrors.required"
                    class="invalid-field-message">*Context path is required.
@@ -209,14 +218,20 @@
           </div>
           <div class="row" style="padding-bottom: 10px;" *ngFor="let option of stepOptions; index as idx" [formGroupName]="idx">
             <div class="col-5">
-              <ng-select [items]="componentOptions" bindLabel="displayName"
-                         bindValue="name" [addTag]="addOptionTag" formControlName="key"
+              <ng-select [items]="optionChoices" bindLabel="displayName" groupBy="heading"
+                         bindValue="name" [addTag]="addOptionTag" addTagText="Use the Option" formControlName="key"
                          [ngStyle]="{'text-align' : 'left'}"
                          id="field_options-key-{{idx}}"
                          (change)="changeOptionSelection($event, idx)"
                          (close)="clearOptionHover()">
+                <ng-template ng-optgroup-tmp let-item="item">{{item.heading}}</ng-template>
                 <ng-template ng-option-tmp let-item="item">
-                  <div (mouseenter)="onOptionHover(item)">{{item.displayName}}</div>
+                  <div (mouseenter)="onOptionHover(item)">
+                    <div>{{item.displayName}}@if (item.required) { <span class="badge text-bg-secondary">required</span>}</div>
+                    @if (item.description) {
+                      <div class="small text-muted text-truncate" [title]="item.description">{{item.description}}</div>
+                    }
+                  </div>
                 </ng-template>
                 <ng-template ng-footer-tmp>
                   <div class="option-desc-footer">
@@ -236,13 +251,40 @@
                 </ng-template>
               </ng-select>
             </div>
-            <div class="col-5">
-              <input type="text" class="d-inline-block form-control"
-                     style="display:inline-block; padding-top: 4px; padding-bottom: 4px; padding-left: 10px; line-height: 28px;"
-                     id="field_options-value-{{idx}}" formControlName="value"
-                     [placeholder]="optionDefaultValue(idx)"
-                     data-toggle="tooltip"
-                     title="Value of the option. Click the Camel component button for documentation on valid options."/>
+            <div class="col-5 text-start">
+              @switch (valueField(idx)) {
+                @case ('switch') {
+                  <div class="form-check form-switch mt-2">
+                    <input class="form-check-input" type="checkbox" role="switch" id="field_options-value-{{idx}}"
+                           [checked]="switchOn(idx)" (change)="setSwitch(idx, $any($event.target).checked)" />
+                    <label class="form-check-label" for="field_options-value-{{idx}}">{{ switchOn(idx) ? 'On' : 'Off' }}</label>
+                  </div>
+                }
+                @case ('choice') {
+                  <select class="form-select" id="field_options-value-{{idx}}" formControlName="value">
+                    <option [ngValue]="null">{{ optionDefaultValue(idx) || 'Default' }}</option>
+                    @for (choice of choicesOf(idx); track choice) {
+                      <option [ngValue]="choice">{{ choice }}</option>
+                    }
+                  </select>
+                }
+                @case ('number') {
+                  <input type="text" inputmode="numeric" class="form-control" id="field_options-value-{{idx}}" formControlName="value"
+                         [placeholder]="optionDefaultValue(idx)" />
+                }
+                @case ('secret') {
+                  <input type="password" autocomplete="new-password" class="form-control" id="field_options-value-{{idx}}"
+                         formControlName="value" [placeholder]="optionDefaultValue(idx)" />
+                }
+                @default {
+                  <input type="text" class="form-control" id="field_options-value-{{idx}}" formControlName="value"
+                         [placeholder]="optionDefaultValue(idx)"
+                         title="Value of the option. Click the Camel component button for documentation on valid options."/>
+                }
+              }
+              @if (isRequiredOption(idx)) {
+                <small class="text-muted">required</small>
+              }
             </div>
             <button title="Add option" type="button" aria-label="Add option"
                     class="col-1 btn btn-fx btn-fx-icon btn-fx-ghost"
@@ -257,6 +299,12 @@
             </button>
           </div>
         </div>
+
+        @if (missingRequiredOptions.length) {
+          <div class="alert alert-warning py-1 px-2 small text-start mb-2" role="status">
+            Required: {{ missingRequiredOptions.join(', ') }}. Fill them in unless a Connection supplies them.
+          </div>
+        }
 
         <ng-container *ngTemplateOutlet="addStepMenu"></ng-container>
 

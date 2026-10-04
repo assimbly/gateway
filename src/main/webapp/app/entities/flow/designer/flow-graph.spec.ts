@@ -1,6 +1,7 @@
 import { IFlow } from 'app/shared/model/flow.model';
 import { ILink } from 'app/shared/model/link.model';
 import { IStep } from 'app/shared/model/step.model';
+import { PathRule, pathRule } from 'app/shared/camel/endpoint';
 
 import {
   addBranch,
@@ -610,6 +611,21 @@ describe('Flow graph', () => {
       const withSinkComponent = edited(changeComponent(ifRouter, ifBranch.to, 'log'));
 
       expect(problems(withSinkComponent)).toEqual([expect.objectContaining({ linkTo: ifBranch.to })]);
+    });
+
+    it('is a Draft while a Step leaves a required part of its path empty', () => {
+      const sftpPath = pathRule('sftp:host:port/directoryName', [
+        { name: 'host', kind: 'path', displayName: 'Host', required: true },
+        { name: 'port', kind: 'path', displayName: 'Port' },
+      ]);
+      const rules = (componentType: string): PathRule | undefined => (componentType === 'sftp' ? sftpPath : undefined);
+      const withSftpSink = (uri: string): FlowGraph =>
+        loadFlowGraph(flow([step(10, 'SOURCE', [outbound('1-11')]), step(11, 'SINK', [inbound('1-11')], { componentType: 'sftp', uri })]));
+
+      expect(problems(withSftpSink(''), rules)).toEqual([{ stepKey: 'step-11', message: 'Fill in the Host in the path.' }]);
+      expect(isDraft(withSftpSink(''), rules)).toBe(true);
+      expect(isDraft(withSftpSink('example.com/in'), rules)).toBe(false);
+      expect(isDraft(withSftpSink(''))).toBe(false);
     });
   });
 
