@@ -76,6 +76,35 @@ A Step where messages leave the Flow. It has one inbound Link and no outbound Li
 The Flow-level error handler. It is part of the Flow's settings, not a node joined by Links.
 _Avoid_: Error node
 
+## APIs
+
+**API**:
+A REST interface that Assimbly serves, made up of Operations under one base path, with a name and a version label. It is designed in Assimbly, and its OpenAPI document is produced from it. An imported OpenAPI document becomes an API once, and from then on the API is what gets edited.
+_Avoid_: Service, REST route
+
+**Operation**:
+One HTTP method on one path template within an API, for example `GET /customers/{id}`, together with its parameters and request and response schemas. Every Operation is handled by exactly one Handler Flow. No two Operations anywhere share the same method and full path.
+_Avoid_: Endpoint (that is a Step's `component:path?options`), Route, Resource
+
+**Declared response**:
+One answer an Operation promises in its contract: a status code with a description and, optionally, a media type and schema. It describes what a caller can expect; the Response Sink is what actually answers.
+_Avoid_: Response (that is the Sink)
+
+**Handler Flow**:
+The Flow that handles one Operation. Its Source is that Operation, so a request to the Operation is a message entering the Flow. Calling an existing Flow or a database from an Operation is done with Steps in its Handler Flow. Only a Visual or Script Flow can be a Handler Flow, and it lives and dies with its Operation.
+_Avoid_: Operation flow, API flow
+
+**Response**:
+A Sink that ends a request to an Operation and gives the caller its status code, headers and body. In a Handler Flow, every Branch that ends the request ends in a Response. A failure no Step handles answers the caller with `500` instead.
+_Avoid_: Reply (fine in code), return
+
+**API status**:
+A summary of the Flow statuses of an API's Handler Flows, such as "3 of 4 Operations running". An API has no status of its own: starting or stopping it starts or stops its Handler Flows.
+
+**Call Flow**:
+A Step that sends the message to another Flow. As an Action it waits for that Flow's answer and carries on with it; as a Sink it hands the message over and the Flow ends there.
+_Avoid_: Flow link (it isn't a Link), subflow
+
 ## Endpoints
 
 **Endpoint**:
