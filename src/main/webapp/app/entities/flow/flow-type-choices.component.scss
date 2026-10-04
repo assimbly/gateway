@@ -1,0 +1,60 @@
+.flow-type-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0.75rem;
+}
+
+.flow-type-choice {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  background: var(--app-surface);
+  color: var(--app-text);
+  font-weight: normal;
+  text-align: left;
+  text-decoration: none;
+
+  &:hover {
+    border-color: var(--app-primary);
+    background: var(--app-hover);
+    color: var(--app-text);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--app-focus);
+    outline-offset: 2px;
+  }
+}
+
+.flow-type-choice__icon {
+  margin-top: 0.125rem;
+  font-size: 1.25rem;
+  color: var(--app-primary-accessible);
+}
+
+.flow-type-choice__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.flow-type-choice__title {
+  font-weight: 600;
+}
+
+.flow-type-choice__level {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--app-text-muted);
+}
+
+.flow-type-choice__audience {
+  font-size: 0.875rem;
+  color: var(--app-text-muted);
+}

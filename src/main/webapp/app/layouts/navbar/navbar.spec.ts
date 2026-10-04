@@ -3,9 +3,11 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
+import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
 import { provideTranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 
+import { fontAwesomeIcons } from 'app/config/font-awesome-icons';
 import { Account, AccountService } from 'app/core/auth';
 import { ThemeService } from 'app/core/theme';
 import { LayoutService } from 'app/layouts/main/layout.service';
@@ -59,6 +61,7 @@ describe('Navbar Component', () => {
   });
 
   beforeEach(() => {
+    TestBed.inject(FaIconLibrary).addIcons(...fontAwesomeIcons);
     fixture = TestBed.createComponent(Navbar);
     comp = fixture.componentInstance;
     accountService = TestBed.inject(AccountService);
@@ -134,20 +137,20 @@ describe('Navbar Component', () => {
 
   it('should treat flows and admin child routes as active', () => {
     expect(comp.isFlowsActive()).toBe(true);
-    expect(comp.isFlowsManageActive()).toBe(true);
+    expect(comp.isFlowListActive()).toBe(true);
     expect(comp.isAdminActive()).toBe(false);
     expect(comp.isActivePath('/broker')).toBe(false);
     expect(comp.isActivePath('/queue')).toBe(false);
     expect(comp.isActivePath('/admin/metrics')).toBe(false);
   });
 
-  it('should highlight the flows manage submenu item on the home route', () => {
+  it('should highlight the Flows submenu item on the home route', () => {
     accountService.authenticate(account);
     fixture.detectChanges();
 
-    const manageLink: HTMLElement = fixture.nativeElement.querySelector('#flows-menu-items a');
-    expect(manageLink.textContent).toContain('Manage');
-    expect(manageLink.classList.contains('active')).toBe(true);
+    const flowsLink: HTMLElement = fixture.nativeElement.querySelector('#flows-menu-items a');
+    expect(flowsLink.textContent).toContain('Flows');
+    expect(flowsLink.classList.contains('active')).toBe(true);
   });
 
   it('should label the environment variables submenu item as Variables', () => {
@@ -157,16 +160,16 @@ describe('Navbar Component', () => {
     fixture.nativeElement.querySelector('#flows-menu').click();
     fixture.detectChanges();
 
-    const labels = Array.from(fixture.nativeElement.querySelectorAll('#flows-menu-items span')).map(
+    const labels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#flows-menu-items span')).map(
       (span: HTMLElement) => span.textContent?.trim(),
     );
     expect(labels).toContain('Variables');
     expect(labels).not.toContain('Environment Variables');
   });
 
-  it('should keep the flows submenu expanded on the manage route', () => {
+  it('should keep the flows submenu expanded on the Flows list route', () => {
     expect(comp.flowsExpanded()).toBe(true);
-    expect(comp.isFlowsManageActive()).toBe(true);
+    expect(comp.isFlowListActive()).toBe(true);
     expect(comp.brokerExpanded()).toBe(false);
     expect(comp.adminExpanded()).toBe(false);
     expect(comp.accountExpanded()).toBe(false);

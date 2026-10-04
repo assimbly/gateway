@@ -4,7 +4,7 @@ import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription, forkJoin, interval } from 'rxjs';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { RouterModule } from '@angular/router';
 
 import { SortState, sortParams } from 'app/shared/sort';
@@ -24,11 +24,14 @@ import { SearchToolbar } from 'app/shared/filter';
 import { DataTable, DataTableColumn } from 'app/shared/table';
 import { FlowRowComponent } from './flow-row.component';
 import { FlowSearchByNamePipe } from './flow.searchbyname.pipe';
+import { FlowTypeChoicesComponent } from './flow-type-choices.component';
+import { NewFlowDialogComponent, takeChosenFile } from './new-flow-dialog.component';
 
 @Component({
   selector: 'jhi-flow',
   templateUrl: './flow.component.html',
-  imports: [CommonModule, RouterModule, FontAwesomeModule, NgbDropdownModule, SearchToolbar, DataTable, FlowRowComponent],
+  styleUrl: './flow.component.scss',
+  imports: [CommonModule, RouterModule, FontAwesomeModule, SearchToolbar, DataTable, FlowRowComponent, FlowTypeChoicesComponent],
 })
 export class FlowComponent implements OnInit, OnDestroy {
   integrations: IIntegration[];
@@ -58,6 +61,7 @@ export class FlowComponent implements OnInit, OnDestroy {
   test: any;
   searchText = '';
   flowsLoading = true;
+  flowsLoadFailed = false;
   readonly columns: DataTableColumn[] = [
     { key: 'name', header: 'Name', sortable: true },
     { key: 'completed', header: 'Completed', numeric: true },
@@ -78,7 +82,8 @@ export class FlowComponent implements OnInit, OnDestroy {
     protected parseLinks: ParseLinks,
     protected accountService: AccountService,
     protected integrationService: IntegrationService,
-    protected changeDetector: ChangeDetectorRef
+    protected changeDetector: ChangeDetectorRef,
+    protected modalService: NgbModal,
   ) {
     this.flows = [];
     this.itemsPerPage = ITEMS_PER_PAGE + 5;
@@ -123,6 +128,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.page = 0;
     this.flows = [];
     this.flowsLoading = true;
+    this.flowsLoadFailed = false;
     this.loadFlows();
   }
 
@@ -214,6 +220,24 @@ export class FlowComponent implements OnInit, OnDestroy {
     return this.searchPipe.transform(this.flows ?? [], this.searchText, this.sortState.order === 'asc', this.sortState.predicate);
   }
 
+  get integrationId(): number | undefined {
+    return this.integrations?.[this.indexIntegration]?.id;
+  }
+
+  openNewFlow(): NewFlowDialogComponent {
+    const modalRef = this.modalService.open(NewFlowDialogComponent, { size: 'lg', ariaLabelledBy: 'new-flow-title' });
+    const dialog: NewFlowDialogComponent = modalRef.componentInstance;
+    dialog.integrationId = this.integrationId;
+    return dialog;
+  }
+
+  importFromFile(event: Event): void {
+    const file = takeChosenFile(event);
+    if (file) {
+      void this.openNewFlow().importFile(file);
+    }
+  }
+
   trackId(index: number, item: IFlow) {
     return item.id;
   }
@@ -262,6 +286,7 @@ export class FlowComponent implements OnInit, OnDestroy {
 
   protected onError(errorMessage: string) {
     this.flowsLoading = false;
+    this.flowsLoadFailed = true;
     this.changeDetector.detectChanges();
 		this.alertService.addAlert({
 		  type: 'danger',

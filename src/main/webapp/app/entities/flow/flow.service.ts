@@ -75,6 +75,15 @@ export class FlowService {
     }
   }
 
+  /** Imports the Flow with this id from an export file; a Flow with the same name is updated, otherwise one is created. */
+  importFlowConfiguration(integrationId: number, flowId: string, xmlconfiguration: string): Observable<HttpResponse<string>> {
+    return this.http.post(`${this.environmentUrl}/${integrationId}/flow/${flowId}`, xmlconfiguration, {
+      headers: new HttpHeaders({ Accept: 'application/xml', 'Content-Type': 'application/xml' }),
+      observe: 'response',
+      responseType: 'text',
+    });
+  }
+
   saveFlows(flowId: number, xmlconfiguration: string, header: string): Observable<EntityResponseType> {
     const options = {
       headers: new HttpHeaders({ Accept: 'application/xml' }),

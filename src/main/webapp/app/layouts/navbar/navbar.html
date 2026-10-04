@@ -86,41 +86,11 @@
           <a
             [class]="itemClass"
             routerLink="/"
-            [class.active]="isFlowsManageActive()"
+            [class.active]="isFlowListActive()"
             (click)="layout.flowsExpanded.set(true); collapseNavbar()"
           >
             <fa-icon icon="list" [fixedWidth]="true" />
-            <span>Manage</span>
-          </a>
-          <a
-            [class]="itemClass"
-            routerLink="/flow/editor"
-            [queryParams]="{ mode: 'edit', editor: 'flow' }"
-            [class.active]="isFlowEditorActive('flow')"
-            (click)="collapseNavbar()"
-          >
-            <fa-icon icon="pencil-alt" [fixedWidth]="true" />
-            <span>Design</span>
-          </a>
-          <a
-            [class]="itemClass"
-            routerLink="/flow/editor"
-            [queryParams]="{ mode: 'edit', editor: 'route' }"
-            [class.active]="isFlowEditorActive('route')"
-            (click)="collapseNavbar()"
-          >
-            <fa-icon icon="edit" [fixedWidth]="true" />
-            <span>Editor</span>
-          </a>
-          <a
-            [class]="itemClass"
-            routerLink="/flow/editor"
-            [queryParams]="{ mode: 'edit', editor: 'script' }"
-            [class.active]="isFlowEditorActive('script')"
-            (click)="collapseNavbar()"
-          >
-            <fa-icon icon="code" [fixedWidth]="true" />
-            <span>Script</span>
+            <span>Flows</span>
           </a>
           <a
             [class]="itemClass"
@@ -129,7 +99,7 @@
             (click)="collapseNavbar()"
           >
             <fa-icon icon="paper-plane" [fixedWidth]="true" />
-            <span>Send</span>
+            <span>Test message</span>
           </a>
           <a
             [class]="itemClass"

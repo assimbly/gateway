@@ -8,8 +8,6 @@ import org.w3c.dom.Document;
 @Service
 public class Import {
 
-	private String configuration;
-
 	@Autowired
 	private ImportXMLGateways importXMLGateways;
 
@@ -45,11 +43,12 @@ public class Import {
 	// imports flow configuration (specific flow)
 	public String convertFlowConfigurationToDB(Long integrationId, Long flowId, String mediaType, String flowConfiguration)	throws Exception {
 
-		if(!flowConfiguration.endsWith("</dil>")){
-            configuration = new Transform("transform-to-dil.xsl").transformToDil(flowConfiguration);
+		String dilConfiguration = flowConfiguration.strip();
+		if(!dilConfiguration.endsWith("</dil>")){
+            dilConfiguration = new Transform("transform-to-dil.xsl").transformToDil(dilConfiguration);
 		}
 
-		Document doc = ImportXMLUtil.getDocument(mediaType, configuration);
+		Document doc = ImportXMLUtil.getDocument(mediaType, dilConfiguration);
 
 		importXMLMessages.setMessagesFromXML(doc);
 

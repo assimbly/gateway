@@ -9,6 +9,8 @@ const environment = {
   SERVER_API_URL: '',
   __VERSION__: 'test',
   __DEBUG_INFO_ENABLED__: false,
+  __TYPE__: 'FULL',
+  __KEYSTORE_PWD__: '',
 };
 
 module.exports = {
