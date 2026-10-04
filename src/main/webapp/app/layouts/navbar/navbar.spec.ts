@@ -144,12 +144,12 @@ describe('Navbar Component', () => {
     expect(comp.isActivePath('/admin/metrics')).toBe(false);
   });
 
-  it('should highlight the Flows submenu item on the home route', () => {
+  it('should highlight the Manage submenu item on the home route', () => {
     accountService.authenticate(account);
     fixture.detectChanges();
 
     const flowsLink: HTMLElement = fixture.nativeElement.querySelector('#flows-menu-items a');
-    expect(flowsLink.textContent).toContain('Flows');
+    expect(flowsLink.textContent).toContain('Manage');
     expect(flowsLink.classList.contains('active')).toBe(true);
   });
 

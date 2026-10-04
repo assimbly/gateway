@@ -99,8 +99,10 @@
         [draftReason]="draftReason"
         [sourceComponent]="sourceComponent"
         [saving]="isSaving"
+        [submitted]="formSubmitted"
         (save)="save()"
-        (saveAndStart)="save(true)"
+        (saveAndStart)="save('start')"
+        (saveAndReturn)="save('return')"
       />
 
       <ng-template #stepEditor let-index>
@@ -124,6 +126,7 @@
           [messageCreated]="messageCreated"
           [connectionCreated]="connectionCreated"
           [uriPlaceholder]="uriPlaceholders[index]"
+          [autoPath]="steps[index]?.stepType === 'ERROR' ? errorHandlerAutoPath : undefined"
           [uriPopoverMessage]="uriPopoverMessages[index]"
           [uriList]="URIList[index]"
           [componentOptions]="componentOptions[index]"
@@ -159,8 +162,14 @@
                     title="Lay the Flow out from left to right">
               <fa-icon icon="sitemap"></fa-icon><span>Auto-arrange</span>
             </button>
-            <button type="button" class="btn btn-fx btn-fx-ghost" (click)="openFlowSettings()">
+            <button type="button" class="btn btn-fx btn-fx-ghost" (click)="openFlowSettings()"
+                    [class.active]="isFlowPanelOpen('settings')" [attr.aria-pressed]="isFlowPanelOpen('settings')">
               <fa-icon icon="cogs"></fa-icon><span>Flow settings</span>
+            </button>
+            <button type="button" class="btn btn-fx btn-fx-ghost" (click)="openErrorHandler()"
+                    [class.active]="isFlowPanelOpen('errorHandler')" [attr.aria-pressed]="isFlowPanelOpen('errorHandler')"
+                    title="What happens to a message that fails in this Flow">
+              <fa-icon icon="exclamation-triangle"></fa-icon><span>Error handler</span>
             </button>
             <div class="flow-designer-toolbar-end">
               <button type="button" class="btn btn-fx btn-fx-ghost" (click)="togglePanel()" aria-controls="flow-designer-panel"
@@ -220,27 +229,43 @@
                   (linkChange)="onLinkChange($event)"
                   (deleteBranch)="onDeleteBranch(link.to)"
                 ></jhi-link-editor>
+              } @else if (flowPanel === 'errorHandler') {
+                <p class="text-muted small mb-2">
+                  A message that fails in this Flow goes to its Error handler. By default it logs the error, with all its details.
+                </p>
+                @if (errorStepIndex >= 0) {
+                  <ng-container *ngTemplateOutlet="stepEditor; context: { $implicit: errorStepIndex }"></ng-container>
+                }
               } @else {
-                <div class="card bg-light text-start mb-3">
+                <div class="card bg-light text-start flow-settings">
                   <div class="card-body">
                     <h5 class="border-bottom">FLOW</h5>
-                    <div class="mb-3">
-                      <label class="form-control-label" for="field_logLevel">Log level</label>
-                      <select class="form-select" id="field_logLevel" formControlName="logLevel">
-                        @for (level of logLevelListType; track level) {
-                          <option [value]="level">{{ level }}</option>
-                        }
-                      </select>
+                    <div class="flow-setting">
+                      <div class="flow-setting__text">
+                        <label class="form-check-label" for="field_trace">Trace</label>
+                        <small class="text-muted" id="field_trace_help">Records the messages at each Step of the Flow.</small>
+                      </div>
+                      <div class="form-check form-switch mb-0">
+                        <input class="form-check-input" type="checkbox" role="switch" id="field_trace" aria-describedby="field_trace_help"
+                               [checked]="traceOn" (change)="setTrace($any($event.target).checked)" />
+                      </div>
                     </div>
-                    <div class="form-check mb-1">
-                      <input class="form-check-input" type="checkbox" id="field_autoStart" formControlName="autoStart" />
-                      <label class="form-check-label" for="field_autoStart">Start automatically when the Gateway starts</label>
+                    <div class="flow-setting">
+                      <div class="flow-setting__text">
+                        <label class="form-check-label" for="field_autoStart">Auto start</label>
+                        <small class="text-muted" id="field_autoStart_help">
+                          @if (flowIsDraft) {
+                            This Flow is a Draft, so it is saved with auto start off until it is complete.
+                          } @else {
+                            Starts the Flow when the Gateway starts.
+                          }
+                        </small>
+                      </div>
+                      <div class="form-check form-switch mb-0">
+                        <input class="form-check-input" type="checkbox" role="switch" id="field_autoStart" aria-describedby="field_autoStart_help"
+                               formControlName="autoStart" />
+                      </div>
                     </div>
-                    @if (flowIsDraft) {
-                      <p class="text-muted small mb-3">This Flow is a Draft, so it is saved with auto-start off until it is complete.</p>
-                    } @else {
-                      <div class="mb-3"></div>
-                    }
                     <label class="form-control-label" for="field_notes">Notes</label>
                     <ngx-codemirror
                       *ngIf="flow"
@@ -252,9 +277,6 @@
                     </ngx-codemirror>
                   </div>
                 </div>
-                @if (errorStepIndex >= 0) {
-                  <ng-container *ngTemplateOutlet="stepEditor; context: { $implicit: errorStepIndex }"></ng-container>
-                }
               }
               </div>
               @if (selection.type !== 'flow') {
@@ -298,6 +320,7 @@
                     [messageCreated]="messageCreated"
                     [connectionCreated]="connectionCreated"
                     [uriPlaceholder]="uriPlaceholders[index]"
+                    [autoPath]="step.stepType === 'ERROR' ? errorHandlerAutoPath : undefined"
                     [uriPopoverMessage]="uriPopoverMessages[index]"
                     [uriList]="URIList[index]"
                     [componentOptions]="componentOptions[index]"

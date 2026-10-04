@@ -68,6 +68,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     { key: 'status', header: 'Status' },
     { key: 'completed', header: 'Completed', numeric: true },
     { key: 'failed', header: 'Failed', numeric: true },
+    { key: 'stats', header: 'Stats' },
     { key: 'actions', header: 'Actions', align: 'end' },
   ];
   private readonly searchPipe = new FlowSearchByNamePipe();
@@ -125,9 +126,9 @@ export class FlowComponent implements OnInit, OnDestroy {
       );
   }
 
+  // The Flows shown stay until the new list arrives, so the toolbar doesn't flicker away on a refresh.
   reset() {
     this.page = 0;
-    this.flows = [];
     this.flowsLoading = true;
     this.flowsLoadFailed = false;
     this.loadFlows();
@@ -215,6 +216,16 @@ export class FlowComponent implements OnInit, OnDestroy {
         this.indexIntegration = 0;
       }
     }
+  }
+
+  /** An empty Gateway shows how to create the first Flow instead of the list. */
+  get showEmptyState(): boolean {
+    return !this.flowsLoading && !this.flowsLoadFailed && !this.flows.length;
+  }
+
+  /** Filter, Add and Refresh only make sense once there is a Flow; a failed load keeps Refresh to try again. */
+  get hasFlows(): boolean {
+    return this.flows.length > 0 || this.flowsLoadFailed;
   }
 
   get filteredFlows(): IFlow[] {

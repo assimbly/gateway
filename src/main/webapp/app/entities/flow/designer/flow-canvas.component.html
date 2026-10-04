@@ -1,4 +1,4 @@
-<f-flow fDraggable class="flow-canvas" (fSelectionChange)="onSelectionChange($event)" (fMoveNodes)="onMoveNodes($event)"
+<f-flow fDraggable class="flow-canvas" [class.flow-canvas-shown]="shown" (fSelectionChange)="onSelectionChange($event)" (fMoveNodes)="onMoveNodes($event)"
         (fNodesRendered)="fitToScreen()">
   <f-background>
     <f-circle-pattern></f-circle-pattern>

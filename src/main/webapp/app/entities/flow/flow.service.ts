@@ -1,5 +1,5 @@
 import { Service, inject } from '@angular/core';
-import { HttpClient, HttpResponse, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, Observer, Subscription, switchMap } from 'rxjs';
 
 import { serverApiUrl } from 'app/config';
@@ -11,9 +11,13 @@ import { WindowRef } from 'app/shared/window/window.service';
 import { saveAs } from 'file-saver/FileSaver';
 import { IIntegration } from 'app/shared/model/integration.model';
 import { IFlow, Flow } from 'app/shared/model/flow.model';
+import { HANDLES_OWN_ERRORS } from 'app/core/interceptor/error-handler.interceptor';
 
 type EntityResponseType = HttpResponse<IFlow>;
 type EntityArrayResponseType = HttpResponse<IFlow[]>;
+
+/** Configuring, starting, stopping, pausing or resuming a Flow shows its own errors: the Flows list and the editor explain them. */
+const OWN_ERRORS = new HttpContext().set(HANDLES_OWN_ERRORS, true);
 
 @Service()
 export class FlowService {
@@ -71,6 +75,7 @@ export class FlowService {
         headers: new HttpHeaders({ PlaceholderReplacement: 'true', Accept: 'application/xml' }),
         observe: 'response',
         responseType: 'text',
+        context: OWN_ERRORS,
       });
     } else {
       return this.http.post(`${this.integrationUrl}/flow/${flowId}/configure`, xmlconfiguration, {
@@ -103,7 +108,7 @@ export class FlowService {
     return this.http.get<any>(`${this.validationUrl}/uri`, options);
   }
 
-  /** Sends the Flow's saved configuration to the runtime, then starts it. */
+  /** Sends the Flow's saved configuration to the runtime, then starts it. A failure is for the caller to show. */
   configureAndStart(flowId: number): Observable<HttpResponse<string>> {
     return this.getConfiguration(flowId).pipe(
       switchMap(configuration => this.setConfiguration(flowId, configuration.body, 'true')),
@@ -112,23 +117,23 @@ export class FlowService {
   }
 
   start(flowId: number): Observable<HttpResponse<string>> {
-    return this.http.get(`${this.integrationUrl}/flow/${flowId}/start`, { observe: 'response', responseType: 'text' });
+    return this.http.get(`${this.integrationUrl}/flow/${flowId}/start`, { observe: 'response', responseType: 'text', context: OWN_ERRORS });
   }
 
   pause(flowId: number): Observable<HttpResponse<string>> {
-    return this.http.get(`${this.integrationUrl}/flow/${flowId}/pause`, { observe: 'response', responseType: 'text' });
+    return this.http.get(`${this.integrationUrl}/flow/${flowId}/pause`, { observe: 'response', responseType: 'text', context: OWN_ERRORS });
   }
 
   resume(flowId: number): Observable<HttpResponse<string>> {
-    return this.http.get(`${this.integrationUrl}/flow/${flowId}/resume`, { observe: 'response', responseType: 'text' });
+    return this.http.get(`${this.integrationUrl}/flow/${flowId}/resume`, { observe: 'response', responseType: 'text', context: OWN_ERRORS });
   }
 
   restart(flowId: number): Observable<HttpResponse<string>> {
-    return this.http.get(`${this.integrationUrl}/flow/${flowId}/restart`, { observe: 'response', responseType: 'text' });
+    return this.http.get(`${this.integrationUrl}/flow/${flowId}/restart`, { observe: 'response', responseType: 'text', context: OWN_ERRORS });
   }
 
   stop(flowId: number): Observable<HttpResponse<string>> {
-    return this.http.get(`${this.integrationUrl}/flow/${flowId}/stop`, { observe: 'response', responseType: 'text' });
+    return this.http.get(`${this.integrationUrl}/flow/${flowId}/stop`, { observe: 'response', responseType: 'text', context: OWN_ERRORS });
   }
 
   getFlowStatus(flowId: number): Observable<HttpResponse<string>> {

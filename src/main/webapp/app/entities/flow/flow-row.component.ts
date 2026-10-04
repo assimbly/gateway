@@ -2,8 +2,7 @@ import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit, inject } from '
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { IconProp } from '@fortawesome/fontawesome-svg-core';
-import { NgbDropdownModule, NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbModal, NgbOffcanvas, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 
 import { Flow, IFlow, LogLevelType } from 'app/shared/model/flow.model';
 import { isDraft, loadFlowGraph, opensOnCanvas } from './designer/flow-graph';
@@ -16,13 +15,25 @@ import { IntegrationService } from '../integration/integration.service';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
 import { Collectors } from 'app/shared/collect/collectors';
-import { OverflowActionDirective, PrimaryActionDirective, RowActions, StatusControls, StatusControlsTone, Truncate } from 'app/shared/table';
+import { OverflowActionDirective, RowActions, StatusControls, Truncate } from 'app/shared/table';
 import { FlowRowAlerts } from './flow-row-alerts.component';
 import { FlowRowStats, FlowStatsSection } from './flow-row-stats.component';
-import { FlowAction, FlowStatusView, countLabel, flowTypeLabel, hasRun, flowStatusView, sourceStepOf, testMessageBlocked } from './flow-status';
+import {
+  FlowAction,
+  FlowFailure,
+  FlowStatusView,
+  countLabel,
+  failureOfError,
+  flowEventOf,
+  flowFailureOf,
+  flowStatusView,
+  flowTypeLabel,
+  hasRun,
+  sourceStepOf,
+  testMessageBlocked,
+} from './flow-status';
 import { Components } from 'app/shared/camel/component-type';
 import { ComponentSchemas } from './component-schemas.service';
-import { FlowStatusPillComponent } from './flow-status-pill.component';
 import { FlowAlertsDrawerComponent } from './flow-alerts-drawer.component';
 
 import { Router } from '@angular/router';
@@ -46,14 +57,13 @@ enum Status {
     RouterModule,
     FontAwesomeModule,
     NgbDropdownModule,
+    NgbTooltip,
     RowActions,
-    PrimaryActionDirective,
     OverflowActionDirective,
     StatusControls,
     Truncate,
     FlowRowAlerts,
     FlowRowStats,
-    FlowStatusPillComponent,
   ],
 })
 export class FlowRowComponent implements OnInit, OnDestroy {
@@ -91,8 +101,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   public flowStartTime: any;
   public clickButton = false;
 
-  public flowError = false;
-  public flowErrorButton: string;
+  /** Why the Flow last failed to start, stop, pause or resume; null when it didn't. */
+  public failure: FlowFailure | null = null;
 
   public flowAlerts: string;
   public numberOfAlerts: any;
@@ -137,24 +147,16 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     private changeDetector: ChangeDetectorRef
   ) {}
 
-  get statusTone(): StatusControlsTone {
-    switch (this.statusFlow) {
-      case Status.active:
-        return 'started';
-      case Status.paused:
-        return 'paused';
-      case Status.inactiveError:
-        return 'failed';
-      default:
-        return 'default';
-    }
-  }
-
-  readonly menuLabels: Record<FlowAction, string> = { start: 'Start', stop: 'Stop', pause: 'Pause', resume: 'Resume', restart: 'Restart' };
-  readonly menuIcons: Record<FlowAction, IconProp> = { start: 'play', stop: 'stop', pause: 'pause', resume: 'step-forward', restart: 'sync' };
-
   get state(): FlowStatusView {
     return flowStatusView(this.statusFlow, this.isDraft);
+  }
+
+  shows(action: FlowAction): boolean {
+    return this.state.controls.includes(action);
+  }
+
+  isDisabled(action: FlowAction): boolean {
+    return this.state.disabled.includes(action);
   }
 
   /** Why the ⋮ menu's Send test message is unavailable, or null when it can be sent. */
@@ -328,19 +330,17 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         break;
       case 'error':
       case 'failed':
-        const lastStatus = this.flowStatus;
         this.statusFlow = Status.inactiveError;
         this.isFlowStarted = this.isFlowPaused = false;
         this.flowStatusButton = `Failed`;
-        this.setErrorMessage(lastStatus,this.statusMessage);
+        this.failure = failureOfError(this.statusMessage);
         break;
       default:
-        const unknownStatus = this.flowStatus;
         this.statusFlow = Status.inactive;
         this.isFlowStarted = this.isFlowPaused = false;
         this.isFlowStopped = this.isFlowRestarted = this.isFlowResumed = true;
         this.flowStatusButton = `Unknown`;
-        this.setErrorMessage(unknownStatus,this.statusMessage);
+        this.failure = flowFailureOf(this.statusMessage);
         break;
     }
     this.ran = this.ran || hasRun(status);
@@ -353,66 +353,6 @@ export class FlowRowComponent implements OnInit, OnDestroy {
       this.completedCount = null;
       this.failedCount = null;
     }
-  }
-
-  setErrorMessage(action: string, errorReport: any){
-
-      this.flowError = true;
-
-      try {
-
-          if (errorReport.flow.installed) {
-
-                  const total = errorReport.flow.installed.total;
-                  const failed = errorReport.flow.installed.failed;
-
-                  this.flowErrorButton = `${failed} of ${total} steps failed to start <br/><br/>
-                                           <b>Details:</b> <br/>`;
-
-                  for (let i = 0; i < errorReport.flow.steps.length; i++) {
-
-                      const uri = errorReport.flow.steps[i].uri;
-                      const status = errorReport.flow.steps[i].status;
-
-                      if(status==='error' && uri){
-
-                          const errorMessage = errorReport.flow.steps[i].message;
-
-                          this.flowErrorButton = this.flowErrorButton + `<br/><table class="table" style="width: 100%">
-                            <tbody>
-                              <tr>
-                                <td><b>uri:</b></td>
-                                <td>${uri}</td>
-                              </tr>
-                              <tr>
-                                <td><b>error:</b></td>
-                                <td>${errorMessage}</td>
-                              </tr>
-                            </tbody>
-                          </table>`;
-                      }else if(status==='error'){
-
-                          const errorMessage = errorReport.flow.steps[i].message;
-
-                          this.flowErrorButton = this.flowErrorButton + `<br/><table class="table">
-                            <tbody>
-                              <tr>
-                                <td><b>error:</b></td>
-                                <td>${errorMessage}</td>
-                              </tr>
-                            </tbody>
-                          </table>`;
-                      }
-
-                  }
-
-          } else {
-              this.flowErrorButton = errorReport.flow.message;
-          }
-      } catch (e) {
-           this.flowErrorButton = errorReport;
-      }
-
   }
 
   getFlowAlertsPoll(): void {
@@ -793,7 +733,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.flowStatus = 'Starting';
     this.isFlowStatusOK = true;
     this.disableActionBtns = true;
-    this.flowError = false;
+    this.failure = null;
 
     if(this.flow.logLevel === LogLevelType.TRACE){
       this.enableTracing();
@@ -802,12 +742,10 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.configureAndRun(
       this.flowService.start(this.flow.id),
       body => {
-        this.statusMessage = JSON.parse(body);
-        this.disableActionBtns = false;
-        this.setFlowStatus(this.statusMessage.flow.event);
+        this.applyAnswer(body);
       },
       err => {
-        this.statusMessage = JSON.parse(err.error);
+        this.statusMessage = err.error;
         this.disableActionBtns = false;
         this.setFlowStatus('error');
         this.flowStatusError = `Flow with id=${this.flow.id} is not started.`;
@@ -832,14 +770,13 @@ export class FlowRowComponent implements OnInit, OnDestroy {
           if (this.destroyed) {
             return;
           }
-          this.statusMessage = JSON.parse(response.body);
-          this.disableActionBtns = false;
-          this.setFlowStatus(this.statusMessage.flow.event);
+          this.applyAnswer(response.body);
         },
         err => {
           if (this.destroyed) {
             return;
           }
+          this.statusMessage = err.error;
           this.disableActionBtns = false;
           this.setFlowStatus('error');
           this.isFlowStatusOK = false;
@@ -857,12 +794,10 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.configureAndRun(
       this.flowService.resume(this.flow.id),
       body => {
-        this.statusMessage = JSON.parse(body);
-        this.disableActionBtns = false;
-        this.setFlowStatus(this.statusMessage.flow.event);
+        this.applyAnswer(body);
       },
       err => {
-        this.statusMessage = JSON.parse(err.error);
+        this.statusMessage = err.error;
         this.disableActionBtns = false;
         this.setFlowStatus('error');
         this.isFlowStatusOK = false;
@@ -888,12 +823,10 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.configureAndRun(
       this.flowService.restart(this.flow.id),
       body => {
-        this.statusMessage = JSON.parse(body);
-        this.disableActionBtns = false;
-        this.setFlowStatus(this.statusMessage.flow.event);
+        this.applyAnswer(body);
       },
       err => {
-        this.statusMessage = JSON.parse(err.error);
+        this.statusMessage = err.error;
         this.disableActionBtns = false;
         this.setFlowStatus('error');
         this.isFlowStatusOK = false;
@@ -919,14 +852,13 @@ export class FlowRowComponent implements OnInit, OnDestroy {
           if (this.destroyed) {
             return;
           }
-          this.statusMessage = JSON.parse(response.body);
-          this.disableActionBtns = false;
-          this.setFlowStatus(this.statusMessage.flow.event);
+          this.applyAnswer(response.body);
         },
         err => {
           if (this.destroyed) {
             return;
           }
+          this.statusMessage = err.error;
           this.disableActionBtns = false;
           this.setFlowStatus('error');
           this.isFlowStatusOK = false;
@@ -934,6 +866,13 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         },
       ),
     );
+  }
+
+  /** Shows what the runtime answered: the Flow's new status, or Error when the answer reports a failure. */
+  private applyAnswer(body: string): void {
+    this.statusMessage = body;
+    this.disableActionBtns = false;
+    this.setFlowStatus(flowFailureOf(body) ? 'error' : (flowEventOf(body) ?? ''));
   }
 
   private configureAndRun(
@@ -967,6 +906,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
               onActionError(err);
             } else {
               onConfigureError();
+              this.statusMessage = err.error;
+              this.setFlowStatus('error');
             }
           },
         }),

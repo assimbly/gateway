@@ -129,15 +129,37 @@ export class FlowCanvasComponent {
 
   private fitted = false;
 
+  /** Whether the Steps are shown: only once the first fit has moved them into place, so they don't jump there. */
+  shown = false;
+
+  /** Shows the canvas anyway should Foblex never report its Steps rendered. */
+  private readonly showFallback = setTimeout(() => this.show(), 1500);
+
+  private show(): void {
+    clearTimeout(this.showFallback);
+    if (!this.shown) {
+      this.shown = true;
+      this.cdr.markForCheck();
+    }
+  }
+
   /**
    * Fits the Flow into view once, when it first appears; after that the view stays where the user put it.
    * A Flow of just its Source starts at the left, leaving the room on the right for the Steps still to come.
-   * The fit waits a moment, because the Steps are not measured yet when Foblex reports them rendered.
+   * The fit waits a moment, because the Steps are not measured yet when Foblex reports them rendered. Until the
+   * fit has been drawn the canvas stays invisible (but measured).
    */
   fitToScreen(): void {
     if (!this.fitted) {
       this.fitted = true;
-      setTimeout(() => (this.graph.steps.length === 1 ? this.showAtStart(this.graph.steps[0]) : this.canvas?.fitToScreen({ x: 80, y: 80 }, false, false, 1)));
+      setTimeout(() => {
+        if (this.graph.steps.length === 1) {
+          this.showAtStart(this.graph.steps[0]);
+        } else {
+          this.canvas?.fitToScreen({ x: 80, y: 80 }, false, false, 1);
+        }
+        requestAnimationFrame(() => this.show());
+      });
     }
   }
 

@@ -154,6 +154,54 @@
   overflow-y: auto;
 }
 
+// The Flow settings fill the panel; the Notes take the height the settings above them leave.
+.flow-settings {
+  height: 100%;
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .notes-codemirror {
+    flex: 1 1 auto;
+    min-height: 10rem;
+    display: flex;
+    flex-direction: column;
+
+    .CodeMirror {
+      flex: 1 1 auto;
+      height: auto;
+      min-height: 0;
+    }
+  }
+}
+
+// A setting with its name and what it does on the left, and its on/off switch on the right.
+.flow-setting {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  .form-check-label {
+    display: block;
+    font-weight: 600;
+  }
+
+  .form-switch .form-check-input {
+    width: 2.5em;
+    height: 1.25em;
+    cursor: pointer;
+  }
+}
+
+.flow-setting__text {
+  min-width: 0;
+}
+
 .flow-designer-minimap {
   flex: 0 0 14rem;
   overflow: hidden;

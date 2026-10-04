@@ -1,31 +1,51 @@
 import { Component, ElementRef, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { HttpResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { NgClass } from '@angular/common';
+import { Router } from '@angular/router';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbDropdownModule, NgbOffcanvas, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { EMPTY, Observable, Subject, catchError, forkJoin, map, merge, of, switchMap, timer } from 'rxjs';
 
 import { Components } from 'app/shared/camel/component-type';
+import { StatusControlsTone } from 'app/shared/table';
 
 import { FlowService } from '../flow.service';
-import { RuntimeStatus, countLabel, hasRun, flowStatusView, runtimeStatusOf, testMessageBlocked } from '../flow-status';
-import { FlowStatusPillComponent } from '../flow-status-pill.component';
+import {
+  FlowFailure,
+  RuntimeStatus,
+  countLabel,
+  failureOfError,
+  flowEventOf,
+  flowFailureOf,
+  flowStatusView,
+  hasRun,
+  runtimeStatusOf,
+  testMessageBlocked,
+} from '../flow-status';
+import { FlowRowAlerts } from '../flow-row-alerts.component';
 import { FlowAlertsDrawerComponent } from '../flow-alerts-drawer.component';
 
 const POLL_INTERVAL = 10000;
 
+const TONE_CLASS: Record<StatusControlsTone, string> = {
+  default: 'btn-fx-secondary',
+  started: 'btn-fx-success',
+  paused: 'btn-fx-warning',
+  failed: 'btn-fx-danger',
+};
+
 /**
- * The one header row of every Flow editor: the breadcrumb with the Flow's name editable in place, the Flow status with
- * its counters and Alerts, and the actions to save, start or stop the Flow and send it a test message.
+ * The one header row of every Flow editor: the Flow's name, its counters and Alerts, and the actions to save, start or
+ * stop the Flow and send it a test message. The colour of Start/Stop shows the Flow status.
  */
 @Component({
   selector: 'jhi-flow-editor-header',
   templateUrl: './flow-editor-header.component.html',
   styleUrl: './flow-editor-header.component.scss',
-  imports: [ReactiveFormsModule, RouterLink, FontAwesomeModule, NgbDropdownModule, NgbTooltip, FlowStatusPillComponent],
+  imports: [NgClass, ReactiveFormsModule, FontAwesomeModule, NgbDropdownModule, NgbTooltip, FlowRowAlerts],
 })
 export class FlowEditorHeaderComponent {
   readonly nameControl = input.required<FormControl<string>>();
@@ -36,9 +56,13 @@ export class FlowEditorHeaderComponent {
   /** The Component of the Flow's Source, which a test message is sent to. */
   readonly sourceComponent = input<string | undefined>();
   readonly saving = input(false);
+  /** Whether the user tried to save, after which a missing name is an error rather than a hint. */
+  readonly submitted = input(false);
 
   readonly save = output<void>();
   readonly saveAndStart = output<void>();
+  /** Saves the Flow and goes back to the Manage page. */
+  readonly saveAndReturn = output<void>();
 
   readonly status = signal<RuntimeStatus>('inactive');
   readonly ran = signal(false);
@@ -46,8 +70,11 @@ export class FlowEditorHeaderComponent {
   readonly failed = signal<number | null>(null);
   readonly alerts = signal(0);
   readonly busy = signal(false);
+  /** Why the Flow last failed to start or stop, shown behind the Error badge; null when it didn't. */
+  readonly failure = signal<FlowFailure | null>(null);
 
   readonly state = computed(() => flowStatusView(this.status(), this.draftReason() !== null));
+  readonly toneClass = computed(() => (this.flowId() ? TONE_CLASS[this.state().tone] : 'btn-fx-secondary'));
   readonly running = computed(() => this.status() === 'active' || this.status() === 'paused');
   readonly completedLabel = computed(() => countLabel(this.completed(), this.ran()));
   readonly failedLabel = computed(() => countLabel(this.failed(), this.ran()));
@@ -65,6 +92,12 @@ export class FlowEditorHeaderComponent {
     const source = this.sourceComponent();
     return testMessageBlocked(this.status(), source ? (this.components.types.find(type => type.name === source) ?? { name: source }) : null);
   });
+
+  /** The name is required: once the user empties it, or tries to save without one, the field says so. */
+  nameInvalid(): boolean {
+    const name = this.nameControl();
+    return name.invalid && (name.dirty || this.submitted());
+  }
 
   private readonly flowService = inject(FlowService);
   private readonly components = inject(Components);
@@ -116,13 +149,16 @@ export class FlowEditorHeaderComponent {
     this.busy.set(true);
     action.subscribe({
       next: response => {
+        const failure = flowFailureOf(response.body);
         this.busy.set(false);
-        this.status.set(runtimeStatusOf(eventOf(response.body)));
+        this.failure.set(failure);
+        this.status.set(failure ? 'inactiveError' : runtimeStatusOf(flowEventOf(response.body)));
         this.ran.set(true);
         this.refresh.next();
       },
-      error: () => {
+      error: (error: HttpErrorResponse) => {
         this.busy.set(false);
+        this.failure.set(failureOfError(error.error));
         this.status.set('inactiveError');
         this.ran.set(true);
       },
@@ -137,6 +173,9 @@ export class FlowEditorHeaderComponent {
         if (!(this.status() === 'inactiveError' && reported === 'inactive')) {
           this.status.set(reported);
         }
+        if (reported === 'active' || reported === 'paused') {
+          this.failure.set(null);
+        }
         this.ran.set(this.ran() || hasRun(status.body));
         this.alerts.set(alerts.body?.total ?? 0);
         return this.ran() ? this.flowService.getFlowMessages(id) : of(null);
@@ -149,14 +188,5 @@ export class FlowEditorHeaderComponent {
       }),
       catchError(() => EMPTY),
     );
-  }
-}
-
-/** The event in a start or stop answer, such as `{"flow": {"event": "started"}}`. */
-function eventOf(body: string | null): string | undefined {
-  try {
-    return JSON.parse(body ?? '')?.flow?.event;
-  } catch {
-    return undefined;
   }
 }

@@ -30,30 +30,29 @@ export function runtimeStatusOf(reported: string | null | undefined): RuntimeSta
 export type FlowAction = 'start' | 'stop' | 'resume' | 'pause' | 'restart';
 
 export interface FlowStatusView {
-  /** The Flow status in words, or Draft, which isn't a Flow status: a Draft can't run. */
-  label: 'Running' | 'Paused' | 'Stopped' | 'Error' | 'Draft';
+  /** The Flow status in words, for the controls' tooltip and screen readers. */
+  label: 'Running' | 'Paused' | 'Stopped' | 'Error';
+  /** The colour of the controls, which shows the Flow status. */
   tone: StatusControlsTone;
+  /** A Draft can't be started until its design is finished. */
   draft: boolean;
-  /** The one obvious thing to do; none for a Draft, which has to be finished first. */
-  mainAction: FlowAction | null;
-  /** The other actions that fit the state, for the row's ⋮ menu. */
-  menuActions: FlowAction[];
+  /** The play/pause/stop buttons shown for the state, like a media player's. */
+  controls: FlowAction[];
+  /** The shown buttons that can't be used in this state. */
+  disabled: FlowAction[];
 }
 
 const BY_STATUS: Record<RuntimeStatus, Omit<FlowStatusView, 'draft'>> = {
-  active: { label: 'Running', tone: 'started', mainAction: 'stop', menuActions: ['pause', 'restart'] },
-  paused: { label: 'Paused', tone: 'paused', mainAction: 'resume', menuActions: ['stop', 'restart'] },
-  inactive: { label: 'Stopped', tone: 'default', mainAction: 'start', menuActions: [] },
-  inactiveError: { label: 'Error', tone: 'failed', mainAction: 'start', menuActions: [] },
+  active: { label: 'Running', tone: 'started', controls: ['pause', 'stop', 'restart'], disabled: [] },
+  paused: { label: 'Paused', tone: 'paused', controls: ['resume', 'stop', 'restart'], disabled: [] },
+  inactive: { label: 'Stopped', tone: 'default', controls: ['start', 'pause', 'stop'], disabled: ['pause', 'stop'] },
+  inactiveError: { label: 'Error', tone: 'failed', controls: ['start', 'pause', 'stop'], disabled: ['pause', 'stop'] },
 };
 
-/** What a Flows list row shows for a Flow's runtime state. A Draft that is still running keeps its Flow status, so it can be stopped. */
+/** What a Flows list row shows for a Flow's runtime state. A Draft that is still running can still be stopped. */
 export function flowStatusView(status: RuntimeStatus, draft: boolean): FlowStatusView {
-  const running = status === 'active' || status === 'paused';
-  if (draft && !running) {
-    return { label: 'Draft', tone: 'default', draft: true, mainAction: null, menuActions: [] };
-  }
-  return { ...BY_STATUS[status], draft: false };
+  const view = BY_STATUS[status];
+  return { ...view, draft, disabled: draft && view.controls.includes('start') ? ['start', ...view.disabled] : view.disabled };
 }
 
 /**
@@ -105,4 +104,59 @@ export function testMessageBlocked(
     return `A test message can't be sent to a ${source.title ?? source.name} Source.`;
   }
   return null;
+}
+
+/** Why a Flow didn't start: a one-line summary and, per failed Step, its Endpoint and the runtime's message. */
+export interface FlowFailure {
+  summary: string;
+  steps: Array<{ uri?: string; message: string }>;
+}
+
+const DEFAULT_FAILURE = 'The Flow could not be started.';
+
+/**
+ * Reads a failure from what the runtime answered to start, stop, pause or resume: `{"flow": {...}}`, as JSON text
+ * or parsed. Null when the answer doesn't report a failure. A non-JSON answer is taken as the message itself.
+ */
+export function flowFailureOf(answer: unknown): FlowFailure | null {
+  const flow = parsedFlow(answer);
+  if (flow === undefined) {
+    const text = typeof answer === 'string' ? answer.trim() : '';
+    return text ? { summary: text, steps: [] } : null;
+  }
+  const steps: Array<{ uri?: string; message: string; status?: string }> = Array.isArray(flow?.steps) ? flow.steps : [];
+  const failedSteps = steps.filter(step => step?.status === 'error').map(step => ({ uri: step.uri || undefined, message: step.message ?? 'Failed.' }));
+  const installed = flow?.installed;
+  const failed = flow?.status === 'failed' || flow?.status === 'error' || failedSteps.length > 0 || Number(installed?.failed) > 0;
+  if (!failed) {
+    return null;
+  }
+  const summary =
+    installed?.total != null && installed?.failed != null
+      ? `${installed.failed} of ${installed.total} Steps failed to start.`
+      : (flow?.message ?? DEFAULT_FAILURE);
+  return { summary, steps: failedSteps };
+}
+
+/** The failure of a call that failed: what its answer says, or a general message when it says nothing. */
+export function failureOfError(error: unknown): FlowFailure {
+  return flowFailureOf(error) ?? { summary: DEFAULT_FAILURE, steps: [] };
+}
+
+/** The `flow` object of a runtime answer; undefined when the answer isn't one. */
+function parsedFlow(answer: unknown): any {
+  let value = answer;
+  if (typeof answer === 'string') {
+    try {
+      value = JSON.parse(answer);
+    } catch {
+      return undefined;
+    }
+  }
+  return value && typeof value === 'object' && 'flow' in value ? (value as { flow: unknown }).flow : undefined;
+}
+
+/** The event in a runtime answer, such as `started` in `{"flow": {"event": "started"}}`. */
+export function flowEventOf(answer: unknown): string | undefined {
+  return parsedFlow(answer)?.event;
 }

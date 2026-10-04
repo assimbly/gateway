@@ -41,6 +41,7 @@ import { ThemeService } from "app/core/theme";
 import { FlowCanvasComponent, DesignerSelection } from "../designer/flow-canvas.component";
 import { FlowEditorHeaderComponent } from "./flow-editor-header.component";
 import { sourceStepOf } from "../flow-status";
+import { automaticErrorHandlerPath, defaultErrorHandlerStep, errorHandlerPath, errorHandlerPathOnSave } from "./error-handler";
 import { ComponentSchemas } from "../component-schemas.service";
 import { LinkEditorComponent } from "../designer/link-editor.component";
 import { FlowGraphHistory } from "../designer/flow-graph-history";
@@ -112,7 +113,10 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	}
 	@ViewChild(FlowEditorHeaderComponent) header?: FlowEditorHeaderComponent;
 	/** Set by Save & start: start the Flow once it is saved. */
-	private startAfterSave = false;
+	/** What happens once the Flow is saved: stay in the editor, start the Flow, or go back to Manage. */
+	private afterSaveAction: AfterSave = 'stay';
+	/** The Flow's name as it was last saved, which a default Error Handler path follows. */
+	private savedFlowName?: string | null;
 	private readonly location = inject(Location);
 	private readonly schemas = inject(ComponentSchemas);
 	routes: Route[];
@@ -129,11 +133,6 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
   public stepTypes = ["SOURCE", "ACTION", "SINK", "ROUTE", "SCRIPT", "CONNECTION", "ERROR"];
   public languageComponentsNames: Array<any> = ['groovy', 'python', 'javascript', 'simple', 'jslt','xslt'];
   public componentsWithConnection: Array<any> = ['activemq','amazonmq','amqp','amqps','jms','sjms','sjms2','sql','ibmmq','spring-rabbitmq'];
-
-	public logLevelListType = [
-		LogLevelType.OFF,
-		LogLevelType.TRACE,
-	];
 
 	panelCollapsed: any = "uno";
 	public isCollapsed = true;
@@ -424,7 +423,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
                 }else if(this.activeEditor === 'script'){
                     this.createNewStep(StepType.SOURCE,'scheduler',0);
                     this.createNewStep(StepType.SCRIPT,'groovy',1);
-                    this.createNewStep(StepType.ERROR,this.integrations[0].defaultErrorComponentType,2);
+                    this.addStepForm(defaultErrorHandlerStep());
                 }else if(this.activeEditor === 'route'){
                     this.createNewStep(StepType.ROUTE,'',0);
                     this.createNewStep(StepType.ERROR,'',1);
@@ -481,11 +480,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
           index
         );
 
-        if(step.connectionId){
-          this.enableConnection[index] = true;
-        }else{
-          this.enableConnection[index] = false;
-        }
+        this.enableConnection[index] = this.showsConnection(step);
 
         if(step.messageId){
           this.enableMessage[index] = true;
@@ -692,6 +687,12 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	}
 
 	clone(): void {
+		// The copy logs to its own name and id once it is saved.
+		const errorHandler = this.steps.find(step => step.stepType === StepType.ERROR);
+		if (errorHandler?.uri && errorHandler.uri === errorHandlerPath(this.flow.name, this.flow.id)) {
+			errorHandler.uri = '';
+		}
+
 		// reset id and flow name to null
 		this.flow.id = null;
 		this.flow.name = null;
@@ -988,6 +989,11 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 
 
+	}
+
+	/** A Step shows its Connection when it has one, or when its Component needs one. */
+	private showsConnection(step: IStep): boolean {
+		return !!step.connectionId || this.componentsWithConnection.includes(step.componentType?.toLowerCase());
 	}
 
 	addConnection(step, index): void {
@@ -1481,9 +1487,10 @@ splitOptions4(options: string): string[] {
 		});
 	}
 
-	save(startAfterSave = false): any {
+	save(then: AfterSave = 'stay'): any {
 
-		this.startAfterSave = startAfterSave;
+		this.afterSaveAction = then;
+		this.savedFlowName = this.flow.name;
 		this.formSubmitted = true;
 		this.savingFlowFailed = false;
 		this.savingFlowSuccess = false;
@@ -1524,6 +1531,7 @@ splitOptions4(options: string): string[] {
        takeUntilDestroyed(this.destroyRef),
        switchMap(flow => {
          this.flow = flow.body;
+         this.fillErrorHandlerPath();
          return stepDeletes.length ? forkJoin(stepDeletes) : of([]);
        }),
        switchMap(() => this.stepService.updateMultiple(this.steps)),
@@ -1552,6 +1560,7 @@ splitOptions4(options: string): string[] {
         takeUntilDestroyed(this.destroyRef),
         switchMap(flowUpdated => {
           this.flow = flowUpdated.body;
+          this.fillErrorHandlerPath();
           this.steps.forEach(step => {
             step.flowId = this.flow.id;
           });
@@ -1798,6 +1807,17 @@ splitOptions4(options: string): string[] {
 		return selection.type === 'link' ? this.canvasProblems.find(p => p.linkTo === selection.to)?.message : undefined;
 	}
 
+	/** Trace is the Flow's log level switched between TRACE and OFF. */
+	get traceOn(): boolean {
+		return this.editFlowForm?.controls.logLevel.value === LogLevelType.TRACE;
+	}
+
+	setTrace(on: boolean): void {
+		const logLevel = this.editFlowForm.controls.logLevel;
+		logLevel.setValue(on ? LogLevelType.TRACE : LogLevelType.OFF);
+		logLevel.markAsDirty();
+	}
+
 	get flowIsDraft(): boolean {
 		return this.canvasProblems.length > 0;
 	}
@@ -1822,7 +1842,7 @@ splitOptions4(options: string): string[] {
 		if (graph.errorStep) {
 			this.addSavedStepForm(graph.errorStep, ERROR_STEP_KEY);
 		} else {
-			this.addNewStepForm(StepType.ERROR, this.defaultComponentType('ERROR'), ERROR_STEP_KEY);
+			this.addSavedStepForm(defaultErrorHandlerStep(), ERROR_STEP_KEY);
 		}
 
 		this.designer = new FlowGraphHistory(graph);
@@ -1838,8 +1858,13 @@ splitOptions4(options: string): string[] {
 	}
 
 	private addSavedStepForm(step: IStep, key: string): void {
-		const index = this.steps.length;
 		this.stepKeys.push(key);
+		this.addStepForm(step);
+	}
+
+	/** Adds a form for a Step that already has its settings, after the Steps there are. */
+	private addStepForm(step: IStep): void {
+		const index = this.steps.length;
 		this.numberOfSteps = this.numberOfSteps + 1;
 
 		if (typeof this.stepsOptions[index] === 'undefined') {
@@ -1849,7 +1874,7 @@ splitOptions4(options: string): string[] {
 		(<FormArray>this.editFlowForm.controls.stepsData).insert(index, this.initializeStepData(step));
 		this.setTypeLinks(step, index);
 		this.getOptions(step, this.editFlowForm.controls.stepsData.get(index.toString()), this.stepsOptions[index], index);
-		this.enableConnection[index] = !!step.connectionId;
+		this.enableConnection[index] = this.showsConnection(step);
 		this.enableMessage[index] = !!step.messageId;
 	}
 
@@ -1943,8 +1968,25 @@ splitOptions4(options: string): string[] {
 		this.setPanelCollapsed(!this.sidePanelCollapsed);
 	}
 
+	/** What the side panel shows while no Step or Link is selected: the Flow settings or its Error handler. */
+	flowPanel: 'settings' | 'errorHandler' = 'settings';
+
+	/** Whether the side panel shows this part of the Flow settings. */
+	isFlowPanelOpen(panel: 'settings' | 'errorHandler'): boolean {
+		return !this.sidePanelCollapsed && this.selection.type === 'flow' && this.flowPanel === panel;
+	}
+
 	openFlowSettings(): void {
+		this.openFlowPanel('settings');
+	}
+
+	openErrorHandler(): void {
+		this.openFlowPanel('errorHandler');
+	}
+
+	private openFlowPanel(panel: 'settings' | 'errorHandler'): void {
 		this.onSelectionChange({ type: 'flow' });
+		this.flowPanel = panel;
 		this.setPanelCollapsed(false);
 	}
 
@@ -1959,6 +2001,7 @@ splitOptions4(options: string): string[] {
 
 	onSelectionChange(selection: DesignerSelection): void {
 		this.selection = selection;
+		this.flowPanel = 'settings';
 		this.cdr.markForCheck();
 	}
 
@@ -2076,21 +2119,35 @@ splitOptions4(options: string): string[] {
 	}
 
 	/**
-	 * Stays in the editor after a save: the URL gets the Flow's id (a new Flow only has one now), and the Flow is
-	 * loaded again so every Step has its saved id. Save & start then starts it; a failed start shows as Error.
+	 * Save & return goes back to Manage. Otherwise the editor stays: the URL gets the Flow's id (a new Flow only has
+	 * one now), and the Flow is loaded again so every Step has its saved id. Save & start then starts it; a failed
+	 * start shows as Error.
 	 */
 	private afterSave(): void {
 		this.savingFlowSuccess = true;
 		this.isSaving = false;
 		this.editFlowForm.markAsPristine();
+		const then = this.afterSaveAction;
+		this.afterSaveAction = 'stay';
+		if (then === 'return') {
+			this.router.navigate(['/']);
+			return;
+		}
 		const url = this.router.createUrlTree(['/flow/editor', this.flow.id], {
 			queryParams: { mode: 'edit', editor: this.activeEditor, id: this.flow.id },
 		});
 		this.location.replaceState(this.router.serializeUrl(url));
 		this.load(this.flow.id);
-		if (this.startAfterSave) {
-			this.startAfterSave = false;
+		if (then === 'start') {
 			this.header?.start(this.flow.id);
+		}
+	}
+
+	/** A logging Error Handler logs to FlowName/FlowID; the path is set once the Flow has its id. */
+	private fillErrorHandlerPath(): void {
+		const errorHandler = this.steps.find(step => step.stepType === StepType.ERROR);
+		if (errorHandler) {
+			errorHandler.uri = errorHandlerPathOnSave(errorHandler, this.flow, this.savedFlowName);
 		}
 	}
 
@@ -2101,6 +2158,15 @@ splitOptions4(options: string): string[] {
 	/** Why the Flow is a Draft, or null. Only a Visual Flow can be a Draft. */
 	get draftReason(): string | null {
 		return this.useCanvas && this.canvasProblems.length > 0 ? this.canvasProblems[0].message : null;
+	}
+
+	/** The path the Error Handler logs to automatically, while the user leaves it to the Flow. */
+	get errorHandlerAutoPath(): string | undefined {
+		const index = this.steps.findIndex(step => step.stepType === StepType.ERROR);
+		const form = index >= 0 ? this.stepFormAt(index)?.getRawValue() : undefined;
+		return form
+			? automaticErrorHandlerPath({ componentType: form.componentType, uri: form.uri }, { name: this.nameControl.value, id: this.flow?.id }, this.flow?.name)
+			: undefined;
 	}
 
 	get sourceComponent(): string | undefined {
@@ -2150,6 +2216,7 @@ splitOptions4(options: string): string[] {
 				takeUntilDestroyed(this.destroyRef),
 				switchMap(flow => {
 					this.flow = flow.body;
+					this.fillErrorHandlerPath();
 					stepsInGraph.forEach(step => (step.flowId = this.flow.id));
 					return this.stepService.updateMultiple(stepsInGraph);
 				}),
@@ -2200,7 +2267,9 @@ splitOptions4(options: string): string[] {
 
 }
 
-/** The graph key of a Flow's Error Step, which lives in the Flow settings rather than on the canvas. */
+type AfterSave = 'stay' | 'start' | 'return';
+
+/** The graph key of a Flow's Error Step, which has its own Error handler panel rather than a place on the canvas. */
 const ERROR_STEP_KEY = 'error';
 
 const PANEL_COLLAPSED_KEY = 'flow-designer.panel-collapsed';

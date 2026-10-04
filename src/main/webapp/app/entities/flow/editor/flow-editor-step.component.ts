@@ -62,6 +62,8 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   @Input() connectionCreated = false;
 
   @Input() uriPlaceholder: string;
+  /** The path an Error Handler gets automatically while the user leaves it to the Flow, shown as a hint. */
+  @Input() autoPath?: string;
   @Input() uriPopoverMessage: string;
   @Input() uriList: IStep[] = [];
   @Input() componentOptions: Array<any> = [];
@@ -326,6 +328,23 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
 
   get uriErrors(): any {
     return this.stepForm?.get('uri')?.errors;
+  }
+
+  /** A Step whose Component needs a Connection gets the Connection field by itself; only Route and Script Steps add one. */
+  get canAddConnection(): boolean {
+    return !this.isComponentStep;
+  }
+
+  get canAddAction(): boolean {
+    return !this.onCanvas && (this.stepType === 'ACTION' || (this.stepType === 'SOURCE' && this.activeEditor === 'flow'));
+  }
+
+  get canAddScript(): boolean {
+    return this.stepType === 'SCRIPT' || (this.stepType === 'SOURCE' && this.activeEditor === 'script');
+  }
+
+  get hasAddMenu(): boolean {
+    return (this.canAddConnection && !this.enableConnection) || this.canAddAction || this.canAddScript || this.stepType === 'ROUTE';
   }
 
   get canRemoveStep(): boolean {

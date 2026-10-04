@@ -130,6 +130,21 @@ Small changes that work with any Camel component, no rewrite. They target the **
 - **Clear alerts (backend, JUnit).** Against a temporary alerts directory: after Clear the page is empty, and the files exist under `cleared/`. Prior art: the package-private `FlowAlertLogService(Path)` constructor exists for this.
 - **The header component** gets a smoke test: Save & start is disabled for a Draft, and the breadcrumb renames the Flow.
 
+## Revisions after using it
+
+After using the slices in the running UI, some choices above were changed. Where this section and the stories above disagree, this section is current:
+
+- **Manage.** The sidebar item for the list is called *Manage* again, so the section reads *Flows → Manage*.
+- **An empty Gateway shows only the start.** Filter, Add and Refresh only show once there is a Flow, or when loading the list failed, so Refresh can try again.
+- **No status pill.** Each row has play/pause/stop/resume/restart controls, like a media player, and their colour shows the Flow status. Only the Draft, Error and Alert badges follow them. Error and Alert no longer show in the name column. Start/Stop has moved out of the Actions column and the ⋮ menu, which keep Send test message, Edit, Clone, Export and Delete.
+- **Stats column.** The Stats icon has its own column and shows on running Flows only.
+- **No breadcrumb in the editor.** Users navigate with the sidebar. The name is a labelled *Flow name* field with a pencil icon and an example placeholder. A new Flow focuses it, without a hint. Once the user tries to save without a name, or empties it, the field says so.
+- **Save & return to Manage** saves and goes back to the list. Save and Save & start still stay in the editor. The editor's Start/Stop is coloured by the Flow status instead of showing a pill.
+- **Error handler.** It has its own toolbar button next to Flow settings and its own side panel, and is no longer part of Flow settings. A new Visual or Script Flow's Error handler logs: Component `log`, Options `level=ERROR&showAll=true`, Path `FlowName/FlowID`. The path is filled in on save, once the Flow has an id. It follows a rename while it is still that default, and a clone gets its own. An Error handler with an empty path gets the default path the next time its Flow is saved. While the path is still automatic, the Path field says where it logs ("Automatic: logs to Orders/12") and that typing a logger name replaces it. Until the first save, FlowID stands in for the id.
+- **Connections follow the Component.** The step editor has no Add → Connection for Component Steps: a Step whose Component needs a Connection (JMS, SJMS, ActiveMQ, AMQP, IBM MQ, RabbitMQ, SQL, …) shows the Connection field by itself. Route and Script Steps can't be read that way, so they keep Add → Connection.
+- **A failed start shows as Error, not as JSON.** Configure, start, stop, pause and resume calls handle their own errors instead of the page's error alert. In the editor and in the list, a failure turns the controls red and adds an Error badge. The badge opens a summary ("1 of 3 Steps failed to start.") with each failed Step's Endpoint and message, without the stack trace. An answer that reports `status: failed` counts as a failure even when the HTTP call succeeded.
+- **No jump when the canvas opens.** The canvas stays invisible (still measured) until the first fit has put the Steps in place, then fades in.
+
 ## Out of Scope
 
 - Per-component forms (ADR 0002).

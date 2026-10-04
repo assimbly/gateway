@@ -152,3 +152,19 @@
     stroke: var(--app-primary, #2e90fa);
   }
 }
+
+// The Steps appear once the first fit has put them in place, instead of jumping there from the top left.
+.flow-canvas f-canvas {
+  visibility: hidden;
+}
+
+.flow-canvas.flow-canvas-shown f-canvas {
+  visibility: visible;
+  animation: flow-canvas-fade-in 120ms ease-out;
+}
+
+@keyframes flow-canvas-fade-in {
+  from {
+    opacity: 0;
+  }
+}

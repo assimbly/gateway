@@ -1,4 +1,5 @@
 <div>
+  @if (hasFlows) {
   <jhi-search-toolbar [(query)]="searchText" placeholder="Filter by flow name" inputId="searchTextId">
     <ng-container actions>
       <button type="button" class="btn btn-fx btn-fx-primary" (click)="openNewFlow()" aria-label="Add">
@@ -11,8 +12,9 @@
       </button>
     </ng-container>
   </jhi-search-toolbar>
+  }
 
-  @if (!flowsLoading && !flowsLoadFailed && !flows.length) {
+  @if (showEmptyState) {
     <section class="flows-empty" aria-labelledby="flows-empty-title">
       <h2 class="flows-empty__title" id="flows-empty-title">Create your first Flow</h2>
       <p class="flows-empty__lead">How do you want to build it?</p>

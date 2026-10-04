@@ -1,32 +1,45 @@
 <ng-template #errorModal let-modal>
   <div class="modal-header">
-    <h4 class="modal-title">Install error</h4>
+    <h4 class="modal-title">Error in {{ flowName }}</h4>
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
   </div>
   <div class="modal-body">
-    <p class="mb-3">{{ flowName }}</p>
-    <div class="flow-error-detail" [innerHtml]="flowErrorButton"></div>
+    <div class="flow-error-detail">
+      <p>{{ failure?.summary }}</p>
+      @if (failure?.steps?.length) {
+        <table class="table table-sm">
+          <tbody>
+            @for (step of failure!.steps; track $index) {
+              @if (step.uri) {
+                <tr>
+                  <td><b>Endpoint</b></td>
+                  <td class="font-monospace">{{ step.uri }}</td>
+                </tr>
+              }
+              <tr>
+                <td><b>Error</b></td>
+                <td>{{ step.message }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-fx btn-fx-secondary" (click)="modal.dismiss()">Close</button>
   </div>
 </ng-template>
 
-<button
-  type="button"
-  class="badge bg-danger text-white border-0"
-  *ngIf="flowError"
-  (click)="openError(errorModal)"
->
-  <fa-icon icon="exclamation-triangle"></fa-icon>
-  Error
-</button>
-<button
-  type="button"
-  class="badge bg-warning text-dark border-0"
-  *ngIf="numberOfAlerts > 0"
-  (click)="alertsOpen.emit()"
->
-  <fa-icon icon="exclamation-triangle"></fa-icon>
-  Alert ({{ numberOfAlerts }})
-</button>
+@if (failure) {
+  <button type="button" class="badge bg-danger text-white border-0" title="Show the error" (click)="openError(errorModal)">
+    <fa-icon icon="exclamation-triangle"></fa-icon>
+    Error
+  </button>
+}
+@if (numberOfAlerts > 0) {
+  <button type="button" class="badge bg-warning text-dark border-0" (click)="alertsOpen.emit()">
+    <fa-icon icon="exclamation-triangle"></fa-icon>
+    Alert ({{ numberOfAlerts }})
+  </button>
+}

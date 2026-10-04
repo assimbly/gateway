@@ -1,64 +1,60 @@
 <td class="table-fx-identity">
-  <div class="d-flex align-items-center gap-2 min-w-0">
-    <a class="flex-grow-1 min-w-0" [routerLink]="['/flow/editor', flow.id]"
-       [queryParams]="{ mode: 'edit', editor: flow.type || 'flow', id: flow.id }">
-      <jhi-truncate [text]="flow.name" />
-    </a>
+  <a [routerLink]="['/flow/editor', flow.id]" [queryParams]="{ mode: 'edit', editor: flow.type || 'flow', id: flow.id }">
+    <jhi-truncate [text]="flow.name" />
+  </a>
+</td>
+<td class="text-muted">{{ typeLabel }}</td>
+<td>
+  <div class="d-flex align-items-center gap-2 text-nowrap">
+    <span class="visually-hidden">{{ state.label }}</span>
+    <jhi-status-controls
+      [busy]="disableActionBtns"
+      [tone]="state.tone"
+      [showStart]="shows('start')"
+      [startDisabled]="isDisabled('start')"
+      [showPause]="shows('pause')"
+      [pauseDisabled]="isDisabled('pause')"
+      [showResume]="shows('resume')"
+      [showStop]="shows('stop')"
+      [stopDisabled]="isDisabled('stop')"
+      [showRestart]="shows('restart')"
+      (start)="run('start')"
+      (pause)="run('pause')"
+      (resume)="run('resume')"
+      (stop)="run('stop')"
+      (restart)="run('restart')"
+    />
+    @if (state.draft) {
+      <a
+        class="badge text-bg-secondary text-decoration-none"
+        [routerLink]="['/flow/editor', flow.id]"
+        [queryParams]="{ mode: 'edit', editor: flow.type || 'flow', id: flow.id }"
+        ngbTooltip="This Flow is a Draft. Finish its design to start it."
+        >Draft</a
+      >
+    }
     <jhi-flow-row-alerts
       [flowName]="flow.name"
-      [flowError]="flowError"
-      [flowErrorButton]="flowErrorButton"
+      [failure]="failure"
       [numberOfAlerts]="numberOfAlerts"
       (alertsOpen)="openAlerts()"
     />
   </div>
 </td>
-<td class="text-muted">{{ typeLabel }}</td>
-<td>
-  @if (state.draft) {
-    <span class="d-inline-flex align-items-center gap-1 text-nowrap">
-      <jhi-flow-status-pill label="Draft" />
-      <span aria-hidden="true">·</span>
-      <a [routerLink]="['/flow/editor', flow.id]" [queryParams]="{ mode: 'edit', editor: flow.type || 'flow', id: flow.id }">Finish design</a>
-    </span>
-  } @else {
-    <jhi-flow-status-pill [label]="state.label" [tone]="state.tone" />
-  }
-</td>
 <td class="text-end table-fx-numeric">{{ count(completedCount) }}</td>
 <td class="text-end table-fx-numeric">{{ count(failedCount) }}</td>
-<td class="text-end">
-  <jhi-row-actions>
-    <jhi-status-controls
-      *ngIf="state.mainAction as action"
-      jhiPrimaryAction
-      [busy]="disableActionBtns"
-      [showStart]="action === 'start'"
-      [showStop]="action === 'stop'"
-      [showResume]="action === 'resume'"
-      (start)="run('start')"
-      (stop)="run('stop')"
-      (resume)="run('resume')"
-    />
+<td>
+  @if (state.tone === 'started') {
     <jhi-flow-row-stats
-      jhiPrimaryAction
       [loading]="flowStatsLoading"
       [empty]="flowStatsEmpty"
       [sections]="flowStatsSections"
       (load)="getFlowStatistic(flow)"
     />
-    <button
-      *ngFor="let action of state.menuActions"
-      jhiOverflowAction
-      type="button"
-      ngbDropdownItem
-      class="btn-fx-dropdown-item"
-      [disabled]="disableActionBtns"
-      (click)="run(action)"
-    >
-      <fa-icon [icon]="menuIcons[action]"></fa-icon>
-      <span>{{ menuLabels[action] }}</span>
-    </button>
+  }
+</td>
+<td class="text-end">
+  <jhi-row-actions>
     <button
       jhiOverflowAction
       type="button"
