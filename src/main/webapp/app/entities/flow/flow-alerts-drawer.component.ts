@@ -73,6 +73,7 @@ export class FlowAlertsDrawerComponent {
       return;
     }
     this.loading.set(true);
+    this.failed.set(null);
     this.flowService.getFlowAlertsPage(this.flow.id, this.alerts().length, PAGE_SIZE).subscribe({
       next: response => {
         this.total.set(response.body?.total ?? 0);
@@ -124,6 +125,7 @@ export class FlowAlertsDrawerComponent {
       return;
     }
     this.clearing.set(true);
+    this.failed.set(null);
     this.flowService.clearFlowAlerts(this.flow.id).subscribe({
       next: () => {
         this.clearing.set(false);

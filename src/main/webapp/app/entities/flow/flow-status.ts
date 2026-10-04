@@ -1,3 +1,4 @@
+import { IStep, StepType } from 'app/shared/model/step.model';
 import { StatusControlsTone } from 'app/shared/table';
 
 /** The runtime state the Flows list tracks for a row. */
@@ -28,7 +29,7 @@ export function runtimeStatusOf(reported: string | null | undefined): RuntimeSta
 
 export type FlowAction = 'start' | 'stop' | 'resume' | 'pause' | 'restart';
 
-export interface RowStatus {
+export interface FlowStatusView {
   /** The Flow status in words, or Draft, which isn't a Flow status: a Draft can't run. */
   label: 'Running' | 'Paused' | 'Stopped' | 'Error' | 'Draft';
   tone: StatusControlsTone;
@@ -39,7 +40,7 @@ export interface RowStatus {
   menuActions: FlowAction[];
 }
 
-const BY_STATUS: Record<RuntimeStatus, Omit<RowStatus, 'draft'>> = {
+const BY_STATUS: Record<RuntimeStatus, Omit<FlowStatusView, 'draft'>> = {
   active: { label: 'Running', tone: 'started', mainAction: 'stop', menuActions: ['pause', 'restart'] },
   paused: { label: 'Paused', tone: 'paused', mainAction: 'resume', menuActions: ['stop', 'restart'] },
   inactive: { label: 'Stopped', tone: 'default', mainAction: 'start', menuActions: [] },
@@ -47,7 +48,7 @@ const BY_STATUS: Record<RuntimeStatus, Omit<RowStatus, 'draft'>> = {
 };
 
 /** What a Flows list row shows for a Flow's runtime state. A Draft that is still running keeps its Flow status, so it can be stopped. */
-export function rowStatus(status: RuntimeStatus, draft: boolean): RowStatus {
+export function flowStatusView(status: RuntimeStatus, draft: boolean): FlowStatusView {
   const running = status === 'active' || status === 'paused';
   if (draft && !running) {
     return { label: 'Draft', tone: 'default', draft: true, mainAction: null, menuActions: [] };
@@ -80,19 +81,28 @@ export function flowTypeLabel(type: string | undefined): 'Visual' | 'Script' | '
   }
 }
 
+/** A Flow's Source Step; older Flows call it FROM. A Route Flow has none. */
+export function sourceStepOf(steps: IStep[] | null | undefined): IStep | undefined {
+  return steps?.find(step => step.stepType === StepType.SOURCE || step.stepType === StepType.FROM);
+}
+
 /**
  * Why a test message can't be sent to the Flow's Source now, or null when it can. A test message is sent to the
- * Source's Endpoint, so the Flow has to be running and the Source's Component has to accept messages sent to it.
+ * Source's Endpoint, so the Flow has to be running, have a Source, and the Source's Component has to accept messages
+ * sent to it. `source` is null for a Flow without a Source.
  */
 export function testMessageBlocked(
   status: RuntimeStatus,
-  sourceComponent: { name: string; title?: string; consumerOnly?: boolean } | undefined,
+  source: { name: string; title?: string; consumerOnly?: boolean } | null,
 ): string | null {
   if (status !== 'active') {
     return 'Start the Flow to send it a test message.';
   }
-  if (sourceComponent?.consumerOnly) {
-    return `A test message can't be sent to a ${sourceComponent.title ?? sourceComponent.name} Source.`;
+  if (!source) {
+    return 'This Flow has no Source to send a test message to.';
+  }
+  if (source.consumerOnly) {
+    return `A test message can't be sent to a ${source.title ?? source.name} Source.`;
   }
   return null;
 }

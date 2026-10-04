@@ -94,7 +94,7 @@ public class FlowServiceImpl implements FlowService {
     @Transactional(readOnly = true)
     public Optional<FlowDTO> findByName(String name) {
         log.debug("Request to get Flow by name : {}", name);
-        return flowRepository.findByName(name)
+        return flowRepository.findFirstByNameOrderByIdAsc(name)
             .map(flowMapper::toDto);
     }
 

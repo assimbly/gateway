@@ -7,7 +7,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { PopoverModule } from 'ngx-bootstrap/popover';
 import { CodemirrorComponent, CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { Components } from 'app/shared/camel/component-type';
-import { EndpointRole } from 'app/shared/camel/catalogue';
+import { CatalogueEntry, EndpointRole, NO_MATCH, matchRank, roleMismatch, searchCatalogue } from 'app/shared/camel/catalogue';
 import { OptionSchema, PathPart, ValueField, groupOptions, pathRule, requiredOptions, valueFieldOf } from 'app/shared/camel/endpoint';
 import { IStep } from 'app/shared/model/step.model';
 import { IMessage } from 'app/shared/model/message.model';
@@ -118,6 +118,11 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   }
 
   private choicesCache?: { options: unknown[]; length: number; role: EndpointRole; choices: OptionSchema[] };
+  private pathPartsCache?: { syntax: string; options: unknown[]; parts: PathPart[] };
+  private componentChoicesCache?: { names: unknown[]; role: EndpointRole; search: string; choices: ComponentChoice[] };
+
+  /** What is typed in the component list; while searching it also shows the components this Step can't use. */
+  componentSearch = '';
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['componentOptions'] && this.componentOptions?.length) {
@@ -142,7 +147,47 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
 
   /** The Component's path parts, from its syntax, for the Path field's hint. */
   get pathParts(): PathPart[] {
-    return this.uriPlaceholder ? pathRule(this.uriPlaceholder, this.componentOptions ?? []).parts : [];
+    const syntax = this.uriPlaceholder ?? '';
+    const options = this.componentOptions ?? [];
+    if (this.pathPartsCache?.syntax !== syntax || this.pathPartsCache.options !== options) {
+      this.pathPartsCache = { syntax, options, parts: syntax ? pathRule(syntax, options).parts : [] };
+    }
+    return this.pathPartsCache.parts;
+  }
+
+  /**
+   * The components this Step can use, with the catalogue's title and description; while searching, also the ones
+   * it can't use, disabled with the reason, so every component Camel offers can be found.
+   */
+  get componentChoices(): ComponentChoice[] {
+    const names = this.stepType === 'SOURCE' ? this.sourceComponentsNames : this.stepType === 'ACTION' ? this.actionComponentsNames : this.sinkComponentsNames;
+    const cache = this.componentChoicesCache;
+    if (cache && cache.names === names && cache.role === this.role && cache.search === this.componentSearch) {
+      return cache.choices;
+    }
+    const usable = new Set<string>(names ?? []);
+    const choices: ComponentChoice[] = [...usable].map(name => this.componentChoice(this.catalogueEntry(name)));
+    if (this.componentSearch.trim()) {
+      const others = this.components.types.filter(type => !usable.has(type.name));
+      searchCatalogue(others, this.componentSearch).forEach(entry =>
+        choices.push(this.componentChoice(entry, roleMismatch(entry, this.role) ?? `${entry.title ?? entry.name} isn't available for this Step.`)),
+      );
+    }
+    this.componentChoicesCache = { names, role: this.role, search: this.componentSearch, choices };
+    return choices;
+  }
+
+  readonly matchesComponent = (term: string, item: ComponentChoice): boolean => matchRank(item, term) < NO_MATCH;
+
+  /** Compares an enum value with the empty "Default" entry, which a new row holds as null and a loaded row as ''. */
+  readonly sameValue = (a: unknown, b: unknown): boolean => (a ?? '') === (b ?? '');
+
+  private catalogueEntry(name: string): CatalogueEntry {
+    return this.components.types.find(type => type.name === name) ?? { name };
+  }
+
+  private componentChoice(entry: CatalogueEntry, reason?: string): ComponentChoice {
+    return { ...entry, label: entry.title ?? entry.name, reason, disabled: !!reason };
   }
 
   optionSchema(idx: number): OptionSchema | undefined {
@@ -150,8 +195,22 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
     return key ? (this.componentOptions ?? []).find(option => option.name === key) : undefined;
   }
 
+  /** The field for an Option's value; a placeholder such as `{{flag}}` in a boolean Option keeps a text field. */
   valueField(idx: number): ValueField {
-    return valueFieldOf(this.optionSchema(idx));
+    const field = valueFieldOf(this.optionSchema(idx));
+    const value = this.optionValue(idx);
+    return field === 'switch' && value !== '' && value !== 'true' && value !== 'false' ? 'text' : field;
+  }
+
+  hasValue(idx: number): boolean {
+    return this.optionValue(idx) !== '';
+  }
+
+  /** Leaves the Option unset, so the Component's default applies. */
+  clearValue(idx: number): void {
+    const control = (this.stepForm.get('options') as FormArray).at(idx).get('value')!;
+    control.setValue('');
+    control.markAsDirty();
   }
 
   isRequiredOption(idx: number): boolean {
@@ -490,4 +549,12 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
       defaultValue: new FormControl(''),
     });
   }
+}
+
+/** A component in the Step editor's component list. */
+interface ComponentChoice extends CatalogueEntry {
+  label: string;
+  /** Why this Step can't use it; such a component is shown disabled. */
+  reason?: string;
+  disabled: boolean;
 }

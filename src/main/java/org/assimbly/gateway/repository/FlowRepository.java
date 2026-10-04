@@ -25,4 +25,7 @@ public interface FlowRepository extends JpaRepository<Flow, Long> {
 
     Optional<Flow> findByName(String flowName);
 
+    /** The Flow with this name; names aren't unique, so this takes the oldest of several. */
+    Optional<Flow> findFirstByNameOrderByIdAsc(String flowName);
+
 }

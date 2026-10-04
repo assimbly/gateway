@@ -78,8 +78,15 @@ public class FlowAlertLogService {
                 try {
                     Files.move(file, target);
                 } catch (IOException moveFailed) {
+                    // The runtime may hold the log open (Windows refuses to move it). Copy it aside and empty it;
+                    // alerts written in between are lost. If it can't be emptied, drop the copy so it isn't kept twice.
                     Files.copy(file, target);
-                    Files.newOutputStream(file, StandardOpenOption.TRUNCATE_EXISTING).close();
+                    try {
+                        Files.newOutputStream(file, StandardOpenOption.TRUNCATE_EXISTING).close();
+                    } catch (IOException truncateFailed) {
+                        Files.deleteIfExists(target);
+                        throw truncateFailed;
+                    }
                 }
             }
         } catch (IOException e) {

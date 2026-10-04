@@ -35,7 +35,6 @@ export const RECENT = 'recent';
 const RECENT_KEY = 'step-picker.recent';
 const RECENT_MAX = 8;
 const CHIPS_SHOWN = 6;
-const HIDDEN_SHOWN = 5;
 
 /**
  * The + button on the canvas: it opens a menu to choose the next Step's kind (Action, Router or Sink)
@@ -128,9 +127,7 @@ export class StepPickerComponent implements OnChanges {
     }
     const usable = new Set(this.componentsOf(kind));
     const others = [...this.catalogue.values()].filter(entry => !usable.has(entry.name));
-    return searchCatalogue(others, this.filter)
-      .slice(0, HIDDEN_SHOWN)
-      .map(entry => ({
+    return searchCatalogue(others, this.filter).map(entry => ({
         name: entry.name,
         reason: roleMismatch(entry, 'producer') ?? `${entry.title ?? entry.name} isn't available for this Step.`,
       }));

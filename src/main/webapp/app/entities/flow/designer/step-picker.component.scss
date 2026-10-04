@@ -54,7 +54,7 @@
   &.active {
     border-color: var(--app-primary, #2e90fa);
     background: var(--app-primary, #2e90fa);
-    color: #fff;
+    color: var(--app-primary-contrast, #fff);
   }
 }
 

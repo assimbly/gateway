@@ -134,26 +134,24 @@
             </i>
           </div>
           <div class="col-10">
-            <ng-select *ngIf="stepType==='SOURCE'"
-                       [items]="sourceComponentsNames" [clearable]="false"
+            <ng-select *ngIf="stepType==='SOURCE' || stepType==='SINK' || stepType==='ACTION' || stepType==='ERROR'"
+                       [items]="componentChoices" bindValue="name" bindLabel="label" [clearable]="false"
+                       [searchFn]="matchesComponent" (search)="componentSearch = $event.term" (close)="componentSearch = ''"
                        formControlName="componentType" id="field_component_type"
                        style="text-align: left;"
-                       (change)="onComponentTypeChange($event)"></ng-select>
-            <ng-select *ngIf="stepType==='SINK'"
-                       [items]="sinkComponentsNames" [clearable]="false"
-                       formControlName="componentType" id="field_component_type"
-                       (change)="onComponentTypeChange($event)"
-                       style="text-align: left;"></ng-select>
-            <ng-select *ngIf="stepType==='ACTION'"
-                       [items]="actionComponentsNames" [clearable]="false"
-                       formControlName="componentType" id="field_component_type"
-                       (change)="onComponentTypeChange($event)"
-                       style="text-align: left;"></ng-select>
-            <ng-select *ngIf="stepType==='ERROR'"
-                       [items]="sinkComponentsNames" [clearable]="false"
-                       formControlName="componentType" id="field_component_type"
-                       (change)="onComponentTypeChange($event)"
-                       style="text-align: left;"></ng-select>
+                       (change)="onComponentTypeChange($event?.name)">
+              <ng-template ng-option-tmp let-item="item">
+                <div [title]="item.reason ?? item.description ?? ''">
+                  <span class="fw-semibold">{{ item.label }}</span>
+                  @if (item.label !== item.name) {
+                    <small class="text-muted font-monospace ms-1">{{ item.name }}</small>
+                  }
+                  @if (item.reason ?? item.description; as line) {
+                    <div class="small text-muted text-truncate">{{ line }}</div>
+                  }
+                </div>
+              </ng-template>
+            </ng-select>
             <input *ngIf="stepType==='ROUTER'" type="text" class="form-control" id="field_component_type"
                    readonly [value]="routerKind ?? ''"
                    title="A Router keeps its kind. To use another kind, delete this Router and add a new one."/>
@@ -254,15 +252,20 @@
             <div class="col-5 text-start">
               @switch (valueField(idx)) {
                 @case ('switch') {
-                  <div class="form-check form-switch mt-2">
-                    <input class="form-check-input" type="checkbox" role="switch" id="field_options-value-{{idx}}"
-                           [checked]="switchOn(idx)" (change)="setSwitch(idx, $any($event.target).checked)" />
-                    <label class="form-check-label" for="field_options-value-{{idx}}">{{ switchOn(idx) ? 'On' : 'Off' }}</label>
+                  <div class="d-flex align-items-center gap-2 mt-2">
+                    <div class="form-check form-switch mb-0">
+                      <input class="form-check-input" type="checkbox" role="switch" id="field_options-value-{{idx}}"
+                             [checked]="switchOn(idx)" (change)="setSwitch(idx, $any($event.target).checked)" />
+                      <label class="form-check-label" for="field_options-value-{{idx}}">{{ switchOn(idx) ? 'On' : 'Off' }}</label>
+                    </div>
+                    @if (hasValue(idx)) {
+                      <button type="button" class="btn btn-link btn-sm p-0" (click)="clearValue(idx)">Use default</button>
+                    }
                   </div>
                 }
                 @case ('choice') {
-                  <select class="form-select" id="field_options-value-{{idx}}" formControlName="value">
-                    <option [ngValue]="null">{{ optionDefaultValue(idx) || 'Default' }}</option>
+                  <select class="form-select" id="field_options-value-{{idx}}" formControlName="value" [compareWith]="sameValue">
+                    <option [ngValue]="''">{{ optionDefaultValue(idx) || 'Default' }}</option>
                     @for (choice of choicesOf(idx); track choice) {
                       <option [ngValue]="choice">{{ choice }}</option>
                     }

@@ -19,6 +19,7 @@ import { FlowService } from '../flow.service';
 import { Option, TypeLinks } from '../editor/flow-editor.component';
 
 import { Step, StepType, IStep } from 'app/shared/model/step.model';
+import { sourceStepOf } from '../flow-status';
 import { Connection } from 'app/shared/model/connection.model';
 import { IMessage } from 'app/shared/model/message.model';
 
@@ -225,7 +226,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     /** Sends the test message to the Flow's Source: its Component, path, Options and Connection. */
     private prefillFromFlowSource(flowId: number): void {
         this.flowService.find(flowId).subscribe(response => {
-            const source = response.body?.steps?.find(step => step.stepType === StepType.SOURCE || step.stepType === StepType.FROM);
+            const source = sourceStepOf(response.body?.steps);
             if (!source?.componentType) {
                 return;
             }

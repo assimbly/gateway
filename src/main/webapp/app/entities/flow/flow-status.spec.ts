@@ -1,4 +1,6 @@
-import { countLabel, flowTypeLabel, hasRun, rowStatus, runtimeStatusOf, testMessageBlocked } from './flow-row-status';
+import { IStep } from 'app/shared/model/step.model';
+
+import { countLabel, flowTypeLabel, hasRun, flowStatusView, runtimeStatusOf, sourceStepOf, testMessageBlocked } from './flow-status';
 
 describe('Flows list row status', () => {
   it.each([
@@ -7,15 +9,15 @@ describe('Flows list row status', () => {
     ['inactive', 'Stopped', 'default', 'start', []],
     ['inactiveError', 'Error', 'failed', 'start', []],
   ] as const)('shows a %s Flow as %s, with one main action and the rest in the menu', (status, label, tone, mainAction, menuActions) => {
-    expect(rowStatus(status, false)).toEqual({ label, tone, draft: false, mainAction, menuActions });
+    expect(flowStatusView(status, false)).toEqual({ label, tone, draft: false, mainAction, menuActions });
   });
 
   it.each(['inactive', 'inactiveError'] as const)('shows a %s Draft as a Draft to finish, which it can not start', status => {
-    expect(rowStatus(status, true)).toEqual({ label: 'Draft', tone: 'default', draft: true, mainAction: null, menuActions: [] });
+    expect(flowStatusView(status, true)).toEqual({ label: 'Draft', tone: 'default', draft: true, mainAction: null, menuActions: [] });
   });
 
   it('keeps showing the Flow status of a Draft that is still running, so it can be stopped', () => {
-    expect(rowStatus('active', true)).toMatchObject({ label: 'Running', draft: false, mainAction: 'stop' });
+    expect(flowStatusView('active', true)).toMatchObject({ label: 'Running', draft: false, mainAction: 'stop' });
   });
 
   it('shows — for a Flow that never ran, and the count, 0 included, once it has', () => {
@@ -57,6 +59,16 @@ describe('Flows list row status', () => {
     expect(testMessageBlocked(status, { name: 'file', title: 'File', consumerOnly: false })).toBe(
       'Start the Flow to send it a test message.',
     );
+  });
+
+  it('blocks a test message to a Flow without a Source, such as a Route Flow', () => {
+    expect(testMessageBlocked('active', null)).toBe('This Flow has no Source to send a test message to.');
+  });
+
+  it('finds the Source among the Steps, also as the older FROM Step', () => {
+    expect(sourceStepOf([{ stepType: 'SINK' }, { stepType: 'SOURCE', componentType: 'file' }] as IStep[])?.componentType).toBe('file');
+    expect(sourceStepOf([{ stepType: 'FROM', componentType: 'sftp' }] as IStep[])?.componentType).toBe('sftp');
+    expect(sourceStepOf([{ stepType: 'ROUTE' }] as IStep[])).toBeUndefined();
   });
 
   it('blocks a test message to a Source whose Component only receives, such as a Scheduler', () => {

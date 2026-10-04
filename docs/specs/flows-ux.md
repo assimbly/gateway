@@ -80,7 +80,7 @@ Small changes that work with any Camel component, no rewrite. They target the **
 ### Generic, catalogue-driven (ADR 0002)
 
 - Everything the picker and the Step editor show comes from the Camel catalogue at runtime: `title`, `description`, `label`, `syntax`, `consumerOnly` / `producerOnly` per component (all already in `shared/camel/component-type.ts`), and each Option's `kind`, `displayName`, `group`, `type`, `enum`, `defaultValue`, `required`, `secret` and `description` from the component schema the backend serves (`/flow/schema/{component}`).
-- No component gets custom UI, and there's no hand-maintained mapping table (categories, "common" lists or groupings). **Recently used** is the only list that isn't from the catalogue. It's kept per browser in `localStorage` and works without it.
+- No component gets custom UI, and there's no hand-maintained mapping table (categories, "common" lists or groupings). The canvas picker (Action, Router, Sink) and the Step editor's component list (where a Source's component is chosen) both show titles and descriptions, search title, id and description, and grey out a found component the Step can't use, with the reason. **Recently used** is the only list that isn't from the catalogue. It's kept per browser in `localStorage` and works without it.
 - The schema's `group` values are folded into three headings: `common`, and the role's own `consumer` or `producer` group, → Common; groups containing `security` → Security; everything else → Advanced. Options that only apply to consumers or producers (by `group` or `label`) are filtered by the Step's role. The schema endpoint doesn't filter them itself.
 - A number value is a text field with a numeric keyboard and an enum value keeps any value it already has, so property placeholders keep working.
 
@@ -91,14 +91,14 @@ Small changes that work with any Camel component, no rewrite. They target the **
 
 ### Flows list
 
-- The status pill comes from the existing status in the row component (`active` → Running, `paused` → Paused, `inactive` → Stopped, `inactiveError` → Error). A Draft is shown in the same spot, but it isn't a Flow status: Drafts have none. The `statusTone` colours are reused for the pill.
+- The status pill comes from the existing status in the row component (`active` → Running, `paused` → Paused, `inactive` → Stopped, `inactiveError` → Error). A Draft is shown in the same spot, but it isn't a Flow status: Drafts have none. A Flow that is still running when it becomes a Draft (it was started before an edit) keeps showing its Flow status, so it can be stopped. The `statusTone` colours are reused for the pill.
 - `jhi-status-controls` gets a mode with a single main button, and its secondary actions move into the row's existing `jhi-row-actions` menu.
 - "Has been started" (for `0` vs `—`) is true once the runtime reports a status other than `unconfigured` for the Flow. (The statistics endpoint answers with zero counters even for a Flow that never ran, so it can't tell.) After a Gateway restart a Flow shows `—` again until it is started.
 
 ### Editor header
 
 - One header component is shared by the canvas editor and the Script/Route form editor. It replaces the canvas's name input row and the forms' bottom Cancel/Save buttons. Cancel becomes the breadcrumb's back link, which goes through the existing unsaved-changes guard.
-- Save & start saves, then starts. If the start fails, the Flow stays saved and the status shows Error.
+- Save stays in the editor: a new Flow gets its id in the URL, and the Flow is loaded again so every Step has its saved id. Save & start saves, then starts. If the start fails, the Flow stays saved and the status shows Error until it runs again.
 - Send test message navigates to the Test message page with the Flow's id in the query. The page reads the Flow's Source (component, path, options) and prefills its Endpoint. The button is enabled only while the Flow is Running and its Source's component isn't `consumerOnly`: a test message is sent *to* the Source's Endpoint, so its component has to accept messages (a Scheduler or Timer Source can't).
 
 ### Import from file
@@ -108,7 +108,7 @@ Small changes that work with any Camel component, no rewrite. They target the **
 ### Alerts
 
 - Alerts are read from per-Flow files under `{baseDirectory}/alerts/{flowId}/*_alerts.log` (`FlowAlertLogService`). Each alert is a single line `timestamp : message`, so there's no Step reference and no separate stack trace.
-- **Clear** adds `DELETE /flows/{id}/alerts`. It moves the Flow's alert files into a `cleared/` subfolder of that Flow's alert directory (which `page()` already skips, because it only reads regular files in the Flow's directory). Nothing is deleted, so a cleared alert can still be found on disk.
+- **Clear** adds `DELETE /flows/{id}/alerts`. It moves the Flow's alert files into a `cleared/` subfolder of that Flow's alert directory (which `page()` already skips, because it only reads regular files in the Flow's directory). Nothing is deleted, so a cleared alert can still be found on disk. A log the runtime holds open can't be moved on Windows: it is copied aside and emptied instead, and an alert written between the two is lost.
 - The drawer reuses the existing paging of `/flows/{id}/alerts`.
 
 ### Theme and layout

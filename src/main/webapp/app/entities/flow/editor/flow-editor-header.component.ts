@@ -11,7 +11,7 @@ import { EMPTY, Observable, Subject, catchError, forkJoin, map, merge, of, switc
 import { Components } from 'app/shared/camel/component-type';
 
 import { FlowService } from '../flow.service';
-import { RuntimeStatus, countLabel, hasRun, rowStatus, runtimeStatusOf, testMessageBlocked } from '../flow-row-status';
+import { RuntimeStatus, countLabel, hasRun, flowStatusView, runtimeStatusOf, testMessageBlocked } from '../flow-status';
 import { FlowStatusPillComponent } from '../flow-status-pill.component';
 import { FlowAlertsDrawerComponent } from '../flow-alerts-drawer.component';
 
@@ -47,7 +47,7 @@ export class FlowEditorHeaderComponent {
   readonly alerts = signal(0);
   readonly busy = signal(false);
 
-  readonly state = computed(() => rowStatus(this.status(), this.draftReason() !== null));
+  readonly state = computed(() => flowStatusView(this.status(), this.draftReason() !== null));
   readonly running = computed(() => this.status() === 'active' || this.status() === 'paused');
   readonly completedLabel = computed(() => countLabel(this.completed(), this.ran()));
   readonly failedLabel = computed(() => countLabel(this.failed(), this.ran()));
@@ -61,12 +61,10 @@ export class FlowEditorHeaderComponent {
   });
 
   /** Why no test message can be sent now, or null when it can. */
-  readonly testMessageBlocked = computed(() =>
-    testMessageBlocked(
-      this.status(),
-      this.components.types.find(type => type.name === this.sourceComponent()),
-    ),
-  );
+  readonly testMessageBlocked = computed(() => {
+    const source = this.sourceComponent();
+    return testMessageBlocked(this.status(), source ? (this.components.types.find(type => type.name === source) ?? { name: source }) : null);
+  });
 
   private readonly flowService = inject(FlowService);
   private readonly components = inject(Components);
@@ -134,7 +132,11 @@ export class FlowEditorHeaderComponent {
   private readRuntime(id: number): Observable<void> {
     return forkJoin([this.flowService.getFlowStatus(id), this.flowService.getFlowAlertsPage(id, 0, 0)]).pipe(
       switchMap(([status, alerts]) => {
-        this.status.set(runtimeStatusOf(status.body));
+        const reported = runtimeStatusOf(status.body);
+        // A failed start stays an Error until the Flow runs again; the runtime itself may only report it as stopped.
+        if (!(this.status() === 'inactiveError' && reported === 'inactive')) {
+          this.status.set(reported);
+        }
         this.ran.set(this.ran() || hasRun(status.body));
         this.alerts.set(alerts.body?.total ?? 0);
         return this.ran() ? this.flowService.getFlowMessages(id) : of(null);

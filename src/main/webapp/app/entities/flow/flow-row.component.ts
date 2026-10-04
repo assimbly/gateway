@@ -19,9 +19,9 @@ import { Collectors } from 'app/shared/collect/collectors';
 import { OverflowActionDirective, PrimaryActionDirective, RowActions, StatusControls, StatusControlsTone, Truncate } from 'app/shared/table';
 import { FlowRowAlerts } from './flow-row-alerts.component';
 import { FlowRowStats, FlowStatsSection } from './flow-row-stats.component';
-import { FlowAction, RowStatus, countLabel, flowTypeLabel, hasRun, rowStatus, testMessageBlocked } from './flow-row-status';
+import { FlowAction, FlowStatusView, countLabel, flowTypeLabel, hasRun, flowStatusView, sourceStepOf, testMessageBlocked } from './flow-status';
 import { Components } from 'app/shared/camel/component-type';
-import { ComponentSchemas } from 'app/shared/camel/component-schemas.service';
+import { ComponentSchemas } from './component-schemas.service';
 import { FlowStatusPillComponent } from './flow-status-pill.component';
 import { FlowAlertsDrawerComponent } from './flow-alerts-drawer.component';
 
@@ -153,14 +153,14 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   readonly menuLabels: Record<FlowAction, string> = { start: 'Start', stop: 'Stop', pause: 'Pause', resume: 'Resume', restart: 'Restart' };
   readonly menuIcons: Record<FlowAction, IconProp> = { start: 'play', stop: 'stop', pause: 'pause', resume: 'step-forward', restart: 'sync' };
 
-  get state(): RowStatus {
-    return rowStatus(this.statusFlow, this.isDraft);
+  get state(): FlowStatusView {
+    return flowStatusView(this.statusFlow, this.isDraft);
   }
 
   /** Why the ⋮ menu's Send test message is unavailable, or null when it can be sent. */
   get testMessageBlocked(): string | null {
-    const source = this.flow.steps?.find(step => step.stepType === StepType.SOURCE || step.stepType === StepType.FROM);
-    return testMessageBlocked(this.statusFlow, this.components.types.find(type => type.name === source?.componentType));
+    const source = sourceStepOf(this.flow.steps)?.componentType;
+    return testMessageBlocked(this.statusFlow, source ? (this.components.types.find(type => type.name === source) ?? { name: source }) : null);
   }
 
   sendTestMessage(): void {

@@ -40,7 +40,8 @@ import { CodemirrorModule } from "@ctrl/ngx-codemirror";
 import { ThemeService } from "app/core/theme";
 import { FlowCanvasComponent, DesignerSelection } from "../designer/flow-canvas.component";
 import { FlowEditorHeaderComponent } from "./flow-editor-header.component";
-import { ComponentSchemas } from "app/shared/camel/component-schemas.service";
+import { sourceStepOf } from "../flow-status";
+import { ComponentSchemas } from "../component-schemas.service";
 import { LinkEditorComponent } from "../designer/link-editor.component";
 import { FlowGraphHistory } from "../designer/flow-graph-history";
 import {
@@ -1486,7 +1487,6 @@ splitOptions4(options: string): string[] {
 		this.formSubmitted = true;
 		this.savingFlowFailed = false;
 		this.savingFlowSuccess = false;
-		const goToOverview = true;
 
 		this.setDataFromForm();
 		this.setOptions();
@@ -1534,7 +1534,13 @@ splitOptions4(options: string): string[] {
        }),
        switchMap(() => this.stepService.findByFlowId(this.flow.id)),
      )
-     .subscribe(() => this.afterSave());
+     .subscribe({
+       next: () => this.afterSave(),
+       error: () => {
+         this.savingFlowFailed = true;
+         this.isSaving = false;
+       },
+     });
   }
 
   createFlow(){
@@ -2098,7 +2104,7 @@ splitOptions4(options: string): string[] {
 	}
 
 	get sourceComponent(): string | undefined {
-		return this.steps?.find(step => step.stepType === StepType.SOURCE)?.componentType;
+		return sourceStepOf(this.steps)?.componentType;
 	}
 
 	@HostListener('window:beforeunload', ['$event'])
