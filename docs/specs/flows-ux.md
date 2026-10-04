@@ -92,7 +92,7 @@ Small changes that work with any Camel component, no rewrite. They target the **
 
 - The status pill comes from the existing status in the row component (`active` → Running, `paused` → Paused, `inactive` → Stopped, `inactiveError` → Error). A Draft is shown in the same spot, but it isn't a Flow status: Drafts have none. The `statusTone` colours are reused for the pill.
 - `jhi-status-controls` gets a mode with a single main button, and its secondary actions move into the row's existing `jhi-row-actions` menu.
-- "Has been started" (for `0` vs `—`) is true when the statistics endpoint returns any counters for the Flow.
+- "Has been started" (for `0` vs `—`) is true once the runtime reports a status other than `unconfigured` for the Flow. (The statistics endpoint answers with zero counters even for a Flow that never ran, so it can't tell.) After a Gateway restart a Flow shows `—` again until it is started.
 
 ### Editor header
 

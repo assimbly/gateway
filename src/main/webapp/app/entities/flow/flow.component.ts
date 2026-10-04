@@ -64,10 +64,11 @@ export class FlowComponent implements OnInit, OnDestroy {
   flowsLoadFailed = false;
   readonly columns: DataTableColumn[] = [
     { key: 'name', header: 'Name', sortable: true },
+    { key: 'type', header: 'Type' },
+    { key: 'status', header: 'Status' },
     { key: 'completed', header: 'Completed', numeric: true },
     { key: 'failed', header: 'Failed', numeric: true },
     { key: 'actions', header: 'Actions', align: 'end' },
-    { key: 'status', header: 'Status', align: 'end' },
   ];
   private readonly searchPipe = new FlowSearchByNamePipe();
   private readonly eventSubscriptions = new Subscription();

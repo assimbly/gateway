@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { Flow, IFlow, LogLevelType } from 'app/shared/model/flow.model';
@@ -18,6 +19,8 @@ import { Collectors } from 'app/shared/collect/collectors';
 import { OverflowActionDirective, PrimaryActionDirective, RowActions, StatusControls, StatusControlsTone, Truncate } from 'app/shared/table';
 import { FlowRowAlerts } from './flow-row-alerts.component';
 import { FlowRowStats, FlowStatsSection } from './flow-row-stats.component';
+import { FlowAction, RowStatus, countLabel, flowTypeLabel, hasRun, rowStatus } from './flow-row-status';
+import { FlowStatusPillComponent } from './flow-status-pill.component';
 
 import { Router } from '@angular/router';
 import dayjs from 'dayjs/esm';
@@ -47,6 +50,7 @@ enum Status {
     Truncate,
     FlowRowAlerts,
     FlowRowStats,
+    FlowStatusPillComponent,
   ],
 })
 export class FlowRowComponent implements OnInit, OnDestroy {
@@ -70,6 +74,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   public disableActionBtns: boolean;
   /** A Flow designed on the canvas that is still incomplete; it can't be started. */
   public isDraft = false;
+  /** Whether the Flow has run since the Gateway started; until then its counts show `—`. */
+  public ran = false;
 
   public flowDetails: string;
   public flowStatus: string;
@@ -140,6 +146,36 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         return 'failed';
       default:
         return 'default';
+    }
+  }
+
+  readonly menuLabels: Record<FlowAction, string> = { start: 'Start', stop: 'Stop', pause: 'Pause', resume: 'Resume', restart: 'Restart' };
+  readonly menuIcons: Record<FlowAction, IconProp> = { start: 'play', stop: 'stop', pause: 'pause', resume: 'step-forward', restart: 'sync' };
+
+  get state(): RowStatus {
+    return rowStatus(this.statusFlow, this.isDraft);
+  }
+
+  get typeLabel(): string {
+    return flowTypeLabel(this.flow.type);
+  }
+
+  count(value: number | null): string {
+    return countLabel(value, this.ran);
+  }
+
+  run(action: FlowAction): void {
+    switch (action) {
+      case 'start':
+        return this.start();
+      case 'stop':
+        return this.stop();
+      case 'pause':
+        return this.pause();
+      case 'resume':
+        return this.resume();
+      case 'restart':
+        return this.restart();
     }
   }
 
@@ -283,10 +319,11 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         this.setErrorMessage(unknownStatus,this.statusMessage);
         break;
     }
+    this.ran = this.ran || hasRun(status);
     if (refreshView) {
       this.changeDetector.detectChanges();
     }
-    if (this.statusFlow === Status.active || this.statusFlow === Status.paused) {
+    if (this.ran) {
       this.loadFlowMessages();
     } else {
       this.completedCount = null;
@@ -647,7 +684,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.flowService.getFlowMessages(this.flow.id).subscribe({
         next: response => {
-          if (this.destroyed || (this.statusFlow !== Status.active && this.statusFlow !== Status.paused)) {
+          if (this.destroyed || !this.ran) {
             return;
           }
           const body = response.body;
@@ -657,10 +694,6 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         },
       }),
     );
-  }
-
-  formatMetric(value: number | null): string {
-    return value == null || Number.isNaN(value) ? '—' : String(value);
   }
 
   flowConfigurationNotObtained(id) {

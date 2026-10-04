@@ -17,14 +17,33 @@
     />
   </div>
 </td>
-<td class="text-end table-fx-numeric">{{ formatMetric(completedCount) }}</td>
-<td class="text-end table-fx-numeric">{{ formatMetric(failedCount) }}</td>
+<td class="text-muted">{{ typeLabel }}</td>
+<td>
+  @if (state.draft) {
+    <span class="d-inline-flex align-items-center gap-1 text-nowrap">
+      <jhi-flow-status-pill label="Draft" />
+      <span aria-hidden="true">·</span>
+      <a [routerLink]="['/flow/editor', flow.id]" [queryParams]="{ mode: 'edit', editor: flow.type || 'flow', id: flow.id }">Finish design</a>
+    </span>
+  } @else {
+    <jhi-flow-status-pill [label]="state.label" [tone]="state.tone" />
+  }
+</td>
+<td class="text-end table-fx-numeric">{{ count(completedCount) }}</td>
+<td class="text-end table-fx-numeric">{{ count(failedCount) }}</td>
 <td class="text-end">
   <jhi-row-actions>
-    <button jhiOverflowAction type="button" ngbDropdownItem class="btn-fx-dropdown-item" (click)="navigateToFlowEditor('edit')">
-      <fa-icon icon="edit"></fa-icon>
-      <span>Edit</span>
-    </button>
+    <jhi-status-controls
+      *ngIf="state.mainAction as action"
+      jhiPrimaryAction
+      [busy]="disableActionBtns"
+      [showStart]="action === 'start'"
+      [showStop]="action === 'stop'"
+      [showResume]="action === 'resume'"
+      (start)="run('start')"
+      (stop)="run('stop')"
+      (resume)="run('resume')"
+    />
     <jhi-flow-row-stats
       jhiPrimaryAction
       [loading]="flowStatsLoading"
@@ -32,6 +51,22 @@
       [sections]="flowStatsSections"
       (load)="getFlowStatistic(flow)"
     />
+    <button
+      *ngFor="let action of state.menuActions"
+      jhiOverflowAction
+      type="button"
+      ngbDropdownItem
+      class="btn-fx-dropdown-item"
+      [disabled]="disableActionBtns"
+      (click)="run(action)"
+    >
+      <fa-icon [icon]="menuIcons[action]"></fa-icon>
+      <span>{{ menuLabels[action] }}</span>
+    </button>
+    <button jhiOverflowAction type="button" ngbDropdownItem class="btn-fx-dropdown-item" (click)="navigateToFlowEditor('edit')">
+      <fa-icon icon="edit"></fa-icon>
+      <span>Edit</span>
+    </button>
     <button jhiOverflowAction type="button" ngbDropdownItem class="btn-fx-dropdown-item" (click)="navigateToFlowEditor('clone')">
       <fa-icon icon="clone"></fa-icon>
       <span>Clone</span>
@@ -51,23 +86,4 @@
       <span>Delete</span>
     </button>
   </jhi-row-actions>
-</td>
-<td class="text-end">
-  <jhi-status-controls
-    [busy]="disableActionBtns"
-    [tone]="statusTone"
-    [showStart]="!isFlowStarted"
-    [startDisabled]="isDraft"
-    [showPause]="!isFlowPaused"
-    [pauseDisabled]="isFlowStopped"
-    [showResume]="!isFlowResumed"
-    [showStop]="true"
-    [stopDisabled]="isFlowStopped"
-    [showRestart]="isFlowStarted"
-    (start)="start()"
-    (pause)="pause()"
-    (resume)="resume()"
-    (stop)="stop()"
-    (restart)="restart()"
-  />
 </td>

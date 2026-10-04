@@ -1,0 +1,36 @@
+.flow-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.125rem 0.5rem;
+  border: 1px solid var(--app-border);
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  white-space: nowrap;
+  color: var(--app-text);
+
+  &::before {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--app-text-muted);
+  }
+}
+
+.flow-status-pill--started::before {
+  background: var(--app-success);
+}
+
+.flow-status-pill--paused::before {
+  background: var(--app-warning);
+}
+
+.flow-status-pill--failed {
+  border-color: var(--app-danger);
+
+  &::before {
+    background: var(--app-danger);
+  }
+}
