@@ -50,21 +50,23 @@
   >
     <tr *ngFor="let rowBroker of filteredBrokers; trackBy: trackId">
       <td class="table-fx-identity">
-        <jhi-truncate [text]="rowBroker.name" />
+        <a [routerLink]="['/broker', rowBroker.id, 'edit']">
+          <jhi-truncate [text]="rowBroker.name" />
+        </a>
       </td>
       <td class="text-end table-fx-numeric">{{ formatMetric(totalConsumers) }}</td>
       <td class="text-end table-fx-numeric">{{ formatMetric(totalMessages) }}</td>
       <td class="text-end">
         <jhi-row-actions>
           <button
-            jhiPrimaryAction
+            jhiOverflowAction
             type="button"
-            class="btn btn-fx btn-fx-sm btn-fx-ghost"
+            ngbDropdownItem
+            class="btn-fx-dropdown-item"
             [routerLink]="['/broker', rowBroker.id, 'edit']"
-            aria-label="Edit"
           >
             <fa-icon icon="edit"></fa-icon>
-            <span class="d-none d-md-inline">Edit</span>
+            <span>Edit</span>
           </button>
           <button
             jhiPrimaryAction

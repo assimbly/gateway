@@ -34,7 +34,7 @@
             <tbody>
                 <tr *ngFor="let route of routes ;trackBy: trackId">
                     <td><a [routerLink]="['/route', route.id, 'view']">{{ route.id }}</a></td>
-                    <td>{{ route.name }}</td>
+                    <td><a [routerLink]="['/route', route.id, 'edit']">{{ route.name }}</a></td>
                     <td>{{ route.type }}</td>
                     <td>{{ route.content }}</td>
                     <td class="text-right">

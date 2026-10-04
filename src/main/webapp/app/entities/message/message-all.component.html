@@ -41,7 +41,7 @@
       </thead>
       <tbody infinite-scroll>
         <tr *ngFor="let message of messages">
-          <td style="width:85%">{{ message.name }}</td>
+          <td style="width:85%"><a [routerLink]="['/message', message.id, 'edit']" queryParamsHandling="merge">{{ message.name }}</a></td>
           <td style="width:15%" class="text-right">
             <div class="btn-group flex-btn-group-container">
               <button

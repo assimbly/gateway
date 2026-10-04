@@ -87,22 +87,24 @@
   >
     <tr *ngFor="let integration of filteredIntegrations; trackBy: trackId">
       <td class="table-fx-identity">
-        <jhi-truncate [text]="integration.name" />
+        <a [routerLink]="['/integration', integration.id, 'edit']" queryParamsHandling="merge">
+          <jhi-truncate [text]="integration.name" />
+        </a>
       </td>
       <td>{{ integration.type }}</td>
       <td>{{ integration.stage }}</td>
       <td class="text-end">
         <jhi-row-actions>
           <button
-            jhiPrimaryAction
+            jhiOverflowAction
             type="button"
-            class="btn btn-fx btn-fx-sm btn-fx-ghost"
+            ngbDropdownItem
+            class="btn-fx-dropdown-item"
             [routerLink]="['/integration', integration.id, 'edit']"
             queryParamsHandling="merge"
-            aria-label="Edit"
           >
             <fa-icon icon="pencil-alt"></fa-icon>
-            <span class="d-none d-md-inline">Edit</span>
+            <span>Edit</span>
           </button>
           <button
             jhiPrimaryAction

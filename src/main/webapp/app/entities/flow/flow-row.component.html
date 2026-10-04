@@ -1,6 +1,9 @@
 <td class="table-fx-identity">
   <div class="d-flex align-items-center gap-2 min-w-0">
-    <jhi-truncate class="flex-grow-1" [text]="flow.name" />
+    <a class="flex-grow-1 min-w-0" [routerLink]="['/flow/editor', flow.id]"
+       [queryParams]="{ mode: 'edit', editor: flow.type || 'flow', id: flow.id }">
+      <jhi-truncate [text]="flow.name" />
+    </a>
     <jhi-flow-row-alerts
       [flowName]="flow.name"
       [flowError]="flowError"
@@ -18,15 +21,9 @@
 <td class="text-end table-fx-numeric">{{ formatMetric(failedCount) }}</td>
 <td class="text-end">
   <jhi-row-actions>
-    <button
-      jhiPrimaryAction
-      type="button"
-      class="btn btn-fx btn-fx-sm btn-fx-ghost"
-      (click)="navigateToFlowEditor('edit')"
-      aria-label="Edit"
-    >
+    <button jhiOverflowAction type="button" ngbDropdownItem class="btn-fx-dropdown-item" (click)="navigateToFlowEditor('edit')">
       <fa-icon icon="edit"></fa-icon>
-      <span class="d-none d-md-inline">Edit</span>
+      <span>Edit</span>
     </button>
     <jhi-flow-row-stats
       jhiPrimaryAction

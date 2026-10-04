@@ -34,7 +34,7 @@
     @for (userManagement of filteredUsers(); track trackLogin(userManagement)) {
       <tr data-cy="entityTable">
         <td class="table-fx-identity">
-          <a [routerLink]="['/user-management', userManagement.login, 'view']">
+          <a [routerLink]="['/user-management', userManagement.login, 'edit']">
             <jhi-truncate [text]="userManagement.login" />
           </a>
         </td>
@@ -71,15 +71,15 @@
         <td class="text-end">
           <jhi-row-actions>
             <button
-              jhiPrimaryAction
+              jhiOverflowAction
               type="button"
-              class="btn btn-fx btn-fx-sm btn-fx-ghost"
+              ngbDropdownItem
+              class="btn-fx-dropdown-item"
               [routerLink]="['/user-management', userManagement.login, 'view']"
               data-cy="entityDetailsButton"
-              aria-label="View"
             >
               <fa-icon icon="eye" />
-              <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+              <span jhiTranslate="entity.action.view">View</span>
             </button>
             <button
               jhiPrimaryAction

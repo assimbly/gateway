@@ -35,7 +35,7 @@
       <tbody infinite-scroll>
         <tr *ngFor="let connection of connections">
           <td style="width:20%">
-            {{ connection.name }}
+            <a [routerLink]="['/connection', connection.id, 'edit']" queryParamsHandling="merge">{{ connection.name }}</a>
           </td>
           <td style="width:65%">
             {{ connection.type }}
