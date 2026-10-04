@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -7,6 +7,7 @@ import { NgbDropdownModule, NgbModal, NgbOffcanvas, NgbTooltip } from '@ng-boots
 import { Flow, IFlow, LogLevelType } from 'app/shared/model/flow.model';
 import { isDraft, loadFlowGraph, opensOnCanvas } from './designer/flow-graph';
 import { FlowService } from './flow.service';
+import { IApiHandler } from 'app/entities/api/api.model';
 import { FlowDeleteDialogComponent } from 'app/entities/flow/flow-delete-dialog.component';
 
 import { Step, StepType } from 'app/shared/model/step.model';
@@ -66,10 +67,12 @@ enum Status {
     FlowRowStats,
   ],
 })
-export class FlowRowComponent implements OnInit, OnDestroy {
+export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
   sslUrl: any;
 
   @Input() flow: Flow;
+  /** The API and Operation this Flow handles, when it is a Handler Flow. */
+  @Input() handler?: IApiHandler;
 
   steps: Array<Step> = [new Step()];
   fromStep: Array<Step> = [];
@@ -198,8 +201,27 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
     this.steps = this.flow.steps;
     this.getSteps();
+    this.checkDraft();
+    this.registerTriggeredAction();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // The Handler Flows are known after the rows are made; a Handler Flow is also a Draft while it doesn't answer.
+    if (changes['handler'] && !changes['handler'].firstChange) {
+      this.checkDraft();
+    }
+  }
+
+  /** Why Delete is refused: a Handler Flow is deleted with its Operation. */
+  get deleteBlocked(): string | null {
+    return this.handler
+      ? `This Flow handles ${this.handler.method} ${this.handler.fullPath} of the API ${this.handler.apiName}. Delete that Operation instead; its Handler Flow goes with it.`
+      : null;
+  }
+
+  private checkDraft(): void {
     if (opensOnCanvas(this.flow.type)) {
-      const graph = loadFlowGraph(this.flow);
+      const graph = loadFlowGraph(this.flow, this.handler);
       this.isDraft = isDraft(graph);
       // A Step with an empty required path part also makes a Draft, once its Component's schema is read.
       this.subscriptions.add(
@@ -212,9 +234,6 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         }),
       );
     }
-
-    this.registerTriggeredAction();
-
   }
 
   ngOnDestroy(): void {

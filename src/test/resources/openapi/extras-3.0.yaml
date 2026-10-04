@@ -29,6 +29,7 @@ paths:
           example: open
           schema:
             type: string
+            enum: [open, paid]
       callbacks:
         paid:
           '{$request.body#/callback}':

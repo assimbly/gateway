@@ -1,0 +1,187 @@
+// The APIs pages: the list, an API with its Operations, the Operation panel and the import.
+
+.api-empty {
+  max-width: 56rem;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.api-empty__title {
+  margin-bottom: 0.25rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.api-empty__lead {
+  margin-bottom: 1rem;
+  color: var(--app-text-muted);
+}
+
+// Messages from the Gateway can list several conflicts, one per line.
+.api-message {
+  white-space: pre-line;
+}
+
+.api-status {
+  white-space: nowrap;
+  color: var(--app-text-muted);
+}
+
+.api-status--started {
+  color: var(--app-success);
+}
+
+.api-status--failed {
+  color: var(--app-danger);
+}
+
+.api-method {
+  display: inline-block;
+  min-width: 4.5rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background: var(--app-text-muted);
+}
+
+.api-method--get {
+  background: #2f7d4f;
+}
+
+.api-method--post {
+  background: #1f6fb2;
+}
+
+.api-method--put {
+  background: #9a6700;
+}
+
+.api-method--patch {
+  background: #6f42c1;
+}
+
+.api-method--delete {
+  background: #b42318;
+}
+
+.api-header {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.api-header__description {
+  grid-column: 1 / -1;
+}
+
+.api-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.api-toolbar__status {
+  margin-right: auto;
+}
+
+.api-operations tr {
+  cursor: pointer;
+}
+
+.api-operations tr.api-operation--selected td {
+  background: var(--app-active);
+}
+
+.api-layout {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.api-layout__main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.api-panel {
+  flex: 0 0 min(36rem, 100%);
+  max-height: calc(100vh - 8rem);
+  overflow-y: auto;
+  padding: 1rem;
+  border: 1px solid var(--app-border);
+  border-radius: 0.5rem;
+  background: var(--app-surface);
+  position: sticky;
+  top: 1rem;
+}
+
+@media (max-width: 991.98px) {
+  .api-layout {
+    flex-direction: column;
+  }
+
+  .api-panel {
+    flex-basis: auto;
+    width: 100%;
+    max-height: none;
+    position: static;
+  }
+}
+
+.api-panel h3 {
+  font-size: 1.125rem;
+  margin-bottom: 0.75rem;
+}
+
+.api-panel h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 1.25rem 0 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--app-border);
+}
+
+.api-rows {
+  width: 100%;
+  font-size: 0.875rem;
+}
+
+.api-rows th {
+  font-weight: 600;
+  color: var(--app-text-muted);
+  padding: 0 0.25rem 0.25rem;
+}
+
+.api-rows td {
+  padding: 0.125rem 0.25rem;
+  vertical-align: top;
+}
+
+.api-schema .CodeMirror {
+  height: 12rem;
+  border: 1px solid var(--app-border);
+  border-radius: 0.25rem;
+}
+
+.api-try-result pre {
+  max-height: 16rem;
+  overflow: auto;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  background: var(--app-code-bg);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.api-dropped {
+  max-height: 16rem;
+  overflow-y: auto;
+  font-size: 0.875rem;
+}

@@ -156,43 +156,52 @@ class HandlerFlowDilExportIntTest {
     }
 
     @Test
-    void everyStepRefersToTheProblemRouteConfigurationThatAnswers500() throws Exception {
+    void everyStepHasItsOwnProblemRouteConfigurationThatAnswers500() throws Exception {
         Flow flow = handlerFlow("GET", "/{id}");
-        String id = "apiproblem" + flow.getId();
 
         Document dil = export(flow);
 
+        // The runtime adds a Route configuration for each Step that refers to one, so each Step has its own.
         NodeList steps = (NodeList) xPath.evaluate("//flow/steps/step[type!='error']", dil, XPathConstants.NODESET);
         assertThat(steps.getLength()).isEqualTo(2);
         for (int i = 0; i < steps.getLength(); i++) {
-            Element block = (Element) xPath.evaluate("blocks/block[type='routeconfiguration']", steps.item(i), XPathConstants.NODE);
+            Element step = (Element) steps.item(i);
+            String id = "apiproblem" + text(step, "id");
+            Element block = (Element) xPath.evaluate("blocks/block[type='routeconfiguration']", step, XPathConstants.NODE);
             assertThat(text(block, "id")).isEqualTo(id);
             assertThat(text(block, "uri")).isEqualTo(id);
-        }
 
-        Element configuration = (Element) xPath.evaluate("/dil/core/routeConfigurations/routeConfiguration[@id='" + id + "']", dil, XPathConstants.NODE);
-        assertThat(configuration).isNotNull();
-        assertThat(text(configuration, "onException/exception")).isEqualTo("java.lang.Exception");
-        assertThat(text(configuration, "onException/handled/constant")).isEqualTo("true");
-        assertThat(text(configuration, "onException/setHeader[@name='CamelHttpResponseCode']/constant")).isEqualTo("500");
-        assertThat(text(configuration, "onException/setHeader[@name='Content-Type']/constant")).isEqualTo("application/problem+json");
-        String body = text(configuration, "onException/setBody/simple");
-        assertThat(body).contains("\"title\":\"Internal Server Error\"", "\"instance\":\"GET /customers/{id}\"", "\"correlationId\":\"${exchangeId}\"");
-        assertThat(body).doesNotContain("exception.message");
+            Element configuration = (Element) xPath.evaluate("/dil/core/routeConfigurations/routeConfiguration[@id='" + id + "']", dil, XPathConstants.NODE);
+            assertThat(configuration).isNotNull();
+            assertThat(text(configuration, "onException/exception")).isEqualTo("java.lang.Exception");
+            assertThat(text(configuration, "onException/handled/constant")).isEqualTo("true");
+            assertThat(text(configuration, "onException/setHeader[@name='CamelHttpResponseCode']/constant")).isEqualTo("500");
+            assertThat(text(configuration, "onException/setHeader[@name='Content-Type']/constant")).isEqualTo("application/problem+json");
+            String body = text(configuration, "onException/setBody/simple");
+            assertThat(body).contains("\"title\":\"Internal Server Error\"", "\"instance\":\"GET /customers/{id}\"", "\"correlationId\":\"${exchangeId}\"");
+            assertThat(body).doesNotContain("exception.message");
+        }
+        assertThat(((NodeList) xPath.evaluate("/dil/core/routeConfigurations/routeConfiguration", dil, XPathConstants.NODESET)).getLength()).isEqualTo(2);
+    }
+
+    @Test
+    void aFlowlinkSourceKeepsTheExchangePatternItHas() throws Exception {
+        Flow called = plainFlow("called");
+        Step source = new Step();
+        source.setStepType(StepType.SOURCE);
+        source.setComponentType("flowlink");
+        source.setOptions("transport=sync");
+        called.addStep(source);
+        stepRepository.save(source);
+
+        Element exported = step(export(called), "source");
+
+        assertThat(xPath.evaluate("options/exchangePattern", exported, XPathConstants.NODE)).isNull();
     }
 
     @Test
     void aFlowThatHandlesNoOperationExportsAsBefore() throws Exception {
-        Flow plain = new Flow();
-        plain.setName("plain");
-        plain.setType("flow");
-        plain.setIntegration(integrationRepository.findById(integrationId).orElseThrow());
-        plain.setVersion(1);
-        plain.setAutoStart(false);
-        plain.setLogLevel(org.assimbly.gateway.domain.enumeration.LogLevelType.OFF);
-        plain.setCreated(java.time.Instant.now());
-        plain.setLastModified(java.time.Instant.now());
-        plain = flowRepository.save(plain);
+        Flow plain = plainFlow("plain");
         Step source = new Step();
         source.setStepType(StepType.SOURCE);
         source.setComponentType("rest");
@@ -211,6 +220,19 @@ class HandlerFlowDilExportIntTest {
         ApiOperationDTO operation = apiService.createOperation(api.id(), new ApiOperationDTO(null, null, method, path, null, null, null, null,
             null, null, null, List.of(), List.of(), null, null, null));
         return flowRepository.findById(operation.handlerFlowId()).orElseThrow();
+    }
+
+    private Flow plainFlow(String name) {
+        Flow flow = new Flow();
+        flow.setName(name);
+        flow.setType("flow");
+        flow.setIntegration(integrationRepository.findById(integrationId).orElseThrow());
+        flow.setVersion(1);
+        flow.setAutoStart(false);
+        flow.setLogLevel(org.assimbly.gateway.domain.enumeration.LogLevelType.OFF);
+        flow.setCreated(java.time.Instant.now());
+        flow.setLastModified(java.time.Instant.now());
+        return flowRepository.save(flow);
     }
 
     private static Step response(Flow flow) {

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, OnDestroy, QueryList, ViewChildren } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy, QueryList, ViewChildren, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription, forkJoin, interval } from 'rxjs';
@@ -26,6 +26,8 @@ import { FlowRowComponent } from './flow-row.component';
 import { FlowSearchByNamePipe } from './flow.searchbyname.pipe';
 import { FlowTypeChoicesComponent } from './flow-type-choices.component';
 import { NewFlowDialogComponent, takeChosenFile } from './new-flow-dialog.component';
+import { ApiService } from 'app/entities/api/api.service';
+import { IApiHandler } from 'app/entities/api/api.model';
 
 @Component({
   selector: 'jhi-flow',
@@ -71,6 +73,9 @@ export class FlowComponent implements OnInit, OnDestroy {
     { key: 'stats', header: 'Stats' },
     { key: 'actions', header: 'Actions', align: 'end' },
   ];
+  /** The Handler Flows by Flow id, to mark them with their API and Operation. */
+  handlers: Record<number, IApiHandler> = {};
+  private readonly apiService = inject(ApiService);
   private readonly searchPipe = new FlowSearchByNamePipe();
   private readonly eventSubscriptions = new Subscription();
   private readonly polls = new Subscription();
@@ -142,6 +147,7 @@ export class FlowComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.getIntegrations();
+    this.loadHandlers();
     this.accountService.identity().subscribe(account => {
       this.currentAccount = account;
     });
@@ -151,6 +157,10 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.registerDeletedFlows();
     this.polls.add(interval(15000).subscribe(() => this.flowRows?.forEach(row => row.pollMessages())));
     this.polls.add(interval(10000).subscribe(() => this.flowRows?.forEach(row => row.pollAlerts())));
+  }
+
+  loadHandlers(): void {
+    this.apiService.handlers().subscribe(handlers => (this.handlers = handlers));
   }
 
   ngAfterViewInit() {

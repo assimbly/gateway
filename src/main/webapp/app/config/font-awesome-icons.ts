@@ -76,6 +76,9 @@ import {
   faRedo,
   faSitemap,
   faUndo,
+  faPlug,
+  faWandMagicSparkles,
+  faArrowUpRightFromSquare,
   // jhipster-needle-add-icon-import
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -157,5 +160,8 @@ export const fontAwesomeIcons = [
   faRedo,
   faSitemap,
   faUndo,
+  faPlug,
+  faWandMagicSparkles,
+  faArrowUpRightFromSquare,
   // jhipster-needle-add-icon-import
 ];

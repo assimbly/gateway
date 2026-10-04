@@ -301,9 +301,6 @@ public class ExportXML {
         logLevelAsString = flowDB.getLogLevel().toString();
 
         handledOperation = apiOperationRepository.findByHandlerFlowId(flowDB.getId()).orElse(null);
-        if (handledOperation != null) {
-            setProblemRouteConfiguration(flowDB);
-        }
 
         //notes
         String flowNotes = flowDB.getNotes();
@@ -449,27 +446,25 @@ public class ExportXML {
     /** A Call Flow Action waits for the other Flow's answer (InOut); as a Sink it hands the message over (InOnly). */
     private static String withFlowlinkPattern(Step stepDB) {
         String options = stepDB.getOptions();
-        if (!"flowlink".equalsIgnoreCase(stepDB.getComponentType()) || (options != null && options.contains("exchangePattern="))) {
+        boolean callFlow = "flowlink".equalsIgnoreCase(stepDB.getComponentType())
+            && (stepDB.getStepType() == StepType.ACTION || stepDB.getStepType() == StepType.SINK);
+        if (!callFlow || (options != null && options.contains("exchangePattern="))) {
             return options;
         }
         String pattern = stepDB.getStepType() == StepType.ACTION ? "InOut" : "InOnly";
         return options == null || options.isEmpty() ? "exchangePattern=" + pattern : options + "&exchangePattern=" + pattern;
     }
 
-    private static String problemRouteConfigurationId(Flow flowDB) {
-        return "apiproblem" + flowDB.getId();
-    }
-
     /**
-     * The Route configuration every Step of a Handler Flow runs with: a failure no Step handles answers the caller
+     * The Route configuration a Step of a Handler Flow runs with: a failure no Step handles answers the caller
      * with 500 and an application/problem+json body that names the Operation and the exchange as correlation id,
      * never the exception itself.
      */
-    private void setProblemRouteConfiguration(Flow flowDB) {
+    private void setProblemRouteConfiguration(String id) {
         String operation = handledOperation.getMethod() + " " + ApiPaths.fullPath(handledOperation.getApi().getBasePath(), handledOperation.getPath());
 
         Element configuration = doc.createElement("routeConfiguration");
-        configuration.setAttribute("id", problemRouteConfigurationId(flowDB));
+        configuration.setAttribute("id", id);
         routeConfigurations.appendChild(configuration);
 
         Element onException = setElement("onException", null, configuration);
@@ -550,7 +545,9 @@ public class ExportXML {
         }
 
         if (handledOperation != null && !stepDB.getStepType().getStep().equalsIgnoreCase("error")) {
-            String problemId = problemRouteConfigurationId(stepDB.getFlow());
+            // The runtime adds a Route configuration for every Step that refers to one, so each Step gets its own copy.
+            String problemId = "apiproblem" + stepId;
+            setProblemRouteConfiguration(problemId);
             block = setElement("block", null, blocks);
             setElement("id", problemId, block);
             setElement("type", "routeconfiguration", block);

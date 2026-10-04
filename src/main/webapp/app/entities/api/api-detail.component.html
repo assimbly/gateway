@@ -1,0 +1,135 @@
+@if (api(); as api) {
+  <div class="api-layout">
+    <div class="api-layout__main">
+      <nav aria-label="breadcrumb" class="mb-2">
+        <a routerLink="/rest-apis"><fa-icon icon="arrow-left"></fa-icon> APIs</a>
+      </nav>
+
+      <form [formGroup]="form" (ngSubmit)="saveHeader()" novalidate>
+        <div class="api-header">
+          <div>
+            <label class="form-label" for="api-name">Name</label>
+            <input id="api-name" class="form-control" formControlName="name" required
+                   [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid" />
+          </div>
+          <div>
+            <label class="form-label" for="api-base-path">Base path</label>
+            <input id="api-base-path" class="form-control" formControlName="basePath" placeholder="/customers"
+                   [class.is-invalid]="form.controls.basePath.touched && form.controls.basePath.invalid" aria-describedby="api-base-path-help" />
+            <small class="text-muted" id="api-base-path-help">Starts with /, without parameters. Every Operation's path goes after it.</small>
+          </div>
+          <div>
+            <label class="form-label" for="api-version">Version</label>
+            <input id="api-version" class="form-control" formControlName="versionLabel" placeholder="1.0" aria-describedby="api-version-help" />
+            <small class="text-muted" id="api-version-help">A label for the contract; it doesn't change any path.</small>
+          </div>
+          <div class="api-header__description">
+            <label class="form-label" for="api-description">Description</label>
+            <textarea id="api-description" class="form-control" rows="2" formControlName="description"></textarea>
+          </div>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-fx btn-fx-primary" [disabled]="saving || (!isNew && form.pristine)">
+            <fa-icon icon="save"></fa-icon> {{ isNew ? 'Create API' : 'Save' }}
+          </button>
+          @if (!isNew) {
+            <button type="button" class="btn btn-fx btn-fx-ghost text-danger" (click)="deleteApi()">
+              <fa-icon icon="trash"></fa-icon> Delete API
+            </button>
+          }
+        </div>
+      </form>
+
+      @if (message(); as text) {
+        <div class="alert alert-danger alert-dismissible py-2 mt-3">
+          <span class="api-message">{{ text }}</span>
+          <button type="button" class="btn-close py-2" aria-label="Close" (click)="message.set(undefined)"></button>
+        </div>
+      }
+      @if (notice(); as text) {
+        <div class="alert alert-info alert-dismissible py-2 mt-3">
+          {{ text }}
+          <button type="button" class="btn-close py-2" aria-label="Close" (click)="notice.set(undefined)"></button>
+        </div>
+      }
+
+      @if (!isNew) {
+        <div class="api-toolbar">
+          <span class="api-toolbar__status">
+            <strong>Operations</strong>
+            @if (status(); as s) {
+              · <span [class]="'api-status api-status--' + s.tone">{{ s.label }}</span>
+            }
+          </span>
+          <button type="button" class="btn btn-fx btn-fx-primary" (click)="newOperation()">
+            <fa-icon icon="plus"></fa-icon> New Operation
+          </button>
+          <button type="button" class="btn btn-fx btn-fx-secondary" (click)="start()" [disabled]="running() || !api.operations?.length"
+                  ngbTooltip="Starts every Handler Flow. Drafts are skipped.">
+            <fa-icon icon="play"></fa-icon> Start
+          </button>
+          <button type="button" class="btn btn-fx btn-fx-secondary" (click)="stop()" [disabled]="running() || !api.operations?.length">
+            <fa-icon icon="stop"></fa-icon> Stop
+          </button>
+          <button type="button" class="btn btn-fx btn-fx-ghost" (click)="exportApi('yaml')" ngbTooltip="OpenAPI 3.0.3 YAML">
+            <fa-icon icon="file-export"></fa-icon> Export OpenAPI
+          </button>
+          <button type="button" class="btn btn-fx btn-fx-ghost" (click)="exportApi('json')" ngbTooltip="OpenAPI 3.0.3 JSON">JSON</button>
+          <button type="button" class="btn btn-fx btn-fx-ghost" (click)="refreshStates()" aria-label="Refresh the status">
+            <fa-icon icon="sync"></fa-icon>
+          </button>
+        </div>
+
+        @if (api.operations?.length) {
+          <div class="table-responsive">
+            <table class="table table-fx api-operations" aria-label="Operations">
+              <thead>
+                <tr>
+                  <th scope="col">Method</th>
+                  <th scope="col">Path</th>
+                  <th scope="col">Summary</th>
+                  <th scope="col">Handler Flow</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (operation of api.operations; track operation.id) {
+                  <tr [class.api-operation--selected]="isSelected(operation)" (click)="select(operation)">
+                    <td><span [class]="methodClass(operation.method)">{{ operation.method }}</span></td>
+                    <td>
+                      <button type="button" class="btn btn-link p-0 text-start" (click)="$event.stopPropagation(); select(operation)">
+                        <code>{{ operation.fullPath }}</code>
+                      </button>
+                    </td>
+                    <td class="text-muted">{{ operation.summary }}</td>
+                    <td class="text-nowrap">
+                      @let state = stateOf(operation);
+                      {{ stateLabel(state) }}
+                      @if (state?.draft) {
+                        <span class="badge text-bg-secondary ms-1" ngbTooltip="The Handler Flow is a Draft: finish it to start it.">Draft</span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <p class="text-muted">No Operations yet. Add one: it gets a Handler Flow that answers 200 right away, which you build on.</p>
+        }
+      }
+    </div>
+
+    @if (selected(); as selectedOperation) {
+      <aside class="api-panel" aria-label="Operation">
+        <jhi-operation-panel
+          [api]="api"
+          [operation]="selectedOperation === 'new' ? undefined : selectedOperation"
+          [state]="selectedOperation === 'new' ? undefined : stateOf(selectedOperation)"
+          (saved)="onSaved($event)"
+          (deleted)="onDeleted()"
+          (closed)="selected.set(undefined)"
+        />
+      </aside>
+    }
+  </div>
+}

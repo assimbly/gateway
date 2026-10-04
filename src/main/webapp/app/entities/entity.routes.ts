@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 
+import { apiRoute } from './api/api.route';
 import { brokerRoute } from './broker/broker.route';
 import { certificateRoute } from './certificate/certificate.route';
 import { connectionRoute } from './connection/connection.route';
@@ -30,6 +31,7 @@ const routes: Routes = [
   ...queueRoute,
   ...topicRoute,
   ...flowRoute,
+  ...apiRoute,
   ...connectionRoute,
   ...messageRoute,
   ...routeRoute,

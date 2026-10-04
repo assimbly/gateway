@@ -3,7 +3,7 @@ package org.assimbly.gateway.service.dto;
 import java.util.List;
 
 /**
- * An API with its Operations. On the list of APIs the Operations are left out and only counted.
+ * An API with its Operations; {@code operationCount} counts them.
  */
 public record ApiDTO(
     Long id,

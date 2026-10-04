@@ -59,7 +59,7 @@ public class ApiService {
 
     @Transactional(readOnly = true)
     public List<ApiDTO> findAll() {
-        return apiRepository.findAllByOrderByNameAsc().stream().map(api -> toDto(api, false)).toList();
+        return apiRepository.findAllByOrderByNameAsc().stream().map(api -> toDto(api, true)).toList();
     }
 
     @Transactional(readOnly = true)

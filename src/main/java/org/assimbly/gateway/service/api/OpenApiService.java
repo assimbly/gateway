@@ -390,6 +390,12 @@ public class OpenApiService {
                         dropped.add("the example" + whereParameter);
                     }
                     dropUnknown(parameter, PARAMETER_KEYS, "", whereParameter);
+                    // A parameter keeps only its type; the rest of its schema, such as a format or enum, is listed.
+                    parameter.path("schema").fieldNames().forEachRemaining(key -> {
+                        if (!key.equals("type")) {
+                            dropped.add(describeKey(key) + " of the schema" + whereParameter);
+                        }
+                    });
                     String type = parameterType(parameter.path("schema").path("type"));
                     if (type == null) {
                         dropped.add("the schema" + whereParameter + " (kept as a string)");

@@ -82,6 +82,20 @@
           </div>
         }
 
+        <a
+          class="app-sidebar__link"
+          routerLink="/rest-apis"
+          [class.active]="isActivePath('/rest-apis')"
+          [attr.aria-label]="iconOnly ? 'APIs' : null"
+          [title]="iconOnly ? 'APIs' : ''"
+          (click)="collapseNavbar()"
+        >
+          <fa-icon icon="plug" [fixedWidth]="true" />
+          @if (!iconOnly) {
+            <span class="app-sidebar__label">APIs</span>
+          }
+        </a>
+
         <ng-template #flowsLinks let-itemClass="itemClass">
           <a
             [class]="itemClass"

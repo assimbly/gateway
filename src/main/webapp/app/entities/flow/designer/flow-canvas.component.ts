@@ -17,7 +17,23 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { EFMarkerType, FCanvasComponent, FFlowModule, FMinimapComponent, FMoveNodesEvent, FSelectionChangeEvent } from '@foblex/flow';
 
-import { defaultBranch, DesignLink, DesignStep, FlowGraph, openEnds, Problem, routerKind, routerOf, routerShape, StepKind } from './flow-graph';
+import {
+  defaultBranch,
+  DesignLink,
+  DesignStep,
+  endsRequest,
+  FlowGraph,
+  isLockedSource,
+  isResponse,
+  openEnds,
+  Problem,
+  RESPONSE_COMPONENT,
+  routerKind,
+  routerOf,
+  routerShape,
+  StepKind,
+} from './flow-graph';
+import { responseSettings } from './response';
 import { PickedKind, StepComponents, StepPickerComponent } from './step-picker.component';
 
 /** What the right-hand panel shows: a Step, the Link leading to a Step, or the Flow settings. */
@@ -37,6 +53,8 @@ export type DesignerSelection = { type: 'step'; key: string } | { type: 'link'; 
 export class FlowCanvasComponent {
   @Input({ required: true }) graph!: FlowGraph;
   @Input() problems: Problem[] = [];
+  /** What may not be meant but doesn't keep the Flow from running, such as an undeclared Response status. */
+  @Input() warnings: Problem[] = [];
   @Input() selection: DesignerSelection = { type: 'flow' };
   @Input() readOnly = false;
   @Input() components: StepComponents = { actions: [], sinks: [] };
@@ -69,7 +87,44 @@ export class FlowCanvasComponent {
   readonly kindIcons: Record<StepKind, IconProp> = { SOURCE: 'sign-in-alt', ACTION: 'cogs', ROUTER: 'code-branch', SINK: 'sign-out-alt' };
 
   label(step: DesignStep): string {
+    const handler = this.graph.handler;
+    if (handler && isLockedSource(this.graph, step.key)) {
+      return `${handler.method} ${handler.fullPath}`;
+    }
+    if (isResponse(this.graph, step)) {
+      return `Response ${responseSettings(step).status}`;
+    }
+    if (step.componentType?.toLowerCase() === 'flowlink') {
+      return 'Call Flow';
+    }
     return step.kind === 'ROUTER' ? routerKind(step) : step.componentType || step.uri || 'choose a component';
+  }
+
+  /** What the step kind shows: a Handler Flow's Source is its Operation, and a Response is named as such. */
+  kindLabel(step: DesignStep): string {
+    if (isLockedSource(this.graph, step.key)) {
+      return 'OPERATION';
+    }
+    return isResponse(this.graph, step) ? 'RESPONSE' : step.kind;
+  }
+
+  /** The components with a Response first; kept while the components stay the same, so the pickers keep theirs. */
+  private withResponse?: { from: StepComponents; components: StepComponents };
+
+  /** The components after an open end: in a Handler Flow, a Response comes first where the Branch ends the request. */
+  appendComponents(step: DesignStep): StepComponents {
+    if (!this.graph.handler || !endsRequest(this.graph, step.key)) {
+      return this.components;
+    }
+    if (this.withResponse?.from !== this.components) {
+      this.withResponse = { from: this.components, components: { ...this.components, sinks: [RESPONSE_COMPONENT, ...this.components.sinks] } };
+    }
+    return this.withResponse.components;
+  }
+
+  warningOf(step: DesignStep): string | undefined {
+    const messages = this.warnings.filter(p => p.stepKey === step.key).map(p => p.message);
+    return messages.length ? messages.join(' ') : undefined;
   }
 
   /** The Branch name (or "default") and Condition shown on a Router's Link; nothing on other Links. */

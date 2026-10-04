@@ -149,6 +149,23 @@
         ></jhi-flow-editor-step>
       </ng-template>
 
+      <ng-template #operationSource>
+        <div class="card bg-light text-start">
+          <div class="card-body">
+            <h5 class="border-bottom">OPERATION</h5>
+            <p class="mb-1"><strong>{{ handler?.method }}</strong> <code>{{ handler?.fullPath }}</code></p>
+            <p class="small text-muted">
+              This Flow handles an Operation of the API
+              <a [routerLink]="['/rest-apis', handler?.apiId]">{{ handler?.apiName }}</a>, and that Operation is its Source. Change its method, path or
+              parameters on the API page.
+            </p>
+            @if (handler && handler.runtimePath !== handler.fullPath) {
+              <p class="small text-muted mb-0">The runtime serves it on <code>{{ handler.runtimePath }}</code>.</p>
+            }
+          </div>
+        </div>
+      </ng-template>
+
       @if (useCanvas) {
         <div class="flow-designer">
           <div class="flow-designer-toolbar">
@@ -186,6 +203,7 @@
                   #flowCanvasRef
                   [graph]="canvasGraph"
                   [problems]="canvasProblems"
+                  [warnings]="canvasWarnings"
                   [selection]="selection"
                   [readOnly]="!!canvasGraph.readOnlyReason"
                   [components]="{ actions: actionComponentsNames, sinks: sinkComponentsNames }"
@@ -219,7 +237,38 @@
             <aside class="flow-designer-panel" id="flow-designer-panel" [class.d-none]="sidePanelCollapsed">
               <div class="flow-designer-panel-editor">
               @if (selection.type === 'step' && selectedStepIndex >= 0) {
-                <ng-container *ngTemplateOutlet="stepEditor; context: { $implicit: selectedStepIndex }"></ng-container>
+                @switch (panelFor(selectedStepIndex)) {
+                  @case ('operation') {
+                    <ng-container *ngTemplateOutlet="operationSource"></ng-container>
+                  }
+                  @case ('response') {
+                    <jhi-response-editor
+                      [uri]="stepFormAt(selectedStepIndex).value.uri"
+                      [options]="steps[selectedStepIndex].options"
+                      [declaredStatuses]="handler?.declaredStatuses ?? []"
+                      [responseMediaType]="handler?.responseMediaType"
+                      [warning]="selectedWarning"
+                      [problem]="selectedProblem"
+                      [deletable]="selectedStepDeletable"
+                      (settingsChange)="onResponseChange(selectedStepIndex, $event)"
+                      (remove)="onDeleteStep(stepKeys[selectedStepIndex])"
+                    />
+                  }
+                  @case ('callFlow') {
+                    <jhi-call-flow-editor
+                      [options]="steps[selectedStepIndex].options"
+                      [kind]="$any(steps[selectedStepIndex].stepType)"
+                      [flows]="callableFlows"
+                      [problem]="selectedProblem"
+                      [deletable]="selectedStepDeletable"
+                      (optionsChange)="onCallFlowChange(selectedStepIndex, $event)"
+                      (remove)="onDeleteStep(stepKeys[selectedStepIndex])"
+                    />
+                  }
+                  @default {
+                    <ng-container *ngTemplateOutlet="stepEditor; context: { $implicit: selectedStepIndex }"></ng-container>
+                  }
+                }
               } @else if (selectedLink; as link) {
                 <jhi-link-editor
                   [graph]="canvasGraph!"
@@ -302,8 +351,11 @@
                 <br/>
                 <hr/>
                 <div style="min-height: 44rem;">
+                  <ng-container *ngFor="let step of steps; index as index">
+                  @if (handler && step.stepType === 'SOURCE') {
+                    <ng-container *ngTemplateOutlet="operationSource"></ng-container>
+                  } @else {
                   <jhi-flow-editor-step
-                    *ngFor="let step of steps; index as index"
                     [step]="step"
                     [index]="index"
                     [stepForm]="stepFormAt(index)"
@@ -342,6 +394,8 @@
                     (createOrEditMessage)="createOrEditMessage($event.step, $event.control)"
                     (createOrEditConnection)="createOrEditConnection($event.step, $event.connectionType, $event.control)"
                   ></jhi-flow-editor-step>
+                  }
+                  </ng-container>
                 </div>
               </ng-template>
             </li>

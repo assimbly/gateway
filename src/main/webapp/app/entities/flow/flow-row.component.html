@@ -2,6 +2,12 @@
   <a [routerLink]="['/flow/editor', flow.id]" [queryParams]="{ mode: 'edit', editor: flow.type || 'flow', id: flow.id }">
     <jhi-truncate [text]="flow.name" />
   </a>
+  @if (handler) {
+    <a class="badge text-bg-light border fw-normal text-decoration-none ms-2" [routerLink]="['/rest-apis', handler.apiId]"
+       [ngbTooltip]="'Handles ' + handler.method + ' ' + handler.fullPath + ' of the API ' + handler.apiName">
+      <fa-icon icon="plug"></fa-icon> {{ handler.apiName }} · {{ handler.method }} {{ handler.fullPath }}
+    </a>
+  }
 </td>
 <td class="text-muted">{{ typeLabel }}</td>
 <td>
@@ -84,6 +90,8 @@
       type="button"
       ngbDropdownItem
       class="btn-fx-dropdown-item btn-fx-dropdown-danger"
+      [disabled]="deleteBlocked !== null"
+      [title]="deleteBlocked ?? ''"
       (click)="navigateToFlowEditor('delete')"
     >
       <fa-icon icon="trash"></fa-icon>

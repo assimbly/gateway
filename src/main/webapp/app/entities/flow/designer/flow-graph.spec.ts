@@ -11,19 +11,26 @@ import {
   changeComponent,
   deleteStep,
   EditResult,
+  endsRequest,
   FlowGraph,
+  HandlerInfo,
   insertStep,
   isDraft,
+  isLockedSource,
+  isResponse,
   linksToSave,
   loadFlowGraph,
   moveStep,
   openEnds,
   problems,
+  RESPONSE_COMPONENT,
   ROUTER_KINDS,
   routerShape,
   stepsToSave,
+  takesCondition,
   updateLink,
   updateStep,
+  warnings,
 } from './flow-graph';
 
 const inbound = (name: string, extra: Partial<ILink> = {}): ILink => ({ name, bound: 'in', transport: 'sync', ...extra });
@@ -626,6 +633,127 @@ describe('Flow graph', () => {
       expect(isDraft(withSftpSink(''), rules)).toBe(true);
       expect(isDraft(withSftpSink('example.com/in'), rules)).toBe(false);
       expect(isDraft(withSftpSink(''))).toBe(false);
+    });
+  });
+
+  describe('Handler Flows', () => {
+    const operation: HandlerInfo = { method: 'GET', fullPath: '/customers/{id}', declaredStatuses: ['200', '404'] };
+    const operationSource = (links: ILink[] = []): IStep =>
+      step(10, 'SOURCE', links, { componentType: 'rest', uri: undefined, options: 'method=get&path=/customers/{id}&exchangePattern=InOut' });
+    const response = (id: number, links: ILink[], status = '200'): IStep =>
+      step(id, 'SINK', links, { componentType: 'setmessage', uri: undefined, options: `status=${status}` });
+
+    /** A new Operation's Handler Flow: Operation → Response (200, keep the body). */
+    const newHandlerFlow = (status = '200', handler: HandlerInfo = operation): FlowGraph =>
+      loadFlowGraph(flow([operationSource([outbound('1-11')]), response(11, [inbound('1-11')], status)]), handler);
+
+    const routedTo = (graph: FlowGraph, kind: string): { graph: FlowGraph; branchEnd: string } => {
+      const routed = edited(insertStep(graph, 'step-11', 'ROUTER', kind));
+      const router = routed.steps.find(s => s.kind === 'ROUTER')!;
+      const branch = routed.links.find(l => l.from === router.key && l.rule)!;
+      return { graph: routed, branchEnd: branch.to };
+    };
+
+    it('a new Handler Flow (Operation → Response) is complete; an imported one (only the Operation) is a Draft', () => {
+      expect(problems(newHandlerFlow())).toEqual([]);
+
+      const imported = loadFlowGraph(flow([operationSource()]), operation);
+      expect(isDraft(imported)).toBe(true);
+      expect(problems(imported)).toEqual([{ stepKey: 'step-10', message: expect.stringContaining('next Step') }]);
+    });
+
+    it("doesn't ask for the path of the Operation Source, which has its method and path as options", () => {
+      const restPath = pathRule('rest:method:path:uriTemplate', [
+        { name: 'method', kind: 'path', displayName: 'Method', required: true },
+        { name: 'path', kind: 'path', displayName: 'Path', required: true },
+      ]);
+      const rules = (componentType: string): PathRule | undefined => (componentType === 'rest' ? restPath : undefined);
+
+      expect(problems(newHandlerFlow(), rules)).toEqual([]);
+    });
+
+    it("locks the Source: it can't be swapped, edited or deleted", () => {
+      const graph = newHandlerFlow();
+
+      expect(changeComponent(graph, 'step-10', 'file')).toEqual({ outcome: 'rejected', reason: expect.stringContaining('Operation') });
+      expect(updateStep(graph, 'step-10', { options: 'method=post' })).toEqual({ outcome: 'rejected', reason: expect.stringContaining('Operation') });
+      expect(deleteStep(graph, 'step-10').outcome).toBe('rejected');
+      expect(isLockedSource(graph, 'step-10')).toBe(true);
+      expect(isLockedSource(sourceToSink(), 'step-10')).toBe(false);
+    });
+
+    it('knows its Responses, and only in a Handler Flow', () => {
+      const graph = newHandlerFlow('201');
+
+      expect(isResponse(graph, graph.steps.find(s => s.key === 'step-11')!)).toBe(true);
+      const plain = loadFlowGraph(flow([operationSource([outbound('1-11')]), response(11, [inbound('1-11')])]));
+      expect(isResponse(plain, plain.steps.find(s => s.key === 'step-11')!)).toBe(false);
+    });
+
+    it('is a Draft while a Branch that ends the request ends in an ordinary Sink', () => {
+      const graph = edited(changeComponent(newHandlerFlow(), 'step-11', 'log'));
+
+      expect(problems(graph)).toEqual([{ stepKey: 'step-11', message: expect.stringContaining('Response') }]);
+    });
+
+    it.each(['enrich', 'wiretap', 'loop'])('lets the Branch of an %s Router, which returns to its Router, end in an ordinary Sink', kind => {
+      const { graph, branchEnd } = routedTo(newHandlerFlow(), kind);
+      const routed = edited(changeComponent(graph, branchEnd, 'log'));
+      const complete = takesCondition(routed, branchEnd) ? edited(updateLink(routed, branchEnd, { language: 'simple', expression: 'true' })) : routed;
+
+      expect(problems(complete)).toEqual([]);
+      expect(endsRequest(complete, branchEnd)).toBe(false);
+      expect(endsRequest(complete, 'step-11')).toBe(true);
+    });
+
+    it('lets content and if Routers answer differently per Branch', () => {
+      const { graph, branchEnd } = routedTo(newHandlerFlow(), 'if');
+      const withCondition = edited(updateLink(graph, branchEnd, { language: 'simple', expression: '${body} == null' }));
+
+      const ordinary = edited(changeComponent(withCondition, branchEnd, 'log'));
+      expect(problems(ordinary)).toEqual([{ stepKey: branchEnd, message: expect.stringContaining('Response') }]);
+
+      const notFound = edited(updateStep(edited(changeComponent(withCondition, branchEnd, 'setmessage')), branchEnd, { options: 'status=404' }));
+      expect(problems(notFound)).toEqual([]);
+    });
+
+    it('offers a Response at an open end that ends the request, starting at 200', () => {
+      const imported = loadFlowGraph(flow([operationSource()]), operation);
+
+      const graph = edited(appendStep(imported, 'step-10', 'SINK', RESPONSE_COMPONENT));
+
+      const appended = graph.steps.find(s => s.key !== 'step-10')!;
+      expect(appended).toMatchObject({ kind: 'SINK', componentType: 'setmessage', options: 'status=200' });
+      expect(problems(graph)).toEqual([]);
+    });
+
+    it('refuses a Response on a Branch that returns to its Router, and outside a Handler Flow', () => {
+      const { graph, branchEnd } = routedTo(newHandlerFlow(), 'enrich');
+      const withAction = edited(insertStep(graph, branchEnd, 'ACTION', 'setbody'));
+      const action = withAction.steps.find(s => s.kind === 'ACTION')!;
+      const openEnd = edited(deleteStep(withAction, branchEnd));
+
+      expect(appendStep(openEnd, action.key, 'SINK', RESPONSE_COMPONENT)).toEqual({ outcome: 'rejected', reason: expect.stringContaining('returns') });
+      expect(appendStep(openEnd, action.key, 'SINK', 'log').outcome).toBe('accepted');
+
+      const plain = loadFlowGraph(flow([step(10, 'SOURCE')]));
+      expect(appendStep(plain, 'step-10', 'SINK', RESPONSE_COMPONENT).outcome).toBe('rejected');
+    });
+
+    it('is a Draft while a Response has no valid status', () => {
+      expect(problems(newHandlerFlow('abc'))).toEqual([{ stepKey: 'step-11', message: expect.stringContaining('100 to 599') }]);
+      expect(problems(newHandlerFlow('600'))).toHaveLength(1);
+      expect(warnings(newHandlerFlow('abc'))).toEqual([]);
+    });
+
+    it('warns, without making a Draft, when a Response uses a status that is not a Declared response', () => {
+      const teapot = newHandlerFlow('418');
+
+      expect(warnings(teapot)).toEqual([{ stepKey: 'step-11', message: expect.stringContaining('418') }]);
+      expect(isDraft(teapot)).toBe(false);
+      expect(warnings(newHandlerFlow('404'))).toEqual([]);
+      expect(warnings(newHandlerFlow('418', { ...operation, declaredStatuses: [] }))).toEqual([]);
+      expect(warnings(newHandlerFlow('418', { ...operation, declaredStatuses: ['200', 'default'] }))).toEqual([]);
     });
   });
 

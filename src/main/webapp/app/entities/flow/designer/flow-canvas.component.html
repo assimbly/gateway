@@ -37,11 +37,13 @@
             <div fConnector fConnectorType="target" [fConnectorId]="'in-' + step.key" [fConnectorDisabled]="true"
                  class="flow-connector flow-connector-in"></div>
           }
-          <div class="flow-step-kind">{{ step.kind }}</div>
+          <div class="flow-step-kind">{{ kindLabel(step) }}</div>
           <fa-icon class="flow-step-icon" [icon]="kindIcons[step.kind]"></fa-icon>
           <div class="flow-step-label" [title]="label(step)">{{ label(step) }}</div>
           @if (problemOf(step); as problem) {
             <span class="flow-step-warning" [title]="problem"><fa-icon icon="exclamation-triangle"></fa-icon></span>
+          } @else if (warningOf(step); as warning) {
+            <span class="flow-step-warning flow-step-warning--soft" [title]="warning"><fa-icon icon="exclamation-circle"></fa-icon></span>
           }
           @if (canAddBranch(step) && !readOnly) {
             <button type="button" fDragBlocker class="flow-plus flow-add-branch" title="Add a Branch" aria-label="Add a Branch"
@@ -54,7 +56,7 @@
                  [fConnectorDisabled]="true" class="flow-connector flow-connector-out"></div>
           }
           @if (isOpenEnd(step) && !readOnly) {
-            <jhi-step-picker fDragBlocker class="flow-append" [kinds]="appendKinds" [components]="components" title="Add the next Step (Space)"
+            <jhi-step-picker fDragBlocker class="flow-append" [kinds]="appendKinds" [components]="appendComponents(step)" title="Add the next Step (Space)"
                              [target]="'after:' + step.key"
                              (click)="$event.stopPropagation()" (dblclick)="$event.stopPropagation()"
                              (picked)="appendStep.emit({ after: step.key, kind: $event.kind, componentType: $event.componentType })">

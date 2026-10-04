@@ -39,6 +39,7 @@
         jhi-flow-row
         *ngFor="let flow of filteredFlows; trackBy: trackId"
         [flow]="flow"
+        [handler]="handlers[flow.id!]"
       ></tr>
     </jhi-data-table>
   }

@@ -20,7 +20,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { Components } from 'app/shared/camel/component-type';
 import { CatalogueEntry, CategoryChip, NO_MATCH, categoryChips, labelsOf, matchRank, roleMismatch, searchCatalogue } from 'app/shared/camel/catalogue';
 
-import { ROUTER_KINDS } from './flow-graph';
+import { RESPONSE_COMPONENT, ROUTER_KINDS } from './flow-graph';
 
 export type PickedKind = 'ACTION' | 'ROUTER' | 'SINK';
 
@@ -35,6 +35,16 @@ export const RECENT = 'recent';
 const RECENT_KEY = 'step-picker.recent';
 const RECENT_MAX = 8;
 const CHIPS_SHOWN = 6;
+
+/** Entries the designer offers that aren't Camel components of their own. */
+const DESIGNER_ENTRIES: Record<string, CatalogueEntry> = {
+  [RESPONSE_COMPONENT]: {
+    name: RESPONSE_COMPONENT,
+    title: 'Response',
+    description: 'Ends the request: the status code, headers and body the caller gets.',
+    label: 'core',
+  },
+};
 
 /**
  * The + button on the canvas: it opens a menu to choose the next Step's kind (Action, Router or Sink)
@@ -79,7 +89,7 @@ export class StepPickerComponent implements OnChanges {
   }
 
   entry(name: string): CatalogueEntry {
-    return this.catalogue.get(name) ?? { name };
+    return DESIGNER_ENTRIES[name] ?? this.catalogue.get(name) ?? { name };
   }
 
   /** The category chips of a kind of Step, from the labels of the components it can use. */

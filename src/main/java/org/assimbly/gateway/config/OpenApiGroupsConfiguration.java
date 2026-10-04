@@ -43,7 +43,7 @@ public class OpenApiGroupsConfiguration {
         RESOURCES("resources", "Resources", Set.of(
             "ConnectionKeysResource", "ConnectionResource", "EnvironmentVariablesResource", "FlowResource",
             "HeaderResource", "IntegrationResource", "LinkResource", "RouteResource", "StepResource",
-            "MessageResource", "BrokerResource", "QueueResource", "TopicResource", "CertificateResource"
+            "MessageResource", "BrokerResource", "QueueResource", "TopicResource", "CertificateResource", "ApiResource"
         )),
         OBSERVABILITY("observability", "Observability", Set.of(
             "StatisticsRuntime", "HealthRuntime", "HealthIntegrationRuntime", "HealthBrokerResource",

@@ -1,0 +1,73 @@
+<div class="card bg-light text-start">
+  <div class="card-body">
+    <h5 class="border-bottom">RESPONSE</h5>
+    <p class="small text-muted">Ends the request: what the caller gets back.</p>
+
+    @if (problem) {
+      <div class="alert alert-danger py-1 small">{{ problem }}</div>
+    }
+
+    <label class="form-label" for="response-status">Status</label>
+    <input id="response-status" class="form-control" list="response-statuses" inputmode="numeric" [(ngModel)]="settings.status" (ngModelChange)="emit()"
+           [class.is-invalid]="!statusValid" aria-describedby="response-status-help" />
+    <datalist id="response-statuses">
+      @for (status of statusChoices; track status) {
+        <option [value]="status"></option>
+      }
+    </datalist>
+    @if (!statusValid) {
+      <div class="invalid-feedback d-block">A status is a number from 100 to 599.</div>
+    }
+    @if (warning) {
+      <div class="small text-warning-emphasis mt-1"><fa-icon icon="exclamation-circle"></fa-icon> {{ warning }}</div>
+    }
+    <small class="text-muted" id="response-status-help">
+      @if (statusChoices.length) {
+        Declared: {{ statusChoices.join(', ') }}. Any other status works too.
+      } @else {
+        The Operation declares no responses yet.
+      }
+    </small>
+
+    <h6 class="mt-3">Headers</h6>
+    @if (responseMediaType && !contentTypeSet) {
+      <p class="small text-muted mb-1">Content-Type: {{ responseMediaType }}, from the Operation.</p>
+    }
+    @for (header of settings.headers; track $index) {
+      <div class="input-group input-group-sm mb-1">
+        <input class="form-control" placeholder="Name" [(ngModel)]="header.name" (ngModelChange)="emit()" [attr.aria-label]="'Name of header ' + ($index + 1)" />
+        <input class="form-control" placeholder="Value or ${expression}" [(ngModel)]="header.value" (ngModelChange)="emit()"
+               [attr.aria-label]="'Value of header ' + ($index + 1)" />
+        <button type="button" class="btn btn-fx btn-fx-ghost" (click)="removeHeader($index)" aria-label="Remove header"><fa-icon icon="times"></fa-icon></button>
+      </div>
+    }
+    <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-sm" (click)="addHeader()"><fa-icon icon="plus"></fa-icon> Header</button>
+
+    <h6 class="mt-3">Body</h6>
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="response-body" id="response-keep-body" [checked]="keepBody" (change)="setKeepBody(true)" />
+      <label class="form-check-label" for="response-keep-body">Keep the current body</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="response-body" id="response-set-body" [checked]="!keepBody" (change)="setKeepBody(false)" />
+      <label class="form-check-label" for="response-set-body">Set the body</label>
+    </div>
+    @if (!keepBody) {
+      <div class="mt-2">
+        <label class="form-label small mb-0" for="response-language">Language</label>
+        <select id="response-language" class="form-select form-select-sm" [(ngModel)]="settings.language" (ngModelChange)="emit()">
+          @for (language of languages; track language) {
+            <option [value]="language">{{ language }}</option>
+          }
+        </select>
+        <label class="form-label small mb-0 mt-1" for="response-body-expression">Expression</label>
+        <textarea id="response-body-expression" class="form-control form-control-sm font-monospace" rows="4" [(ngModel)]="settings.body" (ngModelChange)="emit()"
+                  placeholder='{"id": "${header.id}"}'></textarea>
+      </div>
+    }
+
+    @if (deletable) {
+      <button type="button" class="btn btn-fx btn-fx-ghost text-danger mt-3" (click)="remove.emit()"><fa-icon icon="trash"></fa-icon> Delete Step</button>
+    }
+  </div>
+</div>

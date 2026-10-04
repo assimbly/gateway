@@ -44,6 +44,10 @@ import { sourceStepOf } from "../flow-status";
 import { automaticErrorHandlerPath, defaultErrorHandlerStep, errorHandlerPath, errorHandlerPathOnSave } from "./error-handler";
 import { ComponentSchemas } from "../component-schemas.service";
 import { LinkEditorComponent } from "../designer/link-editor.component";
+import { ResponseEditorComponent } from "./response-editor.component";
+import { CallFlowEditorComponent, callableFlows } from "./call-flow-editor.component";
+import { ApiService } from "app/entities/api/api.service";
+import { IApiHandler } from "app/entities/api/api.model";
 import { FlowGraphHistory } from "../designer/flow-graph-history";
 import {
   addBranch,
@@ -57,6 +61,7 @@ import {
   FlowGraph,
   insertStep,
   isDraft,
+  isResponse,
   LinkSettings,
   linksToSave,
   loadFlowGraph,
@@ -67,6 +72,7 @@ import {
   routerKind,
   stepsToSave,
   updateLink,
+  warnings,
 } from "../designer/flow-graph";
 
 @Component({
@@ -75,7 +81,7 @@ import {
   styleUrl: '../designer/flow-designer.scss',
   encapsulation: ViewEncapsulation.None,
   providers: [StepEditorRegistry],
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, NgbModule, FontAwesomeModule, PopoverModule, AlertError, FlowEditorStepComponent, FieldTabDirective, CodemirrorModule, FlowCanvasComponent, LinkEditorComponent, FlowEditorHeaderComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, NgbModule, FontAwesomeModule, PopoverModule, AlertError, FlowEditorStepComponent, FieldTabDirective, CodemirrorModule, FlowCanvasComponent, LinkEditorComponent, FlowEditorHeaderComponent, ResponseEditorComponent, CallFlowEditorComponent],
 })
 export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
@@ -119,6 +125,12 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	private savedFlowName?: string | null;
 	private readonly location = inject(Location);
 	private readonly schemas = inject(ComponentSchemas);
+	private readonly apiService = inject(ApiService);
+
+	/** The API and Operation this Flow handles, when it is a Handler Flow: its Source is that Operation. */
+	handler?: IApiHandler;
+	/** The Flows a Call Flow Step can call: those with a flowlink Source. */
+	callableFlows: IFlow[] = [];
 	routes: Route[];
 	messages: IMessage[];
 	connections: Connection[];
@@ -344,11 +356,14 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 					}
 
 					if (id) {
-						this.flowService
-							.find(id)
+						forkJoin([this.flowService.find(id), this.apiService.handlerOf(Number(id)), this.flowService.query({ page: 0, size: 1000 })])
 							.subscribe(
-								(flow) => {
+								([flow, handler, flows]) => {
 									this.flow = flow.body;
+									// A clone is an ordinary Flow: its Source becomes a placeholder (see clone()).
+									this.handler = isCloning ? undefined : handler;
+									this.clonedHandler = isCloning ? handler : undefined;
+									this.callableFlows = callableFlows(flows.body ?? [], this.flow.id);
 									if (this.singleIntegration) {
 										this.flow.integrationId = this.integrations[this.indexIntegration].id;
 									}
@@ -687,6 +702,19 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	}
 
 	clone(): void {
+		// A clone of a Handler Flow doesn't claim its Operation: its Source is a placeholder, so the clone is a Draft.
+		if (this.clonedHandler) {
+			const sourceIndex = this.steps.findIndex(step => step.stepType === StepType.SOURCE);
+			if (sourceIndex >= 0) {
+				const source = this.steps[sourceIndex];
+				source.componentType = '';
+				source.uri = '';
+				source.options = '';
+				this.stepFormAt(sourceIndex).patchValue({ componentType: '', uri: '' });
+			}
+			this.clonedHandler = undefined;
+		}
+
 		// The copy logs to its own name and id once it is saved.
 		const errorHandler = this.steps.find(step => step.stepType === StepType.ERROR);
 		if (errorHandler?.uri && errorHandler.uri === errorHandlerPath(this.flow.name, this.flow.id)) {
@@ -1230,6 +1258,10 @@ splitOptions4(options: string): string[] {
 
   setOptions(): void {
     this.steps.forEach((step, i) => {
+      // The Operation (a Handler Flow's Source), Responses and Call Flows keep their options in the Step itself.
+      if (this.editsOwnOptions(i)) {
+        return;
+      }
       step.options = '';
       this.setStepOptions(this.stepsOptions[i], step, this.selectOptions(i));
     });
@@ -1750,7 +1782,55 @@ splitOptions4(options: string): string[] {
 	designerNotice?: string;
 	designerMessage?: string;
 
+	canvasWarnings: Problem[] = [];
+
 	@ViewChild(FlowCanvasComponent) flowCanvas?: FlowCanvasComponent;
+
+	/** Set while a Handler Flow is being cloned: the clone's Source becomes a placeholder. */
+	private clonedHandler?: IApiHandler;
+
+	/** What the side panel edits the Step at this index with. */
+	panelFor(index: number): 'operation' | 'response' | 'callFlow' | 'step' {
+		const step = this.steps[index];
+		if (this.handler && step?.stepType === StepType.SOURCE) {
+			return 'operation';
+		}
+		const design = this.canvasGraph?.steps.find(s => s.key === this.stepKeys[index]);
+		if (design && this.canvasGraph && isResponse(this.canvasGraph, design)) {
+			return 'response';
+		}
+		const componentType = (this.stepFormAt(index)?.value.componentType ?? step?.componentType ?? '').toLowerCase();
+		return componentType === 'flowlink' && (step?.stepType === StepType.ACTION || step?.stepType === StepType.SINK) ? 'callFlow' : 'step';
+	}
+
+	/** Whether a Step's options are edited by its own panel rather than by option rows. */
+	private editsOwnOptions(index: number): boolean {
+		return this.panelFor(index) !== 'step';
+	}
+
+	get selectedProblem(): string | undefined {
+		const selection = this.selection;
+		return selection.type === 'step' ? this.canvasProblems.find(p => p.stepKey === selection.key)?.message : undefined;
+	}
+
+	get selectedWarning(): string | undefined {
+		const selection = this.selection;
+		return selection.type === 'step' ? this.canvasWarnings.find(p => p.stepKey === selection.key)?.message : undefined;
+	}
+
+	/** A Response's settings changed in its panel: the body is the Step's uri, the rest its options. */
+	onResponseChange(index: number, settings: { uri: string | undefined; options: string }): void {
+		this.steps[index].options = settings.options;
+		const uri = this.stepFormAt(index).controls.uri;
+		uri.setValue(settings.uri ?? '');
+		uri.markAsDirty();
+	}
+
+	onCallFlowChange(index: number, options: string): void {
+		this.steps[index].options = options;
+		this.stepFormAt(index).markAsDirty();
+		this.refreshCanvas();
+	}
 
 	private designerBody?: HTMLElement;
 
@@ -1823,7 +1903,7 @@ splitOptions4(options: string): string[] {
 	}
 
 	private loadDesigner(flow: IFlow): void {
-		const graph = loadFlowGraph(flow);
+		const graph = loadFlowGraph(flow, this.handler);
 
 		this.steps = [];
 		this.stepKeys = [];
@@ -1934,6 +2014,7 @@ splitOptions4(options: string): string[] {
 	private checkCanvas(): void {
 		if (this.canvasGraph) {
 			this.canvasProblems = problems(this.canvasGraph, this.schemas.pathRule);
+			this.canvasWarnings = warnings(this.canvasGraph);
 			this.cdr.markForCheck();
 		}
 	}
@@ -1952,7 +2033,13 @@ splitOptions4(options: string): string[] {
 	private addFormsForNewSteps(): void {
 		this.designer!.current.steps
 			.filter(step => !this.stepKeys.includes(step.key))
-			.forEach(step => this.addNewStepForm(step.kind as StepType, this.defaultComponentType(step.kind, step.componentType), step.key));
+			.forEach(step => {
+				this.addNewStepForm(step.kind as StepType, this.defaultComponentType(step.kind, step.componentType), step.key);
+				// A new Response starts with its status, which the graph gave it.
+				if (step.options) {
+					this.steps[this.stepKeys.indexOf(step.key)].options = step.options;
+				}
+			});
 	}
 
 	/** Whether the side panel is hidden, to give the canvas the whole width. Hidden by default; remembered in this browser. */

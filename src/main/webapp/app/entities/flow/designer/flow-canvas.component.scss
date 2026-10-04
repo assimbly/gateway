@@ -92,6 +92,10 @@
   color: var(--app-danger, #f04438);
 }
 
+.flow-step-warning--soft {
+  color: var(--app-warning, #f79009);
+}
+
 .flow-connector {
   position: absolute;
   top: 50%;

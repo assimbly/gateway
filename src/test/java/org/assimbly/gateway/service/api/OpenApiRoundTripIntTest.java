@@ -197,7 +197,8 @@ class OpenApiRoundTripIntTest {
             "x-audience", "x-logo", "x-owner", "x-rate-limit",
             "contact", "tags", "security", "bearerAuth", "servers",
             "cookie parameter session", "example of the query parameter status",
-            "callbacks", "X-Total", "examples", "application/xml");
+            "callbacks", "X-Total", "examples", "application/xml",
+            "enum of the schema of the query parameter status");
     }
 
     @Test

@@ -2,6 +2,7 @@ import { IFlow } from 'app/shared/model/flow.model';
 import { ILink } from 'app/shared/model/link.model';
 import { IStep } from 'app/shared/model/step.model';
 import { PathRule, missingPathParts } from 'app/shared/camel/endpoint';
+import { responseSettings } from './response';
 
 export type StepKind = 'SOURCE' | 'ACTION' | 'ROUTER' | 'SINK';
 
@@ -32,11 +33,21 @@ export interface DesignLink {
   expression?: string;
 }
 
+/** What a Handler Flow knows of the Operation it handles: its Source is that Operation (ADR 0003). */
+export interface HandlerInfo {
+  method: string;
+  fullPath: string;
+  /** The Operation's Declared response statuses, such as '200', '404' or 'default'. */
+  declaredStatuses: string[];
+}
+
 export interface FlowGraph {
   flowId?: number;
   steps: DesignStep[];
   links: DesignLink[];
   errorStep?: IStep;
+  /** Set when the Flow is a Handler Flow. */
+  handler?: HandlerInfo;
   /** The saved Links did not form a complete Flow, so they were rebuilt as a chain in Step order. */
   repaired: boolean;
   /** Set when the Flow uses Step types the designer can't edit; the canvas then only shows it. */
@@ -98,19 +109,20 @@ export function routerShape(step: Pick<DesignStep, 'componentType' | 'uri'>): Ro
   return ROUTER_SHAPES[routerKind(step)] ?? list(false, false);
 }
 
-export function loadFlowGraph(flow: IFlow): FlowGraph {
+/** Loads a Flow; with `handler`, as the Handler Flow of that Operation. */
+export function loadFlowGraph(flow: IFlow, handler?: HandlerInfo): FlowGraph {
   const flowSteps = flow.steps ?? [];
   const savedSteps: DesignStep[] = flowSteps.filter(s => KINDS.includes(s.stepType as StepKind)).map(toDesignStep);
   const errorStep = flowSteps.find(s => s.stepType === 'ERROR');
 
   const readOnlyReason = unsupportedReason(flowSteps);
   if (readOnlyReason) {
-    const graph = { flowId: flow.id, steps: savedSteps, links: linksFromSavedLinks(flowSteps, savedSteps), errorStep, repaired: false, readOnlyReason };
+    const graph = { flowId: flow.id, steps: savedSteps, links: linksFromSavedLinks(flowSteps, savedSteps), errorStep, handler, repaired: false, readOnlyReason };
     return arrangedIfUnplaced(graph);
   }
 
   const placed = withPlaceholders(savedSteps);
-  const saved = { flowId: flow.id, steps: placed, links: linksFromSavedLinks(flowSteps, placed), errorStep, repaired: false };
+  const saved = { flowId: flow.id, steps: placed, links: linksFromSavedLinks(flowSteps, placed), errorStep, handler, repaired: false };
   if (isValidTree(saved)) {
     return arrangedIfUnplaced(saved);
   }
@@ -317,6 +329,17 @@ export function appendStep(graph: FlowGraph, afterKey: string, kind: 'ACTION' | 
     return rejected('A Step can only be added after a Source or Action that has no next Step yet.');
   }
 
+  if (componentType === RESPONSE_COMPONENT) {
+    if (!graph.handler) {
+      return rejected('Only a Handler Flow ends a request with a Response.');
+    }
+    if (kind !== 'SINK' || !endsRequest(graph, afterKey)) {
+      return rejected('This Branch returns to its Router, so it can\'t answer the request: end it with an ordinary Sink.');
+    }
+    const response: DesignStep = { key: nextKey(), kind: 'SINK', componentType: RESPONSE_STEP_COMPONENT, options: 'status=200', ...nextColumnPosition(graph.steps, after) };
+    return accepted({ ...graph, steps: [...graph.steps, response], links: [...graph.links, plainLink(after.key, response.key)] });
+  }
+
   const appended: DesignStep = { key: nextKey(), kind, componentType, ...nextColumnPosition(graph.steps, after) };
   let steps = [...graph.steps, appended];
   let links = [...graph.links, plainLink(after.key, appended.key)];
@@ -465,6 +488,9 @@ export function changeComponent(graph: FlowGraph, key: string, componentType: st
   if (!target) {
     return rejected('There is no such Step.');
   }
+  if (isLockedSource(graph, key)) {
+    return rejected(LOCKED_SOURCE);
+  }
   if (target.kind === 'ROUTER' && !sameBranches(routerShape(target), routerShape({ componentType }))) {
     return rejected(`A ${componentType} Router has different Branches; delete this Router and insert a new one instead.`);
   }
@@ -486,7 +512,57 @@ export type LinkSettings = Pick<DesignLink, 'rule' | 'language' | 'expression' |
 
 export function updateStep(graph: FlowGraph, key: string, settings: Partial<StepSettings>): EditResult {
   const target = graph.steps.find(s => s.key === key);
+  if (target && isLockedSource(graph, key)) {
+    return rejected(LOCKED_SOURCE);
+  }
   return target ? accepted(replaceStep(graph, { ...target, ...settings })) : rejected('There is no such Step.');
+}
+
+/** The picker's entry for a Response; it is stored as a setmessage Sink (see response.ts). */
+export const RESPONSE_COMPONENT = 'response';
+export const RESPONSE_STEP_COMPONENT = 'setmessage';
+
+const LOCKED_SOURCE = "The Source of a Handler Flow is its Operation: change the method or path on the Operation's API page.";
+
+/** A Handler Flow's Source is its Operation, edited from the API; on the canvas it can't be swapped or edited. */
+export function isLockedSource(graph: FlowGraph, key: string): boolean {
+  return !!graph.handler && graph.steps.some(s => s.key === key && s.kind === 'SOURCE');
+}
+
+/**
+ * Whether a Step is on a part of the Flow that ends the request: every part does, except a Branch that returns to its
+ * Router (the named Branch of enrich, split, loop and dowhile Routers) and the wiretap Branch.
+ */
+export function endsRequest(graph: FlowGraph, key: string): boolean {
+  let link = graph.links.find(l => l.to === key);
+  while (link) {
+    if (returnsFromBranch(graph, link)) {
+      return false;
+    }
+    const from = link.from;
+    link = graph.links.find(l => l.to === from);
+  }
+  return true;
+}
+
+function returnsFromBranch(graph: FlowGraph, link: DesignLink): boolean {
+  const router = routerOf(graph, link);
+  if (!router || !link.rule) {
+    return false;
+  }
+  const shape = routerShape(router);
+  return shape.slots === 'fixed' && link.rule === shape.branch && (shape.returnsToRouter || routerKind(router) === 'wiretap');
+}
+
+/** A Response: in a Handler Flow, a setmessage Sink without a Message of its own, on a part that ends the request. */
+export function isResponse(graph: FlowGraph, step: DesignStep): boolean {
+  return (
+    !!graph.handler &&
+    step.kind === 'SINK' &&
+    step.componentType?.toLowerCase() === RESPONSE_STEP_COMPONENT &&
+    !step.messageId &&
+    endsRequest(graph, step.key)
+  );
 }
 
 export function moveStep(graph: FlowGraph, key: string, x: number, y: number): EditResult {
@@ -570,8 +646,9 @@ export function problems(graph: FlowGraph, pathRules?: PathRules): Problem[] {
     .filter(s => !(s.componentType || s.uri))
     .map(s => ({ stepKey: s.key, message: 'Choose a component for this Step.' }));
 
+  // The Operation Source of a Handler Flow has its method and path as options, written from the Operation.
   const pathProblems: Problem[] = graph.steps.flatMap(s => {
-    const rule = s.componentType ? pathRules?.(s.componentType) : undefined;
+    const rule = s.componentType && !isLockedSource(graph, s.key) ? pathRules?.(s.componentType) : undefined;
     const missing = rule ? missingPathParts(rule, s.uri) : [];
     return missing.length ? [{ stepKey: s.key, message: `Fill in the ${missing.join(' and ')} in the path.` }] : [];
   });
@@ -582,7 +659,40 @@ export function problems(graph: FlowGraph, pathRules?: PathRules): Problem[] {
     .filter(l => !l.expression && takesCondition(graph, l.to))
     .map(l => ({ linkTo: l.to, message: `Give the ${l.rule} Branch a Condition.` }));
 
-  return [...stepProblems, ...pathProblems, ...openEndProblems, ...linkProblems];
+  const responseProblems: Problem[] = graph.handler
+    ? graph.steps
+        .filter(s => s.kind === 'SINK' && (s.componentType || s.uri) && endsRequest(graph, s.key) && !isResponse(graph, s))
+        .map(s => ({ stepKey: s.key, message: 'This Branch ends the request: end it with a Response, so the caller gets an answer.' }))
+    : [];
+
+  const statusProblems: Problem[] = graph.steps
+    .filter(s => isResponse(graph, s) && !isHttpStatus(responseSettings(s).status))
+    .map(s => ({ stepKey: s.key, message: 'Give the Response a status from 100 to 599.' }));
+
+  return [...stepProblems, ...pathProblems, ...openEndProblems, ...linkProblems, ...responseProblems, ...statusProblems];
+}
+
+function isHttpStatus(status: string): boolean {
+  return /^[1-5]\d\d$/.test(status);
+}
+
+/**
+ * What doesn't keep a Flow from running but may not be meant: a Response whose status isn't one of the Operation's
+ * Declared responses, while it declares any (a declared `default` covers every status).
+ */
+export function warnings(graph: FlowGraph): Problem[] {
+  const declared = graph.handler?.declaredStatuses ?? [];
+  if (graph.readOnlyReason || !declared.length || declared.includes('default')) {
+    return [];
+  }
+  return graph.steps
+    .filter(s => isResponse(graph, s))
+    .map(s => ({ step: s, status: responseSettings(s).status }))
+    .filter(({ status }) => isHttpStatus(status) && !declared.includes(status))
+    .map(({ step, status }) => ({
+      stepKey: step.key,
+      message: `${status} isn't a Declared response of ${graph.handler!.method} ${graph.handler!.fullPath} (${declared.join(', ')}).`,
+    }));
 }
 
 /** A Flow is a Draft while anything in it is incomplete. A Draft can be saved but not started. */
