@@ -90,6 +90,14 @@ public class FlowServiceImpl implements FlowService {
             .map(flowMapper::toDto);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<FlowDTO> findByName(String name) {
+        log.debug("Request to get Flow by name : {}", name);
+        return flowRepository.findByName(name)
+            .map(flowMapper::toDto);
+    }
+
     /**
      * Delete the flow by id.
      *

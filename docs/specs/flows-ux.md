@@ -102,7 +102,7 @@ Small changes that work with any Camel component, no rewrite. They target the **
 
 ### Import from file
 
-- Uses the existing single-Flow import (`POST /environment/{integrationId}/flow/{flowId}`, `Import.convertFlowConfigurationToDB`). **Verified:** `{flowId}` picks which `<flow>` in the file to import, so the dialog reads it from the file. The import matches Flows by name: it creates a Flow when none has that name, and otherwise updates the one that does. An export ends in `</dil>`, which the import used to skip (it read a stale field), so importing an export failed until that was fixed.
+- Uses the existing single-Flow import (`POST /environment/{integrationId}/flow/{flowId}`, `Import.convertFlowConfigurationToDB`). **Verified:** `{flowId}` picks which `<flow>` in the file to import, so the dialog reads it from the file. The import matches Flows by name: it creates a Flow when none has that name, and otherwise replaces the one that does. Before replacing, the dialog looks the name up (`GET /flows/byname?name=`) and asks the user to confirm. An export ends in `</dil>`, which the import used to skip (it read a stale field), so importing an export failed until that was fixed.
 
 ### Alerts
 

@@ -44,6 +44,14 @@ public interface FlowService {
     Optional<FlowDTO> findOne(Long id);
 
     /**
+     * Get the flow with this name.
+     *
+     * @param name the name of the entity
+     * @return the entity
+     */
+    Optional<FlowDTO> findByName(String name);
+
+    /**
      * Delete the "id" flow.
      *
      * @param id the id of the entity

@@ -18,6 +18,15 @@
   @if (importing(); as fileName) {
     <p class="mt-3 mb-0" role="status"><fa-icon icon="spinner" animation="spin" /> Importing {{ fileName }}…</p>
   }
+  @if (pendingReplace(); as pending) {
+    <div class="alert alert-warning mt-3 mb-0" role="alert">
+      <p class="mb-2">A Flow named {{ pending.flow.name }} already exists. Importing {{ pending.fileName }} replaces it.</p>
+      <button type="button" class="btn btn-fx btn-fx-primary btn-sm me-2" (click)="confirmReplace()">
+        Replace {{ pending.flow.name }}
+      </button>
+      <button type="button" class="btn btn-fx btn-fx-secondary btn-sm" (click)="cancelReplace()">Keep the existing Flow</button>
+    </div>
+  }
   @if (importError(); as error) {
     <div class="alert alert-danger mt-3 mb-0" role="alert">{{ error }}</div>
   }

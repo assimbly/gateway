@@ -21,6 +21,8 @@ export class NewFlowDialogComponent {
 
   readonly importing = signal<string | null>(null);
   readonly importError = signal<string | null>(null);
+  /** An import that would replace the Flow with the same name, waiting for the user to confirm it. */
+  readonly pendingReplace = signal<PendingImport | null>(null);
 
   readonly activeModal = inject(NgbActiveModal);
   private readonly flowService = inject(FlowService);
@@ -41,6 +43,7 @@ export class NewFlowDialogComponent {
 
   async importFile(file: File): Promise<void> {
     this.importError.set(null);
+    this.pendingReplace.set(null);
     let xml: string;
     try {
       xml = await readText(file);
@@ -58,20 +61,59 @@ export class NewFlowDialogComponent {
       return;
     }
 
+    const pending: PendingImport = { fileName: file.name, xml, integrationId: this.integrationId, flow: found };
     this.importing.set(file.name);
-    this.flowService.importFlowConfiguration(this.integrationId, found.id, xml).subscribe({
+    this.flowService.findByName(found.name).subscribe({
       next: () => {
-        this.eventManager.broadcast(new EventWithContent('flowListModification', 'imported'));
-        this.alertService.addAlert({ type: 'success', message: `Imported Flow ${found.name}` });
-        this.activeModal.close();
+        this.importing.set(null);
+        this.pendingReplace.set(pending);
       },
       error: (error: HttpErrorResponse) => {
-        this.importing.set(null);
-        const reason = failureMessage(error);
-        this.importError.set(`Couldn't import ${file.name}${reason ? `: ${reason}` : '.'}`);
+        if (error.status === 404) {
+          this.send(pending, 'Imported');
+        } else {
+          this.fail(pending.fileName, error);
+        }
       },
     });
   }
+
+  confirmReplace(): void {
+    const pending = this.pendingReplace();
+    if (pending) {
+      this.pendingReplace.set(null);
+      this.send(pending, 'Replaced');
+    }
+  }
+
+  cancelReplace(): void {
+    this.pendingReplace.set(null);
+  }
+
+  private send(pending: PendingImport, verb: 'Imported' | 'Replaced'): void {
+    this.importing.set(pending.fileName);
+    this.flowService.importFlowConfiguration(pending.integrationId, pending.flow.id, pending.xml).subscribe({
+      next: () => {
+        this.eventManager.broadcast(new EventWithContent('flowListModification', 'imported'));
+        this.alertService.addAlert({ type: 'success', message: `${verb} Flow ${pending.flow.name}` });
+        this.activeModal.close();
+      },
+      error: (error: HttpErrorResponse) => this.fail(pending.fileName, error),
+    });
+  }
+
+  private fail(fileName: string, error: HttpErrorResponse): void {
+    this.importing.set(null);
+    const reason = failureMessage(error);
+    this.importError.set(`Couldn't import ${fileName}${reason ? `: ${reason}` : '.'}`);
+  }
+}
+
+interface PendingImport {
+  fileName: string;
+  xml: string;
+  integrationId: number;
+  flow: { id: string; name: string };
 }
 
 /** The single Flow in a Flow export, or why the file isn't one. */

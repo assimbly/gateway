@@ -140,6 +140,19 @@ public class FlowResource {
 
 
     /**
+     * GET  /flows/byname?name= : get the flow with this name, for example to check whether an import would replace it.
+     *
+     * @param name the name of the flow
+     * @return the ResponseEntity with status 200 (OK) and with body the flowDTO, or with status 404 (Not Found)
+     */
+    @Operation(summary = "Get a flow by its name")
+    @GetMapping("/flows/byname")
+    public ResponseEntity<FlowDTO> getFlowByName(@RequestParam(value = "name") String name) {
+        log.debug("REST request to get Flow by name : {}", name);
+        return ResponseUtil.wrapOrNotFound(flowService.findByName(name));
+    }
+
+    /**
      * GET  /flows/:id : get the "id" flow.
      *
      * @param id the id of the flowDTO to retrieve

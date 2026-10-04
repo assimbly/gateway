@@ -83,6 +83,7 @@ describe('New Flow dialog', () => {
     const broadcast = jest.spyOn(eventManager, 'broadcast');
 
     await dialog.importFile(new File([flowExport], 'export_flow_Orders to SFTP_20261004.xml'));
+    lookUpExistingFlow().flush(null, { status: 404, statusText: 'Not Found' });
 
     const request = http.expectOne({ method: 'POST', url: 'api/environment/7/flow/12' });
     expect(request.request.body).toBe(flowExport);
@@ -90,6 +91,33 @@ describe('New Flow dialog', () => {
 
     expect(activeModal.close).toHaveBeenCalled();
     expect(broadcast).toHaveBeenCalledWith(expect.objectContaining({ name: 'flowListModification' }));
+  });
+
+  it('asks before replacing a Flow with the same name, and replaces it once confirmed', async () => {
+    await dialog.importFile(new File([flowExport], 'export.xml'));
+    lookUpExistingFlow().flush({ id: 3, name: 'Orders to SFTP' });
+    fixture.detectChanges();
+
+    http.expectNone('api/environment/7/flow/12');
+    expect(fixture.nativeElement.textContent).toContain('A Flow named Orders to SFTP already exists');
+
+    buttonNamed('Replace Orders to SFTP').click();
+
+    http.expectOne({ method: 'POST', url: 'api/environment/7/flow/12' }).flush('Flow configuration set');
+    expect(activeModal.close).toHaveBeenCalled();
+  });
+
+  it('leaves the existing Flow alone when replacing it is cancelled', async () => {
+    await dialog.importFile(new File([flowExport], 'export.xml'));
+    lookUpExistingFlow().flush({ id: 3, name: 'Orders to SFTP' });
+    fixture.detectChanges();
+
+    buttonNamed('Keep the existing Flow').click();
+    fixture.detectChanges();
+
+    http.expectNone('api/environment/7/flow/12');
+    expect(activeModal.close).not.toHaveBeenCalled();
+    expect(fixture.nativeElement.textContent).not.toContain('already exists');
   });
 
   it.each([
@@ -106,6 +134,7 @@ describe('New Flow dialog', () => {
 
   it('stays open and says why when the Gateway rejects the import', async () => {
     await dialog.importFile(new File([flowExport], 'export.xml'));
+    lookUpExistingFlow().flush(null, { status: 404, statusText: 'Not Found' });
 
     http
       .expectOne('api/environment/7/flow/12')
@@ -115,6 +144,19 @@ describe('New Flow dialog', () => {
     expect(activeModal.close).not.toHaveBeenCalled();
     expect(fixture.nativeElement.textContent).toContain("Couldn't import export.xml");
   });
+
+  function lookUpExistingFlow() {
+    return http.expectOne(request => request.url === 'api/flows/byname' && request.params.get('name') === 'Orders to SFTP');
+  }
+
+  function buttonNamed(name: string): HTMLElement {
+    const buttons: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('button'));
+    const button = buttons.find(element => element.textContent?.trim() === name);
+    if (!button) {
+      throw new Error(`No button named ${name}`);
+    }
+    return button;
+  }
 
   function choiceNamed(name: string): HTMLElement {
     const choices: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('a, button'));
