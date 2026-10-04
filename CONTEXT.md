@@ -8,8 +8,23 @@ The Gateway is where users design, configure and run integration Flows. This glo
 A unit of integration logic: a tree of Steps joined by Links, starting at exactly one Source, with Flow-level settings such as error handling. Branches never merge and never loop back.
 _Avoid_: Route (a Route is a separate thing: a hand-written Camel route a Step can refer to)
 
+**Flow type**:
+How a Flow is built, chosen when the Flow is created: **Visual** (Steps on the canvas, no code), **Script** (a Source, a script and an error handler, low code) or **Route** (a single Step that runs a hand-written Route, code). Every Flow has exactly one Flow type, and it never changes.
+_Avoid_: Editor (the screen, not the kind of Flow); calling a Route-type Flow "a Route"
+
+**Flow status**:
+The runtime state of a Flow: Running, Paused, Stopped or Error (it couldn't start, or it stopped because of a failure). A Draft has no Flow status, because it can't run.
+_Avoid_: Failed (that word counts failed messages), Active, Inactive
+
+**Alert**:
+An error a Flow reported while running. It stays until someone clears it, and clearing it clears it for everyone.
+
+**Test message**:
+A message a user composes by hand and sends to an endpoint, usually a Flow's Source, to try the Flow out.
+_Avoid_: Send, message sender
+
 **Draft**:
-A Flow that has been saved but is not yet complete enough to run: a Step still needs its configuration, or a Branch doesn't end in a Sink yet.
+A Flow that has been saved but is not yet complete enough to run: a Step has no Component yet or is missing a required part of its path, or a Branch doesn't end in a Sink yet. Missing required Options don't make a Flow a Draft.
 
 **Open end**:
 A Source or Action that has no next Step yet. A new Flow is a single open end: its Source.
@@ -60,3 +75,17 @@ A Step where messages leave the Flow. It has one inbound Link and no outbound Li
 **Error Step**:
 The Flow-level error handler. It is part of the Flow's settings, not a node joined by Links.
 _Avoid_: Error node
+
+## Endpoints
+
+**Endpoint**:
+What a Step talks to, written as a Component, a path and Options (`component:path?options`). Every Endpoint is edited the same way, whatever its Component.
+_Avoid_: URI (fine in code), Connection (reusable settings an Endpoint can use)
+
+**Component**:
+The kind of system an Endpoint talks to, such as File, SFTP, HTTP or Kafka. Components come from Apache Camel, and every Component it offers is available.
+_Avoid_: Connector, scheme
+
+**Option**:
+One key–value setting on an Endpoint, such as `delay` = `5000`.
+_Avoid_: Parameter, property
