@@ -638,6 +638,13 @@ export function takesCondition(graph: FlowGraph, linkTo: string): boolean {
 /** The path syntax of a Component, when its schema has been read; without it a Step's path isn't checked. */
 export type PathRules = (componentType: string) => PathRule | undefined;
 
+/** The Components that only run with a Connection, such as a JMS broker or a database. */
+export const COMPONENTS_WITH_CONNECTION: readonly string[] = ['activemq', 'amazonmq', 'amqp', 'amqps', 'jms', 'sjms', 'sjms2', 'sql', 'ibmmq', 'spring-rabbitmq'];
+
+export function needsConnection(componentType: string | undefined): boolean {
+  return !!componentType && COMPONENTS_WITH_CONNECTION.includes(componentType.toLowerCase());
+}
+
 export function problems(graph: FlowGraph, pathRules?: PathRules): Problem[] {
   if (graph.readOnlyReason) {
     return [];
@@ -652,6 +659,10 @@ export function problems(graph: FlowGraph, pathRules?: PathRules): Problem[] {
     const missing = rule ? missingPathParts(rule, s.uri) : [];
     return missing.length ? [{ stepKey: s.key, message: `Fill in the ${missing.join(' and ')} in the path.` }] : [];
   });
+
+  const connectionProblems: Problem[] = graph.steps
+    .filter(s => needsConnection(s.componentType) && !s.connectionId)
+    .map(s => ({ stepKey: s.key, message: 'Choose a Connection for this Step.' }));
 
   const openEndProblems: Problem[] = openEnds(graph).map(s => ({ stepKey: s.key, message: 'Add the next Step: the Flow ends in a Sink.' }));
 
@@ -669,7 +680,7 @@ export function problems(graph: FlowGraph, pathRules?: PathRules): Problem[] {
     .filter(s => isResponse(graph, s) && !isHttpStatus(responseSettings(s).status))
     .map(s => ({ stepKey: s.key, message: 'Give the Response a status from 100 to 599.' }));
 
-  return [...stepProblems, ...pathProblems, ...openEndProblems, ...linkProblems, ...responseProblems, ...statusProblems];
+  return [...stepProblems, ...pathProblems, ...connectionProblems, ...openEndProblems, ...linkProblems, ...responseProblems, ...statusProblems];
 }
 
 function isHttpStatus(status: string): boolean {

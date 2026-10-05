@@ -634,6 +634,14 @@ describe('Flow graph', () => {
       expect(isDraft(withSftpSink('example.com/in'), rules)).toBe(false);
       expect(isDraft(withSftpSink(''))).toBe(false);
     });
+
+    it('is a Draft while a Step whose Component needs a Connection has none', () => {
+      const withSjmsSink = (connectionId?: number): FlowGraph =>
+        loadFlowGraph(flow([step(10, 'SOURCE', [outbound('1-11')]), step(11, 'SINK', [inbound('1-11')], { componentType: 'sjms', uri: 'queue', connectionId })]));
+
+      expect(problems(withSjmsSink())).toEqual([{ stepKey: 'step-11', message: 'Choose a Connection for this Step.' }]);
+      expect(isDraft(withSjmsSink(3))).toBe(false);
+    });
   });
 
   describe('Handler Flows', () => {
