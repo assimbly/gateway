@@ -92,8 +92,23 @@
 
       <div class="row">
         <div class="col-10">
-          <div class="float-start text-start">
-            <h5 class="border-bottom">{{ step.stepType === 'ERROR' ? 'ERROR HANDLER' : step.stepType }}</h5></div>
+          @if (isRouteStep) {
+            <div class="step-name text-start">
+              <label class="step-name__label" for="field_routeName_{{index}}">{{ routeStepLabel }} name</label>
+              <div class="step-name__field" [class.is-invalid]="routeNameMissing">
+                <fa-icon icon="pencil-alt" class="step-name__icon" aria-hidden="true"></fa-icon>
+                <input id="field_routeName_{{index}}" type="text" class="step-name__input" formControlName="routeName"
+                       [placeholder]="stepType === 'ERROR' ? 'e.g. Orders error handler' : 'e.g. Orders route'"
+                       [attr.aria-invalid]="routeNameMissing" autocomplete="off"/>
+              </div>
+              @if (routeNameMissing) {
+                <small class="text-danger">Name the {{ routeStepLabel }} to save it.</small>
+              }
+            </div>
+          } @else {
+            <div class="float-start text-start">
+              <h5 class="border-bottom">{{ step.stepType === 'ERROR' ? 'ERROR HANDLER' : step.stepType }}</h5></div>
+          }
         </div>
         <div class="col-2" *ngIf="canRemoveStep">
           <button title="Remove step" type="button" *ngIf="onCanvas || index > 0"
@@ -311,76 +326,40 @@
 
       </div>
 
-      <!-- route -->
-      <div class="row" *ngIf="stepType =='ROUTE'">
+      <!-- route and, in a Route Flow, the error handler -->
+      <div class="row" *ngIf="isRouteStep">
 
         <div class="col-12">
-          <label class="form-control-label float-start" for="field_route" style="float: left; margin-left: 6px;">Route</label>
+          <label class="form-control-label float-start" for="field_routeContent_{{index}}" style="float: left; margin-left: 6px;">Route</label>
+          @if (stepType === 'ERROR') {
+            <i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info"
+               [popover]="errorHandlerPopover" style="float: left; margin-left: 6px;">
+              <fa-icon icon="info-circle"></fa-icon>
+            </i>
+          }
         </div>
         <div class="col-10">
-          <ng-select [items]="routes" bindLabel="name" bindValue="id" formControlName="route"
-                     id="field_route" dropdownPosition="top" style="text-align: left;"></ng-select>
+          <ngx-codemirror
+            class="route-codemirror-inline"
+            id="field_routeContent_{{index}}"
+            formControlName="routeContent"
+            [options]="routeEditorOptions()"
+            (codeMirrorLoaded)="refreshCodeMirror($event)">
+          </ngx-codemirror>
+          @if (routeContentMissing) {
+            <div class="invalid-field-message">*Route is required.</div>
+          }
         </div>
         <button title="Edit route" type="button" aria-label="Edit route"
                 class="col-2 btn btn-fx btn-fx-ghost btn-fx-icon"
-                *ngIf="routeCreated && routeValue"
                 (click)="onCreateOrEditRoute()">
           <fa-icon icon="edit"></fa-icon>
-        </button>
-        <button title="New route" type="button" aria-label="New route"
-                class="col-2 btn btn-fx btn-fx-ghost btn-fx-icon"
-                *ngIf="routeCreated && !routeValue"
-                (click)="onCreateOrEditRoute()">
-          <fa-icon icon="plus"></fa-icon>
-        </button>
-        <button title="Create route" type="button" aria-label="Create route" *ngIf="!routeCreated"
-                class="col-2 btn btn-fx btn-fx-ghost btn-fx-icon"
-                (click)="onCreateOrEditRoute()">
-          <fa-icon icon="plus"></fa-icon>
         </button>
 
         <div class="col-12">
           <ng-container *ngTemplateOutlet="addStepMenu"></ng-container>
         </div>
 
-      </div>
-
-      <!-- error -->
-      <div class="row" *ngIf="stepType =='ERROR' && activeEditor =='route'">
-
-        <div class="col-12">
-          <label class="form-control-label float-start" for="field_errorhandler" style="float: left; margin-left: 6px;">Error Handler</label>
-          <i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info"
-             [popover]="errorHandlerPopover" style="float: left; margin-left: 6px;">
-            <fa-icon icon="info-circle"></fa-icon>
-          </i>
-        </div>
-
-        <div class="col-10" >
-          <ng-select [items]="routes" bindLabel="name" bindValue="id" formControlName="route"
-                     id="field_route" dropdownPosition="top" style="text-align: left;"></ng-select>
-        </div>
-        <button title="Edit route" type="button" aria-label="Edit route"
-                class="col-2 btn btn-fx btn-fx-ghost btn-fx-icon"
-                *ngIf="routeCreated && routeValue"
-                (click)="onCreateOrEditRoute()">
-          <fa-icon icon="edit"></fa-icon>
-        </button>
-        <button title="New route" type="button" aria-label="New route"
-                class="col-2 btn btn-fx btn-fx-ghost btn-fx-icon"
-                *ngIf="routeCreated && !routeValue"
-                (click)="onCreateOrEditRoute()">
-          <fa-icon icon="plus"></fa-icon>
-        </button>
-        <button title="Create route" type="button" aria-label="Create route" *ngIf="!routeCreated"
-                class="col-2 btn btn-fx btn-fx-ghost btn-fx-icon"
-                (click)="onCreateOrEditRoute()">
-          <fa-icon icon="plus"></fa-icon>
-        </button>
-
-        <div class="col-12">
-          <ng-container *ngTemplateOutlet="addStepMenu"></ng-container>
-        </div>
       </div>
 
       <!-- script -->

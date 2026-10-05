@@ -86,9 +86,9 @@ export class RouteDialogComponent implements OnInit {
 
     ngOnInit() {
 
-        // route is injected in the component (see RoutePopupService);
+        // route is injected in the component (see RoutePopupService); a new one may come with a name and content typed elsewhere.
         if (!this.route.id) {
-            this.route = this.createFromForm();
+            this.route = { ...this.createFromForm(), name: this.route.name ?? '', content: this.route.content ?? '' };
         }
 
         this.updateForm(this.route);
@@ -96,7 +96,12 @@ export class RouteDialogComponent implements OnInit {
         this.routeService.query().subscribe(
             res => {
                 this.routes = res.body;
-                this.routeNames = this.routes.map(h => h.name);
+                this.routeNames = this.routes.filter(h => h.id !== this.route.id).map(h => h.name);
+                // The validator reads the names once they are bound; then a name already taken shows at once.
+                setTimeout(() => {
+                    this.editForm.controls.name.updateValueAndValidity();
+                    this.editForm.controls.name.markAsTouched();
+                });
             },
             res => this.onError(res.body)
         );

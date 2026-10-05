@@ -11,9 +11,9 @@ import { CatalogueEntry, EndpointRole, NO_MATCH, matchRank, roleMismatch, search
 import { OptionSchema, PathPart, ValueField, groupOptions, pathRule, requiredOptions, valueFieldOf } from 'app/shared/camel/endpoint';
 import { IStep } from 'app/shared/model/step.model';
 import { IMessage } from 'app/shared/model/message.model';
-import { Route } from 'app/shared/model/route.model';
 import { Connection } from 'app/shared/model/connection.model';
 import { ThemeService } from 'app/core/theme';
+import { isRouteStep, missingRouteFields } from './route-step';
 
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/mode/groovy/groovy';
@@ -21,6 +21,7 @@ import 'codemirror/mode/clike/clike';
 import 'codemirror/mode/python/python';
 import 'codemirror/mode/xml/xml';
 import 'codemirror/addon/display/placeholder';
+import 'codemirror/addon/edit/closetag';
 
 @Injectable()
 export class StepEditorRegistry {
@@ -54,10 +55,8 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   @Input() actionComponentsNames: Array<any> = [];
   @Input() languageComponentsNames: Array<any> = [];
 
-  @Input() routes: Route[] = [];
   @Input() messages: IMessage[] = [];
   @Input() connections: Connection[] = [];
-  @Input() routeCreated = false;
   @Input() messageCreated = false;
   @Input() connectionCreated = false;
 
@@ -82,7 +81,8 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   @Output() addStep = new EventEmitter<{ step: IStep; index: number }>();
   @Output() addConnection = new EventEmitter<{ step: IStep; index: number }>();
   @Output() componentTypeChange = new EventEmitter<{ step: IStep; index: number; componentType: any }>();
-  @Output() createOrEditRoute = new EventEmitter<{ step: IStep; control: AbstractControl }>();
+  /** Opens the large Route editor on the Step's form, which holds its Route as `route`, `routeName` and `routeContent`. */
+  @Output() createOrEditRoute = new EventEmitter<{ step: IStep; form: FormGroup }>();
   @Output() createOrEditMessage = new EventEmitter<{ step: IStep; control: AbstractControl }>();
   @Output() createOrEditConnection = new EventEmitter<{ step: IStep; connectionType: string; control: AbstractControl }>();
 
@@ -91,6 +91,8 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   private scriptOptionsCache: Record<string, unknown> | null = null;
   private pathOptionsKey = '';
   private pathOptionsCache: Record<string, unknown> | null = null;
+  private routeOptionsTheme = '';
+  private routeOptionsCache: Record<string, unknown> | null = null;
 
   @ViewChild('scriptEditor')
   set scriptEditor(editor: CodemirrorComponent | undefined) {
@@ -294,10 +296,6 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
     return this.stepForm?.get('uri')?.value;
   }
 
-  get routeValue(): any {
-    return this.stepForm?.get('route')?.value;
-  }
-
   get messageValue(): any {
     return this.stepForm?.get('message')?.value;
   }
@@ -308,10 +306,6 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
 
   get connectionDisabled(): boolean {
     return !!this.stepForm?.get('connection')?.disabled;
-  }
-
-  get routeControl(): AbstractControl {
-    return this.stepForm.get('route');
   }
 
   get messageControl(): AbstractControl {
@@ -354,6 +348,27 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
     return this.stepType === 'ACTION' || this.stepType === 'ROUTER' || this.stepType === 'SCRIPT' || this.stepType === 'ROUTE';
   }
 
+  /** A Route, or the Error handler of a Route Flow: a name and a Camel route in XML. */
+  get isRouteStep(): boolean {
+    return isRouteStep(this.stepType, this.activeEditor);
+  }
+
+  get routeStepLabel(): string {
+    return this.stepType === 'ERROR' ? 'Error handler' : 'Route';
+  }
+
+  get routeNameMissing(): boolean {
+    return this.formSubmitted && this.missingRouteFields.name;
+  }
+
+  get routeContentMissing(): boolean {
+    return this.formSubmitted && this.missingRouteFields.content;
+  }
+
+  private get missingRouteFields(): { name: boolean; content: boolean } {
+    return missingRouteFields(this.stepType, { name: this.stepForm?.get('routeName')?.value, content: this.stepForm?.get('routeContent')?.value });
+  }
+
   get isComponentStep(): boolean {
     return (
       this.stepType === 'ACTION' ||
@@ -385,7 +400,7 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   }
 
   onCreateOrEditRoute(): void {
-    this.createOrEditRoute.emit({ step: this.step, control: this.routeControl });
+    this.createOrEditRoute.emit({ step: this.step, form: this.stepForm });
   }
 
   onCreateOrEditMessage(): void {
@@ -433,6 +448,23 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
       mode: this.scriptEditorMode(componentType),
     };
     return this.scriptOptionsCache;
+  }
+
+  routeEditorOptions(): Record<string, unknown> {
+    const theme = this.themeService.editorTheme();
+    if (this.routeOptionsCache && this.routeOptionsTheme === theme) {
+      return this.routeOptionsCache;
+    }
+    this.routeOptionsTheme = theme;
+    this.routeOptionsCache = {
+      lineNumbers: true,
+      gutters: ['CodeMirror-linenumbers'],
+      viewportMargin: Infinity,
+      theme,
+      mode: 'xml',
+      autoCloseTags: true,
+    };
+    return this.routeOptionsCache;
   }
 
   pathEditorOptions(): Record<string, unknown> {
