@@ -10,7 +10,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { SortState, sortParams } from 'app/shared/sort';
 import { HasAnyAuthorityDirective } from 'app/shared/auth';
 import { SearchToolbar } from 'app/shared/filter';
-import { DataTable, DataTableColumn, OverflowActionDirective, PrimaryActionDirective, RowActions, Truncate } from 'app/shared/table';
+import { DataTable, DataTableColumn, OverflowActionDirective, RowActions, Truncate } from 'app/shared/table';
 
 import { IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
 import { EnvironmentVariablesDeleteDialogComponent } from './environment-variables-delete-dialog.component';
@@ -29,7 +29,6 @@ import { EnvironmentVariablesService } from './environment-variables.service';
         SearchToolbar,
         DataTable,
         RowActions,
-        PrimaryActionDirective,
         OverflowActionDirective,
         Truncate,
     ],

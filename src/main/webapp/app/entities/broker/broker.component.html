@@ -54,8 +54,40 @@
           <jhi-truncate [text]="rowBroker.name" />
         </a>
       </td>
+      <td>
+        <jhi-status-controls
+          [busy]="disableActionBtns"
+          [tone]="statusTone"
+          [showStart]="!isBrokerStarted"
+          [showStop]="true"
+          [stopDisabled]="isBrokerStopped"
+          [showRestart]="!isBrokerRestarted"
+          (start)="start()"
+          (stop)="stop()"
+          (restart)="restart()"
+        />
+      </td>
       <td class="text-end table-fx-numeric">{{ formatMetric(totalConsumers) }}</td>
       <td class="text-end table-fx-numeric">{{ formatMetric(totalMessages) }}</td>
+      <td>
+        @if (isBrokerStarted) {
+          <button
+            type="button"
+            class="btn btn-fx btn-fx-sm btn-fx-icon btn-fx-ghost"
+            (click)="getBrokerInfo(rowBroker.id)"
+            [ngbPopover]="statsTemplate"
+            popoverTitle="Stats"
+            placement="left"
+            container="body"
+            triggers="click"
+            [autoClose]="'outside'"
+            aria-label="Stats"
+            title="Stats"
+          >
+            <fa-icon icon="chart-bar"></fa-icon>
+          </button>
+        }
+      </td>
       <td class="text-end">
         <jhi-row-actions>
           <button
@@ -67,22 +99,6 @@
           >
             <fa-icon icon="edit"></fa-icon>
             <span>Edit</span>
-          </button>
-          <button
-            jhiPrimaryAction
-            type="button"
-            class="btn btn-fx btn-fx-sm btn-fx-ghost"
-            (click)="getBrokerInfo(rowBroker.id)"
-            [ngbPopover]="statsTemplate"
-            popoverTitle="Stats"
-            placement="left"
-            container="body"
-            triggers="click"
-            [autoClose]="'outside'"
-            aria-label="Stats"
-          >
-            <fa-icon icon="chart-bar"></fa-icon>
-            <span class="d-none d-md-inline">Stats</span>
           </button>
           <button
             jhiOverflowAction
@@ -105,19 +121,6 @@
             <span>Delete</span>
           </button>
         </jhi-row-actions>
-      </td>
-      <td class="text-end">
-        <jhi-status-controls
-          [busy]="disableActionBtns"
-          [tone]="statusTone"
-          [showStart]="!isBrokerStarted"
-          [showStop]="true"
-          [stopDisabled]="isBrokerStopped"
-          [showRestart]="!isBrokerRestarted"
-          (start)="start()"
-          (stop)="stop()"
-          (restart)="restart()"
-        />
       </td>
     </tr>
   </jhi-data-table>
