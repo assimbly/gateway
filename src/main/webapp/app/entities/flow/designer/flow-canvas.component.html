@@ -39,7 +39,12 @@
           }
           <div class="flow-step-kind">{{ kindLabel(step) }}</div>
           <fa-icon class="flow-step-icon" [icon]="kindIcons[step.kind]"></fa-icon>
-          <div class="flow-step-label" [title]="label(step)">{{ label(step) }}</div>
+          @if (operationUrl && isOperation(step)) {
+            <a fDragBlocker class="flow-step-label" [href]="operationUrl" target="_blank" rel="noopener" [title]="'Open ' + operationUrl + ' in a new tab'"
+               (click)="$event.stopPropagation()" (dblclick)="$event.stopPropagation()">{{ label(step) }}</a>
+          } @else {
+            <div class="flow-step-label" [title]="label(step)">{{ label(step) }}</div>
+          }
           @if (problemOf(step); as problem) {
             <span class="flow-step-warning" [title]="problem"><fa-icon icon="exclamation-triangle"></fa-icon></span>
           } @else if (warningOf(step); as warning) {

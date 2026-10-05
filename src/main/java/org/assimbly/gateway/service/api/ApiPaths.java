@@ -79,6 +79,19 @@ public final class ApiPaths {
         return normalize(prefix + normalize(fullPath));
     }
 
+    /**
+     * The id of a Handler Flow Step's problem Route configuration. It starts with the Flow's id, because the runtime
+     * removes a Flow's Route configurations by that prefix when it loads the Flow again.
+     */
+    public static String problemConfigurationId(Long flowId, String stepId) {
+        return flowId + "apiproblem" + stepId;
+    }
+
+    /** Whether a Route configuration's id is a problem Route configuration, also in the form earlier backups have. */
+    public static boolean isProblemConfigurationId(String id) {
+        return id.matches("(\\d+)?apiproblem\\d+");
+    }
+
     private static String nullToEmpty(String value) {
         return value == null ? "" : value;
     }

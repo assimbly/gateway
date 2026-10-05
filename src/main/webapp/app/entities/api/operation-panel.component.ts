@@ -6,7 +6,17 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 
 import { ThemeService } from 'app/core/theme';
-import { DEFAULT_MEDIA_TYPE, IApi, IApiDeclaredResponse, IApiOperation, IApiParameter, ITryResponse, METHODS, PARAMETER_TYPES } from './api.model';
+import {
+  DEFAULT_MEDIA_TYPE,
+  IApi,
+  IApiDeclaredResponse,
+  IApiOperation,
+  IApiParameter,
+  ITryResponse,
+  METHODS,
+  PARAMETER_TYPES,
+  handlerFlowQueryParams,
+} from './api.model';
 import { ApiService, errorMessage } from './api.service';
 import { HandlerFlowState } from './handler-flows.service';
 import { withPathParameters } from './path-parameters';
@@ -29,6 +39,8 @@ export class OperationPanelComponent implements OnChanges {
   /** The Operation to edit; none for a new one. */
   @Input() operation?: IApiOperation;
   @Input() state?: HandlerFlowState;
+  /** The full URL the Operation is served on, once known; its path links to it. */
+  @Input() url?: string;
 
   @Output() saved = new EventEmitter<IApiOperation>();
   @Output() deleted = new EventEmitter<void>();
@@ -68,7 +80,7 @@ export class OperationPanelComponent implements OnChanges {
   ngOnChanges(): void {
     this.draft = this.operation
       ? structuredClone(this.operation)
-      : { method: 'GET', path: '/', parameters: [], declaredResponses: [], flowType: 'flow', requestMediaType: DEFAULT_MEDIA_TYPE, responseMediaType: DEFAULT_MEDIA_TYPE };
+      : { method: 'GET', path: '/', parameters: [], declaredResponses: [], requestMediaType: DEFAULT_MEDIA_TYPE, responseMediaType: DEFAULT_MEDIA_TYPE };
     this.message = undefined;
     this.exampleFor = undefined;
     this.openSchemas = new Set();
@@ -168,10 +180,7 @@ export class OperationPanelComponent implements OnChanges {
     });
   }
 
-  /** The Handler Flow's editor, with the type of editor its Flow type opens in. */
-  handlerFlowQueryParams(): Record<string, unknown> {
-    return { mode: 'edit', editor: this.operation?.flowType || 'flow', id: this.operation?.handlerFlowId };
-  }
+  readonly handlerFlowQueryParams = handlerFlowQueryParams;
 
   parametersIn(where: IApiParameter['in']): IApiParameter[] {
     return (this.operation?.parameters ?? []).filter(p => p.in === where);

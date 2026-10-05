@@ -11,7 +11,7 @@
         [formControl]="nameControl()"
         [attr.aria-invalid]="nameInvalid()"
         [attr.aria-describedby]="nameInvalid() ? 'field_flowName_hint' : null"
-        placeholder="e.g. Orders to SFTP"
+        placeholder="e.g. Orders"
         autocomplete="off"
         required
       />
@@ -70,7 +70,7 @@
         <span [ngbTooltip]="draftReason() ? 'This Flow is a Draft: ' + draftReason() : ''">
           <button type="button" ngbDropdownItem [disabled]="draftReason() !== null" (click)="saveAndStart.emit()">Save &amp; start</button>
         </span>
-        <button type="button" ngbDropdownItem (click)="saveAndReturn.emit()">Save &amp; return to Manage</button>
+        <button type="button" ngbDropdownItem (click)="saveAndReturn.emit()">Save &amp; manage</button>
       </div>
     </div>
   </div>

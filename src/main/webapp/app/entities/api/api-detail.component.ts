@@ -2,26 +2,28 @@ import { Component, OnInit, ViewEncapsulation, inject, signal } from '@angular/c
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { forkJoin } from 'rxjs';
 
 import { flowStatusView } from 'app/entities/flow/flow-status';
-import { IApi, IApiOperation } from './api.model';
+import { IApi, IApiHandler, IApiOperation, handlerFlowQueryParams } from './api.model';
 import { ApiService, errorMessage } from './api.service';
 import { ApiStatus, apiStatus } from './api-status';
-import { ApiRunReport, HandlerFlowState, HandlerFlowsService } from './handler-flows.service';
+import { HandlerFlowState, HandlerFlowsService } from './handler-flows.service';
 import { OperationPanelComponent } from './operation-panel.component';
+import { operationUrl } from './operation-url';
 import { downloadText } from './download';
 
 /**
  * An API: its name, base path and version, and its Operations, each answered by its Handler Flow. Clicking an
- * Operation opens it in the side panel. Start and Stop run every Handler Flow; Drafts are skipped.
+ * Operation opens it in the side panel. The Handler Flows are started and stopped on the Flows page; an API is a design.
  */
 @Component({
   selector: 'jhi-api-detail',
   templateUrl: './api-detail.component.html',
   styleUrl: './api.scss',
   encapsulation: ViewEncapsulation.None,
-  imports: [ReactiveFormsModule, RouterModule, FontAwesomeModule, NgbTooltipModule, OperationPanelComponent],
+  imports: [ReactiveFormsModule, RouterModule, FontAwesomeModule, NgbDropdownModule, NgbTooltipModule, OperationPanelComponent],
 })
 export class ApiDetailComponent implements OnInit {
   private readonly apiService = inject(ApiService);
@@ -36,7 +38,9 @@ export class ApiDetailComponent implements OnInit {
   readonly selected = signal<IApiOperation | 'new' | undefined>(undefined);
   readonly message = signal<string | undefined>(undefined);
   readonly notice = signal<string | undefined>(undefined);
-  readonly running = signal(false);
+  /** The Handler Flows by Flow id, for the runtime path of each Operation. */
+  readonly handlers = signal<Record<number, IApiHandler>>({});
+  readonly listenerUrl = signal<string | undefined>(undefined);
   saving = false;
 
   readonly form = new FormGroup({
@@ -86,6 +90,14 @@ export class ApiDetailComponent implements OnInit {
       this.states.set(states);
       this.status.set(apiStatus([...states.values()]));
     });
+    // The runtime path has the tenant's prefix, so it comes from the Gateway.
+    forkJoin([this.apiService.handlers(), this.apiService.listenerUrl()]).subscribe({
+      next: ([handlers, listener]) => {
+        this.handlers.set(handlers);
+        this.listenerUrl.set(listener);
+      },
+      error: () => undefined,
+    });
   }
 
   saveHeader(): void {
@@ -127,42 +139,6 @@ export class ApiDetailComponent implements OnInit {
     });
   }
 
-  start(): void {
-    this.run(this.handlerFlows.start(this.api()!, this.states()), 'Started');
-  }
-
-  stop(): void {
-    this.run(this.handlerFlows.stop(this.api()!), 'Stopped');
-  }
-
-  private run(action: ReturnType<HandlerFlowsService['stop']>, verb: string): void {
-    this.running.set(true);
-    this.message.set(undefined);
-    this.notice.set(undefined);
-    action.subscribe({
-      next: report => {
-        this.running.set(false);
-        this.reportRun(report, verb);
-        this.refreshStates();
-      },
-      error: error => {
-        this.running.set(false);
-        this.message.set(errorMessage(error));
-      },
-    });
-  }
-
-  private reportRun(report: ApiRunReport, verb: string): void {
-    const parts = [`${verb} ${report.done} ${report.done === 1 ? 'Handler Flow' : 'Handler Flows'}`];
-    if (report.skippedDrafts) {
-      parts.push(`skipped ${report.skippedDrafts} ${report.skippedDrafts === 1 ? 'Draft' : 'Drafts'}`);
-    }
-    this.notice.set(parts.join(', ') + '.');
-    if (report.failed.length) {
-      this.message.set(report.failed.map(f => `${f.operation.method} ${f.operation.fullPath}: ${f.message}`).join('\n'));
-    }
-  }
-
   exportApi(format: 'yaml' | 'json'): void {
     this.apiService.exportDocument(this.api()!.id!, format).subscribe({
       next: ({ text, fileName }) => downloadText(text, fileName, format === 'json' ? 'application/json' : 'application/yaml'),
@@ -189,6 +165,17 @@ export class ApiDetailComponent implements OnInit {
 
   stateLabel(state: HandlerFlowState | undefined): string {
     return state ? flowStatusView(state.status, state.draft).label : '…';
+  }
+
+  /** The full URL the Operation is served on, once known. */
+  urlOf(operation: IApiOperation): string | undefined {
+    const listener = this.listenerUrl();
+    const handler = operation.handlerFlowId ? this.handlers()[operation.handlerFlowId] : undefined;
+    return listener && handler ? operationUrl(listener, handler.runtimePath) : undefined;
+  }
+
+  handlerFlowQueryParams(operation: IApiOperation): Record<string, unknown> {
+    return handlerFlowQueryParams(operation);
   }
 
   onSaved(operation: IApiOperation): void {

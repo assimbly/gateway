@@ -108,6 +108,6 @@ class ApiBackupRoundTripIntTest {
 
         // What the export generates for the runtime isn't imported as Messages or Routes of their own.
         assertThat(messageRepository.findAll()).noneMatch(m -> m.getName().startsWith("response"));
-        assertThat(routeRepository.findAll()).noneMatch(r -> r.getName().startsWith("apiproblem"));
+        assertThat(routeRepository.findAll()).noneMatch(r -> r.getName().contains("apiproblem"));
     }
 }

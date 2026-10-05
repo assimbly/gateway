@@ -1,6 +1,6 @@
 <div class="flow-type-choices">
-  @for (choice of flowTypes; track choice.type) {
-    <a class="flow-type-choice" routerLink="/flow/editor" [queryParams]="{ mode: 'edit', editor: choice.type }" (click)="chosen.emit()">
+  @for (choice of flowTypes; track choice.title) {
+    <a class="flow-type-choice" [routerLink]="choice.link" [queryParams]="choice.queryParams" (click)="chosen.emit()">
       <fa-icon class="flow-type-choice__icon" [icon]="choice.icon" [fixedWidth]="true" />
       <span class="flow-type-choice__text">
         <span class="flow-type-choice__title">{{ choice.title }}</span>

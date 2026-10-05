@@ -141,6 +141,12 @@ public class ApiResource {
         return ResponseUtil.wrapOrNotFound(apiService.handlerOf(flowId));
     }
 
+    @Operation(summary = "The runtime's REST listener as callers reach it; an Operation's URL is this and its runtime path")
+    @GetMapping("/apis/listener")
+    public Map<String, String> getListener(HttpServletRequest request) {
+        return Map.of("url", listenerUrl(request));
+    }
+
     /** The runtime's REST listener as callers reach it: this Gateway's host on the listener's port. */
     private String listenerUrl(HttpServletRequest request) {
         URI listener = URI.create(applicationProperties.getGateway().getRestListenerUrl());

@@ -64,17 +64,15 @@
           <button type="button" class="btn btn-fx btn-fx-primary" (click)="newOperation()">
             <fa-icon icon="plus"></fa-icon> New Operation
           </button>
-          <button type="button" class="btn btn-fx btn-fx-secondary" (click)="start()" [disabled]="running() || !api.operations?.length"
-                  ngbTooltip="Starts every Handler Flow. Drafts are skipped.">
-            <fa-icon icon="play"></fa-icon> Start
-          </button>
-          <button type="button" class="btn btn-fx btn-fx-secondary" (click)="stop()" [disabled]="running() || !api.operations?.length">
-            <fa-icon icon="stop"></fa-icon> Stop
-          </button>
-          <button type="button" class="btn btn-fx btn-fx-ghost" (click)="exportApi('yaml')" ngbTooltip="OpenAPI 3.0.3 YAML">
-            <fa-icon icon="file-export"></fa-icon> Export OpenAPI
-          </button>
-          <button type="button" class="btn btn-fx btn-fx-ghost" (click)="exportApi('json')" ngbTooltip="OpenAPI 3.0.3 JSON">JSON</button>
+          <div ngbDropdown class="d-inline-block">
+            <button type="button" class="btn btn-fx btn-fx-ghost" ngbDropdownToggle id="export-openapi">
+              <fa-icon icon="file-export"></fa-icon> Export OpenAPI
+            </button>
+            <div ngbDropdownMenu aria-labelledby="export-openapi">
+              <button type="button" ngbDropdownItem class="btn-fx-dropdown-item" (click)="exportApi('yaml')">Export as YAML</button>
+              <button type="button" ngbDropdownItem class="btn-fx-dropdown-item" (click)="exportApi('json')">Export as JSON</button>
+            </div>
+          </div>
           <button type="button" class="btn btn-fx btn-fx-ghost" (click)="refreshStates()" aria-label="Refresh the status">
             <fa-icon icon="sync"></fa-icon>
           </button>
@@ -89,18 +87,32 @@
                   <th scope="col">Path</th>
                   <th scope="col">Summary</th>
                   <th scope="col">Handler Flow</th>
+                  <th scope="col">Handler Flow Status</th>
                 </tr>
               </thead>
               <tbody>
                 @for (operation of api.operations; track operation.id) {
                   <tr [class.api-operation--selected]="isSelected(operation)" (click)="select(operation)">
-                    <td><span [class]="methodClass(operation.method)">{{ operation.method }}</span></td>
                     <td>
-                      <button type="button" class="btn btn-link p-0 text-start" (click)="$event.stopPropagation(); select(operation)">
-                        <code>{{ operation.fullPath }}</code>
+                      <button type="button" class="btn btn-link p-0" (click)="$event.stopPropagation(); select(operation)"
+                              [attr.aria-label]="'Edit ' + operation.method + ' ' + operation.fullPath">
+                        <span [class]="methodClass(operation.method)">{{ operation.method }}</span>
                       </button>
                     </td>
+                    <td>
+                      @if (urlOf(operation); as url) {
+                        <a [href]="url" target="_blank" rel="noopener" (click)="$event.stopPropagation()" [ngbTooltip]="'Open ' + url + ' in a new tab'">
+                          <code>{{ operation.fullPath }}</code>
+                        </a>
+                      } @else {
+                        <code>{{ operation.fullPath }}</code>
+                      }
+                    </td>
                     <td class="text-muted">{{ operation.summary }}</td>
+                    <td class="text-nowrap">
+                      <a [routerLink]="['/flow/editor', operation.handlerFlowId]" [queryParams]="handlerFlowQueryParams(operation)"
+                         (click)="$event.stopPropagation()">{{ operation.handlerFlowName }}</a>
+                    </td>
                     <td class="text-nowrap">
                       @let state = stateOf(operation);
                       {{ stateLabel(state) }}
@@ -125,6 +137,7 @@
           [api]="api"
           [operation]="selectedOperation === 'new' ? undefined : selectedOperation"
           [state]="selectedOperation === 'new' ? undefined : stateOf(selectedOperation)"
+          [url]="selectedOperation === 'new' ? undefined : urlOf(selectedOperation)"
           (saved)="onSaved($event)"
           (deleted)="onDeleted()"
           (closed)="selected.set(undefined)"

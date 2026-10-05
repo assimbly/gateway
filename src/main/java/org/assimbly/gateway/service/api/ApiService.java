@@ -115,7 +115,7 @@ public class ApiService {
     }
 
     /**
-     * Creates the Operation and its Handler Flow. With {@code withResponse} false, a Visual Handler Flow is only the
+     * Creates the Operation and its Handler Flow. With {@code withResponse} false, the Handler Flow is only the
      * Operation, as an import makes it: a Draft until a Response is added.
      */
     public ApiOperationDTO createOperation(Long apiId, ApiOperationDTO dto, boolean withResponse) {
@@ -124,7 +124,7 @@ public class ApiService {
         ApiOperation operation = new ApiOperation();
         operation.setApi(api);
         writeOperation(operation, dto);
-        operation.setHandlerFlow(handlerFlows.create(operation, api.getIntegration(), dto.flowType(), withResponse));
+        operation.setHandlerFlow(handlerFlows.create(operation, api.getIntegration(), withResponse));
         api.addOperation(operation);
         return toDto(operationRepository.save(operation));
     }

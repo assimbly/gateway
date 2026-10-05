@@ -39,8 +39,13 @@ export interface IApiOperation {
   declaredResponses: IApiDeclaredResponse[];
   handlerFlowId?: number;
   handlerFlowName?: string;
-  /** `flow` (Visual) or `script`; chosen when the Operation is created. */
+  /** The Handler Flow's type; always `flow` (Visual) for a new Operation. */
   flowType?: string;
+}
+
+/** The Handler Flow's editor, with the type of editor its Flow type opens in. */
+export function handlerFlowQueryParams(operation: IApiOperation): Record<string, unknown> {
+  return { mode: 'edit', editor: operation.flowType || 'flow', id: operation.handlerFlowId };
 }
 
 export interface IApi {

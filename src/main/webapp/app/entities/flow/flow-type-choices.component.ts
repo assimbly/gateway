@@ -4,38 +4,47 @@ import { RouterLink } from '@angular/router';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
-/** A Flow type as stored in `flow.type`, which is also the `editor` query parameter of `/flow/editor`. */
-type FlowType = 'flow' | 'script' | 'route';
-
+/** What a card opens: the editor for a new Flow of a type (the type is also the `editor` query parameter), or the API designer. */
 interface FlowTypeChoice {
-  type: FlowType;
   title: string;
   level: string;
   audience: string;
   icon: IconProp;
+  link: string;
+  queryParams?: { mode: string; editor: 'flow' | 'script' | 'route' };
 }
 
 const FLOW_TYPES: readonly FlowTypeChoice[] = [
   {
-    type: 'flow',
     title: 'Visual',
     level: 'No code · recommended',
     audience: 'Connect Steps on a canvas. For anyone who knows the systems they integrate.',
     icon: 'sitemap',
+    link: '/flow/editor',
+    queryParams: { mode: 'edit', editor: 'flow' },
   },
   {
-    type: 'script',
-    title: 'Script',
-    level: 'Low code',
-    audience: 'A Source, a script and an error handler. For when a few lines of code are quicker.',
-    icon: 'file-alt',
-  },
-  {
-    type: 'route',
     title: 'Camel route',
-    level: 'Code',
+    level: 'Low code',
     audience: 'A hand-written Apache Camel route. For Camel engineers.',
     icon: 'code',
+    link: '/flow/editor',
+    queryParams: { mode: 'edit', editor: 'route' },
+  },
+  {
+    title: 'Script',
+    level: 'Code',
+    audience: 'A Source, a script and an error handler. For when a few lines of code are quicker.',
+    icon: 'file-alt',
+    link: '/flow/editor',
+    queryParams: { mode: 'edit', editor: 'script' },
+  },
+  {
+    title: 'API',
+    level: 'Design',
+    audience: 'Design an OpenAPI contract-first REST API.',
+    icon: 'plug',
+    link: '/rest-apis/new',
   },
 ];
 

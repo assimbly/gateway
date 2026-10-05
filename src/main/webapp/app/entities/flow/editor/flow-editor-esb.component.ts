@@ -22,7 +22,7 @@ import { Step, StepType, IStep } from "app/shared/model/step.model";
 import { Flow, IFlow, LogLevelType } from "app/shared/model/flow.model";
 import { Integration } from "app/shared/model/integration.model";
 import { IMessage } from 'app/shared/model/message.model';
-import { Route } from "app/shared/model/route.model";
+import { IRoute, Route } from "app/shared/model/route.model";
 import { Connection } from 'app/shared/model/connection.model';
 import dayjs from "dayjs/esm";
 import { from, forkJoin, Observable, of, Subscription } from "rxjs";
@@ -42,11 +42,13 @@ import { FlowCanvasComponent, DesignerSelection } from "../designer/flow-canvas.
 import { FlowEditorHeaderComponent } from "./flow-editor-header.component";
 import { sourceStepOf } from "../flow-status";
 import { automaticErrorHandlerPath, defaultErrorHandlerStep, errorHandlerPath, errorHandlerPathOnSave } from "./error-handler";
+import { isRouteStep, missingRouteFields, routeToSave } from "./route-step";
 import { ComponentSchemas } from "../component-schemas.service";
 import { LinkEditorComponent } from "../designer/link-editor.component";
 import { ResponseEditorComponent } from "./response-editor.component";
 import { CallFlowEditorComponent, callableFlows } from "./call-flow-editor.component";
 import { ApiService } from "app/entities/api/api.service";
+import { operationUrl } from "app/entities/api/operation-url";
 import { IApiHandler } from "app/entities/api/api.model";
 import { FlowGraphHistory } from "../designer/flow-graph-history";
 import {
@@ -54,6 +56,7 @@ import {
   appendStep,
   autoArrange,
   canDeleteStep,
+  COMPONENTS_WITH_CONNECTION,
   deleteBranch,
   deleteStep,
   DesignLink,
@@ -129,6 +132,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 	/** The API and Operation this Flow handles, when it is a Handler Flow: its Source is that Operation. */
 	handler?: IApiHandler;
+	/** The full URL a Handler Flow's Operation is served on; the Operation links to it. */
+	operationUrl?: string;
 	/** The Flows a Call Flow Step can call: those with a flowlink Source. */
 	callableFlows: IFlow[] = [];
 	routes: Route[];
@@ -144,7 +149,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
   public stepTypes = ["SOURCE", "ACTION", "SINK", "ROUTE", "SCRIPT", "CONNECTION", "ERROR"];
   public languageComponentsNames: Array<any> = ['groovy', 'python', 'javascript', 'simple', 'jslt','xslt'];
-  public componentsWithConnection: Array<any> = ['activemq','amazonmq','amqp','amqps','jms','sjms','sjms2','sql','ibmmq','spring-rabbitmq'];
+  public componentsWithConnection: readonly string[] = COMPONENTS_WITH_CONNECTION;
 
 	panelCollapsed: any = "uno";
 	public isCollapsed = true;
@@ -175,7 +180,6 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	predicate: any;
 	reverse: any;
 
-	routeCreated: boolean;
   connectionCreated: boolean;
   messageCreated: boolean;
   errorStep: boolean = true;
@@ -335,7 +339,6 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
           this.messageCreated = this.messages.length > 0;
 
 					this.routes = routes.body;
-					this.routeCreated = this.routes.length > 0;
 
           this.connections = connections.body;
           this.connectionCreated = this.connections.length > 0;
@@ -363,6 +366,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 									// A clone is an ordinary Flow: its Source becomes a placeholder (see clone()).
 									this.handler = isCloning ? undefined : handler;
 									this.clonedHandler = isCloning ? handler : undefined;
+									this.loadOperationUrl();
 									this.callableFlows = callableFlows(flows.body ?? [], this.flow.id);
 									if (this.singleIntegration) {
 										this.flow.integrationId = this.integrations[this.indexIntegration].id;
@@ -855,6 +859,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
       options: new FormArray([this.initializeOption()]),
       message: new FormControl(step.messageId),
 			route: new FormControl(step.routeId),
+			routeName: new FormControl(this.routeOf(step.routeId)?.name ?? ''),
+			routeContent: new FormControl(this.routeOf(step.routeId)?.content ?? ''),
 			connection: new FormControl(step.connectionId),
 			links: new FormControl(step.links),
 		});
@@ -914,6 +920,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			uri: step.uri,
 			message: step.messageId,
 			route: step.routeId,
+			routeName: this.routeOf(step.routeId)?.name ?? '',
+			routeContent: this.routeOf(step.routeId)?.content ?? '',
 			connection: step.connectionId,
 			links: new FormControl(step.links),
 		});
@@ -1353,66 +1361,73 @@ splitOptions4(options: string): string[] {
     );
   }
 
-	createOrEditRoute(step, formRoute: AbstractControl): void {
-		step.routeId = formRoute.value;
-
-		if (
-			typeof step.routeId === "undefined" ||
-			step.routeId === null ||
-			!step.routeId
-		) {
-			const modalRef = this.routePopupService.open(
-				RouteDialogComponent as Component,
-				null,
-				this.flow.type
-			);
-			modalRef.then(
-				(res) => {
-					res.result.then(
-						(result) => {
-							this.setRoute(step, result.id, formRoute);
-						},
-						(reason) => {
-							this.setRoute(step, reason.id, formRoute);
-						},
-					);
-				},
-			);
-		} else {
-			const modalRef = this.routePopupService.open(
-				RouteDialogComponent as Component,
-				step.routeId,
-				this.flow.type
-			);
-			modalRef.then(
-				(res) => {
-					// Success
-					res.result.then(
-						(result) => {
-							this.setRoute(step, result.id, formRoute);
-						},
-						(reason) => {
-							this.setRoute(step, reason.id, formRoute);
-						},
-					);
-				},
-			);
-		}
+	/**
+	 * Opens the large Route editor with the Route as typed in the Step. A Route saved there is the Step's Route from
+	 * then on; closing it without saving keeps what the Step has.
+	 */
+	createOrEditRoute(step: IStep, form: FormGroup): void {
+		const typed: IRoute = {
+			...this.routeOf(form.value.route),
+			name: form.value.routeName ?? '',
+			content: form.value.routeContent ?? '',
+		};
+		const modalRef = this.routePopupService.routeModalRef(RouteDialogComponent, typed, this.flow.type);
+		modalRef.result.then(
+			(route: IRoute) => this.setRoute(step, form, route),
+			(route: IRoute | string) => this.setRoute(step, form, route),
+		);
 	}
 
-	setRoute(step, id, formRoute: AbstractControl): void {
-		this.routeService
-			.getAllRoutes()
-			.subscribe(
-				(res) => {
-					this.routes = res.body;
-					this.routeCreated = this.routes.length > 0;
-					step.routeId = id;
-					formRoute.patchValue(id);
-					step = null;
-				},
-				(res) => this.onError(res.body),
+	private setRoute(step: IStep, form: FormGroup, route: IRoute | string | undefined): void {
+		if (typeof route !== 'object' || !route?.id) {
+			return;
+		}
+		if (form.value.route !== route.id) {
+			form.markAsDirty();
+		}
+		step.routeId = route.id;
+		form.patchValue({ route: route.id, routeName: route.name, routeContent: route.content });
+		this.routeService.getAllRoutes().subscribe({
+			next: res => (this.routes = res.body),
+			error: res => this.onError(res.body),
+		});
+	}
+
+	private routeOf(id: number | null | undefined): IRoute | undefined {
+		return id ? this.routes?.find(route => route.id === id) : undefined;
+	}
+
+	/** Saves the Routes as typed in the Flow's Route Steps, and gives each Step the id of its Route. */
+	private saveRoutes$(): Observable<unknown> {
+		const stepsData = this.editFlowForm.controls.stepsData as FormArray;
+		const saves = this.steps.map((step, index) => {
+			const form = stepsData.at(index) as FormGroup;
+			if (!isRouteStep(step.stepType, this.activeEditor)) {
+				return of(null);
+			}
+			const fields = { name: form.value.routeName, content: form.value.routeContent };
+			if (!fields.name?.trim() && !fields.content?.trim()) {
+				// An Error handler left empty has no Route.
+				step.routeId = null;
+				form.patchValue({ route: null });
+				return of(null);
+			}
+			const route = routeToSave(fields, this.routeOf(step.routeId));
+			if (!route) {
+				return of(null);
+			}
+			return (route.id ? this.routeService.update(route) : this.routeService.create(route)).pipe(
+				map(saved => {
+					step.routeId = saved.body.id;
+					form.patchValue({ route: saved.body.id });
+					return saved;
+				}),
 			);
+		});
+		return forkJoin(saves).pipe(
+			switchMap(() => this.routeService.getAllRoutes()),
+			map(res => (this.routes = res.body)),
+		);
 	}
 
   createOrEditConnection(step, connectionType: string, formConnection: AbstractControl): void {
@@ -1520,6 +1535,11 @@ splitOptions4(options: string): string[] {
 	}
 
 	save(then: AfterSave = 'stay'): any {
+		// Save & manage always ends on Manage: a Flow without unsaved changes has nothing to save first.
+		if (then === 'return' && this.flow?.id && !this.hasUnsavedChanges) {
+			this.router.navigate(['/']);
+			return;
+		}
 
 		this.afterSaveAction = then;
 		this.savedFlowName = this.flow.name;
@@ -1540,6 +1560,16 @@ splitOptions4(options: string): string[] {
 
 		if (this.useCanvas) {
 		  this.saveDesigner();
+		} else if (this.steps.some(step => isRouteStep(step.stepType, this.activeEditor))) {
+		  this.saveRoutes$()
+		    .pipe(takeUntilDestroyed(this.destroyRef))
+		    .subscribe({
+		      next: () => (this.flow.id ? this.updateFlow() : this.createFlow()),
+		      error: () => {
+		        this.savingFlowFailedMessage = 'The Routes could not be saved. Give each Route a name no other Route has.';
+		        this.savingFlowFailed = true;
+		      },
+		    });
 		} else if (this.flow.id) {
 		  this.updateFlow();
 		} else {
@@ -1706,10 +1736,16 @@ splitOptions4(options: string): string[] {
 	}
 
   checkForm(){
+      const stepsData = this.editFlowForm.controls.stepsData as FormArray;
       this.steps.forEach(
-      				(step: Step) => {
-      					if(step.routeId == null && step.stepType === StepType.ROUTE){
-                    this.savingFlowFailedMessage = 'Routes cannot be empty.';
+      				(step: Step, index) => {
+      					if (!isRouteStep(step.stepType, this.activeEditor)) {
+      						return;
+      					}
+      					const form = stepsData.at(index).value;
+      					const missing = missingRouteFields(step.stepType, { name: form.routeName, content: form.routeContent });
+      					if (missing.name || missing.content) {
+                    this.savingFlowFailedMessage = missing.name ? 'Name each Route.' : 'Routes cannot be empty.';
                     this.savingFlowFailed = true;
       					}
       				},
@@ -1788,6 +1824,22 @@ splitOptions4(options: string): string[] {
 
 	/** Set while a Handler Flow is being cloned: the clone's Source becomes a placeholder. */
 	private clonedHandler?: IApiHandler;
+
+	/** The Operation's URL is the runtime's REST listener and the Operation's runtime path. */
+	private loadOperationUrl(): void {
+		const handler = this.handler;
+		this.operationUrl = undefined;
+		if (!handler) {
+			return;
+		}
+		this.apiService.listenerUrl().subscribe({
+			next: (listener) => {
+				this.operationUrl = operationUrl(listener, handler.runtimePath);
+				this.cdr.markForCheck();
+			},
+			error: () => undefined,
+		});
+	}
 
 	/** What the side panel edits the Step at this index with. */
 	panelFor(index: number): 'operation' | 'response' | 'callFlow' | 'step' {
@@ -2206,7 +2258,7 @@ splitOptions4(options: string): string[] {
 	}
 
 	/**
-	 * Save & return goes back to Manage. Otherwise the editor stays: the URL gets the Flow's id (a new Flow only has
+	 * Save & manage goes back to Manage. Otherwise the editor stays: the URL gets the Flow's id (a new Flow only has
 	 * one now), and the Flow is loaded again so every Step has its saved id. Save & start then starts it; a failed
 	 * start shows as Error.
 	 */

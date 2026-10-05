@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, forkJoin, map, of } from 'rxjs';
 
 import { FlowService } from 'app/entities/flow/flow.service';
-import { RuntimeStatus, failureOfError, flowFailureOf, runtimeStatusOf } from 'app/entities/flow/flow-status';
+import { RuntimeStatus, runtimeStatusOf } from 'app/entities/flow/flow-status';
 import { isDraft, loadFlowGraph, opensOnCanvas } from 'app/entities/flow/designer/flow-graph';
 import { IApi, IApiOperation } from './api.model';
 
@@ -12,16 +12,9 @@ export interface HandlerFlowState {
   draft: boolean;
 }
 
-/** What starting or stopping a whole API did. */
-export interface ApiRunReport {
-  done: number;
-  skippedDrafts: number;
-  failed: { operation: IApiOperation; message: string }[];
-}
-
 /**
- * The Handler Flows of an API, read and run Flow by Flow. Whether a Flow is a Draft is only known from its design, so
- * starting an API is done here: the Drafts are skipped and counted.
+ * The Handler Flows of an API, read Flow by Flow. Whether a Flow is a Draft is only known from its design. The Flows
+ * are started and stopped on their own pages; an API has no Start or Stop.
  */
 @Injectable({ providedIn: 'root' })
 export class HandlerFlowsService {
@@ -53,38 +46,5 @@ export class HandlerFlowsService {
       catchError(() => of(false)),
     );
     return forkJoin([status$, draft$]).pipe(map(([status, draft]) => ({ status, draft })));
-  }
-
-  /** Starts every Handler Flow that isn't a Draft; the Drafts are skipped and counted. */
-  start(api: IApi, states: Map<number, HandlerFlowState>): Observable<ApiRunReport> {
-    const operations = (api.operations ?? []).filter(o => o.handlerFlowId);
-    const toStart = operations.filter(o => !states.get(o.handlerFlowId!)?.draft);
-    return this.runEach(toStart, id => this.flowService.configureAndStart(id)).pipe(
-      map(report => ({ ...report, skippedDrafts: operations.length - toStart.length })),
-    );
-  }
-
-  stop(api: IApi): Observable<ApiRunReport> {
-    return this.runEach((api.operations ?? []).filter(o => o.handlerFlowId), id => this.flowService.stop(id));
-  }
-
-  private runEach(operations: IApiOperation[], action: (flowId: number) => Observable<{ body: string | null }>): Observable<ApiRunReport> {
-    if (!operations.length) {
-      return of({ done: 0, skippedDrafts: 0, failed: [] });
-    }
-    const runs = operations.map(operation =>
-      action(operation.handlerFlowId!).pipe(
-        map(response => flowFailureOf(response.body)),
-        catchError(error => of(failureOfError(error?.error ?? error))),
-        map(failure => ({ operation, failure })),
-      ),
-    );
-    return forkJoin(runs).pipe(
-      map(results => ({
-        done: results.filter(r => !r.failure).length,
-        skippedDrafts: 0,
-        failed: results.filter(r => r.failure).map(r => ({ operation: r.operation, message: r.failure!.summary })),
-      })),
-    );
   }
 }

@@ -47,7 +47,10 @@ describe('New Flow dialog', () => {
     TestBed.configureTestingModule({
       imports: [NewFlowDialogComponent],
       providers: [
-        provideRouter([{ path: 'flow/editor', component: EditorStub }]),
+        provideRouter([
+          { path: 'flow/editor', component: EditorStub },
+          { path: 'rest-apis/new', component: EditorStub },
+        ]),
         provideHttpClient(),
         provideHttpClientTesting(),
         provideTranslateService(),
@@ -77,6 +80,23 @@ describe('New Flow dialog', () => {
     expect(url.root.children['primary'].segments.map(s => s.path)).toEqual(['flow', 'editor']);
     expect(url.queryParams).toEqual({ mode: 'edit', editor });
     expect(activeModal.close).toHaveBeenCalled();
+  });
+
+  it('opens the API designer for a new API', async () => {
+    choiceNamed('API').click();
+    await fixture.whenStable();
+
+    const url = TestBed.inject(Router).parseUrl(TestBed.inject(Router).url);
+    expect(url.root.children['primary'].segments.map(s => s.path)).toEqual(['rest-apis', 'new']);
+    expect(activeModal.close).toHaveBeenCalled();
+  });
+
+  it('offers Visual, Camel route (low code), Script (code) and API, in that order', () => {
+    const titles = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('.flow-type-choice__title')).map(e => e.textContent?.trim());
+    const levels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('.flow-type-choice__level')).map(e => e.textContent?.trim());
+
+    expect(titles.slice(0, 4)).toEqual(['Visual', 'Camel route', 'Script', 'API']);
+    expect(levels.slice(1, 4)).toEqual(['Low code', 'Code', 'Design']);
   });
 
   it('imports a Flow export into the Flow it contains, then refreshes the list', async () => {

@@ -26,11 +26,6 @@ import java.util.Optional;
 @Component
 public class HandlerFlows {
 
-    /** What a new Script Handler Flow's script does until the user writes one: answer with the request's body. */
-    static final String DEFAULT_SCRIPT = "// The request is the message: answer with its body, or set a new one.\n"
-        + "// Set the CamelHttpResponseCode header for a status other than 200.\n"
-        + "body";
-
     private final FlowRepository flowRepository;
     private final StepRepository stepRepository;
     private final LinkRepository linkRepository;
@@ -45,17 +40,15 @@ public class HandlerFlows {
     }
 
     /**
-     * A new Handler Flow for the Operation. A Visual one is Operation → Response (200, keep the body), so it answers
-     * right away; with {@code withResponse} false it is only the Operation, an open end, which makes it a Draft.
-     * A Script one is the Operation and a script.
+     * A new Handler Flow for the Operation, always a Visual Flow: Operation → Response (200, keep the body), so it
+     * answers right away; with {@code withResponse} false it is only the Operation, an open end, which makes it a Draft.
      */
-    public Flow create(ApiOperation operation, Integration integration, String flowType, boolean withResponse) {
-        boolean script = "script".equals(flowType);
+    public Flow create(ApiOperation operation, Integration integration, boolean withResponse) {
         Instant now = Instant.now();
 
         Flow flow = new Flow();
         flow.setName(uniqueName(defaultName(operation)));
-        flow.setType(script ? "script" : "flow");
+        flow.setType("flow");
         flow.setIntegration(integration);
         flow.setAutoStart(false);
         flow.setParallelProcessing(false);
@@ -75,10 +68,7 @@ public class HandlerFlows {
         Step errorHandler = newStep(flow, StepType.ERROR, "log", flow.getName() + "/" + flow.getId(), "level=ERROR&showAll=true", null, null);
         stepRepository.save(errorHandler);
 
-        if (script) {
-            stepRepository.save(newStep(flow, StepType.SCRIPT, "groovy", DEFAULT_SCRIPT, null, null, null));
-            link(source, flow.getId() + "-" + source.getId(), "out");
-        } else if (withResponse) {
+        if (withResponse) {
             Step response = stepRepository.save(newStep(flow, StepType.SINK, "setmessage", null, "status=200", 200d, 0d));
             String name = flow.getId() + "-" + response.getId();
             link(source, name, "out");

@@ -4,7 +4,11 @@
       New Operation
     } @else {
       <span [class]="'api-method api-method--' + operation!.method.toLowerCase()">{{ operation!.method }}</span>
-      <code>{{ operation!.fullPath }}</code>
+      @if (url) {
+        <a [href]="url" target="_blank" rel="noopener" [title]="'Open ' + url + ' in a new tab'"><code>{{ operation!.fullPath }}</code></a>
+      } @else {
+        <code>{{ operation!.fullPath }}</code>
+      }
     }
   </h3>
   <button type="button" class="btn-close" aria-label="Close" (click)="closed.emit()"></button>
@@ -12,7 +16,7 @@
 
 @if (!isNew) {
   <p class="d-flex flex-wrap align-items-center gap-2">
-    <a class="btn btn-fx btn-fx-secondary btn-fx-sm" [routerLink]="['/flow/editor', operation!.handlerFlowId]" [queryParams]="handlerFlowQueryParams()">
+    <a class="btn btn-fx btn-fx-secondary btn-fx-sm" [routerLink]="['/flow/editor', operation!.handlerFlowId]" [queryParams]="handlerFlowQueryParams(operation!)">
       <fa-icon icon="arrow-up-right-from-square"></fa-icon> Open Handler Flow
     </a>
     <span class="text-muted small">
@@ -44,18 +48,7 @@
   </div>
 
   @if (isNew) {
-    <fieldset class="mt-2">
-      <legend class="form-label fs-6 mb-1">Handler Flow</legend>
-      <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" id="flow-type-visual" name="flowType" value="flow" [(ngModel)]="draft.flowType" />
-        <label class="form-check-label" for="flow-type-visual">Visual</label>
-      </div>
-      <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" id="flow-type-script" name="flowType" value="script" [(ngModel)]="draft.flowType" />
-        <label class="form-check-label" for="flow-type-script">Script</label>
-      </div>
-      <div class="small text-muted">A Visual Handler Flow starts as Operation → Response (200, keeping the body).</div>
-    </fieldset>
+    <div class="small text-muted mt-2">The Operation gets a Handler Flow, which starts as Operation → Response (200, keeping the body).</div>
   }
 
   <div class="row g-2 mt-1">

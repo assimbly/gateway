@@ -85,15 +85,15 @@ class ApiServiceIntTest {
     }
 
     @Test
-    void aScriptOperationGetsAScriptHandlerFlowWithTheOperationAsItsSource() {
+    void aHandlerFlowIsAlwaysAVisualFlowWhateverFlowTypeIsAsked() {
         ApiDTO api = api("Customers", "/customers");
 
         ApiOperationDTO operation = apiService.createOperation(api.id(), withFlowType(operation("POST", "/"), "script"));
 
         Flow flow = flowRepository.findById(operation.handlerFlowId()).orElseThrow();
-        assertThat(flow.getType()).isEqualTo("script");
+        assertThat(flow.getType()).isEqualTo("flow");
         assertThat(options(step(flow, StepType.SOURCE))).containsEntry("method", "post").containsEntry("path", "/customers");
-        assertThat(step(flow, StepType.SCRIPT).getComponentType()).isEqualTo("groovy");
+        assertThat(flow.getSteps()).noneMatch(s -> s.getStepType() == StepType.SCRIPT);
     }
 
     @Test

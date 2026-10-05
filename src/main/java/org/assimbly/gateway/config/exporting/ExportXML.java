@@ -546,7 +546,9 @@ public class ExportXML {
 
         if (handledOperation != null && !stepDB.getStepType().getStep().equalsIgnoreCase("error")) {
             // The runtime adds a Route configuration for every Step that refers to one, so each Step gets its own copy.
-            String problemId = "apiproblem" + stepId;
+            // Its id starts with the Flow's id: the runtime removes the Flow's Route configurations by that prefix when
+            // the Flow is loaded again, and refuses a Route configuration that already exists.
+            String problemId = ApiPaths.problemConfigurationId(handledOperation.getHandlerFlow().getId(), stepId);
             setProblemRouteConfiguration(problemId);
             block = setElement("block", null, blocks);
             setElement("id", problemId, block);

@@ -57,6 +57,8 @@ export class FlowCanvasComponent {
   @Input() warnings: Problem[] = [];
   @Input() selection: DesignerSelection = { type: 'flow' };
   @Input() readOnly = false;
+  /** The full URL a Handler Flow's Operation is served on; the Operation's label links to it. */
+  @Input() operationUrl?: string;
   @Input() components: StepComponents = { actions: [], sinks: [] };
 
   @Output() selectionChange = new EventEmitter<DesignerSelection>();
@@ -85,6 +87,11 @@ export class FlowCanvasComponent {
   readonly appendKinds: PickedKind[] = ['ACTION', 'ROUTER', 'SINK'];
   readonly endMarker = EFMarkerType.END_ALL_STATES;
   readonly kindIcons: Record<StepKind, IconProp> = { SOURCE: 'sign-in-alt', ACTION: 'cogs', ROUTER: 'code-branch', SINK: 'sign-out-alt' };
+
+  /** Whether the Step is the Operation a Handler Flow serves, which links to its URL. */
+  isOperation(step: DesignStep): boolean {
+    return !!this.graph.handler && isLockedSource(this.graph, step.key);
+  }
 
   label(step: DesignStep): string {
     const handler = this.graph.handler;

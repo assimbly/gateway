@@ -2,6 +2,7 @@ package org.assimbly.gateway.config.importing;
 
 import org.assimbly.gateway.domain.Route;
 import org.assimbly.gateway.repository.RouteRepository;
+import org.assimbly.gateway.service.api.ApiPaths;
 import org.assimbly.util.TransformUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +59,7 @@ public class ImportXMLRoutes {
 
 		for (String routeId : routeIds) {
             // A Handler Flow's problem Route configuration is generated on export, not kept.
-            if (routeId.startsWith("apiproblem")) {
+            if (ApiPaths.isProblemConfigurationId(routeId)) {
                 continue;
             }
 			setRouteFromXML(doc, routeId);

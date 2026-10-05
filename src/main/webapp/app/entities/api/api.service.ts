@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
-import { Observable, catchError, map, of } from 'rxjs';
+import { Observable, catchError, map, of, shareReplay } from 'rxjs';
 
 import { serverApiUrl } from 'app/config';
 import { HANDLES_OWN_ERRORS } from 'app/core/interceptor/error-handler.interceptor';
@@ -13,6 +13,7 @@ const OWN_ERRORS = new HttpContext().set(HANDLES_OWN_ERRORS, true);
 export class ApiService {
   private readonly http = inject(HttpClient);
   private readonly resourceUrl = `${serverApiUrl}api/apis`;
+  private listener?: Observable<string>;
 
   query(): Observable<IApi[]> {
     return this.http.get<IApi[]>(this.resourceUrl);
@@ -69,6 +70,15 @@ export class ApiService {
   /** Every Handler Flow by its Flow id. */
   handlers(): Observable<Record<number, IApiHandler>> {
     return this.http.get<Record<number, IApiHandler>>(`${this.resourceUrl}/handlers`);
+  }
+
+  /** The runtime's REST listener as callers reach it; an Operation's URL is this and its runtime path. */
+  listenerUrl(): Observable<string> {
+    this.listener ??= this.http.get<{ url: string }>(`${this.resourceUrl}/listener`).pipe(
+      map(listener => listener.url),
+      shareReplay(1),
+    );
+    return this.listener;
   }
 
   /** The API and Operation a Flow handles; undefined when it isn't a Handler Flow. */

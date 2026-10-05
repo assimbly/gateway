@@ -23,6 +23,15 @@ class ApiPathsTest {
     }
 
     @Test
+    void aProblemRouteConfigurationIdStartsWithTheFlowIdSoTheRuntimeRemovesItWhenTheFlowIsLoadedAgain() {
+        assertThat(ApiPaths.problemConfigurationId(1553L, "7")).isEqualTo("1553apiproblem7").startsWith("1553");
+        assertThat(ApiPaths.isProblemConfigurationId("1553apiproblem7")).isTrue();
+        assertThat(ApiPaths.isProblemConfigurationId("apiproblem7")).isTrue();
+        assertThat(ApiPaths.isProblemConfigurationId("7")).isFalse();
+        assertThat(ApiPaths.isProblemConfigurationId("apiproblems")).isFalse();
+    }
+
+    @Test
     void pathParametersAreReadFromTheTemplateInOrder() {
         assertThat(ApiPaths.pathParameterNames("/customers/{customerId}/orders/{orderId}")).containsExactly("customerId", "orderId");
         assertThat(ApiPaths.pathParameterNames("/customers")).isEmpty();

@@ -166,7 +166,8 @@ class HandlerFlowDilExportIntTest {
         assertThat(steps.getLength()).isEqualTo(2);
         for (int i = 0; i < steps.getLength(); i++) {
             Element step = (Element) steps.item(i);
-            String id = "apiproblem" + text(step, "id");
+            // The runtime removes a Flow's Route configurations by its id as prefix when the Flow is loaded again.
+            String id = flow.getId() + "apiproblem" + text(step, "id");
             Element block = (Element) xPath.evaluate("blocks/block[type='routeconfiguration']", step, XPathConstants.NODE);
             assertThat(text(block, "id")).isEqualTo(id);
             assertThat(text(block, "uri")).isEqualTo(id);
