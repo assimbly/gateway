@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { FlowEditorEsbComponent } from './flow-editor-esb.component';
@@ -11,6 +11,13 @@ import { FlowEditorEsbComponent } from './flow-editor-esb.component';
 export class FlowEditorComponent implements OnInit {
 
   editor: string = 'esb';
+
+  @ViewChild(FlowEditorEsbComponent) esbEditor?: FlowEditorEsbComponent;
+
+  /** Asks before leaving the editor with unsaved changes. */
+  canDeactivate(): boolean {
+    return !this.esbEditor?.hasUnsavedChanges || window.confirm('This Flow has unsaved changes. Leave without saving?');
+  }
 
   constructor(
     private route: ActivatedRoute,

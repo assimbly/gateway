@@ -1,0 +1,28 @@
+.flows-empty {
+  max-width: 56rem;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.flows-empty__title {
+  margin-bottom: 0.25rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.flows-empty__lead {
+  margin-bottom: 1rem;
+  color: var(--app-text-muted);
+}
+
+.flows-empty__import {
+  margin-top: 1rem;
+  color: var(--app-text-muted);
+}
+
+.flows-empty__import-link {
+  padding: 0;
+  border: 0;
+  vertical-align: baseline;
+  color: var(--app-primary-accessible);
+}

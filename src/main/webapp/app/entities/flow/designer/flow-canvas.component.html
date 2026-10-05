@@ -1,0 +1,79 @@
+<f-flow fDraggable class="flow-canvas" [class.flow-canvas-shown]="shown" (fSelectionChange)="onSelectionChange($event)" (fMoveNodes)="onMoveNodes($event)"
+        (fNodesRendered)="fitToScreen()">
+  <f-background>
+    <f-circle-pattern></f-circle-pattern>
+  </f-background>
+  <f-canvas fZoom [position]="canvasPosition">
+    <ng-container ngProjectAs="[fConnections]">
+      @for (link of graph.links; track link.to) {
+        <f-connection [fConnectionId]="'link-' + link.to" [fSourceId]="'out-' + link.from" [fTargetId]="'in-' + link.to"
+                      fType="segment" fBehavior="fixed" [fRadius]="12" [fReassignDisabled]="true"
+                      class="flow-link" [class.flow-link-problem]="linkHasProblem(link)" [class.flow-link-selected]="isLinkSelected(link)">
+          <f-connection-marker-arrow [type]="endMarker"></f-connection-marker-arrow>
+          <div fConnectionContent [position]="0.5" class="flow-link-content">
+            @if (branchLabel(link); as text) {
+              <button type="button" fDragBlocker class="flow-link-label" [title]="text"
+                      (click)="selectionChange.emit({ type: 'link', to: link.to })">{{ text }}</button>
+            }
+            @if (!readOnly) {
+              <jhi-step-picker fDragBlocker [kinds]="insertKinds" [components]="components" title="Insert a Step here"
+                               [target]="'link:' + link.to"
+                               (picked)="insertStep.emit({ linkTo: link.to, kind: $any($event.kind), componentType: $event.componentType })">
+              </jhi-step-picker>
+            }
+          </div>
+        </f-connection>
+      }
+    </ng-container>
+
+    <ng-container ngProjectAs="[fNodes]">
+      @for (step of graph.steps; track step.key) {
+        <div fNode fDragHandle [fNodeId]="step.key" [attr.data-step-key]="step.key" [fNodePosition]="{ x: step.x ?? 0, y: step.y ?? 0 }"
+             [fNodeDraggingDisabled]="readOnly" [fMinimapClass]="['flow-minimap-' + step.kind.toLowerCase()]"
+             class="flow-step" [ngClass]="'flow-step-' + step.kind.toLowerCase()"
+             [class.flow-step-problem]="hasProblem(step)" [class.flow-step-selected]="isSelected(step)"
+             (click)="selectionChange.emit({ type: 'step', key: step.key })" (dblclick)="openStep.emit(step.key)">
+          @if (step.kind !== 'SOURCE') {
+            <div fConnector fConnectorType="target" [fConnectorId]="'in-' + step.key" [fConnectorDisabled]="true"
+                 class="flow-connector flow-connector-in"></div>
+          }
+          <div class="flow-step-kind">{{ kindLabel(step) }}</div>
+          <fa-icon class="flow-step-icon" [icon]="kindIcons[step.kind]"></fa-icon>
+          @if (operationUrl && isOperation(step)) {
+            <a fDragBlocker class="flow-step-label" [href]="operationUrl" target="_blank" rel="noopener" [title]="'Open ' + operationUrl + ' in a new tab'"
+               (click)="$event.stopPropagation()" (dblclick)="$event.stopPropagation()">{{ label(step) }}</a>
+          } @else {
+            <div class="flow-step-label" [title]="label(step)">{{ label(step) }}</div>
+          }
+          @if (problemOf(step); as problem) {
+            <span class="flow-step-warning" [title]="problem"><fa-icon icon="exclamation-triangle"></fa-icon></span>
+          } @else if (warningOf(step); as warning) {
+            <span class="flow-step-warning flow-step-warning--soft" [title]="warning"><fa-icon icon="exclamation-circle"></fa-icon></span>
+          }
+          @if (canAddBranch(step) && !readOnly) {
+            <button type="button" fDragBlocker class="flow-plus flow-add-branch" title="Add a Branch" aria-label="Add a Branch"
+                    (click)="$event.stopPropagation(); addBranch.emit(step.key)" (dblclick)="$event.stopPropagation()">
+              <fa-icon icon="plus"></fa-icon>
+            </button>
+          }
+          @if (step.kind !== 'SINK') {
+            <div fConnector fConnectorType="source" [fConnectorId]="'out-' + step.key" [fConnectorMultiple]="step.kind === 'ROUTER'"
+                 [fConnectorDisabled]="true" class="flow-connector flow-connector-out"></div>
+          }
+          @if (isOpenEnd(step) && !readOnly) {
+            <jhi-step-picker fDragBlocker class="flow-append" [kinds]="appendKinds" [components]="appendComponents(step)" title="Add the next Step (Space)"
+                             [target]="'after:' + step.key"
+                             (click)="$event.stopPropagation()" (dblclick)="$event.stopPropagation()"
+                             (picked)="appendStep.emit({ after: step.key, kind: $event.kind, componentType: $event.componentType })">
+            </jhi-step-picker>
+          }
+        </div>
+      }
+    </ng-container>
+  </f-canvas>
+
+  <!-- Declared here, inside the flow, so the minimap can reach it; the editor shows it in its side panel. -->
+  <ng-template #minimap>
+    <f-minimap [fMinSize]="400"></f-minimap>
+  </ng-template>
+</f-flow>

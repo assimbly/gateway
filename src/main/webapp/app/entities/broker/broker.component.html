@@ -50,26 +50,30 @@
   >
     <tr *ngFor="let rowBroker of filteredBrokers; trackBy: trackId">
       <td class="table-fx-identity">
-        <jhi-truncate [text]="rowBroker.name" />
+        <a [routerLink]="['/broker', rowBroker.id, 'edit']">
+          <jhi-truncate [text]="rowBroker.name" />
+        </a>
+      </td>
+      <td>
+        <jhi-status-controls
+          [busy]="disableActionBtns"
+          [tone]="statusTone"
+          [showStart]="!isBrokerStarted"
+          [showStop]="true"
+          [stopDisabled]="isBrokerStopped"
+          [showRestart]="!isBrokerRestarted"
+          (start)="start()"
+          (stop)="stop()"
+          (restart)="restart()"
+        />
       </td>
       <td class="text-end table-fx-numeric">{{ formatMetric(totalConsumers) }}</td>
       <td class="text-end table-fx-numeric">{{ formatMetric(totalMessages) }}</td>
-      <td class="text-end">
-        <jhi-row-actions>
+      <td>
+        @if (isBrokerStarted) {
           <button
-            jhiPrimaryAction
             type="button"
-            class="btn btn-fx btn-fx-sm btn-fx-ghost"
-            [routerLink]="['/broker', rowBroker.id, 'edit']"
-            aria-label="Edit"
-          >
-            <fa-icon icon="edit"></fa-icon>
-            <span class="d-none d-md-inline">Edit</span>
-          </button>
-          <button
-            jhiPrimaryAction
-            type="button"
-            class="btn btn-fx btn-fx-sm btn-fx-ghost"
+            class="btn btn-fx btn-fx-sm btn-fx-icon btn-fx-ghost"
             (click)="getBrokerInfo(rowBroker.id)"
             [ngbPopover]="statsTemplate"
             popoverTitle="Stats"
@@ -78,9 +82,23 @@
             triggers="click"
             [autoClose]="'outside'"
             aria-label="Stats"
+            title="Stats"
           >
             <fa-icon icon="chart-bar"></fa-icon>
-            <span class="d-none d-md-inline">Stats</span>
+          </button>
+        }
+      </td>
+      <td class="text-end">
+        <jhi-row-actions>
+          <button
+            jhiOverflowAction
+            type="button"
+            ngbDropdownItem
+            class="btn-fx-dropdown-item"
+            [routerLink]="['/broker', rowBroker.id, 'edit']"
+          >
+            <fa-icon icon="edit"></fa-icon>
+            <span>Edit</span>
           </button>
           <button
             jhiOverflowAction
@@ -103,19 +121,6 @@
             <span>Delete</span>
           </button>
         </jhi-row-actions>
-      </td>
-      <td class="text-end">
-        <jhi-status-controls
-          [busy]="disableActionBtns"
-          [tone]="statusTone"
-          [showStart]="!isBrokerStarted"
-          [showStop]="true"
-          [stopDisabled]="isBrokerStopped"
-          [showRestart]="!isBrokerRestarted"
-          (start)="start()"
-          (stop)="stop()"
-          (restart)="restart()"
-        />
       </td>
     </tr>
   </jhi-data-table>

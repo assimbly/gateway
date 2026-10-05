@@ -1,0 +1,64 @@
+<div ngbDropdown container="body" placement="bottom-start bottom-end top-start top-end" autoClose="outside" class="d-inline-block"
+     (openChange)="onOpenChange($event)">
+  <button type="button" class="flow-plus" ngbDropdownToggle [attr.aria-label]="title" [title]="title">
+    <fa-icon icon="plus"></fa-icon>
+  </button>
+  <div ngbDropdownMenu class="step-picker">
+    <input #search type="search" class="form-control form-control-sm" placeholder="Search components…" aria-label="Search components"
+           [(ngModel)]="filter" (keydown.enter)="$event.preventDefault(); pickFirstMatch()" />
+    <div class="step-picker-kinds" role="tablist">
+      @for (k of kinds; track k) {
+        <button type="button" role="tab" class="step-picker-kind" [class.active]="k === kind" [attr.aria-selected]="k === kind"
+                (click)="activeKind = k; category = null; search.focus({ preventScroll: true })">
+          {{ labels[k] }}
+          @if (filter) {
+            <span class="step-picker-count">{{ matches(k).length }}</span>
+          }
+        </button>
+      }
+    </div>
+    @if (kind !== 'ROUTER') {
+      <div class="step-picker-chips" aria-label="Categories">
+        @if (recentOf(kind).length) {
+          <button type="button" class="step-picker-chip" [class.active]="category === 'recent'" [attr.aria-pressed]="category === 'recent'"
+                  (click)="chooseCategory('recent')">Recently used</button>
+        }
+        @for (chip of showAllCategories ? chips(kind).shown.concat(chips(kind).more) : chips(kind).shown; track chip.label) {
+          <button type="button" class="step-picker-chip" [class.active]="category === chip.label" [attr.aria-pressed]="category === chip.label"
+                  (click)="chooseCategory(chip.label)">
+            {{ chip.label }} <span class="step-picker-count">{{ chip.count }}</span>
+          </button>
+        }
+        @if (chips(kind).more.length) {
+          <button type="button" class="step-picker-chip step-picker-chip-more" (click)="showAllCategories = !showAllCategories">
+            {{ showAllCategories ? 'Fewer' : 'More' }}
+          </button>
+        }
+      </div>
+    }
+    <div class="step-picker-list" role="listbox" [attr.aria-label]="labels[kind] + ' components'">
+      @for (name of matches(kind); track name) {
+        @let item = entry(name);
+        <button type="button" role="option" class="step-picker-item" [title]="item.description ?? ''" (click)="pick(kind, name)">
+          <span class="step-picker-item-title">{{ item.title ?? name }}</span>
+          @if (item.title) {
+            <span class="step-picker-item-id">{{ name }}</span>
+          }
+          @if (item.description) {
+            <span class="step-picker-item-description">{{ item.description }}</span>
+          }
+        </button>
+      } @empty {
+        <div class="step-picker-empty">No {{ labels[kind] | lowercase }} matches "{{ filter }}".</div>
+      }
+      @for (hidden of hiddenMatches(kind); track hidden.name) {
+        @let item = entry(hidden.name);
+        <div class="step-picker-item step-picker-item-unavailable" role="option" aria-disabled="true">
+          <span class="step-picker-item-title">{{ item.title ?? hidden.name }}</span>
+          <span class="step-picker-item-id">{{ hidden.name }}</span>
+          <span class="step-picker-item-description">{{ hidden.reason }}</span>
+        </div>
+      }
+    </div>
+  </div>
+</div>

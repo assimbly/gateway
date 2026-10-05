@@ -1,36 +1,46 @@
 <div>
+  @if (hasFlows) {
   <jhi-search-toolbar [(query)]="searchText" placeholder="Filter by flow name" inputId="searchTextId">
     <ng-container actions>
-      <div ngbDropdown class="d-inline-block" placement="bottom-end">
-        <button type="button" class="btn btn-fx btn-fx-primary" id="dropdownMenuFlows" ngbDropdownToggle aria-label="Add">
-          <fa-icon icon="plus"></fa-icon>
-          <span class="d-none d-md-inline"> Add</span>
-        </button>
-        <div ngbDropdownMenu aria-labelledby="dropdownMenuFlows">
-          <a ngbDropdownItem routerLink="/flow/editor" [queryParams]="{ mode: 'edit', editor: 'flow' }">Flow</a>
-          <a ngbDropdownItem routerLink="/flow/editor" [queryParams]="{ mode: 'edit', editor: 'route' }">Route</a>
-          <a ngbDropdownItem routerLink="/flow/editor" [queryParams]="{ mode: 'edit', editor: 'script' }">Script</a>
-        </div>
-      </div>
+      <button type="button" class="btn btn-fx btn-fx-primary" (click)="openNewFlow()" aria-label="Add">
+        <fa-icon icon="plus"></fa-icon>
+        <span class="d-none d-md-inline"> Add</span>
+      </button>
       <button class="btn btn-fx btn-fx-secondary" type="button" (click)="reset()" aria-label="Refresh">
         <fa-icon icon="sync"></fa-icon>
         <span class="d-none d-md-inline"> Refresh</span>
       </button>
     </ng-container>
   </jhi-search-toolbar>
+  }
 
-  <jhi-data-table
-    [columns]="columns"
-    [(sortState)]="sortState"
-    [hasRows]="!!filteredFlows.length"
-    [loading]="flowsLoading"
-    [emptyMessage]="'No flows yet. Use Add to create a Flow, Route, or Script.'"
-    ariaLabel="Flows"
-  >
-    <tr
-      jhi-flow-row
-      *ngFor="let flow of filteredFlows; trackBy: trackId"
-      [flow]="flow"
-    ></tr>
-  </jhi-data-table>
+  @if (showEmptyState) {
+    <section class="flows-empty" aria-labelledby="flows-empty-title">
+      <h2 class="flows-empty__title" id="flows-empty-title">Create your first Flow</h2>
+      <p class="flows-empty__lead">How do you want to build it?</p>
+      <jhi-flow-type-choices />
+      <p class="flows-empty__import">
+        Or
+        <button type="button" class="btn btn-link flows-empty__import-link" (click)="importInput.click()">import a Flow</button>
+        from an export file.
+        <input #importInput type="file" class="visually-hidden" accept=".xml,application/xml,text/xml" tabindex="-1" aria-hidden="true" (change)="importFromFile($event)" />
+      </p>
+    </section>
+  } @else {
+    <jhi-data-table
+      [columns]="columns"
+      [(sortState)]="sortState"
+      [hasRows]="!!filteredFlows.length"
+      [loading]="flowsLoading"
+      [emptyMessage]="'No flows match this filter.'"
+      ariaLabel="Flows"
+    >
+      <tr
+        jhi-flow-row
+        *ngFor="let flow of filteredFlows; trackBy: trackId"
+        [flow]="flow"
+        [handler]="handlers[flow.id!]"
+      ></tr>
+    </jhi-data-table>
+  }
 </div>

@@ -54,6 +54,7 @@ const flowRoute: Routes = [
       pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
+    canDeactivate: [(component: FlowEditorComponent) => component.canDeactivate()],
   },
   {
     path: 'flow/editor/:id',
@@ -63,6 +64,7 @@ const flowRoute: Routes = [
       pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
+    canDeactivate: [(component: FlowEditorComponent) => component.canDeactivate()],
   },
   {
     path: 'flow/editor/:id/:clone',
@@ -72,6 +74,7 @@ const flowRoute: Routes = [
       pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
+    canDeactivate: [(component: FlowEditorComponent) => component.canDeactivate()],
   },
   {
     path: 'flow/new',

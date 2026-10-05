@@ -10,7 +10,7 @@ import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { SortState, sortParams } from 'app/shared/sort';
 import { SearchToolbar } from 'app/shared/filter';
-import { DataTable, DataTableColumn, OverflowActionDirective, PrimaryActionDirective, RowActions, Truncate } from 'app/shared/table';
+import { DataTable, DataTableColumn, OverflowActionDirective, RowActions, Truncate } from 'app/shared/table';
 
 import { ICertificate } from 'app/shared/model/certificate.model';
 import { AccountService } from 'app/core/auth/account.service';
@@ -37,7 +37,6 @@ import { saveAs } from 'file-saver/FileSaver';
     SearchToolbar,
     DataTable,
     RowActions,
-    PrimaryActionDirective,
     OverflowActionDirective,
     Truncate,
   ],

@@ -1,5 +1,5 @@
-import { ChangeDetectorRef, Component, DestroyRef, ElementRef, OnDestroy, OnInit, TemplateRef, ViewChild, ViewEncapsulation, inject } from "@angular/core";
-import { CommonModule } from "@angular/common";
+import { ChangeDetectorRef, Component, DestroyRef, ElementRef, HostListener, OnDestroy, OnInit, TemplateRef, ViewChild, ViewEncapsulation, inject } from "@angular/core";
+import { CommonModule, Location } from "@angular/common";
 import { AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { NgbModal, NgbModalRef, NgbModule } from "@ng-bootstrap/ng-bootstrap";
@@ -22,7 +22,7 @@ import { Step, StepType, IStep } from "app/shared/model/step.model";
 import { Flow, IFlow, LogLevelType } from "app/shared/model/flow.model";
 import { Integration } from "app/shared/model/integration.model";
 import { IMessage } from 'app/shared/model/message.model';
-import { Route } from "app/shared/model/route.model";
+import { IRoute, Route } from "app/shared/model/route.model";
 import { Connection } from 'app/shared/model/connection.model';
 import dayjs from "dayjs/esm";
 import { from, forkJoin, Observable, of, Subscription } from "rxjs";
@@ -38,13 +38,53 @@ import { FlowService } from "../flow.service";
 import { FieldTabDirective } from "app/shared/form/field-tab.directive";
 import { CodemirrorModule } from "@ctrl/ngx-codemirror";
 import { ThemeService } from "app/core/theme";
+import { FlowCanvasComponent, DesignerSelection } from "../designer/flow-canvas.component";
+import { FlowEditorHeaderComponent } from "./flow-editor-header.component";
+import { sourceStepOf } from "../flow-status";
+import { automaticErrorHandlerPath, defaultErrorHandlerStep, errorHandlerPath, errorHandlerPathOnSave } from "./error-handler";
+import { isRouteStep, missingRouteFields, routeToSave } from "./route-step";
+import { ComponentSchemas } from "../component-schemas.service";
+import { LinkEditorComponent } from "../designer/link-editor.component";
+import { ResponseEditorComponent } from "./response-editor.component";
+import { CallFlowEditorComponent, callableFlows } from "./call-flow-editor.component";
+import { ApiService } from "app/entities/api/api.service";
+import { operationUrl } from "app/entities/api/operation-url";
+import { IApiHandler } from "app/entities/api/api.model";
+import { FlowGraphHistory } from "../designer/flow-graph-history";
+import {
+  addBranch,
+  appendStep,
+  autoArrange,
+  canDeleteStep,
+  COMPONENTS_WITH_CONNECTION,
+  deleteBranch,
+  deleteStep,
+  DesignLink,
+  EditResult,
+  FlowGraph,
+  insertStep,
+  isDraft,
+  isResponse,
+  LinkSettings,
+  linksToSave,
+  loadFlowGraph,
+  moveStep,
+  opensOnCanvas,
+  Problem,
+  problems,
+  routerKind,
+  stepsToSave,
+  updateLink,
+  warnings,
+} from "../designer/flow-graph";
 
 @Component({
   selector: 'jhi-flow-editor-esb',
   templateUrl: './flow-editor-esb.component.html',
+  styleUrl: '../designer/flow-designer.scss',
   encapsulation: ViewEncapsulation.None,
   providers: [StepEditorRegistry],
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, NgbModule, FontAwesomeModule, PopoverModule, AlertError, FlowEditorStepComponent, FieldTabDirective, CodemirrorModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, NgbModule, FontAwesomeModule, PopoverModule, AlertError, FlowEditorStepComponent, FieldTabDirective, CodemirrorModule, FlowCanvasComponent, LinkEditorComponent, FlowEditorHeaderComponent, ResponseEditorComponent, CallFlowEditorComponent],
 })
 export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
@@ -80,7 +120,22 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			setTimeout(refresh);
 		});
 	}
-	@ViewChild('flowNameInput') flowNameInput?: ElementRef<HTMLInputElement>;
+	@ViewChild(FlowEditorHeaderComponent) header?: FlowEditorHeaderComponent;
+	/** Set by Save & start: start the Flow once it is saved. */
+	/** What happens once the Flow is saved: stay in the editor, start the Flow, or go back to Manage. */
+	private afterSaveAction: AfterSave = 'stay';
+	/** The Flow's name as it was last saved, which a default Error Handler path follows. */
+	private savedFlowName?: string | null;
+	private readonly location = inject(Location);
+	private readonly schemas = inject(ComponentSchemas);
+	private readonly apiService = inject(ApiService);
+
+	/** The API and Operation this Flow handles, when it is a Handler Flow: its Source is that Operation. */
+	handler?: IApiHandler;
+	/** The full URL a Handler Flow's Operation is served on; the Operation links to it. */
+	operationUrl?: string;
+	/** The Flows a Call Flow Step can call: those with a flowlink Source. */
+	callableFlows: IFlow[] = [];
 	routes: Route[];
 	messages: IMessage[];
 	connections: Connection[];
@@ -94,12 +149,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
   public stepTypes = ["SOURCE", "ACTION", "SINK", "ROUTE", "SCRIPT", "CONNECTION", "ERROR"];
   public languageComponentsNames: Array<any> = ['groovy', 'python', 'javascript', 'simple', 'jslt','xslt'];
-  public componentsWithConnection: Array<any> = ['activemq','amazonmq','amqp','amqps','jms','sjms','sjms2','sql','ibmmq','spring-rabbitmq'];
-
-	public logLevelListType = [
-		LogLevelType.OFF,
-		LogLevelType.TRACE,
-	];
+  public componentsWithConnection: readonly string[] = COMPONENTS_WITH_CONNECTION;
 
 	panelCollapsed: any = "uno";
 	public isCollapsed = true;
@@ -130,7 +180,6 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	predicate: any;
 	reverse: any;
 
-	routeCreated: boolean;
   connectionCreated: boolean;
   messageCreated: boolean;
   errorStep: boolean = true;
@@ -290,7 +339,6 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
           this.messageCreated = this.messages.length > 0;
 
 					this.routes = routes.body;
-					this.routeCreated = this.routes.length > 0;
 
           this.connections = connections.body;
           this.connectionCreated = this.connections.length > 0;
@@ -311,18 +359,26 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 					}
 
 					if (id) {
-						this.flowService
-							.find(id)
+						forkJoin([this.flowService.find(id), this.apiService.handlerOf(Number(id)), this.flowService.query({ page: 0, size: 1000 })])
 							.subscribe(
-								(flow) => {
+								([flow, handler, flows]) => {
 									this.flow = flow.body;
+									// A clone is an ordinary Flow: its Source becomes a placeholder (see clone()).
+									this.handler = isCloning ? undefined : handler;
+									this.clonedHandler = isCloning ? handler : undefined;
+									this.loadOperationUrl();
+									this.callableFlows = callableFlows(flows.body ?? [], this.flow.id);
 									if (this.singleIntegration) {
 										this.flow.integrationId = this.integrations[this.indexIntegration].id;
 									}
 
 									this.initializeForm(this.flow);
 
-                  this.loadSteps();
+                  if (this.useCanvas) {
+                    this.loadDesigner(this.flow);
+                  } else {
+                    this.loadSteps();
+                  }
 
                   if (this.activeStep) {
                     const activeIndex = this.steps.findIndex(
@@ -377,14 +433,16 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 								this.numberOfSteps = 1;
 
 								// create new route step
-                if(this.activeEditor === 'flow'){
+                if(this.useCanvas){
+                    this.loadDesigner(this.flow);
+                }else if(this.activeEditor === 'flow'){
                     this.createNewStep(StepType.SOURCE,this.integrations[0].defaultFromComponentType,0);
                     this.createNewStep(StepType.SINK,this.integrations[0].defaultToComponentType,1);
                     this.createNewStep(StepType.ERROR,this.integrations[0].defaultErrorComponentType,2);
                 }else if(this.activeEditor === 'script'){
                     this.createNewStep(StepType.SOURCE,'scheduler',0);
                     this.createNewStep(StepType.SCRIPT,'groovy',1);
-                    this.createNewStep(StepType.ERROR,this.integrations[0].defaultErrorComponentType,2);
+                    this.addStepForm(defaultErrorHandlerStep());
                 }else if(this.activeEditor === 'route'){
                     this.createNewStep(StepType.ROUTE,'',0);
                     this.createNewStep(StepType.ERROR,'',1);
@@ -441,11 +499,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
           index
         );
 
-        if(step.connectionId){
-          this.enableConnection[index] = true;
-        }else{
-          this.enableConnection[index] = false;
-        }
+        this.enableConnection[index] = this.showsConnection(step);
 
         if(step.messageId){
           this.enableMessage[index] = true;
@@ -652,6 +706,25 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	}
 
 	clone(): void {
+		// A clone of a Handler Flow doesn't claim its Operation: its Source is a placeholder, so the clone is a Draft.
+		if (this.clonedHandler) {
+			const sourceIndex = this.steps.findIndex(step => step.stepType === StepType.SOURCE);
+			if (sourceIndex >= 0) {
+				const source = this.steps[sourceIndex];
+				source.componentType = '';
+				source.uri = '';
+				source.options = '';
+				this.stepFormAt(sourceIndex).patchValue({ componentType: '', uri: '' });
+			}
+			this.clonedHandler = undefined;
+		}
+
+		// The copy logs to its own name and id once it is saved.
+		const errorHandler = this.steps.find(step => step.stepType === StepType.ERROR);
+		if (errorHandler?.uri && errorHandler.uri === errorHandlerPath(this.flow.name, this.flow.id)) {
+			errorHandler.uri = '';
+		}
+
 		// reset id and flow name to null
 		this.flow.id = null;
 		this.flow.name = null;
@@ -678,9 +751,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 	private focusFlowNameIfEmpty(): void {
 		setTimeout(() => {
-			const el = this.flowNameInput?.nativeElement;
-			if (el && !el.value) {
-				el.focus();
+			if (!this.editFlowForm?.controls.name.value) {
+				this.header?.focusName();
 			}
 			this.editFlowForm?.controls.name.markAsPristine();
 			this.editFlowForm?.controls.name.markAsUntouched();
@@ -787,6 +859,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
       options: new FormArray([this.initializeOption()]),
       message: new FormControl(step.messageId),
 			route: new FormControl(step.routeId),
+			routeName: new FormControl(this.routeOf(step.routeId)?.name ?? ''),
+			routeContent: new FormControl(this.routeOf(step.routeId)?.content ?? ''),
 			connection: new FormControl(step.connectionId),
 			links: new FormControl(step.links),
 		});
@@ -846,6 +920,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			uri: step.uri,
 			message: step.messageId,
 			route: step.routeId,
+			routeName: this.routeOf(step.routeId)?.name ?? '',
+			routeContent: this.routeOf(step.routeId)?.content ?? '',
 			connection: step.connectionId,
 			links: new FormControl(step.links),
 		});
@@ -949,6 +1025,11 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 
 
+	}
+
+	/** A Step shows its Connection when it has one, or when its Component needs one. */
+	private showsConnection(step: IStep): boolean {
+		return !!step.connectionId || this.componentsWithConnection.includes(step.componentType?.toLowerCase());
 	}
 
 	addConnection(step, index): void {
@@ -1185,6 +1266,10 @@ splitOptions4(options: string): string[] {
 
   setOptions(): void {
     this.steps.forEach((step, i) => {
+      // The Operation (a Handler Flow's Source), Responses and Call Flows keep their options in the Step itself.
+      if (this.editsOwnOptions(i)) {
+        return;
+      }
       step.options = '';
       this.setStepOptions(this.stepsOptions[i], step, this.selectOptions(i));
     });
@@ -1276,66 +1361,73 @@ splitOptions4(options: string): string[] {
     );
   }
 
-	createOrEditRoute(step, formRoute: AbstractControl): void {
-		step.routeId = formRoute.value;
-
-		if (
-			typeof step.routeId === "undefined" ||
-			step.routeId === null ||
-			!step.routeId
-		) {
-			const modalRef = this.routePopupService.open(
-				RouteDialogComponent as Component,
-				null,
-				this.flow.type
-			);
-			modalRef.then(
-				(res) => {
-					res.result.then(
-						(result) => {
-							this.setRoute(step, result.id, formRoute);
-						},
-						(reason) => {
-							this.setRoute(step, reason.id, formRoute);
-						},
-					);
-				},
-			);
-		} else {
-			const modalRef = this.routePopupService.open(
-				RouteDialogComponent as Component,
-				step.routeId,
-				this.flow.type
-			);
-			modalRef.then(
-				(res) => {
-					// Success
-					res.result.then(
-						(result) => {
-							this.setRoute(step, result.id, formRoute);
-						},
-						(reason) => {
-							this.setRoute(step, reason.id, formRoute);
-						},
-					);
-				},
-			);
-		}
+	/**
+	 * Opens the large Route editor with the Route as typed in the Step. A Route saved there is the Step's Route from
+	 * then on; closing it without saving keeps what the Step has.
+	 */
+	createOrEditRoute(step: IStep, form: FormGroup): void {
+		const typed: IRoute = {
+			...this.routeOf(form.value.route),
+			name: form.value.routeName ?? '',
+			content: form.value.routeContent ?? '',
+		};
+		const modalRef = this.routePopupService.routeModalRef(RouteDialogComponent, typed, this.flow.type);
+		modalRef.result.then(
+			(route: IRoute) => this.setRoute(step, form, route),
+			(route: IRoute | string) => this.setRoute(step, form, route),
+		);
 	}
 
-	setRoute(step, id, formRoute: AbstractControl): void {
-		this.routeService
-			.getAllRoutes()
-			.subscribe(
-				(res) => {
-					this.routes = res.body;
-					this.routeCreated = this.routes.length > 0;
-					step.routeId = id;
-					formRoute.patchValue(id);
-					step = null;
-				},
-				(res) => this.onError(res.body),
+	private setRoute(step: IStep, form: FormGroup, route: IRoute | string | undefined): void {
+		if (typeof route !== 'object' || !route?.id) {
+			return;
+		}
+		if (form.value.route !== route.id) {
+			form.markAsDirty();
+		}
+		step.routeId = route.id;
+		form.patchValue({ route: route.id, routeName: route.name, routeContent: route.content });
+		this.routeService.getAllRoutes().subscribe({
+			next: res => (this.routes = res.body),
+			error: res => this.onError(res.body),
+		});
+	}
+
+	private routeOf(id: number | null | undefined): IRoute | undefined {
+		return id ? this.routes?.find(route => route.id === id) : undefined;
+	}
+
+	/** Saves the Routes as typed in the Flow's Route Steps, and gives each Step the id of its Route. */
+	private saveRoutes$(): Observable<unknown> {
+		const stepsData = this.editFlowForm.controls.stepsData as FormArray;
+		const saves = this.steps.map((step, index) => {
+			const form = stepsData.at(index) as FormGroup;
+			if (!isRouteStep(step.stepType, this.activeEditor)) {
+				return of(null);
+			}
+			const fields = { name: form.value.routeName, content: form.value.routeContent };
+			if (!fields.name?.trim() && !fields.content?.trim()) {
+				// An Error handler left empty has no Route.
+				step.routeId = null;
+				form.patchValue({ route: null });
+				return of(null);
+			}
+			const route = routeToSave(fields, this.routeOf(step.routeId));
+			if (!route) {
+				return of(null);
+			}
+			return (route.id ? this.routeService.update(route) : this.routeService.create(route)).pipe(
+				map(saved => {
+					step.routeId = saved.body.id;
+					form.patchValue({ route: saved.body.id });
+					return saved;
+				}),
 			);
+		});
+		return forkJoin(saves).pipe(
+			switchMap(() => this.routeService.getAllRoutes()),
+			map(res => (this.routes = res.body)),
+		);
 	}
 
   createOrEditConnection(step, connectionType: string, formConnection: AbstractControl): void {
@@ -1442,12 +1534,18 @@ splitOptions4(options: string): string[] {
 		});
 	}
 
-	save(): any {
+	save(then: AfterSave = 'stay'): any {
+		// Save & manage always ends on Manage: a Flow without unsaved changes has nothing to save first.
+		if (then === 'return' && this.flow?.id && !this.hasUnsavedChanges) {
+			this.router.navigate(['/']);
+			return;
+		}
 
+		this.afterSaveAction = then;
+		this.savedFlowName = this.flow.name;
 		this.formSubmitted = true;
 		this.savingFlowFailed = false;
 		this.savingFlowSuccess = false;
-		const goToOverview = true;
 
 		this.setDataFromForm();
 		this.setOptions();
@@ -1455,11 +1553,24 @@ splitOptions4(options: string): string[] {
     this.checkForm();
 
 		if (!this.editFlowForm.valid || this.savingFlowFailed) {
+			this.editFlowForm.markAllAsTouched();
 			this.focusFirstInvalid();
 			return;
 		}
 
-		if (this.flow.id) {
+		if (this.useCanvas) {
+		  this.saveDesigner();
+		} else if (this.steps.some(step => isRouteStep(step.stepType, this.activeEditor))) {
+		  this.saveRoutes$()
+		    .pipe(takeUntilDestroyed(this.destroyRef))
+		    .subscribe({
+		      next: () => (this.flow.id ? this.updateFlow() : this.createFlow()),
+		      error: () => {
+		        this.savingFlowFailedMessage = 'The Routes could not be saved. Give each Route a name no other Route has.';
+		        this.savingFlowFailed = true;
+		      },
+		    });
+		} else if (this.flow.id) {
 		  this.updateFlow();
 		} else {
 		  this.createFlow();
@@ -1482,6 +1593,7 @@ splitOptions4(options: string): string[] {
        takeUntilDestroyed(this.destroyRef),
        switchMap(flow => {
          this.flow = flow.body;
+         this.fillErrorHandlerPath();
          return stepDeletes.length ? forkJoin(stepDeletes) : of([]);
        }),
        switchMap(() => this.stepService.updateMultiple(this.steps)),
@@ -1492,10 +1604,12 @@ splitOptions4(options: string): string[] {
        }),
        switchMap(() => this.stepService.findByFlowId(this.flow.id)),
      )
-     .subscribe(() => {
-       this.savingFlowSuccess = true;
-       this.isSaving = false;
-       this.router.navigate(['/']);
+     .subscribe({
+       next: () => this.afterSave(),
+       error: () => {
+         this.savingFlowFailed = true;
+         this.isSaving = false;
+       },
      });
   }
 
@@ -1508,6 +1622,7 @@ splitOptions4(options: string): string[] {
         takeUntilDestroyed(this.destroyRef),
         switchMap(flowUpdated => {
           this.flow = flowUpdated.body;
+          this.fillErrorHandlerPath();
           this.steps.forEach(step => {
             step.flowId = this.flow.id;
           });
@@ -1522,9 +1637,7 @@ splitOptions4(options: string): string[] {
         next: () => {
           this.updateForm();
           this.finished = true;
-          this.savingFlowSuccess = true;
-          this.isSaving = false;
-          this.router.navigate(['/']);
+          this.afterSave();
         },
         error: () => {
           this.handleErrorWhileCreatingFlow(this.flow.id, this.step.id);
@@ -1577,6 +1690,7 @@ splitOptions4(options: string): string[] {
 		this.flow.name = flowControls.name.value;
 		this.flow.logLevel = flowControls.logLevel.value;
 		this.flow.notes = flowControls.notes.value;
+		this.flow.autoStart = flowControls.autoStart.value;
 		this.flow.integrationId = flowControls.integration.value;
 
 		(<FormArray>flowControls.stepsData).controls.forEach(
@@ -1622,10 +1736,16 @@ splitOptions4(options: string): string[] {
 	}
 
   checkForm(){
+      const stepsData = this.editFlowForm.controls.stepsData as FormArray;
       this.steps.forEach(
-      				(step: Step) => {
-      					if(step.routeId == null && step.stepType === StepType.ROUTE){
-                    this.savingFlowFailedMessage = 'Routes cannot be empty.';
+      				(step: Step, index) => {
+      					if (!isRouteStep(step.stepType, this.activeEditor)) {
+      						return;
+      					}
+      					const form = stepsData.at(index).value;
+      					const missing = missingRouteFields(step.stepType, { name: form.routeName, content: form.routeContent });
+      					if (missing.name || missing.content) {
+                    this.savingFlowFailedMessage = missing.name ? 'Name each Route.' : 'Routes cannot be empty.';
                     this.savingFlowFailed = true;
       					}
       				},
@@ -1683,6 +1803,588 @@ splitOptions4(options: string): string[] {
     }
 
 
+	// Visual designer
+	//
+	// The Flow graph (in `designer`) holds the shape of the Flow: its Steps, Links, Branches and positions.
+	// Each Step keeps its configuration in the Step forms; `stepKeys[i]` is the graph key of `steps[i]`.
+	// Forms are never removed while editing, so undo can bring a deleted Step back with its settings;
+	// only the Steps still in the graph are saved.
+
+	designer?: FlowGraphHistory;
+	canvasGraph?: FlowGraph;
+	canvasProblems: Problem[] = [];
+	selection: DesignerSelection = { type: 'flow' };
+	stepKeys: string[] = [];
+	designerNotice?: string;
+	designerMessage?: string;
+
+	canvasWarnings: Problem[] = [];
+
+	@ViewChild(FlowCanvasComponent) flowCanvas?: FlowCanvasComponent;
+
+	/** Set while a Handler Flow is being cloned: the clone's Source becomes a placeholder. */
+	private clonedHandler?: IApiHandler;
+
+	/** The Operation's URL is the runtime's REST listener and the Operation's runtime path. */
+	private loadOperationUrl(): void {
+		const handler = this.handler;
+		this.operationUrl = undefined;
+		if (!handler) {
+			return;
+		}
+		this.apiService.listenerUrl().subscribe({
+			next: (listener) => {
+				this.operationUrl = operationUrl(listener, handler.runtimePath);
+				this.cdr.markForCheck();
+			},
+			error: () => undefined,
+		});
+	}
+
+	/** What the side panel edits the Step at this index with. */
+	panelFor(index: number): 'operation' | 'response' | 'callFlow' | 'step' {
+		const step = this.steps[index];
+		if (this.handler && step?.stepType === StepType.SOURCE) {
+			return 'operation';
+		}
+		const design = this.canvasGraph?.steps.find(s => s.key === this.stepKeys[index]);
+		if (design && this.canvasGraph && isResponse(this.canvasGraph, design)) {
+			return 'response';
+		}
+		const componentType = (this.stepFormAt(index)?.value.componentType ?? step?.componentType ?? '').toLowerCase();
+		return componentType === 'flowlink' && (step?.stepType === StepType.ACTION || step?.stepType === StepType.SINK) ? 'callFlow' : 'step';
+	}
+
+	/** Whether a Step's options are edited by its own panel rather than by option rows. */
+	private editsOwnOptions(index: number): boolean {
+		return this.panelFor(index) !== 'step';
+	}
+
+	get selectedProblem(): string | undefined {
+		const selection = this.selection;
+		return selection.type === 'step' ? this.canvasProblems.find(p => p.stepKey === selection.key)?.message : undefined;
+	}
+
+	get selectedWarning(): string | undefined {
+		const selection = this.selection;
+		return selection.type === 'step' ? this.canvasWarnings.find(p => p.stepKey === selection.key)?.message : undefined;
+	}
+
+	/** A Response's settings changed in its panel: the body is the Step's uri, the rest its options. */
+	onResponseChange(index: number, settings: { uri: string | undefined; options: string }): void {
+		this.steps[index].options = settings.options;
+		const uri = this.stepFormAt(index).controls.uri;
+		uri.setValue(settings.uri ?? '');
+		uri.markAsDirty();
+	}
+
+	onCallFlowChange(index: number, options: string): void {
+		this.steps[index].options = options;
+		this.stepFormAt(index).markAsDirty();
+		this.refreshCanvas();
+	}
+
+	private designerBody?: HTMLElement;
+
+	/** The canvas and its panel reach down to the bottom of the window. */
+	@ViewChild('designerBody') set designerBodyRef(ref: ElementRef<HTMLElement> | undefined) {
+		this.designerBody = ref?.nativeElement;
+		this.fitDesignerToWindow();
+	}
+
+	@HostListener('window:resize')
+	fitDesignerToWindow(): void {
+		const body = this.designerBody;
+		if (body) {
+			const setHeight = (height: number) => (body.style.height = `${Math.max(Math.floor(height), DESIGNER_MIN_HEIGHT)}px`);
+			const top = body.getBoundingClientRect().top + window.scrollY;
+			setHeight(window.innerHeight - top);
+			// The page's own padding below the designer would still make the window scroll; take that off too.
+			setHeight(window.innerHeight - top - (document.documentElement.scrollHeight - window.innerHeight));
+		}
+	}
+
+	/** Script and Route Flows keep the form editor; every other Flow is designed on the canvas. */
+	get useCanvas(): boolean {
+		return opensOnCanvas(this.activeEditor);
+	}
+
+	/** The kind of the selected Router, shown read-only as its component. */
+	get selectedRouterKind(): string | undefined {
+		const selection = this.selection;
+		const router = selection.type === 'step' ? this.canvasGraph?.steps.find(s => s.key === selection.key && s.kind === 'ROUTER') : undefined;
+		return router ? routerKind(router) : undefined;
+	}
+
+	get selectedStepDeletable(): boolean {
+		const selection = this.selection;
+		return selection.type === 'step' && !!this.designer && !this.designer.current.readOnlyReason && canDeleteStep(this.designer.current, selection.key);
+	}
+
+	get selectedStepIndex(): number {
+		return this.selection.type === 'step' ? this.stepKeys.indexOf(this.selection.key) : -1;
+	}
+
+	get errorStepIndex(): number {
+		return this.stepKeys.indexOf(ERROR_STEP_KEY);
+	}
+
+	get selectedLink(): DesignLink | undefined {
+		const selection = this.selection;
+		return selection.type === 'link' ? this.canvasGraph?.links.find(l => l.to === selection.to) : undefined;
+	}
+
+	get selectedLinkProblem(): string | undefined {
+		const selection = this.selection;
+		return selection.type === 'link' ? this.canvasProblems.find(p => p.linkTo === selection.to)?.message : undefined;
+	}
+
+	/** Trace is the Flow's log level switched between TRACE and OFF. */
+	get traceOn(): boolean {
+		return this.editFlowForm?.controls.logLevel.value === LogLevelType.TRACE;
+	}
+
+	setTrace(on: boolean): void {
+		const logLevel = this.editFlowForm.controls.logLevel;
+		logLevel.setValue(on ? LogLevelType.TRACE : LogLevelType.OFF);
+		logLevel.markAsDirty();
+	}
+
+	get flowIsDraft(): boolean {
+		return this.canvasProblems.length > 0;
+	}
+
+	private loadDesigner(flow: IFlow): void {
+		const graph = loadFlowGraph(flow, this.handler);
+
+		this.steps = [];
+		this.stepKeys = [];
+		this.numberOfSteps = 0;
+		(<FormArray>this.editFlowForm.controls.stepsData).clear();
+
+		graph.steps.forEach(designStep => {
+			const saved = (flow.steps ?? []).find(step => step.id != null && step.id === designStep.id);
+			if (saved) {
+				this.addSavedStepForm(saved, designStep.key);
+			} else {
+				this.addNewStepForm(designStep.kind as StepType, this.defaultComponentType(designStep.kind, designStep.componentType), designStep.key);
+			}
+		});
+
+		if (graph.errorStep) {
+			this.addSavedStepForm(graph.errorStep, ERROR_STEP_KEY);
+		} else {
+			this.addSavedStepForm(defaultErrorHandlerStep(), ERROR_STEP_KEY);
+		}
+
+		this.designer = new FlowGraphHistory(graph);
+		this.selection = { type: 'flow' };
+		this.designerNotice =
+			graph.readOnlyReason ??
+			(graph.repaired ? 'The Links of this Flow were incomplete. They are shown as a chain and will be saved that way.' : undefined);
+		this.refreshCanvas();
+
+		this.editFlowForm.controls.stepsData.valueChanges
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe(() => this.refreshCanvas());
+	}
+
+	private addSavedStepForm(step: IStep, key: string): void {
+		this.stepKeys.push(key);
+		this.addStepForm(step);
+	}
+
+	/** Adds a form for a Step that already has its settings, after the Steps there are. */
+	private addStepForm(step: IStep): void {
+		const index = this.steps.length;
+		this.numberOfSteps = this.numberOfSteps + 1;
+
+		if (typeof this.stepsOptions[index] === 'undefined') {
+			this.stepsOptions.push([]);
+		}
+		this.steps.push(step);
+		(<FormArray>this.editFlowForm.controls.stepsData).insert(index, this.initializeStepData(step));
+		this.setTypeLinks(step, index);
+		this.getOptions(step, this.editFlowForm.controls.stepsData.get(index.toString()), this.stepsOptions[index], index);
+		this.enableConnection[index] = this.showsConnection(step);
+		this.enableMessage[index] = !!step.messageId;
+	}
+
+	private addNewStepForm(stepType: StepType, componentType: string, key: string): void {
+		this.stepKeys.push(key);
+		this.createNewStep(stepType, componentType, this.steps.length);
+	}
+
+	private defaultComponentType(kind: string, componentType?: string): string {
+		const integration = this.integrations?.[this.indexIntegration ?? 0] ?? this.integrations?.[0];
+		switch (kind) {
+			case 'SOURCE':
+				return componentType || integration?.defaultFromComponentType || '';
+			case 'SINK':
+				return componentType || integration?.defaultToComponentType || '';
+			case 'ERROR':
+				return componentType || integration?.defaultErrorComponentType || '';
+			default:
+				return componentType || 'log';
+		}
+	}
+
+	/** The Flow graph with each Step's component and settings taken from its form. */
+	private syncedGraph(): FlowGraph {
+		const graph = this.designer!.current;
+		const stepsData = this.editFlowForm.controls.stepsData as FormArray;
+		return {
+			...graph,
+			steps: graph.steps.map(step => {
+				const index = this.stepKeys.indexOf(step.key);
+				const form = (stepsData.at(index) as FormGroup)?.getRawValue();
+				return form
+					? {
+							...step,
+							componentType: form.componentType || undefined,
+							uri: form.uri || undefined,
+							options: this.steps[index]?.options,
+							connectionId: form.connection || undefined,
+							messageId: form.message || undefined,
+							routeId: form.route || undefined,
+						}
+					: step;
+			}),
+		};
+	}
+
+	private refreshCanvas(): void {
+		if (!this.designer) {
+			return;
+		}
+		this.canvasGraph = this.syncedGraph();
+		this.checkCanvas();
+		// Required path parts are known once a Component's schema is read; check again when new ones arrive.
+		this.schemas.load(this.canvasGraph.steps.map(step => step.componentType)).subscribe(() => this.checkCanvas());
+	}
+
+	private checkCanvas(): void {
+		if (this.canvasGraph) {
+			this.canvasProblems = problems(this.canvasGraph, this.schemas.pathRule);
+			this.canvasWarnings = warnings(this.canvasGraph);
+			this.cdr.markForCheck();
+		}
+	}
+
+	/** Applies an edit of the Flow graph; a rejected edit is explained to the user and changes nothing. */
+	private edit(result: EditResult): void {
+		if (!this.designer || this.designer.current.readOnlyReason) {
+			return;
+		}
+		this.designer.apply(result);
+		this.designerMessage = result.outcome === 'rejected' ? result.reason : undefined;
+		this.addFormsForNewSteps();
+		this.refreshCanvas();
+	}
+
+	private addFormsForNewSteps(): void {
+		this.designer!.current.steps
+			.filter(step => !this.stepKeys.includes(step.key))
+			.forEach(step => {
+				this.addNewStepForm(step.kind as StepType, this.defaultComponentType(step.kind, step.componentType), step.key);
+				// A new Response starts with its status, which the graph gave it.
+				if (step.options) {
+					this.steps[this.stepKeys.indexOf(step.key)].options = step.options;
+				}
+			});
+	}
+
+	/** Whether the side panel is hidden, to give the canvas the whole width. Hidden by default; remembered in this browser. */
+	sidePanelCollapsed = readPanelCollapsed();
+
+	togglePanel(): void {
+		this.setPanelCollapsed(!this.sidePanelCollapsed);
+	}
+
+	/** A double-click on a Step shows it in the side panel when the panel is hidden, and hides the panel when it is shown. */
+	toggleStepEditor(key: string): void {
+		this.onSelectionChange({ type: 'step', key });
+		this.setPanelCollapsed(!this.sidePanelCollapsed);
+	}
+
+	/** What the side panel shows while no Step or Link is selected: the Flow settings or its Error handler. */
+	flowPanel: 'settings' | 'errorHandler' = 'settings';
+
+	/** Whether the side panel shows this part of the Flow settings. */
+	isFlowPanelOpen(panel: 'settings' | 'errorHandler'): boolean {
+		return !this.sidePanelCollapsed && this.selection.type === 'flow' && this.flowPanel === panel;
+	}
+
+	openFlowSettings(): void {
+		this.openFlowPanel('settings');
+	}
+
+	openErrorHandler(): void {
+		this.openFlowPanel('errorHandler');
+	}
+
+	private openFlowPanel(panel: 'settings' | 'errorHandler'): void {
+		this.onSelectionChange({ type: 'flow' });
+		this.flowPanel = panel;
+		this.setPanelCollapsed(false);
+	}
+
+	private setPanelCollapsed(collapsed: boolean): void {
+		this.sidePanelCollapsed = collapsed;
+		try {
+			localStorage.setItem(PANEL_COLLAPSED_KEY, String(collapsed));
+		} catch {
+			// Without storage the panel is simply hidden again next time.
+		}
+	}
+
+	onSelectionChange(selection: DesignerSelection): void {
+		this.selection = selection;
+		this.flowPanel = 'settings';
+		this.cdr.markForCheck();
+	}
+
+	onInsertStep(event: { linkTo: string; kind: 'ACTION' | 'ROUTER'; componentType: string }): void {
+		const before = new Set(this.designer!.current.steps.map(s => s.key));
+		this.edit(insertStep(this.designer!.current, event.linkTo, event.kind, event.componentType));
+		const inserted = this.designer!.current.steps.find(s => !before.has(s.key) && s.kind === event.kind);
+		if (inserted) {
+			this.selection = { type: 'step', key: inserted.key };
+			this.flowCanvas?.reveal(inserted.key);
+		}
+	}
+
+	onAppendStep(event: { after: string; kind: 'ACTION' | 'ROUTER' | 'SINK'; componentType: string }): void {
+		const before = new Set(this.designer!.current.steps.map(s => s.key));
+		this.edit(appendStep(this.designer!.current, event.after, event.kind, event.componentType));
+		const appended = this.designer!.current.steps.find(s => !before.has(s.key) && s.kind === event.kind);
+		if (appended) {
+			this.selection = { type: 'step', key: appended.key };
+			this.flowCanvas?.reveal(appended.key);
+		}
+	}
+
+	onAddBranch(routerKey: string): void {
+		this.edit(addBranch(this.designer!.current, routerKey));
+	}
+
+	onDeleteStep(key: string): void {
+		const graph = this.designer!.current;
+		const step = graph.steps.find(s => s.key === key);
+		const branches = graph.links.filter(l => l.from === key).length;
+		if (
+			step?.kind === 'ROUTER' &&
+			branches > 1 &&
+			!window.confirm(`Delete this ${routerKind(step)} Router? Its Default branch takes its place and its other Branches are deleted.`)
+		) {
+			return;
+		}
+		this.edit(deleteStep(graph, key));
+		if (!this.designer!.current.steps.some(s => s.key === key)) {
+			this.selection = { type: 'flow' };
+		}
+	}
+
+	onDeleteBranch(linkTo: string): void {
+		this.edit(deleteBranch(this.designer!.current, linkTo));
+		if (!this.designer!.current.links.some(l => l.to === linkTo)) {
+			this.selection = { type: 'flow' };
+		}
+	}
+
+	onMoveStep(event: { key: string; x: number; y: number }): void {
+		this.edit(moveStep(this.designer!.current, event.key, event.x, event.y));
+	}
+
+	onLinkChange(settings: Partial<LinkSettings>): void {
+		const selection = this.selection;
+		if (selection.type === 'link') {
+			this.edit(updateLink(this.designer!.current, selection.to, settings));
+		}
+	}
+
+	autoArrangeCanvas(): void {
+		this.edit({ outcome: 'accepted', graph: autoArrange(this.designer!.current) });
+	}
+
+	undo(): void {
+		this.designer?.undo();
+		this.refreshCanvas();
+	}
+
+	redo(): void {
+		this.designer?.redo();
+		this.addFormsForNewSteps();
+		this.refreshCanvas();
+	}
+
+	@HostListener('document:keydown', ['$event'])
+	onDesignerKeydown(event: KeyboardEvent): void {
+		const target = event.target as HTMLElement;
+		if (!this.designer || target.closest('input, textarea, select, [contenteditable], .CodeMirror')) {
+			return;
+		}
+		// Space adds a Step, like the + that fits the selection. On a focused button or link, Space keeps its usual meaning.
+		if (event.key === ' ' && !event.ctrlKey && !event.metaKey && !event.altKey && !target.closest('button, a')) {
+			if (this.flowCanvas?.openStepPicker(this.selection)) {
+				event.preventDefault();
+			}
+			return;
+		}
+		if (event.key === 'Delete' && !event.ctrlKey && !event.metaKey) {
+			const selection = this.selection;
+			if (selection.type === 'step') {
+				this.onDeleteStep(selection.key);
+			} else if (selection.type === 'link') {
+				this.onDeleteBranch(selection.to);
+			}
+			return;
+		}
+		if (!(event.ctrlKey || event.metaKey)) {
+			return;
+		}
+		if (event.key.toLowerCase() === 'z' && !event.shiftKey) {
+			event.preventDefault();
+			this.undo();
+		} else if (event.key.toLowerCase() === 'y' || (event.key.toLowerCase() === 'z' && event.shiftKey)) {
+			event.preventDefault();
+			this.redo();
+		}
+	}
+
+	/** True while the Flow has edits that are not saved; used to warn before leaving the designer. */
+	get hasUnsavedChanges(): boolean {
+		return !!this.designer?.hasUnsavedChanges || !!this.editFlowForm?.dirty;
+	}
+
+	/**
+	 * Save & manage goes back to Manage. Otherwise the editor stays: the URL gets the Flow's id (a new Flow only has
+	 * one now), and the Flow is loaded again so every Step has its saved id. Save & start then starts it; a failed
+	 * start shows as Error.
+	 */
+	private afterSave(): void {
+		this.savingFlowSuccess = true;
+		this.isSaving = false;
+		this.editFlowForm.markAsPristine();
+		const then = this.afterSaveAction;
+		this.afterSaveAction = 'stay';
+		if (then === 'return') {
+			this.router.navigate(['/']);
+			return;
+		}
+		const url = this.router.createUrlTree(['/flow/editor', this.flow.id], {
+			queryParams: { mode: 'edit', editor: this.activeEditor, id: this.flow.id },
+		});
+		this.location.replaceState(this.router.serializeUrl(url));
+		this.load(this.flow.id);
+		if (then === 'start') {
+			this.header?.start(this.flow.id);
+		}
+	}
+
+	/** A logging Error Handler logs to FlowName/FlowID; the path is set once the Flow has its id. */
+	private fillErrorHandlerPath(): void {
+		const errorHandler = this.steps.find(step => step.stepType === StepType.ERROR);
+		if (errorHandler) {
+			errorHandler.uri = errorHandlerPathOnSave(errorHandler, this.flow, this.savedFlowName);
+		}
+	}
+
+	get nameControl(): FormControl<string> {
+		return this.editFlowForm.controls.name as FormControl<string>;
+	}
+
+	/** Why the Flow is a Draft, or null. Only a Visual Flow can be a Draft. */
+	get draftReason(): string | null {
+		return this.useCanvas && this.canvasProblems.length > 0 ? this.canvasProblems[0].message : null;
+	}
+
+	/** The path the Error Handler logs to automatically, while the user leaves it to the Flow. */
+	get errorHandlerAutoPath(): string | undefined {
+		const index = this.steps.findIndex(step => step.stepType === StepType.ERROR);
+		const form = index >= 0 ? this.stepFormAt(index)?.getRawValue() : undefined;
+		return form
+			? automaticErrorHandlerPath({ componentType: form.componentType, uri: form.uri }, { name: this.nameControl.value, id: this.flow?.id }, this.flow?.name)
+			: undefined;
+	}
+
+	get sourceComponent(): string | undefined {
+		return sourceStepOf(this.steps)?.componentType;
+	}
+
+	@HostListener('window:beforeunload', ['$event'])
+	onBeforeUnload(event: BeforeUnloadEvent): void {
+		if (this.hasUnsavedChanges) {
+			event.preventDefault();
+		}
+	}
+
+	/**
+	 * Saves the whole Flow: the Flow itself, then the Steps still in the graph, then all Links again
+	 * (named after the Step they lead to), and finally deletes the Steps that were removed.
+	 */
+	private saveDesigner(): void {
+		const graph = this.syncedGraph();
+		if (graph.readOnlyReason) {
+			this.savingFlowFailedMessage = graph.readOnlyReason;
+			this.savingFlowFailed = true;
+			return;
+		}
+
+		const keys = [...graph.steps.map(s => s.key), ERROR_STEP_KEY];
+		const stepsInGraph = keys.map(key => this.steps[this.stepKeys.indexOf(key)]);
+		const removedSteps = this.steps.filter((step, i) => step.id != null && !keys.includes(this.stepKeys[i]));
+
+		stepsToSave(graph, this.flow.id ?? 0).forEach(({ key, step }) => {
+			const target = this.steps[this.stepKeys.indexOf(key)];
+			target.options = step.options;
+			target.coordinateX = step.coordinateX;
+			target.coordinateY = step.coordinateY;
+		});
+
+		// A Draft can't run, so it is never started automatically; the setting can be switched on again once it is complete.
+		if (isDraft(graph)) {
+			this.flow.autoStart = false;
+		}
+
+		this.isSaving = true;
+		const flowSaved$ = this.flow.id ? this.flowService.update(this.flow) : this.flowService.create(this.flow);
+
+		flowSaved$
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				switchMap(flow => {
+					this.flow = flow.body;
+					this.fillErrorHandlerPath();
+					stepsInGraph.forEach(step => (step.flowId = this.flow.id));
+					return this.stepService.updateMultiple(stepsInGraph);
+				}),
+				switchMap(saved => {
+					const stepIds = new Map<string, number>(keys.map((key, i) => [key, saved.body[i].id]));
+					const linkDeletes = [...saved.body, ...removedSteps].map(step => this.linkService.deleteByStepId(step.id));
+					return forkJoin(linkDeletes).pipe(map(() => stepIds));
+				}),
+				switchMap(stepIds => {
+					const stepDeletes = removedSteps.map(step => this.stepService.delete(step.id));
+					return (stepDeletes.length ? forkJoin(stepDeletes) : of([])).pipe(map(() => stepIds));
+				}),
+				switchMap(stepIds => {
+					const links = linksToSave(graph, this.flow.id, stepIds).map(link => this.linkService.create(link));
+					return links.length ? forkJoin(links) : of([]);
+				}),
+			)
+			.subscribe({
+				next: () => {
+					this.designer!.markSaved();
+					this.afterSave();
+				},
+				error: () => {
+					this.savingFlowFailed = true;
+					this.isSaving = false;
+				},
+			});
+	}
+
 	ngOnDestroy() {
 		this.subscription.unsubscribe();
 		this.eventManager.destroy(this.eventSubscriber);
@@ -1703,6 +2405,24 @@ splitOptions4(options: string): string[] {
   }
 
 }
+
+type AfterSave = 'stay' | 'start' | 'return';
+
+/** The graph key of a Flow's Error Step, which has its own Error handler panel rather than a place on the canvas. */
+const ERROR_STEP_KEY = 'error';
+
+const PANEL_COLLAPSED_KEY = 'flow-designer.panel-collapsed';
+
+function readPanelCollapsed(): boolean {
+	try {
+		return localStorage.getItem(PANEL_COLLAPSED_KEY) !== 'false';
+	} catch {
+		return true;
+	}
+}
+
+/** The height in pixels the designer never shrinks below, however small the window. */
+const DESIGNER_MIN_HEIGHT = 400;
 
 export class Option {
   constructor(public key?: string, public value?: string) {}

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, inject, Injectable, Input, OnDestroy, Output, TemplateRef, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, inject, Injectable, Input, OnChanges, OnDestroy, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -7,17 +7,21 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { PopoverModule } from 'ngx-bootstrap/popover';
 import { CodemirrorComponent, CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { Components } from 'app/shared/camel/component-type';
+import { CatalogueEntry, EndpointRole, NO_MATCH, matchRank, roleMismatch, searchCatalogue } from 'app/shared/camel/catalogue';
+import { OptionSchema, PathPart, ValueField, groupOptions, pathRule, requiredOptions, valueFieldOf } from 'app/shared/camel/endpoint';
 import { IStep } from 'app/shared/model/step.model';
 import { IMessage } from 'app/shared/model/message.model';
-import { Route } from 'app/shared/model/route.model';
 import { Connection } from 'app/shared/model/connection.model';
 import { ThemeService } from 'app/core/theme';
+import { isRouteStep, missingRouteFields } from './route-step';
 
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/mode/groovy/groovy';
 import 'codemirror/mode/clike/clike';
 import 'codemirror/mode/python/python';
 import 'codemirror/mode/xml/xml';
+import 'codemirror/addon/display/placeholder';
+import 'codemirror/addon/edit/closetag';
 
 @Injectable()
 export class StepEditorRegistry {
@@ -33,11 +37,17 @@ export class StepEditorRegistry {
   templateUrl: './flow-editor-step.component.html',
   imports: [CommonModule, ReactiveFormsModule, NgbModule, FontAwesomeModule, NgSelectModule, PopoverModule, CodemirrorModule],
 })
-export class FlowEditorStepComponent implements OnDestroy {
+export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   @Input({ required: true }) step: IStep;
   @Input({ required: true }) index: number;
   @Input({ required: true }) stepForm: FormGroup;
   @Input() activeEditor: string;
+  /** On the visual designer's canvas, Steps are added there instead of through this form. */
+  @Input() onCanvas = false;
+  /** On the canvas, the kind of the Router being edited; it is shown as its component and can't be changed here. */
+  @Input() routerKind?: string;
+  /** On the canvas, whether the Flow keeps a valid shape without this Step; the canvas decides which Steps can go. */
+  @Input() deletable = false;
   @Input() formSubmitted = false;
 
   @Input() sourceComponentsNames: Array<any> = [];
@@ -45,14 +55,14 @@ export class FlowEditorStepComponent implements OnDestroy {
   @Input() actionComponentsNames: Array<any> = [];
   @Input() languageComponentsNames: Array<any> = [];
 
-  @Input() routes: Route[] = [];
   @Input() messages: IMessage[] = [];
   @Input() connections: Connection[] = [];
-  @Input() routeCreated = false;
   @Input() messageCreated = false;
   @Input() connectionCreated = false;
 
   @Input() uriPlaceholder: string;
+  /** The path an Error Handler gets automatically while the user leaves it to the Flow, shown as a hint. */
+  @Input() autoPath?: string;
   @Input() uriPopoverMessage: string;
   @Input() uriList: IStep[] = [];
   @Input() componentOptions: Array<any> = [];
@@ -71,13 +81,18 @@ export class FlowEditorStepComponent implements OnDestroy {
   @Output() addStep = new EventEmitter<{ step: IStep; index: number }>();
   @Output() addConnection = new EventEmitter<{ step: IStep; index: number }>();
   @Output() componentTypeChange = new EventEmitter<{ step: IStep; index: number; componentType: any }>();
-  @Output() createOrEditRoute = new EventEmitter<{ step: IStep; control: AbstractControl }>();
+  /** Opens the large Route editor on the Step's form, which holds its Route as `route`, `routeName` and `routeContent`. */
+  @Output() createOrEditRoute = new EventEmitter<{ step: IStep; form: FormGroup }>();
   @Output() createOrEditMessage = new EventEmitter<{ step: IStep; control: AbstractControl }>();
   @Output() createOrEditConnection = new EventEmitter<{ step: IStep; connectionType: string; control: AbstractControl }>();
 
   readonly themeService = inject(ThemeService);
   private scriptOptionsKey = '';
   private scriptOptionsCache: Record<string, unknown> | null = null;
+  private pathOptionsKey = '';
+  private pathOptionsCache: Record<string, unknown> | null = null;
+  private routeOptionsTheme = '';
+  private routeOptionsCache: Record<string, unknown> | null = null;
 
   @ViewChild('scriptEditor')
   set scriptEditor(editor: CodemirrorComponent | undefined) {
@@ -106,6 +121,162 @@ export class FlowEditorStepComponent implements OnDestroy {
     this.stepEditorRegistry.editors.push(this);
   }
 
+  private choicesCache?: { options: unknown[]; length: number; role: EndpointRole; choices: OptionSchema[] };
+  private pathPartsCache?: { syntax: string; options: unknown[]; parts: PathPart[] };
+  private componentChoicesCache?: { names: unknown[]; role: EndpointRole; search: string; choices: ComponentChoice[] };
+
+  /** What is typed in the component list; while searching it also shows the components this Step can't use. */
+  componentSearch = '';
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['componentOptions'] && this.componentOptions?.length) {
+      this.addRequiredOptions();
+    }
+  }
+
+  /** A Source receives messages; every other Step sends them. */
+  get role(): EndpointRole {
+    return this.stepType === 'SOURCE' ? 'consumer' : 'producer';
+  }
+
+  /** The Options this Step can set, under Common, Advanced and Security. Cached so the key list keeps its items. */
+  get optionChoices(): OptionSchema[] {
+    const options = this.componentOptions ?? [];
+    const cache = this.choicesCache;
+    if (!cache || cache.options !== options || cache.length !== options.length || cache.role !== this.role) {
+      this.choicesCache = { options, length: options.length, role: this.role, choices: groupOptions(options, this.role) };
+    }
+    return this.choicesCache!.choices;
+  }
+
+  /** The Component's path parts, from its syntax, for the Path field's hint. */
+  get pathParts(): PathPart[] {
+    const syntax = this.uriPlaceholder ?? '';
+    const options = this.componentOptions ?? [];
+    if (this.pathPartsCache?.syntax !== syntax || this.pathPartsCache.options !== options) {
+      this.pathPartsCache = { syntax, options, parts: syntax ? pathRule(syntax, options).parts : [] };
+    }
+    return this.pathPartsCache.parts;
+  }
+
+  /**
+   * The components this Step can use, with the catalogue's title and description; while searching, also the ones
+   * it can't use, disabled with the reason, so every component Camel offers can be found.
+   */
+  get componentChoices(): ComponentChoice[] {
+    const names = this.stepType === 'SOURCE' ? this.sourceComponentsNames : this.stepType === 'ACTION' ? this.actionComponentsNames : this.sinkComponentsNames;
+    const cache = this.componentChoicesCache;
+    if (cache && cache.names === names && cache.role === this.role && cache.search === this.componentSearch) {
+      return cache.choices;
+    }
+    const usable = new Set<string>(names ?? []);
+    const choices: ComponentChoice[] = [...usable].map(name => this.componentChoice(this.catalogueEntry(name)));
+    if (this.componentSearch.trim()) {
+      const others = this.components.types.filter(type => !usable.has(type.name));
+      searchCatalogue(others, this.componentSearch).forEach(entry =>
+        choices.push(this.componentChoice(entry, roleMismatch(entry, this.role) ?? `${entry.title ?? entry.name} isn't available for this Step.`)),
+      );
+    }
+    this.componentChoicesCache = { names, role: this.role, search: this.componentSearch, choices };
+    return choices;
+  }
+
+  readonly matchesComponent = (term: string, item: ComponentChoice): boolean => matchRank(item, term) < NO_MATCH;
+
+  /** Compares an enum value with the empty "Default" entry, which a new row holds as null and a loaded row as ''. */
+  readonly sameValue = (a: unknown, b: unknown): boolean => (a ?? '') === (b ?? '');
+
+  private catalogueEntry(name: string): CatalogueEntry {
+    return this.components.types.find(type => type.name === name) ?? { name };
+  }
+
+  private componentChoice(entry: CatalogueEntry, reason?: string): ComponentChoice {
+    return { ...entry, label: entry.title ?? entry.name, reason, disabled: !!reason };
+  }
+
+  optionSchema(idx: number): OptionSchema | undefined {
+    const key = (this.stepForm.get('options') as FormArray)?.at(idx)?.get('key')?.value;
+    return key ? (this.componentOptions ?? []).find(option => option.name === key) : undefined;
+  }
+
+  /** The field for an Option's value; a placeholder such as `{{flag}}` in a boolean Option keeps a text field. */
+  valueField(idx: number): ValueField {
+    const field = valueFieldOf(this.optionSchema(idx));
+    const value = this.optionValue(idx);
+    return field === 'switch' && value !== '' && value !== 'true' && value !== 'false' ? 'text' : field;
+  }
+
+  hasValue(idx: number): boolean {
+    return this.optionValue(idx) !== '';
+  }
+
+  /** Leaves the Option unset, so the Component's default applies. */
+  clearValue(idx: number): void {
+    const control = (this.stepForm.get('options') as FormArray).at(idx).get('value')!;
+    control.setValue('');
+    control.markAsDirty();
+  }
+
+  isRequiredOption(idx: number): boolean {
+    return !!this.optionSchema(idx)?.required;
+  }
+
+  switchOn(idx: number): boolean {
+    const value = this.optionValue(idx);
+    return value === '' ? this.optionSchema(idx)?.defaultValue === true : value === 'true';
+  }
+
+  setSwitch(idx: number, on: boolean): void {
+    const control = (this.stepForm.get('options') as FormArray).at(idx).get('value')!;
+    control.setValue(String(on));
+    control.markAsDirty();
+  }
+
+  /** The enum values, plus a value typed earlier that the catalogue doesn't list, such as a placeholder. */
+  choicesOf(idx: number): readonly string[] {
+    const values = this.optionSchema(idx)?.enum ?? [];
+    const value = this.optionValue(idx);
+    return value && !values.includes(value) ? [...values, value] : values;
+  }
+
+  /** The required Options that have no value yet. They don't block: a Connection may supply them. */
+  get missingRequiredOptions(): string[] {
+    const formOptions = (this.stepForm.get('options') as FormArray)?.controls ?? [];
+    const filled = new Set(formOptions.filter(option => `${option.get('value')?.value ?? ''}`.trim()).map(option => option.get('key')?.value));
+    return requiredOptions(this.componentOptions ?? [], this.role)
+      .filter(name => !filled.has(name))
+      .map(name => this.componentOptions.find(option => option.name === name)?.displayName ?? name);
+  }
+
+  private optionValue(idx: number): string {
+    return `${(this.stepForm.get('options') as FormArray)?.at(idx)?.get('value')?.value ?? ''}`;
+  }
+
+  /**
+   * Adds an empty row for each required Option of a Step that has no Options yet. A saved Step's own Options are
+   * filled in after its schema arrives, so they are left alone.
+   */
+  private addRequiredOptions(): void {
+    const formOptions = this.stepForm?.get('options') as FormArray | null;
+    if (!formOptions || this.step?.options) {
+      return;
+    }
+    const present = new Set(formOptions.controls.map(option => option.get('key')?.value));
+    requiredOptions(this.componentOptions, this.role)
+      .filter(name => !present.has(name))
+      .forEach(name => {
+        const emptyRow = formOptions.controls.findIndex(option => !option.get('key')?.value && !option.get('value')?.value);
+        if (emptyRow < 0) {
+          this.addOption();
+        }
+        const row = emptyRow < 0 ? formOptions.length - 1 : emptyRow;
+        formOptions.at(row).get('key')!.setValue(name);
+        if (this.stepOptions[row]) {
+          this.stepOptions[row].key = name;
+        }
+      });
+  }
+
   ngOnDestroy(): void {
     const index = this.stepEditorRegistry.editors.indexOf(this);
     if (index >= 0) {
@@ -125,10 +296,6 @@ export class FlowEditorStepComponent implements OnDestroy {
     return this.stepForm?.get('uri')?.value;
   }
 
-  get routeValue(): any {
-    return this.stepForm?.get('route')?.value;
-  }
-
   get messageValue(): any {
     return this.stepForm?.get('message')?.value;
   }
@@ -139,10 +306,6 @@ export class FlowEditorStepComponent implements OnDestroy {
 
   get connectionDisabled(): boolean {
     return !!this.stepForm?.get('connection')?.disabled;
-  }
-
-  get routeControl(): AbstractControl {
-    return this.stepForm.get('route');
   }
 
   get messageControl(): AbstractControl {
@@ -161,8 +324,49 @@ export class FlowEditorStepComponent implements OnDestroy {
     return this.stepForm?.get('uri')?.errors;
   }
 
+  /** A Step whose Component needs a Connection gets the Connection field by itself; only Route and Script Steps add one. */
+  get canAddConnection(): boolean {
+    return !this.isComponentStep;
+  }
+
+  get canAddAction(): boolean {
+    return !this.onCanvas && (this.stepType === 'ACTION' || (this.stepType === 'SOURCE' && this.activeEditor === 'flow'));
+  }
+
+  get canAddScript(): boolean {
+    return this.stepType === 'SCRIPT' || (this.stepType === 'SOURCE' && this.activeEditor === 'script');
+  }
+
+  get hasAddMenu(): boolean {
+    return (this.canAddConnection && !this.enableConnection) || this.canAddAction || this.canAddScript || this.stepType === 'ROUTE';
+  }
+
   get canRemoveStep(): boolean {
+    if (this.onCanvas) {
+      return this.deletable;
+    }
     return this.stepType === 'ACTION' || this.stepType === 'ROUTER' || this.stepType === 'SCRIPT' || this.stepType === 'ROUTE';
+  }
+
+  /** A Route, or the Error handler of a Route Flow: a name and a Camel route in XML. */
+  get isRouteStep(): boolean {
+    return isRouteStep(this.stepType, this.activeEditor);
+  }
+
+  get routeStepLabel(): string {
+    return this.stepType === 'ERROR' ? 'Error handler' : 'Route';
+  }
+
+  get routeNameMissing(): boolean {
+    return this.formSubmitted && this.missingRouteFields.name;
+  }
+
+  get routeContentMissing(): boolean {
+    return this.formSubmitted && this.missingRouteFields.content;
+  }
+
+  private get missingRouteFields(): { name: boolean; content: boolean } {
+    return missingRouteFields(this.stepType, { name: this.stepForm?.get('routeName')?.value, content: this.stepForm?.get('routeContent')?.value });
   }
 
   get isComponentStep(): boolean {
@@ -196,7 +400,7 @@ export class FlowEditorStepComponent implements OnDestroy {
   }
 
   onCreateOrEditRoute(): void {
-    this.createOrEditRoute.emit({ step: this.step, control: this.routeControl });
+    this.createOrEditRoute.emit({ step: this.step, form: this.stepForm });
   }
 
   onCreateOrEditMessage(): void {
@@ -246,6 +450,42 @@ export class FlowEditorStepComponent implements OnDestroy {
     return this.scriptOptionsCache;
   }
 
+  routeEditorOptions(): Record<string, unknown> {
+    const theme = this.themeService.editorTheme();
+    if (this.routeOptionsCache && this.routeOptionsTheme === theme) {
+      return this.routeOptionsCache;
+    }
+    this.routeOptionsTheme = theme;
+    this.routeOptionsCache = {
+      lineNumbers: true,
+      gutters: ['CodeMirror-linenumbers'],
+      viewportMargin: Infinity,
+      theme,
+      mode: 'xml',
+      autoCloseTags: true,
+    };
+    return this.routeOptionsCache;
+  }
+
+  pathEditorOptions(): Record<string, unknown> {
+    const theme = this.themeService.editorTheme();
+    const placeholder = this.uriPlaceholder ?? '';
+    const key = `${theme}|${placeholder}`;
+    if (this.pathOptionsCache && this.pathOptionsKey === key) {
+      return this.pathOptionsCache;
+    }
+    this.pathOptionsKey = key;
+    this.pathOptionsCache = {
+      lineNumbers: true,
+      gutters: ['CodeMirror-linenumbers'],
+      lineWrapping: true,
+      theme,
+      mode: 'text',
+      placeholder,
+    };
+    return this.pathOptionsCache;
+  }
+
   private scriptEditorMode(componentType: string): string {
     switch ((componentType || '').toLowerCase()) {
       case 'javascript':
@@ -265,6 +505,10 @@ export class FlowEditorStepComponent implements OnDestroy {
 
   openModal(templateRef: TemplateRef<any>): void {
     this.modalRef = this.modalService.open(templateRef);
+  }
+
+  openPathModal(templateRef: TemplateRef<any>): void {
+    this.modalRef = this.modalService.open(templateRef, { size: 'xl' });
   }
 
   openFullScreenModal(templateRef: TemplateRef<any>): void {
@@ -356,4 +600,12 @@ export class FlowEditorStepComponent implements OnDestroy {
       defaultValue: new FormControl(''),
     });
   }
+}
+
+/** A component in the Step editor's component list. */
+interface ComponentChoice extends CatalogueEntry {
+  label: string;
+  /** Why this Step can't use it; such a component is shown disabled. */
+  reason?: string;
+  disabled: boolean;
 }

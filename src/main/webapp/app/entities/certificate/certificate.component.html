@@ -38,7 +38,9 @@
   >
     <tr *ngFor="let certificate of filteredCertificates; trackBy: trackId">
       <td class="table-fx-identity">
-        <jhi-truncate [text]="certificate.certificateName" />
+        <a [routerLink]="['/certificate', certificate.id, 'edit']">
+          <jhi-truncate [text]="certificate.certificateName" />
+        </a>
       </td>
       <td class="table-fx-identity">
         <jhi-truncate [text]="certificate.url" />
@@ -47,14 +49,14 @@
       <td class="text-end">
         <jhi-row-actions>
           <button
-            jhiPrimaryAction
+            jhiOverflowAction
             type="button"
-            class="btn btn-fx btn-fx-sm btn-fx-ghost"
+            ngbDropdownItem
+            class="btn-fx-dropdown-item"
             [routerLink]="['/certificate', certificate.id, 'view']"
-            aria-label="View"
           >
             <fa-icon icon="eye"></fa-icon>
-            <span class="d-none d-md-inline">View</span>
+            <span>View</span>
           </button>
           <button
             jhiOverflowAction

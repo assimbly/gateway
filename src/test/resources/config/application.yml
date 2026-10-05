@@ -17,8 +17,13 @@
 spring:
     application:
         name: gateway
-    cache:
-        type: simple
+    main:
+        allow-bean-definition-overriding: true
+        allow-circular-references: true
+        lazy-initialization: true
+    mvc:
+        pathmatch:
+            matching-strategy: ant_path_matcher
     datasource:
         type: com.zaxxer.hikari.HikariDataSource
         url: jdbc:h2:mem:gateway;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
@@ -41,7 +46,7 @@ spring:
             hibernate.cache.use_second_level_cache: false
             hibernate.cache.use_query_cache: false
             hibernate.generate_statistics: true
-            hibernate.hbm2ddl.auto: validate
+            hibernate.hbm2ddl.auto: none
             hibernate.jdbc.time_zone: UTC
     liquibase:
         contexts: test
@@ -66,6 +71,8 @@ server:
 # ===================================================================
 
 jhipster:
+    clientApp:
+        name: 'gatewayApp'
     async:
         core-pool-size: 1
         max-pool-size: 50
@@ -76,19 +83,17 @@ jhipster:
             enabled: true
             host: localhost
             port: 5000
-            queue-size: 512
     mail:
         from: test@localhost
         base-url: http://127.0.0.1:8080
     security:
+        authentication:
+            jwt:
+                base64-secret: aW50ZWdyYXRpb24tdGVzdC1qd3Qtc2VjcmV0LWtleS1mb3ItdGhlLWFzc2ltYmx5LWdhdGV3YXktdGVzdHMtb25seQ==
+                token-validity-in-seconds: 86400
         remember-me:
             # security key (this key should be unique for your application, and kept secret)
             key: 3ff0a5bceb965db5bcb77fecccd1ce908c269e49
-    metrics: # DropWizard Metrics configuration, used by MetricsConfiguration
-        jmx.enabled: true
-        logs: # Reports Dropwizard metrics in the logs
-            enabled: true
-            report-frequency: 60 # in seconds
 
 # ===================================================================
 # Application specific properties
@@ -100,3 +105,8 @@ jhipster:
 # ===================================================================
 
 # application:
+
+encryption:
+    jasypt:
+        algorithm: PBEWithHMACSHA512AndAES_256
+        password: integration-test-password

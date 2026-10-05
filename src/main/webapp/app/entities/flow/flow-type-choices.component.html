@@ -1,0 +1,22 @@
+<div class="flow-type-choices">
+  @for (choice of flowTypes; track choice.title) {
+    <a class="flow-type-choice" [routerLink]="choice.link" [queryParams]="choice.queryParams" (click)="chosen.emit()">
+      <fa-icon class="flow-type-choice__icon" [icon]="choice.icon" [fixedWidth]="true" />
+      <span class="flow-type-choice__text">
+        <span class="flow-type-choice__title">{{ choice.title }}</span>
+        <span class="flow-type-choice__level">{{ choice.level }}</span>
+        <span class="flow-type-choice__audience">{{ choice.audience }}</span>
+      </span>
+    </a>
+  }
+  @if (withImport()) {
+    <button type="button" class="flow-type-choice" (click)="importChosen.emit()">
+      <fa-icon class="flow-type-choice__icon" icon="file-import" [fixedWidth]="true" />
+      <span class="flow-type-choice__text">
+        <span class="flow-type-choice__title">Import from file</span>
+        <span class="flow-type-choice__level">Export file</span>
+        <span class="flow-type-choice__audience">A Flow saved with Export, from this or another Gateway.</span>
+      </span>
+    </button>
+  }
+</div>

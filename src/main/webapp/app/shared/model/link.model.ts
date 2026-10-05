@@ -5,6 +5,7 @@ export interface ILink {
     transport?: string;
 	  rule?: string;
     expression?: string;
+    language?: string;
 	  point?: string;
     format?: string;
 	  pattern?: string;
@@ -22,6 +23,7 @@ export class Link implements ILink {
         public point?: string,
         public format?: string,
         public pattern?: string,
-        public stepId?: number
+        public stepId?: number,
+        public language?: string,
     ) {}
 }

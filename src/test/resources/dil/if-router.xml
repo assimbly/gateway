@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dil>
+  <integrations>
+    <integration>
+      <id>1</id>
+      <name>roundtrip</name>
+      <type>FULL</type>
+      <options>
+        <environment>test</environment>
+        <stage>TEST</stage>
+      </options>
+      <flows>
+        <flow>
+          <id>if-flow</id>
+          <name>IfRouterFlow</name>
+          <type>esb</type>
+          <steps>
+            <step>
+              <id>error</id>
+              <type>error</type>
+              <uri>failedexchange</uri>
+            </step>
+            <step>
+              <id>source</id>
+              <type>source</type>
+              <uri>timer:tick</uri>
+              <links><link><id>router</id><bound>out</bound><transport>sync</transport></link></links>
+            </step>
+            <step>
+              <id>router</id>
+              <type>router</type>
+              <uri>if</uri>
+              <links><link><id>router</id><bound>in</bound><transport>sync</transport></link><link><id>sink-else</id><bound>out</bound><transport>sync</transport></link><link><id>sink-if</id><bound>out</bound><transport>sync</transport><rule>if</rule><language>simple</language><expression>${body} contains 'Test'</expression></link></links>
+            </step>
+            <step>
+              <id>sink-else</id>
+              <type>sink</type>
+              <uri>log:sink-else</uri>
+              <links><link><id>sink-else</id><bound>in</bound><transport>sync</transport></link></links>
+            </step>
+            <step>
+              <id>sink-if</id>
+              <type>sink</type>
+              <uri>log:sink-if</uri>
+              <links><link><id>sink-if</id><bound>in</bound><transport>sync</transport></link></links>
+            </step>
+          </steps>
+        </flow>
+      </flows>
+    </integration>
+  </integrations>
+  <core/>
+</dil>

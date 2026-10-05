@@ -513,32 +513,11 @@ ng-dropdown-panel > div {
   word-break: break-word;
 }
 
-.flow-alert-list {
-  margin: 0;
-  padding-left: 1.25rem;
-  display: block;
-  max-height: 24rem;
-  overflow-y: auto;
-  text-align: left;
-}
-
-.flow-alert-list li {
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  margin-bottom: 0.75rem;
-}
-
 .invalid-field-message {
   margin-top: 0.25rem;
   margin-bottom: 0;
   color: var(--app-danger);
   line-height: 1.3;
-}
-
-.flow-alert-list .flow-alert-status {
-  list-style: none;
-  margin-left: -1.25rem;
-  color: var(--bs-secondary-color);
 }
 
 .flow-error-detail {
@@ -1154,6 +1133,85 @@ ng-dropdown-panel > div {
   height: 12.5rem;
 }
 
+/* A Route Step shows up to 8 lines of its Route; the large editor shows all of it. */
+.route-codemirror-inline {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  text-align: left;
+}
+
+.route-codemirror-inline .CodeMirror {
+  height: auto;
+}
+
+.route-codemirror-inline .CodeMirror-scroll {
+  min-height: calc(3lh + 8px);
+  max-height: calc(8lh + 8px);
+}
+
+/* The name of a Route Step, edited in place like a Flow's name. */
+.step-name {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  max-width: 32rem;
+}
+
+.step-name__label {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--app-text-muted);
+}
+
+.step-name__field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.625rem;
+  border: 1px solid var(--app-border);
+  border-radius: 6px;
+  background: var(--app-surface);
+
+  &:hover {
+    border-color: var(--app-text-muted);
+  }
+
+  &:focus-within {
+    border-color: var(--app-focus);
+    box-shadow: 0 0 0 0.15rem color-mix(in srgb, var(--app-focus) 25%, transparent);
+  }
+
+  &.is-invalid {
+    border-color: var(--app-danger);
+  }
+}
+
+.step-name__icon {
+  color: var(--app-text-muted);
+  font-size: 0.875rem;
+}
+
+.step-name__input {
+  flex: 1 1 auto;
+  min-width: 6rem;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--app-text);
+  font-size: 1.125rem;
+  font-weight: 600;
+
+  &::placeholder {
+    color: var(--app-text-muted);
+    font-weight: 400;
+  }
+}
+
 .notes-codemirror .CodeMirror {
   height: 40rem;
 }
@@ -1193,6 +1251,20 @@ ng-dropdown-panel > div {
 
 .script-codemirror-full .CodeMirror {
   height: calc(100vh - 12rem);
+}
+
+.path-codemirror {
+  display: block;
+  width: 100%;
+  text-align: left;
+}
+
+.path-codemirror .CodeMirror {
+  height: 60vh;
+}
+
+.path-codemirror .CodeMirror-placeholder {
+  color: var(--app-text-muted);
 }
 
 #messageBrowserEditor

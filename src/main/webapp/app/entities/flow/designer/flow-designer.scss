@@ -1,0 +1,266 @@
+// Layout of the visual designer on the Flow editor page (the editor component uses ViewEncapsulation.None).
+
+.flow-designer-page {
+  max-width: 1600px;
+}
+
+.flow-designer {
+  margin-bottom: 0;
+}
+
+.flow-designer-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+
+  .btn span {
+    margin-left: 0.35rem;
+  }
+}
+
+.flow-designer-toolbar-end {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-left: auto;
+}
+
+.flow-designer-body {
+  display: flex;
+  gap: 1rem;
+  align-items: stretch;
+  // The editor sets the height so the designer reaches the bottom of the window.
+  height: 40rem;
+}
+
+// The + buttons on the canvas, used by the canvas and the Step picker.
+.flow-plus {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--app-border, #d0d5dd);
+  background: var(--app-surface, #fff);
+  font-size: 0.7rem;
+  line-height: 1;
+  color: var(--app-text, #344054);
+
+  &::after {
+    display: none;
+  }
+
+  &:hover {
+    border-color: var(--app-primary, #2e90fa);
+    color: var(--app-primary, #2e90fa);
+  }
+}
+
+// Foblex Flow's default theme, mapped onto the app's light and dark theme colours.
+.flow-designer-canvas .f-flow {
+  --ff-canvas-background-color: var(--app-bg);
+  --ff-background-dot-color: var(--app-border);
+  --ff-connection-color: var(--app-text-muted);
+  --ff-connection-hover-color: var(--app-primary);
+  --ff-connection-selected-color: var(--app-primary);
+  --ff-connection-content-background-color: transparent;
+  --ff-connection-content-border-color: transparent;
+  --ff-connection-content-color: var(--app-text);
+
+  .f-canvas,
+  .f-connection-content {
+    background: transparent;
+  }
+
+  .flow-step .flow-connector.f-connector {
+    background: var(--flow-kind-color);
+    border: none;
+  }
+}
+
+.flow-designer-canvas {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 1px solid var(--app-border, #d0d5dd);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+// Notices and messages float over the top of the canvas, so they never push it down.
+.flow-designer-alerts {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+
+  .alert {
+    align-self: flex-start;
+    max-width: 100%;
+    pointer-events: auto;
+  }
+}
+
+.flow-designer-panel {
+  display: flex;
+  flex: 0 0 28rem;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 0;
+
+  .form-group.container {
+    padding: 0;
+  }
+
+  // In the Step form, fields take all the width their icon buttons leave, so the form has the same margin on both sides.
+  jhi-flow-editor-step .row {
+    > .col-10,
+    > .col-5 {
+      flex: 1 1 0;
+      width: auto;
+    }
+
+    > .btn.col-1,
+    > .btn.col-2 {
+      flex: 0 0 auto;
+      width: auto;
+      // A button has no gutter padding of its own; this keeps it inside the row's right edge.
+      margin-right: calc(var(--bs-gutter-x) * 0.5);
+    }
+  }
+
+  // An option's key and value get most of the row, with small gaps and compact buttons, so both stay readable.
+  jhi-flow-editor-step [formarrayname='options'] .row {
+    --bs-gutter-x: 0.5rem;
+
+    > .btn.col-1 {
+      width: 28px;
+      min-width: 28px;
+      padding-right: 0;
+      padding-left: 0;
+    }
+  }
+}
+
+// The Step, Link or Flow editor; it scrolls when it is taller than the space above the minimap.
+.flow-designer-panel-editor {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+// The Flow settings fill the panel; the Notes take the height the settings above them leave.
+.flow-settings {
+  height: 100%;
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .notes-codemirror {
+    flex: 1 1 auto;
+    min-height: 10rem;
+    display: flex;
+    flex-direction: column;
+
+    .CodeMirror {
+      flex: 1 1 auto;
+      height: auto;
+      min-height: 0;
+    }
+  }
+}
+
+// A setting with its name and what it does on the left, and its on/off switch on the right.
+.flow-setting {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  .form-check-label {
+    display: block;
+    font-weight: 600;
+  }
+
+  .form-switch .form-check-input {
+    width: 2.5em;
+    height: 1.25em;
+    cursor: pointer;
+  }
+}
+
+.flow-setting__text {
+  min-width: 0;
+}
+
+.flow-designer-minimap {
+  flex: 0 0 14rem;
+  overflow: hidden;
+  border: 1px solid var(--app-border, #d0d5dd);
+  border-radius: 8px;
+  background: var(--app-bg, #f8f9fb);
+  cursor: crosshair;
+  touch-action: none;
+
+  // Foblex places its minimap over the corner of the canvas; here it fills this box instead.
+  .f-minimap {
+    position: static;
+    width: 100%;
+    height: 100%;
+  }
+
+  .f-minimap-node {
+    fill: var(--app-text-muted, #98a2b3);
+  }
+
+  .flow-minimap-source {
+    fill: #12b76a;
+  }
+
+  .flow-minimap-action {
+    fill: #2e90fa;
+  }
+
+  .flow-minimap-router {
+    fill: #9e77ed;
+  }
+
+  .flow-minimap-sink {
+    fill: #f79009;
+  }
+
+  .f-minimap-view {
+    fill: var(--app-primary, #2e90fa);
+    fill-opacity: 0.08;
+    stroke: var(--app-primary, #2e90fa);
+    stroke-width: 1;
+  }
+}
+
+@media (max-width: 1100px) {
+  .flow-designer-body {
+    flex-direction: column;
+    height: auto !important;
+  }
+
+  .flow-designer-canvas {
+    height: 70vh;
+  }
+
+  .flow-designer-panel {
+    flex-basis: auto;
+  }
+
+  .flow-designer-minimap {
+    display: none;
+  }
+}

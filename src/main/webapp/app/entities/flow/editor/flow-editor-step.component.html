@@ -1,4 +1,5 @@
 <ng-template #addStepMenu>
+  @if (hasAddMenu) {
   <div class="row mt-2">
     <div class="col-10 d-flex justify-content-end">
       <div ngbDropdown placement="bottom-end">
@@ -7,33 +8,23 @@
           Add
         </button>
         <div ngbDropdownMenu>
-          <button type="button" ngbDropdownItem (click)="onAddConnection()">
-            Connection
-          </button>
-          <button type="button" ngbDropdownItem (click)="onAddStep()"
-                  *ngIf="stepType =='ACTION'">
-            Action
-          </button>
-          <button type="button" ngbDropdownItem (click)="onAddStep()"
-                  *ngIf="stepType =='SOURCE' && activeEditor == 'flow'">
-            Action
-          </button>
-          <button type="button" ngbDropdownItem (click)="onAddStep()"
-                  *ngIf="stepType =='SCRIPT'">
-            Script
-          </button>
-          <button type="button" ngbDropdownItem (click)="onAddStep()"
-                  *ngIf="stepType =='SOURCE' && activeEditor == 'script'">
-            Script
-          </button>
-          <button type="button" ngbDropdownItem (click)="onAddStep()"
-                  *ngIf="stepType =='ROUTE'">
-            Route
-          </button>
+          @if (canAddConnection && !enableConnection) {
+            <button type="button" ngbDropdownItem (click)="onAddConnection()">Connection</button>
+          }
+          @if (canAddAction) {
+            <button type="button" ngbDropdownItem (click)="onAddStep()">Action</button>
+          }
+          @if (canAddScript) {
+            <button type="button" ngbDropdownItem (click)="onAddStep()">Script</button>
+          }
+          @if (stepType === 'ROUTE') {
+            <button type="button" ngbDropdownItem (click)="onAddStep()">Route</button>
+          }
         </div>
       </div>
     </div>
   </div>
+  }
 </ng-template>
 
 <ng-template #errorHandlerPopover let-message="message">
@@ -46,7 +37,12 @@
   <div style="min-width:200px; overflow-y: auto;" [innerHtml]="uriPopoverMessage"></div>
 </ng-template>
 <ng-template #pathPopover let-message="message">
-  <div style="min-width:300px;">{{uriPlaceholder}}</div>
+  <div style="min-width:300px;">
+    <div class="font-monospace mb-1">{{uriPlaceholder}}</div>
+    @for (part of pathParts; track part.name) {
+      <div><b>{{part.displayName}}</b>@if (part.required) { (required)}@if (part.description) {: {{part.description}}}</div>
+    }
+  </div>
 </ng-template>
 
 <ng-template #uriFullscreenEditor>
@@ -77,8 +73,12 @@
       </button>
     </div>
     <div class="modal-body">
-      <textarea class="form-control" formControlName="uri" placeholder="{{uriPlaceholder}}" rows="5"
-                [value]="uriValue"></textarea>
+      <ngx-codemirror
+        class="path-codemirror"
+        formControlName="uri"
+        [options]="pathEditorOptions()"
+        (codeMirrorLoaded)="refreshCodeMirror($event)">
+      </ngx-codemirror>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-fx btn-fx-secondary" (click)="cancelModal()">Close</button>
@@ -92,11 +92,26 @@
 
       <div class="row">
         <div class="col-10">
-          <div class="float-start text-start">
-            <h5 class="border-bottom">{{step.stepType}}</h5></div>
+          @if (isRouteStep) {
+            <div class="step-name text-start">
+              <label class="step-name__label" for="field_routeName_{{index}}">{{ routeStepLabel }} name</label>
+              <div class="step-name__field" [class.is-invalid]="routeNameMissing">
+                <fa-icon icon="pencil-alt" class="step-name__icon" aria-hidden="true"></fa-icon>
+                <input id="field_routeName_{{index}}" type="text" class="step-name__input" formControlName="routeName"
+                       [placeholder]="stepType === 'ERROR' ? 'e.g. Orders error handler' : 'e.g. Orders route'"
+                       [attr.aria-invalid]="routeNameMissing" autocomplete="off"/>
+              </div>
+              @if (routeNameMissing) {
+                <small class="text-danger">Name the {{ routeStepLabel }} to save it.</small>
+              }
+            </div>
+          } @else {
+            <div class="float-start text-start">
+              <h5 class="border-bottom">{{ step.stepType === 'ERROR' ? 'ERROR HANDLER' : step.stepType }}</h5></div>
+          }
         </div>
         <div class="col-2" *ngIf="canRemoveStep">
-          <button title="Remove step" type="button" *ngIf="index > 0"
+          <button title="Remove step" type="button" *ngIf="onCanvas || index > 0"
                   class="btn btn-close" aria-label="Close"
                   (click)="onRemoveStep()">
           </button>
@@ -125,26 +140,27 @@
             </i>
           </div>
           <div class="col-10">
-            <ng-select *ngIf="stepType==='SOURCE'"
-                       [items]="sourceComponentsNames" [clearable]="false"
+            <ng-select *ngIf="stepType==='SOURCE' || stepType==='SINK' || stepType==='ACTION' || stepType==='ERROR'"
+                       [items]="componentChoices" bindValue="name" bindLabel="label" [clearable]="false"
+                       [searchFn]="matchesComponent" (search)="componentSearch = $event.term" (close)="componentSearch = ''"
                        formControlName="componentType" id="field_component_type"
                        style="text-align: left;"
-                       (change)="onComponentTypeChange($event)"></ng-select>
-            <ng-select *ngIf="stepType==='SINK'"
-                       [items]="sinkComponentsNames" [clearable]="false"
-                       formControlName="componentType" id="field_component_type"
-                       (change)="onComponentTypeChange($event)"
-                       style="text-align: left;"></ng-select>
-            <ng-select *ngIf="stepType==='ACTION'"
-                       [items]="actionComponentsNames" [clearable]="false"
-                       formControlName="componentType" id="field_component_type"
-                       (change)="onComponentTypeChange($event)"
-                       style="text-align: left;"></ng-select>
-            <ng-select *ngIf="stepType==='ERROR'"
-                       [items]="sinkComponentsNames" [clearable]="false"
-                       formControlName="componentType" id="field_component_type"
-                       (change)="onComponentTypeChange($event)"
-                       style="text-align: left;"></ng-select>
+                       (change)="onComponentTypeChange($event?.name)">
+              <ng-template ng-option-tmp let-item="item">
+                <div [title]="item.reason ?? item.description ?? ''">
+                  <span class="fw-semibold">{{ item.label }}</span>
+                  @if (item.label !== item.name) {
+                    <small class="text-muted font-monospace ms-1">{{ item.name }}</small>
+                  }
+                  @if (item.reason ?? item.description; as line) {
+                    <div class="small text-muted text-truncate">{{ line }}</div>
+                  }
+                </div>
+              </ng-template>
+            </ng-select>
+            <input *ngIf="stepType==='ROUTER'" type="text" class="form-control" id="field_component_type"
+                   readonly [value]="routerKind ?? ''"
+                   title="A Router keeps its kind. To use another kind, delete this Router and add a new one."/>
             <div *ngIf="formSubmitted && componentTypeErrors">
               <div *ngIf="componentTypeErrors.required"
                    class="invalid-field-message">*ComponentType is required. Please select one.
@@ -172,10 +188,21 @@
             </i>
           </div>
           <div class="col-10">
-            <input type="text" class="d-inline-block form-control" list="urilist" formControlName="uri" [value]="uriValue" />
+            <input type="text" class="d-inline-block form-control" list="urilist" formControlName="uri" [value]="uriValue"
+                   [attr.placeholder]="autoPath ?? null"
+                   [attr.aria-describedby]="autoPath ? 'field_uri_auto field_uri_syntax' : 'field_uri_syntax'" />
             <datalist id="urilist">
               <option *ngFor="let uriStep of uriList" [value]="uriStep.uri">{{uriStep.uri}}</option>
             </datalist>
+            @if (autoPath) {
+              <small class="form-text text-muted d-block text-start" id="field_uri_auto">
+                Automatic: logs to <span class="font-monospace">{{autoPath}}</span>.
+                Type a logger name to use your own.
+              </small>
+            }
+            @if (uriPlaceholder) {
+              <small class="form-text text-muted d-block text-start font-monospace" id="field_uri_syntax">{{uriPlaceholder}}</small>
+            }
             <div *ngIf="formSubmitted && uriErrors">
               <div *ngIf="uriErrors.required"
                    class="invalid-field-message">*Context path is required.
@@ -183,7 +210,7 @@
             </div>
           </div>
           <button type="button" class="col-2 btn btn-fx btn-fx-ghost btn-fx-icon"
-                  title="Edit path" aria-label="Edit path" (click)="openModal(uriEditor)">
+                  title="Edit path" aria-label="Edit path" (click)="openPathModal(uriEditor)">
             <fa-icon icon="edit"></fa-icon>
           </button>
         </div>
@@ -202,14 +229,20 @@
           </div>
           <div class="row" style="padding-bottom: 10px;" *ngFor="let option of stepOptions; index as idx" [formGroupName]="idx">
             <div class="col-5">
-              <ng-select [items]="componentOptions" bindLabel="displayName"
-                         bindValue="name" [addTag]="addOptionTag" formControlName="key"
+              <ng-select [items]="optionChoices" bindLabel="displayName" groupBy="heading"
+                         bindValue="name" [addTag]="addOptionTag" addTagText="Use the Option" formControlName="key"
                          [ngStyle]="{'text-align' : 'left'}"
                          id="field_options-key-{{idx}}"
                          (change)="changeOptionSelection($event, idx)"
                          (close)="clearOptionHover()">
+                <ng-template ng-optgroup-tmp let-item="item">{{item.heading}}</ng-template>
                 <ng-template ng-option-tmp let-item="item">
-                  <div (mouseenter)="onOptionHover(item)">{{item.displayName}}</div>
+                  <div (mouseenter)="onOptionHover(item)">
+                    <div>{{item.displayName}}@if (item.required) { <span class="badge text-bg-secondary">required</span>}</div>
+                    @if (item.description) {
+                      <div class="small text-muted text-truncate" [title]="item.description">{{item.description}}</div>
+                    }
+                  </div>
                 </ng-template>
                 <ng-template ng-footer-tmp>
                   <div class="option-desc-footer">
@@ -229,13 +262,45 @@
                 </ng-template>
               </ng-select>
             </div>
-            <div class="col-5">
-              <input type="text" class="d-inline-block form-control"
-                     style="display:inline-block; padding-top: 4px; padding-bottom: 4px; padding-left: 10px; line-height: 28px;"
-                     id="field_options-value-{{idx}}" formControlName="value"
-                     [placeholder]="optionDefaultValue(idx)"
-                     data-toggle="tooltip"
-                     title="Value of the option. Click the Camel component button for documentation on valid options."/>
+            <div class="col-5 text-start">
+              @switch (valueField(idx)) {
+                @case ('switch') {
+                  <div class="d-flex align-items-center gap-2 mt-2">
+                    <div class="form-check form-switch mb-0">
+                      <input class="form-check-input" type="checkbox" role="switch" id="field_options-value-{{idx}}"
+                             [checked]="switchOn(idx)" (change)="setSwitch(idx, $any($event.target).checked)" />
+                      <label class="form-check-label" for="field_options-value-{{idx}}">{{ switchOn(idx) ? 'On' : 'Off' }}</label>
+                    </div>
+                    @if (hasValue(idx)) {
+                      <button type="button" class="btn btn-link btn-sm p-0" (click)="clearValue(idx)">Use default</button>
+                    }
+                  </div>
+                }
+                @case ('choice') {
+                  <select class="form-select" id="field_options-value-{{idx}}" formControlName="value" [compareWith]="sameValue">
+                    <option [ngValue]="''">{{ optionDefaultValue(idx) || 'Default' }}</option>
+                    @for (choice of choicesOf(idx); track choice) {
+                      <option [ngValue]="choice">{{ choice }}</option>
+                    }
+                  </select>
+                }
+                @case ('number') {
+                  <input type="text" inputmode="numeric" class="form-control" id="field_options-value-{{idx}}" formControlName="value"
+                         [placeholder]="optionDefaultValue(idx)" />
+                }
+                @case ('secret') {
+                  <input type="password" autocomplete="new-password" class="form-control" id="field_options-value-{{idx}}"
+                         formControlName="value" [placeholder]="optionDefaultValue(idx)" />
+                }
+                @default {
+                  <input type="text" class="form-control" id="field_options-value-{{idx}}" formControlName="value"
+                         [placeholder]="optionDefaultValue(idx)"
+                         title="Value of the option. Click the Camel component button for documentation on valid options."/>
+                }
+              }
+              @if (isRequiredOption(idx)) {
+                <small class="text-muted">required</small>
+              }
             </div>
             <button title="Add option" type="button" aria-label="Add option"
                     class="col-1 btn btn-fx btn-fx-icon btn-fx-ghost"
@@ -251,80 +316,50 @@
           </div>
         </div>
 
+        @if (missingRequiredOptions.length) {
+          <div class="alert alert-warning py-1 px-2 small text-start mb-2" role="status">
+            Required: {{ missingRequiredOptions.join(', ') }}. Fill them in unless a Connection supplies them.
+          </div>
+        }
+
         <ng-container *ngTemplateOutlet="addStepMenu"></ng-container>
 
       </div>
 
-      <!-- route -->
-      <div class="row" *ngIf="stepType =='ROUTE'">
+      <!-- route and, in a Route Flow, the error handler -->
+      <div class="row" *ngIf="isRouteStep">
 
         <div class="col-12">
-          <label class="form-control-label float-start" for="field_route" style="float: left; margin-left: 6px;">Route</label>
+          <label class="form-control-label float-start" for="field_routeContent_{{index}}" style="float: left; margin-left: 6px;">Route</label>
+          @if (stepType === 'ERROR') {
+            <i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info"
+               [popover]="errorHandlerPopover" style="float: left; margin-left: 6px;">
+              <fa-icon icon="info-circle"></fa-icon>
+            </i>
+          }
         </div>
         <div class="col-10">
-          <ng-select [items]="routes" bindLabel="name" bindValue="id" formControlName="route"
-                     id="field_route" dropdownPosition="top" style="text-align: left;"></ng-select>
+          <ngx-codemirror
+            class="route-codemirror-inline"
+            id="field_routeContent_{{index}}"
+            formControlName="routeContent"
+            [options]="routeEditorOptions()"
+            (codeMirrorLoaded)="refreshCodeMirror($event)">
+          </ngx-codemirror>
+          @if (routeContentMissing) {
+            <div class="invalid-field-message">*Route is required.</div>
+          }
         </div>
         <button title="Edit route" type="button" aria-label="Edit route"
                 class="col-2 btn btn-fx btn-fx-ghost btn-fx-icon"
-                *ngIf="routeCreated && routeValue"
                 (click)="onCreateOrEditRoute()">
           <fa-icon icon="edit"></fa-icon>
-        </button>
-        <button title="New route" type="button" aria-label="New route"
-                class="col-2 btn btn-fx btn-fx-ghost btn-fx-icon"
-                *ngIf="routeCreated && !routeValue"
-                (click)="onCreateOrEditRoute()">
-          <fa-icon icon="plus"></fa-icon>
-        </button>
-        <button title="Create route" type="button" aria-label="Create route" *ngIf="!routeCreated"
-                class="col-2 btn btn-fx btn-fx-ghost btn-fx-icon"
-                (click)="onCreateOrEditRoute()">
-          <fa-icon icon="plus"></fa-icon>
         </button>
 
         <div class="col-12">
           <ng-container *ngTemplateOutlet="addStepMenu"></ng-container>
         </div>
 
-      </div>
-
-      <!-- error -->
-      <div class="row" *ngIf="stepType =='ERROR' && activeEditor =='route'">
-
-        <div class="col-12">
-          <label class="form-control-label float-start" for="field_errorhandler" style="float: left; margin-left: 6px;">Error Handler</label>
-          <i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info"
-             [popover]="errorHandlerPopover" style="float: left; margin-left: 6px;">
-            <fa-icon icon="info-circle"></fa-icon>
-          </i>
-        </div>
-
-        <div class="col-10" >
-          <ng-select [items]="routes" bindLabel="name" bindValue="id" formControlName="route"
-                     id="field_route" dropdownPosition="top" style="text-align: left;"></ng-select>
-        </div>
-        <button title="Edit route" type="button" aria-label="Edit route"
-                class="col-2 btn btn-fx btn-fx-ghost btn-fx-icon"
-                *ngIf="routeCreated && routeValue"
-                (click)="onCreateOrEditRoute()">
-          <fa-icon icon="edit"></fa-icon>
-        </button>
-        <button title="New route" type="button" aria-label="New route"
-                class="col-2 btn btn-fx btn-fx-ghost btn-fx-icon"
-                *ngIf="routeCreated && !routeValue"
-                (click)="onCreateOrEditRoute()">
-          <fa-icon icon="plus"></fa-icon>
-        </button>
-        <button title="Create route" type="button" aria-label="Create route" *ngIf="!routeCreated"
-                class="col-2 btn btn-fx btn-fx-ghost btn-fx-icon"
-                (click)="onCreateOrEditRoute()">
-          <fa-icon icon="plus"></fa-icon>
-        </button>
-
-        <div class="col-12">
-          <ng-container *ngTemplateOutlet="addStepMenu"></ng-container>
-        </div>
       </div>
 
       <!-- script -->

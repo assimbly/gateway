@@ -82,7 +82,7 @@
   <div class="col-12"></div>
 </div>
 
-<div class="container">
+<div [ngClass]="useCanvas ? 'container-fluid flow-designer-page' : 'container'">
 
   <div class="row">
 
@@ -93,23 +93,258 @@
         <input type="text" class="form-control" id="id" *ngIf="flow" readonly formControlName="id"/>
       </div>
 
-      <div class="form-group">
-        <div class="form-group row">
-          <div class="col-8">
-            <input
-              style="border: 2px solid lightgrey; border-radius: 4px;font-weight:bold; font-size: 24px; margin-bottom: 0; min-width: 866px;"
-              type="text" class="form-control" id="name" #flowNameInput placeholder="Type flowname..." *ngIf="flow"
-              formControlName="name"/>
-            <div
-              *ngIf="formSubmitted && editFlowForm['controls'].name.errors">
-              <div *ngIf="editFlowForm['controls'].name.errors.required" class="invalid-field-message"
-                   style="color: red;">*Flowname is required.
-              </div>
+      <jhi-flow-editor-header
+        [nameControl]="nameControl"
+        [flowId]="flow?.id"
+        [draftReason]="draftReason"
+        [sourceComponent]="sourceComponent"
+        [saving]="isSaving"
+        [submitted]="formSubmitted"
+        (save)="save()"
+        (saveAndStart)="save('start')"
+        (saveAndReturn)="save('return')"
+      />
+
+      <ng-template #stepEditor let-index>
+        <jhi-flow-editor-step
+          [step]="steps[index]"
+          [index]="index"
+          [stepForm]="stepFormAt(index)"
+          [activeEditor]="'flow'"
+          [onCanvas]="true"
+          [routerKind]="selectedRouterKind"
+          [deletable]="selectedStepDeletable"
+          [formSubmitted]="formSubmitted"
+          [sourceComponentsNames]="sourceComponentsNames"
+          [sinkComponentsNames]="sinkComponentsNames"
+          [actionComponentsNames]="actionComponentsNames"
+          [languageComponentsNames]="languageComponentsNames"
+          [messages]="messages"
+          [connections]="connections"
+          [messageCreated]="messageCreated"
+          [connectionCreated]="connectionCreated"
+          [uriPlaceholder]="uriPlaceholders[index]"
+          [autoPath]="steps[index]?.stepType === 'ERROR' ? errorHandlerAutoPath : undefined"
+          [uriPopoverMessage]="uriPopoverMessages[index]"
+          [uriList]="URIList[index]"
+          [componentOptions]="componentOptions[index]"
+          [stepOptions]="stepsOptions[index]"
+          [selectedOptions]="selectedOptions[index]"
+          [componentTypeCamelLink]="componentTypeCamelLinks[index]"
+          [enableMessage]="enableMessage[index]"
+          [enableConnection]="enableConnection[index]"
+          [filterConnection]="filterConnection[index]"
+          [connectionType]="connectionType[index]"
+          [errorHandlerPopoverMessage]="errorHandlerPopoverMessage"
+          [optionsPopoverMessage]="optionsPopoverMessage"
+          [customOptions]="customOptions"
+          (removeStep)="onDeleteStep(stepKeys[$event.index])"
+          (addConnection)="addConnection($event.step, $event.index)"
+          (componentTypeChange)="setTypeLinks($event.step, $event.index, $event.componentType)"
+          (createOrEditRoute)="createOrEditRoute($event.step, $event.form)"
+          (createOrEditMessage)="createOrEditMessage($event.step, $event.control)"
+          (createOrEditConnection)="createOrEditConnection($event.step, $event.connectionType, $event.control)"
+        ></jhi-flow-editor-step>
+      </ng-template>
+
+      <ng-template #operationSource>
+        <div class="card bg-light text-start">
+          <div class="card-body">
+            <h5 class="border-bottom">OPERATION</h5>
+            <p class="mb-1">
+              <strong>{{ handler?.method }}</strong>
+              @if (operationUrl) {
+                <a [href]="operationUrl" target="_blank" rel="noopener" title="Open it in a new tab"><code>{{ handler?.fullPath }}</code></a>
+              } @else {
+                <code>{{ handler?.fullPath }}</code>
+              }
+            </p>
+            @if (handler && handler.runtimePath !== handler.fullPath) {
+              <p class="small text-muted">The runtime serves it on <code>{{ handler.runtimePath }}</code>.</p>
+            }
+            <h5 class="border-bottom">API</h5>
+            <p class="small text-muted mb-0">
+              This Flow handles an API Operation. Design its method, path or parameters on the API
+              <a [routerLink]="['/rest-apis', handler?.apiId]">{{ handler?.apiName }}</a> page.
+            </p>
+          </div>
+        </div>
+      </ng-template>
+
+      @if (useCanvas) {
+        <div class="flow-designer">
+          <div class="flow-designer-toolbar">
+            <button type="button" class="btn btn-fx btn-fx-ghost" (click)="undo()" [disabled]="!designer?.canUndo" title="Undo (Ctrl+Z)">
+              <fa-icon icon="undo"></fa-icon><span>Undo</span>
+            </button>
+            <button type="button" class="btn btn-fx btn-fx-ghost" (click)="redo()" [disabled]="!designer?.canRedo" title="Redo (Ctrl+Y)">
+              <fa-icon icon="redo"></fa-icon><span>Redo</span>
+            </button>
+            <button type="button" class="btn btn-fx btn-fx-ghost" (click)="autoArrangeCanvas()" [disabled]="!!canvasGraph?.readOnlyReason"
+                    title="Lay the Flow out from left to right">
+              <fa-icon icon="sitemap"></fa-icon><span>Auto-arrange</span>
+            </button>
+            <button type="button" class="btn btn-fx btn-fx-ghost" (click)="openFlowSettings()"
+                    [class.active]="isFlowPanelOpen('settings')" [attr.aria-pressed]="isFlowPanelOpen('settings')">
+              <fa-icon icon="cogs"></fa-icon><span>Flow settings</span>
+            </button>
+            <button type="button" class="btn btn-fx btn-fx-ghost" (click)="openErrorHandler()"
+                    [class.active]="isFlowPanelOpen('errorHandler')" [attr.aria-pressed]="isFlowPanelOpen('errorHandler')"
+                    title="What happens to a message that fails in this Flow">
+              <fa-icon icon="exclamation-triangle"></fa-icon><span>Error handler</span>
+            </button>
+            <div class="flow-designer-toolbar-end">
+              <button type="button" class="btn btn-fx btn-fx-ghost" (click)="togglePanel()" aria-controls="flow-designer-panel"
+                      [attr.aria-expanded]="!sidePanelCollapsed">
+                <fa-icon [icon]="sidePanelCollapsed ? 'chevron-left' : 'chevron-right'"></fa-icon>
+                <span>{{ sidePanelCollapsed ? 'Show editor' : 'Hide editor' }}</span>
+              </button>
             </div>
           </div>
-          <div class="col-4"></div>
+          <div class="flow-designer-body" #designerBody>
+            @if (canvasGraph) {
+            <div class="flow-designer-canvas">
+                <jhi-flow-canvas
+                  #flowCanvasRef
+                  [graph]="canvasGraph"
+                  [problems]="canvasProblems"
+                  [warnings]="canvasWarnings"
+                  [selection]="selection"
+                  [operationUrl]="operationUrl"
+                  [readOnly]="!!canvasGraph.readOnlyReason"
+                  [components]="{ actions: actionComponentsNames, sinks: sinkComponentsNames }"
+                  (selectionChange)="onSelectionChange($event)"
+                  (openStep)="toggleStepEditor($event)"
+                  (insertStep)="onInsertStep($event)"
+                  (appendStep)="onAppendStep($event)"
+                  (addBranch)="onAddBranch($event)"
+                  (moveStep)="onMoveStep($event)"
+                ></jhi-flow-canvas>
+              <div class="flow-designer-alerts">
+                @if (designerNotice) {
+                  <div class="alert alert-warning py-2 mb-0">{{ designerNotice }}</div>
+                }
+                @if (designerMessage) {
+                  <div class="alert alert-info alert-dismissible py-2 mb-0">
+                    {{ designerMessage }}
+                    <button type="button" class="btn-close py-2" aria-label="Close" (click)="designerMessage = undefined"></button>
+                  </div>
+                }
+                @if (savingFlowFailed) {
+                  <div class="alert alert-danger py-2 mb-0">{{ savingFlowFailedMessage }}</div>
+                }
+                @for (message of [invalidUriMessage, notUniqueUriMessage]; track $index) {
+                  @if (message) {
+                    <div class="alert alert-danger py-2 mb-0">{{ message }}</div>
+                  }
+                }
+              </div>
+            </div>
+            <aside class="flow-designer-panel" id="flow-designer-panel" [class.d-none]="sidePanelCollapsed">
+              <div class="flow-designer-panel-editor">
+              @if (selection.type === 'step' && selectedStepIndex >= 0) {
+                @switch (panelFor(selectedStepIndex)) {
+                  @case ('operation') {
+                    <ng-container *ngTemplateOutlet="operationSource"></ng-container>
+                  }
+                  @case ('response') {
+                    <jhi-response-editor
+                      [uri]="stepFormAt(selectedStepIndex).value.uri"
+                      [options]="steps[selectedStepIndex].options"
+                      [declaredStatuses]="handler?.declaredStatuses ?? []"
+                      [responseMediaType]="handler?.responseMediaType"
+                      [warning]="selectedWarning"
+                      [problem]="selectedProblem"
+                      [deletable]="selectedStepDeletable"
+                      (settingsChange)="onResponseChange(selectedStepIndex, $event)"
+                      (remove)="onDeleteStep(stepKeys[selectedStepIndex])"
+                    />
+                  }
+                  @case ('callFlow') {
+                    <jhi-call-flow-editor
+                      [options]="steps[selectedStepIndex].options"
+                      [kind]="$any(steps[selectedStepIndex].stepType)"
+                      [flows]="callableFlows"
+                      [problem]="selectedProblem"
+                      [deletable]="selectedStepDeletable"
+                      (optionsChange)="onCallFlowChange(selectedStepIndex, $event)"
+                      (remove)="onDeleteStep(stepKeys[selectedStepIndex])"
+                    />
+                  }
+                  @default {
+                    <ng-container *ngTemplateOutlet="stepEditor; context: { $implicit: selectedStepIndex }"></ng-container>
+                  }
+                }
+              } @else if (selectedLink; as link) {
+                <jhi-link-editor
+                  [graph]="canvasGraph!"
+                  [link]="link"
+                  [readOnly]="!!canvasGraph?.readOnlyReason"
+                  [problem]="selectedLinkProblem"
+                  (linkChange)="onLinkChange($event)"
+                  (deleteBranch)="onDeleteBranch(link.to)"
+                ></jhi-link-editor>
+              } @else if (flowPanel === 'errorHandler') {
+                <p class="text-muted small mb-2">
+                  A message that fails in this Flow goes to its Error handler. By default it logs the error, with all its details.
+                </p>
+                @if (errorStepIndex >= 0) {
+                  <ng-container *ngTemplateOutlet="stepEditor; context: { $implicit: errorStepIndex }"></ng-container>
+                }
+              } @else {
+                <div class="card bg-light text-start flow-settings">
+                  <div class="card-body">
+                    <h5 class="border-bottom">FLOW</h5>
+                    <div class="flow-setting">
+                      <div class="flow-setting__text">
+                        <label class="form-check-label" for="field_trace">Trace</label>
+                        <small class="text-muted" id="field_trace_help">Records the messages at each Step of the Flow.</small>
+                      </div>
+                      <div class="form-check form-switch mb-0">
+                        <input class="form-check-input" type="checkbox" role="switch" id="field_trace" aria-describedby="field_trace_help"
+                               [checked]="traceOn" (change)="setTrace($any($event.target).checked)" />
+                      </div>
+                    </div>
+                    <div class="flow-setting">
+                      <div class="flow-setting__text">
+                        <label class="form-check-label" for="field_autoStart">Auto start</label>
+                        <small class="text-muted" id="field_autoStart_help">
+                          @if (flowIsDraft) {
+                            This Flow is a Draft, so it is saved with auto start off until it is complete.
+                          } @else {
+                            Starts the Flow when the Gateway starts.
+                          }
+                        </small>
+                      </div>
+                      <div class="form-check form-switch mb-0">
+                        <input class="form-check-input" type="checkbox" role="switch" id="field_autoStart" aria-describedby="field_autoStart_help"
+                               formControlName="autoStart" />
+                      </div>
+                    </div>
+                    <label class="form-control-label" for="field_notes">Notes</label>
+                    <ngx-codemirror
+                      *ngIf="flow"
+                      class="notes-codemirror"
+                      id="field_notes"
+                      formControlName="notes"
+                      [options]="notesEditorOptions()"
+                      (codeMirrorLoaded)="refreshCodeMirror($event)">
+                    </ngx-codemirror>
+                  </div>
+                </div>
+              }
+              </div>
+              @if (selection.type !== 'flow') {
+                <div class="flow-designer-minimap" title="Click or drag to move the view"
+                     (pointerdown)="flowCanvasRef.onMinimapPointer($event)" (pointermove)="flowCanvasRef.onMinimapPointer($event)">
+                  <ng-container *ngTemplateOutlet="flowCanvasRef.minimap"></ng-container>
+                </div>
+              }
+            </aside>
+            }
+          </div>
         </div>
-      </div>
+      } @else {
 
       <div class="card text-center" style="width: 54rem; background-color: var(--app-hover);">
         <div class="card-header">
@@ -122,8 +357,11 @@
                 <br/>
                 <hr/>
                 <div style="min-height: 44rem;">
+                  <ng-container *ngFor="let step of steps; index as index">
+                  @if (handler && step.stepType === 'SOURCE') {
+                    <ng-container *ngTemplateOutlet="operationSource"></ng-container>
+                  } @else {
                   <jhi-flow-editor-step
-                    *ngFor="let step of steps; index as index"
                     [step]="step"
                     [index]="index"
                     [stepForm]="stepFormAt(index)"
@@ -133,13 +371,12 @@
                     [sinkComponentsNames]="sinkComponentsNames"
                     [actionComponentsNames]="actionComponentsNames"
                     [languageComponentsNames]="languageComponentsNames"
-                    [routes]="routes"
                     [messages]="messages"
                     [connections]="connections"
-                    [routeCreated]="routeCreated"
                     [messageCreated]="messageCreated"
                     [connectionCreated]="connectionCreated"
                     [uriPlaceholder]="uriPlaceholders[index]"
+                    [autoPath]="step.stepType === 'ERROR' ? errorHandlerAutoPath : undefined"
                     [uriPopoverMessage]="uriPopoverMessages[index]"
                     [uriList]="URIList[index]"
                     [componentOptions]="componentOptions[index]"
@@ -157,10 +394,12 @@
                     (addStep)="addStep($event.step, $event.index)"
                     (addConnection)="addConnection($event.step, $event.index)"
                     (componentTypeChange)="setTypeLinks($event.step, $event.index, $event.componentType)"
-                    (createOrEditRoute)="createOrEditRoute($event.step, $event.control)"
+                    (createOrEditRoute)="createOrEditRoute($event.step, $event.form)"
                     (createOrEditMessage)="createOrEditMessage($event.step, $event.control)"
                     (createOrEditConnection)="createOrEditConnection($event.step, $event.connectionType, $event.control)"
                   ></jhi-flow-editor-step>
+                  }
+                  </ng-container>
                 </div>
               </ng-template>
             </li>
@@ -194,17 +433,9 @@
         </div>
       </div>
 
-      <div class="form-fx-actions" style="max-width: 54rem;">
-        <button type="button" class="btn btn-fx btn-fx-secondary" [routerLink]="['/']">
-          <fa-icon icon="ban"></fa-icon>
-          <span>Cancel</span>
-        </button>
-        <button type="button" class="btn btn-fx btn-fx-primary" (click)="save()" [disabled]="isSaving || (formSubmitted && editFlowForm.invalid)">
-          <fa-icon icon="save"></fa-icon>
-          <span>Save</span>
-        </button>
-      </div>
-      <br/>
+      }
+
+      @if (!useCanvas) {
       <div *ngIf="savingFlowSuccess">
         <span class="text-success">*{{savingFlowSuccessMessage}}</span>
       </div>
@@ -218,6 +449,7 @@
         <span class="text-danger">*{{notUniqueUriMessage}}</span>
       </div>
       <br/>
+      }
     </form>
   </div>
 </div>

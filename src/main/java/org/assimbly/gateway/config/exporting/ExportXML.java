@@ -1,14 +1,20 @@
 package org.assimbly.gateway.config.exporting;
 
+import java.math.BigDecimal;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xerces.dom.DocumentImpl;
 import org.assimbly.docconverter.StringConverter;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.domain.*;
+import org.assimbly.gateway.domain.enumeration.StepType;
+import org.assimbly.gateway.repository.ApiOperationRepository;
+import org.assimbly.gateway.repository.ApiRepository;
 import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
 import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.repository.IntegrationRepository;
 import org.assimbly.gateway.repository.RouteRepository;
+import org.assimbly.gateway.service.api.ApiPaths;
+import org.assimbly.gateway.service.api.ResponseSettings;
 import org.assimbly.util.IntegrationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +51,12 @@ public class ExportXML {
     @Autowired
     private EnvironmentVariablesRepository environmentVariablesRepository;
 
+    @Autowired
+    private ApiOperationRepository apiOperationRepository;
+
+    @Autowired
+    private ApiRepository apiRepository;
+
     private String xmlConfiguration;
 
     private Document doc;
@@ -70,6 +82,9 @@ public class ExportXML {
     private List<String> messagesList;
     private List<String> routesList;
 
+    /** The Operation the Flow being exported handles; null when it isn't a Handler Flow. */
+    private ApiOperation handledOperation;
+
 
     public ExportXML(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
@@ -87,9 +102,61 @@ public class ExportXML {
             }
         }
 
+        setApis(integrationId);
+
         xmlConfiguration = StringConverter.docToString(doc);
 
         return xmlConfiguration;
+    }
+
+    /**
+     * The Integration's APIs, for a backup: each Operation names its Handler Flow by the Flow's id in this export.
+     * The runtime never reads them.
+     */
+    public void setApis(Long integrationId) {
+        List<Api> apisDB = apiRepository.findAllByIntegrationId(integrationId);
+        if (apisDB.isEmpty()) {
+            return;
+        }
+        Element apis = setElement("apis", null, (Element) flows.getParentNode());
+        for (Api apiDB : apisDB) {
+            Element api = setElement("api", null, apis);
+            setElement("id", apiDB.getId().toString(), api);
+            setElement("name", apiDB.getName(), api);
+            setElement("basePath", apiDB.getBasePath(), api);
+            setOptionalElement("versionLabel", apiDB.getVersionLabel(), api);
+            setOptionalElement("description", apiDB.getDescription(), api);
+            Element operations = setElement("operations", null, api);
+            for (ApiOperation operationDB : apiDB.getOperations()) {
+                Element operation = setElement("operation", null, operations);
+                setElement("method", operationDB.getMethod(), operation);
+                setElement("path", operationDB.getPath(), operation);
+                setOptionalElement("operationId", operationDB.getOperationId(), operation);
+                setOptionalElement("summary", operationDB.getSummary(), operation);
+                setOptionalElement("description", operationDB.getDescription(), operation);
+                setOptionalElement("requestMediaType", operationDB.getRequestMediaType(), operation);
+                setOptionalElement("responseMediaType", operationDB.getResponseMediaType(), operation);
+                setOptionalElement("requestSchema", operationDB.getRequestSchema(), operation);
+                setElement("handlerFlowId", operationDB.getHandlerFlow().getId().toString(), operation);
+                Element parameters = setElement("parameters", null, operation);
+                for (ApiParameter parameterDB : operationDB.getParameters()) {
+                    Element parameter = setElement("parameter", null, parameters);
+                    setElement("name", parameterDB.getName(), parameter);
+                    setElement("in", parameterDB.getLocation(), parameter);
+                    setOptionalElement("type", parameterDB.getType(), parameter);
+                    setElement("required", Boolean.toString(parameterDB.isRequired()), parameter);
+                    setOptionalElement("description", parameterDB.getDescription(), parameter);
+                }
+                Element responses = setElement("declaredResponses", null, operation);
+                for (ApiDeclaredResponse responseDB : operationDB.getDeclaredResponses()) {
+                    Element response = setElement("declaredResponse", null, responses);
+                    setElement("status", responseDB.getStatus(), response);
+                    setElement("description", responseDB.getDescription(), response);
+                    setOptionalElement("mediaType", responseDB.getMediaType(), response);
+                    setOptionalElement("schema", responseDB.getSchema(), response);
+                }
+            }
+        }
     }
 
     public String getXMLConfigurationByIds(Long integrationId, String ids) throws Exception {
@@ -233,6 +300,8 @@ public class ExportXML {
         flowTypeAsString = flowDB.getType();
         logLevelAsString = flowDB.getLogLevel().toString();
 
+        handledOperation = apiOperationRepository.findByHandlerFlowId(flowDB.getId()).orElse(null);
+
         //notes
         String flowNotes = flowDB.getNotes();
         if(flowNotes!=null){
@@ -288,7 +357,7 @@ public class ExportXML {
         String confUri = stepDB.getUri();
         String confStepType = stepDB.getStepType().getStep();
         String confComponentType = stepDB.getComponentType();
-        String confOptions = stepDB.getOptions();
+        String confOptions = withFlowlinkPattern(stepDB);
         Message confMessage = stepDB.getMessage();
 
         Element step = setElement("step", null, steps);
@@ -296,8 +365,17 @@ public class ExportXML {
         setElement("id", confId, step);
         setElement("type", confStepType, step);
 
-        confUri = createUri(confUri, confComponentType, confMessage);
+        ResponseSettings response = isResponse(stepDB) ? ResponseSettings.of(stepDB.getUri(), stepDB.getOptions()) : null;
+        if (response != null) {
+            // A Response's settings go into a message; with no body, setheaders leaves the body as it is.
+            confUri = (response.keepsBody() ? "setheaders" : "setmessage") + ":message:" + responseMessageName(stepDB);
+            confOptions = null;
+        } else {
+            confUri = createUri(confUri, confComponentType, confMessage);
+        }
         setElement("uri", confUri, step);
+
+        setCoordinates(stepDB, step);
 
         if (confOptions != null && !confOptions.isEmpty()) {
             Element options =  setElement("options", null, step);
@@ -314,8 +392,97 @@ public class ExportXML {
 
         setBlocks(confId, stepDB, step);
 
+        if (response != null) {
+            setResponseMessage(stepDB, response, (Element) step.getElementsByTagName("blocks").item(0));
+        }
+
         setLinks(stepDB, step);
 
+    }
+
+    /** In a Handler Flow, a setmessage Sink without a message of its own is a Response. */
+    private boolean isResponse(Step stepDB) {
+        return handledOperation != null
+            && stepDB.getStepType() == StepType.SINK
+            && "setmessage".equalsIgnoreCase(stepDB.getComponentType())
+            && stepDB.getMessage() == null;
+    }
+
+    private static String responseMessageName(Step stepDB) {
+        return "response" + stepDB.getId();
+    }
+
+    /**
+     * The message a Response sets, in the runtime's message format: the status as CamelHttpResponseCode, the
+     * Operation's response media type as Content-Type (unless a header of its own sets it), its headers and its body.
+     */
+    private void setResponseMessage(Step stepDB, ResponseSettings response, Element blocks) {
+        String name = responseMessageName(stepDB);
+
+        Element block = setElement("block", null, blocks);
+        setElement("id", name, block);
+        setElement("type", "message", block);
+
+        Element message = setElement("message", null, messages);
+        setElement("id", name, message);
+        setElement("name", name, message);
+
+        if (!response.keepsBody()) {
+            Element body = setElement("body", null, message);
+            setElement("content", response.body(), body);
+            setElement("language", response.language(), body);
+        }
+
+        Element headers = setElement("headers", null, message);
+        response.answerHeaders(handledOperation.getResponseMediaType()).forEach((headerName, value) -> {
+            Element header = setElement("header", null, headers);
+            setElement("name", headerName, header);
+            setElement("value", value, header);
+            setElement("language", response.headers().containsKey(headerName) ? "simple" : "constant", header);
+            setElement("type", "header", header);
+        });
+    }
+
+    /** A Call Flow Action waits for the other Flow's answer (InOut); as a Sink it hands the message over (InOnly). */
+    private static String withFlowlinkPattern(Step stepDB) {
+        String options = stepDB.getOptions();
+        boolean callFlow = "flowlink".equalsIgnoreCase(stepDB.getComponentType())
+            && (stepDB.getStepType() == StepType.ACTION || stepDB.getStepType() == StepType.SINK);
+        if (!callFlow || (options != null && options.contains("exchangePattern="))) {
+            return options;
+        }
+        String pattern = stepDB.getStepType() == StepType.ACTION ? "InOut" : "InOnly";
+        return options == null || options.isEmpty() ? "exchangePattern=" + pattern : options + "&exchangePattern=" + pattern;
+    }
+
+    /**
+     * The Route configuration a Step of a Handler Flow runs with: a failure no Step handles answers the caller
+     * with 500 and an application/problem+json body that names the Operation and the exchange as correlation id,
+     * never the exception itself.
+     */
+    private void setProblemRouteConfiguration(String id) {
+        String operation = handledOperation.getMethod() + " " + ApiPaths.fullPath(handledOperation.getApi().getBasePath(), handledOperation.getPath());
+
+        Element configuration = doc.createElement("routeConfiguration");
+        configuration.setAttribute("id", id);
+        routeConfigurations.appendChild(configuration);
+
+        Element onException = setElement("onException", null, configuration);
+        setElement("exception", "java.lang.Exception", onException);
+        Element handled = setElement("handled", null, onException);
+        setElement("constant", "true", handled);
+        setConstantHeader(onException, "CamelHttpResponseCode", "500");
+        setConstantHeader(onException, "Content-Type", "application/problem+json");
+        Element setBody = setElement("setBody", null, onException);
+        setElement("simple", "{\"type\":\"about:blank\",\"title\":\"Internal Server Error\",\"status\":500,"
+            + "\"detail\":\"The request could not be processed.\",\"instance\":\"" + operation.replace("\"", "\\\"") + "\","
+            + "\"correlationId\":\"${exchangeId}\"}", setBody);
+    }
+
+    private void setConstantHeader(Element parent, String name, String value) {
+        Element setHeader = setElement("setHeader", null, parent);
+        setHeader.setAttribute("name", name);
+        setElement("constant", value, setHeader);
     }
 
     public void setBlocks(String confId, Step stepDB, Element step) throws Exception {
@@ -377,10 +544,36 @@ public class ExportXML {
             setElement("response", "response", block);
         }
 
-        if(confRouteId == null && confConnection == null && confMessage == null && confResponseId == null) {
+        if (handledOperation != null && !stepDB.getStepType().getStep().equalsIgnoreCase("error")) {
+            // The runtime adds a Route configuration for every Step that refers to one, so each Step gets its own copy.
+            // Its id starts with the Flow's id: the runtime removes the Flow's Route configurations by that prefix when
+            // the Flow is loaded again, and refuses a Route configuration that already exists.
+            String problemId = ApiPaths.problemConfigurationId(handledOperation.getHandlerFlow().getId(), stepId);
+            setProblemRouteConfiguration(problemId);
+            block = setElement("block", null, blocks);
+            setElement("id", problemId, block);
+            setElement("type", "routeconfiguration", block);
+            setElement("uri", problemId, block);
+        }
+
+        if (!blocks.hasChildNodes() && !isResponse(stepDB)) {
             step.removeChild(blocks);
         }
 
+    }
+
+    public void setCoordinates(Step stepDB, Element step) {
+
+        if (stepDB.getCoordinateX() != null && stepDB.getCoordinateY() != null) {
+            Element coordinates = setElement("coordinates", null, step);
+            setElement("x", formatCoordinate(stepDB.getCoordinateX()), coordinates);
+            setElement("y", formatCoordinate(stepDB.getCoordinateY()), coordinates);
+        }
+
+    }
+
+    private String formatCoordinate(Double coordinate) {
+        return BigDecimal.valueOf(coordinate).stripTrailingZeros().toPlainString();
     }
 
     public void setLinks(Step stepDB, Element step) {
@@ -395,6 +588,10 @@ public class ExportXML {
                 setElement("id", confLink.getName(), link);
                 setElement("transport", confLink.getTransport(), link);
                 setElement("bound", confLink.getBound(), link);
+                setOptionalElement("pattern", confLink.getPattern(), link);
+                setOptionalElement("rule", confLink.getRule(), link);
+                setOptionalElement("language", confLink.getLanguage(), link);
+                setOptionalElement("expression", confLink.getExpression(), link);
             }
 
         }
@@ -630,6 +827,12 @@ public class ExportXML {
         }
 
         return componentType;
+    }
+
+    private void setOptionalElement(String elementName, String elementValue, Element parent){
+        if(elementValue != null && !elementValue.isEmpty()){
+            setElement(elementName, elementValue, parent);
+        }
     }
 
     private Element setElement(String elementName, String elementValue, Element parent){

@@ -174,6 +174,7 @@ springBoot {
 test {
     useJUnitPlatform()
     exclude "**/*IT*", "**/*IntTest*"
+    environment "ASSIMBLY_ENCRYPTION_SECRET", System.getenv('ASSIMBLY_ENCRYPTION_SECRET') ?: 'integration-test-secret'
 
     testLogging {
         events 'FAILED', 'SKIPPED'
@@ -185,6 +186,9 @@ tasks.register('integrationTest', Test) {
     useJUnitPlatform()
     description = "Execute integration tests."
     group = "verification"
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    environment "ASSIMBLY_ENCRYPTION_SECRET", System.getenv('ASSIMBLY_ENCRYPTION_SECRET') ?: 'integration-test-secret'
     include "**/*IT*", "**/*IntTest*"
 
     testLogging {
@@ -356,6 +360,11 @@ dependencies {
 
     implementation("io.github.assimbly:docconverter:3.0.2")
 
+    // reads OpenAPI 3.0 and 3.1 documents for the REST API builder's import; swagger-core comes as swagger-core-jakarta
+    implementation("io.swagger.parser.v3:swagger-parser-v3:2.1.45") {
+        exclude group: "io.swagger.core.v3", module: "swagger-core"
+    }
+
     implementation 'com.warrenstrange:googleauth'
 
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
@@ -380,6 +389,7 @@ dependencies {
     testImplementation "com.mattbertolini:liquibase-slf4j"
     testImplementation "org.hamcrest:hamcrest:3.0"
     testImplementation "org.mockito:mockito-junit-jupiter:5.23.0"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 
     liquibaseRuntime "org.springframework.boot:spring-boot-starter-liquibase"
     liquibaseRuntime "org.liquibase.ext:liquibase-hibernate6:${liquibase_version}"

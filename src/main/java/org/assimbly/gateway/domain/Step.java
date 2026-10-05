@@ -53,6 +53,12 @@ public class Step implements Serializable {
     @Column(name = "route_id")
     private Integer routeId;
 
+    @Column(name = "coordinate_x")
+    private Double coordinateX;
+
+    @Column(name = "coordinate_y")
+    private Double coordinateY;
+
     @ManyToOne
     @JsonIgnore
     private Flow flow;
@@ -167,6 +173,22 @@ public class Step implements Serializable {
 
     public void setRouteId(Integer routeId) {
         this.routeId = routeId;
+    }
+
+    public Double getCoordinateX() {
+        return coordinateX;
+    }
+
+    public void setCoordinateX(Double coordinateX) {
+        this.coordinateX = coordinateX;
+    }
+
+    public Double getCoordinateY() {
+        return coordinateY;
+    }
+
+    public void setCoordinateY(Double coordinateY) {
+        this.coordinateY = coordinateY;
     }
 
     public Integer getResponseId() {

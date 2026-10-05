@@ -39,6 +39,9 @@ public class ImportXMLGateways {
     @Autowired
     private ImportXMLEnvironmentVariables importXMLEnvironmentVariables;
 
+    @Autowired
+    private ImportXMLApis importXMLApis;
+
 	public void setGatewayFromXML(Document doc, Long integrationIdLong) throws Exception {
 
 		XPath xPath = XPathFactory.newInstance().newXPath();
@@ -105,6 +108,8 @@ public class ImportXMLGateways {
             importXMLConnections.setConnectionsFromXML(doc);
 
             importXMLFlows.setFlowsFromXML(doc, integrationIdLong);
+
+            importXMLApis.setApisFromXML(doc, integrationIdLong);
 
 			log.info("Importing finished");
 

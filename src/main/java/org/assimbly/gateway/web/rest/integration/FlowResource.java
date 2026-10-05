@@ -140,6 +140,19 @@ public class FlowResource {
 
 
     /**
+     * GET  /flows/byname?name= : get the flow with this name, for example to check whether an import would replace it.
+     *
+     * @param name the name of the flow
+     * @return the ResponseEntity with status 200 (OK) and with body the flowDTO, or with status 404 (Not Found)
+     */
+    @Operation(summary = "Get a flow by its name")
+    @GetMapping("/flows/byname")
+    public ResponseEntity<FlowDTO> getFlowByName(@RequestParam(value = "name") String name) {
+        log.debug("REST request to get Flow by name : {}", name);
+        return ResponseUtil.wrapOrNotFound(flowService.findByName(name));
+    }
+
+    /**
      * GET  /flows/:id : get the "id" flow.
      *
      * @param id the id of the flowDTO to retrieve
@@ -171,6 +184,20 @@ public class FlowResource {
     ) {
         log.debug("REST request to get alerts for Flow : {}", id);
         return ResponseEntity.ok(flowAlertLogService.page(id, offset, limit));
+    }
+
+    /**
+     * DELETE /flows/:id/alerts : clear a flow's alerts for everyone. The alert logs are moved aside, not deleted.
+     *
+     * @param id the flow id
+     * @return the ResponseEntity with status 204 (No Content)
+     */
+    @Operation(summary = "Clear the alerts of a flow")
+    @DeleteMapping("/flows/{id}/alerts")
+    public ResponseEntity<Void> clearFlowAlerts(@PathVariable(value = "id") Long id) {
+        log.debug("REST request to clear alerts for Flow : {}", id);
+        flowAlertLogService.clear(id);
+        return ResponseEntity.noContent().build();
     }
 
     /**

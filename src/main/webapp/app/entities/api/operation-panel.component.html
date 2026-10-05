@@ -1,0 +1,252 @@
+<div class="d-flex align-items-start justify-content-between gap-2">
+  <h3>
+    @if (isNew) {
+      New Operation
+    } @else {
+      <span [class]="'api-method api-method--' + operation!.method.toLowerCase()">{{ operation!.method }}</span>
+      @if (url) {
+        <a [href]="url" target="_blank" rel="noopener" [title]="'Open ' + url + ' in a new tab'"><code>{{ operation!.fullPath }}</code></a>
+      } @else {
+        <code>{{ operation!.fullPath }}</code>
+      }
+    }
+  </h3>
+  <button type="button" class="btn-close" aria-label="Close" (click)="closed.emit()"></button>
+</div>
+
+@if (!isNew) {
+  <p class="d-flex flex-wrap align-items-center gap-2">
+    <a class="btn btn-fx btn-fx-secondary btn-fx-sm" [routerLink]="['/flow/editor', operation!.handlerFlowId]" [queryParams]="handlerFlowQueryParams(operation!)">
+      <fa-icon icon="arrow-up-right-from-square"></fa-icon> Open Handler Flow
+    </a>
+    <span class="text-muted small">
+      {{ operation!.handlerFlowName }}
+      @if (state?.draft) {
+        <span class="badge text-bg-secondary ms-1">Draft</span>
+      }
+    </span>
+  </p>
+}
+
+<form (ngSubmit)="save()" #operationForm="ngForm" novalidate>
+  <div class="row g-2">
+    <div class="col-4">
+      <label class="form-label" for="operation-method">Method</label>
+      <select id="operation-method" class="form-select" name="method" [(ngModel)]="draft.method">
+        @for (method of methods; track method) {
+          <option [value]="method">{{ method }}</option>
+        }
+      </select>
+    </div>
+    <div class="col-8">
+      <label class="form-label" for="operation-path">Path</label>
+      <div class="input-group">
+        <span class="input-group-text" title="The API's base path">{{ api.basePath === '/' ? '' : api.basePath }}</span>
+        <input id="operation-path" class="form-control" name="path" required placeholder="/{id}" [ngModel]="draft.path" (ngModelChange)="onPathChange($event)" />
+      </div>
+    </div>
+  </div>
+
+  @if (isNew) {
+    <div class="small text-muted mt-2">The Operation gets a Handler Flow, which starts as Operation → Response (200, keeping the body).</div>
+  }
+
+  <div class="row g-2 mt-1">
+    <div class="col-6">
+      <label class="form-label" for="operation-id">operationId</label>
+      <input id="operation-id" class="form-control" name="operationId" placeholder="getCustomer" [(ngModel)]="draft.operationId" />
+    </div>
+    <div class="col-6">
+      <label class="form-label" for="operation-summary">Summary</label>
+      <input id="operation-summary" class="form-control" name="summary" [(ngModel)]="draft.summary" />
+    </div>
+    <div class="col-12">
+      <label class="form-label" for="operation-description">Description</label>
+      <textarea id="operation-description" class="form-control" rows="2" name="description" [(ngModel)]="draft.description"></textarea>
+    </div>
+  </div>
+
+  <h4>Parameters</h4>
+  @if (draft.parameters.length) {
+    <table class="api-rows">
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">In</th>
+          <th scope="col">Type</th>
+          <th scope="col">Required</th>
+          <th scope="col">Description</th>
+          <th scope="col"><span class="visually-hidden">Remove</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (parameter of draft.parameters; track $index) {
+          @let fromPath = parameter.in === 'path';
+          <tr>
+            <td>
+              <input class="form-control form-control-sm" [name]="'parameter-name-' + $index" [(ngModel)]="parameter.name" [readonly]="fromPath"
+                     [attr.aria-label]="'Name of parameter ' + ($index + 1)" [title]="fromPath ? 'Comes from the path; change the path to change it.' : ''" />
+            </td>
+            <td>
+              @if (fromPath) {
+                <span class="form-control-plaintext form-control-sm">path</span>
+              } @else {
+                <select class="form-select form-select-sm" [name]="'parameter-in-' + $index" [(ngModel)]="parameter.in" [attr.aria-label]="'Where parameter ' + ($index + 1) + ' goes'">
+                  <option value="query">query</option>
+                  <option value="header">header</option>
+                </select>
+              }
+            </td>
+            <td>
+              <select class="form-select form-select-sm" [name]="'parameter-type-' + $index" [(ngModel)]="parameter.type" [attr.aria-label]="'Type of parameter ' + ($index + 1)">
+                @for (type of parameterTypes; track type) {
+                  <option [value]="type">{{ type }}</option>
+                }
+              </select>
+            </td>
+            <td class="text-center">
+              <input class="form-check-input" type="checkbox" [name]="'parameter-required-' + $index" [(ngModel)]="parameter.required" [disabled]="fromPath"
+                     [attr.aria-label]="'Parameter ' + ($index + 1) + ' is required'" />
+            </td>
+            <td>
+              <input class="form-control form-control-sm" [name]="'parameter-description-' + $index" [(ngModel)]="parameter.description"
+                     [attr.aria-label]="'Description of parameter ' + ($index + 1)" />
+            </td>
+            <td>
+              @if (!fromPath) {
+                <button type="button" class="btn btn-fx btn-fx-sm btn-fx-icon btn-fx-ghost" (click)="removeParameter(parameter)" aria-label="Remove parameter">
+                  <fa-icon icon="times"></fa-icon>
+                </button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+  <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-sm" (click)="addParameter()"><fa-icon icon="plus"></fa-icon> Query or header parameter</button>
+
+  <h4>Request</h4>
+  <label class="form-label" for="operation-request-media-type">Media type</label>
+  <input id="operation-request-media-type" class="form-control" name="requestMediaType" list="api-media-types" [(ngModel)]="draft.requestMediaType" />
+  <div class="d-flex justify-content-between align-items-end mt-2">
+    <label class="form-label mb-1" for="operation-request-schema">Schema (JSON Schema)</label>
+    <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-sm" (click)="openExample('request')">
+      <fa-icon icon="wand-magic-sparkles"></fa-icon> Generate from example JSON
+    </button>
+  </div>
+  @if (exampleFor === 'request') {
+    <ng-container *ngTemplateOutlet="example"></ng-container>
+  }
+  <ngx-codemirror id="operation-request-schema" class="api-schema" name="requestSchema" [(ngModel)]="draft.requestSchema" [options]="jsonEditorOptions()"></ngx-codemirror>
+
+  <h4>Responses</h4>
+  <label class="form-label" for="operation-response-media-type">Media type</label>
+  <input id="operation-response-media-type" class="form-control" name="responseMediaType" list="api-media-types" [(ngModel)]="draft.responseMediaType"
+         aria-describedby="operation-response-media-type-help" />
+  <small class="text-muted" id="operation-response-media-type-help">Every Response sends it as Content-Type, unless a Response sets that header itself.</small>
+
+  <h4>Declared responses</h4>
+  @for (response of draft.declaredResponses; track $index) {
+    <div class="row g-2 align-items-end mb-2">
+      <div class="col-3">
+        <label class="form-label small mb-0" [for]="'response-status-' + $index">Status</label>
+        <input class="form-control form-control-sm" [id]="'response-status-' + $index" [name]="'response-status-' + $index" [(ngModel)]="response.status" placeholder="200" />
+      </div>
+      <div class="col-5">
+        <label class="form-label small mb-0" [for]="'response-description-' + $index">Description</label>
+        <input class="form-control form-control-sm" [id]="'response-description-' + $index" [name]="'response-description-' + $index" [(ngModel)]="response.description" required />
+      </div>
+      <div class="col-4 d-flex gap-1">
+        <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-sm" (click)="toggleSchema($index)" [attr.aria-expanded]="openSchemas.has($index)">
+          Schema{{ response.schema ? ' ✓' : '' }}
+        </button>
+        <button type="button" class="btn btn-fx btn-fx-sm btn-fx-icon btn-fx-ghost" (click)="removeResponse(response)" aria-label="Remove Declared response">
+          <fa-icon icon="times"></fa-icon>
+        </button>
+      </div>
+    </div>
+    @if (openSchemas.has($index)) {
+      <div class="mb-3 ps-2">
+        <div class="d-flex justify-content-between align-items-end">
+          <label class="form-label small mb-1" [for]="'response-media-type-' + $index">Media type (if not the Operation's)</label>
+          <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-sm" (click)="openExample($index)">
+            <fa-icon icon="wand-magic-sparkles"></fa-icon> Generate from example JSON
+          </button>
+        </div>
+        <input class="form-control form-control-sm mb-1" [id]="'response-media-type-' + $index" [name]="'response-media-type-' + $index" list="api-media-types"
+               [(ngModel)]="response.mediaType" />
+        @if (exampleFor === $index) {
+          <ng-container *ngTemplateOutlet="example"></ng-container>
+        }
+        <ngx-codemirror class="api-schema" [name]="'response-schema-' + $index" [(ngModel)]="response.schema" [options]="jsonEditorOptions()"></ngx-codemirror>
+      </div>
+    }
+  }
+  <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-sm" (click)="addResponse()"><fa-icon icon="plus"></fa-icon> Declared response</button>
+
+  <datalist id="api-media-types">
+    @for (mediaType of mediaTypes; track mediaType) {
+      <option [value]="mediaType"></option>
+    }
+  </datalist>
+
+  @if (message) {
+    <div class="alert alert-danger py-2 mt-3 api-message">{{ message }}</div>
+  }
+
+  <div class="d-flex gap-2 mt-3">
+    <button type="submit" class="btn btn-fx btn-fx-primary" [disabled]="saving">
+      <fa-icon icon="save"></fa-icon> {{ isNew ? 'Add Operation' : 'Save' }}
+    </button>
+    @if (!isNew) {
+      <button type="button" class="btn btn-fx btn-fx-ghost text-danger" (click)="delete()"><fa-icon icon="trash"></fa-icon> Delete</button>
+    }
+  </div>
+</form>
+
+@if (!isNew) {
+  <h4>Try it</h4>
+  <p class="small text-muted">Sends the request to the Operation's real path on the runtime. Start its Handler Flow first.</p>
+  @for (parameter of operation!.parameters; track tryKey(parameter)) {
+    <div class="mb-1">
+      <label class="form-label small mb-0" [for]="'try-' + tryKey(parameter)">{{ parameter.name }} <span class="text-muted">({{ parameter.in }})</span></label>
+      <input class="form-control form-control-sm" [id]="'try-' + tryKey(parameter)" [(ngModel)]="tryValues[tryKey(parameter)]" />
+    </div>
+  }
+  @if (operation!.method !== 'GET' && operation!.method !== 'HEAD') {
+    <label class="form-label small mb-0" for="try-body">Body</label>
+    <textarea id="try-body" class="form-control form-control-sm font-monospace" rows="5" [(ngModel)]="tryBody"></textarea>
+  }
+  <button type="button" class="btn btn-fx btn-fx-secondary btn-fx-sm mt-2" (click)="sendTry()" [disabled]="trying">
+    <fa-icon icon="paper-plane"></fa-icon> Send
+  </button>
+  @if (tryError) {
+    <div class="alert alert-danger py-2 mt-2 api-message">{{ tryError }}</div>
+  }
+  @if (tryResult; as result) {
+    <div class="api-try-result mt-2" aria-live="polite">
+      <div><strong>{{ result.status }}</strong> <span class="text-muted small">in {{ result.durationMillis }} ms · {{ result.url }}</span></div>
+      <table class="api-rows my-1">
+        @for (header of tryHeaders(result); track header.name) {
+          <tr>
+            <td class="text-muted">{{ header.name }}</td>
+            <td>{{ header.value }}</td>
+          </tr>
+        }
+      </table>
+      <pre>{{ result.body }}</pre>
+    </div>
+  }
+}
+
+<ng-template #example>
+  <div class="mb-2">
+    <label class="form-label small mb-0" for="example-json">Example JSON</label>
+    <textarea id="example-json" class="form-control form-control-sm font-monospace" rows="4" [(ngModel)]="exampleText" [ngModelOptions]="{ standalone: true }" placeholder='{"id": 1, "name": "Ann"}'></textarea>
+    @if (exampleError) {
+      <div class="text-danger small">{{ exampleError }}</div>
+    }
+    <button type="button" class="btn btn-fx btn-fx-secondary btn-fx-sm mt-1" (click)="generateSchema()">Generate schema</button>
+  </div>
+</ng-template>

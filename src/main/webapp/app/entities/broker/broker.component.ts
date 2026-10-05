@@ -9,7 +9,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { RouterModule } from '@angular/router';
 import { SearchToolbar } from 'app/shared/filter';
 import { SortState } from 'app/shared/sort';
-import { DataTable, DataTableColumn, OverflowActionDirective, PrimaryActionDirective, RowActions, StatusControls, StatusControlsTone, Truncate } from 'app/shared/table';
+import { DataTable, DataTableColumn, OverflowActionDirective, RowActions, StatusControls, StatusControlsTone, Truncate } from 'app/shared/table';
 
 import { IBroker } from 'app/shared/model/broker.model';
 import { AccountService } from 'app/core/auth/account.service';
@@ -36,7 +36,6 @@ enum Status {
         SearchToolbar,
         DataTable,
         RowActions,
-        PrimaryActionDirective,
         OverflowActionDirective,
         StatusControls,
         Truncate,
@@ -50,10 +49,11 @@ export class BrokerComponent implements OnInit, OnDestroy {
     sortState: SortState = { predicate: 'name', order: 'asc' };
     readonly columns: DataTableColumn[] = [
         { key: 'name', header: 'Name', sortable: true },
+        { key: 'status', header: 'Status' },
         { key: 'consumers', header: 'Consumers', numeric: true },
         { key: 'messages', header: 'Messages', numeric: true },
+        { key: 'stats', header: 'Stats' },
         { key: 'actions', header: 'Actions', align: 'end' },
-        { key: 'status', header: 'Status', align: 'end' },
     ];
     totalConsumers: number | null = null;
     totalMessages: number | null = null;

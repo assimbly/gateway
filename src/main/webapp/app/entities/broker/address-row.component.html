@@ -1,19 +1,22 @@
 <td class="table-fx-identity">
-    <jhi-truncate [text]="address.name" />
+    <a [routerLink]="['/broker/browser/message-browser']"
+       [queryParams]="{ endpointName: address.name, endpointType: endpointType, brokerType: brokerType }">
+        <jhi-truncate [text]="address.name" />
+    </a>
 </td>
 <td class="text-end table-fx-numeric">{{ address.numberOfConsumers }}</td>
 <td class="text-end table-fx-numeric">{{ address.numberOfMessages }}</td>
 <td class="text-end">
     <jhi-row-actions>
         <button
-            jhiPrimaryAction
+            jhiOverflowAction
             type="button"
-            class="btn btn-fx btn-fx-sm btn-fx-ghost"
+            ngbDropdownItem
+            class="btn-fx-dropdown-item"
             (click)="navigateToMessageBrowser(address.name)"
-            aria-label="Browse"
         >
             <fa-icon icon="eye"></fa-icon>
-            <span class="d-none d-md-inline">Browse</span>
+            <span>Browse</span>
         </button>
 
         <button

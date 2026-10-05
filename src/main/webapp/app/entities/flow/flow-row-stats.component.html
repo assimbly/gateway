@@ -21,7 +21,7 @@
 
 <button
   type="button"
-  class="btn btn-fx btn-fx-sm btn-fx-ghost"
+  class="btn btn-fx btn-fx-sm btn-fx-icon btn-fx-ghost"
   (mouseenter)="load.emit()"
   [ngbPopover]="statsTemplate"
   popoverTitle="Source stats"
@@ -31,7 +31,7 @@
   triggers="click"
   [autoClose]="'outside'"
   aria-label="Stats"
+  title="Stats"
 >
   <fa-icon icon="chart-bar"></fa-icon>
-  <span class="d-none d-md-inline">Stats</span>
 </button>

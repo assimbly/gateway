@@ -1,11 +1,13 @@
-import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbModal, NgbOffcanvas, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 
 import { Flow, IFlow, LogLevelType } from 'app/shared/model/flow.model';
+import { isDraft, loadFlowGraph, opensOnCanvas } from './designer/flow-graph';
 import { FlowService } from './flow.service';
+import { IApiHandler } from 'app/entities/api/api.model';
 import { FlowDeleteDialogComponent } from 'app/entities/flow/flow-delete-dialog.component';
 
 import { Step, StepType } from 'app/shared/model/step.model';
@@ -14,9 +16,26 @@ import { IntegrationService } from '../integration/integration.service';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
 import { Collectors } from 'app/shared/collect/collectors';
-import { OverflowActionDirective, PrimaryActionDirective, RowActions, StatusControls, StatusControlsTone, Truncate } from 'app/shared/table';
+import { OverflowActionDirective, RowActions, StatusControls, Truncate } from 'app/shared/table';
 import { FlowRowAlerts } from './flow-row-alerts.component';
 import { FlowRowStats, FlowStatsSection } from './flow-row-stats.component';
+import {
+  FlowAction,
+  FlowFailure,
+  FlowStatusView,
+  countLabel,
+  failureOfError,
+  flowEventOf,
+  flowFailureOf,
+  flowStatusView,
+  flowTypeLabel,
+  hasRun,
+  sourceStepOf,
+  testMessageBlocked,
+} from './flow-status';
+import { Components } from 'app/shared/camel/component-type';
+import { ComponentSchemas } from './component-schemas.service';
+import { FlowAlertsDrawerComponent } from './flow-alerts-drawer.component';
 
 import { Router } from '@angular/router';
 import dayjs from 'dayjs/esm';
@@ -39,8 +58,8 @@ enum Status {
     RouterModule,
     FontAwesomeModule,
     NgbDropdownModule,
+    NgbTooltip,
     RowActions,
-    PrimaryActionDirective,
     OverflowActionDirective,
     StatusControls,
     Truncate,
@@ -48,10 +67,12 @@ enum Status {
     FlowRowStats,
   ],
 })
-export class FlowRowComponent implements OnInit, OnDestroy {
+export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
   sslUrl: any;
 
   @Input() flow: Flow;
+  /** The API and Operation this Flow handles, when it is a Handler Flow. */
+  @Input() handler?: IApiHandler;
 
   steps: Array<Step> = [new Step()];
   fromStep: Array<Step> = [];
@@ -67,6 +88,10 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
   public isFlowStopped: boolean;
   public disableActionBtns: boolean;
+  /** A Flow designed on the canvas that is still incomplete; it can't be started. */
+  public isDraft = false;
+  /** Whether the Flow has run since the Gateway started; until then its counts show `—`. */
+  public ran = false;
 
   public flowDetails: string;
   public flowStatus: string;
@@ -79,16 +104,11 @@ export class FlowRowComponent implements OnInit, OnDestroy {
   public flowStartTime: any;
   public clickButton = false;
 
-  public flowError = false;
-  public flowErrorButton: string;
+  /** Why the Flow last failed to start, stop, pause or resume; null when it didn't. */
+  public failure: FlowFailure | null = null;
 
   public flowAlerts: string;
   public numberOfAlerts: any;
-  public alertMessages: string[] = [];
-  public alertsTotal = 0;
-  public alertsLoading = false;
-  public alertsLoadingMore = false;
-  private readonly alertPageSize = 10;
   public showNumberOfItems: number;
   public completedCount: number | null = null;
   public failedCount: number | null = null;
@@ -111,6 +131,9 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
   intervalTime: any;
 
+  private readonly components = inject(Components);
+  private readonly schemas = inject(ComponentSchemas);
+  private readonly offcanvas = inject(NgbOffcanvas);
   private destroyed = false;
   private readonly subscriptions = new Subscription();
 
@@ -127,16 +150,48 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     private changeDetector: ChangeDetectorRef
   ) {}
 
-  get statusTone(): StatusControlsTone {
-    switch (this.statusFlow) {
-      case Status.active:
-        return 'started';
-      case Status.paused:
-        return 'paused';
-      case Status.inactiveError:
-        return 'failed';
-      default:
-        return 'default';
+  get state(): FlowStatusView {
+    return flowStatusView(this.statusFlow, this.isDraft);
+  }
+
+  shows(action: FlowAction): boolean {
+    return this.state.controls.includes(action);
+  }
+
+  isDisabled(action: FlowAction): boolean {
+    return this.state.disabled.includes(action);
+  }
+
+  /** Why the ⋮ menu's Send test message is unavailable, or null when it can be sent. */
+  get testMessageBlocked(): string | null {
+    const source = sourceStepOf(this.flow.steps)?.componentType;
+    return testMessageBlocked(this.statusFlow, source ? (this.components.types.find(type => type.name === source) ?? { name: source }) : null);
+  }
+
+  sendTestMessage(): void {
+    this.router.navigate(['/flow/message-sender'], { queryParams: { flowId: this.flow.id } });
+  }
+
+  get typeLabel(): string {
+    return flowTypeLabel(this.flow.type);
+  }
+
+  count(value: number | null): string {
+    return countLabel(value, this.ran);
+  }
+
+  run(action: FlowAction): void {
+    switch (action) {
+      case 'start':
+        return this.start();
+      case 'stop':
+        return this.stop();
+      case 'pause':
+        return this.pause();
+      case 'resume':
+        return this.resume();
+      case 'restart':
+        return this.restart();
     }
   }
 
@@ -146,9 +201,39 @@ export class FlowRowComponent implements OnInit, OnDestroy {
 
     this.steps = this.flow.steps;
     this.getSteps();
-
+    this.checkDraft();
     this.registerTriggeredAction();
+  }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    // The Handler Flows are known after the rows are made; a Handler Flow is also a Draft while it doesn't answer.
+    if (changes['handler'] && !changes['handler'].firstChange) {
+      this.checkDraft();
+    }
+  }
+
+  /** Why Delete is refused: a Handler Flow is deleted with its Operation. */
+  get deleteBlocked(): string | null {
+    return this.handler
+      ? `This Flow handles ${this.handler.method} ${this.handler.fullPath} of the API ${this.handler.apiName}. Delete that Operation instead; its Handler Flow goes with it.`
+      : null;
+  }
+
+  private checkDraft(): void {
+    if (opensOnCanvas(this.flow.type)) {
+      const graph = loadFlowGraph(this.flow, this.handler);
+      this.isDraft = isDraft(graph);
+      // A Step with an empty required path part also makes a Draft, once its Component's schema is read.
+      this.subscriptions.add(
+        this.schemas.load(graph.steps.map(step => step.componentType)).subscribe(() => {
+          const draft = isDraft(graph, this.schemas.pathRule);
+          if (draft !== this.isDraft) {
+            this.isDraft = draft;
+            this.changeDetector.markForCheck();
+          }
+        }),
+      );
+    }
   }
 
   ngOnDestroy(): void {
@@ -170,12 +255,12 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.getFlowNumberOfAlerts(this.flow.id);
   }
 
-  onAlertsOpen(): void {
-    this.alertMessages = [];
-    this.alertsTotal = 0;
-    this.alertsLoading = true;
-    this.alertsLoadingMore = false;
-    this.loadAlertPage();
+  /** Opens the Alerts drawer; once they are cleared the row's count goes to zero. */
+  openAlerts(): void {
+    FlowAlertsDrawerComponent.open(this.offcanvas, { id: this.flow.id!, name: this.flow.name, type: this.flow.type }, () => {
+      this.setFlowNumberOfAlerts(0);
+      this.changeDetector.detectChanges();
+    });
   }
 
   getStatus(id: number) {
@@ -264,25 +349,24 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         break;
       case 'error':
       case 'failed':
-        const lastStatus = this.flowStatus;
         this.statusFlow = Status.inactiveError;
         this.isFlowStarted = this.isFlowPaused = false;
         this.flowStatusButton = `Failed`;
-        this.setErrorMessage(lastStatus,this.statusMessage);
+        this.failure = failureOfError(this.statusMessage);
         break;
       default:
-        const unknownStatus = this.flowStatus;
         this.statusFlow = Status.inactive;
         this.isFlowStarted = this.isFlowPaused = false;
         this.isFlowStopped = this.isFlowRestarted = this.isFlowResumed = true;
         this.flowStatusButton = `Unknown`;
-        this.setErrorMessage(unknownStatus,this.statusMessage);
+        this.failure = flowFailureOf(this.statusMessage);
         break;
     }
+    this.ran = this.ran || hasRun(status);
     if (refreshView) {
       this.changeDetector.detectChanges();
     }
-    if (this.statusFlow === Status.active || this.statusFlow === Status.paused) {
+    if (this.ran) {
       this.loadFlowMessages();
     } else {
       this.completedCount = null;
@@ -290,123 +374,11 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     }
   }
 
-  setErrorMessage(action: string, errorReport: any){
-
-      this.flowError = true;
-
-      try {
-
-          if (errorReport.flow.installed) {
-
-                  const total = errorReport.flow.installed.total;
-                  const failed = errorReport.flow.installed.failed;
-
-                  this.flowErrorButton = `${failed} of ${total} steps failed to start <br/><br/>
-                                           <b>Details:</b> <br/>`;
-
-                  for (let i = 0; i < errorReport.flow.steps.length; i++) {
-
-                      const uri = errorReport.flow.steps[i].uri;
-                      const status = errorReport.flow.steps[i].status;
-
-                      if(status==='error' && uri){
-
-                          const errorMessage = errorReport.flow.steps[i].message;
-
-                          this.flowErrorButton = this.flowErrorButton + `<br/><table class="table" style="width: 100%">
-                            <tbody>
-                              <tr>
-                                <td><b>uri:</b></td>
-                                <td>${uri}</td>
-                              </tr>
-                              <tr>
-                                <td><b>error:</b></td>
-                                <td>${errorMessage}</td>
-                              </tr>
-                            </tbody>
-                          </table>`;
-                      }else if(status==='error'){
-
-                          const errorMessage = errorReport.flow.steps[i].message;
-
-                          this.flowErrorButton = this.flowErrorButton + `<br/><table class="table">
-                            <tbody>
-                              <tr>
-                                <td><b>error:</b></td>
-                                <td>${errorMessage}</td>
-                              </tr>
-                            </tbody>
-                          </table>`;
-                      }
-
-                  }
-
-          } else {
-              this.flowErrorButton = errorReport.flow.message;
-          }
-      } catch (e) {
-           this.flowErrorButton = errorReport;
-      }
-
-  }
-
   getFlowAlertsPoll(): void {
     if (this.destroyed) {
       return;
     }
     this.getFlowNumberOfAlerts(this.flow.id);
-  }
-
-  onAlertsScroll(event: Event): void {
-    if (this.alertsLoading || this.alertsLoadingMore || this.alertMessages.length >= this.alertsTotal) {
-      return;
-    }
-    const element = event.target as HTMLElement;
-    const distanceFromBottom = element.scrollHeight - element.scrollTop - element.clientHeight;
-    if (distanceFromBottom <= 48) {
-      this.alertsLoadingMore = true;
-      this.loadAlertPage();
-    }
-  }
-
-  private loadMoreAlertsIfNeeded(): void {
-    if (this.alertsLoading || this.alertsLoadingMore || this.alertMessages.length >= this.alertsTotal) {
-      return;
-    }
-    const list = document.querySelector('.flow-alert-list') as HTMLElement | null;
-    if (list && list.scrollHeight <= list.clientHeight + 1) {
-      this.alertsLoadingMore = true;
-      this.loadAlertPage();
-    }
-  }
-
-  private loadAlertPage(): void {
-    const offset = this.alertMessages.length;
-    this.subscriptions.add(
-      this.flowService.getFlowAlertsPage(this.flow.id, offset, this.alertPageSize).subscribe({
-        next: response => {
-          if (this.destroyed) {
-            return;
-          }
-          const page = response.body;
-          this.alertsTotal = page?.total ?? 0;
-          this.alertMessages = this.alertMessages.concat(page?.messages ?? []);
-          this.alertsLoading = false;
-          this.alertsLoadingMore = false;
-          this.setFlowNumberOfAlerts(this.alertsTotal);
-          this.changeDetector.detectChanges();
-          setTimeout(() => this.loadMoreAlertsIfNeeded());
-        },
-        error: () => {
-          if (this.destroyed) {
-            return;
-          }
-          this.alertsLoading = false;
-          this.alertsLoadingMore = false;
-          this.changeDetector.detectChanges();
-        },
-      }),
-    );
   }
 
   getFlowNumberOfAlerts(id: number) {
@@ -643,7 +615,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.flowService.getFlowMessages(this.flow.id).subscribe({
         next: response => {
-          if (this.destroyed || (this.statusFlow !== Status.active && this.statusFlow !== Status.paused)) {
+          if (this.destroyed || !this.ran) {
             return;
           }
           const body = response.body;
@@ -653,10 +625,6 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         },
       }),
     );
-  }
-
-  formatMetric(value: number | null): string {
-    return value == null || Number.isNaN(value) ? '—' : String(value);
   }
 
   flowConfigurationNotObtained(id) {
@@ -749,7 +717,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.subscriptions.add(this.eventManager.subscribe('trigerAction', (response: EventWithContent<unknown>) => {
       switch (response.content as string) {
         case 'start':
-          if (this.statusFlow === Status.inactive) {
+          if (this.statusFlow === Status.inactive && !this.isDraft) {
             this.start();
           }
           break;
@@ -784,7 +752,7 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.flowStatus = 'Starting';
     this.isFlowStatusOK = true;
     this.disableActionBtns = true;
-    this.flowError = false;
+    this.failure = null;
 
     if(this.flow.logLevel === LogLevelType.TRACE){
       this.enableTracing();
@@ -793,12 +761,10 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.configureAndRun(
       this.flowService.start(this.flow.id),
       body => {
-        this.statusMessage = JSON.parse(body);
-        this.disableActionBtns = false;
-        this.setFlowStatus(this.statusMessage.flow.event);
+        this.applyAnswer(body);
       },
       err => {
-        this.statusMessage = JSON.parse(err.error);
+        this.statusMessage = err.error;
         this.disableActionBtns = false;
         this.setFlowStatus('error');
         this.flowStatusError = `Flow with id=${this.flow.id} is not started.`;
@@ -823,14 +789,13 @@ export class FlowRowComponent implements OnInit, OnDestroy {
           if (this.destroyed) {
             return;
           }
-          this.statusMessage = JSON.parse(response.body);
-          this.disableActionBtns = false;
-          this.setFlowStatus(this.statusMessage.flow.event);
+          this.applyAnswer(response.body);
         },
         err => {
           if (this.destroyed) {
             return;
           }
+          this.statusMessage = err.error;
           this.disableActionBtns = false;
           this.setFlowStatus('error');
           this.isFlowStatusOK = false;
@@ -848,12 +813,10 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.configureAndRun(
       this.flowService.resume(this.flow.id),
       body => {
-        this.statusMessage = JSON.parse(body);
-        this.disableActionBtns = false;
-        this.setFlowStatus(this.statusMessage.flow.event);
+        this.applyAnswer(body);
       },
       err => {
-        this.statusMessage = JSON.parse(err.error);
+        this.statusMessage = err.error;
         this.disableActionBtns = false;
         this.setFlowStatus('error');
         this.isFlowStatusOK = false;
@@ -879,12 +842,10 @@ export class FlowRowComponent implements OnInit, OnDestroy {
     this.configureAndRun(
       this.flowService.restart(this.flow.id),
       body => {
-        this.statusMessage = JSON.parse(body);
-        this.disableActionBtns = false;
-        this.setFlowStatus(this.statusMessage.flow.event);
+        this.applyAnswer(body);
       },
       err => {
-        this.statusMessage = JSON.parse(err.error);
+        this.statusMessage = err.error;
         this.disableActionBtns = false;
         this.setFlowStatus('error');
         this.isFlowStatusOK = false;
@@ -910,14 +871,13 @@ export class FlowRowComponent implements OnInit, OnDestroy {
           if (this.destroyed) {
             return;
           }
-          this.statusMessage = JSON.parse(response.body);
-          this.disableActionBtns = false;
-          this.setFlowStatus(this.statusMessage.flow.event);
+          this.applyAnswer(response.body);
         },
         err => {
           if (this.destroyed) {
             return;
           }
+          this.statusMessage = err.error;
           this.disableActionBtns = false;
           this.setFlowStatus('error');
           this.isFlowStatusOK = false;
@@ -925,6 +885,13 @@ export class FlowRowComponent implements OnInit, OnDestroy {
         },
       ),
     );
+  }
+
+  /** Shows what the runtime answered: the Flow's new status, or Error when the answer reports a failure. */
+  private applyAnswer(body: string): void {
+    this.statusMessage = body;
+    this.disableActionBtns = false;
+    this.setFlowStatus(flowFailureOf(body) ? 'error' : (flowEventOf(body) ?? ''));
   }
 
   private configureAndRun(
@@ -958,6 +925,8 @@ export class FlowRowComponent implements OnInit, OnDestroy {
               onActionError(err);
             } else {
               onConfigureError();
+              this.statusMessage = err.error;
+              this.setFlowStatus('error');
             }
           },
         }),

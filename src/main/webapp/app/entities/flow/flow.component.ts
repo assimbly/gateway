@@ -1,10 +1,10 @@
-import { ChangeDetectorRef, Component, OnInit, OnDestroy, QueryList, ViewChildren } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy, QueryList, ViewChildren, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription, forkJoin, interval } from 'rxjs';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { RouterModule } from '@angular/router';
 
 import { SortState, sortParams } from 'app/shared/sort';
@@ -24,11 +24,16 @@ import { SearchToolbar } from 'app/shared/filter';
 import { DataTable, DataTableColumn } from 'app/shared/table';
 import { FlowRowComponent } from './flow-row.component';
 import { FlowSearchByNamePipe } from './flow.searchbyname.pipe';
+import { FlowTypeChoicesComponent } from './flow-type-choices.component';
+import { NewFlowDialogComponent, takeChosenFile } from './new-flow-dialog.component';
+import { ApiService } from 'app/entities/api/api.service';
+import { IApiHandler } from 'app/entities/api/api.model';
 
 @Component({
   selector: 'jhi-flow',
   templateUrl: './flow.component.html',
-  imports: [CommonModule, RouterModule, FontAwesomeModule, NgbDropdownModule, SearchToolbar, DataTable, FlowRowComponent],
+  styleUrl: './flow.component.scss',
+  imports: [CommonModule, RouterModule, FontAwesomeModule, SearchToolbar, DataTable, FlowRowComponent, FlowTypeChoicesComponent],
 })
 export class FlowComponent implements OnInit, OnDestroy {
   integrations: IIntegration[];
@@ -58,13 +63,19 @@ export class FlowComponent implements OnInit, OnDestroy {
   test: any;
   searchText = '';
   flowsLoading = true;
+  flowsLoadFailed = false;
   readonly columns: DataTableColumn[] = [
     { key: 'name', header: 'Name', sortable: true },
+    { key: 'type', header: 'Type' },
+    { key: 'status', header: 'Status' },
     { key: 'completed', header: 'Completed', numeric: true },
     { key: 'failed', header: 'Failed', numeric: true },
+    { key: 'stats', header: 'Stats' },
     { key: 'actions', header: 'Actions', align: 'end' },
-    { key: 'status', header: 'Status', align: 'end' },
   ];
+  /** The Handler Flows by Flow id, to mark them with their API and Operation. */
+  handlers: Record<number, IApiHandler> = {};
+  private readonly apiService = inject(ApiService);
   private readonly searchPipe = new FlowSearchByNamePipe();
   private readonly eventSubscriptions = new Subscription();
   private readonly polls = new Subscription();
@@ -78,7 +89,8 @@ export class FlowComponent implements OnInit, OnDestroy {
     protected parseLinks: ParseLinks,
     protected accountService: AccountService,
     protected integrationService: IntegrationService,
-    protected changeDetector: ChangeDetectorRef
+    protected changeDetector: ChangeDetectorRef,
+    protected modalService: NgbModal,
   ) {
     this.flows = [];
     this.itemsPerPage = ITEMS_PER_PAGE + 5;
@@ -119,10 +131,11 @@ export class FlowComponent implements OnInit, OnDestroy {
       );
   }
 
+  // The Flows shown stay until the new list arrives, so the toolbar doesn't flicker away on a refresh.
   reset() {
     this.page = 0;
-    this.flows = [];
     this.flowsLoading = true;
+    this.flowsLoadFailed = false;
     this.loadFlows();
   }
 
@@ -134,6 +147,7 @@ export class FlowComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.getIntegrations();
+    this.loadHandlers();
     this.accountService.identity().subscribe(account => {
       this.currentAccount = account;
     });
@@ -143,6 +157,10 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.registerDeletedFlows();
     this.polls.add(interval(15000).subscribe(() => this.flowRows?.forEach(row => row.pollMessages())));
     this.polls.add(interval(10000).subscribe(() => this.flowRows?.forEach(row => row.pollAlerts())));
+  }
+
+  loadHandlers(): void {
+    this.apiService.handlers().subscribe(handlers => (this.handlers = handlers));
   }
 
   ngAfterViewInit() {
@@ -210,8 +228,36 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
   }
 
+  /** An empty Gateway shows how to create the first Flow instead of the list. */
+  get showEmptyState(): boolean {
+    return !this.flowsLoading && !this.flowsLoadFailed && !this.flows.length;
+  }
+
+  /** Filter, Add and Refresh only make sense once there is a Flow; a failed load keeps Refresh to try again. */
+  get hasFlows(): boolean {
+    return this.flows.length > 0 || this.flowsLoadFailed;
+  }
+
   get filteredFlows(): IFlow[] {
     return this.searchPipe.transform(this.flows ?? [], this.searchText, this.sortState.order === 'asc', this.sortState.predicate);
+  }
+
+  get integrationId(): number | undefined {
+    return this.integrations?.[this.indexIntegration]?.id;
+  }
+
+  openNewFlow(): NewFlowDialogComponent {
+    const modalRef = this.modalService.open(NewFlowDialogComponent, { size: 'lg', ariaLabelledBy: 'new-flow-title' });
+    const dialog: NewFlowDialogComponent = modalRef.componentInstance;
+    dialog.integrationId = this.integrationId;
+    return dialog;
+  }
+
+  importFromFile(event: Event): void {
+    const file = takeChosenFile(event);
+    if (file) {
+      void this.openNewFlow().importFile(file);
+    }
   }
 
   trackId(index: number, item: IFlow) {
@@ -262,6 +308,7 @@ export class FlowComponent implements OnInit, OnDestroy {
 
   protected onError(errorMessage: string) {
     this.flowsLoading = false;
+    this.flowsLoadFailed = true;
     this.changeDetector.detectChanges();
 		this.alertService.addAlert({
 		  type: 'danger',

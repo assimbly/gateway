@@ -1,0 +1,48 @@
+<div class="api-empty">
+  <nav aria-label="breadcrumb" class="mb-2">
+    <a routerLink="/rest-apis"><fa-icon icon="arrow-left"></fa-icon> APIs</a>
+  </nav>
+  <h2 class="api-empty__title">Import OpenAPI</h2>
+  <p class="api-empty__lead">
+    An OpenAPI 3.0 or 3.1 document, in JSON or YAML, becomes a new API. Each Operation gets a Handler Flow that is a Draft until you end it with a
+    Response. Swagger 2.0 documents need converting to OpenAPI 3 first.
+  </p>
+
+  @if (result(); as imported) {
+    <div class="alert alert-success">
+      Imported the API <a [routerLink]="['/rest-apis', imported.api.id]">{{ imported.api.name }}</a> with {{ imported.api.operations?.length ?? 0 }}
+      {{ imported.api.operations?.length === 1 ? 'Operation' : 'Operations' }} under <code>{{ imported.api.basePath }}</code>.
+    </div>
+    @if (imported.dropped.length) {
+      <h3 class="fs-6">What wasn't brought across ({{ imported.dropped.length }})</h3>
+      <ul class="api-dropped">
+        @for (part of imported.dropped; track $index) {
+          <li>{{ part }}</li>
+        }
+      </ul>
+    } @else {
+      <p class="text-muted">Everything in the document was brought across.</p>
+    }
+    <a class="btn btn-fx btn-fx-primary" [routerLink]="['/rest-apis', imported.api.id]">Open the API</a>
+  } @else {
+    <div class="mb-2">
+      <label class="btn btn-fx btn-fx-secondary mb-0" for="openapi-file">
+        <fa-icon icon="upload"></fa-icon> Choose a file
+      </label>
+      <input id="openapi-file" type="file" class="visually-hidden" accept=".yaml,.yml,.json,application/json,application/yaml,text/yaml" (change)="readFile($event)" />
+      @if (fileName) {
+        <span class="ms-2 text-muted">{{ fileName }}</span>
+      }
+    </div>
+    <label class="form-label" for="openapi-document">Or paste the document</label>
+    <textarea id="openapi-document" class="form-control font-monospace" rows="16" [(ngModel)]="document" placeholder="openapi: 3.0.3"></textarea>
+
+    @if (error(); as text) {
+      <div class="alert alert-danger py-2 mt-3 api-message">{{ text }}</div>
+    }
+
+    <button type="button" class="btn btn-fx btn-fx-primary mt-3" (click)="importDocument()" [disabled]="importing() || !document.trim()">
+      <fa-icon icon="file-import"></fa-icon> Import
+    </button>
+  }
+</div>

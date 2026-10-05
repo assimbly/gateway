@@ -1,0 +1,39 @@
+<div class="card bg-light text-start">
+  <div class="card-body">
+    <h5 class="border-bottom">CALL FLOW</h5>
+    <p class="small text-muted">
+      @if (kind === 'ACTION') {
+        Sends the message to another Flow, waits for its answer, and carries on with that answer.
+      } @else {
+        Hands the message over to another Flow; this Branch ends here.
+      }
+    </p>
+
+    @if (problem) {
+      <div class="alert alert-danger py-1 small">{{ problem }}</div>
+    }
+
+    <label class="form-label" for="call-flow-target">Flow to call</label>
+    @if (flows.length) {
+      <select id="call-flow-target" class="form-select" [(ngModel)]="targetFlowId" (ngModelChange)="emit()" [class.is-invalid]="!targetFlowId">
+        <option value="">Choose a Flow…</option>
+        @for (flow of flows; track flow.id) {
+          <option [value]="'' + flow.id">{{ flow.name }}</option>
+        }
+      </select>
+      <small class="text-muted">Only Flows with a flowlink Source can be called.</small>
+    } @else {
+      <p class="small">No Flow has a flowlink Source yet. Give the Flow you want to call a flowlink Source first.</p>
+    }
+
+    <label class="form-label mt-2" for="call-flow-transport">Transport</label>
+    <select id="call-flow-transport" class="form-select" [(ngModel)]="transport" (ngModelChange)="emit()">
+      <option value="sync">sync: in the same thread</option>
+      <option value="async">async: through a queue</option>
+    </select>
+
+    @if (deletable) {
+      <button type="button" class="btn btn-fx btn-fx-ghost text-danger mt-3" (click)="remove.emit()"><fa-icon icon="trash"></fa-icon> Delete Step</button>
+    }
+  </div>
+</div>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <!--
+        An API with its Operations, their parameters and Declared responses (docs/specs/rest-api-builder.md).
+        Method + full path is unique across APIs; that spans tables, so the service checks it.
+    -->
+    <changeSet id="20261004120000-1" author="gateway">
+        <createTable tableName="api">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_api_name"/>
+            </column>
+            <column name="base_path" type="varchar(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_api_base_path"/>
+            </column>
+            <column name="version_label" type="varchar(255)"/>
+            <column name="description" type="${clobType}"/>
+            <column name="integration_id" type="bigint"/>
+        </createTable>
+
+        <createTable tableName="api_operation">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="api_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="method" type="varchar(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="path" type="varchar(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="operation_id" type="varchar(255)"/>
+            <column name="summary" type="varchar(1024)"/>
+            <column name="description" type="${clobType}"/>
+            <column name="request_media_type" type="varchar(255)"/>
+            <column name="response_media_type" type="varchar(255)"/>
+            <column name="request_schema" type="${clobType}"/>
+            <column name="handler_flow_id" type="bigint">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_api_operation_handler_flow"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="api_parameter">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="operation_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="location" type="varchar(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="varchar(16)"/>
+            <column name="required" type="boolean"/>
+            <column name="description" type="varchar(1024)"/>
+        </createTable>
+
+        <createTable tableName="api_declared_response">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="operation_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(1024)"/>
+            <column name="media_type" type="varchar(255)"/>
+            <column name="schema" type="${clobType}"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20261004120000-2" author="gateway">
+        <addForeignKeyConstraint baseTableName="api" baseColumnNames="integration_id" constraintName="fk_api_integration_id"
+                                 referencedTableName="integration" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="api_operation" baseColumnNames="api_id" constraintName="fk_api_operation_api_id"
+                                 referencedTableName="api" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="api_operation" baseColumnNames="handler_flow_id" constraintName="fk_api_operation_handler_flow_id"
+                                 referencedTableName="flow" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="api_parameter" baseColumnNames="operation_id" constraintName="fk_api_parameter_operation_id"
+                                 referencedTableName="api_operation" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="api_declared_response" baseColumnNames="operation_id" constraintName="fk_api_declared_response_operation_id"
+                                 referencedTableName="api_operation" referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>

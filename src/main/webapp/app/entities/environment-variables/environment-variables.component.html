@@ -27,7 +27,13 @@
   >
     <tr *ngFor="let environmentVariables of filteredVariables; trackBy: trackId">
       <td class="table-fx-identity">
-        <jhi-truncate [text]="environmentVariables.key" />
+        @if (accountService.hasAnyAuthority('ROLE_ADMIN')) {
+          <a [routerLink]="['/environment-variables', environmentVariables.id, 'edit']">
+            <jhi-truncate [text]="environmentVariables.key" />
+          </a>
+        } @else {
+          <jhi-truncate [text]="environmentVariables.key" />
+        }
       </td>
       <td class="table-fx-identity">
         <jhi-truncate [text]="environmentVariables.value" />
@@ -35,26 +41,26 @@
       <td class="text-end">
         <jhi-row-actions *jhiHasAnyAuthority="'ROLE_ADMIN'">
           <button
-            jhiPrimaryAction
+            jhiOverflowAction
             type="button"
-            class="btn btn-fx btn-fx-sm btn-fx-ghost"
+            ngbDropdownItem
+            class="btn-fx-dropdown-item"
             [routerLink]="['/environment-variables', environmentVariables.id, 'edit']"
-            aria-label="Edit"
           >
             <fa-icon icon="pencil-alt"></fa-icon>
-            <span class="d-none d-md-inline">Edit</span>
+            <span>Edit</span>
           </button>
           <button
-            jhiPrimaryAction
+            jhiOverflowAction
             type="button"
-            class="btn btn-fx btn-fx-sm btn-fx-ghost"
+            ngbDropdownItem
+            class="btn-fx-dropdown-item"
             [routerLink]="['/environment-variables', environmentVariables.id, 'edit']"
             fragment="clone"
             queryParamsHandling="merge"
-            aria-label="Clone"
           >
             <fa-icon icon="clone"></fa-icon>
-            <span class="d-none d-md-inline">Clone</span>
+            <span>Clone</span>
           </button>
           <button
             jhiOverflowAction

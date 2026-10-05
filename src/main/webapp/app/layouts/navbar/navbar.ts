@@ -114,17 +114,10 @@ export default class Navbar implements OnInit {
     return this.isFlowsPath(this.currentUrl());
   }
 
-  isFlowEditorActive(editor: string): boolean {
-    const [path, query = ''] = this.currentUrl().split('?');
-    if (path !== '/flow/editor' && !path.startsWith('/flow/editor/')) {
-      return false;
-    }
-    return new URLSearchParams(query).get('editor') === editor;
-  }
-
-  isFlowsManageActive(): boolean {
+  /** The Flows list, and every page of a single Flow such as its editor. */
+  isFlowListActive(): boolean {
     const path = this.currentPath();
-    return path === '/' || path === '/flow';
+    return path === '/' || (path.startsWith('/flow') && !this.isActivePath('/flow/message-sender'));
   }
 
   isActivePath(path: string, exact = false): boolean {

@@ -17,6 +17,7 @@ import {
   faClone,
   faCloud,
   faCode,
+  faCodeBranch,
   faCogs,
   faDatabase,
   faDesktop,
@@ -72,6 +73,12 @@ import {
   faUsers,
   faUsersCog,
   faWrench,
+  faRedo,
+  faSitemap,
+  faUndo,
+  faPlug,
+  faWandMagicSparkles,
+  faArrowUpRightFromSquare,
   // jhipster-needle-add-icon-import
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -94,6 +101,7 @@ export const fontAwesomeIcons = [
   faClone,
   faCloud,
   faCode,
+  faCodeBranch,
   faCogs,
   faDatabase,
   faDesktop,
@@ -149,5 +157,11 @@ export const fontAwesomeIcons = [
   faUsers,
   faUsersCog,
   faWrench,
+  faRedo,
+  faSitemap,
+  faUndo,
+  faPlug,
+  faWandMagicSparkles,
+  faArrowUpRightFromSquare,
   // jhipster-needle-add-icon-import
 ];

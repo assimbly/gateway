@@ -1,40 +1,82 @@
 <td class="table-fx-identity">
-  <div class="d-flex align-items-center gap-2 min-w-0">
-    <jhi-truncate class="flex-grow-1" [text]="flow.name" />
+  <a [routerLink]="['/flow/editor', flow.id]" [queryParams]="{ mode: 'edit', editor: flow.type || 'flow', id: flow.id }">
+    <jhi-truncate [text]="flow.name" />
+  </a>
+  @if (handler) {
+    <a class="badge text-bg-light border fw-normal text-decoration-none ms-2" [routerLink]="['/rest-apis', handler.apiId]"
+       [ngbTooltip]="'Handles ' + handler.method + ' ' + handler.fullPath + ' of the API ' + handler.apiName">
+      <fa-icon icon="plug"></fa-icon> {{ handler.apiName }} · {{ handler.method }} {{ handler.fullPath }}
+    </a>
+  }
+</td>
+<td class="text-muted">{{ typeLabel }}</td>
+<td>
+  <div class="d-flex align-items-center gap-2 text-nowrap">
+    <span class="visually-hidden">{{ state.label }}</span>
+    <jhi-status-controls
+      [busy]="disableActionBtns"
+      [tone]="state.tone"
+      [showStart]="shows('start')"
+      [startDisabled]="isDisabled('start')"
+      [showPause]="shows('pause')"
+      [pauseDisabled]="isDisabled('pause')"
+      [showResume]="shows('resume')"
+      [showStop]="shows('stop')"
+      [stopDisabled]="isDisabled('stop')"
+      [showRestart]="shows('restart')"
+      (start)="run('start')"
+      (pause)="run('pause')"
+      (resume)="run('resume')"
+      (stop)="run('stop')"
+      (restart)="run('restart')"
+    />
+    @if (state.draft) {
+      <a
+        class="badge text-bg-secondary text-decoration-none"
+        [routerLink]="['/flow/editor', flow.id]"
+        [queryParams]="{ mode: 'edit', editor: flow.type || 'flow', id: flow.id }"
+        ngbTooltip="This Flow is a Draft. Finish its design to start it."
+        >Draft</a
+      >
+    }
     <jhi-flow-row-alerts
       [flowName]="flow.name"
-      [flowError]="flowError"
-      [flowErrorButton]="flowErrorButton"
+      [failure]="failure"
       [numberOfAlerts]="numberOfAlerts"
-      [alertsLoading]="alertsLoading"
-      [alertsLoadingMore]="alertsLoadingMore"
-      [alertMessages]="alertMessages"
-      (alertsOpen)="onAlertsOpen()"
-      (alertsScroll)="onAlertsScroll($event)"
+      (alertsOpen)="openAlerts()"
     />
   </div>
 </td>
-<td class="text-end table-fx-numeric">{{ formatMetric(completedCount) }}</td>
-<td class="text-end table-fx-numeric">{{ formatMetric(failedCount) }}</td>
-<td class="text-end">
-  <jhi-row-actions>
-    <button
-      jhiPrimaryAction
-      type="button"
-      class="btn btn-fx btn-fx-sm btn-fx-ghost"
-      (click)="navigateToFlowEditor('edit')"
-      aria-label="Edit"
-    >
-      <fa-icon icon="edit"></fa-icon>
-      <span class="d-none d-md-inline">Edit</span>
-    </button>
+<td class="text-end table-fx-numeric">{{ count(completedCount) }}</td>
+<td class="text-end table-fx-numeric">{{ count(failedCount) }}</td>
+<td>
+  @if (state.tone === 'started') {
     <jhi-flow-row-stats
-      jhiPrimaryAction
       [loading]="flowStatsLoading"
       [empty]="flowStatsEmpty"
       [sections]="flowStatsSections"
       (load)="getFlowStatistic(flow)"
     />
+  }
+</td>
+<td class="text-end">
+  <jhi-row-actions>
+    <button
+      jhiOverflowAction
+      type="button"
+      ngbDropdownItem
+      class="btn-fx-dropdown-item"
+      [disabled]="testMessageBlocked !== null"
+      [title]="testMessageBlocked ?? ''"
+      (click)="sendTestMessage()"
+    >
+      <fa-icon icon="paper-plane"></fa-icon>
+      <span>Send test message</span>
+    </button>
+    <button jhiOverflowAction type="button" ngbDropdownItem class="btn-fx-dropdown-item" (click)="navigateToFlowEditor('edit')">
+      <fa-icon icon="edit"></fa-icon>
+      <span>Edit</span>
+    </button>
     <button jhiOverflowAction type="button" ngbDropdownItem class="btn-fx-dropdown-item" (click)="navigateToFlowEditor('clone')">
       <fa-icon icon="clone"></fa-icon>
       <span>Clone</span>
@@ -48,28 +90,12 @@
       type="button"
       ngbDropdownItem
       class="btn-fx-dropdown-item btn-fx-dropdown-danger"
+      [disabled]="deleteBlocked !== null"
+      [title]="deleteBlocked ?? ''"
       (click)="navigateToFlowEditor('delete')"
     >
       <fa-icon icon="trash"></fa-icon>
       <span>Delete</span>
     </button>
   </jhi-row-actions>
-</td>
-<td class="text-end">
-  <jhi-status-controls
-    [busy]="disableActionBtns"
-    [tone]="statusTone"
-    [showStart]="!isFlowStarted"
-    [showPause]="!isFlowPaused"
-    [pauseDisabled]="isFlowStopped"
-    [showResume]="!isFlowResumed"
-    [showStop]="true"
-    [stopDisabled]="isFlowStopped"
-    [showRestart]="isFlowStarted"
-    (start)="start()"
-    (pause)="pause()"
-    (resume)="resume()"
-    (stop)="stop()"
-    (restart)="restart()"
-  />
 </td>

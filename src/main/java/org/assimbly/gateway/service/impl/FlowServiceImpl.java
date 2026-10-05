@@ -3,6 +3,7 @@ package org.assimbly.gateway.service.impl;
 import org.assimbly.gateway.domain.Flow;
 import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.service.FlowService;
+import org.assimbly.gateway.service.api.ApiService;
 import org.assimbly.gateway.service.dto.FlowDTO;
 import org.assimbly.gateway.service.mapper.FlowMapper;
 import org.slf4j.Logger;
@@ -27,9 +28,12 @@ public class FlowServiceImpl implements FlowService {
 
     private final FlowMapper flowMapper;
 
-    public FlowServiceImpl(FlowRepository flowRepository, FlowMapper flowMapper) {
+    private final ApiService apiService;
+
+    public FlowServiceImpl(FlowRepository flowRepository, FlowMapper flowMapper, ApiService apiService) {
         this.flowRepository = flowRepository;
         this.flowMapper = flowMapper;
+        this.apiService = apiService;
     }
 
     /**
@@ -90,14 +94,23 @@ public class FlowServiceImpl implements FlowService {
             .map(flowMapper::toDto);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<FlowDTO> findByName(String name) {
+        log.debug("Request to get Flow by name : {}", name);
+        return flowRepository.findFirstByNameOrderByIdAsc(name)
+            .map(flowMapper::toDto);
+    }
+
     /**
-     * Delete the flow by id.
+     * Delete the flow by id. A Handler Flow is refused: it is deleted with its Operation.
      *
      * @param id the id of the entity
      */
     @Override
     public void delete(Long id) {
         log.debug("Request to delete Flow : {}", id);
+        apiService.checkFlowDeletable(id);
         flowRepository.deleteById(id);
     }
 

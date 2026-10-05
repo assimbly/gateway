@@ -1,0 +1,42 @@
+{
+  "openapi": "3.1.0",
+  "info": { "title": "Orders", "version": "1" },
+  "paths": {
+    "/orders/{orderId}": {
+      "get": {
+        "operationId": "getOrder",
+        "parameters": [
+          { "name": "orderId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "The order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "note": { "type": ["string", "null"] }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "replaceOrder",
+        "parameters": [
+          { "name": "orderId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": { "schema": { "type": "object", "properties": { "note": { "type": "string" } } } }
+          }
+        },
+        "responses": { "204": { "description": "Replaced" } }
+      }
+    }
+  }
+}
