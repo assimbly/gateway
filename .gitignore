@@ -132,6 +132,7 @@ Desktop.ini
 # Directories
 ######################
 /deploy/
+/issues/
 
 ######################
 # Logs
