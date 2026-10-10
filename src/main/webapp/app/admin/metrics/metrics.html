@@ -1,8 +1,8 @@
 <div>
-  <div class="d-flex justify-content-end">
+  <div class="d-flex justify-content-end align-items-center gap-2 mb-3">
     <button class="btn btn-fx btn-fx-secondary" type="button" (click)="refresh()" aria-label="Refresh">
       <fa-icon icon="sync"></fa-icon>
-      <span jhiTranslate="metrics.refresh.button">Refresh</span>
+      <span class="d-none d-md-inline" jhiTranslate="metrics.refresh.button">Refresh</span>
     </button>
   </div>
 
@@ -24,7 +24,11 @@
   }
 
   @if (updatingMetrics()) {
-    <div class="well well-lg" jhiTranslate="metrics.updating">Updating...</div>
+    <div class="d-flex justify-content-center me-3">
+      <div class="spinner-border" role="status" aria-live="polite">
+        <span class="visually-hidden" jhiTranslate="metrics.updating">Updating...</span>
+      </div>
+    </div>
   }
 
   @if (metricsRef?.['http.server.requests']; as metricsRefHttpServerRequests) {

@@ -1,567 +1,228 @@
-import { Component, OnInit, AfterViewInit, AfterContentInit, ViewEncapsulation, ViewChild, ElementRef, inject } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormArray, FormControl, FormGroup } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { map, timeout } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
-import { AlertService } from 'app/core/util/alert.service';
-import { NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { CodemirrorModule } from '@ctrl/ngx-codemirror';
+import { NgSelectModule } from '@ng-select/ng-select';
 
-import { Integration } from 'app/shared/model/integration.model';
-import { IMessage } from 'app/shared/model/message.model';
 import { IBroker } from 'app/shared/model/broker.model';
-import { Components } from 'app//shared/camel/component-type';
-
-import { IntegrationService } from 'app/entities/integration/integration.service';
+import { IAddress } from 'app/shared/model/address.model';
 import { BrokerService } from 'app/entities/broker/broker.service';
-import { ThemeService } from 'app/core/theme';
+import { QueueService } from 'app/entities/queue/queue.service';
+import { TopicService } from 'app/entities/topic/topic.service';
 
-import dayjs from 'dayjs/esm';
+import SendMessageEditor from 'app/shared/send/send-message-editor';
+import SendResultPanel from 'app/shared/send/send-result';
+import SendToolbar from 'app/shared/send/send-toolbar';
+import { focusFirstInvalid } from 'app/shared/send/send-form';
+import { SendHeader, headersToJson } from 'app/shared/send/send-headers';
+import { SEND_TIMEOUT_MS, SendState } from 'app/shared/send/send-state';
+import { BodyMode, SendMessage, UploadedMessages } from 'app/shared/send/send-upload';
 
+/** The JMS headers that used to have their own tab. They are suggestions for the name of a header now. */
+export const JMS_HEADER_NAMES = ['JMSCorrelationID', 'JMSReplyTo', 'JMSType'];
 
 @Component({
     selector: 'jhi-broker-message-sender',
     templateUrl: './broker-message-sender.component.html',
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, FontAwesomeModule, NgbModule, CodemirrorModule],
+    imports: [CommonModule, ReactiveFormsModule, NgSelectModule, SendToolbar, SendResultPanel, SendMessageEditor],
+    host: {
+        '(document:keydown.control.enter)': 'send()',
+        '(document:keydown.meta.enter)': 'send()',
+    },
 })
-export class BrokerMessageSenderComponent implements OnInit {
-    @ViewChild('editor', { read: ElementRef, static: false }) editor: ElementRef;
-    readonly themeService = inject(ThemeService);
+export class BrokerMessageSenderComponent implements OnInit, OnDestroy {
+    private readonly element = inject(ElementRef<HTMLElement>);
+    private readonly brokerService = inject(BrokerService);
+    private readonly queueService = inject(QueueService);
+    private readonly topicService = inject(TopicService);
+    private readonly formBuilder = inject(FormBuilder);
+    private readonly route = inject(ActivatedRoute);
 
-    messages: IMessage[];
-    message: IMessage;
+    readonly jmsHeaderNames = JMS_HEADER_NAMES;
+    readonly state = new SendState();
 
-    brokers: IBroker[];
+    // the message
+    readonly body = signal('');
+    readonly bodyMode = signal<BodyMode>('text');
+    readonly headers = signal<SendHeader[]>([]);
+
     brokerType: string;
+    brokers: IBroker[] = [];
 
     endpointName: string;
     endpointType: string;
 
-    headers: FormArray;
-    jmsHeaders: FormArray;
+    // names of the existing queues or topics, offered as suggestions for the destination
+    suggestions: string[] = [];
+    // the options of the endpoint select: the suggestions plus the name that is currently filled in
+    endpointOptions: string[] = [];
+    loadingSuggestions = false;
 
-    requestDestination: string;
-    requestExchangePattern: string;
-    requestNumberOfTimes: string;
-    requestHeaders: string;
-    requestBody: string;
-
-    responseBody: string;
-
-    requestEditorMode = 'text';
-    responseEditorMode = 'text';
-
-    alert: string;
-    numberOfMessages: number;
-    numberOfSuccesfulMessages;
-    number;
-    numberOfFailedMessages: number;
-    sendingMessages: string;
-    successfulMessages: string;
-    failedMessages: string;
-
-    active;
-    disabled = true;
-
-    isSending: boolean;
-    isSuccessful = false;
-    isFailed = false;
-    isAlert = false;
-    isSaving: boolean;
-    finished = false;
-
-    integrations: Integration[];
-
-    createRoute: number;
-    predicate: any;
-    reverse: any;
-
-    destinationPopoverMessage: string;
-    exchangePatternPopoverMessage: string;
-    numberOfTimesPopoverMessage: string;
+    // true when the page was opened from an endpoint row (query params), false when opened from the sidebar
+    openedFromEndpoint = false;
 
     messageSenderForm: FormGroup;
+    finished = false;
 
-    messageFromFile = false;
+    private readonly uploaded = new UploadedMessages(this.body, this.bodyMode, this.headers);
+    private destroyed = false;
 
-    serviceType: Array<string> = [];
-    upload: any;
-    fileName: string;
-    subtitle: string;
-    dateTime: string;
-
-    modalRef: NgbModalRef | null;
-
-    constructor(
-        private integrationService: IntegrationService,
-        private brokerService: BrokerService,
-        private alertService: AlertService,
-        private formBuilder: FormBuilder,
-        private route: ActivatedRoute,
-        public components: Components,
-        private element: ElementRef
-    ) {}
+    get isSending(): boolean {
+        return this.state.sending();
+    }
 
     ngOnInit() {
         this.initializeForm();
-        this.load();
+        this.applyQueryParams();
         this.setBrokerType();
-        this.setPopoverMessages();
-
         this.finished = true;
     }
 
-    load() {
-        this.isSending = false;
-        this.createRoute = 0;
-        this.active = '0';
-
-        this.headers = this.messageSenderForm.get('headers') as FormArray;
-
-        this.route.queryParams.subscribe(params => {
-            this.endpointType = params['endpointType'];
-            this.endpointName = params['endpointName'];
-            this.brokerType = params['brokerType'];
-            this.messageSenderForm.controls.destination.setValue(this.endpointName);
-        });
-
-        this.subtitle = 'Sending to ' + this.endpointType + ' ' + this.endpointName;
-
-        this.messageSenderForm.controls.exchangepattern.setValue('FireAndForget');
+    ngOnDestroy() {
+        this.destroyed = true;
     }
 
     initializeForm() {
         this.messageSenderForm = this.formBuilder.group({
-            id: new FormControl(''),
-            destination: new FormControl(''),
-            exchangepattern: new FormControl('FireAndForget'),
-            numberoftimes: new FormControl('1'),
-            requestbody: new FormControl(''),
-            headers: new FormArray([this.initializeHeader(null, null)]),
-            jmsHeaders: new FormArray([this.initializeHeader(null, null)])
+            destination: new FormControl('', Validators.required),
+            endpointType: new FormControl('queue'),
         });
     }
 
-    initializeHeader(keyVal, valueVal): FormGroup {
-        return this.formBuilder.group({
-            key: new FormControl(keyVal),
-            value: new FormControl(valueVal)
+    /** Pre-fills the destination when the page is opened from an endpoint row (Endpoints list). */
+    applyQueryParams() {
+        this.route.queryParams.subscribe(params => {
+            this.openedFromEndpoint = !!params['endpointName'];
+            this.endpointName = params['endpointName'];
+            this.endpointType = params['endpointType'] === 'topic' ? 'topic' : 'queue';
+            this.brokerType = params['brokerType'] ?? this.brokerType;
+
+            this.messageSenderForm.controls.destination.setValue(this.endpointName ?? '');
+            this.messageSenderForm.controls.endpointType.setValue(this.endpointType);
+            this.updateEndpointOptions();
         });
     }
 
-    initializeJmsHeader(keyVal, valueVal): FormGroup {
-        return this.formBuilder.group({
-            key: new FormControl(keyVal),
-            value: new FormControl(valueVal)
-        });
+    get selectedEndpointType(): string {
+        return this.messageSenderForm.controls.endpointType.value === 'topic' ? 'topic' : 'queue';
     }
 
-    updateForm() {
-        this.updateTemplateData();
+    get subtitle(): string {
+        const name = this.messageSenderForm?.controls.destination.value;
+        return name ? 'To ' + this.selectedEndpointType + ' ' + name : 'Choose a queue or topic to send to';
     }
 
-    updateTemplateData() {
-        this.messageSenderForm.patchValue({
-            name: '',
-            destination: '',
-            exchangePattern: '',
-            numberoftimes: '',
-            requestbody: ''
-        });
-    }
-
-    addHeader(headerType: string) {
-        this.headers = this.messageSenderForm.get(headerType) as FormArray;
-        this.headers.push(this.initializeHeader(null, null));
-    }
-
-    removeHeader(headerType: string, index, force: boolean) {
-        this.headers = this.messageSenderForm.get(headerType) as FormArray;
-        if (index === 0 && !force) {
-            this.headers
-                .at(index)
-                .get('key')
-                .patchValue('');
-            this.headers
-                .at(index)
-                .get('value')
-                .patchValue('');
-        } else {
-            this.headers.removeAt(index);
+    setEndpointType(type: string) {
+        if (this.selectedEndpointType === type) {
+            return;
         }
+        this.messageSenderForm.controls.endpointType.setValue(type);
+        this.suggestions = [];
+        this.updateEndpointOptions();
+        this.loadSuggestions();
     }
 
-    createHeader(): FormGroup {
-        return this.initializeHeader(null, null);
-    }
-
-    setPopoverMessages() {
-        this.destinationPopoverMessage = `Name of the queue or topic`;
-        this.exchangePatternPopoverMessage = `Fire and Forget (Send only) or Request and Reply (Send and wait for response)`;
-        this.numberOfTimesPopoverMessage = `Number of messages send (1 by default). This setting is only for FireAndForget pattern`;
-    }
-
-    cancel() {
-        window.history.back();
-    }
-
-    send(close: boolean) {
-        if (!this.messageSenderForm.valid) {
-            this.isSending = false;
+    /** Loads the names of the existing queues or topics (depending on the selected type) as suggestions. */
+    loadSuggestions() {
+        if (!this.brokerType) {
             return;
         }
 
-        this.isSending = true;
-        this.isAlert = true;
-        this.isSending = true;
-        this.isFailed = false;
-        this.isSuccessful = false;
-        this.numberOfMessages = 1;
-        this.numberOfSuccesfulMessages = 0;
-        this.numberOfFailedMessages = 0;
+        const type = this.selectedEndpointType;
+        const addresses$ =
+            type === 'topic'
+                ? this.topicService.getAllTopics(this.brokerType).pipe(map(res => res.body?.topics?.topic ?? []))
+                : this.queueService.getAllQueues(this.brokerType).pipe(map(res => res.body?.queues?.queue ?? []));
 
-        if (this.messages && this.messages.length > 1) {
-            for (let i = 0; i < this.messages.length; i++) {
-                this.numberOfMessages = this.messages.length;
-                this.sendingMessages = i + 1 + ' of ' + this.numberOfMessages;
-                this.setRequestFromArray(this.messages[i]);
-                this.sendMessage(close);
-            }
-        } else {
-            this.sendingMessages = '1 of ' + this.numberOfMessages;
-            this.setRequestFromForm();
-            this.sendMessage(close);
-        }
-    }
-
-    setRequestFromForm() {
-        this.headers = this.messageSenderForm.get('headers') as FormArray;
-        this.jmsHeaders = this.messageSenderForm.get('jmsHeaders') as FormArray;
-        this.requestDestination = this.messageSenderForm.controls.destination.value;
-        this.requestExchangePattern =
-            this.messageSenderForm.controls.exchangepattern.value == null
-                ? 'FireAndForget'
-                : this.messageSenderForm.controls.exchangepattern.value;
-        this.requestNumberOfTimes =
-            this.messageSenderForm.controls.numberoftimes.value == null ? 1 : this.messageSenderForm.controls.numberoftimes.value;
-        this.requestBody = this.messageSenderForm.controls.requestbody.value;
-
-        if (!this.requestBody) {
-            this.requestBody = ' ';
-        }
-
-        const headersJson = this.formArrayToJson(this.headers);
-        const jmsHeadersJson = this.formArrayToJson(this.jmsHeaders);
-
-        const allHeadersJson = {
-            ...headersJson,
-            ...jmsHeadersJson
-        };
-
-        this.requestHeaders = JSON.stringify(allHeadersJson);
-    }
-
-    setRequestFromArray(message: IMessage) {
-        let allHeadersJson = {};
-
-        if (this.messageFromFile) {
-            this.headers = message.headers == null ? {} : message.headers;
-            this.jmsHeaders = message.jmsHeaders == null ? {} : message.jmsHeaders;
-
-            allHeadersJson = {
-                ...this.headers,
-                ...this.jmsHeaders
-            };
-        } else {
-            this.headers = this.messageSenderForm.get('headers') as FormArray;
-            this.jmsHeaders = this.messageSenderForm.get('jmsHeaders') as FormArray;
-
-            const headersJson = this.formArrayToJson(this.headers);
-            const jmsHeadersJson = this.formArrayToJson(this.jmsHeaders);
-
-            allHeadersJson = {
-                ...headersJson,
-                ...jmsHeadersJson
-            };
-        }
-
-        this.requestDestination = this.messageSenderForm.controls.destination.value;
-
-        this.requestExchangePattern =
-            this.messageSenderForm.controls.exchangepattern.value == null
-                ? 'FireAndForget'
-                : this.messageSenderForm.controls.exchangepattern.value;
-        this.requestNumberOfTimes =
-            this.messageSenderForm.controls.numberoftimes.value == null ? 1 : this.messageSenderForm.controls.numberoftimes.value;
-        this.requestBody = message.body == null ? ' ' : message.body;
-
-        this.requestHeaders = JSON.stringify(allHeadersJson);
-    }
-
-    sendMessage(close: boolean) {
-        if (this.requestExchangePattern === 'FireAndForget') {
-            this.brokerService.sendMessage(this.brokerType, this.requestDestination, this.requestHeaders, this.requestBody).subscribe(
-                res => {
-                    this.handleSendResponse(res.body, false);
-                    if (close) {
-                        window.history.back();
-                    }
-                },
-                res => {
-                    this.handleSendError(res.error);
+        this.loadingSuggestions = true;
+        addresses$.subscribe(
+            (addresses: IAddress[]) => {
+                // ignore the response if the user switched type in the meantime
+                if (type !== this.selectedEndpointType) {
+                    return;
                 }
-            );
-        } else if (this.requestExchangePattern === 'RequestAndReply') {
-            this.brokerService.sendMessage(this.brokerType, this.requestDestination, this.requestHeaders, this.requestBody).subscribe(
-                res => {
-                    this.handleSendResponse(res.body, true);
-                },
-                res => {
-                    this.handleSendError(res.error);
-                }
-            );
-        }
-    }
-
-    formArrayToJson(formArray: FormArray) {
-        const json: any = {};
-
-        formArray.controls.forEach((element, index) => {
-            const key = element.get('key').value;
-            const value = element.get('value').value;
-            if (key) {
-                json[key] = value;
+                this.loadingSuggestions = false;
+                this.suggestions = addresses
+                    .filter(address => address.temporary?.toString() !== 'true' && !!address.name)
+                    .map(address => address.name)
+                    .sort();
+                this.updateEndpointOptions();
+            },
+            () => {
+                // suggestions are optional: the user can still type a name
+                this.loadingSuggestions = false;
+                this.suggestions = [];
+                this.updateEndpointOptions();
             }
-        });
-
-        return json;
+        );
     }
 
-    handleSendResponse(body: string, showResponse: boolean) {
-        const now = dayjs();
-        this.dateTime = new Date().toLocaleString();
-
-        this.isSuccessful = true;
-        this.numberOfSuccesfulMessages = this.numberOfSuccesfulMessages + 1;
-        this.successfulMessages =
-            ' | Messages: ' + this.numberOfSuccesfulMessages + ' of ' + this.numberOfMessages + ' | Last time: ' + this.dateTime;
-        this.isSending = false;
-
-        /* uncomment when using responses
-        if (showResponse) {
-            this.setEditorMode(body);
-            //this.responseBody = body;
-            //this.active = '2';
-        } else {
-            //this.responseBody = body;
-        }*/
+    /** The select must always contain the name that is filled in, also when it is not (yet) an existing endpoint. */
+    updateEndpointOptions() {
+        const current = this.messageSenderForm.controls.destination.value;
+        this.endpointOptions = current && !this.suggestions.includes(current) ? [current, ...this.suggestions] : [...this.suggestions];
     }
 
-    handleSendError(body: any) {
-        this.dateTime = new Date().toLocaleString();
-        this.isSending = false;
-        this.isFailed = true;
-        this.numberOfFailedMessages = this.numberOfFailedMessages + 1;
-        this.failedMessages =
-            ' | Messages: ' +
-            this.numberOfFailedMessages +
-            ' of ' +
-            this.numberOfMessages +
-            ' | Last time: ' +
-            this.dateTime +
-            '| Error: ' +
-            body;
+    send() {
+        if (this.destroyed || this.state.sending()) {
+            return;
+        }
+        if (!this.messageSenderForm.valid) {
+            this.messageSenderForm.markAllAsTouched();
+            focusFirstInvalid(this.element.nativeElement);
+            return;
+        }
+
+        // remember where the message goes: the user may change the form while the answer is pending
+        const destination: string = this.messageSenderForm.controls.destination.value;
+        const endpointType = this.selectedEndpointType;
+        const messages = this.uploaded.messagesToSend();
+
+        this.state.start(messages.length, endpointType + ' ' + destination);
+        messages.forEach(message => this.sendMessage(destination, endpointType, message));
     }
 
-    setVersion() {
-        const now = dayjs();
+    private sendMessage(destination: string, endpointType: string, message: SendMessage) {
+        // the headers of the page apply to every message, the headers of an uploaded message override them
+        const headers = JSON.stringify(headersToJson([...this.headers(), ...message.headers]));
+
+        this.brokerService
+            .sendMessage(this.brokerType, destination, headers, message.body || ' ', endpointType)
+            .pipe(timeout(SEND_TIMEOUT_MS))
+            .subscribe({
+                next: () => this.state.succeed(),
+                error: error => this.state.fail(error),
+            });
     }
 
     setBrokerType() {
-        if (!this.brokerType) {
-            this.brokerService.getBrokers().subscribe(
-                data => {
-                    if (data) {
-                        for (let i = 0; i < data.body.length; i++) {
-                            this.brokers.push(data.body[i]);
-                        }
-                        this.brokerType = this.brokers[0].type;
-                        if (this.brokerType == null) {
-                            console.log('Unknown broker: set brokertype to artemis');
-                            this.brokerType = 'artemis';
-                        }
-                    }
-                },
-                error => console.log(error)
-            );
+        if (this.brokerType) {
+            this.loadSuggestions();
+            return;
         }
-    }
 
-    // Get currrent scroll position
-    findPos(obj) {
-        let curtop = 0;
-        if (obj.offsetParent) {
-            do {
-                curtop += obj.offsetTop;
-            } while ((obj = obj.offsetParent));
-        }
-        return curtop;
+        this.brokerService.getBrokers().subscribe(
+            data => {
+                if (data) {
+                    this.brokers = data.body ?? [];
+                    this.brokerType = this.brokers[0]?.type;
+                    if (this.brokerType == null) {
+                        this.brokerType = 'artemis';
+                    }
+                    this.loadSuggestions();
+                }
+            },
+            error => console.log(error)
+        );
     }
 
     goBack() {
         window.history.back();
     }
 
-    setEditorMode(str: string) {
-        if (str.startsWith('{') || str.startsWith('[')) {
-            this.responseEditorMode = 'json';
-        } else if (str.startsWith('<')) {
-            this.responseEditorMode = 'xml';
-        } else {
-            this.responseEditorMode = 'text';
-        }
+    async onFile(file: File) {
+        this.state.reset();
+        await this.uploaded.addFile(file);
     }
-
-    allowDrop(e) {
-        e.stopPropagation();
-        e.preventDefault();
-    }
-
-    drop(e) {
-        e.preventDefault();
-        const file = e.dataTransfer.files[0];
-        this.readFile(file);
-    }
-
-    readFile(file: File) {
-        const reader = new FileReader();
-        reader.onload = () => {
-            this.requestBody = reader.result.toString();
-        };
-        reader.readAsText(file);
-    }
-
-    onError(errorMessage) {
-        this.alertService.addAlert({
-		  type: 'danger',
-		  message: errorMessage,
-		});
-    }
-
-    openFile(event) {
-        const reader = new FileReader();
-
-        reader.onload = () => {
-            this.upload = reader.result;
-            this.setUploadMessages();
-        };
-
-        reader.readAsBinaryString(event.target.files[0]);
-        this.fileName = event.target.files[0].name;
-    }
-
-    openDirectory(event) {
-        this.messages = [];
-        this.messageFromFile = false;
-
-        for (let i = 0; i < event.target.files.length; i++) {
-            const reader = new FileReader();
-
-            reader.onload = () => {
-                this.message = {};
-                this.message.body = reader.result.toString();
-                this.messages.push(this.message);
-            };
-            reader.readAsBinaryString(event.target.files[i]);
-        }
-
-        this.messageSenderForm.controls.requestbody.setValue('Uploaded ' + event.target.files.length + ' files from directory');
-    }
-
-    setUploadMessages() {
-        // reset the form
-        this.initializeForm();
-        this.load();
-
-        this.messageFromFile = true;
-
-        // set the uploaded messages
-        try {
-            // try to parse via json
-            const data = JSON.parse(this.upload);
-
-            if (data.messages.message) {
-                if (data.messages.message.length === 1) {
-                    const body = data.messages.message[0].body;
-                    const headers = data.messages.message[0].headers;
-                    const jmsHeaders = data.messages.message[0].jmsHeaders;
-
-                    this.messageSenderForm.controls.requestbody.setValue(body);
-                    this.requestEditorMode = this.getFileType(body);
-
-                    for (var key in headers) {
-                        if (headers.hasOwnProperty(key)) {
-                            this.headers = this.messageSenderForm.get('headers') as FormArray;
-                            this.headers.push(this.initializeHeader(key, headers[key]));
-                        }
-                    }
-
-                    if (Object.keys(headers).length > 0) {
-                        this.removeHeader('headers', 0, true);
-                    }
-
-                    for (var key in jmsHeaders) {
-                        if (jmsHeaders.hasOwnProperty(key)) {
-                            this.headers = this.messageSenderForm.get('jmsHeaders') as FormArray;
-                            this.headers.push(this.initializeHeader(key, jmsHeaders[key]));
-                        }
-                    }
-
-                    if (Object.keys(jmsHeaders).length) {
-                        this.removeHeader('jmsHeaders', 0, true);
-                    }
-                } else {
-                    this.messages = [];
-
-                    for (let i = 0; i < data.messages.message.length; i++) {
-                        this.message = {};
-
-                        this.message.headers = data.messages.message[i].headers;
-                        this.message.body = data.messages.message[i].body;
-
-                        this.messages.push(this.message);
-                    }
-
-                    this.messageSenderForm.controls.requestbody.setValue(
-                        'Uploaded file ' + this.fileName + ' with ' + data.messages.message.length + ' messages'
-                    );
-                }
-            } else {
-                this.requestEditorMode = 'json';
-                this.messageSenderForm.controls.requestbody.setValue(this.upload);
-            }
-        } catch (e) {
-            this.messageSenderForm.controls.requestbody.setValue(this.upload);
-            this.requestEditorMode = this.getFileType(this.upload);
-        }
-    }
-
-    getFileType(doc) {
-        try {
-            // try to parse via json
-            const a = JSON.parse(doc);
-            return 'json';
-        } catch (e) {
-            try {
-                // try xml parsing
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(doc, 'application/xml');
-                if (xmlDoc.documentElement.nodeName == '' || xmlDoc.documentElement.nodeName == 'parsererror') return 'txt';
-                else return 'xml';
-            } catch (e) {
-                return 'txt';
-            }
-        }
-    }
-
 }

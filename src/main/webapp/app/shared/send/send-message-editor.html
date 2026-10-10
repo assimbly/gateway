@@ -1,0 +1,39 @@
+<ul ngbNav #nav="ngbNav" class="nav-pills send-tabs" [activeId]="activeTab()" (activeIdChange)="activeTab.set($event)">
+  <li ngbNavItem="body">
+    <a ngbNavLink>Body</a>
+    <ng-template ngbNavContent>
+      <!-- the drop is handled here: the editor has its own drop output, which does not carry the browser event -->
+      <div (drop)="drop($event)" (dragover)="allowDrop($event)">
+        <ngx-codemirror
+          class="body-codemirror"
+          name="codemirror"
+          [ngModel]="body()"
+          (ngModelChange)="body.set($event)"
+          [ngModelOptions]="{ standalone: true }"
+          [options]="bodyEditorOptions()"
+          (codeMirrorLoaded)="refreshCodeMirror($event)"
+        >
+        </ngx-codemirror>
+      </div>
+      <div class="form-text">Drop a file on the body to replace the body with its content.</div>
+    </ng-template>
+  </li>
+  <!-- stays alive when another tab is shown: it remembers which template the rows were loaded from -->
+  <li ngbNavItem="headers" [destroyOnHide]="false">
+    <a ngbNavLink>
+      Headers
+      @if (headerCount() > 0) {
+        <span class="badge rounded-pill text-bg-secondary ms-1">{{ headerCount() }}</span>
+      }
+    </a>
+    <ng-template ngbNavContent>
+      <jhi-send-headers-editor
+        [headers]="headers()"
+        (headersChange)="headers.set($event)"
+        [suggestions]="suggestions()"
+        [templatesEnabled]="templatesEnabled()"
+      />
+    </ng-template>
+  </li>
+</ul>
+<div [ngbNavOutlet]="nav" class="send-tabs__content"></div>

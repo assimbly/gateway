@@ -1,7 +1,7 @@
 <form name="importForm">
     <div class="modal-header">
         <h4 class="modal-title" id="uploadCertificateLabel">Import trusted certificate</h4>
-        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" (click)="clear()"></button>
+        <button type="button" class="btn-close" aria-label="Close" (click)="clear()"></button>
     </div>
     <div class="modal-body">
     	<div class="alert alert-danger" *ngIf="uploadError">
@@ -24,12 +24,12 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">
-            <span class="fa fa-ban"></span>&nbsp;
+        <button type="button" class="btn btn-fx btn-fx-secondary" (click)="clear()">
+            <span class="fa fa-ban"></span>
             <span>Cancel</span>
         </button>
-        <button type="button" class="btn btn-primary" [disabled]="!certificateFile || nameField.invalid || isSaving" (click)="importCertificates()">
-            <span class="fa fa-upload"></span>&nbsp;
+        <button type="button" class="btn btn-fx btn-fx-primary" [disabled]="!certificateFile || nameField.invalid || isSaving" (click)="importCertificates()">
+            <span class="fa fa-upload"></span>
             <span>Import</span>
         </button>
     </div>

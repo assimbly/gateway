@@ -1,13 +1,13 @@
 <div>
-  <div class="d-flex justify-content-end mb-3">
+  <div class="d-flex justify-content-end align-items-center gap-2 mb-3">
     <button class="btn btn-fx btn-fx-secondary" type="button" (click)="refresh()" aria-label="Refresh">
       <fa-icon icon="sync"></fa-icon>
-      <span jhiTranslate="health.refresh.button">Refresh</span>
+      <span class="d-none d-md-inline" jhiTranslate="health.refresh.button">Refresh</span>
     </button>
   </div>
 
   <div class="table-responsive">
-    <table id="healthCheck" class="table table-striped" aria-label="Health Checks">
+    <table id="healthCheck" class="table table-sm table-striped table-bordered" aria-label="Health Checks">
       <thead>
         <tr>
           <th scope="col" jhiTranslate="health.table.service">Service name</th>
@@ -47,9 +47,14 @@
               </td>
               <td class="text-center">
                 @if (componentHealth.value?.details) {
-                  <a class="hand" (click)="showHealth({ key: componentHealth.key, value: componentHealth.value })">
+                  <button
+                    type="button"
+                    class="btn btn-fx btn-fx-sm btn-fx-icon btn-fx-ghost"
+                    aria-label="Details"
+                    (click)="showHealth({ key: componentHealth.key, value: componentHealth.value })"
+                  >
                     <fa-icon icon="eye" />
-                  </a>
+                  </button>
                 }
               </td>
             </tr>
@@ -58,4 +63,10 @@
       }
     </table>
   </div>
+
+  @if (!health()) {
+    <div class="d-flex justify-content-center me-3">
+      <div class="spinner-border"></div>
+    </div>
+  }
 </div>

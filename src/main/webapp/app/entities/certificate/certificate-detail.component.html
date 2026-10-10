@@ -29,11 +29,13 @@
                         </dd>
                     }
                 </dl>
-                <button type="submit"
-                        (click)="previousState()"
-                        class="btn btn-info">
-                    <fa-icon [icon]="'arrow-left'"></fa-icon>&nbsp;<span> Back</span>
-                </button>
+                <div class="form-fx-actions">
+                    <button type="button"
+                            (click)="previousState()"
+                            class="btn btn-fx btn-fx-secondary">
+                        <fa-icon [icon]="'arrow-left'"></fa-icon><span>Back</span>
+                    </button>
+                </div>
             </div>
         }
     </div>

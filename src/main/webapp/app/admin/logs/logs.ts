@@ -47,6 +47,10 @@ export default class Logs implements OnInit {
     this.logsService.changeLevel(name, level).subscribe(() => this.findAndExtractLoggers());
   }
 
+  refresh(): void {
+    this.findAndExtractLoggers();
+  }
+
   private findAndExtractLoggers(): void {
     this.isLoading.set(true);
     this.logsService

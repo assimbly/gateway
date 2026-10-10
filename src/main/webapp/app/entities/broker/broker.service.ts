@@ -147,11 +147,17 @@ export class BrokerService {
         });
     }
 
-    sendMessage(brokerType: string, endpointName: string, messageHeaders: string, messageBody: string): Observable<HttpResponse<string>> {
+    sendMessage(
+        brokerType: string,
+        endpointName: string,
+        messageHeaders: string,
+        messageBody: string,
+        endpointType: string = 'queue'
+    ): Observable<HttpResponse<string>> {
         return this.http.post(`${this.resourceUrl}/${brokerType}/message/${endpointName}/send`, messageBody, {
             observe: 'response',
             responseType: 'text',
-            params: { messageHeaders }
+            params: { messageHeaders, endpointType }
         });
     }
 }

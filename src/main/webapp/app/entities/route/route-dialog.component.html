@@ -1,4 +1,4 @@
-<div name="editForm">
+<div name="editForm" class="route-dialog">
     <div class="modal-body">
 	<form role="form" [formGroup]="editForm" novalidate>
         <jhi-alert-error></jhi-alert-error>
@@ -22,7 +22,7 @@
             </select>
         </div>
 		<br/>
-		<div class="form-group">
+		<div class="form-group route-field">
       <label class="form-control-label" for="field_route">Route</label>
 			<ngx-codemirror #codeEditor
 				class="route-codemirror" name="content" id="field_content"

@@ -1,0 +1,32 @@
+<div class="send-toolbar">
+  <div class="send-toolbar__title">
+    <h4 class="mb-0">{{ title() }}</h4>
+    <div class="send-toolbar__subtitle text-muted">{{ subtitle() }}</div>
+  </div>
+  <div class="send-toolbar__actions">
+    @if (showBack()) {
+      <button type="button" class="btn btn-fx btn-fx-secondary" (click)="back.emit()">
+        <fa-icon icon="arrow-left"></fa-icon><span class="d-none d-md-inline">Back</span>
+      </button>
+    }
+    @if (uploadEnabled()) {
+      <button type="button" class="btn btn-fx btn-fx-secondary" title="Upload a file" aria-label="Upload" (click)="fileInput.click()">
+        <fa-icon icon="upload"></fa-icon><span class="d-none d-md-inline">Upload</span>
+      </button>
+      <input #fileInput type="file" hidden (change)="onFile($event)" />
+    }
+    <button
+      type="button"
+      class="btn btn-fx btn-fx-primary"
+      [disabled]="sending()"
+      (click)="send.emit()"
+      title="Send (Ctrl+Enter)"
+    >
+      @if (sending()) {
+        <fa-icon icon="spinner" animation="spin"></fa-icon><span class="d-none d-md-inline">Sending</span>
+      } @else {
+        <fa-icon icon="paper-plane"></fa-icon><span class="d-none d-md-inline">Send</span>
+      }
+    </button>
+  </div>
+</div>

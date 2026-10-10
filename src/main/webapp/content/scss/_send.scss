@@ -1,0 +1,209 @@
+/*
+ * Send pages (Flows > Send, Broker > Send)
+ *
+ * Shared layout of both pages: toolbar, cards, tabs and the headers editor.
+ * Components: app/shared/send
+ */
+
+.send-page {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 0 1rem 2rem;
+  text-align: left;
+}
+
+/* Title and actions (Back, Upload, Send) */
+.send-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.send-toolbar__title {
+  min-width: 0;
+}
+
+.send-toolbar__subtitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 48rem;
+}
+
+.send-toolbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.send-card {
+  margin-bottom: 1rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--app-border);
+  border-radius: 0.375rem;
+  background: var(--app-surface);
+  color: var(--app-text);
+}
+
+.send-card__title {
+  margin: 0 0 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--app-text-muted);
+}
+
+/* The destination fields flow into as many columns as fit */
+.send-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+.send-fields > * {
+  min-width: 0;
+}
+
+/* The options sit under the fields, outside their grid, so they span exactly the width of the fields above */
+.send-options {
+  margin-top: 1rem;
+}
+
+/* A select with a button next to it (documentation, edit path, connection) */
+.send-field-with-action {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.send-field-with-action > ng-select {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.send-tabs {
+  margin-bottom: 0.75rem;
+}
+
+.send-tabs__content {
+  min-width: 0;
+}
+
+/* Rows of the headers editor: key | value | remove (| type | language) */
+.send-headers__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.send-headers__row {
+  display: grid;
+  grid-template-columns: minmax(10rem, 1fr) minmax(10rem, 2fr) auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/*
+ * Rows of the options: option | value, of equal width. Together they span the full width of the fields above,
+ * so the value ends where the last field (Exchange pattern) ends. The remove button sits inside the value field.
+ */
+.send-option-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: center;
+}
+
+.send-option-value {
+  position: relative;
+}
+
+.send-option-value .form-control {
+  padding-right: 2.5rem;
+}
+
+.send-option-value__remove {
+  position: absolute;
+  top: 50%;
+  right: 0.25rem;
+  transform: translateY(-50%);
+}
+
+.send-headers__row--advanced {
+  grid-template-columns: minmax(10rem, 1fr) minmax(10rem, 2fr) minmax(7rem, 0.5fr) minmax(8rem, 0.6fr) auto;
+}
+
+.send-headers__row > *,
+.send-option-row > * {
+  min-width: 0;
+}
+
+.send-headers__row--head {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--app-text-muted);
+}
+
+.send-headers__templates {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.send-headers__template-select {
+  flex: 1 1 14rem;
+  max-width: 24rem;
+}
+
+.send-headers__naming {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.send-headers__naming .form-control {
+  flex: 1 1 14rem;
+  max-width: 24rem;
+}
+
+.send-headers__empty {
+  padding: 0.5rem 0;
+}
+
+@media (max-width: 767.98px) {
+  .send-headers__row,
+  .send-headers__row--advanced {
+    grid-template-columns: 1fr auto;
+  }
+
+  .send-option-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.5rem;
+  }
+
+  .send-headers__row--head {
+    display: none;
+  }
+
+  /* key and remove share the first line, value (type, language) follow below */
+  .send-headers__row > ng-select {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .send-headers__row > .btn {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .send-headers__row > input,
+  .send-headers__row > select {
+    grid-column: 1 / -1;
+  }
+}

@@ -1,7 +1,7 @@
 <div class="row justify-content-center">
     <div class="col-8">
         <form name="editForm" role="form" novalidate #editForm="ngForm">
-            <h2 id="jhi-certificate-heading">Manage whitelist</h2>
+            <h2 id="jhi-certificate-heading">{{ certificate?.id ? 'Edit Certificate' : 'Create Certificate' }}</h2>
             <div>
                 <jhi-alert-error></jhi-alert-error>
                 @if (errorMessage) {
@@ -26,21 +26,19 @@
                     </select>
                 </div>
             </div>
-            <div class="row" style="margin-top: 1em;">
-				<div class="col">
-					<button type="button" id="cancel-save" class="btn btn-secondary"  (click)="previousState()">
-						<fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span>Cancel</span>
-					</button>
-					<button type="button" id="add-entity" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary" (click)="add()">
-						<fa-icon [icon]="'save'"></fa-icon>&nbsp;<span>Add</span>
-					</button>
-					<button type="button" id="remove-entity" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary" (click)="remove()">
-						<fa-icon [icon]="['fas', 'trash-alt']"></fa-icon>&nbsp;<span>Remove</span>
-					</button>
-					<button type="button" id="renew-entity" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary" (click)="renew()">
-						<fa-icon [icon]="['fas', 'sync']"></fa-icon>&nbsp;<span>Renew</span>
-					</button>                                
-				</div>
+            <div class="form-fx-actions">
+				<button type="button" id="cancel-save" class="btn btn-fx btn-fx-secondary"  (click)="previousState()">
+					<fa-icon [icon]="'ban'"></fa-icon><span>Cancel</span>
+				</button>
+				<button type="button" id="remove-entity" [disabled]="editForm.form.invalid || isSaving" class="btn btn-fx btn-fx-secondary" (click)="remove()">
+					<fa-icon [icon]="'trash'"></fa-icon><span>Delete</span>
+				</button>
+				<button type="button" id="renew-entity" [disabled]="editForm.form.invalid || isSaving" class="btn btn-fx btn-fx-secondary" (click)="renew()">
+					<fa-icon [icon]="'sync'"></fa-icon><span>Renew</span>
+				</button>
+				<button type="button" id="add-entity" [disabled]="editForm.form.invalid || isSaving" class="btn btn-fx btn-fx-primary" (click)="add()">
+					<fa-icon [icon]="'save'"></fa-icon><span>Add</span>
+				</button>
             </div>
         </form>
     </div>

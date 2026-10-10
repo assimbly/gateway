@@ -38,6 +38,10 @@ export default class Configuration implements OnInit {
   private readonly configurationService = inject(ConfigurationService);
 
   ngOnInit(): void {
+    this.refresh();
+  }
+
+  refresh(): void {
     this.configurationService.getBeans().subscribe(beans => {
       this.allBeans.set(beans);
     });

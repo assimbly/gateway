@@ -1,10 +1,17 @@
 @if (allBeans()) {
   <div>
-    <jhi-search-toolbar [(query)]="beansFilter" placeholder="Filter by prefix" inputId="configuration-filter" />
+    <jhi-search-toolbar [(query)]="beansFilter" placeholder="Filter by prefix" inputId="configuration-filter">
+      <ng-container actions>
+        <button class="btn btn-fx btn-fx-secondary" type="button" (click)="refresh()" aria-label="Refresh">
+          <fa-icon icon="sync"></fa-icon>
+          <span class="d-none d-md-inline"> Refresh</span>
+        </button>
+      </ng-container>
+    </jhi-search-toolbar>
 
     <h3 id="spring-configuration">Spring configuration</h3>
 
-    <table class="table table-striped table-bordered table-responsive d-table" aria-describedby="spring-configuration">
+    <table class="table table-sm table-striped table-bordered table-responsive d-table" aria-describedby="spring-configuration">
       <thead>
         <tr jhiSort [(sortState)]="sortState">
           <th jhiSortBy="prefix" scope="col" class="w-40">
@@ -60,5 +67,9 @@
         </table>
       </div>
     }
+  </div>
+} @else {
+  <div class="d-flex justify-content-center me-3">
+    <div class="spinner-border"></div>
   </div>
 }

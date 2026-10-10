@@ -131,9 +131,9 @@
         </div>
       </div>
 
-      <div>
-        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+      <div class="form-fx-actions">
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-fx btn-fx-secondary" (click)="previousState()">
+          <fa-icon icon="ban" /><span jhiTranslate="entity.action.cancel">Cancel</span>
         </button>
 
         <button
@@ -141,9 +141,9 @@
           id="save-entity"
           data-cy="entityCreateSaveButton"
           [disabled]="editForm.invalid || isSaving()"
-          class="btn btn-primary"
+          class="btn btn-fx btn-fx-primary"
         >
-          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+          <fa-icon icon="save" /><span jhiTranslate="entity.action.save">Save</span>
         </button>
       </div>
     </form>

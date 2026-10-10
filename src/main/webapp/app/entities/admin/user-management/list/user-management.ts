@@ -17,7 +17,7 @@ import { SearchToolbar } from 'app/shared/filter';
 import { TranslateDirective } from 'app/shared/language';
 import { ItemCount } from 'app/shared/pagination';
 import { SortService, type SortState, sortStateSignal } from 'app/shared/sort';
-import { DataTable, DataTableColumn, OverflowActionDirective, PrimaryActionDirective, RowActions, Truncate } from 'app/shared/table';
+import { DataTable, DataTableColumn, OverflowActionDirective, RowActions, Truncate } from 'app/shared/table';
 import { UserManagementDeleteDialog } from '../delete/user-management-delete-dialog';
 import { UserManagementService } from '../service/user-management.service';
 import { IUserManagement } from '../user-management.model';
@@ -38,7 +38,6 @@ import { IUserManagement } from '../user-management.model';
     SearchToolbar,
     DataTable,
     RowActions,
-    PrimaryActionDirective,
     OverflowActionDirective,
     Truncate,
   ],

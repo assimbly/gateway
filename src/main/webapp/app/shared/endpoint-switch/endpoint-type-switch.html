@@ -1,0 +1,18 @@
+<div class="btn-group" role="group" aria-label="Endpoint type">
+  <a
+    class="btn btn-fx btn-fx-secondary"
+    routerLink="/queue"
+    [class.active]="active() === 'queue'"
+    [attr.aria-pressed]="active() === 'queue'"
+  >
+    Queues
+  </a>
+  <a
+    class="btn btn-fx btn-fx-secondary"
+    routerLink="/topic"
+    [class.active]="active() === 'topic'"
+    [attr.aria-pressed]="active() === 'topic'"
+  >
+    Topics
+  </a>
+</div>

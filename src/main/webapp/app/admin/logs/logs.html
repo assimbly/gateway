@@ -1,8 +1,15 @@
 @defer (when loggers() && !isLoading()) {
   <div class="table-responsive">
-    <p jhiTranslate="logs.nbloggers" [translateValues]="{ total: loggers()?.length }">There are {{ loggers()?.length }} loggers.</p>
+    <jhi-search-toolbar [(query)]="filter" placeholder="Filter loggers" inputId="logs-filter">
+      <ng-container actions>
+        <button class="btn btn-fx btn-fx-secondary" type="button" (click)="refresh()" aria-label="Refresh">
+          <fa-icon icon="sync"></fa-icon>
+          <span class="d-none d-md-inline"> Refresh</span>
+        </button>
+      </ng-container>
+    </jhi-search-toolbar>
 
-    <jhi-search-toolbar [(query)]="filter" placeholder="Filter loggers" inputId="logs-filter" />
+    <p class="mt-2" jhiTranslate="logs.nbloggers" [translateValues]="{ total: loggers()?.length }">There are {{ loggers()?.length }} loggers.</p>
 
     <table class="table table-sm table-striped table-bordered logs-table" aria-label="Logs">
       <colgroup>

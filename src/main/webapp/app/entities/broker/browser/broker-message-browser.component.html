@@ -98,9 +98,9 @@
 
 <div class="container-fluid" *ngIf="messages?.length > 0">
   <div class="row">
-    <div class="col-6">
+    <div class="col-6" style="min-width: 0;">
       <div class="table-responsive" [ngStyle]="{ visibility: finished ? 'visible' : 'hidden' }">
-        <table class="table table-hover table-striped table-condensed">
+        <table class="table table-hover table-striped table-condensed" style="width: 100%; table-layout: auto; word-break: break-word;">
           <thead class="transparant">
             <tr>
               <th [style.display]="'none'"><span>ID</span></th>
@@ -131,7 +131,7 @@
       </button>
       <br />
     </div>
-    <div class="col-6" class="overflow-auto" style="position: fixed; left: 50%; height: 65%; width: 48%;">
+    <div class="col-6 overflow-auto" style="min-width: 0; position: sticky; top: 1rem; align-self: flex-start; max-height: calc(100vh - 2rem);">
 
       <div class="table-responsive" [ngStyle]="{ visibility: finished ? 'visible' : 'hidden' }">
         <table class="table table-striped table-condensed">

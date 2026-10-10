@@ -5,6 +5,7 @@
     persistKey="searchTopicText"
     inputId="searchTextId"
   >
+    <jhi-endpoint-type-switch extras active="topic" />
     <ng-container actions>
       <button *ngIf="isBroker" class="btn btn-fx btn-fx-primary" type="button" [routerLink]="['/topic/new']" aria-label="Add">
         <fa-icon icon="plus"></fa-icon><span class="d-none d-md-inline"> Add</span>

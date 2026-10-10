@@ -5,7 +5,7 @@
 <div class="row justify-content-center">
     <div class="col-8">
         <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-            <h2 id="jhi-queue-heading">Create a new Queue</h2>
+            <h2 id="jhi-queue-heading">Create Queue</h2>
 
             <div class="row">
                 <jhi-alert-error></jhi-alert-error>
@@ -20,17 +20,14 @@
                 </div>
             </div>
 
-            <div class="row" style="margin-top: 1em;">
-	            <div class="col d-flex gap-2">
-					<button type="button" id="cancel-save" class="btn btn-fx btn-fx-secondary" (click)="previousState()">
-						<fa-icon icon="ban"></fa-icon><span>Cancel</span>
-					</button>
+            <div class="form-fx-actions">
+				<button type="button" id="cancel-save" class="btn btn-fx btn-fx-secondary" (click)="previousState()">
+					<fa-icon icon="ban"></fa-icon><span>Cancel</span>
+				</button>
 
-					<button type="submit" id="save-entity" [disabled]="editForm.invalid || isSaving" class="btn btn-fx btn-fx-primary">
-						<fa-icon icon="save"></fa-icon><span>Save</span>
-					</button>
-	            </div>
-
+				<button type="submit" id="save-entity" [disabled]="editForm.invalid || isSaving" class="btn btn-fx btn-fx-primary">
+					<fa-icon icon="save"></fa-icon><span>Save</span>
+				</button>
             </div>
         </form>
     </div>

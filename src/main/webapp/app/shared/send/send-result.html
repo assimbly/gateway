@@ -1,0 +1,36 @@
+@if (result(); as r) {
+  @switch (r.status) {
+    @case ('sending') {
+      <div class="alert alert-secondary d-flex align-items-center gap-2" role="status">
+        <fa-icon icon="spinner" animation="spin"></fa-icon>
+        <span>
+          {{ r.total > 1 ? 'Sending ' + r.total + ' messages' : 'Sending message' }} to <b>{{ r.target }}</b
+          >...
+        </span>
+      </div>
+    }
+    @case ('success') {
+      <div class="alert alert-success d-flex align-items-center gap-2" role="alert">
+        <fa-icon icon="check"></fa-icon>
+        <span>
+          <b>{{ r.succeeded === 1 ? 'Message sent' : r.succeeded + ' messages sent' }}</b> to {{ r.target }}
+          <small class="text-muted"> ({{ r.time }})</small>
+        </span>
+      </div>
+    }
+    @case ('failed') {
+      <div class="alert alert-danger d-flex align-items-start gap-2" role="alert">
+        <fa-icon icon="exclamation-triangle" class="mt-1"></fa-icon>
+        <span>
+          <b>Sending failed</b> to {{ r.target }}
+          @if (r.total > 1) {
+            ({{ r.failed }} of {{ r.total }} messages failed)
+          }
+          <small class="text-muted"> ({{ r.time }})</small>
+          <br />
+          <span class="font-monospace small">{{ r.error }}</span>
+        </span>
+      </div>
+    }
+  }
+}

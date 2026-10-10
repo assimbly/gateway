@@ -63,6 +63,16 @@
             type="button"
             ngbDropdownItem
             class="btn-fx-dropdown-item"
+            [routerLink]="['/certificate', certificate.id, 'edit']"
+          >
+            <fa-icon icon="pencil-alt"></fa-icon>
+            <span>Edit</span>
+          </button>
+          <button
+            jhiOverflowAction
+            type="button"
+            ngbDropdownItem
+            class="btn-fx-dropdown-item"
             (click)="exportCertificate(certificate.id)"
           >
             <fa-icon icon="download"></fa-icon>
@@ -75,8 +85,8 @@
             class="btn-fx-dropdown-item btn-fx-dropdown-danger"
             (click)="delete(certificate)"
           >
-            <fa-icon icon="times"></fa-icon>
-            <span>Remove</span>
+            <fa-icon icon="trash"></fa-icon>
+            <span>Delete</span>
           </button>
         </jhi-row-actions>
       </td>

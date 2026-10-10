@@ -113,7 +113,7 @@
             (click)="collapseNavbar()"
           >
             <fa-icon icon="paper-plane" [fixedWidth]="true" />
-            <span>Test message</span>
+            <span>Send</span>
           </a>
           <a
             [class]="itemClass"
@@ -171,7 +171,7 @@
           <a
             [class]="itemClass"
             routerLink="/broker"
-            [class.active]="isActivePath('/broker')"
+            [class.active]="isBrokerManageActive()"
             (click)="collapseNavbar()"
           >
             <fa-icon icon="list" [fixedWidth]="true" />
@@ -179,21 +179,21 @@
           </a>
           <a
             [class]="itemClass"
-            routerLink="/queue"
-            [class.active]="isActivePath('/queue')"
+            routerLink="/broker/sender/message-sender"
+            [class.active]="isBrokerSendActive()"
             (click)="collapseNavbar()"
           >
-            <fa-icon icon="inbox" [fixedWidth]="true" />
-            <span>Queues</span>
+            <fa-icon icon="paper-plane" [fixedWidth]="true" />
+            <span>Send</span>
           </a>
           <a
             [class]="itemClass"
-            routerLink="/topic"
-            [class.active]="isActivePath('/topic')"
+            routerLink="/queue"
+            [class.active]="isEndpointsActive()"
             (click)="collapseNavbar()"
           >
-            <fa-icon icon="bullhorn" [fixedWidth]="true" />
-            <span>Topics</span>
+            <fa-icon icon="inbox" [fixedWidth]="true" />
+            <span>Endpoints</span>
           </a>
         </ng-template>
       }

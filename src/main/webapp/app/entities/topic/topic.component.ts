@@ -18,6 +18,7 @@ import { TopicService } from './topic.service';
 import { TopicDeleteDialogComponent } from './topic-delete-dialog.component';
 import { IBroker } from 'app/shared/model/broker.model';
 import { SearchToolbar } from 'app/shared/filter';
+import { EndpointTypeSwitch } from 'app/shared/endpoint-switch';
 import { DataTable, DataTableColumn } from 'app/shared/table';
 import { AddressRowComponent } from 'app/entities/broker/address-row.component';
 import { filterAddresses } from 'app/shared/util/address-filter';
@@ -25,7 +26,7 @@ import { filterAddresses } from 'app/shared/util/address-filter';
 @Component({
   selector: 'jhi-topic',
   templateUrl: './topic.component.html',
-  imports: [CommonModule, RouterModule, FontAwesomeModule, SearchToolbar, DataTable, AddressRowComponent],
+  imports: [CommonModule, RouterModule, FontAwesomeModule, SearchToolbar, EndpointTypeSwitch, DataTable, AddressRowComponent],
 })
 export class TopicComponent implements OnInit, OnDestroy {
 

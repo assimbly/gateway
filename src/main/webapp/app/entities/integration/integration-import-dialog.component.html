@@ -1,7 +1,7 @@
 <form name="importForm">
     <div class="modal-header">
         <h4 class="modal-title" id="myIntegrationLabel">Import XML Configuration</h4>
-        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" (click)="clear()"></button>
+        <button type="button" class="btn-close" aria-label="Close" (click)="clear()"></button>
     </div>
     <div class="modal-body">
         <div class="form-group">
@@ -19,12 +19,12 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">
-            <span class="fa fa-ban"></span>&nbsp;
+        <button type="button" class="btn btn-fx btn-fx-secondary" (click)="clear()">
+            <span class="fa fa-ban"></span>
             <span>Cancel</span>
         </button>
-        <button type="button" class="btn btn-primary" [disabled]="!integrationId || !xmlConfiguration" (click)="importConfiguration()">
-            <span class="fa fa-upload"></span>&nbsp;
+        <button type="button" class="btn btn-fx btn-fx-primary" [disabled]="!integrationId || !xmlConfiguration" (click)="importConfiguration()">
+            <span class="fa fa-upload"></span>
             <span>Import</span>
         </button>
         <jhi-alert-error></jhi-alert-error>

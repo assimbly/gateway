@@ -1,0 +1,152 @@
+<div class="send-headers">
+  @if (templatesEnabled()) {
+    <div class="send-headers__templates">
+      <label class="form-control-label d-block" for="sendHeadersTemplate">Template</label>
+      <div class="d-flex align-items-center flex-wrap gap-2">
+        <ng-select
+          class="send-headers__template-select"
+          inputId="sendHeadersTemplate"
+          [items]="templates()"
+          bindLabel="name"
+          bindValue="id"
+          placeholder="Load a template"
+          [disabled]="busy()"
+          [ngModel]="templateId()"
+          (ngModelChange)="selectTemplate($event)"
+          [ngModelOptions]="{ standalone: true }"
+        ></ng-select>
+        @if (modified()) {
+          <span class="badge text-bg-warning">Modified</span>
+          <button type="button" class="btn btn-fx btn-fx-secondary btn-fx-sm" [disabled]="busy()" (click)="updateTemplate()">
+            <fa-icon icon="save"></fa-icon><span>Update template</span>
+          </button>
+        }
+        <button
+          type="button"
+          class="btn btn-fx btn-fx-ghost btn-fx-sm"
+          [disabled]="busy() || !canSaveTemplate()"
+          (click)="startNamingTemplate()"
+        >
+          <fa-icon icon="plus"></fa-icon><span>Save as template</span>
+        </button>
+        <a routerLink="/message" class="btn btn-fx btn-fx-ghost btn-fx-sm" title="Create, edit and delete templates">Manage templates</a>
+      </div>
+      <div class="form-text">Loading a template copies its headers. Changes here do not change the template unless you update it.</div>
+      @if (namingTemplate()) {
+        <div class="send-headers__naming mt-2">
+          <input
+            type="text"
+            class="form-control"
+            maxlength="255"
+            placeholder="Name of the template"
+            aria-label="Name of the template"
+            [class.is-invalid]="!!nameError() && templateName().length > 0"
+            [ngModel]="templateName()"
+            (ngModelChange)="templateName.set($event)"
+            [ngModelOptions]="{ standalone: true }"
+            (keydown.enter)="saveAsTemplate(); $event.preventDefault()"
+            (keydown.escape)="cancelNamingTemplate()"
+          />
+          <button type="button" class="btn btn-fx btn-fx-primary" [disabled]="busy() || !!nameError()" (click)="saveAsTemplate()">Save</button>
+          <button type="button" class="btn btn-fx btn-fx-ghost" (click)="cancelNamingTemplate()">Cancel</button>
+        </div>
+        @if (nameError() && templateName().length > 0) {
+          <div class="invalid-field-message">{{ nameError() }}</div>
+        }
+      }
+    </div>
+  }
+
+  <div class="send-headers__rows">
+    @if (headers().length > 0) {
+      <div class="send-headers__row send-headers__row--head" [class.send-headers__row--advanced]="showTypeLanguage()" aria-hidden="true">
+        <span>Key</span>
+        <span>Value</span>
+        @if (showTypeLanguage()) {
+          <span>Type</span>
+          <span>Language</span>
+        }
+        <span></span>
+      </div>
+    }
+    @for (row of headers(); track $index; let i = $index) {
+      <div class="send-headers__row" [class.send-headers__row--advanced]="showTypeLanguage()">
+        <ng-select
+          [items]="keyOptions()"
+          [addTag]="true"
+          addTagText="Use header"
+          [clearable]="false"
+          [selectOnTab]="true"
+          placeholder="Header name"
+          [attr.aria-label]="'Name of header ' + (i + 1)"
+          [ngModel]="row.key || null"
+          (ngModelChange)="setKey(i, $event)"
+          (search)="onKeySearch(i, $event)"
+          (blur)="onKeyBlur(i)"
+          [ngModelOptions]="{ standalone: true }"
+        ></ng-select>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Value"
+          [attr.aria-label]="'Value of header ' + (i + 1)"
+          [ngModel]="row.value"
+          (ngModelChange)="patch(i, { value: $event })"
+          (keydown.enter)="onEnter(i, $event)"
+          [ngModelOptions]="{ standalone: true }"
+        />
+        @if (showTypeLanguage()) {
+          <select
+            class="form-select"
+            [attr.aria-label]="'Type of header ' + (i + 1)"
+            [ngModel]="row.type"
+            (ngModelChange)="patch(i, { type: $event })"
+            [ngModelOptions]="{ standalone: true }"
+          >
+            @for (type of types; track type) {
+              <option [value]="type">{{ type }}</option>
+            }
+          </select>
+          <select
+            class="form-select"
+            [attr.aria-label]="'Language of header ' + (i + 1)"
+            [ngModel]="row.language"
+            (ngModelChange)="patch(i, { language: $event })"
+            [ngModelOptions]="{ standalone: true }"
+          >
+            @for (language of languages; track language) {
+              <option [value]="language">{{ language }}</option>
+            }
+          </select>
+        }
+        <button
+          type="button"
+          class="btn btn-fx btn-fx-icon btn-fx-ghost-danger"
+          title="Remove header"
+          [attr.aria-label]="'Remove header ' + (i + 1)"
+          (click)="remove(i)"
+        >
+          <fa-icon icon="times"></fa-icon>
+        </button>
+      </div>
+    } @empty {
+      <div class="text-muted send-headers__empty">No headers. The message is sent with the headers of the endpoint only.</div>
+    }
+  </div>
+
+  <div class="d-flex align-items-center flex-wrap gap-3 mt-2">
+    <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-sm" (click)="add()"><fa-icon icon="plus"></fa-icon><span>Add header</span></button>
+    @if (templatesEnabled()) {
+      <div class="form-check form-switch mb-0">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          id="sendHeadersAdvanced"
+          [checked]="showTypeLanguage()"
+          (change)="showTypeLanguage.set(!showTypeLanguage())"
+        />
+        <label class="form-check-label" for="sendHeadersAdvanced">Show type &amp; language</label>
+      </div>
+    }
+  </div>
+</div>

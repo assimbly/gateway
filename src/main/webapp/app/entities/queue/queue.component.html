@@ -5,6 +5,7 @@
     persistKey="searchQueueText"
     inputId="searchTextId"
   >
+    <jhi-endpoint-type-switch extras active="queue" />
     <ng-container actions>
       <button *ngIf="isBroker" class="btn btn-fx btn-fx-primary" type="button" [routerLink]="['/queue/new']" aria-label="Add">
         <fa-icon icon="plus"></fa-icon><span class="d-none d-md-inline"> Add</span>

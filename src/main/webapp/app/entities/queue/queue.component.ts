@@ -18,6 +18,7 @@ import { QueueService } from './queue.service';
 import { QueueDeleteDialogComponent } from './queue-delete-dialog.component';
 import { IBroker } from 'app/shared/model/broker.model';
 import { SearchToolbar } from 'app/shared/filter';
+import { EndpointTypeSwitch } from 'app/shared/endpoint-switch';
 import { DataTable, DataTableColumn } from 'app/shared/table';
 import { AddressRowComponent } from 'app/entities/broker/address-row.component';
 import { filterAddresses } from 'app/shared/util/address-filter';
@@ -25,7 +26,7 @@ import { filterAddresses } from 'app/shared/util/address-filter';
 @Component({
   selector: 'jhi-queue',
   templateUrl: './queue.component.html',
-  imports: [CommonModule, RouterModule, FontAwesomeModule, SearchToolbar, DataTable, AddressRowComponent],
+  imports: [CommonModule, RouterModule, FontAwesomeModule, SearchToolbar, EndpointTypeSwitch, DataTable, AddressRowComponent],
 })
 export class QueueComponent implements OnInit, OnDestroy {
   queues: IQueue[] = [];

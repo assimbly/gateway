@@ -1,428 +1,237 @@
-<div class="container">
-  <div class="row">
-    <ng-template #componentPopover let-message="message">
-      <div [innerHtml]="componentPopoverMessage"></div>
-    </ng-template>
-    <ng-template #optionsPopover let-message="message">
-      <div [innerHtml]="optionsPopoverMessage"></div>
-    </ng-template>
-    <ng-template #messagePopover let-message="message">
-      <div [innerHtml]="messagePopoverMessage"></div>
-    </ng-template>
-    <ng-template #connectionPopover let-message="message">
-      <div [innerHtml]="connectionPopoverMessage"></div>
-    </ng-template>
-    <ng-template #popover let-message="message">
-      <div [innerHtml]="popoverMessage"></div>
-    </ng-template>
-    <ng-template #stepPopover let-message="message">
-      <div [innerHtml]="stepPopoverMessage"></div>
-    </ng-template>
-    <ng-template #exchangePatternPopover let-message="message">
-      <div [innerHtml]="exchangePatternPopoverMessage"></div>
-    </ng-template>
-    <ng-template #numberOfTimesPopover let-message="message">
-      <div [innerHtml]="numberOfTimesPopoverMessage"></div>
-    </ng-template>
+<div class="send-page">
+  <jhi-send-toolbar
+    title="Send message"
+    [subtitle]="subtitle"
+    [showBack]="openedFromFlow"
+    [sending]="state.sending()"
+    (send)="send()"
+    (back)="goBack()"
+    (fileSelected)="onFile($event)"
+  />
 
-    <form [formGroup]="messageSenderForm" (ngSubmit)="save()" *ngIf="finished" novalidate class="needs-validation">
+  <jhi-send-result [result]="state.result()" />
 
-      <div formArrayName="stepsData" style="width: 600px">
-        <div [formGroupName]="0">
-                    <div class="form-group" [style.display]="'none'">
-                      <label for="id">ID</label>
-                      <input type="text" class="form-control" id="id" formControlName="id" readonly/>
-                    </div>
-                    <ng-template #uriPopover let-message="message">
-                      <div style="min-width: 300px" [innerHtml]="uriPopoverMessages[0]"></div>
-                    </ng-template>
-                    <ng-template #pathPopover let-message="message">
-                      <div style="min-width:300px;">{{uriPlaceholders[0]}}</div>
-                    </ng-template>
-                    <ng-template #uriEditor>
-                      <div class="modal-header">
-                        <h4 class="modal-title">Endpoint (context path)</h4>
-                        <button type="button" class="close" aria-label="Close" (click)="cancelModal()">
-                          <span aria-hidden="true">&times;</span>
-                        </button>
-                      </div>
-                      <div class="modal-body">
-                      <textarea
-                        class="form-control"
-                        id="field_uri"
-                        formControlName="uri"
-                        placeholder="{{ uriPlaceholders[0] }}"
-                        rows="5"
-                      ></textarea>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-dark" (click)="cancelModal()">Close</button>
-                      </div>
-                    </ng-template>
-
-                    <div class="form-group" style="width: 600px">
-                      <div class="input-group border-bottom my-3">
-                        <h5>Endpoint&ensp;</h5>
-                      </div>
-                      <div class="row">
-                        <div class="col-12">
-                          <label class="form-control-label" for="field_component_type">Component</label>
-                          <i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="uriPopover"
-                             container="body" placement="right" style="margin-left: 6px;">
-                            <fa-icon icon="info-circle"></fa-icon>
-                          </i>
-                        </div>
-                      </div>
-                      <div class="row">
-                        <div class="col-10">
-                          <ng-select
-                            *ngIf="requestStep.stepType === 'TO'"
-                            [items]="producerComponentsNames"
-                            [clearable]="false"
-                            formControlName="componentType"
-                            id="field_component_type"
-                            (change)="setTypeLinks(requestStep, 0, $event)"
-                          ></ng-select>
-                        </div>
-                        <button type="button"
-                                class="col-2 btn btn-fx btn-fx-ghost btn-fx-icon"
-                                [disabled]="!componentTypeCamelLinks[0]"
-                                (click)="openComponentDocs(0)"
-                                title="Camel documentation"
-                                aria-label="Camel documentation">
-                          <fa-icon icon="book"></fa-icon>
-                        </button>
-                      </div>
-                      <div class="row" style="margin-top: 1em">
-                        <div class="col-12">
-                          <label class="form-control-label" for="field_uri">Path</label>
-                          <i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="pathPopover"
-                             container="body" placement="right" style="margin-left: 6px;">
-                            <fa-icon icon="info-circle"></fa-icon>
-                          </i>
-                        </div>
-                      </div>
-                      <div class="row">
-                        <div class="col-10">
-                          <ng-select
-                            [items]="URIList"
-                            [addTag]="true"
-                            bindLabel="uri"
-                            bindValue="uri"
-                            id="field_uri"
-                            formControlName="uri"
-                            placeholder="{{uriPlaceholders[0]}}"
-                            [(ngModel)]="requestStep.uri"
-                            dropdownPosition="bottom"
-                          ></ng-select>
-                        </div>
-                        <button type="button"
-                                class="col-2 btn btn-fx btn-fx-ghost btn-fx-icon"
-                                title="Edit path"
-                                aria-label="Edit path"
-                                (click)="openModal(uriEditor)">
-                          <fa-icon icon="edit"></fa-icon>
-                        </button>
-                      </div>
-                    </div>
-                    <div
-                      *ngIf="
-                      messageSenderForm['controls'].stepsData['controls'][0]['controls'].componentType.errors &&
-                      (messageSenderForm['controls'].stepsData['controls'][0]['controls'].componentType.dirty ||
-                        messageSenderForm['controls'].stepsData['controls'][0]['controls'].componentType.touched)
-                    "
-                    >
-                      <div
-                        *ngIf="messageSenderForm['controls'].stepsData['controls'][0]['controls'].componentType.errors.required"
-                        class="invalid-field-message"
-                      >
-                        ComponentType is required. Please select one.
-                      </div>
-                    </div>
-                    <div
-                      *ngIf="
-                      messageSenderForm['controls'].stepsData['controls'][0]['controls'].uri.errors &&
-                      (messageSenderForm['controls'].stepsData['controls'][0]['controls'].uri.dirty ||
-                        messageSenderForm['controls'].stepsData['controls'][0]['controls'].uri.touched)
-                    "
-                    >
-                      <div
-                        *ngIf="messageSenderForm['controls'].stepsData['controls'][0]['controls'].uri.errors.required"
-                        class="invalid-field-message"
-                      >
-                        Context path is required.
-                      </div>
-                    </div>
-                    <div class="form-group" formArrayName="options">
-                      <div class="row" style="margin-top: 1em">
-                        <div class="col-12">
-                          <label class="form-control-label">Options</label>
-                          <i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="optionsPopover"
-                             container="body" placement="right">
-                            <fa-icon icon="info-circle"></fa-icon>
-                          </i>
-                        </div>
-                      </div>
-
-                      <div class="row" style="padding-bottom: 10px;" *ngFor="let option of stepsOptions[0]; index as idx" [formGroupName]="idx">
-                        <div class="col-5">
-                          <ng-select
-                            [items]="componentOptions[0]"
-                            bindLabel="displayName"
-                            bindValue="name"
-                            [addTag]="addOptionTag"
-                            formControlName="key"
-                            [ngStyle]="{'text-align' : 'left'}"
-                            (change)="changeOptionSelection($event, 0, idx)"
-                            id="field_options-key-{{ idx }}"
-                            (close)="clearOptionHover(0)">
-                            <ng-template ng-option-tmp let-item="item">
-                              <div (mouseenter)="onOptionHover(0, item)">{{item.displayName}}</div>
-                            </ng-template>
-                            <ng-template ng-footer-tmp>
-                              <div class="option-desc-footer">
-                                <ng-container *ngIf="hoveredOptionByStep[0] as opt; else optionDescPlaceholder">
-                                  <div class="option-desc-footer-title">{{opt.displayName}}</div>
-                                  <div class="option-desc-footer-body">{{opt.description}}</div>
-                                  <div class="option-desc-footer-meta">
-                                    <span><b>Group:</b> {{opt.group}}</span>
-                                    <span><b>Type:</b> {{opt.type}}</span>
-                                    <span *ngIf="opt.hasOwnProperty('defaultValue')"><b>Default:</b> {{opt.defaultValue}}</span>
-                                  </div>
-                                </ng-container>
-                                <ng-template #optionDescPlaceholder>
-                                  <div class="option-desc-footer-placeholder">Hover an option to see its description</div>
-                                </ng-template>
-                              </div>
-                            </ng-template>
-                          </ng-select>
-                        </div>
-                        <div class="col-5">
-                          <input
-                            type="text"
-                            class="d-inline-block form-control"
-                            style="display:inline-block; padding-top: 4px; padding-bottom: 4px; padding-left: 10px; line-height: 28px;"
-                            id="field_options-value-{{ idx }}"
-                            formControlName="value"
-                            [placeholder]="
-                            messageSenderForm['controls'].stepsData['controls'][0]['controls'].options['controls'][idx]['controls']
-                              .defaultValue.value
-                          "
-                            data-toggle="tooltip"
-                            title="Value of the option. Click the Camel component button for documentation on valid options."/>
-                        </div>
-                        <button title="Add option" type="button" aria-label="Add option"
-                                class="col-1 btn btn-fx btn-fx-icon btn-fx-ghost"
-                                (click)="addOption(stepsOptions[0], 0)">
-                          <fa-icon icon="plus"></fa-icon>
-                        </button>
-                        <button title="Remove option" type="button" aria-label="Remove option"
-                                *ngIf="idx > 0"
-                                class="col-1 btn btn-fx btn-fx-icon btn-fx-ghost-danger"
-                                (click)="removeOption(stepsOptions[0], option, 0)">
-                          <fa-icon icon="times"></fa-icon>
-                        </button>
-                      </div>
-                    </div>
-
-                    <div [ngStyle]="{'display': enableConnection ? 'block' : 'none'}">
-                      <div class="border-bottom my-3"><h5>Connection</h5></div>
-                      <div class="form-group">
-                        <div class="input-group">
-                          <ng-select
-                            [items]="filterConnection[0]"
-                            bindLabel="name"
-                            bindValue="id"
-                            formControlName="connection"
-                            id="field_connection"
-                            dropdownPosition="top"
-                          ></ng-select>
-                          <button
-                            type="button"
-                            *ngIf="connectionCreated && messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection.value"
-                            class="col-2 btn btn-primary left-border-radius-0"
-                            title="Edit connection"
-                            (click)="
-                          createOrEditConnection(
-                            requestStep,
-                            connectionType[0],
-                            messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection
-                          )
-                        "
-                          >
-                            <fa-icon style="color: white;" icon="pencil-alt"></fa-icon>
-                          </button>
-                          <button
-                            type="button"
-                            *ngIf="connectionCreated && !messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection.value"
-                            class="col-2 btn btn-primary left-border-radius-0 flow-new-button"
-                            title="New connection"
-                            (click)="
-                          createOrEditConnection(
-                            requestStep,
-                            connectionType[0],
-                            messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection
-                          )
-                        "
-                            [disabled]="messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection.disabled"
-                          ></button>
-                          <button
-                            type="button"
-                            *ngIf="!connectionCreated"
-                            class="col-2 btn btn-primary left-border-radius-0"
-                            title="Create connection"
-                            (click)="
-                          createOrEditConnection(
-                            requestStep,
-                            connectionType[0],
-                            messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection
-                          )
-                        "
-                          >
-                            <fa-icon icon="plus" style="color: white;"></fa-icon>
-                          </button>
-                        </div>
-                      </div>
-                      <div
-                        *ngIf="
-                      messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection.errors &&
-                      (messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection.dirty ||
-                        messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection.touched)
-                    "
-                      >
-                        <div
-                          *ngIf="messageSenderForm['controls'].stepsData['controls'][0]['controls'].connection.errors.required"
-                          class="invalid-field-message"
-                        >
-                          Connection is required for this component
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="row" style="margin-top: 1em">
-                          <div class="col-12">
-                            <label class="form-control-label">Exchange Pattern </label>
-                            <i
-                              triggers="mouseenter:mouseleave"
-                              popoverTitle="Info"
-                              [popover]="exchangePatternPopover"
-                              style="margin-left: 0.5em"
-                            >
-                              <fa-icon icon="info-circle"></fa-icon>
-                            </i>
-                          </div>
-                        </div>
-                    <div class="row">
-                      <div class="col-10">
-                        <select type="text" class="form-control" id="field_exchangepattern" formControlName="exchangepattern">
-                          <option value="FireAndForget">FireAndForget</option>
-                          <option value="RequestAndReply">RequestAndReply</option>
-                        </select>
-                        <input type="hidden" formControlName="numberoftimes" />
-                      </div>
-                    </div>
-                  </div>
-
-                    <div class="border-bottom my-3"><h5>Request Headers</h5></div>
-                    <div class="form-group">
-                      <div class="row">
-                        <div class="col-10">
-                          <ng-select
-                            [items]="messages"
-                            bindLabel="name"
-                            bindValue="id"
-                            formControlName="message"
-                            id="field_message"
-                            dropdownPosition="top"
-                          ></ng-select>
-                        </div>
-                        <button
-                          type="button"
-                          class="col-2 btn btn-fx btn-fx-icon btn-fx-ghost"
-                          [title]="messageCreated && messageSenderForm['controls'].stepsData['controls'][0]['controls'].message.value ? 'Edit header' : 'Add header'"
-                          [attr.aria-label]="messageCreated && messageSenderForm['controls'].stepsData['controls'][0]['controls'].message.value ? 'Edit header' : 'Add header'"
-                          (click)="createOrEditMessage(requestStep, messageSenderForm['controls'].stepsData['controls'][0]['controls'].message)"
-                        >
-                          <fa-icon [icon]="messageCreated && messageSenderForm['controls'].stepsData['controls'][0]['controls'].message.value ? 'pencil-alt' : 'plus'"></fa-icon>
-                        </button>
-                      </div>
-                    </div>
+  @if (finished) {
+    <form [formGroup]="messageSenderForm" novalidate>
+      <ng-template #uriEditor>
+        <div class="modal-header">
+          <h4 class="modal-title">Edit Path</h4>
+          <button type="button" class="btn-close" aria-label="Close" (click)="cancelModal()"></button>
         </div>
-      </div>
+        <div class="modal-body">
+          <ngx-codemirror
+            class="path-codemirror"
+            formControlName="uri"
+            [options]="pathEditorOptions()"
+            (codeMirrorLoaded)="refreshCodeMirror($event)"
+          ></ngx-codemirror>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-fx btn-fx-secondary" (click)="cancelModal()">Close</button>
+        </div>
+      </ng-template>
 
-      <div class="row mt-3">
-        <div class="col-6" formArrayName="stepsData">
-          <div [formGroupName]="0">
-            <div class="form-group">
-              <label class="form-control-label" for="field_messagebody"><h5>Request Body</h5></label>
-              <div style="border: 1px solid var(--app-border)">
-                <ngx-codemirror
-                  name="codemirror"
-                  formControlName="requestbody"
-                  [options]="{
-                    lineNumbers: true,
-                    theme: themeService.editorTheme(),
-                    mode: 'text'
-                  }"
-                  (drop)="drop($event)"
-                  (dragover)="allowDrop($event)"
-                  style="width: 100%; overflow: auto;"></ngx-codemirror>
+      <section class="send-card">
+        <h2 class="send-card__title">Destination</h2>
+        <div class="send-fields">
+          <div>
+            <label class="form-control-label d-block" for="field_component_type">Component</label>
+            <div class="send-field-with-action">
+              <ng-select
+                [items]="producerComponentsNames"
+                [clearable]="false"
+                formControlName="componentType"
+                inputId="field_component_type"
+                (change)="setComponentType($event)"
+                [class.is-invalid]="messageSenderForm.controls.componentType.invalid && messageSenderForm.controls.componentType.touched"
+              ></ng-select>
+              <button
+                type="button"
+                class="btn btn-fx btn-fx-ghost btn-fx-icon"
+                [disabled]="!componentTypeCamelLink"
+                (click)="openComponentDocs()"
+                title="Camel documentation"
+                aria-label="Camel documentation"
+              >
+                <fa-icon icon="book"></fa-icon>
+              </button>
+            </div>
+            @if (messageSenderForm.controls.componentType.touched && messageSenderForm.controls.componentType.invalid) {
+              <div class="invalid-field-message">*Component is required. Please select one.</div>
+            }
+            @if (componentDescription) {
+              <div class="form-text">{{ componentDescription }}</div>
+            }
+          </div>
+
+          <div>
+            <label class="form-control-label d-block" for="field_uri">Path</label>
+            <div class="send-field-with-action">
+              <ng-select
+                [items]="URIList"
+                [clearable]="false"
+                [addTag]="true"
+                addTagText="Use path"
+                notFoundText="No existing paths. Type a path to use it."
+                placeholder="Select or type a path"
+                formControlName="uri"
+                inputId="field_uri"
+                [class.is-invalid]="messageSenderForm.controls.uri.invalid && messageSenderForm.controls.uri.touched"
+              ></ng-select>
+              <button
+                type="button"
+                class="btn btn-fx btn-fx-ghost btn-fx-icon"
+                title="Edit path"
+                aria-label="Edit path"
+                [disabled]="messageSenderForm.controls.uri.disabled"
+                (click)="openModal(uriEditor)"
+              >
+                <fa-icon icon="edit"></fa-icon>
+              </button>
+            </div>
+            @if (messageSenderForm.controls.uri.touched && messageSenderForm.controls.uri.invalid) {
+              <div class="invalid-field-message">*Path is required.</div>
+            }
+            @if (uriPlaceholder) {
+              <div class="form-text font-monospace">{{ uriPlaceholder }}</div>
+            }
+          </div>
+
+          @if (enableConnection) {
+            <div>
+              <label class="form-control-label d-block" for="field_connection">Connection</label>
+              <div class="send-field-with-action">
+                <ng-select
+                  [items]="filterConnection"
+                  bindLabel="name"
+                  bindValue="id"
+                  formControlName="connection"
+                  inputId="field_connection"
+                  [class.is-invalid]="messageSenderForm.controls.connection.invalid && messageSenderForm.controls.connection.touched"
+                ></ng-select>
+                <button
+                  type="button"
+                  class="btn btn-fx btn-fx-ghost btn-fx-icon"
+                  [title]="connectionButtonTitle"
+                  [attr.aria-label]="connectionButtonTitle"
+                  (click)="createOrEditConnection()"
+                >
+                  <fa-icon [icon]="messageSenderForm.controls.connection.value ? 'pencil-alt' : 'plus'"></fa-icon>
+                </button>
               </div>
+              @if (messageSenderForm.controls.connection.touched && messageSenderForm.controls.connection.invalid) {
+                <div class="invalid-field-message">*Connection is required for this component.</div>
+              }
             </div>
+          }
+
+          <div>
+            <label class="form-control-label d-block" for="field_exchangepattern">Exchange pattern</label>
+            <ng-select
+              [items]="exchangePatterns"
+              bindLabel="label"
+              bindValue="value"
+              [clearable]="false"
+              [searchable]="false"
+              formControlName="exchangepattern"
+              inputId="field_exchangepattern"
+            ></ng-select>
+            <div class="form-text">Request and reply waits for the response. Fire and forget only sends.</div>
           </div>
         </div>
-        <div class="col-6">
-          <div class="form-group">
-            <label class="form-control-label" for="responsebody"><h5>Response Body</h5></label>
-            <div class="response-body-readonly" title="Read-only">
-              <span class="response-body-readonly__hint">Read-only</span>
-              <ngx-codemirror
-                name="codemirror"
-                formControlName="responsebody"
-                [options]="{
-                  lineNumbers: true,
-                  theme: themeService.editorTheme(),
-                  mode: responseEditorMode,
-                  readOnly: true,
-                  cursorBlinkRate: -1
-                }"
-                style="width: 100%; overflow: auto;"></ngx-codemirror>
+
+        <div class="send-options" formArrayName="options">
+            <label class="form-control-label d-block">Options</label>
+            <div class="send-headers__rows">
+              @for (option of options.controls; track option; let idx = $index) {
+                <div class="send-option-row" [formGroupName]="idx">
+                  <ng-select
+                    [items]="componentOptions"
+                    bindLabel="displayName"
+                    bindValue="name"
+                    [addTag]="addOptionTag"
+                    formControlName="key"
+                    placeholder="Option"
+                    [attr.aria-label]="'Name of option ' + (idx + 1)"
+                    (change)="changeOptionSelection($event, idx)"
+                    (close)="clearOptionHover()"
+                  >
+                    <ng-template ng-option-tmp let-item="item">
+                      <div (mouseenter)="onOptionHover(item)">{{ item.displayName }}</div>
+                    </ng-template>
+                    <ng-template ng-footer-tmp>
+                      <div class="option-desc-footer">
+                        @if (hoveredOption; as opt) {
+                          <div class="option-desc-footer-title">{{ opt.displayName }}</div>
+                          <div class="option-desc-footer-body">{{ opt.description }}</div>
+                          <div class="option-desc-footer-meta">
+                            <span><b>Group:</b> {{ opt.group }}</span>
+                            <span><b>Type:</b> {{ opt.type }}</span>
+                            @if (opt.defaultValue !== undefined) {
+                              <span><b>Default:</b> {{ opt.defaultValue }}</span>
+                            }
+                          </div>
+                        } @else {
+                          <div class="option-desc-footer-placeholder">Hover an option to see its description</div>
+                        }
+                      </div>
+                    </ng-template>
+                  </ng-select>
+                  <div class="send-option-value">
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="value"
+                      [placeholder]="option.get('defaultValue')?.value || 'Value'"
+                      [attr.aria-label]="'Value of option ' + (idx + 1)"
+                      title="Value of the option. Click the Camel documentation button for the valid options."
+                    />
+                    <button
+                      type="button"
+                      class="btn btn-fx btn-fx-sm btn-fx-icon btn-fx-ghost-danger send-option-value__remove"
+                      title="Remove option"
+                      [attr.aria-label]="'Remove option ' + (idx + 1)"
+                      (click)="removeOption(idx)"
+                    >
+                      <fa-icon icon="times"></fa-icon>
+                    </button>
+                  </div>
+                </div>
+              }
             </div>
-          </div>
+            <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-sm mt-2" (click)="addOption()">
+              <fa-icon icon="plus"></fa-icon><span>Add option</span>
+            </button>
         </div>
-      </div>
-
-        <br/>
-
-        <div class="row">
-          <div class="col-12">
-            <jhi-alert *ngIf="isAlert"></jhi-alert>
-          </div>
-        </div>
-
-        <br/>
-
-        <div class="container">
-          <div class="row">
-            <div class="col-5 offset-5">
-              <button type="button" class="btn btn-secondary" [routerLink]="['/']">
-                <fa-icon icon="ban" style="color: white;"></fa-icon>
-                <span>Cancel</span>
-              </button>
-              <button type="button" (click)="send()" [disabled]="messageSenderForm.invalid || isSending"
-                      class="btn btn-primary">
-                <fa-icon icon="paper-plane" style="color: white;"></fa-icon>
-                <span *ngIf="!isSending"></span>&nbsp; <span *ngIf="!isSending" style="color: white;">Send</span>
-                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" *ngIf="isSending"
-                      style="color: white;"></span>
-                <span *ngIf="isSending" style="color: white;">Sending</span>
-              </button>
-            </div>
-            <div class="col-2"></div>
-          </div>
-        </div>
-
+      </section>
     </form>
-  </div>
+
+    <section class="send-card">
+      <h2 class="send-card__title">Message</h2>
+      <jhi-send-message-editor [(body)]="body" [(headers)]="headers" [(bodyMode)]="bodyMode" [templatesEnabled]="true" />
+    </section>
+
+    @if (response(); as r) {
+      <section class="send-card" aria-live="polite">
+        <h2 class="send-card__title">
+          Response
+          <span class="badge ms-2" [class.text-bg-success]="r.ok" [class.text-bg-danger]="!r.ok">{{ r.ok ? 'OK' : 'Failed' }}</span>
+          @if (r.status) {
+            <span class="ms-2 text-muted text-lowercase">status {{ r.status }}</span>
+          }
+          <span class="ms-2 text-muted text-lowercase">{{ r.ms }} ms</span>
+        </h2>
+        <div class="response-body-readonly" title="Read-only">
+          <span class="response-body-readonly__hint">Read-only</span>
+          <ngx-codemirror
+            class="body-codemirror"
+            name="response"
+            [ngModel]="r.body"
+            [ngModelOptions]="{ standalone: true }"
+            [options]="responseOptions()"
+          ></ngx-codemirror>
+        </div>
+      </section>
+    }
+  }
 </div>

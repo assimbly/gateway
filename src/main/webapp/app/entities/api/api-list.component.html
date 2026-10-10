@@ -54,6 +54,10 @@
           <td class="text-end table-fx-numeric">{{ api.operationCount }}</td>
           <td class="text-end">
             <jhi-row-actions>
+              <button jhiOverflowAction type="button" ngbDropdownItem class="btn-fx-dropdown-item" [routerLink]="['/rest-apis', api.id]">
+                <fa-icon icon="pencil-alt"></fa-icon>
+                <span>Edit</span>
+              </button>
               <button jhiOverflowAction type="button" ngbDropdownItem class="btn-fx-dropdown-item" (click)="exportApi(api, 'yaml')">
                 <fa-icon icon="file-export"></fa-icon>
                 <span>Export OpenAPI (YAML)</span>

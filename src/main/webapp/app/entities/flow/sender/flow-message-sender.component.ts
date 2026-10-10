@@ -1,225 +1,201 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, TemplateRef, ViewEncapsulation, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, TemplateRef, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { forkJoin, Observable, Subscription } from 'rxjs';
-import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
-import { AlertService } from 'app/core/util/alert.service';
-import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { Observable, defer, forkJoin, from, of } from 'rxjs';
+import { catchError, concatMap, map, switchMap } from 'rxjs/operators';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { PopoverModule } from 'ngx-bootstrap/popover';
 import { CodemirrorModule } from '@ctrl/ngx-codemirror';
-import { Alert } from 'app/shared/alert';
 
-import { Integration } from 'app/shared/model/integration.model';
-import { Flow, IFlow } from 'app/shared/model/flow.model';
-import { FlowService } from '../flow.service';
-
-import { Option, TypeLinks } from '../editor/flow-editor.component';
-
-import { Step, StepType, IStep } from 'app/shared/model/step.model';
-import { sourceStepOf } from '../flow-status';
-import { Connection } from 'app/shared/model/connection.model';
-import { IMessage } from 'app/shared/model/message.model';
-
-import { StepService } from '../../step/step.service';
-import { ConnectionService } from '../../connection/connection.service';
-import { MessageService } from 'app/entities/message/message.service';
-import { IntegrationService } from '../../integration/integration.service';
-
-import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
+import { ThemeService } from 'app/core/theme';
 import { Components } from 'app/shared/camel/component-type';
 import { Connections } from 'app/shared/camel/connections';
-
-import { map } from 'rxjs/operators';
-
-import { MessageDialogComponent } from 'app/entities/message/message-dialog.component';
+import { Connection } from 'app/shared/model/connection.model';
+import { IStep, StepType } from 'app/shared/model/step.model';
 import { ConnectionDialogComponent } from 'app/entities/connection/connection-dialog.component';
-
-import { MessagePopupService } from 'app/entities/message/message-popup.service';
 import { ConnectionPopupService } from 'app/entities/connection/connection-popup.service';
-import { ThemeService } from 'app/core/theme';
+import { ConnectionService } from 'app/entities/connection/connection.service';
+import { StepService } from 'app/entities/step/step.service';
 
-import dayjs from 'dayjs/esm';
+import SendMessageEditor from 'app/shared/send/send-message-editor';
+import SendResultPanel from 'app/shared/send/send-result';
+import SendToolbar from 'app/shared/send/send-toolbar';
+import { focusFirstInvalid } from 'app/shared/send/send-form';
+import { SendHeader, filledHeaders, headersToTemplateJson } from 'app/shared/send/send-headers';
+import { SendState, sendErrorText } from 'app/shared/send/send-state';
+import { BodyMode, SendMessage, UploadedMessages, detectResponseMode } from 'app/shared/send/send-upload';
+
+import { ApiService } from 'app/entities/api/api.service';
+import { FlowService } from '../flow.service';
+import { sourceStepOf } from '../flow-status';
+import { RestTarget, restHostOf, restTargetOf } from './rest-target';
+
+/** The answer to a message that was sent with the exchange pattern Request and Reply. */
+export interface FlowResponse {
+    ok: boolean;
+    status: number;
+    body: string;
+    ms: number;
+}
+
+type SendOutcome = FlowResponse & { error?: unknown };
 
 @Component({
     selector: 'jhi-flow-message-sender',
     templateUrl: './flow-message-sender.component.html',
-    encapsulation: ViewEncapsulation.None,
-    imports: [CommonModule, ReactiveFormsModule, RouterModule, NgbModule, FontAwesomeModule, NgSelectModule, PopoverModule, CodemirrorModule, Alert],
+    imports: [
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        FontAwesomeModule,
+        NgSelectModule,
+        CodemirrorModule,
+        SendToolbar,
+        SendResultPanel,
+        SendMessageEditor,
+    ],
+    host: {
+        '(document:keydown.control.enter)': 'send()',
+        '(document:keydown.meta.enter)': 'send()',
+    },
 })
 export class FlowMessageSenderComponent implements OnInit, OnDestroy {
+    private readonly element = inject(ElementRef<HTMLElement>);
+    private readonly route = inject(ActivatedRoute);
+    private readonly flowService = inject(FlowService);
+    private readonly apiService = inject(ApiService);
+    private readonly stepService = inject(StepService);
+    private readonly connectionService = inject(ConnectionService);
+    private readonly connectionPopupService = inject(ConnectionPopupService);
+    private readonly modalService = inject(NgbModal);
+    private readonly cdr = inject(ChangeDetectorRef);
+    private readonly components = inject(Components);
+    private readonly connectionsList = inject(Connections);
     readonly themeService = inject(ThemeService);
 
-    flows: IFlow[];
-    connections: Connection[];
-    messages: IMessage[];
+    readonly state = new SendState();
 
-    stepsOptions: Array<Array<Option>> = [[]];
-    steps: IStep[] = new Array<Step>();
-    URIList: IStep[] = new Array<Step>();
+    // the message
+    readonly body = signal('');
+    readonly bodyMode = signal<BodyMode>('text');
+    readonly headers = signal<SendHeader[]>([]);
 
-    step: IStep;
-    requestStep: IStep;
-    selectedSendStep: IStep;
+    // the answer to the last message that was sent with Request and Reply
+    readonly response = signal<FlowResponse | null>(null);
+    readonly responseOptions = computed(() => ({
+        lineNumbers: true,
+        gutters: ['CodeMirror-linenumbers'],
+        lineWrapping: true,
+        theme: this.themeService.editorTheme(),
+        mode: detectResponseMode(this.response()?.body),
+        readOnly: true,
+        cursorBlinkRate: -1,
+    }));
 
-    requestExchangePattern: string;
-    requestNumberOfTimes: string;
-    requestComponentType: string;
-    requestUri: string;
-    requestStepId: string;
-    requestOptions: string;
-    requestConnectionId: string;
-    requestHeaderId: string;
-    requestConnectionKeys: string;
-    requestHeader: string;
-    requestBody: string;
-
-    responseBody: string;
-    responseEditorMode = 'text';
-
-    panelCollapsed: any = 'uno';
-    public isCollapsed = true;
-    disabled = true;
-    activeStep: any;
-
-    isSending: boolean;
-    isAlert = false;
-
-    isSaving: boolean;
-    savingFlowFailed = false;
-    savingFlowFailedMessage = 'Saving failed (check logs)';
-    savingFlowSuccess = false;
-    savingFlowSuccessMessage = 'Flow successfully saved';
-    finished = false;
-
-    integrations: Integration[];
-
-    enableConnection = false;
-    createRoute: number;
-    newId: number;
-    predicate: any;
-    queryCount: any;
-    reverse: any;
-    totalItems: number;
-    connectionCreated: boolean;
-    messageCreated: boolean;
-
-    namePopoverMessage: string;
-    stepPopoverMessage: string;
-    exchangePatternPopoverMessage: string;
-    numberOfTimesPopoverMessage: string;
-
-    componentPopoverMessage: string;
-    optionsPopoverMessage: string;
-    messagePopoverMessage: string;
-    connectionPopoverMessage: string;
-    popoverMessage: string;
-
-    selectedOption: Array<any> = [];
-    componentOptions: Array<any> = [];
-    customOptions: Array<any> = [];
-    hoveredOptionByStep: Array<any> = [];
-
-    consumerComponentsNames: Array<any> = [];
-    producerComponentsNames: Array<any> = [];
-
-    public componentsWithConnection: Array<any> = ['activemq','amazonmq','amqp','amqps','jms','sjms','sjms2','sql','ibmmq','spring-rabbitmq'];
-    componentTypeAssimblyLinks: Array<string> = new Array<string>();
-    componentTypeCamelLinks: Array<string> = new Array<string>();
-    uriPlaceholders: Array<string> = new Array<string>();
-    uriPopoverMessages: Array<string> = new Array<string>();
-
-    typesLinks: Array<TypeLinks>;
     messageSenderForm: FormGroup;
-    invalidUriMessage: string;
+    finished = false;
+    // true when the page was opened from a Flow (query param flowId), false when opened from the sidebar
+    openedFromFlow = false;
 
-    filterConnection: Array<Array<Connection>> = [[]];
-    connectionType: Array<string> = [];
-    selectedConnection: Connection = new Connection();
-    closeResult: string;
+    readonly exchangePatterns = [
+        { value: 'RequestAndReply', label: 'Request and reply' },
+        { value: 'FireAndForget', label: 'Fire and forget' },
+    ];
 
-    private subscription: Subscription;
-    private eventSubscriber: Subscription;
-    private wikiDocUrl: string;
-    private camelDocUrl: string;
+    producerComponentsNames: string[] = [];
+    connections: Connection[] = [];
+    filterConnection: Connection[] = [];
+    steps: IStep[] = [];
+    URIList: string[] = [];
+
+    componentOptions: any[] = [];
+    hoveredOption: any = null;
+
+    connectionType = '';
+    enableConnection = false;
+    componentTypeCamelLink = '';
+    componentDescription = '';
+    uriPlaceholder = '';
 
     modalRef: NgbModalRef | null;
 
-    constructor(
-        private eventManager: EventManager,
-        private integrationService: IntegrationService,
-        private flowService: FlowService,
-        private stepService: StepService,
-        private connectionService: ConnectionService,
-        private messageService: MessageService,
-        private alertService: AlertService,
-        private route: ActivatedRoute,
-        private router: Router,
-        public components: Components,
-        public connectionsList: Connections,
-        private modalService: NgbModal,
-        private messagePopupService: MessagePopupService,
-        private connectionPopupService: ConnectionPopupService,
-        private cdr: ChangeDetectorRef,
-    ) {}
+    private camelDocUrl = '';
+    private optionsRequest = 0;
+    private destroyed = false;
+    private readonly uploaded = new UploadedMessages(this.body, this.bodyMode, this.headers);
 
-    ngOnInit() {
-        this.isSaving = false;
-        this.createRoute = 0;
-        this.setPopoverMessages();
-
-        this.setComponents();
-
-        this.subscription = this.route.params.subscribe(params => {
-            this.load();
-        });
-
-        this.registerChangeInFlows();
+    get isSending(): boolean {
+        return this.state.sending();
     }
 
-    load() {
-        forkJoin(
-            this.flowService.getWikiDocUrl(),
+    get options(): FormArray {
+        return this.messageSenderForm.controls.options as FormArray;
+    }
+
+    get subtitle(): string {
+        const component = this.messageSenderForm?.controls.componentType.value;
+        const uri = this.messageSenderForm?.controls.uri.value;
+        return component && uri ? 'To ' + this.targetOf(component, uri) : 'Choose a component and a path to send to';
+    }
+
+    ngOnInit() {
+        this.setComponents();
+        this.load();
+    }
+
+    ngOnDestroy() {
+        this.destroyed = true;
+    }
+
+    private load() {
+        forkJoin([
             this.flowService.getCamelDocUrl(),
             this.connectionService.getAllConnections(),
-            this.messageService.getAllMessages(),
-            this.stepService.query()
-        ).subscribe(([wikiDocUrl, camelDocUrl, connections, messages, steps]) => {
-            this.wikiDocUrl = wikiDocUrl.body;
-
-            this.camelDocUrl = camelDocUrl.body;
-
-            this.steps = steps.body;
-
-            this.connections = connections.body;
-            this.connectionCreated = this.connections.length > 0;
-
-            this.messages = messages.body;
-            this.messageCreated = this.messages.length > 0;
+            this.stepService.query(),
+        ]).subscribe(([camelDocUrl, connections, steps]) => {
+            this.camelDocUrl = camelDocUrl.body ?? '';
+            this.connections = connections.body ?? [];
+            this.steps = steps.body ?? [];
 
             this.initializeForm();
-
-            this.requestStep = new Step();
-            this.requestStep.stepType = StepType.TO;
-            this.requestStep.componentType = 'file';
-            this.requestComponentType = 'file';
-
-            (<FormArray>this.messageSenderForm.controls.stepsData).push(this.initializeStepData(this.requestStep));
-
-            this.stepsOptions[0] = [new Option()];
-            this.hoveredOptionByStep[0] = null;
-
-            this.setTypeLinks(this.requestStep, 0);
+            this.setComponentType('file');
 
             const flowId = Number(this.route.snapshot.queryParamMap.get('flowId'));
             if (flowId) {
+                this.openedFromFlow = true;
                 this.prefillFromFlowSource(flowId);
             }
 
             this.finished = true;
             this.cdr.detectChanges();
+        });
+    }
+
+    private setComponents() {
+        this.producerComponentsNames = this.components.types
+            .filter(component => component.consumerOnly === false)
+            .map(component => component.name)
+            .sort();
+    }
+
+    private initializeForm() {
+        this.messageSenderForm = new FormGroup({
+            componentType: new FormControl('file', Validators.required),
+            uri: new FormControl<string | null>(null, Validators.required),
+            options: new FormArray([this.initializeOption()]),
+            connection: new FormControl('', Validators.required),
+            exchangepattern: new FormControl('RequestAndReply'),
+        });
+    }
+
+    private initializeOption(key: string | null = null, value: string | null = null): FormGroup {
+        return new FormGroup({
+            key: new FormControl(key),
+            value: new FormControl(value),
+            defaultValue: new FormControl(''),
         });
     }
 
@@ -230,353 +206,234 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
             if (!source?.componentType) {
                 return;
             }
-            const stepForm = <FormGroup>(<FormArray>this.messageSenderForm.controls.stepsData).controls[0];
-            this.requestStep.uri = source.uri;
-            this.requestStep.options = source.options;
-            this.setTypeLinks(this.requestStep, 0, source.componentType);
-            stepForm.controls.uri.setValue(source.uri);
-            this.stepsOptions[0] = [];
-            this.getOptions(this.requestStep, stepForm, this.stepsOptions[0]);
+            this.setComponentType(source.componentType);
+            this.messageSenderForm.controls.uri.setValue(source.uri || null);
+            this.setOptionsFromString(source.options);
             if (source.connectionId) {
-                stepForm.controls.connection.setValue(source.connectionId);
+                this.messageSenderForm.controls.connection.setValue(source.connectionId);
             }
             this.cdr.detectChanges();
+
+            const restTarget = source.componentType.toLowerCase() === 'rest' ? restTargetOf(source.uri, source.options) : undefined;
+            if (restTarget) {
+                this.prefillRest(restTarget);
+            }
         });
     }
 
-    // this filters connections not of the correct type
-    filterConnections(step: any, formService: FormControl) {
-        this.connectionType[0] = this.connectionsList.getConnectionType(step.componentType);
-        this.filterConnection[0] = this.connections.filter(f => f.type === this.connectionType[0]);
-        if (this.filterConnection[0].length > 0 && step.connectionId) {
-            formService.setValue(this.filterConnection[0].find(fs => fs.id === step.connectionId).id);
-        }
+    /**
+     * The Source of an API Operation keeps its method and path as Options. The `rest` Component sends to
+     * `rest:method:path`, so they go in the path, and the Component is told where the runtime's REST listener is.
+     */
+    private prefillRest(target: RestTarget): void {
+        this.messageSenderForm.controls.uri.setValue(target.uri);
+        this.setOptionsFromString(target.options);
+        this.cdr.detectChanges();
+
+        this.apiService.listenerUrl().subscribe({
+            next: listenerUrl => {
+                const host = restHostOf(listenerUrl);
+                if (host && !this.hasOption('host')) {
+                    this.setOptionsFromString([target.options, `host=${host}`].filter(Boolean).join('&'));
+                    this.cdr.detectChanges();
+                }
+            },
+            error: () => undefined,
+        });
     }
 
-    setComponents() {
-        const producerComponents = this.components.types.filter(function(component) {
-            return component.consumerOnly === false;
-        });
-
-        const consumerComponents = this.components.types.filter(function(component) {
-            return component.producerOnly === false;
-        });
-
-        this.producerComponentsNames = producerComponents.map(component => component.name);
-        this.producerComponentsNames.sort();
-
-        this.consumerComponentsNames = consumerComponents.map(component => component.name);
-        this.consumerComponentsNames.sort();
+    private hasOption(name: string): boolean {
+        return this.options.controls.some(option => option.get('key')?.value === name && !!option.get('value')?.value);
     }
 
-    setTypeLinks(step: any, stepFormIndex?, e?: string) {
-        const stepForm = <FormGroup>(<FormArray>this.messageSenderForm.controls.stepsData).controls[stepFormIndex];
+    /** Selects a component: its documentation, the paths and options that fit it, and the connections of its type. */
+    setComponentType(name: string) {
+        const form = this.messageSenderForm.controls;
+        const componentType = name.toLowerCase();
+        const camelComponentType = this.components.getCamelComponentType(componentType);
+        const type = this.components.types.find(candidate => candidate.name === name);
 
-        if (typeof e !== 'undefined') {
-            step.componentType = e;
-            this.requestComponentType = step.componentType;
-        } else {
-            step.componentType = 'file';
-            this.requestComponentType = 'file';
-        }
+        form.componentType.setValue(name);
+        form.connection.setValue('');
 
-        let type;
-        let camelType;
-        let componentType;
-        let camelComponentType;
+        this.connectionType = this.connectionsList.getConnectionType(componentType);
+        this.enableConnection = !!this.connectionType;
+        this.filterConnection = this.connections.filter(connection => connection.type === this.connectionType);
 
-        componentType = step.componentType.toLowerCase();
+        this.componentTypeCamelLink = this.camelDocUrl + '/' + camelComponentType + '-component.html';
+        this.uriPlaceholder = type?.syntax ?? '';
+        this.componentDescription = type?.description ?? '';
 
-        camelComponentType = this.components.getCamelComponentType(componentType);
+        this.loadComponentOptions(camelComponentType);
+        this.enableFields(name);
+        this.setURIlist(name);
+    }
 
-        type = this.components.types.find(x => x.name === step.componentType.toString());
-        camelType = this.components.types.find(x => x.name === camelComponentType.toUpperCase());
-
-        stepForm.controls.componentType.patchValue(step.componentType);
-        stepForm.controls.connection.setValue('');
-        this.filterConnections(step, stepForm.controls.connection as FormControl);
-
-        this.componentTypeAssimblyLinks[stepFormIndex] = this.wikiDocUrl + '/component-' + componentType;
-        this.componentTypeCamelLinks[stepFormIndex] = this.camelDocUrl + '/' + camelComponentType + '-component.html';
-
-        this.uriPlaceholders[stepFormIndex] = type.syntax;
-        this.uriPopoverMessages[stepFormIndex] = type.description;
-
-        // set options keys
-        this.getComponentOptions(camelComponentType, step.stepType).subscribe(data => {
-            const componentOptions = data.properties;
-
-            this.componentOptions[0] = Object.keys(componentOptions).map(key => ({ ...componentOptions[key], ...{ name: key } }));
-            this.componentOptions[0].sort(function(a, b) {
-                return a.displayName.toLowerCase().localeCompare(b.displayName.toLowerCase());
+    private loadComponentOptions(camelComponentType: string) {
+        const request = ++this.optionsRequest;
+        this.flowService
+            .getComponentOptions(camelComponentType, StepType.TO.toString().toLowerCase())
+            .pipe(map(response => response.body))
+            .subscribe({
+                next: data => {
+                    if (request !== this.optionsRequest) {
+                        return;
+                    }
+                    const properties = data?.properties ?? {};
+                    this.componentOptions = Object.keys(properties)
+                        .map(key => ({ ...properties[key], name: key }))
+                        .sort((a, b) => a.displayName.toLowerCase().localeCompare(b.displayName.toLowerCase()));
+                    this.ensureOptionItems();
+                    this.cdr.markForCheck();
+                },
+                error: () => {
+                    if (request === this.optionsRequest) {
+                        this.componentOptions = [];
+                        this.ensureOptionItems();
+                    }
+                },
             });
-        });
-
-        this.enableConnection = this.componentsWithConnection.includes(componentType);
-
-        this.enableFields(stepForm);
-
-        this.setURIlist();
     }
 
-    openComponentDocs(index: number): void {
-        const url = this.componentTypeCamelLinks[index];
-        if (url) {
-            window.open(url, '_blank', 'noopener,noreferrer');
+    private enableFields(componentName: string) {
+        const form = this.messageSenderForm.controls;
+        if (componentName === 'wastebin') {
+            form.uri.disable();
+            form.options.disable();
+            form.connection.disable();
+            return;
         }
-    }
-
-    setPopoverMessages() {
-        this.namePopoverMessage = `Name of the flow. Usually the name of the message type like <i>order</i>.<br/><br>Displayed on the <i>flows</i> page.`;
-        this.stepPopoverMessage = `The uris that can be selected in the request`;
-        this.exchangePatternPopoverMessage = `Communication pattern. Either Request and Reply (InOut) or Fire and Forget (InOnly)`;
-        this.numberOfTimesPopoverMessage = `Number of messages send (1 by default). This setting is only for FireAndForget pattern`;
-        this.componentPopoverMessage = `The component to use (scheme). Click on docs icon for online documentation.`;
-        this.optionsPopoverMessage = `Options for the selected component. Hover the option for more information.`;
-        this.messagePopoverMessage = `A group of key/value pairs to add to the message header.<br/><br/> Use the button on the right to create or edit a header.`;
-        this.connectionPopoverMessage = `If available then a connection can be selected. For example a connection that sets up a database connection.<br/><br/>
-                                     Use the button on the right to create or edit connections.`;
-        this.popoverMessage = `Destination`;
-
-    }
-
-    enableFields(stepForm) {
-        const componentHasConnection = this.connectionsList.getConnectionType(stepForm.controls.componentType.value);
-
-        if (stepForm.controls.componentType.value === 'wastebin') {
-            stepForm.controls.uri.disable();
-            stepForm.controls.options.disable();
-            stepForm.controls.connection.disable();
-            stepForm.controls.message.disable();
-        } else if (componentHasConnection) {
-            stepForm.controls.uri.enable();
-            stepForm.controls.options.enable();
-            stepForm.controls.message.enable();
-            stepForm.controls.connection.enable();
+        form.uri.enable();
+        form.options.enable();
+        if (this.connectionType) {
+            form.connection.enable();
         } else {
-            stepForm.controls.uri.enable();
-            stepForm.controls.options.enable();
-            stepForm.controls.message.enable();
-            stepForm.controls.connection.disable();
+            form.connection.disable();
         }
     }
 
-    setURIlist() {
-        this.URIList = [];
-
-        const tStepsUnique = this.steps.filter((v, i, a) => a.findIndex(t => t.uri === v.uri) === i);
-
-        tStepsUnique.forEach((step, i) => {
-            if (this.requestComponentType === step.componentType.toLowerCase()) {
-                this.URIList.push(step);
-            }
-        });
+    /** The paths that are in use by existing steps of the selected component. */
+    private setURIlist(componentName: string) {
+        const uris = this.steps
+            .filter(step => step.componentType?.toLowerCase() === componentName.toLowerCase() && !!step.uri)
+            .map(step => step.uri as string);
+        this.URIList = Array.from(new Set(uris));
     }
 
-    initializeForm() {
-        this.messageSenderForm = new FormGroup({
-            id: new FormControl(''),
-            name: new FormControl(''),
-            templatefilter: new FormControl('from'),
-            stepsData: new FormArray([]),
-			      responsebody: new FormControl('')
-        });
-    }
-
-    initializeStepData(step: Step): FormGroup {
-        return new FormGroup({
-            id: new FormControl(step.id),
-            componentType: new FormControl(step.componentType, Validators.required),
-            uri: new FormControl(step.uri),
-            options: new FormArray([this.initializeOption()]),
-            message: new FormControl(step.messageId),
-            exchangepattern: new FormControl('RequestAndReply'),
-            numberoftimes: new FormControl('1'),
-            connection: new FormControl(step.connectionId, Validators.required),
-            requestbody: new FormControl('')
-        });
-    }
-
-    initializeOption(): FormGroup {
-        return new FormGroup({
-            key: new FormControl(null),
-            value: new FormControl(null),
-            defaultValue: new FormControl('')
-        });
-    }
-
-    updateForm() {
-        const stepsData = this.messageSenderForm.controls.stepsData as FormArray;
-        this.steps.forEach((step, i) => {
-            this.updateStepData(step, stepsData.controls[i] as FormControl);
-        });
-    }
-
-    updateStepData(step: any, stepData: FormControl) {
-        stepData.patchValue({
-            id: step.id,
-            stepType: step.stepType,
-            componentType: step.componentType,
-            uri: step.uri,
-            exchangePattern: step.exchangePattern,
-            numberoftimes: step.numberoftimes,
-            connection: step.connectionId,
-            message: step.messageId
-        });
-    }
-
-    getComponentOptions(componentType: String, stepType?: String): any {
-        const type = stepType != null ? stepType.toString().toLowerCase() : undefined;
-        return this.flowService.getComponentOptions(componentType, type).pipe(
-            map(options => {
-                return options.body;
-            })
-        );
-    }
-
-    getOptions(step: any, stepForm: any, stepOptions: Array<Option>) {
-        if (!step.options) {
-            step.options = '';
+    openComponentDocs(): void {
+        if (this.componentTypeCamelLink) {
+            window.open(this.componentTypeCamelLink, '_blank', 'noopener,noreferrer');
         }
+    }
 
-        const options = step.options.split('&');
+    // options of the endpoint
 
-        options.forEach((option, index) => {
-            const o = new Option();
+    addOption() {
+        this.options.push(this.initializeOption());
+    }
 
-            if (typeof stepForm.controls.options.controls[index] === 'undefined') {
-                stepForm.controls.options.push(this.initializeOption());
-            }
+    removeOption(index: number) {
+        if (this.options.length === 1) {
+            this.options.at(0).reset({ key: null, value: null, defaultValue: '' });
+        } else {
+            this.options.removeAt(index);
+        }
+    }
 
-            if (option.includes('=')) {
-                o.key = option.split('=')[0];
-                o.value = option
-                    .split('=')
-                    .slice(1)
-                    .join('=');
-            } else {
-                o.key = null;
-                o.value = null;
-            }
-
-            stepForm.controls.options.controls[index].patchValue({
-                key: o.key,
-                value: o.value
+    private setOptionsFromString(optionsString: string | null | undefined) {
+        this.options.clear();
+        (optionsString ?? '')
+            .split('&')
+            .filter(option => option.includes('='))
+            .forEach(option => {
+                const [key, ...value] = option.split('=');
+                this.options.push(this.initializeOption(key, value.join('=')));
             });
-
-            stepOptions.push(o);
-        });
-    }
-
-    setOptions() {
-        this.steps.forEach((step, i) => {
-            step.options = '';
-            this.setStepOptions(this.stepsOptions[i], step, this.selectOptions(i));
-        });
-    }
-
-    setStepOptions(stepOptions: Array<Option>, step, formOptions: FormArray) {
-        let index = 0;
-
-        stepOptions.forEach((option, i) => {
-            option.key = (<FormGroup>formOptions.controls[i]).controls.key.value;
-            option.value = (<FormGroup>formOptions.controls[i]).controls.value.value;
-
-            if (option.key && option.value) {
-                this.requestOptions += index > 0 ? `&${option.key}=${option.value}` : `${option.key}=${option.value}`;
-                index++;
-            }
-
-        });
-    }
-
-    addOption(options: Array<Option>, stepIndex) {
-        this.selectOptions(stepIndex).push(this.initializeOption());
-        options.push(new Option());
-    }
-
-    removeOption(options: Array<Option>, option: Option, stepIndex) {
-        const index = options.indexOf(option);
-        const formOptions = this.selectOptions(stepIndex);
-        formOptions.removeAt(index);
-        options.splice(index, 1);
-    }
-
-    validateOptions(option: FormGroup) {
-        if (option.value.key || option.value.value) {
-            option.controls.key.setValidators([Validators.required]);
-            option.controls.value.setValidators([Validators.required]);
-        } else {
-            option.controls.key.clearValidators();
-            option.controls.value.clearValidators();
+        if (this.options.length === 0) {
+            this.options.push(this.initializeOption());
         }
-        option.controls.key.updateValueAndValidity();
-        option.controls.value.updateValueAndValidity();
+        this.ensureOptionItems();
     }
 
-    selectOptions(stepIndex): FormArray {
-        const stepData = (<FormArray>this.messageSenderForm.controls.stepsData).controls[stepIndex];
-        return <FormArray>(<FormGroup>stepData).controls.options;
-    }
-
-    changeOptionSelection(selectedOption, index, optionIndex) {
+    changeOptionSelection(selectedOption: any, optionIndex: number) {
         const selectedName = typeof selectedOption === 'string' ? selectedOption : selectedOption?.name;
         if (!selectedName) {
             return;
         }
+        this.ensureOptionItem(selectedName);
 
-        let defaultValue;
-        const componentOption = this.componentOptions[index].filter(option => option.name === selectedName);
+        const componentOption = this.componentOptions.find(option => option.name === selectedName);
+        const defaultValue = componentOption?.defaultValue;
+        this.options.at(optionIndex).get('defaultValue')?.setValue(defaultValue ? 'Default Value: ' + defaultValue : '');
+    }
 
-        if (componentOption[0]) {
-            defaultValue = componentOption[0].defaultValue;
-        } else {
-            const componentType = (this.requestStep?.componentType || 'file').toLowerCase();
-            const camelComponentType = this.components.getCamelComponentType(componentType);
-            this.componentOptions[index].push({
-                name: selectedName,
-                displayName: selectedName,
-                description: 'Custom option',
-                group: 'custom',
-                type: 'string',
-                componentType: camelComponentType,
-            });
-            this.customOptions.push({
-                name: selectedName,
-                displayName: selectedName,
-                description: 'Custom option',
-                group: 'custom',
-                type: 'string',
-                componentType: camelComponentType,
-            });
-        }
+    addOptionTag(name: string): any {
+        return { name, displayName: name, description: 'Custom option', group: 'custom', type: 'string' };
+    }
 
-        const stepData = (<FormArray>this.messageSenderForm.controls.stepsData).controls[index];
-        const formOptions = <FormArray>(<FormGroup>stepData).controls.options;
+    /** The select can only show an option that is in its items, also an option that is not known for the component. */
+    private ensureOptionItems() {
+        this.options.controls.forEach(option => this.ensureOptionItem(option.get('key')?.value));
+    }
 
-        if (defaultValue) {
-            (<FormGroup>formOptions.controls[optionIndex]).controls.defaultValue.patchValue('Default Value: ' + defaultValue);
-        } else {
-            (<FormGroup>formOptions.controls[optionIndex]).controls.defaultValue.patchValue('');
+    private ensureOptionItem(name: string | null | undefined) {
+        if (name && !this.componentOptions.some(option => option.name === name)) {
+            this.componentOptions = [
+                ...this.componentOptions,
+                { name, displayName: name, description: 'Custom option', group: 'custom', type: 'string' },
+            ];
         }
     }
 
-    addOptionTag(name): any {
-        return { name, displayName: name, description: 'Custom option', group: 'custom', type: 'string', componentType: 'file' };
-    }
-
-    onOptionHover(stepIndex: number, item: any): void {
-        this.hoveredOptionByStep[stepIndex] = item;
+    onOptionHover(item: any): void {
+        this.hoveredOption = item;
         this.cdr.detectChanges();
     }
 
-    clearOptionHover(stepIndex: number): void {
-        this.hoveredOptionByStep[stepIndex] = null;
+    clearOptionHover(): void {
+        this.hoveredOption = null;
         this.cdr.detectChanges();
     }
+
+    // path editor
 
     openModal(templateRef: TemplateRef<any>) {
-        this.modalRef = this.modalService.open(templateRef);
+        this.modalRef = this.modalService.open(templateRef, { size: 'xl' });
+    }
+
+    private pathOptionsCache?: Record<string, unknown>;
+    private pathOptionsKey = '';
+
+    /** The same path editor as in the visual Flow editor. */
+    pathEditorOptions(): Record<string, unknown> {
+        const theme = this.themeService.editorTheme();
+        const placeholder = this.uriPlaceholder ?? '';
+        const key = `${theme}|${placeholder}`;
+        if (this.pathOptionsCache && this.pathOptionsKey === key) {
+            return this.pathOptionsCache;
+        }
+        this.pathOptionsKey = key;
+        this.pathOptionsCache = {
+            lineNumbers: true,
+            gutters: ['CodeMirror-linenumbers'],
+            lineWrapping: true,
+            theme,
+            mode: 'text',
+            placeholder,
+        };
+        return this.pathOptionsCache;
+    }
+
+    refreshCodeMirror(editor: { codeMirror?: { refresh: () => void } }): void {
+        const codeMirror = editor?.codeMirror;
+        if (!codeMirror) {
+            return;
+        }
+        const refresh = () => codeMirror.refresh();
+        requestAnimationFrame(() => {
+            refresh();
+            setTimeout(refresh);
+        });
     }
 
     cancelModal(): void {
@@ -586,410 +443,133 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         }
     }
 
-    previousState() {
-        window.history.back();
+    // connection
+
+    get connectionButtonTitle(): string {
+        return this.messageSenderForm.controls.connection.value ? 'Edit connection' : 'Create connection';
     }
 
-    ngOnDestroy() {
-        this.subscription.unsubscribe();
-        this.eventManager.destroy(this.eventSubscriber);
+    createOrEditConnection() {
+        const control = this.messageSenderForm.controls.connection;
+        const connectionId = control.value || undefined;
+
+        this.connectionPopupService.open(ConnectionDialogComponent as Component, connectionId).then(modalRef => {
+            modalRef.componentInstance.connectionType = this.connectionType;
+            const done = (outcome: any) => this.afterConnectionDialog(typeof outcome === 'object' ? outcome?.id : undefined);
+            modalRef.result.then(done, done);
+        });
     }
 
-    registerChangeInFlows() {
-        this.eventSubscriber = this.eventManager.subscribe('flowListModification', response => this.load());
+    private afterConnectionDialog(id?: number) {
+        this.connectionService.getAllConnections().subscribe(response => {
+            this.connections = response.body ?? [];
+            this.filterConnection = this.connections.filter(connection => connection.type === this.connectionType);
+            if (id) {
+                this.messageSenderForm.controls.connection.setValue(id);
+            }
+            this.cdr.detectChanges();
+        });
     }
 
-    createOrEditMessage(step, formHeader: FormControl) {
-        step.messageId = formHeader.value;
+    // sending
 
-        if (step.messageId === null || typeof step.messageId === 'undefined' || !step.messageId) {
-            const modalRef = this.messagePopupService.open(MessageDialogComponent as Component);
-            modalRef.then(res => {
-                res.result.then(
-                    result => {
-                        this.setHeader(step, result.id, formHeader);
-                    },
-                    reason => {
-                        this.setHeader(step, reason.id, formHeader);
-                    }
-                );
-            });
-        } else {
-            const modalRef = this.messagePopupService.open(MessageDialogComponent as Component, step.messageId);
-            modalRef.then(res => {
-                // Success
-                res.result.then(
-                    result => {
-                        this.setHeader(step, result.id, formHeader);
-                    },
-                    reason => {
-                        this.setHeader(step, reason.id, formHeader);
-                    }
-                );
-            });
-        }
+    private targetOf(componentType: string, uri: string): string {
+        return componentType.toLowerCase() + '://' + uri;
     }
 
-    createOrEditConnection(step, connectionType: string, formService: FormControl) {
-        step.connectionId = formService.value;
-
-        if (typeof step.connectionId === 'undefined' || step.connectionId === null || !step.connectionId) {
-            const modalRef = this.connectionPopupService.open(ConnectionDialogComponent as Component);
-            modalRef.then(res => {
-                // Success
-                res.componentInstance.connectionType = connectionType;
-                res.result.then(
-                    result => {
-                        this.setConnection(step, result.id, formService);
-                    },
-                    reason => {
-                        this.setConnection(step, reason.id, formService);
-                    }
-                );
-            });
-        } else {
-            const modalRef = this.connectionPopupService.open(ConnectionDialogComponent as Component, step.connectionId);
-            modalRef.then(res => {
-                res.componentInstance.connectionType = connectionType;
-                res.result.then(
-                    result => {
-                        this.setConnection(step, result.id, formService);
-                    },
-                    reason => {
-                        this.setConnection(step, reason.id, formService);
-                    }
-                );
-            });
-        }
-    }
-
-    setHeader(step, id, formHeader: FormControl) {
-        this.messageService.getAllMessages().subscribe(
-            res => {
-                this.messages = res.body;
-                this.messageCreated = this.messages.length > 0;
-                this.requestStep.messageId = id;
-
-                if (formHeader.value === null) {
-                    formHeader.patchValue(id);
-                }
-            },
-            res => this.onError(res.body)
-        );
-    }
-
-    setConnection(step, id, formService: FormControl) {
-        this.connectionService.getAllConnections().subscribe(
-            res => {
-                this.connections = res.body;
-                this.connectionCreated = this.connections.length > 0;
-                this.requestStep.connectionId = id;
-                formService.patchValue(id);
-                this.filterConnections(step, formService);
-            },
-            res => this.onError(res.body)
-        );
-    }
-
-    handleErrorWhileCreatingFlow(flowId?: number, stepId?: number) {
-        if (flowId !== null) {
-            this.flowService.delete(flowId);
-        }
-        if (stepId !== null) {
-            this.stepService.delete(stepId);
-        }
-        this.savingFlowFailed = true;
-        this.isSaving = false;
-    }
-
-    export(flow: IFlow) {
-        this.flowService.exportFlowConfiguration(flow);
+    private requestUri(): string {
+        const form = this.messageSenderForm.controls;
+        const options = this.options.controls
+            .map(option => ({ key: option.get('key')?.value, value: option.get('value')?.value }))
+            .filter(option => option.key && option.value)
+            .map(option => `${option.key}=${option.value}`)
+            .join('&');
+        const target = this.targetOf(form.componentType.value, form.uri.value ?? '');
+        return options ? `${target}?${options}` : target;
     }
 
     send() {
-        this.setValidationForm();
-
+        if (this.destroyed || this.state.sending()) {
+            return;
+        }
         if (!this.messageSenderForm.valid) {
-            this.isSending = false;
+            this.messageSenderForm.markAllAsTouched();
+            focusFirstInvalid(this.element.nativeElement);
             return;
         }
 
-        this.isSending = true;
-        this.isAlert = true;
-        this.setRequest();
+        const form = this.messageSenderForm.controls;
+        const uri = this.requestUri();
+        const exchangePattern: string = form.exchangepattern.value;
+        const connectionId = form.connection.enabled && form.connection.value ? String(form.connection.value) : '';
+        const messages = this.uploaded.messagesToSend();
 
-        if (this.requestHeaderId && this.requestConnectionId) {
-            forkJoin(
-                this.connectionService.getConnectionKeys(parseInt(this.requestConnectionId)),
-                this.messageService.getHeader(parseInt(this.requestHeaderId))
-            ).subscribe(([res, res2]) => {
-                const connectionKeys = JSON.stringify(res.body);
-                const header = JSON.stringify(res2.body);
+        this.state.start(messages.length, this.targetOf(form.componentType.value, form.uri.value ?? ''));
+        this.response.set(null);
 
-                this.sendMessage(connectionKeys, header);
+        const keys$: Observable<string> = connectionId
+            ? this.connectionService.getConnectionKeys(parseInt(connectionId, 10)).pipe(map(res => JSON.stringify(res.body)))
+            : of('');
+
+        keys$
+            .pipe(
+                // one message after the other, so the answers come in the order of the messages
+                switchMap(connectionKeys =>
+                    from(messages).pipe(concatMap(message => this.sendOne(uri, exchangePattern, connectionId, connectionKeys, message)))
+                )
+            )
+            .subscribe({
+                next: outcome => this.handleOutcome(outcome, exchangePattern),
+                error: error => messages.forEach(() => this.state.fail(error)),
             });
-        } else if (this.requestHeaderId) {
-            this.messageService.getHeader(parseInt(this.requestHeaderId)).subscribe(
-                res => {
-                    const header = JSON.stringify(res.body);
-                    this.sendMessage('', header);
-                },
-                res => {
-                    this.handleSendError(res.error);
-                }
-            );
-        } else if (this.requestConnectionId) {
-            this.connectionService.getConnectionKeys(parseInt(this.requestConnectionId)).subscribe(
-                res => {
-                    const connectionKeys = JSON.stringify(res.body);
-                    this.sendMessage(connectionKeys, '');
-                },
-                res => {
-                    this.handleSendError(res.error);
-                }
-            );
-        } else {
-            this.sendMessage('', '');
-        }
     }
 
-    sendMessage(requestConnectionKeys, requestHeader) {
-        if (this.requestExchangePattern === 'FireAndForget') {
-            this.flowService
-                .send(
-                    1,
-                    this.requestUri,
-                    this.requestStepId,
-                    this.requestConnectionId,
-                    requestConnectionKeys,
-                    requestHeader,
-                    this.requestNumberOfTimes,
-                    this.requestBody
+    private sendOne(
+        uri: string,
+        exchangePattern: string,
+        connectionId: string,
+        connectionKeys: string,
+        message: SendMessage
+    ): Observable<SendOutcome> {
+        // the headers of the page apply to every message, the headers of an uploaded message override them
+        const rows = [...this.headers(), ...message.headers];
+        const header = filledHeaders(rows).length > 0 ? JSON.stringify(headersToTemplateJson(rows)) : '';
+
+        return defer(() => {
+            const start = Date.now();
+            const request$: Observable<HttpResponse<string>> =
+                exchangePattern === 'FireAndForget'
+                    ? this.flowService.send(1, uri, '0', connectionId, connectionKeys, header, '1', message.body)
+                    : this.flowService.sendRequest(1, uri, '0', connectionId, connectionKeys, header, message.body);
+
+            return request$.pipe(
+                map((res): SendOutcome => ({ ok: true, status: res.status, body: res.body ?? '', ms: Date.now() - start })),
+                catchError((error: HttpErrorResponse) =>
+                    of<SendOutcome>({ ok: false, status: error.status, body: sendErrorText(error), ms: Date.now() - start, error })
                 )
-                .subscribe(
-                    res => {
-                        this.handleSendResponse(res.body, false);
-                    },
-                    res => {
-                        this.handleSendError(res.error);
-                    }
-                );
-        } else if (this.requestExchangePattern === 'RequestAndReply') {
-            this.flowService
-                .sendRequest(
-                    1,
-                    this.requestUri,
-                    this.requestStepId,
-                    this.requestConnectionId,
-                    requestConnectionKeys,
-                    requestHeader,
-                    this.requestBody
-                )
-                .subscribe(
-                    res => {
-                        this.handleSendResponse(res.body, true);
-                    },
-                    res => {
-                        this.handleSendError(res.error);
-                    }
-                );
-        }
+            );
+        });
     }
 
-    setRequest() {
-
-        const stepForm = <FormGroup>(<FormArray>this.messageSenderForm.controls.stepsData).controls[0];
-
-        this.requestStepId = this.requestStep.id == null ? '0' : this.requestStep.id.toString();
-        this.requestComponentType = stepForm.controls.componentType.value;
-        this.requestUri = this.requestStep.uri;
-        this.requestExchangePattern = stepForm.controls.exchangepattern.value.toString();
-        stepForm.controls.numberoftimes.setValue('1');
-        this.requestNumberOfTimes = '1';
-        this.requestConnectionId = stepForm.controls.connection.value == null ? '' : stepForm.controls.connection.value.toString();
-        this.requestHeaderId = stepForm.controls.message.value == null ? '' : stepForm.controls.message.value.toString();
-        this.requestBody = stepForm.controls.requestbody.value == null ? '0' : stepForm.controls.requestbody.value.toString();
-
-        this.requestOptions = '?';
-        this.setStepOptions(this.stepsOptions[0], this.requestStep, this.selectOptions(0));
-
-        if (this.requestOptions.length < 2) {
-            this.requestUri = [this.requestComponentType.toLowerCase(), '://', this.requestUri].join('');
+    private handleOutcome(outcome: SendOutcome, exchangePattern: string) {
+        if (outcome.ok) {
+            this.state.succeed();
         } else {
-            this.requestUri = [this.requestComponentType.toLowerCase(), '://', this.requestUri, this.requestOptions].join('');
+            this.state.fail(outcome.error);
         }
-
-    }
-
-    handleSendResponse(body: string, showResponse: boolean) {
-
-        this.alertService.addAlert({
-          type: 'success',
-          message: 'Send successfully',
-        });
-
-        setTimeout(() => {
-            this.isSending = false;
-        }, 1000);
-        if (showResponse) {
-            this.setEditorMode(body);
-            this.responseBody = body;
-            this.messageSenderForm.controls.responsebody.setValue(body);
-        } else {
-            this.responseBody = body;
+        if (exchangePattern === 'RequestAndReply') {
+            this.response.set(outcome);
         }
-
     }
 
-    handleSendError(body: any) {
-        this.isSending = false;
-        this.alertService.addAlert({
-          type: 'danger',
-          message: 'Send failed',
-        });
-        this.responseBody = body;
-        if (typeof body === 'string') {
-            this.setEditorMode(body);
-        }
-        this.messageSenderForm.controls.responsebody.setValue(body);
-    }
-
-    save() {
-        this.isSaving = true;
-        this.setDataFromForm();
-        this.setOptions();
-        this.setVersion();
-        this.savingFlowFailed = false;
-        this.savingFlowSuccess = false;
-    }
-
-    setValidationForm() {
-        const flowControls = this.messageSenderForm.controls;
-
-        (<FormArray>flowControls.stepsData).controls.forEach((step, index) => {
-            this.setValidationOnStep(this.steps[index], (<FormGroup>step).controls);
-        });
-    }
-
-    setValidationOnStep(step, formStepData) {
-        formStepData.uri.setValidators([Validators.required]);
-        formStepData.uri.updateValueAndValidity();
-    }
-
-    setDataFromForm() {
-        const flowControls = this.messageSenderForm.controls;
-
-        (<FormArray>flowControls.stepsData).controls.forEach((step, index) => {
-            this.setDataFromFormOnStep(this.steps[index], (<FormGroup>step).controls);
-        });
-    }
-
-    setDataFromFormOnStep(step, formStepData) {
-        step.id = formStepData.id.value;
-        step.componentType = formStepData.componentType.value;
-        step.uri = formStepData.uri.value;
-        step.connectionId = formStepData.connection.value;
-        step.messageId = formStepData.message.value;
-    }
-
-    setVersion() {
-        const now = dayjs();
-    }
-
-    // Get currrent scroll position
-    findPos(obj) {
-        let curtop = 0;
-
-        if (obj.offsetParent) {
-            do {
-                curtop += obj.offsetTop;
-            } while ((obj = obj.offsetParent));
-        }
-
-        return curtop;
-    }
+    // upload
 
     goBack() {
         window.history.back();
     }
 
-    setInvalidUriMessage(stepName: string) {
-        this.invalidUriMessage = `Uri for ${stepName} is not valid.`;
-        setTimeout(() => {
-            this.invalidUriMessage = '';
-        }, 15000);
-    }
-
-    formatUri(stepOptions, step, formStep): string {
-        if (formStep.controls.componentType.value === null) {
-            return '';
-        } else {
-            const formOptions = <FormArray>formStep.controls.options;
-            this.setStepOptions(stepOptions, step, formOptions);
-            return `${formStep.controls.componentType.value.toLowerCase()}`;
-        }
-    }
-
-    validateTypeAndUri(step: FormGroup) {
-        step.controls.componentType.markAsTouched();
-        step.controls.uri.markAsTouched();
-    }
-
-    markAsUntouchedTypeAndUri(step: FormGroup) {
-        step.controls.componentType.markAsUntouched();
-        step.controls.uri.markAsUntouched();
-    }
-
-    setEditorMode(str: string) {
-        if (str.startsWith('{') || str.startsWith('[')) {
-            this.responseEditorMode = 'javascript';
-        } else if (str.startsWith('<')) {
-            this.responseEditorMode = 'xml';
-        } else {
-            this.responseEditorMode = 'text';
-        }
-    }
-
-    allowDrop(e) {
-        e.stopPropagation();
-        e.preventDefault();
-    }
-
-    drop(e) {
-        e.preventDefault();
-        const file = e.dataTransfer.files[0];
-        this.readFile(file);
-    }
-
-    readFile(file: File) {
-        const reader = new FileReader();
-        reader.onload = () => {
-            // console.log(reader.result);
-            this.requestBody = reader.result.toString();
-        };
-        reader.readAsText(file);
-    }
-
-    private subscribeToSaveResponse(result: Observable<Flow>) {
-        result.subscribe(
-            (res: Flow) => this.onSaveSuccess(res),
-            (res: Response) => this.onSaveError()
-        );
-    }
-
-    private onSaveSuccess(result: Flow) {
-	    this.eventManager.broadcast(new EventWithContent('flowListModification', 'OK'));
-        this.isSaving = false;
-    }
-
-    private onSaveError() {
-        this.isSaving = false;
-    }
-
-    private onError(error) {
-        this.alertService.addAlert({
-		  type: 'danger',
-		  message: error.message,
-		});
+    async onFile(file: File) {
+        this.state.reset();
+        await this.uploaded.addFile(file);
     }
 }

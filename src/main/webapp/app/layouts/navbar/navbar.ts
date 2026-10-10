@@ -128,6 +128,20 @@ export default class Navbar implements OnInit {
     return current === path || current.startsWith(`${path}/`);
   }
 
+  /** The brokers list and its detail pages, but not the pages reached from Send or Endpoints. */
+  isBrokerManageActive(): boolean {
+    return this.isActivePath('/broker') && !this.isBrokerSendActive() && !this.isActivePath('/broker/browser');
+  }
+
+  isBrokerSendActive(): boolean {
+    return this.isActivePath('/broker/sender');
+  }
+
+  /** Queues and topics, plus the message browser which is opened from an endpoint row. */
+  isEndpointsActive(): boolean {
+    return this.isActivePath('/queue') || this.isActivePath('/topic') || this.isActivePath('/broker/browser');
+  }
+
   isBrokerActive(): boolean {
     return this.isBrokerPath(this.currentUrl());
   }

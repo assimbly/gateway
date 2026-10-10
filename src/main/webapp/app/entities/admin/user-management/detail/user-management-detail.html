@@ -61,13 +61,15 @@
           </dd>
         </dl>
 
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-        </button>
+        <div class="form-fx-actions">
+          <button type="button" (click)="previousState()" class="btn btn-fx btn-fx-secondary" data-cy="entityDetailsBackButton">
+            <fa-icon icon="arrow-left" /><span jhiTranslate="entity.action.back">Back</span>
+          </button>
 
-        <button type="button" [routerLink]="['/user-management', userManagementRef.login, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-        </button>
+          <button type="button" [routerLink]="['/user-management', userManagementRef.login, 'edit']" class="btn btn-fx btn-fx-primary">
+            <fa-icon icon="pencil-alt" /><span jhiTranslate="entity.action.edit">Edit</span>
+          </button>
+        </div>
       </div>
     }
   </div>

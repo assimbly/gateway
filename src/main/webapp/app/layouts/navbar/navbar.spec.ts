@@ -144,6 +144,64 @@ describe('Navbar Component', () => {
     expect(comp.isActivePath('/admin/metrics')).toBe(false);
   });
 
+  it('should treat both queue and topic routes as the Endpoints entry', () => {
+    const currentPath = jest.spyOn(comp as any, 'currentPath');
+
+    currentPath.mockReturnValue('/queue');
+    expect(comp.isEndpointsActive()).toBe(true);
+
+    currentPath.mockReturnValue('/topic/new');
+    expect(comp.isEndpointsActive()).toBe(true);
+
+    currentPath.mockReturnValue('/broker');
+    expect(comp.isEndpointsActive()).toBe(false);
+  });
+
+  it('should highlight only one broker submenu item per route', () => {
+    const currentPath = jest.spyOn(comp as any, 'currentPath');
+    const active = () => [comp.isBrokerManageActive(), comp.isBrokerSendActive(), comp.isEndpointsActive()];
+
+    currentPath.mockReturnValue('/broker');
+    expect(active()).toEqual([true, false, false]);
+
+    currentPath.mockReturnValue('/broker/1/edit');
+    expect(active()).toEqual([true, false, false]);
+
+    currentPath.mockReturnValue('/broker/sender/message-sender');
+    expect(active()).toEqual([false, true, false]);
+
+    currentPath.mockReturnValue('/broker/browser/message-browser');
+    expect(active()).toEqual([false, false, true]);
+
+    currentPath.mockReturnValue('/queue');
+    expect(active()).toEqual([false, false, true]);
+  });
+
+  it('should show Manage, Send and Endpoints in the broker menu in that order', () => {
+    accountService.authenticate({ ...account, authorities: ['ROLE_ADMIN'] });
+    fixture.detectChanges();
+
+    const labels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#broker-menu-items span')).map(
+      (span: HTMLElement) => span.textContent?.trim(),
+    );
+    expect(labels).toEqual(['Manage', 'Send', 'Endpoints']);
+
+    const sendLink: HTMLAnchorElement = fixture.nativeElement.querySelectorAll('#broker-menu-items a')[1];
+    expect(sendLink.getAttribute('href')).toBe('/broker/sender/message-sender');
+  });
+
+  it('should show a single Endpoints entry instead of Queues and Topics in the broker menu', () => {
+    accountService.authenticate({ ...account, authorities: ['ROLE_ADMIN'] });
+    fixture.detectChanges();
+
+    const labels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#broker-menu-items span')).map(
+      (span: HTMLElement) => span.textContent?.trim(),
+    );
+    expect(labels).toContain('Endpoints');
+    expect(labels).not.toContain('Queues');
+    expect(labels).not.toContain('Topics');
+  });
+
   it('should highlight the Manage submenu item on the home route', () => {
     accountService.authenticate(account);
     fixture.detectChanges();
@@ -165,6 +223,17 @@ describe('Navbar Component', () => {
     );
     expect(labels).toContain('Variables');
     expect(labels).not.toContain('Environment Variables');
+  });
+
+  it('should label the message sender submenu item as Send', () => {
+    accountService.authenticate(account);
+    fixture.detectChanges();
+
+    const labels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#flows-menu-items span')).map(
+      (span: HTMLElement) => span.textContent?.trim(),
+    );
+    expect(labels).toContain('Send');
+    expect(labels).not.toContain('Test message');
   });
 
   it('should keep the flows submenu expanded on the Flows list route', () => {

@@ -11,6 +11,7 @@
 @import 'buttons';
 @import 'tables';
 @import 'ng_select';
+@import 'send';
 
 /* ==============================================================
 Bootstrap tweaks
@@ -1155,7 +1156,8 @@ ng-dropdown-panel > div {
   display: flex;
   flex-direction: column;
   gap: 0.125rem;
-  max-width: 32rem;
+  // The name takes the width of the Route editor below it.
+  width: 100%;
 }
 
 .step-name__label {
@@ -1216,6 +1218,23 @@ ng-dropdown-panel > div {
   height: 40rem;
 }
 
+/* Message body of the broker Send page: always shows its line numbers, and the focus shows where you type. */
+.body-codemirror {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  text-align: left;
+}
+
+.body-codemirror .CodeMirror {
+  height: 30rem;
+}
+
+.body-codemirror .CodeMirror-focused {
+  border-color: var(--app-primary);
+  box-shadow: 0 0 0 0.15rem color-mix(in srgb, var(--app-primary) 25%, transparent);
+}
+
 .response-body-readonly {
   position: relative;
 }
@@ -1251,6 +1270,61 @@ ng-dropdown-panel > div {
 
 .script-codemirror-full .CodeMirror {
   height: calc(100vh - 12rem);
+}
+
+/* The large Route editor: the Route fills the window between the Name and the Cancel/Save buttons. */
+jhi-route-dialog {
+  display: block;
+  height: 100%;
+}
+
+.route-dialog {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.route-dialog .modal-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.route-dialog .modal-body > form {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.route-dialog .route-field {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 12rem;
+}
+
+.route-dialog .route-codemirror {
+  position: relative;
+  display: block;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  text-align: left;
+}
+
+.route-dialog .route-codemirror .CodeMirror {
+  position: absolute;
+  inset: 0;
+  height: auto;
+}
+
+/* The buttons sit below the editor in the layout, not on top of it. */
+.route-dialog .modal-footer {
+  position: static;
+  flex: 0 0 auto;
 }
 
 .path-codemirror {
@@ -1318,6 +1392,26 @@ ng-dropdown-panel > div {
 
 [data-bs-theme='dark'] .btn-close {
   filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+// The close button (X) of a pop-up is only the X: no square from the focus ring (the dialog focuses it when it opens),
+// the Bootstrap focus shadow or a `.btn` border. Hovering and focusing make the X darker instead.
+.btn-close,
+.btn.btn-close {
+  border: 0;
+  box-shadow: none;
+  outline: none;
+
+  &:hover,
+  &:focus,
+  &:focus-visible,
+  &:active {
+    border: 0;
+    box-shadow: none;
+    outline: none;
+    background-color: transparent;
+    opacity: 1;
+  }
 }
 
 .list-group-item {

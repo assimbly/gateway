@@ -4,7 +4,7 @@
     <form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
       <div class="row">
         <div class="col-10">
-          <h2 id="jhi-broker-heading">Broker</h2>
+          <h2 id="jhi-broker-heading">{{ broker?.id ? 'Edit Broker' : 'Create Broker' }}</h2>
         </div>
         <div class="col-2">
           <a role="button" class="btn btn-sm right-border-radius-0 activemq-link activemq-broker-img"
