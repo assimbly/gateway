@@ -1,9 +1,9 @@
 <div>
   <jhi-search-toolbar [(query)]="searchText" placeholder="Filter by name or base path" inputId="searchApisId">
     <ng-container actions>
-      <a class="btn btn-fx btn-fx-primary" routerLink="/rest-apis/new" aria-label="New API">
+      <a class="btn btn-fx btn-fx-primary" routerLink="/rest-apis/new" aria-label="Add">
         <fa-icon icon="plus"></fa-icon>
-        <span class="d-none d-md-inline"> New API</span>
+        <span class="d-none d-md-inline"> Add</span>
       </a>
       <a class="btn btn-fx btn-fx-secondary" routerLink="/rest-apis/import" aria-label="Import OpenAPI">
         <fa-icon icon="file-import"></fa-icon>
@@ -31,7 +31,7 @@
         Handler Flow.
       </p>
       <p>
-        <a class="btn btn-fx btn-fx-primary" routerLink="/rest-apis/new">New API</a>
+        <a class="btn btn-fx btn-fx-primary" routerLink="/rest-apis/new">Add</a>
         or <a routerLink="/rest-apis/import">import an OpenAPI document</a>.
       </p>
     </section>

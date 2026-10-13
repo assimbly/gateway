@@ -71,6 +71,7 @@ export class BrokerUpdateComponent implements OnInit {
                     }, 0);
                 });
             } else {
+                this.broker.name = this.broker.name || 'default';
                 this.broker.autoStart = true;
                 this.broker.type = 'artemis';
                 this.broker.configurationType = 'file';

@@ -1,0 +1,39 @@
+<div class="import-page">
+  <nav aria-label="breadcrumb" class="mb-2">
+    <a routerLink="/import"><fa-icon icon="arrow-left"></fa-icon> Import</a>
+  </nav>
+  <h2 class="import-page__title">Import a Flow (DIL)</h2>
+  <p class="import-page__lead">
+    A Flow saved with Export, from this or another Gateway. It becomes a new Flow and opens in the editor for its type. A file with several Flows is a
+    Gateway backup: import it from the Gateway page instead.
+  </p>
+
+  <jhi-import-source
+    [(text)]="text"
+    [(fileName)]="fileName"
+    accept=".xml,application/xml,text/xml"
+    kind="a Flow export"
+    placeholder="&lt;dil&gt;…"
+  />
+
+  @if (conflict(); as name) {
+    <div class="alert alert-warning mt-3 mb-0" role="alert">
+      <p class="mb-2">A Flow named {{ name }} already exists.</p>
+      <button type="button" class="btn btn-fx btn-fx-primary btn-sm me-2" (click)="send('replace')">Replace {{ name }}</button>
+      <button type="button" class="btn btn-fx btn-fx-secondary btn-sm me-2" (click)="send('rename')">Import as a new Flow</button>
+      <button type="button" class="btn btn-fx btn-fx-ghost btn-sm" (click)="cancelConflict()">Cancel</button>
+    </div>
+  }
+
+  @if (error(); as message) {
+    <div class="alert alert-danger py-2 mt-3 mb-0 import-message" role="alert">{{ message }}</div>
+  }
+
+  <button type="button" class="btn btn-fx btn-fx-primary mt-3" (click)="start()" [disabled]="!canImport()">
+    @if (importing()) {
+      <fa-icon icon="spinner" animation="spin"></fa-icon> Importing…
+    } @else {
+      <fa-icon icon="file-import"></fa-icon> Import
+    }
+  </button>
+</div>

@@ -1,32 +1,40 @@
-<form name="importForm">
-    <div class="modal-header">
-        <h4 class="modal-title" id="myIntegrationLabel">Import XML Configuration</h4>
-        <button type="button" class="btn-close" aria-label="Close" (click)="clear()"></button>
+<div class="modal-header">
+    <h4 class="modal-title" id="import-backup-title">Import Gateway backup</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="clear()"></button>
+</div>
+<div class="modal-body">
+    <p class="text-muted">
+        A complete configuration file (DIL XML) from a Gateway's export, with its Flows, APIs, connections and variables. It is merged into the
+        chosen integration; Flows with the same name are replaced. To import a single Flow, use Import in the menu.
+    </p>
+    <div class="form-group mb-3">
+        <label class="form-control-label fw-bold" for="field_id">Integration</label>
+        <select class="form-control form-select" name="id" [(ngModel)]="integrationId" id="field_id" [disabled]="integrations().length <= 1">
+            @for (integration of integrations(); track integration.id) {
+                <option [ngValue]="integration.id">{{ integration.name }}</option>
+            }
+        </select>
     </div>
-    <div class="modal-body">
-        <div class="form-group">
-            <label class="form-control-label font-weight-bold" for="field_id">Integration id</label>
-            <select class="form-control form-select" name="id" [(ngModel)]="integrationId" id="field_id" [disabled]="integrations.length === 1">
-                <option *ngFor="let integration of integrations" value="{{integration.id}}">{{integration.id}}</option>
-            </select>
-        </div>
-        <br/>
-        <div class="form-group">
-            <label class="form-control-label font-weight-bold">XML configuration</label>
-            <div class="custom-file">
-                <input type="file" id="file" class="custom-file-input" (change)='openFile($event)'>
-            </div>
-        </div>
+    <div class="form-group">
+        <label class="form-control-label fw-bold" for="file">XML configuration</label>
+        <input type="file" id="file" class="form-control" accept=".xml,application/xml,text/xml" (change)="openFile($event)" />
     </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-fx btn-fx-secondary" (click)="clear()">
-            <span class="fa fa-ban"></span>
-            <span>Cancel</span>
-        </button>
-        <button type="button" class="btn btn-fx btn-fx-primary" [disabled]="!integrationId || !xmlConfiguration" (click)="importConfiguration()">
-            <span class="fa fa-upload"></span>
-            <span>Import</span>
-        </button>
-        <jhi-alert-error></jhi-alert-error>
-    </div>
-</form>
+    @if (error(); as message) {
+        <div class="alert alert-danger mt-3 mb-0" role="alert">{{ message }}</div>
+    }
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-fx btn-fx-secondary" (click)="clear()">
+        <fa-icon icon="ban"></fa-icon>
+        <span> Cancel</span>
+    </button>
+    <button
+        type="button"
+        class="btn btn-fx btn-fx-primary"
+        [disabled]="integrationId == null || !xmlConfiguration || importing()"
+        (click)="importConfiguration()"
+    >
+        <fa-icon icon="upload"></fa-icon>
+        <span> {{ importing() ? 'Importing…' : 'Import' }}</span>
+    </button>
+</div>

@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
@@ -48,7 +48,7 @@ const FLOW_TYPES: readonly FlowTypeChoice[] = [
   },
 ];
 
-/** The Flow types as cards that open the editor for a new Flow, plus an optional Import from file card. */
+/** The Flow types as cards that open the editor for a new Flow. */
 @Component({
   selector: 'jhi-flow-type-choices',
   templateUrl: './flow-type-choices.component.html',
@@ -56,8 +56,6 @@ const FLOW_TYPES: readonly FlowTypeChoice[] = [
   imports: [RouterLink, FontAwesomeModule],
 })
 export class FlowTypeChoicesComponent {
-  readonly withImport = input(false);
   readonly chosen = output<void>();
-  readonly importChosen = output<void>();
   readonly flowTypes = FLOW_TYPES;
 }

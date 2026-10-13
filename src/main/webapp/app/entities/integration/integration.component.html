@@ -67,6 +67,16 @@
         </button>
       </ng-container>
       <button
+        *jhiHasAnyAuthority="'ROLE_ADMIN'"
+        type="button"
+        (click)="openImportBackup()"
+        class="btn btn-fx btn-fx-secondary"
+        aria-label="Import backup"
+      >
+        <fa-icon icon="file-import"></fa-icon>
+        <span class="d-none d-md-inline"> Import backup</span>
+      </button>
+      <button
         type="button"
         (click)="openRestartIntegrationModal(restartIntegrationModal)"
         class="btn btn-fx btn-fx-secondary"

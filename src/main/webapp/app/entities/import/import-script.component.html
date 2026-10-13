@@ -1,0 +1,57 @@
+<div class="import-page">
+  <nav aria-label="breadcrumb" class="mb-2">
+    <a routerLink="/import"><fa-icon icon="arrow-left"></fa-icon> Import</a>
+  </nav>
+  <h2 class="import-page__title">Import a script</h2>
+  <p class="import-page__lead">
+    A script becomes a new Flow in the script editor: a scheduler Source, the script and an error handler that logs. Set the schedule in the editor.
+  </p>
+
+  <jhi-import-source
+    [(text)]="text"
+    [(fileName)]="fileName"
+    (fileChosen)="onFileChosen($event)"
+    accept=".groovy,.gvy,.py,.js,.mjs,.jslt,.xsl,.xslt,.txt,text/plain"
+    kind="a script"
+    [rows]="16"
+  />
+
+  <div class="row g-3 mt-0">
+    <div class="col-sm-4">
+      <label class="form-label" for="import-script-language">Language</label>
+      <select
+        id="import-script-language"
+        class="form-select"
+        [ngModel]="language()"
+        (ngModelChange)="language.set($event)"
+      >
+        @for (option of languages; track option) {
+          <option [value]="option">{{ option }}</option>
+        }
+      </select>
+    </div>
+    <div class="col-sm-8">
+      <label class="form-label" for="import-script-name">Name of the Flow <span class="text-muted">(optional)</span></label>
+      <input
+        id="import-script-name"
+        type="text"
+        class="form-control"
+        placeholder="script-{{ language() }}"
+        [ngModel]="name()"
+        (ngModelChange)="name.set($event)"
+      />
+    </div>
+  </div>
+
+  @if (error(); as message) {
+    <div class="alert alert-danger py-2 mt-3 mb-0 import-message" role="alert">{{ message }}</div>
+  }
+
+  <button type="button" class="btn btn-fx btn-fx-primary mt-3" (click)="start()" [disabled]="!canImport()">
+    @if (importing()) {
+      <fa-icon icon="spinner" animation="spin"></fa-icon> Importing…
+    } @else {
+      <fa-icon icon="file-import"></fa-icon> Import
+    }
+  </button>
+</div>

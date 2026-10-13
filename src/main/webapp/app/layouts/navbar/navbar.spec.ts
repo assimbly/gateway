@@ -312,6 +312,17 @@ describe('Navbar Component', () => {
     expect(accountMenu.classList.contains('app-sidebar__subnav--collapsed')).toBe(false);
   });
 
+  it('should not have an Import entry in the sidebar', () => {
+    accountService.authenticate({ ...account, authorities: ['ROLE_ADMIN'] });
+    fixture.detectChanges();
+
+    const labels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('nav > a.app-sidebar__link')).map(link =>
+      link.textContent?.trim(),
+    );
+    expect(labels).toContain('APIs');
+    expect(labels).not.toContain('Import');
+  });
+
   it('should render the light or dark logo as the Gateway icon', () => {
     accountService.authenticate(account);
     const theme = TestBed.inject(ThemeService);

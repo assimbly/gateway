@@ -9,14 +9,4 @@
       </span>
     </a>
   }
-  @if (withImport()) {
-    <button type="button" class="flow-type-choice" (click)="importChosen.emit()">
-      <fa-icon class="flow-type-choice__icon" icon="file-import" [fixedWidth]="true" />
-      <span class="flow-type-choice__text">
-        <span class="flow-type-choice__title">Import from file</span>
-        <span class="flow-type-choice__level">Export file</span>
-        <span class="flow-type-choice__audience">A Flow saved with Export, from this or another Gateway.</span>
-      </span>
-    </button>
-  }
 </div>

@@ -6,6 +6,7 @@ import { certificateRoute } from './certificate/certificate.route';
 import { connectionRoute } from './connection/connection.route';
 import { environmentVariablesRoute } from './environment-variables/environment-variables.route';
 import flowRoute from './flow/flow.route';
+import { importRoute } from './import/import.route';
 import { integrationRoute } from './integration/integration.route';
 import { messageRoute } from './message/message.route';
 import { queueRoute } from './queue/queue.route';
@@ -32,6 +33,7 @@ const routes: Routes = [
   ...topicRoute,
   ...flowRoute,
   ...apiRoute,
+  ...importRoute,
   ...connectionRoute,
   ...messageRoute,
   ...routeRoute,

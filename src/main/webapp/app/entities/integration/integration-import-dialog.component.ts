@@ -1,60 +1,97 @@
-import { Component, OnInit, OnDestroy, AfterContentInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
 
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AlertError } from 'app/shared/alert';
-import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
-import { IntegrationService } from './integration.service';
-import { IIntegration } from 'app/shared/model/integration.model';
-import { IntegrationPopupService } from 'app/entities/integration/integration-popup.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
+import { AlertService } from 'app/core/util/alert.service';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { IIntegration } from 'app/shared/model/integration.model';
+import { readText } from 'app/entities/import/import-files';
+
+import { IntegrationService } from './integration.service';
+
+/** Imports a Gateway backup: the complete configuration of an integration, as exported from a Gateway. */
 @Component({
     selector: 'jhi-integration-import-dialog',
     templateUrl: './integration-import-dialog.component.html',
-    imports: [CommonModule, FormsModule, AlertError],
+    imports: [FormsModule, FontAwesomeModule],
 })
-export class IntegrationImportDialogComponent implements AfterContentInit {
-    integrationId: number;
-    integrations: Array<IIntegration> = [];
-    xmlConfiguration: any;
-    fileName = 'Choose file';
-    importError = false;
+export class IntegrationImportDialogComponent implements OnInit {
+    readonly integrations = signal<IIntegration[]>([]);
+    readonly fileName = signal<string | undefined>(undefined);
+    readonly importing = signal(false);
+    readonly error = signal<string | undefined>(undefined);
 
-    constructor(private eventManager: EventManager, private integrationService: IntegrationService, public activeModal: NgbActiveModal) {}
+    integrationId?: number;
+    xmlConfiguration = '';
 
-    ngAfterContentInit() {
+    readonly activeModal = inject(NgbActiveModal);
+    private readonly integrationService = inject(IntegrationService);
+    private readonly eventManager = inject(EventManager);
+    private readonly alertService = inject(AlertService);
+
+    ngOnInit(): void {
         this.integrationService.query().subscribe(res => {
-            this.integrations = res.body;
-            this.integrationId = this.integrations[0].id;
+            const integrations = res.body ?? [];
+            this.integrations.set(integrations);
+            this.integrationId = integrations[0]?.id;
         });
     }
 
-    clear() {
+    clear(): void {
         this.activeModal.dismiss('cancel');
     }
 
-    openFile(event) {
-        const reader = new FileReader();
-        reader.onload = () => {
-            this.xmlConfiguration = reader.result;
-        };
-        reader.readAsBinaryString(event.target.files[0]);
-        this.fileName = event.target.files[0].name;
+    async openFile(event: Event): Promise<void> {
+        const input = event.target as HTMLInputElement;
+        const file = input.files?.[0];
+        input.value = '';
+        if (!file) {
+            return;
+        }
+        this.error.set(undefined);
+        try {
+            this.xmlConfiguration = await readText(file);
+            this.fileName.set(file.name);
+        } catch {
+            this.xmlConfiguration = '';
+            this.fileName.set(undefined);
+            this.error.set(`Couldn't read ${file.name}.`);
+        }
     }
 
-    importConfiguration() {
-        this.integrationService.setIntegrationConfiguration(this.xmlConfiguration).subscribe(
-            data => {
-                this.importError = false;
-                this.activeModal.dismiss(true);
-			    this.eventManager.broadcast(new EventWithContent('integrationListModification', 'OK'));
+    importConfiguration(): void {
+        if (this.integrationId == null) {
+            return;
+        }
+        this.importing.set(true);
+        this.error.set(undefined);
+        this.integrationService.setIntegrationConfiguration(this.integrationId, this.xmlConfiguration).subscribe({
+            next: () => {
+                this.importing.set(false);
+                this.alertService.addAlert({ type: 'success', message: `Imported ${this.fileName() ?? 'the configuration'}` });
+                this.eventManager.broadcast(new EventWithContent('integrationListModification', 'OK'));
+                this.eventManager.broadcast(new EventWithContent('flowListModification', 'imported'));
+                this.activeModal.close(true);
             },
-            err => {
-                this.importError = true;
-                console.log(err);
-            }
-        );
+            error: (err: HttpErrorResponse) => {
+                this.importing.set(false);
+                this.error.set(`Couldn't import ${this.fileName() ?? 'the configuration'}: ${failureMessage(err)}`);
+            },
+        });
     }
+}
+
+/** The reason the Gateway gives for refusing the configuration: the message of its JSON response. */
+function failureMessage(err: HttpErrorResponse): string {
+    const body = err.error;
+    if (body && typeof body === 'object' && typeof body.message === 'string' && body.message) {
+        return body.message;
+    }
+    if (typeof body === 'string' && body.trim()) {
+        return body;
+    }
+    return 'That did not work. Please try again.';
 }

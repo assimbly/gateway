@@ -14,6 +14,7 @@ import { SortState } from 'app/shared/sort';
 import { DataTable, DataTableColumn, OverflowActionDirective, PrimaryActionDirective, RowActions, Truncate } from 'app/shared/table';
 import { IIntegration } from 'app/shared/model/integration.model';
 import { IntegrationDeleteDialogComponent } from './integration-delete-dialog.component';
+import { IntegrationImportDialogComponent } from './integration-import-dialog.component';
 import { AccountService } from 'app/core/auth/account.service';
 import { IntegrationService } from './integration.service';
 import { FlowService } from '../flow/flow.service';
@@ -104,6 +105,10 @@ export class IntegrationComponent implements OnInit, OnDestroy {
 
     registerChangeInIntegrations() {
         this.eventSubscriber = this.eventManager.subscribe('integrationListModification', response => this.loadAll());
+    }
+
+    openImportBackup(): void {
+        this.modalService.open(IntegrationImportDialogComponent, { size: 'lg', backdrop: 'static', ariaLabelledBy: 'import-backup-title' });
     }
 
 	delete(integration: IIntegration): void {

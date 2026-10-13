@@ -25,7 +25,7 @@ import { DataTable, DataTableColumn } from 'app/shared/table';
 import { FlowRowComponent } from './flow-row.component';
 import { FlowSearchByNamePipe } from './flow.searchbyname.pipe';
 import { FlowTypeChoicesComponent } from './flow-type-choices.component';
-import { NewFlowDialogComponent, takeChosenFile } from './new-flow-dialog.component';
+import { NewFlowDialogComponent } from './new-flow-dialog.component';
 import { ApiService } from 'app/entities/api/api.service';
 import { IApiHandler } from 'app/entities/api/api.model';
 
@@ -246,18 +246,8 @@ export class FlowComponent implements OnInit, OnDestroy {
     return this.integrations?.[this.indexIntegration]?.id;
   }
 
-  openNewFlow(): NewFlowDialogComponent {
-    const modalRef = this.modalService.open(NewFlowDialogComponent, { size: 'lg', ariaLabelledBy: 'new-flow-title' });
-    const dialog: NewFlowDialogComponent = modalRef.componentInstance;
-    dialog.integrationId = this.integrationId;
-    return dialog;
-  }
-
-  importFromFile(event: Event): void {
-    const file = takeChosenFile(event);
-    if (file) {
-      void this.openNewFlow().importFile(file);
-    }
+  openNewFlow(): void {
+    this.modalService.open(NewFlowDialogComponent, { size: 'lg', ariaLabelledBy: 'new-flow-title' });
   }
 
   trackId(index: number, item: IFlow) {

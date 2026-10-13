@@ -1,0 +1,41 @@
+<div class="import-page">
+  <nav aria-label="breadcrumb" class="mb-2">
+    <a routerLink="/import"><fa-icon icon="arrow-left"></fa-icon> Import</a>
+  </nav>
+  <h2 class="import-page__title">Import Camel XML</h2>
+  <p class="import-page__lead">
+    A <code>&lt;route&gt;</code>, <code>&lt;routes&gt;</code> or <code>&lt;camelContext&gt;</code> (also inside Spring <code>&lt;beans&gt;</code>) becomes a new Flow
+    in the route editor. Each route becomes a Route Step; anything else in the file is left out and listed.
+  </p>
+
+  <jhi-import-source
+    [(text)]="text"
+    [(fileName)]="fileName"
+    (fileChosen)="onFileChosen($event)"
+    accept=".xml,application/xml,text/xml"
+    kind="Camel XML"
+    placeholder="&lt;route id=&quot;my-route&quot;&gt;…"
+  />
+
+  <label class="form-label mt-3" for="import-camel-name">Name of the Flow <span class="text-muted">(optional)</span></label>
+  <input
+    id="import-camel-name"
+    type="text"
+    class="form-control"
+    placeholder="The id of the first route"
+    [ngModel]="name()"
+    (ngModelChange)="name.set($event)"
+  />
+
+  @if (error(); as message) {
+    <div class="alert alert-danger py-2 mt-3 mb-0 import-message" role="alert">{{ message }}</div>
+  }
+
+  <button type="button" class="btn btn-fx btn-fx-primary mt-3" (click)="start()" [disabled]="!canImport()">
+    @if (importing()) {
+      <fa-icon icon="spinner" animation="spin"></fa-icon> Importing…
+    } @else {
+      <fa-icon icon="file-import"></fa-icon> Import
+    }
+  </button>
+</div>

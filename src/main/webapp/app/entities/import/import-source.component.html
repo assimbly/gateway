@@ -1,0 +1,34 @@
+<div
+  class="import-drop"
+  [class.import-drop--active]="dragging()"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave()"
+  (drop)="onDrop($event)"
+>
+  <label class="btn btn-fx btn-fx-secondary mb-0" [for]="inputId">
+    <fa-icon icon="upload"></fa-icon> Choose a file
+  </label>
+  <input [id]="inputId" type="file" class="visually-hidden" [accept]="accept()" (change)="onFileInput($event)" />
+  <span class="import-drop__hint">
+    @if (fileName(); as name) {
+      <fa-icon icon="file-alt"></fa-icon> {{ name }}
+    } @else {
+      or drop {{ kind() }} here
+    }
+  </span>
+</div>
+
+@if (problem(); as message) {
+  <div class="alert alert-danger py-2 mt-2 mb-0" role="alert">{{ message }}</div>
+}
+
+<label class="form-label mt-3" [for]="textId">Or paste it</label>
+<textarea
+  [id]="textId"
+  class="form-control font-monospace"
+  [rows]="rows()"
+  [placeholder]="placeholder()"
+  spellcheck="false"
+  [ngModel]="text()"
+  (ngModelChange)="onTyped($event)"
+></textarea>

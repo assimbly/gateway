@@ -1,0 +1,18 @@
+<div class="import-page">
+  <h2 class="import-page__title">Import</h2>
+  <p class="import-page__lead">What do you want to import? The result is created right away and opened in its editor.</p>
+
+  <div class="import-choices">
+    @for (choice of choices; track choice.title) {
+      <a class="import-choice" [routerLink]="choice.link">
+        <fa-icon class="import-choice__icon" [icon]="choice.icon" [fixedWidth]="true" />
+        <span class="import-choice__text">
+          <span class="import-choice__title">{{ choice.title }}</span>
+          <span class="import-choice__accepts">{{ choice.accepts }}</span>
+          <span class="import-choice__description">{{ choice.description }}</span>
+          <span class="import-choice__target">Opens in: {{ choice.target }}</span>
+        </span>
+      </a>
+    }
+  </div>
+</div>

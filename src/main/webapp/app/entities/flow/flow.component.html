@@ -6,6 +6,10 @@
         <fa-icon icon="plus"></fa-icon>
         <span class="d-none d-md-inline"> Add</span>
       </button>
+      <a class="btn btn-fx btn-fx-secondary" routerLink="/import" aria-label="Import">
+        <fa-icon icon="file-import"></fa-icon>
+        <span class="d-none d-md-inline"> Import</span>
+      </a>
       <button class="btn btn-fx btn-fx-secondary" type="button" (click)="reset()" aria-label="Refresh">
         <fa-icon icon="sync"></fa-icon>
         <span class="d-none d-md-inline"> Refresh</span>
@@ -20,10 +24,7 @@
       <p class="flows-empty__lead">How do you want to build it?</p>
       <jhi-flow-type-choices />
       <p class="flows-empty__import">
-        Or
-        <button type="button" class="btn btn-link flows-empty__import-link" (click)="importInput.click()">import a Flow</button>
-        from an export file.
-        <input #importInput type="file" class="visually-hidden" accept=".xml,application/xml,text/xml" tabindex="-1" aria-hidden="true" (change)="importFromFile($event)" />
+        Or <a class="flows-empty__import-link" routerLink="/import">import</a> a Flow, Camel XML, a script or an OpenAPI document.
       </p>
     </section>
   } @else {

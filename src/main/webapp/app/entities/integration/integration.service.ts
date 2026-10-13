@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { serverApiUrl } from 'app/config';
+import { HANDLES_OWN_ERRORS } from 'app/core/interceptor/error-handler.interceptor';
 
 import { createRequestOption } from 'app/shared/util/request-util';
 import { IIntegration } from 'app/shared/model/integration.model';
@@ -47,11 +48,14 @@ export class IntegrationService {
         return this.http.get(`${this.integrationUrl}/stop`, { observe: 'response', responseType: 'text' });
     }
 
-    setIntegrationConfiguration(configuration): Observable<any> {
+    /** Imports the complete configuration (DIL XML) of an integration: POST api/environment/{integrationId}. */
+    setIntegrationConfiguration(integrationId: number, configuration: string): Observable<any> {
         const options = {
-            headers: new HttpHeaders({ observe: 'response', 'Content-Type': 'application/xml', Accept: 'application/json' })
+            headers: new HttpHeaders({ observe: 'response', 'Content-Type': 'application/xml', Accept: 'application/json' }),
+            // the import dialog says why the Gateway refused the file, next to the file
+            context: new HttpContext().set(HANDLES_OWN_ERRORS, true)
         };
-        return this.http.post(`${this.environmentUrl}`, configuration, options);
+        return this.http.post(`${this.environmentUrl}/${integrationId}`, configuration, options);
     }
 
     updateBackupFrequency(frequency, url): Observable<any> {

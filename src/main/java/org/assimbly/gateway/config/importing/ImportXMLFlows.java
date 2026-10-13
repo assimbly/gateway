@@ -65,7 +65,8 @@ public class ImportXMLFlows {
 
 	}
 
-	public void setFlowFromXML(Document doc, Long integrationId, String flowId) throws Exception {
+    /** Imports the Flow with this DIL id; returns the saved Flow, or null when the Flow or the Integration isn't found. */
+	public Flow setFlowFromXML(Document doc, Long integrationId, String flowId) throws Exception {
 
         log.info("Importing flow: {}", flowId);
 
@@ -101,7 +102,7 @@ public class ImportXMLFlows {
 
             if (integrationOptional.isEmpty()) {
                 log.warn("Integration not found: {}", integrationId);
-				return;
+				return null;
 			} else {
                 Integration integration = integrationOptional.get();
 				flow.setIntegration(integration);
@@ -162,12 +163,15 @@ public class ImportXMLFlows {
 
             flow = setLinks(doc, flowId, flow);
 
-            flowRepository.save(flow);
+            flow = flowRepository.save(flow);
 
             log.info("Importing flow finished: " + flowId);
 
+            return flow;
+
         } else {
             log.warn("Flow not found: {}", flowId);
+            return null;
         }
 
 	}
