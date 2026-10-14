@@ -41,11 +41,61 @@ export function languageOfFile(fileName: string): ScriptLanguage | undefined {
   return dot < 0 ? undefined : LANGUAGE_BY_EXTENSION[fileName.slice(dot + 1).toLowerCase()];
 }
 
-/** The single Flow in a Flow export, or why the file isn't one. */
-export function flowInExport(xml: string): { id: string; name: string } | string {
+/** Whether a text is meant as JSON (an object or an array), as opposed to XML. */
+export function isJson(text: string): boolean {
+  return /^\s*[{[]/.test(text);
+}
+
+/** The single Flow in a Flow export (XML or JSON), or why the file isn't one. */
+export function flowInExport(text: string): { id: string; name: string } | string {
+  return isJson(text) ? flowInJsonExport(text) : flowInXmlExport(text);
+}
+
+/** The Flows of a JSON export: the `flow` of every `flows`, one object or an array of them, as the XML is converted. */
+function flowInJsonExport(json: string): { id: string; name: string } | string {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(json);
+  } catch {
+    return "isn't valid JSON. Choose a file made with a Flow's Export.";
+  }
+
+  const flows: unknown[] = [];
+  collectFlows(parsed, flows);
+  if (flows.length > 1) {
+    return `contains ${flows.length} Flows. Import it as a Gateway backup instead.`;
+  }
+  const flow = flows.length === 1 ? (flows[0] as Record<string, unknown>) : undefined;
+  const id = scalarText(flow?.['id']);
+  const name = scalarText(flow?.['name']);
+  if (!id || !name) {
+    return "doesn't contain a Flow. Choose a file made with a Flow's Export.";
+  }
+  return { id, name };
+}
+
+function collectFlows(node: unknown, flows: unknown[]): void {
+  if (Array.isArray(node)) {
+    node.forEach(item => collectFlows(item, flows));
+  } else if (node !== null && typeof node === 'object') {
+    for (const [key, value] of Object.entries(node)) {
+      if (key === 'flows' && value !== null && typeof value === 'object' && 'flow' in value) {
+        flows.push(...[(value as { flow: unknown }).flow].flat().filter(flow => flow !== null && typeof flow === 'object'));
+      } else {
+        collectFlows(value, flows);
+      }
+    }
+  }
+}
+
+function scalarText(value: unknown): string {
+  return typeof value === 'string' || typeof value === 'number' ? String(value).trim() : '';
+}
+
+function flowInXmlExport(xml: string): { id: string; name: string } | string {
   const doc = new DOMParser().parseFromString(xml, 'application/xml');
   if (doc.getElementsByTagName('parsererror').length > 0) {
-    return "isn't an XML file. Choose a file made with a Flow's Export.";
+    return "isn't an XML or JSON file. Choose a file made with a Flow's Export.";
   }
   const flows = Array.from(doc.getElementsByTagName('flow')).filter(flow => flow.parentElement?.localName === 'flows');
   if (flows.length > 1) {

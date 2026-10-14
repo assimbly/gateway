@@ -1,12 +1,12 @@
 <div>
   <ng-template #restartIntegrationModal>
     <div class="modal-header">
-      <h4 class="modal-title">Restart Integration</h4>
+      <h4 class="modal-title">Restart Gateway</h4>
       <button type="button" class="btn-close" aria-label="Close" (click)="cancelModal()"></button>
     </div>
     <div class="modal-body">
       <div class="row">
-        <div class="col-12">Are you sure? This will restart Assimbly gateway (and shutdown its flows).</div>
+        <div class="col-12">Are you sure? This restarts the Gateway and stops all its Flows while it restarts.</div>
       </div>
       <div [innerHtml]="restartIntegrationMessage"></div>
     </div>
@@ -51,21 +51,35 @@
     </div>
   </ng-template>
 
-  <jhi-search-toolbar [(query)]="searchText" placeholder="Filter by name" persistKey="searchGatewayText" inputId="searchGatewayId">
+  @if (showEmptyState) {
+    <jhi-empty-state
+      [heading]="isAdmin ? 'Add your first Gateway' : 'No Gateway yet'"
+      description="A Gateway is a running instance of Assimbly: it holds the configuration of your Flows and runs them."
+      [docs]="true"
+    >
+      <a
+        primary
+        *jhiHasAnyAuthority="'ROLE_ADMIN'"
+        class="btn btn-fx btn-fx-primary jh-create-entity create-integration"
+        id="newButton"
+        [routerLink]="['/integration/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span> Add</span>
+      </a>
+      <span secondary *jhiHasAnyAuthority="'ROLE_ADMIN'">
+        Or <button type="button" class="btn btn-link empty-state__link" (click)="openImportBackup()">import</button> a backup.
+      </span>
+    </jhi-empty-state>
+  } @else {
+  <jhi-search-toolbar
+    [(query)]="searchText"
+    placeholder="Filter by name"
+    persistKey="searchGatewayText"
+    inputId="searchGatewayId"
+    hint="A Gateway is a running instance of Assimbly: it holds the configuration of your Flows and runs them."
+  >
     <ng-container actions>
-      <ng-container *jhiHasAnyAuthority="'ROLE_ADMIN'">
-        <button
-          *ngIf="integrations().length === 0"
-          type="button"
-          class="btn btn-fx btn-fx-primary jh-create-entity create-integration"
-          id="newButton"
-          [routerLink]="['/integration/new']"
-          aria-label="Create Gateway"
-        >
-          <fa-icon icon="plus"></fa-icon>
-          <span class="d-none d-md-inline"> Create Gateway</span>
-        </button>
-      </ng-container>
       <button
         *jhiHasAnyAuthority="'ROLE_ADMIN'"
         type="button"
@@ -74,16 +88,21 @@
         aria-label="Import backup"
       >
         <fa-icon icon="file-import"></fa-icon>
-        <span class="d-none d-md-inline"> Import backup</span>
+        <span class="d-none d-md-inline"> Import</span>
+      </button>
+      <button class="btn btn-fx btn-fx-secondary" type="button" (click)="reset()" aria-label="Refresh">
+        <fa-icon icon="sync"></fa-icon>
+        <span class="d-none d-md-inline"> Refresh</span>
       </button>
       <button
         type="button"
         (click)="openRestartIntegrationModal(restartIntegrationModal)"
-        class="btn btn-fx btn-fx-secondary"
-        aria-label="Restart"
+        class="btn btn-fx btn-fx-ghost-danger"
+        aria-label="Restart Gateway"
+        title="Restarts the Gateway and stops all its Flows while it restarts"
       >
-        <fa-icon icon="sync"></fa-icon>
-        <span class="d-none d-md-inline"> Restart</span>
+        <fa-icon icon="power-off"></fa-icon>
+        <span class="d-none d-md-inline"> Restart Gateway</span>
       </button>
     </ng-container>
   </jhi-search-toolbar>
@@ -92,8 +111,8 @@
     [columns]="columns"
     [(sortState)]="sortState"
     [hasRows]="!!filteredIntegrations.length"
-    [emptyMessage]="'No gateway found'"
-    ariaLabel="Gateway"
+    emptyMessage="No gateway matches this filter."
+    ariaLabel="Gateways"
   >
     <tr *ngFor="let integration of filteredIntegrations; trackBy: trackId">
       <td class="table-fx-identity">
@@ -101,30 +120,41 @@
           <jhi-truncate [text]="integration.name" />
         </a>
       </td>
-      <td>{{ integration.type }}</td>
-      <td>{{ integration.stage }}</td>
+      <td>
+        @if (integration.type) {
+          {{ integration.type }}
+        } @else {
+          <span class="text-muted">—</span>
+        }
+      </td>
+      <td>
+        @if (integration.stage) {
+          {{ integration.stage }}
+        } @else {
+          <span class="text-muted">—</span>
+        }
+      </td>
       <td class="text-end">
         <jhi-row-actions>
+          <a
+            jhiPrimaryAction
+            class="btn btn-fx btn-fx-sm btn-fx-ghost"
+            [routerLink]="['/integration', integration.id, 'edit']"
+            queryParamsHandling="merge"
+            aria-label="Edit"
+          >
+            <fa-icon icon="pencil-alt"></fa-icon>
+            <span class="d-none d-md-inline">Edit</span>
+          </a>
           <button
             jhiOverflowAction
             type="button"
             ngbDropdownItem
             class="btn-fx-dropdown-item"
-            [routerLink]="['/integration', integration.id, 'edit']"
-            queryParamsHandling="merge"
-          >
-            <fa-icon icon="pencil-alt"></fa-icon>
-            <span>Edit</span>
-          </button>
-          <button
-            jhiPrimaryAction
-            type="button"
-            class="btn btn-fx btn-fx-sm btn-fx-ghost"
             (click)="openInfoModal(infoIntegrationModal, integration)"
-            aria-label="Info"
           >
             <fa-icon icon="info"></fa-icon>
-            <span class="d-none d-md-inline">Info</span>
+            <span>Info</span>
           </button>
           <button
             jhiOverflowAction
@@ -140,4 +170,5 @@
       </td>
     </tr>
   </jhi-data-table>
+  }
 </div>

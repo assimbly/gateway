@@ -15,6 +15,19 @@ const flowExport = `<?xml version="1.0" encoding="UTF-8"?>
   </integrations>
 </dil>`;
 
+const flowJson = `{
+  "dil": {
+    "integrations": {
+      "integration": {
+        "id": "1",
+        "flows": {
+          "flow": { "id": "12", "name": "Orders to SFTP" }
+        }
+      }
+    }
+  }
+}`;
+
 describe('Import files', () => {
   describe('languageOfFile', () => {
     it.each([
@@ -59,8 +72,35 @@ describe('Import files', () => {
       expect(flowInExport(flowExport.replace('<id>12</id>', '<id>orders-flow</id>'))).toEqual({ id: 'orders-flow', name: 'Orders to SFTP' });
     });
 
-    it('says a text is not XML', () => {
-      expect(flowInExport('this is not xml')).toContain("isn't an XML file");
+    it('says a text is not XML or JSON', () => {
+      expect(flowInExport('this is not xml')).toContain("isn't an XML or JSON file");
+    });
+
+    describe('as JSON', () => {
+      it('finds the id and name of the one Flow', () => {
+        expect(flowInExport(flowJson)).toEqual({ id: '12', name: 'Orders to SFTP' });
+      });
+
+      it('accepts a numeric id', () => {
+        expect(flowInExport(flowJson.replace('"12"', '12'))).toEqual({ id: '12', name: 'Orders to SFTP' });
+      });
+
+      it('says a text is not valid JSON', () => {
+        expect(flowInExport('{"dil": ')).toContain("isn't valid JSON");
+      });
+
+      it('says a file has no Flow', () => {
+        expect(flowInExport('{"dil":{"integrations":{}}}')).toContain("doesn't contain a Flow");
+      });
+
+      it('says a Flow without a name is not a Flow', () => {
+        expect(flowInExport(flowJson.replace('"name": "Orders to SFTP"', '"type": "esb"'))).toContain("doesn't contain a Flow");
+      });
+
+      it('sends a file with several Flows to the Gateway backup import', () => {
+        const flows = '{"dil":{"integrations":{"integration":{"flows":{"flow":[{"id":"1","name":"A"},{"id":"2","name":"B"}]}}}}}';
+        expect(flowInExport(flows)).toContain('contains 2 Flows');
+      });
     });
 
     it('says a file has no Flow', () => {

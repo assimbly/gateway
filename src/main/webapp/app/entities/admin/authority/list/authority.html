@@ -21,9 +21,9 @@
   <jhi-alert />
 
   @if (authorities().length === 0) {
-    <div class="alert alert-warning" id="no-result">
+    <p class="text-muted" id="no-result">
       <span jhiTranslate="jhipsterGradleSampleApplicationApp.adminAuthority.home.notFound">No Authorities found</span>
-    </div>
+    </p>
   } @else {
     <div class="table-responsive table-entities" id="entities">
       <table class="table table-striped" aria-label="Authorities">

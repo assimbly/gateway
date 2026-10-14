@@ -1,25 +1,41 @@
-import { Component, input, model, output, signal } from '@angular/core';
+import { Component, inject, input, model, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { CodemirrorModule } from '@ctrl/ngx-codemirror';
+import 'codemirror/mode/javascript/javascript';
+import 'codemirror/mode/xml/xml';
+import 'codemirror/addon/display/placeholder';
 
-import { readText } from './import-files';
+import { ThemeService } from 'app/core/theme';
+
+import { isJson, readText } from './import-files';
 
 let nextId = 0;
 
-/** What an import reads: a file, chosen or dropped, or text pasted. The text is what the import page sends. */
+/** How the text is highlighted: as XML, as JSON or XML by what it looks like, or not at all. */
+export type ImportHighlight = 'auto' | 'xml' | 'none';
+
+/**
+ * What an import reads: a file, chosen or dropped (on the button or on the editor), or text typed or pasted in a code
+ * editor with line numbers. The text is what the import page sends.
+ */
 @Component({
   selector: 'jhi-import-source',
   templateUrl: './import-source.component.html',
-  imports: [FormsModule, FontAwesomeModule],
+  imports: [FormsModule, FontAwesomeModule, CodemirrorModule],
 })
 export class ImportSourceComponent {
+  private readonly themeService = inject(ThemeService);
+
   /** The `accept` of the file input, such as `.xml`. */
   readonly accept = input('');
   /** What the file is, as the user knows it: "a Flow export", "a script". */
   readonly kind = input('a file');
   readonly placeholder = input('');
+  /** The height of the editor, in lines. */
   readonly rows = input(12);
   readonly maxBytes = input(5 * 1024 * 1024);
+  readonly highlight = input<ImportHighlight>('none');
 
   readonly text = model('');
   /** The name of the file the text came from; undefined once the text is typed or pasted. */
@@ -29,8 +45,61 @@ export class ImportSourceComponent {
   readonly problem = signal<string | undefined>(undefined);
   readonly dragging = signal(false);
 
-  readonly inputId = `import-source-file-${nextId}`;
-  readonly textId = `import-source-text-${nextId++}`;
+  readonly inputId = `import-source-file-${nextId++}`;
+
+  private optionsCache: Record<string, unknown> | undefined;
+  private optionsKey: string | undefined;
+
+  /** The CodeMirror mode of the text. */
+  mode(): string {
+    switch (this.highlight()) {
+      case 'xml':
+        return 'application/xml';
+      case 'auto': {
+        const text = this.text();
+        if (isJson(text)) {
+          return 'application/json';
+        }
+        return text.trimStart().startsWith('<') ? 'application/xml' : 'text/plain';
+      }
+      default:
+        return 'text/plain';
+    }
+  }
+
+  /** CodeMirror options. The same object is returned until the theme, the mode or the placeholder changes. */
+  editorOptions(): Record<string, unknown> {
+    const theme = this.themeService.editorTheme();
+    const mode = this.mode();
+    const key = `${theme}|${mode}|${this.placeholder()}`;
+    if (!this.optionsCache || this.optionsKey !== key) {
+      this.optionsKey = key;
+      this.optionsCache = {
+        lineNumbers: true,
+        gutters: ['CodeMirror-linenumbers'],
+        lineWrapping: true,
+        // a dropped file replaces the text (see `onDrop`), the editor must not insert it at the cursor as well
+        dragDrop: false,
+        placeholder: this.placeholder(),
+        theme,
+        mode,
+      };
+    }
+    return this.optionsCache;
+  }
+
+  /** CodeMirror does not draw itself correctly (no line numbers) until it is refreshed once it is visible. */
+  refreshCodeMirror(editor: { codeMirror?: { refresh: () => void } }): void {
+    const codeMirror = editor?.codeMirror;
+    if (!codeMirror) {
+      return;
+    }
+    const refresh = () => codeMirror.refresh();
+    requestAnimationFrame(() => {
+      refresh();
+      setTimeout(refresh);
+    });
+  }
 
   onFileInput(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -42,6 +111,7 @@ export class ImportSourceComponent {
   }
 
   onDragOver(event: DragEvent): void {
+    event.stopPropagation();
     event.preventDefault();
     this.dragging.set(true);
   }

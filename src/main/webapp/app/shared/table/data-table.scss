@@ -9,6 +9,13 @@
   max-width: 100%;
 }
 
+/* "Nothing matches" is information, not a warning: plain muted text, no yellow bar. */
+.table-fx-empty {
+  margin: 1.5rem 0;
+  text-align: center;
+  color: var(--app-text-muted);
+}
+
 .table-fx-scroll {
   max-width: 100%;
   max-height: calc(100vh - 12rem);

@@ -1,11 +1,13 @@
 package org.assimbly.gateway.config.importing;
 
 import org.assimbly.dil.transpiler.transform.Transform;
+import org.assimbly.docconverter.DocConverter;
 import org.assimbly.gateway.domain.Flow;
 import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.service.dto.FlowImportResultDTO;
 import org.assimbly.gateway.service.importing.FlowImportException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -85,6 +87,11 @@ public class Import {
     public FlowImportResultDTO importFlow(Long integrationId, String mediaType, String flowConfiguration, boolean rename) throws Exception {
 
         String dilConfiguration = flowConfiguration.strip();
+        // JSON is converted to XML first, as the runtime does when it installs a DIL flow
+        if (mediaType.contains("json")) {
+            dilConfiguration = DocConverter.jsonToXml(dilConfiguration).strip();
+            mediaType = MediaType.APPLICATION_XML_VALUE;
+        }
         if(!dilConfiguration.endsWith("</dil>")){
             dilConfiguration = new Transform("transform-to-dil.xsl").transformToDil(dilConfiguration);
         }

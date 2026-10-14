@@ -48,19 +48,39 @@ describe('LayoutService', () => {
       expect(localStorage.getItem(LayoutService.STORAGE_KEY)).toBe('true');
     });
 
-    it('keeps other menus open when a later route expands one section', () => {
+    it('collapses the other menus when a later route moves to another section', () => {
       const service = TestBed.inject(LayoutService);
 
       service.syncMenuExpansion({ flows: true, broker: false, admin: false, account: false });
-      service.brokerExpanded.set(true);
-      service.adminExpanded.set(true);
-
       service.syncMenuExpansion({ flows: false, broker: true, admin: false, account: false });
 
-      expect(service.flowsExpanded()).toBe(true);
+      expect(service.flowsExpanded()).toBe(false);
       expect(service.brokerExpanded()).toBe(true);
-      expect(service.adminExpanded()).toBe(true);
+      expect(service.adminExpanded()).toBe(false);
       expect(service.accountExpanded()).toBe(false);
+    });
+
+    it('keeps a manually opened menu when the route stays in the same section', () => {
+      const service = TestBed.inject(LayoutService);
+
+      service.syncMenuExpansion({ flows: true, broker: false, admin: false, account: false });
+      service.toggleMenu('admin');
+      service.syncMenuExpansion({ flows: true, broker: false, admin: false, account: false });
+
+      expect(service.flowsExpanded()).toBe(false);
+      expect(service.adminExpanded()).toBe(true);
+    });
+
+    it('opens one menu at a time and closes the open one when toggled again', () => {
+      const service = TestBed.inject(LayoutService);
+
+      service.toggleMenu('broker');
+      service.toggleMenu('admin');
+      expect(service.brokerExpanded()).toBe(false);
+      expect(service.adminExpanded()).toBe(true);
+
+      service.toggleMenu('admin');
+      expect(service.adminExpanded()).toBe(false);
     });
 
     it('restores the collapsed preference from localStorage', () => {

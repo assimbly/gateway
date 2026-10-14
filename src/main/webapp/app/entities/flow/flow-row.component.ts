@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -16,13 +16,15 @@ import { IntegrationService } from '../integration/integration.service';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
 import { Collectors } from 'app/shared/collect/collectors';
-import { OverflowActionDirective, RowActions, StatusControls, Truncate } from 'app/shared/table';
+import { OverflowActionDirective, PrimaryActionDirective, RowActions, StatusControls, Truncate } from 'app/shared/table';
 import { FlowRowAlerts } from './flow-row-alerts.component';
 import { FlowRowStats, FlowStatsSection } from './flow-row-stats.component';
 import {
   FlowAction,
   FlowFailure,
+  FlowRuntime,
   FlowStatusView,
+  RuntimeStatus,
   countLabel,
   failureOfError,
   flowEventOf,
@@ -60,6 +62,7 @@ enum Status {
     NgbDropdownModule,
     NgbTooltip,
     RowActions,
+    PrimaryActionDirective,
     OverflowActionDirective,
     StatusControls,
     Truncate,
@@ -73,6 +76,8 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
   @Input() flow: Flow;
   /** The API and Operation this Flow handles, when it is a Handler Flow. */
   @Input() handler?: IApiHandler;
+  /** The Flow's runtime state, each time it changes. */
+  @Output() runtimeChange = new EventEmitter<FlowRuntime>();
 
   steps: Array<Step> = [new Step()];
   fromStep: Array<Step> = [];
@@ -372,6 +377,14 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
       this.completedCount = null;
       this.failedCount = null;
     }
+    if (refreshView) {
+      this.reportRuntime();
+    }
+  }
+
+  /** Tells the list the Flow's state, which it sorts on. Not at init, as the list is being checked then. */
+  private reportRuntime(): void {
+    this.runtimeChange.emit({ status: this.statusFlow as RuntimeStatus, completed: this.completedCount, failed: this.failedCount });
   }
 
   getFlowAlertsPoll(): void {
@@ -621,6 +634,7 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
           const body = response.body;
           this.completedCount = body?.completedTransactions ?? null;
           this.failedCount = body?.failedTransactions ?? null;
+          this.reportRuntime();
           this.changeDetector.detectChanges();
         },
       }),

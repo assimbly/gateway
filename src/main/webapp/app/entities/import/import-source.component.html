@@ -22,13 +22,23 @@
   <div class="alert alert-danger py-2 mt-2 mb-0" role="alert">{{ message }}</div>
 }
 
-<label class="form-label mt-3" [for]="textId">Or paste it</label>
-<textarea
-  [id]="textId"
-  class="form-control font-monospace"
-  [rows]="rows()"
-  [placeholder]="placeholder()"
-  spellcheck="false"
-  [ngModel]="text()"
-  (ngModelChange)="onTyped($event)"
-></textarea>
+<div class="form-label mt-3">Or paste it, or drop {{ kind() }} on the editor</div>
+<!-- the drop is handled here: the editor has its own drop output, which does not carry the browser event -->
+<div
+  class="import-codemirror"
+  [class.import-codemirror--active]="dragging()"
+  [style.--import-rows]="rows()"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave()"
+  (drop)="onDrop($event)"
+>
+  <ngx-codemirror
+    name="import-source-text"
+    [ngModel]="text()"
+    (ngModelChange)="onTyped($event)"
+    [ngModelOptions]="{ standalone: true }"
+    [options]="editorOptions()"
+    (codeMirrorLoaded)="refreshCodeMirror($event)"
+  >
+  </ngx-codemirror>
+</div>

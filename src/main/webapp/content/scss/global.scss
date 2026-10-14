@@ -1230,6 +1230,24 @@ ng-dropdown-panel > div {
   height: 30rem;
 }
 
+// The text of an import page: --import-rows sets the height in lines
+.import-codemirror ngx-codemirror {
+  display: block;
+  min-width: 0;
+}
+
+.import-codemirror .CodeMirror {
+  height: calc(var(--import-rows, 12) * 1.5em + 1rem);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+}
+
+.import-codemirror--active .CodeMirror,
+.import-codemirror .CodeMirror-focused {
+  border-color: var(--app-primary);
+  box-shadow: 0 0 0 0.15rem color-mix(in srgb, var(--app-primary) 25%, transparent);
+}
+
 .body-codemirror .CodeMirror-focused {
   border-color: var(--app-primary);
   box-shadow: 0 0 0 0.15rem color-mix(in srgb, var(--app-primary) 25%, transparent);

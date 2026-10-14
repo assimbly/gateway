@@ -8,6 +8,7 @@ import { Observable, finalize } from 'rxjs';
 import { LANGUAGES } from 'app/config';
 import { AuthorityService } from 'app/entities/admin/authority/service/authority.service';
 import { AlertError } from 'app/shared/alert';
+import { RoleLabelPipe } from 'app/shared/auth';
 import { FindLanguageFromKeyPipe, TranslateDirective } from 'app/shared/language';
 import { UserManagementService } from '../service/user-management.service';
 import { IUserManagement, NewUserManagement } from '../user-management.model';
@@ -17,7 +18,7 @@ import { UserManagementFormGroup, UserManagementFormService } from './user-manag
 @Component({
   selector: 'jhi-user-management-update',
   templateUrl: './user-management-update.html',
-  imports: [TranslateDirective, FindLanguageFromKeyPipe, FontAwesomeModule, AlertError, ReactiveFormsModule],
+  imports: [TranslateDirective, FindLanguageFromKeyPipe, FontAwesomeModule, AlertError, ReactiveFormsModule, RoleLabelPipe],
 })
 export class UserManagementUpdate implements OnInit {
   readonly isSaving = signal(false);

@@ -17,7 +17,8 @@ import { SearchToolbar } from 'app/shared/filter';
 import { TranslateDirective } from 'app/shared/language';
 import { ItemCount } from 'app/shared/pagination';
 import { SortService, type SortState, sortStateSignal } from 'app/shared/sort';
-import { DataTable, DataTableColumn, OverflowActionDirective, RowActions, Truncate } from 'app/shared/table';
+import { RoleLabelPipe } from 'app/shared/auth';
+import { DataTable, DataTableColumn, OverflowActionDirective, PrimaryActionDirective, RowActions, Truncate } from 'app/shared/table';
 import { UserManagementDeleteDialog } from '../delete/user-management-delete-dialog';
 import { UserManagementService } from '../service/user-management.service';
 import { IUserManagement } from '../user-management.model';
@@ -38,8 +39,10 @@ import { IUserManagement } from '../user-management.model';
     SearchToolbar,
     DataTable,
     RowActions,
+    PrimaryActionDirective,
     OverflowActionDirective,
     Truncate,
+    RoleLabelPipe,
   ],
 })
 export class UserManagement {
@@ -50,11 +53,11 @@ export class UserManagement {
   readonly columns: DataTableColumn[] = [
     { key: 'login', header: 'Login', sortable: true },
     { key: 'email', header: 'Email', sortable: true },
-    { key: 'activated', header: '' },
+    { key: 'activated', header: 'Status', sortable: true },
     { key: 'createdDate', header: 'Created date', sortable: true },
     { key: 'lastModifiedBy', header: 'Modified by', sortable: true },
     { key: 'lastModifiedDate', header: 'Modified date', sortable: true },
-    { key: 'profiles', header: 'Profiles' },
+    { key: 'authorities', header: 'Roles' },
     { key: 'actions', header: 'Actions', align: 'end' },
   ];
 

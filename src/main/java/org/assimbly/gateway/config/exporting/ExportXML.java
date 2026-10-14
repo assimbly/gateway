@@ -789,7 +789,7 @@ public class ExportXML {
             }
 
 
-        if(confUri!=null) {
+        if(confUri!=null && !confUri.isEmpty()) {
             confUri = componentType + confUri;
         }else if(componentType.endsWith(":")){
             confUri = StringUtils.substringBeforeLast(componentType,":");

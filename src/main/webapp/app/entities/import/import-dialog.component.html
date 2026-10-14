@@ -1,0 +1,8 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="import-flow-title">Import flow</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss()"></button>
+</div>
+<div class="modal-body">
+  <p class="text-muted">What do you want to import? The result is created right away and opened in its editor.</p>
+  <jhi-import-choices (chosen)="activeModal.close()" />
+</div>

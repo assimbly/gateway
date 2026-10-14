@@ -234,19 +234,25 @@ public class ImportXMLFlows {
 		StepType stepType = StepType.valueOf(type.toUpperCase());
 
         // get componenType & uri
-        String componentType = "";
-		if(uri.contains(":")){
-			String[] uriSplitted = uri.split(":", 2);
-			componentType = uriSplitted[0];
-
-			componentType = componentType.replace("-", "");
-
-	        // get uri
-			uri = uriSplitted[1];
-			while (uri.startsWith("/")) {
-				uri = uri.substring(1);
-			}
-		}
+        // The name before the first ':' (or '://') is the component (scheme), the rest is the path.
+        // Without a ':' (for example 'removeheaders' or 'setbody') the whole value is the component and the path is empty.
+        String componentType;
+        String path;
+        uri = uri.strip();
+        int schemeEnd = uri.indexOf(':');
+        if (schemeEnd >= 0) {
+            componentType = uri.substring(0, schemeEnd);
+            path = uri.substring(schemeEnd + 1);
+            while (path.startsWith("/")) {
+                path = path.substring(1);
+            }
+        } else {
+            componentType = uri;
+            path = "";
+        }
+        // Components are listed in lower case, so this is the name that gets selected
+        componentType = componentType.strip().replace("-", "").toLowerCase(Locale.ROOT);
+        uri = path;
 
         // A Response exported for the runtime: its settings come back from its generated message.
         ResponseSettings response = responseSettings(doc, uri);

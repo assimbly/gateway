@@ -297,6 +297,10 @@ dependencies {
         implementation group: "org.assimbly", name: "integration-rest", version: "${version}", changing: true
     }else if (project.hasProperty("broker")) {
         implementation group: "org.assimbly", name: "broker-rest", version: "${version}", changing: true
+        // Artemis' OpenWire protocol manager (artemis-openwire-protocol) still references the legacy javax.jms API.
+        // In the full build it only ends up on the classpath by accident (via a transitive dependency of the integration
+        // modules), so it has to be added explicitly for the broker-only build.
+        runtimeOnly "javax.jms:javax.jms-api:2.0.1"
     }else{
         implementation group: "org.assimbly", name: "integration-rest", version: "${version}", changing: true
         implementation group: "org.assimbly", name: "broker-rest", version: "${version}", changing: true
@@ -419,9 +423,11 @@ if (project.hasProperty("integration")){
             java {
                 exclude 'org/assimbly/gateway/camel/**'
                 exclude 'org/assimbly/gateway/config/importing/Import.java'
+                exclude 'org/assimbly/gateway/service/importing/**'
                 exclude 'org/assimbly/gateway/config/memory/**'
                 exclude 'org/assimbly/gateway/web/rest/headless/**'
                 exclude 'org/assimbly/gateway/web/rest/integration/**'
+                exclude 'org/assimbly/gateway/web/rest/gateway/ImportResource.java'
                 exclude 'org/assimbly/gateway/web/rest/gateway/EnvironmentVariablesResource.java'
                 exclude 'org/assimbly/gateway/web/rest/gateway/GroupResource.java'
             }

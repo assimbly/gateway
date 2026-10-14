@@ -160,6 +160,15 @@
   min-height: 2.25rem;
 }
 
+.app-sidebar__section {
+  padding: 0.5rem 1rem 0.125rem 1.75rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--app-text-muted);
+}
+
 .app-sidebar__subnav {
   display: flex;
   flex-direction: column;

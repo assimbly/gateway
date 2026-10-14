@@ -9,9 +9,10 @@ import { AlertService } from 'app/core/util/alert.service';
 import { NgbDropdownModule, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { HasAnyAuthorityDirective } from 'app/shared/auth';
+import { EmptyState } from 'app/shared/empty-state';
 import { SearchToolbar } from 'app/shared/filter';
 import { SortState } from 'app/shared/sort';
-import { DataTable, DataTableColumn, OverflowActionDirective, PrimaryActionDirective, RowActions, Truncate } from 'app/shared/table';
+import { DataTable, DataTableColumn, OverflowActionDirective, PrimaryActionDirective, RowActions, Truncate, sortRows } from 'app/shared/table';
 import { IIntegration } from 'app/shared/model/integration.model';
 import { IntegrationDeleteDialogComponent } from './integration-delete-dialog.component';
 import { IntegrationImportDialogComponent } from './integration-import-dialog.component';
@@ -28,6 +29,7 @@ import { FlowService } from '../flow/flow.service';
         FontAwesomeModule,
         NgbDropdownModule,
         HasAnyAuthorityDirective,
+        EmptyState,
         SearchToolbar,
         DataTable,
         RowActions,
@@ -38,6 +40,8 @@ import { FlowService } from '../flow/flow.service';
 })
 export class IntegrationComponent implements OnInit, OnDestroy {
     readonly integrations = signal<IIntegration[]>([]);
+    /** Whether the Gateways have been asked for, so an empty list is known to be empty. */
+    readonly loaded = signal(false);
     currentAccount: any;
     eventSubscriber: Subscription;
     restartIntegrationMessage: string;
@@ -66,6 +70,7 @@ export class IntegrationComponent implements OnInit, OnDestroy {
         this.integrationService.query().subscribe(
             (res: HttpResponse<IIntegration[]>) => {
                 this.integrations.set(res.body ?? []);
+                this.loaded.set(true);
             },
             (res: HttpErrorResponse) => this.onError(res.message)
         );
@@ -87,20 +92,26 @@ export class IntegrationComponent implements OnInit, OnDestroy {
         return item.id;
     }
 
+    get isAdmin(): boolean {
+        return this.accountService.hasAnyAuthority('ROLE_ADMIN');
+    }
+
+    /** With no Gateway at all, the list gives way to an explanation of Gateways and how to add the first. */
+    get showEmptyState(): boolean {
+        return this.loaded() && !this.integrations().length;
+    }
+
     get filteredIntegrations(): IIntegration[] {
         const query = this.searchText?.toLocaleLowerCase() ?? '';
-        let result = [...(this.integrations() ?? [])];
-        const { predicate, order } = this.sortState;
-        const direction = order === 'asc' ? 1 : -1;
-        result.sort((a, b) => {
-            const left = String((a as any)[predicate ?? 'name'] ?? '').toLocaleLowerCase();
-            const right = String((b as any)[predicate ?? 'name'] ?? '').toLocaleLowerCase();
-            return left < right ? -1 * direction : direction;
-        });
+        let result = this.integrations() ?? [];
         if (query) {
             result = result.filter(item => (item.name ?? '').toLocaleLowerCase().includes(query));
         }
-        return result;
+        return sortRows(result, this.sortState, {
+            name: item => item.name,
+            type: item => item.type,
+            stage: item => item.stage,
+        });
     }
 
     registerChangeInIntegrations() {
@@ -175,7 +186,6 @@ export class IntegrationComponent implements OnInit, OnDestroy {
     }
 
     reset() {
-        this.integrations.set([]);
         this.loadAll();
     }
 }

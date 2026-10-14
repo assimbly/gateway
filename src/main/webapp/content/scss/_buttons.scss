@@ -459,3 +459,11 @@
 .broker-actions--embedded {
   margin-top: 3rem;
 }
+
+/* A button that reads as a link inside a sentence, such as "import" in the empty states. */
+.btn.empty-state__link {
+  padding: 0;
+  border: 0;
+  vertical-align: baseline;
+  color: var(--app-primary-accessible);
+}

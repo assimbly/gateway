@@ -20,20 +20,22 @@ import { ITEMS_PER_PAGE } from 'app/config/pagination.constants';
 import { FlowService } from './flow.service';
 import { IIntegration, GatewayType, EnvironmentType } from 'app/shared/model/integration.model';
 import { IntegrationService } from 'app/entities/integration/integration.service';
+import { EmptyState } from 'app/shared/empty-state';
 import { SearchToolbar } from 'app/shared/filter';
 import { DataTable, DataTableColumn } from 'app/shared/table';
 import { FlowRowComponent } from './flow-row.component';
+import { FlowRuntime } from './flow-status';
 import { FlowSearchByNamePipe } from './flow.searchbyname.pipe';
 import { FlowTypeChoicesComponent } from './flow-type-choices.component';
 import { NewFlowDialogComponent } from './new-flow-dialog.component';
+import { ImportDialogComponent } from 'app/entities/import/import-dialog.component';
 import { ApiService } from 'app/entities/api/api.service';
 import { IApiHandler } from 'app/entities/api/api.model';
 
 @Component({
   selector: 'jhi-flow',
   templateUrl: './flow.component.html',
-  styleUrl: './flow.component.scss',
-  imports: [CommonModule, RouterModule, FontAwesomeModule, SearchToolbar, DataTable, FlowRowComponent, FlowTypeChoicesComponent],
+  imports: [CommonModule, RouterModule, FontAwesomeModule, EmptyState, SearchToolbar, DataTable, FlowRowComponent, FlowTypeChoicesComponent],
 })
 export class FlowComponent implements OnInit, OnDestroy {
   integrations: IIntegration[];
@@ -66,15 +68,17 @@ export class FlowComponent implements OnInit, OnDestroy {
   flowsLoadFailed = false;
   readonly columns: DataTableColumn[] = [
     { key: 'name', header: 'Name', sortable: true },
-    { key: 'type', header: 'Type' },
-    { key: 'status', header: 'Status' },
-    { key: 'completed', header: 'Completed', numeric: true },
-    { key: 'failed', header: 'Failed', numeric: true },
+    { key: 'type', header: 'Type', sortable: true },
+    { key: 'status', header: 'Status', sortable: true },
+    { key: 'completed', header: 'Completed', numeric: true, sortable: true },
+    { key: 'failed', header: 'Failed', numeric: true, sortable: true },
     { key: 'stats', header: 'Stats' },
     { key: 'actions', header: 'Actions', align: 'end' },
   ];
   /** The Handler Flows by Flow id, to mark them with their API and Operation. */
   handlers: Record<number, IApiHandler> = {};
+  /** The runtime state of the Flows by Flow id, as their rows report it. */
+  runtimes: Record<number, FlowRuntime> = {};
   private readonly apiService = inject(ApiService);
   private readonly searchPipe = new FlowSearchByNamePipe();
   private readonly eventSubscriptions = new Subscription();
@@ -239,7 +243,18 @@ export class FlowComponent implements OnInit, OnDestroy {
   }
 
   get filteredFlows(): IFlow[] {
-    return this.searchPipe.transform(this.flows ?? [], this.searchText, this.sortState.order === 'asc', this.sortState.predicate);
+    return this.searchPipe.transform(
+      this.flows ?? [],
+      this.searchText,
+      this.sortState.order === 'asc',
+      this.sortState.predicate,
+      this.runtimes,
+    );
+  }
+
+  /** A row reports its Flow's state when it changes, so the list can be sorted on it. */
+  onRuntimeChange(id: number, runtime: FlowRuntime): void {
+    this.runtimes = { ...this.runtimes, [id]: runtime };
   }
 
   get integrationId(): number | undefined {
@@ -248,6 +263,10 @@ export class FlowComponent implements OnInit, OnDestroy {
 
   openNewFlow(): void {
     this.modalService.open(NewFlowDialogComponent, { size: 'lg', ariaLabelledBy: 'new-flow-title' });
+  }
+
+  openImport(): void {
+    this.modalService.open(ImportDialogComponent, { size: 'lg', ariaLabelledBy: 'import-flow-title' });
   }
 
   trackId(index: number, item: IFlow) {

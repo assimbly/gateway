@@ -16,7 +16,6 @@ import { ProfileService } from 'app/layouts/profiles/profile.service';
 import { LoginService } from 'app/login/login.service';
 import { HasAnyAuthorityDirective } from 'app/shared/auth';
 import { TranslateDirective } from 'app/shared/language';
-import ThemeSelector from 'app/shared/theme/theme-selector';
 import { LayoutService } from 'app/layouts/main/layout.service';
 import { ThemeService } from 'app/core/theme';
 
@@ -36,7 +35,6 @@ import { environment } from 'environments/environment';
     NgbTooltip,
     HasAnyAuthorityDirective,
     TranslateDirective,
-    ThemeSelector,
   ],
   host: {
     id: 'app-sidebar',
@@ -155,19 +153,19 @@ export default class Navbar implements OnInit {
   }
 
   toggleFlows(): void {
-    this.layout.flowsExpanded.update(open => !open);
+    this.layout.toggleMenu('flows');
   }
 
   toggleBroker(): void {
-    this.layout.brokerExpanded.update(open => !open);
+    this.layout.toggleMenu('broker');
   }
 
   toggleAdmin(): void {
-    this.layout.adminExpanded.update(open => !open);
+    this.layout.toggleMenu('admin');
   }
 
   toggleAccount(): void {
-    this.layout.accountExpanded.update(open => !open);
+    this.layout.toggleMenu('account');
   }
 
   changeLanguage(languageKey: string): void {

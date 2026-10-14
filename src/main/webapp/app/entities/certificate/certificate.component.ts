@@ -10,7 +10,8 @@ import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { SortState, sortParams } from 'app/shared/sort';
 import { SearchToolbar } from 'app/shared/filter';
-import { DataTable, DataTableColumn, OverflowActionDirective, RowActions, Truncate } from 'app/shared/table';
+import { EmptyState } from 'app/shared/empty-state';
+import { DataTable, DataTableColumn, OverflowActionDirective, PrimaryActionDirective, RowActions, Truncate } from 'app/shared/table';
 
 import { ICertificate } from 'app/shared/model/certificate.model';
 import { AccountService } from 'app/core/auth/account.service';
@@ -34,9 +35,11 @@ import { saveAs } from 'file-saver/FileSaver';
     RouterModule,
     FontAwesomeModule,
     NgbModule,
+    EmptyState,
     SearchToolbar,
     DataTable,
     RowActions,
+    PrimaryActionDirective,
     OverflowActionDirective,
     Truncate,
   ],
@@ -51,6 +54,8 @@ export class CertificateComponent implements OnInit, OnDestroy {
   sortState: SortState = { predicate: 'certificateName', order: 'asc' };
   totalItems: number;
   searchText = '';
+  loading = true;
+  loadFailed = false;
   readonly columns: DataTableColumn[] = [
     { key: 'certificateName', header: 'Name', sortable: true },
     { key: 'url', header: 'URL', sortable: true },
@@ -78,6 +83,8 @@ export class CertificateComponent implements OnInit, OnDestroy {
   }
 
   loadAll() {
+    this.loading = true;
+    this.loadFailed = false;
     this.certificateService
       .query({
         page: this.page,
@@ -122,6 +129,11 @@ export class CertificateComponent implements OnInit, OnDestroy {
 
   trackId(index: number, item: ICertificate) {
     return item.id;
+  }
+
+  /** With no Certificate at all, the list gives way to an explanation of Certificates and how to add the first. */
+  get showEmptyState(): boolean {
+    return !this.loading && !this.loadFailed && !this.securities.length;
   }
 
   get filteredCertificates(): ICertificate[] {
@@ -189,10 +201,14 @@ export class CertificateComponent implements OnInit, OnDestroy {
     } else {
       this.securities = body;
     }
+    this.loading = false;
     this.changeDetector.detectChanges();
   }
 
   protected onError(errorMessage: string) {
+    this.loading = false;
+    this.loadFailed = true;
+    this.changeDetector.detectChanges();
 	this.alertService.addAlert({
 	  type: 'danger',
 	  message: errorMessage,

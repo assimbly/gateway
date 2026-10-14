@@ -18,7 +18,7 @@ import { TopicService } from './topic.service';
 import { TopicDeleteDialogComponent } from './topic-delete-dialog.component';
 import { IBroker } from 'app/shared/model/broker.model';
 import { SearchToolbar } from 'app/shared/filter';
-import { EndpointTypeSwitch } from 'app/shared/endpoint-switch';
+import { EndpointTypeSwitch, EndpointsEmptyState } from 'app/shared/endpoint-switch';
 import { DataTable, DataTableColumn } from 'app/shared/table';
 import { AddressRowComponent } from 'app/entities/broker/address-row.component';
 import { filterAddresses } from 'app/shared/util/address-filter';
@@ -26,7 +26,7 @@ import { filterAddresses } from 'app/shared/util/address-filter';
 @Component({
   selector: 'jhi-topic',
   templateUrl: './topic.component.html',
-  imports: [CommonModule, RouterModule, FontAwesomeModule, SearchToolbar, EndpointTypeSwitch, DataTable, AddressRowComponent],
+  imports: [CommonModule, RouterModule, FontAwesomeModule, SearchToolbar, EndpointTypeSwitch, EndpointsEmptyState, DataTable, AddressRowComponent],
 })
 export class TopicComponent implements OnInit, OnDestroy {
 
@@ -38,10 +38,12 @@ export class TopicComponent implements OnInit, OnDestroy {
   itemsPerPage: number;
   links: any;
   page: number;
-  sortState: SortState = { predicate: 'name', order: 'desc' };
+  sortState: SortState = { predicate: 'name', order: 'asc' };
 
   timeInterval: Subscription;
   isBroker: boolean | undefined;
+  /** Whether the Topics of the Broker have been asked for, so an empty list is known to be empty. */
+  addressesLoaded = false;
 
   searchTopicText: string = '';
   brokerType = '';
@@ -100,6 +102,14 @@ export class TopicComponent implements OnInit, OnDestroy {
   loadPage(page: number): void {
     this.page = page;
     this.getBrokerType();
+  }
+
+  /** Without a running Broker, or without any Topic, the list gives way to an explanation of Endpoints and what to do first. */
+  get showEmptyState(): boolean {
+    if (this.isBroker === undefined) {
+      return false;
+    }
+    return !this.isBroker || (this.addressesLoaded && !this.addresses.length);
   }
 
   get filteredAddresses(): IAddress[] {
@@ -162,10 +172,12 @@ export class TopicComponent implements OnInit, OnDestroy {
 
   getAllTopics() {
     this.addresses = [];
+    this.addressesLoaded = false;
 
     if (this.isBroker) {
       this.topicService.getAllTopics(this.brokerType).subscribe(
         data => {
+          this.addressesLoaded = true;
           if (data && data.body.topics) {
             this.isBroker = true;
             if (data.body.topics.topic) {
@@ -182,6 +194,7 @@ export class TopicComponent implements OnInit, OnDestroy {
         },
         error => {
           console.log(error);
+          this.addressesLoaded = true;
           this.isBroker = false;
           this.changeDetector.detectChanges();
         }

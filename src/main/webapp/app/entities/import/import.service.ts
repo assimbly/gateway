@@ -8,7 +8,7 @@ import { HANDLES_OWN_ERRORS } from 'app/core/interceptor/error-handler.intercept
 import { AlertService } from 'app/core/util/alert.service';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
-import { escapeHtml } from './import-files';
+import { escapeHtml, isJson } from './import-files';
 import { IFlowImportResult, ImportConflict, editorOf } from './import.model';
 
 /** Calls whose failures the import page explains itself, next to the file the user chose. */
@@ -28,7 +28,7 @@ export class ImportService {
 
   importFlow(dil: string, onConflict: ImportConflict): Observable<IFlowImportResult> {
     return this.http.post<IFlowImportResult>(`${this.resourceUrl}/flow`, dil, {
-      headers: { 'Content-Type': 'application/xml' },
+      headers: { 'Content-Type': isJson(dil) ? 'application/json' : 'application/xml' },
       params: new HttpParams().set('onConflict', onConflict),
       context: OWN_ERRORS,
     });

@@ -28,7 +28,7 @@
     (sortChange)="navigateToWithComponentValues($event)"
     [loading]="isLoading() && userManagements().length === 0"
     [hasRows]="filteredUsers().length > 0"
-    [emptyMessage]="'No user found'"
+    [emptyMessage]="'No users match this filter.'"
     ariaLabel="Users"
   >
     @for (userManagement of filteredUsers(); track trackLogin(userManagement)) {
@@ -49,18 +49,39 @@
           }
         </td>
         <td>{{ userManagement.createdDate | formatMediumDatetime }}</td>
-        <td>{{ userManagement.lastModifiedBy }}</td>
-        <td>{{ userManagement.lastModifiedDate | formatMediumDatetime }}</td>
         <td>
-          @for (authority of userManagement.authorities; track $index; let last = $last) {
-            <span>
-              <a class="badge bg-info" [routerLink]="['/authority', authority, 'view']">{{ authority }}</a
-              >{{ last ? '' : ', ' }}
-            </span>
+          @if (userManagement.lastModifiedBy) {
+            {{ userManagement.lastModifiedBy }}
+          } @else {
+            <span class="text-muted">—</span>
+          }
+        </td>
+        <td>
+          @if (userManagement.lastModifiedDate) {
+            {{ userManagement.lastModifiedDate | formatMediumDatetime }}
+          } @else {
+            <span class="text-muted">—</span>
+          }
+        </td>
+        <td>
+          @for (authority of userManagement.authorities; track $index) {
+            <span class="badge text-bg-secondary me-1">{{ authority | roleLabel }}</span>
+          } @empty {
+            <span class="text-muted">—</span>
           }
         </td>
         <td class="text-end">
           <jhi-row-actions>
+            <a
+              jhiPrimaryAction
+              class="btn btn-fx btn-fx-sm btn-fx-ghost"
+              [routerLink]="['/user-management', userManagement.login, 'edit']"
+              aria-label="Edit"
+              data-cy="entityEditButton"
+            >
+              <fa-icon icon="pencil-alt" />
+              <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
+            </a>
             <button
               jhiOverflowAction
               type="button"
@@ -71,17 +92,6 @@
             >
               <fa-icon icon="eye" />
               <span jhiTranslate="entity.action.view">View</span>
-            </button>
-            <button
-              jhiOverflowAction
-              type="button"
-              ngbDropdownItem
-              class="btn-fx-dropdown-item"
-              [routerLink]="['/user-management', userManagement.login, 'edit']"
-              data-cy="entityEditButton"
-            >
-              <fa-icon icon="pencil-alt" />
-              <span jhiTranslate="entity.action.edit">Edit</span>
             </button>
             <ng-container jhiOverflowAction>
               @if (userManagement.activated) {

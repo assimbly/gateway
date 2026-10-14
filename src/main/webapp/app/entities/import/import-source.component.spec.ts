@@ -6,6 +6,10 @@ import { fontAwesomeIcons } from 'app/config/font-awesome-icons';
 
 import { ImportSourceComponent } from './import-source.component';
 
+// jsdom can't measure text, which CodeMirror does
+Range.prototype.getBoundingClientRect = () => ({ x: 0, y: 0, width: 0, height: 0, top: 0, left: 0, right: 0, bottom: 0 }) as DOMRect;
+Range.prototype.getClientRects = () => ({ length: 0, item: () => null, [Symbol.iterator]: [][Symbol.iterator] }) as unknown as DOMRectList;
+
 async function waitFor(done: () => boolean): Promise<void> {
   for (let attempt = 0; attempt < 100 && !done(); attempt++) {
     await new Promise(resolve => setTimeout(resolve, 10));
@@ -51,7 +55,7 @@ describe('Import source', () => {
   });
 
   it('marks where a file can be dropped while one is dragged over', () => {
-    source.onDragOver({ preventDefault: jest.fn() } as unknown as DragEvent);
+    source.onDragOver({ preventDefault: jest.fn(), stopPropagation: jest.fn() } as unknown as DragEvent);
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.import-drop').classList).toContain('import-drop--active');
 
@@ -80,11 +84,41 @@ describe('Import source', () => {
     expect(source.fileName()).toBeUndefined();
   });
 
-  it('shows pasted text in the text area', async () => {
-    source.text.set('pasted');
-    fixture.detectChanges();
-    await fixture.whenStable();
+  it('shows the text in a code editor with line numbers', () => {
+    expect(fixture.nativeElement.querySelector('ngx-codemirror')).not.toBeNull();
+    expect(source.editorOptions()['lineNumbers']).toBe(true);
+    expect(source.editorOptions()['gutters']).toEqual(['CodeMirror-linenumbers']);
+    // the same object is reused, otherwise the editor is re-configured on every change detection
+    expect(source.editorOptions()).toBe(source.editorOptions());
+  });
 
-    expect(fixture.nativeElement.querySelector('textarea').value).toBe('pasted');
+  it('highlights JSON or XML as asked', () => {
+    fixture.componentRef.setInput('highlight', 'xml');
+    expect(source.mode()).toBe('application/xml');
+
+    fixture.componentRef.setInput('highlight', 'auto');
+    source.text.set('{"dil": {}}');
+    expect(source.mode()).toBe('application/json');
+    source.text.set('  <dil/>');
+    expect(source.mode()).toBe('application/xml');
+    source.text.set('println 1');
+    expect(source.mode()).toBe('text/plain');
+
+    fixture.componentRef.setInput('highlight', 'none');
+    source.text.set('<dil/>');
+    expect(source.mode()).toBe('text/plain');
+  });
+
+  it('takes a file that is dropped on the editor', async () => {
+    const file = new File(['{"dil":{}}'], 'flow.json');
+    const drop = new Event('drop', { bubbles: true, cancelable: true });
+    Object.defineProperty(drop, 'dataTransfer', { value: { files: [file] } });
+
+    fixture.nativeElement.querySelector('.import-codemirror').dispatchEvent(drop);
+    await waitFor(() => source.fileName() !== undefined);
+
+    expect(drop.defaultPrevented).toBe(true);
+    expect(source.text()).toBe('{"dil":{}}');
+    expect(source.fileName()).toBe('flow.json');
   });
 });

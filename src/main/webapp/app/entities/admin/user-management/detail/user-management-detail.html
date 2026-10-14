@@ -49,12 +49,12 @@
             <span>{{ userManagementRef.lastModifiedDate | formatMediumDatetime }}</span>
           </dd>
 
-          <dt><span jhiTranslate="userManagement.profiles">Profiles</span></dt>
+          <dt><span jhiTranslate="userManagement.profiles">Roles</span></dt>
           <dd>
             <ul class="list-unstyled">
               @for (authority of userManagementRef.authorities; track $index) {
                 <li>
-                  <span class="badge bg-info">{{ authority }}</span>
+                  <span class="badge text-bg-secondary">{{ authority | roleLabel }}</span>
                 </li>
               }
             </ul>

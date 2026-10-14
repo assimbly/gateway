@@ -7,9 +7,20 @@ import { AlertService } from 'app/core/util/alert.service';
 import { NgbDropdownModule, NgbModal, NgbModalRef, NgbModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { RouterModule } from '@angular/router';
+import { EmptyState } from 'app/shared/empty-state';
 import { SearchToolbar } from 'app/shared/filter';
 import { SortState } from 'app/shared/sort';
-import { DataTable, DataTableColumn, OverflowActionDirective, RowActions, StatusControls, StatusControlsTone, Truncate } from 'app/shared/table';
+import {
+    DataTable,
+    DataTableColumn,
+    OverflowActionDirective,
+    PrimaryActionDirective,
+    RowActions,
+    StatusControls,
+    StatusControlsTone,
+    Truncate,
+    sortRows,
+} from 'app/shared/table';
 
 import { IBroker } from 'app/shared/model/broker.model';
 import { AccountService } from 'app/core/auth/account.service';
@@ -33,9 +44,11 @@ enum Status {
         NgbModule,
         NgbDropdownModule,
         NgbPopoverModule,
+        EmptyState,
         SearchToolbar,
         DataTable,
         RowActions,
+        PrimaryActionDirective,
         OverflowActionDirective,
         StatusControls,
         Truncate,
@@ -44,6 +57,7 @@ enum Status {
 export class BrokerComponent implements OnInit, OnDestroy {
     brokers: IBroker[] = [];
     brokersLoading = true;
+    brokersLoadFailed = false;
     broker: IBroker;
     searchText = '';
     sortState: SortState = { predicate: 'name', order: 'asc' };
@@ -117,6 +131,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
 
     loadAll() {
         this.brokersLoading = true;
+        this.brokersLoadFailed = false;
         this.brokerService.query().subscribe(
             (res: HttpResponse<IBroker[]>) => {
                 this.brokers = res.body ?? [];
@@ -364,13 +379,18 @@ export class BrokerComponent implements OnInit, OnDestroy {
         return value == null || Number.isNaN(value) ? '—' : String(value);
     }
 
+    /** With no Broker at all, the list gives way to an explanation of Brokers and how to add the first. */
+    get showEmptyState(): boolean {
+        return !this.brokersLoading && !this.brokersLoadFailed && !this.brokers?.length;
+    }
+
     get filteredBrokers(): IBroker[] {
         const query = this.searchText?.toLocaleLowerCase() ?? '';
-        let result = [...(this.brokers ?? [])];
+        let result = this.brokers ?? [];
         if (query) {
             result = result.filter(item => (item.name ?? '').toLocaleLowerCase().includes(query));
         }
-        return result;
+        return sortRows(result, this.sortState, { name: broker => broker.name });
     }
 
     trackId(index: number, item: IBroker) {
@@ -383,6 +403,8 @@ export class BrokerComponent implements OnInit, OnDestroy {
 
     protected onError(errorMessage: string) {
         this.brokersLoading = false;
+        this.brokersLoadFailed = true;
+        this.changeDetector.detectChanges();
    		this.alertService.addAlert({
 		  type: 'danger',
 		  message: errorMessage,

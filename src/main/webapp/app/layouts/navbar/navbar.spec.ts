@@ -244,46 +244,48 @@ describe('Navbar Component', () => {
     expect(comp.accountExpanded()).toBe(false);
   });
 
-  it('should keep manually opened menus open when the navbar is recreated', () => {
-    comp.toggleBroker();
+  it('should keep the manually opened menu open when the navbar is recreated', () => {
     comp.toggleAdmin();
-    comp.toggleAccount();
 
     fixture.destroy();
     fixture = TestBed.createComponent(Navbar);
     comp = fixture.componentInstance;
 
-    expect(comp.flowsExpanded()).toBe(true);
-    expect(comp.brokerExpanded()).toBe(true);
+    expect(comp.flowsExpanded()).toBe(false);
     expect(comp.adminExpanded()).toBe(true);
-    expect(comp.accountExpanded()).toBe(true);
   });
 
-  it('should toggle submenu expansion independently', () => {
+  it('should collapse the other submenus when one opens', () => {
     expect(comp.flowsExpanded()).toBe(true);
-    expect(comp.brokerExpanded()).toBe(false);
-    expect(comp.adminExpanded()).toBe(false);
-    expect(comp.accountExpanded()).toBe(false);
 
-    comp.toggleFlows();
     comp.toggleBroker();
-    comp.toggleAdmin();
-    comp.toggleAccount();
-
     expect(comp.flowsExpanded()).toBe(false);
     expect(comp.brokerExpanded()).toBe(true);
+
+    comp.toggleAdmin();
+    expect(comp.brokerExpanded()).toBe(false);
     expect(comp.adminExpanded()).toBe(true);
+
+    comp.toggleAccount();
+    expect(comp.adminExpanded()).toBe(false);
     expect(comp.accountExpanded()).toBe(true);
 
-    comp.toggleFlows();
-    comp.toggleBroker();
-    comp.toggleAdmin();
     comp.toggleAccount();
-
-    expect(comp.flowsExpanded()).toBe(true);
-    expect(comp.brokerExpanded()).toBe(false);
-    expect(comp.adminExpanded()).toBe(false);
     expect(comp.accountExpanded()).toBe(false);
+  });
+
+  it('should group the Administration links under System and Diagnostics', () => {
+    accountService.authenticate({ ...account, authorities: ['ROLE_ADMIN'] });
+    fixture.detectChanges();
+
+    const items = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#admin-menu-items > *')).map(item =>
+      item.textContent?.trim(),
+    );
+    // Translated labels render as their keys in this test setup.
+    expect(items.slice(0, 3)).toEqual(['System', 'Gateways', 'Certificates']);
+    expect(items[3]).toContain('userManagement');
+    expect(items[4]).toBe('Diagnostics');
+    expect(items.indexOf('Log viewer')).toBeGreaterThan(4);
   });
 
   it('should hide submenu items until the group is expanded', () => {
@@ -300,16 +302,13 @@ describe('Navbar Component', () => {
     expect(adminMenu.classList.contains('app-sidebar__subnav--collapsed')).toBe(true);
     expect(accountMenu.classList.contains('app-sidebar__subnav--collapsed')).toBe(true);
 
-    fixture.nativeElement.querySelector('#flows-menu').click();
-    fixture.nativeElement.querySelector('#broker-menu').click();
     fixture.nativeElement.querySelector('#admin-menu').click();
-    fixture.nativeElement.querySelector('#account-menu').click();
     fixture.detectChanges();
 
     expect(flowsMenu.classList.contains('app-sidebar__subnav--collapsed')).toBe(true);
-    expect(brokerMenu.classList.contains('app-sidebar__subnav--collapsed')).toBe(false);
+    expect(brokerMenu.classList.contains('app-sidebar__subnav--collapsed')).toBe(true);
     expect(adminMenu.classList.contains('app-sidebar__subnav--collapsed')).toBe(false);
-    expect(accountMenu.classList.contains('app-sidebar__subnav--collapsed')).toBe(false);
+    expect(accountMenu.classList.contains('app-sidebar__subnav--collapsed')).toBe(true);
   });
 
   it('should not have an Import entry in the sidebar', () => {

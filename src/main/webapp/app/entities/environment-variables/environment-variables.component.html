@@ -1,7 +1,32 @@
 <div>
-  <jhi-search-toolbar [(query)]="searchText" placeholder="Filter by key" persistKey="searchVariablesText" inputId="searchVariablesId">
+  @if (showEmptyState) {
+    <jhi-empty-state
+      [heading]="isAdmin ? 'Add your first Variable' : 'No Variables yet'"
+      description="A Variable is a named value, such as a host name or a folder, that Flows can refer to by its key. It keeps the settings that differ per environment out of your Flows."
+      [docs]="true"
+    >
+      <a
+        primary
+        *jhiHasAnyAuthority="'ROLE_ADMIN'"
+        id="jh-create-entity"
+        class="btn btn-fx btn-fx-primary jh-create-entity create-environment-variables"
+        [routerLink]="['/environment-variables/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span> Add</span>
+      </a>
+    </jhi-empty-state>
+  } @else {
+  <jhi-search-toolbar
+    [(query)]="searchText"
+    placeholder="Filter by key or value"
+    persistKey="searchVariablesText"
+    inputId="searchVariablesId"
+    hint="A Variable is a named value, such as a host name or a folder, that Flows can refer to by its key."
+  >
     <ng-container actions>
-      <button
+      <a
+        *jhiHasAnyAuthority="'ROLE_ADMIN'"
         id="jh-create-entity"
         class="btn btn-fx btn-fx-primary jh-create-entity create-environment-variables"
         [routerLink]="['/environment-variables/new']"
@@ -9,7 +34,7 @@
       >
         <fa-icon icon="plus"></fa-icon>
         <span class="d-none d-md-inline"> Add</span>
-      </button>
+      </a>
       <button class="btn btn-fx btn-fx-secondary" type="button" (click)="reset()" aria-label="Refresh">
         <fa-icon icon="sync"></fa-icon>
         <span class="d-none d-md-inline"> Refresh</span>
@@ -22,12 +47,13 @@
     [(sortState)]="sortState"
     (sortChange)="onSortChange()"
     [hasRows]="!!filteredVariables.length"
-    [emptyMessage]="'No variables found'"
+    [loading]="loading"
+    [emptyMessage]="'No variables match this filter.'"
     ariaLabel="Variables"
   >
     <tr *ngFor="let environmentVariables of filteredVariables; trackBy: trackId">
       <td class="table-fx-identity">
-        @if (accountService.hasAnyAuthority('ROLE_ADMIN')) {
+        @if (isAdmin) {
           <a [routerLink]="['/environment-variables', environmentVariables.id, 'edit']">
             <jhi-truncate [text]="environmentVariables.key" />
           </a>
@@ -36,20 +62,23 @@
         }
       </td>
       <td class="table-fx-identity">
-        <jhi-truncate [text]="environmentVariables.value" />
+        @if (environmentVariables.value) {
+          <jhi-truncate [text]="environmentVariables.value" />
+        } @else {
+          <span class="text-muted">—</span>
+        }
       </td>
       <td class="text-end">
         <jhi-row-actions *jhiHasAnyAuthority="'ROLE_ADMIN'">
-          <button
-            jhiOverflowAction
-            type="button"
-            ngbDropdownItem
-            class="btn-fx-dropdown-item"
+          <a
+            jhiPrimaryAction
+            class="btn btn-fx btn-fx-sm btn-fx-ghost"
             [routerLink]="['/environment-variables', environmentVariables.id, 'edit']"
+            aria-label="Edit"
           >
             <fa-icon icon="pencil-alt"></fa-icon>
-            <span>Edit</span>
-          </button>
+            <span class="d-none d-md-inline">Edit</span>
+          </a>
           <button
             jhiOverflowAction
             type="button"
@@ -76,4 +105,5 @@
       </td>
     </tr>
   </jhi-data-table>
+  }
 </div>

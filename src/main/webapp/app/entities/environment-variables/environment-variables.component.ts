@@ -9,8 +9,9 @@ import { AlertService } from 'app/core/util/alert.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { SortState, sortParams } from 'app/shared/sort';
 import { HasAnyAuthorityDirective } from 'app/shared/auth';
+import { EmptyState } from 'app/shared/empty-state';
 import { SearchToolbar } from 'app/shared/filter';
-import { DataTable, DataTableColumn, OverflowActionDirective, RowActions, Truncate } from 'app/shared/table';
+import { DataTable, DataTableColumn, OverflowActionDirective, PrimaryActionDirective, RowActions, Truncate } from 'app/shared/table';
 
 import { IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
 import { EnvironmentVariablesDeleteDialogComponent } from './environment-variables-delete-dialog.component';
@@ -26,9 +27,11 @@ import { EnvironmentVariablesService } from './environment-variables.service';
         FontAwesomeModule,
         NgbDropdownModule,
         HasAnyAuthorityDirective,
+        EmptyState,
         SearchToolbar,
         DataTable,
         RowActions,
+        PrimaryActionDirective,
         OverflowActionDirective,
         Truncate,
     ],
@@ -38,6 +41,8 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
     currentAccount: any;
     eventSubscriber: Subscription;
     searchText = '';
+    loading = true;
+    loadFailed = false;
 
     sortState: SortState = { predicate: 'key', order: 'asc' };
     page: any;
@@ -45,7 +50,7 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
     private loadRequest = 0;
     readonly columns: DataTableColumn[] = [
         { key: 'key', header: 'Key', sortable: true },
-        { key: 'value', header: 'Value' },
+        { key: 'value', header: 'Value', sortable: true },
         { key: 'actions', header: 'Actions', align: 'end' },
     ];
 
@@ -62,6 +67,8 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
 
     loadAll() {
         const requestId = ++this.loadRequest;
+        this.loading = true;
+        this.loadFailed = false;
         this.environmentVariablesService
             .query({
                 page: this.page,
@@ -82,6 +89,7 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
                     if (body.length < 20) {
                         this.last = this.page;
                     }
+                    this.loading = false;
                     this.cdr.detectChanges();
                 },
                 (res: HttpErrorResponse) => this.onError(res.message)
@@ -105,6 +113,15 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
         this.eventManager.destroy(this.eventSubscriber);
     }
 
+    get isAdmin(): boolean {
+        return this.accountService.hasAnyAuthority('ROLE_ADMIN');
+    }
+
+    /** With no Variable at all, the list gives way to an explanation of Variables and how to add the first. */
+    get showEmptyState(): boolean {
+        return !this.loading && !this.loadFailed && !this.environmentVariables.length;
+    }
+
     get filteredVariables(): IEnvironmentVariables[] {
         const query = this.searchText?.toLocaleLowerCase() ?? '';
         let result = this.environmentVariables ?? [];
@@ -125,6 +142,9 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
     }
 
     protected onError(errorMessage: string) {
+        this.loading = false;
+        this.loadFailed = true;
+        this.cdr.detectChanges();
 		this.alertService.addAlert({
 		  type: 'danger',
 		  message: errorMessage,

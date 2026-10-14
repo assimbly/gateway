@@ -1,8 +1,11 @@
-import { DestroyRef, Service, computed, inject, signal } from '@angular/core';
+import { DestroyRef, Service, WritableSignal, computed, inject, signal } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { NavigationEnd, Router } from '@angular/router';
 
 import { filter } from 'rxjs';
+
+export type MenuGroup = 'flows' | 'broker' | 'admin' | 'account';
+const MENU_GROUPS: readonly MenuGroup[] = ['flows', 'broker', 'admin', 'account'];
 
 @Service()
 export class LayoutService {
@@ -26,6 +29,7 @@ export class LayoutService {
   readonly adminExpanded = signal(false);
   readonly accountExpanded = signal(false);
   private menuExpansionInitialized = false;
+  private activeGroup: MenuGroup | undefined;
 
   constructor() {
     const destroyRef = inject(DestroyRef);
@@ -88,20 +92,43 @@ export class LayoutService {
       this.brokerExpanded.set(active.broker);
       this.adminExpanded.set(active.admin);
       this.accountExpanded.set(active.account);
+      this.activeGroup = MENU_GROUPS.find(name => active[name]);
       this.menuExpansionInitialized = true;
       return;
     }
-    if (active.flows) {
-      this.flowsExpanded.set(true);
+    // Only react when the route moves to another group, so a manually chosen group survives navigation within a group.
+    const group = MENU_GROUPS.find(name => active[name]);
+    if (group && group !== this.activeGroup) {
+      this.openMenu(group);
     }
-    if (active.broker) {
-      this.brokerExpanded.set(true);
+    this.activeGroup = group;
+  }
+
+  /** Accordion: opening a group collapses the others; toggling the open group closes it. */
+  toggleMenu(group: MenuGroup): void {
+    if (this.menuSignal(group)()) {
+      this.menuSignal(group).set(false);
+      return;
     }
-    if (active.admin) {
-      this.adminExpanded.set(true);
+    this.openMenu(group);
+  }
+
+  openMenu(group: MenuGroup): void {
+    for (const name of MENU_GROUPS) {
+      this.menuSignal(name).set(name === group);
     }
-    if (active.account) {
-      this.accountExpanded.set(true);
+  }
+
+  private menuSignal(group: MenuGroup): WritableSignal<boolean> {
+    switch (group) {
+      case 'flows':
+        return this.flowsExpanded;
+      case 'broker':
+        return this.brokerExpanded;
+      case 'admin':
+        return this.adminExpanded;
+      default:
+        return this.accountExpanded;
     }
   }
 

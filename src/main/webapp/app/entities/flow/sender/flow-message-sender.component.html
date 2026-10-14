@@ -1,6 +1,5 @@
 <div class="send-page">
   <jhi-send-toolbar
-    title="Send message"
     [subtitle]="subtitle"
     [showBack]="openedFromFlow"
     [sending]="state.sending()"
@@ -136,12 +135,17 @@
               formControlName="exchangepattern"
               inputId="field_exchangepattern"
             ></ng-select>
-            <div class="form-text">Request and reply waits for the response. Fire and forget only sends.</div>
+            <div class="form-text">
+              Request and reply waits for the response and shows it below. Fire and forget sends the message and does not wait.
+            </div>
           </div>
         </div>
 
         <div class="send-options" formArrayName="options">
             <label class="form-control-label d-block">Options</label>
+            <div class="form-text mb-2">
+              Optional settings added to the endpoint as name=value. Use the Camel documentation button next to Component for the valid options.
+            </div>
             <div class="send-headers__rows">
               @for (option of options.controls; track option; let idx = $index) {
                 <div class="send-option-row" [formGroupName]="idx">

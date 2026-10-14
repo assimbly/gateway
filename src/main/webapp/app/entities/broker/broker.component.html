@@ -15,25 +15,27 @@
     </div>
   </ng-template>
 
-  <jhi-search-toolbar [(query)]="searchText" placeholder="Filter by broker name" persistKey="searchBrokerText" inputId="searchBrokerId">
-    <ng-container actions>
-      <button
-        *ngIf="brokers?.length === 0"
-        id="jh-create-entity"
-        class="btn btn-fx btn-fx-primary jh-create-entity create-broker"
-        [routerLink]="['/broker/new']"
-        aria-label="Add"
-      >
+  @if (showEmptyState) {
+    <jhi-empty-state
+      heading="Add your first Broker"
+      description="A Broker is the message server behind your Queues and Topics. Flows and the Send page exchange messages through it."
+      [docs]="true"
+    >
+      <a primary id="jh-create-entity" class="btn btn-fx btn-fx-primary jh-create-entity create-broker" [routerLink]="['/broker/new']">
         <fa-icon icon="plus"></fa-icon>
-        <span class="d-none d-md-inline"> Add</span>
-      </button>
-      <button
-        *ngIf="brokers?.length > 0"
-        class="btn btn-fx btn-fx-secondary"
-        type="button"
-        (click)="loadAll()"
-        aria-label="Refresh"
-      >
+        <span> Add</span>
+      </a>
+    </jhi-empty-state>
+  } @else {
+  <jhi-search-toolbar
+    [(query)]="searchText"
+    placeholder="Filter by broker name"
+    persistKey="searchBrokerText"
+    inputId="searchBrokerId"
+    hint="A Broker is the message server behind your Queues and Topics. Flows and the Send page exchange messages through it."
+  >
+    <ng-container actions>
+      <button class="btn btn-fx btn-fx-secondary" type="button" (click)="loadAll()" aria-label="Refresh">
         <fa-icon icon="sync"></fa-icon>
         <span class="d-none d-md-inline"> Refresh</span>
       </button>
@@ -45,8 +47,8 @@
     [(sortState)]="sortState"
     [hasRows]="!!filteredBrokers.length"
     [loading]="brokersLoading"
-    [emptyMessage]="'No broker is configured'"
-    ariaLabel="Broker"
+    [emptyMessage]="'No broker matches this filter.'"
+    ariaLabel="Brokers"
   >
     <tr *ngFor="let rowBroker of filteredBrokers; trackBy: trackId">
       <td class="table-fx-identity">
@@ -86,20 +88,21 @@
           >
             <fa-icon icon="chart-bar"></fa-icon>
           </button>
+        } @else {
+          <span class="text-muted">—</span>
         }
       </td>
       <td class="text-end">
         <jhi-row-actions>
-          <button
-            jhiOverflowAction
-            type="button"
-            ngbDropdownItem
-            class="btn-fx-dropdown-item"
+          <a
+            jhiPrimaryAction
+            class="btn btn-fx btn-fx-sm btn-fx-ghost"
             [routerLink]="['/broker', rowBroker.id, 'edit']"
+            aria-label="Edit"
           >
             <fa-icon icon="pencil-alt"></fa-icon>
-            <span>Edit</span>
-          </button>
+            <span class="d-none d-md-inline">Edit</span>
+          </a>
           <button
             jhiOverflowAction
             type="button"
@@ -124,4 +127,5 @@
       </td>
     </tr>
   </jhi-data-table>
+  }
 </div>

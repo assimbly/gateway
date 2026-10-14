@@ -1,22 +1,59 @@
 <div>
-  <jhi-search-toolbar [(query)]="searchText" placeholder="Filter by name or URL" persistKey="searchCertificateText" inputId="searchCertificateId">
+  <ng-template #addMenu let-compact="compact">
+    <div ngbDropdown class="d-inline-block" placement="bottom-end">
+      <button
+        type="button"
+        class="btn btn-fx btn-fx-primary"
+        id="dropdownMenuCertificates"
+        ngbDropdownToggle
+        aria-label="Add certificate"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span [class.d-none]="compact" [class.d-md-inline]="compact"> Add</span>
+      </button>
+      <div ngbDropdownMenu aria-labelledby="dropdownMenuCertificates">
+        <button type="button" ngbDropdownItem id="jh-create-entity" [routerLink]="['/certificate/new']">Download certificate</button>
+        <button type="button" ngbDropdownItem (click)="generateCertificate()">Self-signed identity</button>
+      </div>
+    </div>
+  </ng-template>
+
+  @if (showEmptyState) {
+    <jhi-empty-state
+      heading="Add your first Certificate"
+      description="A Certificate lets the Gateway trust the systems it connects to over HTTPS, and identify itself to them. Add the certificate of a system, or create one of your own."
+      [docs]="true"
+    >
+      <ng-container ngProjectAs="[primary]" [ngTemplateOutlet]="addMenu" [ngTemplateOutletContext]="{ compact: false }" />
+      <span secondary>
+        Or import a
+        <button type="button" class="btn btn-link empty-state__link" (click)="uploadCertificate()">trusted certificate</button>
+        or a
+        <button type="button" class="btn btn-link empty-state__link" (click)="uploadP12Certificate()">server identity</button>.
+      </span>
+    </jhi-empty-state>
+  } @else {
+  <jhi-search-toolbar
+    [(query)]="searchText"
+    placeholder="Filter by name or URL"
+    persistKey="searchCertificateText"
+    inputId="searchCertificateId"
+    hint="A Certificate lets the Gateway trust the systems it connects to over HTTPS, and identify itself to them."
+  >
     <ng-container actions>
+      <ng-container [ngTemplateOutlet]="addMenu" [ngTemplateOutletContext]="{ compact: true }" />
       <div ngbDropdown class="d-inline-block" placement="bottom-end">
         <button
           type="button"
-          class="btn btn-fx btn-fx-primary"
-          id="dropdownMenuCertificates"
+          class="btn btn-fx btn-fx-secondary"
+          id="dropdownImportCertificates"
           ngbDropdownToggle
-          aria-label="Add certificate">
-          <fa-icon icon="plus"></fa-icon>
-          <span class="d-none d-md-inline"> Add</span>
+          aria-label="Import certificate"
+        >
+          <fa-icon icon="file-import"></fa-icon>
+          <span class="d-none d-md-inline"> Import</span>
         </button>
-        <div ngbDropdownMenu aria-labelledby="dropdownMenuCertificates">
-          <h6 class="dropdown-header">Actions</h6>
-          <button type="button" ngbDropdownItem id="jh-create-entity" [routerLink]="['/certificate/new']">Download certificate</button>
-          <button type="button" ngbDropdownItem (click)="generateCertificate()">Self-signed identity</button>
-          <div class="dropdown-divider"></div>
-          <h6 class="dropdown-header">Import</h6>
+        <div ngbDropdownMenu aria-labelledby="dropdownImportCertificates">
           <button type="button" ngbDropdownItem (click)="uploadCertificate()">Trusted certificate (.pem, .crt, .cer)</button>
           <button type="button" ngbDropdownItem (click)="uploadP12Certificate()">Server identity (.p12, .pfx)</button>
         </div>
@@ -33,7 +70,8 @@
     [(sortState)]="sortState"
     (sortChange)="onSortChange()"
     [hasRows]="!!filteredCertificates.length"
-    [emptyMessage]="'No certificates found'"
+    [loading]="loading"
+    [emptyMessage]="'No certificates match this filter.'"
     ariaLabel="Certificates"
   >
     <tr *ngFor="let certificate of filteredCertificates; trackBy: trackId">
@@ -43,11 +81,30 @@
         </a>
       </td>
       <td class="table-fx-identity">
-        <jhi-truncate [text]="certificate.url" />
+        @if (certificate.url) {
+          <jhi-truncate [text]="certificate.url" />
+        } @else {
+          <span class="text-muted">—</span>
+        }
       </td>
-      <td>{{ certificate.certificateExpiry }}</td>
+      <td>
+        @if (certificate.certificateExpiry) {
+          {{ certificate.certificateExpiry }}
+        } @else {
+          <span class="text-muted">—</span>
+        }
+      </td>
       <td class="text-end">
         <jhi-row-actions>
+          <a
+            jhiPrimaryAction
+            class="btn btn-fx btn-fx-sm btn-fx-ghost"
+            [routerLink]="['/certificate', certificate.id, 'edit']"
+            aria-label="Edit"
+          >
+            <fa-icon icon="pencil-alt"></fa-icon>
+            <span class="d-none d-md-inline">Edit</span>
+          </a>
           <button
             jhiOverflowAction
             type="button"
@@ -57,16 +114,6 @@
           >
             <fa-icon icon="eye"></fa-icon>
             <span>View</span>
-          </button>
-          <button
-            jhiOverflowAction
-            type="button"
-            ngbDropdownItem
-            class="btn-fx-dropdown-item"
-            [routerLink]="['/certificate', certificate.id, 'edit']"
-          >
-            <fa-icon icon="pencil-alt"></fa-icon>
-            <span>Edit</span>
           </button>
           <button
             jhiOverflowAction
@@ -92,4 +139,5 @@
       </td>
     </tr>
   </jhi-data-table>
+  }
 </div>

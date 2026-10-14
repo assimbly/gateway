@@ -1,21 +1,4 @@
 <div>
-  <jhi-search-toolbar [(query)]="searchText" placeholder="Filter by name or base path" inputId="searchApisId">
-    <ng-container actions>
-      <a class="btn btn-fx btn-fx-primary" routerLink="/rest-apis/new" aria-label="Add">
-        <fa-icon icon="plus"></fa-icon>
-        <span class="d-none d-md-inline"> Add</span>
-      </a>
-      <a class="btn btn-fx btn-fx-secondary" routerLink="/rest-apis/import" aria-label="Import OpenAPI">
-        <fa-icon icon="file-import"></fa-icon>
-        <span class="d-none d-md-inline"> Import OpenAPI</span>
-      </a>
-      <button class="btn btn-fx btn-fx-secondary" type="button" (click)="load()" aria-label="Refresh">
-        <fa-icon icon="sync"></fa-icon>
-        <span class="d-none d-md-inline"> Refresh</span>
-      </button>
-    </ng-container>
-  </jhi-search-toolbar>
-
   @if (message(); as text) {
     <div class="alert alert-danger alert-dismissible py-2">
       <span class="api-message">{{ text }}</span>
@@ -23,27 +6,58 @@
     </div>
   }
 
-  @if (!loading() && !apis().length) {
-    <section class="api-empty" aria-labelledby="apis-empty-title">
-      <h2 class="api-empty__title" id="apis-empty-title">Design your first API</h2>
-      <p class="api-empty__lead">
-        An API groups Operations such as <code>GET /customers/{{ '{' }}id{{ '}' }}</code> under one base path. Each Operation is answered by its own
-        Handler Flow.
-      </p>
-      <p>
-        <a class="btn btn-fx btn-fx-primary" routerLink="/rest-apis/new">Add</a>
-        or <a routerLink="/rest-apis/import">import an OpenAPI document</a>.
-      </p>
-    </section>
+  @if (showEmptyState) {
+    <jhi-empty-state
+      heading="Design your first API"
+      description="An API groups Operations such as GET /customers/{id} under one base path. Each Operation is answered by its own Handler Flow."
+      [docs]="true"
+    >
+      <a primary class="btn btn-fx btn-fx-primary" routerLink="/rest-apis/new">
+        <fa-icon icon="plus"></fa-icon>
+        <span> Add</span>
+      </a>
+      <span secondary>Or <a routerLink="/rest-apis/import">import an OpenAPI document</a>.</span>
+    </jhi-empty-state>
   } @else {
-    <jhi-data-table [columns]="columns" [hasRows]="!!filteredApis.length" [loading]="loading()" emptyMessage="No APIs match this filter." ariaLabel="APIs">
+    <jhi-search-toolbar
+      [(query)]="searchText"
+      placeholder="Filter by name or base path"
+      inputId="searchApisId"
+      hint="An API groups Operations, such as GET /customers/{id}, under one base path. Each Operation is answered by its own Handler Flow."
+    >
+      <ng-container actions>
+        <a class="btn btn-fx btn-fx-primary" routerLink="/rest-apis/new" aria-label="Add">
+          <fa-icon icon="plus"></fa-icon>
+          <span class="d-none d-md-inline"> Add</span>
+        </a>
+        <a class="btn btn-fx btn-fx-secondary" routerLink="/rest-apis/import" aria-label="Import OpenAPI">
+          <fa-icon icon="file-import"></fa-icon>
+          <span class="d-none d-md-inline"> Import</span>
+        </a>
+        <button class="btn btn-fx btn-fx-secondary" type="button" (click)="load()" aria-label="Refresh">
+          <fa-icon icon="sync"></fa-icon>
+          <span class="d-none d-md-inline"> Refresh</span>
+        </button>
+      </ng-container>
+    </jhi-search-toolbar>
+
+    <jhi-data-table
+      [columns]="columns()"
+      [(sortState)]="sortState"
+      [hasRows]="!!filteredApis.length"
+      [loading]="loading()"
+      emptyMessage="No APIs match this filter."
+      ariaLabel="APIs"
+    >
       @for (api of filteredApis; track api.id) {
         <tr>
           <td class="table-fx-identity">
             <a [routerLink]="['/rest-apis', api.id]"><jhi-truncate [text]="api.name" /></a>
           </td>
           <td><code>{{ api.basePath }}</code></td>
-          <td class="text-muted">{{ api.versionLabel }}</td>
+          @if (showVersion()) {
+            <td class="text-muted">{{ api.versionLabel || '—' }}</td>
+          }
           <td>
             @if (statuses().get(api.id!); as status) {
               <span class="api-status" [class]="'api-status api-status--' + status.tone">{{ status.label }}</span>
@@ -51,13 +65,13 @@
               <span class="text-muted">…</span>
             }
           </td>
-          <td class="text-end table-fx-numeric">{{ api.operationCount }}</td>
+          <td class="text-end table-fx-numeric">{{ api.operationCount ?? 0 }}</td>
           <td class="text-end">
             <jhi-row-actions>
-              <button jhiOverflowAction type="button" ngbDropdownItem class="btn-fx-dropdown-item" [routerLink]="['/rest-apis', api.id]">
+              <a jhiPrimaryAction class="btn btn-fx btn-fx-sm btn-fx-ghost" [routerLink]="['/rest-apis', api.id]" aria-label="Edit">
                 <fa-icon icon="pencil-alt"></fa-icon>
-                <span>Edit</span>
-              </button>
+                <span class="d-none d-md-inline">Edit</span>
+              </a>
               <button jhiOverflowAction type="button" ngbDropdownItem class="btn-fx-dropdown-item" (click)="exportApi(api, 'yaml')">
                 <fa-icon icon="file-export"></fa-icon>
                 <span>Export OpenAPI (YAML)</span>

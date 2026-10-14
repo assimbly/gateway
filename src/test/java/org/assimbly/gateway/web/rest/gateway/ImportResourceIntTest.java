@@ -1,5 +1,6 @@
 package org.assimbly.gateway.web.rest.gateway;
 
+import org.assimbly.docconverter.DocConverter;
 import org.assimbly.gateway.GatewayApp;
 import org.assimbly.gateway.domain.Integration;
 import org.assimbly.gateway.domain.enumeration.EnvironmentType;
@@ -62,6 +63,20 @@ class ImportResourceIntTest {
             .andExpect(jsonPath("$.name").value("EmptyFlow"))
             .andExpect(jsonPath("$.type").value("esb"))
             .andExpect(jsonPath("$.replaced").value(false))
+            .andExpect(jsonPath("$.flowId").isNumber());
+
+        assertThat(flowRepository.findByName("EmptyFlow")).isPresent();
+    }
+
+    @Test
+    void aDilFlowAsJsonIsImported() throws Exception {
+        String json = DocConverter.xmlToJson(fixture("empty-flow.xml"));
+
+        mockMvc.perform(post("/api/import/flow").param("integrationId", integrationId.toString())
+                .contentType(MediaType.APPLICATION_JSON).content(json))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.name").value("EmptyFlow"))
+            .andExpect(jsonPath("$.type").value("esb"))
             .andExpect(jsonPath("$.flowId").isNumber());
 
         assertThat(flowRepository.findByName("EmptyFlow")).isPresent();

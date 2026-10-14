@@ -1,6 +1,6 @@
 <div class="table-fx-shell">
   @if (errorMessage()) {
-    <div class="alert alert-warning" id="no-result" role="status">{{ errorMessage() }}</div>
+    <div class="alert alert-danger" id="no-result" role="alert">{{ errorMessage() }}</div>
   } @else if (loading() && !hasRows()) {
     <div class="table-responsive table-fx-scroll">
       <table class="table table-striped table-hover table-fx" [attr.aria-label]="ariaLabel()" aria-busy="true">
@@ -27,7 +27,7 @@
       </table>
     </div>
   } @else if (!hasRows()) {
-    <div class="alert alert-warning" id="no-result" role="status">{{ emptyMessage() }}</div>
+    <p class="table-fx-empty" id="no-result" role="status">{{ emptyMessage() }}</p>
   } @else {
     <div class="table-responsive table-fx-scroll">
       <table class="table table-striped table-hover table-fx" [attr.aria-label]="ariaLabel()">

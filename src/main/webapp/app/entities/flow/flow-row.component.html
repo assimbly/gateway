@@ -57,10 +57,22 @@
       [sections]="flowStatsSections"
       (load)="getFlowStatistic(flow)"
     />
+  } @else {
+    <span class="text-muted">—</span>
   }
 </td>
 <td class="text-end">
   <jhi-row-actions>
+    <button
+      jhiPrimaryAction
+      type="button"
+      class="btn btn-fx btn-fx-sm btn-fx-ghost"
+      aria-label="Edit"
+      (click)="navigateToFlowEditor('edit')"
+    >
+      <fa-icon icon="pencil-alt"></fa-icon>
+      <span class="d-none d-md-inline">Edit</span>
+    </button>
     <button
       jhiOverflowAction
       type="button"
@@ -72,10 +84,6 @@
     >
       <fa-icon icon="paper-plane"></fa-icon>
       <span>Send test message</span>
-    </button>
-    <button jhiOverflowAction type="button" ngbDropdownItem class="btn-fx-dropdown-item" (click)="navigateToFlowEditor('edit')">
-      <fa-icon icon="pencil-alt"></fa-icon>
-      <span>Edit</span>
     </button>
     <button jhiOverflowAction type="button" ngbDropdownItem class="btn-fx-dropdown-item" (click)="navigateToFlowEditor('clone')">
       <fa-icon icon="clone"></fa-icon>

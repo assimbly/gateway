@@ -18,7 +18,7 @@ import { QueueService } from './queue.service';
 import { QueueDeleteDialogComponent } from './queue-delete-dialog.component';
 import { IBroker } from 'app/shared/model/broker.model';
 import { SearchToolbar } from 'app/shared/filter';
-import { EndpointTypeSwitch } from 'app/shared/endpoint-switch';
+import { EndpointTypeSwitch, EndpointsEmptyState } from 'app/shared/endpoint-switch';
 import { DataTable, DataTableColumn } from 'app/shared/table';
 import { AddressRowComponent } from 'app/entities/broker/address-row.component';
 import { filterAddresses } from 'app/shared/util/address-filter';
@@ -26,7 +26,7 @@ import { filterAddresses } from 'app/shared/util/address-filter';
 @Component({
   selector: 'jhi-queue',
   templateUrl: './queue.component.html',
-  imports: [CommonModule, RouterModule, FontAwesomeModule, SearchToolbar, EndpointTypeSwitch, DataTable, AddressRowComponent],
+  imports: [CommonModule, RouterModule, FontAwesomeModule, SearchToolbar, EndpointTypeSwitch, EndpointsEmptyState, DataTable, AddressRowComponent],
 })
 export class QueueComponent implements OnInit, OnDestroy {
   queues: IQueue[] = [];
@@ -37,9 +37,11 @@ export class QueueComponent implements OnInit, OnDestroy {
   itemsPerPage: number;
   links: any;
   page: number;
-  sortState: SortState = { predicate: 'name', order: 'desc' };
+  sortState: SortState = { predicate: 'name', order: 'asc' };
   timeInterval: Subscription;
   isBroker: boolean | undefined;
+  /** Whether the Queues of the Broker have been asked for, so an empty list is known to be empty. */
+  addressesLoaded = false;
 
   searchQueueText = '';
   brokerType = '';
@@ -94,6 +96,14 @@ export class QueueComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.eventSubscriber.unsubscribe();
     this.timeInterval.unsubscribe();
+  }
+
+  /** Without a running Broker, or without any Queue, the list gives way to an explanation of Endpoints and what to do first. */
+  get showEmptyState(): boolean {
+    if (this.isBroker === undefined) {
+      return false;
+    }
+    return !this.isBroker || (this.addressesLoaded && !this.addresses.length);
   }
 
   get filteredAddresses(): IAddress[] {
@@ -158,10 +168,12 @@ export class QueueComponent implements OnInit, OnDestroy {
 
   getAllQueues() {
     this.addresses = [];
+    this.addressesLoaded = false;
 
     if (this.isBroker) {
       this.queueService.getAllQueues(this.brokerType).subscribe(
         data => {
+          this.addressesLoaded = true;
           if (data && data.body.queues) {
             this.isBroker = true;
             if (data.body.queues.queue) {
@@ -178,6 +190,7 @@ export class QueueComponent implements OnInit, OnDestroy {
         },
         error => {
           console.log(error);
+          this.addressesLoaded = true;
           this.isBroker = false;
           this.changeDetector.detectChanges();
         }

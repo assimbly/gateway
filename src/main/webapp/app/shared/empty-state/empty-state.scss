@@ -1,0 +1,42 @@
+:host {
+  display: block;
+}
+
+.empty-state {
+  max-width: 56rem;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.empty-state__title {
+  margin-bottom: 0.25rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.empty-state__lead {
+  max-width: 40rem;
+  margin-bottom: 1rem;
+  color: var(--app-text-muted);
+}
+
+.empty-state__primary:not(:empty) {
+  margin-bottom: 1rem;
+}
+
+.empty-state__more {
+  margin: 0;
+  color: var(--app-text-muted);
+
+  &:empty {
+    display: none;
+  }
+}
+
+.empty-state__docs {
+  color: var(--app-primary-accessible);
+
+  &:not(:first-child) {
+    margin-left: 0.25rem;
+  }
+}

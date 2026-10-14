@@ -1,9 +1,13 @@
 <div>
+  @if (showEmptyState) {
+    <jhi-endpoints-empty-state kind="queue" [brokerConfigured]="brokers.length > 0" [brokerRunning]="!!isBroker" />
+  } @else {
   <jhi-search-toolbar
     [(query)]="searchQueueText"
     placeholder="Filter by queue name"
     persistKey="searchQueueText"
     inputId="searchTextId"
+    hint="An Endpoint is a Queue or a Topic on your Broker: a named place where messages wait until a Flow or an application picks them up."
   >
     <jhi-endpoint-type-switch extras active="queue" />
     <ng-container actions>
@@ -27,8 +31,7 @@
     [(sortState)]="sortState"
     [loading]="isBroker === undefined"
     [hasRows]="!!filteredAddresses.length"
-    [errorMessage]="isBroker === false ? 'No running broker found' : ''"
-    [emptyMessage]="'No queues found'"
+    [emptyMessage]="'No queues match this filter.'"
     ariaLabel="Queues"
   >
     <tr
@@ -39,4 +42,5 @@
       endpointType="queue"
     ></tr>
   </jhi-data-table>
+  }
 </div>

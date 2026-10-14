@@ -27,6 +27,13 @@ export function runtimeStatusOf(reported: string | null | undefined): RuntimeSta
   }
 }
 
+/** What a row reports about its Flow's runtime state, for the list to sort on. A null count means the Flow never ran. */
+export interface FlowRuntime {
+  status: RuntimeStatus;
+  completed: number | null;
+  failed: number | null;
+}
+
 export type FlowAction = 'start' | 'stop' | 'resume' | 'pause' | 'restart';
 
 export interface FlowStatusView {

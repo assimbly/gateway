@@ -1,0 +1,26 @@
+<div class="mb-3">
+  <jhi-endpoint-type-switch [active]="kind()" />
+</div>
+
+@if (!brokerConfigured()) {
+  <jhi-empty-state heading="Add a Broker first" [description]="about + ' Add a Broker to create them.'" [docs]="true">
+    <a primary class="btn btn-fx btn-fx-primary" routerLink="/broker/new">
+      <fa-icon icon="plus"></fa-icon>
+      <span> Add Broker</span>
+    </a>
+  </jhi-empty-state>
+} @else if (!brokerRunning()) {
+  <jhi-empty-state heading="Start your Broker" [description]="about + ' Start the Broker to see them.'" [docs]="true">
+    <a primary class="btn btn-fx btn-fx-primary" routerLink="/broker">
+      <fa-icon icon="envelope"></fa-icon>
+      <span> Open Brokers</span>
+    </a>
+  </jhi-empty-state>
+} @else {
+  <jhi-empty-state [heading]="'Create your first ' + label()" [description]="about" [docs]="true">
+    <a primary class="btn btn-fx btn-fx-primary" [routerLink]="['/' + kind(), 'new']">
+      <fa-icon icon="plus"></fa-icon>
+      <span> Add</span>
+    </a>
+  </jhi-empty-state>
+}

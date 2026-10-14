@@ -89,6 +89,29 @@ describe('Import a Flow (DIL)', () => {
     expect(TestBed.inject(AlertService).get().map(alert => alert.message)).toEqual(['Imported Flow Orders to SFTP']);
   });
 
+  it('imports a Flow exported as JSON, sending it as JSON', () => {
+    const flowJson = '{"dil":{"integrations":{"integration":{"flows":{"flow":{"id":"12","name":"Orders to SFTP"}}}}}}';
+    page.text.set(flowJson);
+    page.fileName.set('export_flow_Orders.json');
+
+    page.start();
+    lookUpExistingFlow().flush(null, { status: 404, statusText: 'Not Found' });
+    const request = http.expectOne(req => req.url === 'api/import/flow');
+    expect(request.request.headers.get('Content-Type')).toBe('application/json');
+    expect(request.request.body).toBe(flowJson);
+    request.flush(imported);
+  });
+
+  it('sends a Flow exported as XML as XML', () => {
+    page.text.set(flowExport);
+
+    page.start();
+    lookUpExistingFlow().flush(null, { status: 404, statusText: 'Not Found' });
+    const request = http.expectOne(req => req.url === 'api/import/flow');
+    expect(request.request.headers.get('Content-Type')).toBe('application/xml');
+    request.flush(imported);
+  });
+
   it('asks before replacing a Flow with the same name, and replaces it once confirmed', () => {
     page.text.set(flowExport);
 
@@ -137,7 +160,8 @@ describe('Import a Flow (DIL)', () => {
   });
 
   it.each([
-    ['text that is not XML', 'hello', "isn't an XML file"],
+    ['text that is not XML or JSON', 'hello', "isn't an XML or JSON file"],
+    ['JSON that is cut off', '{"dil": ', "isn't valid JSON"],
     ['a file without a Flow', '<dil><integrations/></dil>', "doesn't contain a Flow"],
     ['a Flow that has no name', flowExport.replace('<name>Orders to SFTP</name>', ''), "doesn't contain a Flow"],
   ])('refuses %s, without sending it', (_, text, reason) => {

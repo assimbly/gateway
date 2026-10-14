@@ -4,16 +4,18 @@
   </nav>
   <h2 class="import-page__title">Import a Flow (DIL)</h2>
   <p class="import-page__lead">
-    A Flow saved with Export, from this or another Gateway. It becomes a new Flow and opens in the editor for its type. A file with several Flows is a
-    Gateway backup: import it from the Gateway page instead.
+    A Flow saved with Export, from this or another Gateway, as XML or JSON. It becomes a new Flow and opens in the editor for its type. A file with
+    several Flows is a Gateway backup: import it from the Gateway page instead.
   </p>
 
   <jhi-import-source
     [(text)]="text"
     [(fileName)]="fileName"
-    accept=".xml,application/xml,text/xml"
+    accept=".xml,.json,application/xml,text/xml,application/json"
     kind="a Flow export"
-    placeholder="&lt;dil&gt;…"
+    highlight="auto"
+    [rows]="20"
+    placeholder="&lt;dil&gt;… or {&quot;dil&quot;: …}"
   />
 
   @if (conflict(); as name) {
