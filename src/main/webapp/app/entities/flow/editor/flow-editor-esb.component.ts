@@ -148,7 +148,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	step: IStep;
 
   public stepTypes = ["SOURCE", "ACTION", "SINK", "ROUTE", "SCRIPT", "CONNECTION", "ERROR"];
-  public languageComponentsNames: Array<any> = ['groovy', 'python', 'javascript', 'simple', 'jslt','xslt'];
+  public languageComponentsNames: Array<any> = ['groovy', 'javascript', 'simple', 'jslt','xslt'];
   public componentsWithConnection: readonly string[] = COMPONENTS_WITH_CONNECTION;
 
 	panelCollapsed: any = "uno";
@@ -1432,28 +1432,18 @@ splitOptions4(options: string): string[] {
 
   createOrEditConnection(step, connectionType: string, formConnection: AbstractControl): void {
 
-    step.connectionId = formConnection.value;
+    const previousConnectionId = formConnection.value;
+    step.connectionId = previousConnectionId;
 
-    connectionType = this.connectionsList.getConnectionType(step.componentType);
+    // A Route Step has no Component, so the dialog lets the user pick the type
+    connectionType = this.connectionsList.getConnectionType(step.componentType) || connectionType;
 
-    let modalRef;
-
-    if (typeof step.connectionId === 'undefined' || step.connectionId === null || !step.connectionId) {
-        modalRef = this.connectionPopupService.open(ConnectionDialogComponent as Component, null, connectionType);
-    } else {
-        modalRef = this.connectionPopupService.open(ConnectionDialogComponent as Component, step.connectionId, connectionType);
-    }
+    const modalRef = this.connectionPopupService.open(ConnectionDialogComponent as Component, step.connectionId || null, connectionType);
 
     modalRef.then((res) => {
-       res.result.then(
-              result => {
-                this.setConnection(step, result.id, formConnection);
-              },
-              error => {
-                this.setConnection(step, error.id, formConnection);
-              }
-          );
-
+       // Save hands back the Connection; Cancel or close keeps the one that was selected
+       const done = (outcome: any) => this.setConnection(step, outcome?.id ?? previousConnectionId, formConnection);
+       res.result.then(done, done);
        }, (error)=>{
           console.log('Set connection failed');
        }
@@ -1474,6 +1464,7 @@ splitOptions4(options: string): string[] {
           }
         });
         formConnection.patchValue(id);
+        this.cdr.markForCheck();
       },
       res => this.onError(res.body)
     );

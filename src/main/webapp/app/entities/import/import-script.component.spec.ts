@@ -40,18 +40,18 @@ describe('Import a script', () => {
   it('offers the languages of the script editor, Groovy first', () => {
     const options = Array.from<HTMLOptionElement>(fixture.nativeElement.querySelectorAll('#import-script-language option')).map(o => o.value);
 
-    expect(options).toEqual(['groovy', 'python', 'javascript', 'simple', 'jslt', 'xslt']);
+    expect(options).toEqual(['groovy', 'javascript', 'simple', 'jslt', 'xslt']);
     expect(page.language()).toBe('groovy');
   });
 
   it('imports the script in its language, then opens the new Flow in the script editor', async () => {
     page.text.set('print("hi")');
-    page.language.set('python');
+    page.language.set('javascript');
     page.name.set('Hello');
 
     page.start();
     const request = http.expectOne(req => req.url === 'api/import/script');
-    expect(request.request.params.get('language')).toBe('python');
+    expect(request.request.params.get('language')).toBe('javascript');
     expect(request.request.params.get('name')).toBe('Hello');
     expect(request.request.body).toBe('print("hi")');
     request.flush({ flowId: 5, name: 'Hello', type: 'script', replaced: false, warnings: [] });
@@ -64,9 +64,9 @@ describe('Import a script', () => {
   });
 
   it('takes the language and the name of the Flow from the file that is chosen', () => {
-    page.onFileChosen(new File(['x'], 'nightly-cleanup.py'));
+    page.onFileChosen(new File(['x'], 'nightly-cleanup.js'));
 
-    expect(page.language()).toBe('python');
+    expect(page.language()).toBe('javascript');
     expect(page.name()).toBe('nightly-cleanup');
   });
 

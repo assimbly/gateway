@@ -20,7 +20,7 @@ export class LinkEditorComponent {
   @Output() linkChange = new EventEmitter<Partial<LinkSettings>>();
   @Output() deleteBranch = new EventEmitter<void>();
 
-  readonly languages = ['simple', 'constant', 'header', 'jsonpath', 'xpath', 'groovy', 'javascript', 'python'];
+  readonly languages = ['simple', 'constant', 'header', 'jsonpath', 'xpath', 'groovy', 'javascript'];
   readonly transports = ['sync', 'async'];
   readonly patterns = ['', 'InOnly', 'InOut'];
 

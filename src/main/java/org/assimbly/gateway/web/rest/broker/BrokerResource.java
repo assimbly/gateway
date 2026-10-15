@@ -96,6 +96,18 @@ public class BrokerResource {
     @DeleteMapping("/brokers/{id}")
     public ResponseEntity<Void> deleteBroker(@PathVariable(value = "id") Long id) {
         log.debug("REST request to delete Broker : {}", id);
+
+        // A deleted broker must not keep running (and listening) until the Gateway restarts
+        Optional<BrokerDTO> brokerDTO = brokerService.findOne(id);
+        if (brokerDTO.isPresent() && brokerDTO.get().getType() != null) {
+            try {
+                managedBroker.stop(brokerDTO.get().getType());
+            } catch (Exception e) {
+                log.error("Failed to stop broker {} before deleting it", id, e);
+                throw new BadRequestAlertException("Could not stop the broker, so it was not deleted: " + e.getMessage(), ENTITY_NAME, "brokerstopfailed");
+            }
+        }
+
         brokerService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }

@@ -21,7 +21,7 @@
       </div>
         <div class="form-group">
             <label class="form-control-label" for="field_type">Type</label>
-            <select class="form-control form-select" id="type" name="field_type" [(ngModel)]="connection.type"  (change)="changeType(false)" #type="ngModel" disabled>
+            <select class="form-control form-select" id="type" name="field_type" [ngModel]="connection.type" (ngModelChange)="connection.type = $event; changeType(false)" #type="ngModel" required [disabled]="disableType">
                 <option [ngValue]="type" *ngFor="let type of connections.connectionsList">{{type}}</option>
             </select>
             <div *ngIf="type.invalid && (type.dirty || type.touched)" class="invalid-field-message">

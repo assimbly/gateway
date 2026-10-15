@@ -298,7 +298,13 @@
                     <div class="flow-setting">
                       <div class="flow-setting__text">
                         <label class="form-check-label" for="field_trace">Trace</label>
-                        <small class="text-muted" id="field_trace_help">Records the messages at each Step of the Flow.</small>
+                        <small class="text-muted" id="field_trace_help">
+                          @if (activeEditor === 'route') {
+                            Writes the messages at each Step to the Log viewer (Administration → Log viewer). A Route has no Steps, so nothing is written for this Flow.
+                          } @else {
+                            Writes the messages at each Step to the Log viewer (Administration → Log viewer). Applies when the Flow is started.
+                          }
+                        </small>
                       </div>
                       <div class="form-check form-switch mb-0">
                         <input class="form-check-input" type="checkbox" role="switch" id="field_trace" aria-describedby="field_trace_help"

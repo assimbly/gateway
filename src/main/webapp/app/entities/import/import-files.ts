@@ -20,14 +20,13 @@ export function baseName(fileName: string): string {
 }
 
 /** The languages the Script editor offers. */
-export const SCRIPT_LANGUAGES = ['groovy', 'python', 'javascript', 'simple', 'jslt', 'xslt'] as const;
+export const SCRIPT_LANGUAGES = ['groovy', 'javascript', 'simple', 'jslt', 'xslt'] as const;
 
 export type ScriptLanguage = (typeof SCRIPT_LANGUAGES)[number];
 
 const LANGUAGE_BY_EXTENSION: Readonly<Record<string, ScriptLanguage>> = {
   groovy: 'groovy',
   gvy: 'groovy',
-  py: 'python',
   js: 'javascript',
   mjs: 'javascript',
   jslt: 'jslt',

@@ -322,8 +322,8 @@ class FlowImportServiceIntTest {
 
     @Test
     void aScriptWithoutANameGetsOneFromItsLanguage() {
-        assertThat(flowImportService.importScript(integrationId, "print('x')", "python", null).name()).isEqualTo("script-python");
-        assertThat(flowImportService.importScript(integrationId, "print('y')", "python", " ").name()).isEqualTo("script-python-2");
+        assertThat(flowImportService.importScript(integrationId, "print('x')", "javascript", null).name()).isEqualTo("script-javascript");
+        assertThat(flowImportService.importScript(integrationId, "print('y')", "javascript", " ").name()).isEqualTo("script-javascript-2");
     }
 
     @Test

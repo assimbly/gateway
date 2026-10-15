@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbDropdownModule, NgbModal, NgbOffcanvas, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 
-import { Flow, IFlow, LogLevelType } from 'app/shared/model/flow.model';
+import { Flow, IFlow } from 'app/shared/model/flow.model';
 import { isDraft, loadFlowGraph, opensOnCanvas } from './designer/flow-graph';
 import { FlowService } from './flow.service';
 import { IApiHandler } from 'app/entities/api/api.model';
@@ -15,7 +15,6 @@ import { StepService } from '../step/step.service';
 import { IntegrationService } from '../integration/integration.service';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
-import { Collectors } from 'app/shared/collect/collectors';
 import { OverflowActionDirective, PrimaryActionDirective, RowActions, StatusControls, Truncate } from 'app/shared/table';
 import { FlowRowAlerts } from './flow-row-alerts.component';
 import { FlowRowStats, FlowStatsSection } from './flow-row-stats.component';
@@ -130,8 +129,6 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
   flowRowID: string;
   flowRowErrorStepID: string;
 
-  filter: Filter;
-
   statusMessage: any;
 
   intervalTime: any;
@@ -151,7 +148,6 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
     private modalService: NgbModal,
     private router: Router,
     private eventManager: EventManager,
-	  private collectors: Collectors,
     private changeDetector: ChangeDetectorRef
   ) {}
 
@@ -768,12 +764,8 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
     this.disableActionBtns = true;
     this.failure = null;
 
-    if(this.flow.logLevel === LogLevelType.TRACE){
-      this.enableTracing();
-    }
-
     this.configureAndRun(
-      this.flowService.start(this.flow.id),
+      this.flowService.applyTrace(this.flow.id).pipe(switchMap(() => this.flowService.start(this.flow.id))),
       body => {
         this.applyAnswer(body);
       },
@@ -849,12 +841,8 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
     this.disableActionBtns = true;
     this.flowAlerts = `false`;
 
-    if(this.flow.logLevel === LogLevelType.OFF){
-      this.disableTracing();
-    }
-
     this.configureAndRun(
-      this.flowService.restart(this.flow.id),
+      this.flowService.applyTrace(this.flow.id).pipe(switchMap(() => this.flowService.restart(this.flow.id))),
       body => {
         this.applyAnswer(body);
       },
@@ -947,32 +935,6 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
     );
   }
 
-  enableTracing(){
-
-      const collector = this.collectors.tracing;
-      const sourceStep = this.steps.find(step => step.stepType === 'SOURCE');
-      const sinkStep = this.steps.find(step => step.stepType === 'SINK');
-      const sourceStepId = this.flow.id.toString() + '-' + sourceStep.id.toString();
-      const sinkStepId = this.flow.id.toString() + '-' + sinkStep.id.toString();
-
-      const filters: Array<any> = [];
-      filters.push(new Filter(sourceStepId,sourceStepId));
-      filters.push(new Filter(sinkStepId,sinkStepId));
-
-      collector.id = this.flow.id.toString();
-      collector.filters = filters;
-
-      this.integrationService.addCollector(collector.id,collector).subscribe(
-        response => {
-          //console.log('ok configured' + JSON.stringify(response));
-        },
-        err => {
-          console.log('Failed to configure tracing: ' + err);
-        }
-      );
-
-  }
-
   disableTracing(){
 
    this.integrationService.removeCollector(this.flow.id).subscribe(
@@ -984,14 +946,4 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
 
   }
 
-}
-
-export class Filter {
-  id: string;
-  filter: string;
-
-    constructor(id: string, filter: string) {
-      this.id = id;
-      this.filter = filter;
-    }
 }

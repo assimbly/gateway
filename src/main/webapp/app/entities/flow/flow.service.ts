@@ -1,6 +1,6 @@
 import { Service, inject } from '@angular/core';
 import { HttpClient, HttpContext, HttpResponse, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable, Observer, Subscription, switchMap } from 'rxjs';
+import { Observable, Observer, Subscription, catchError, of, switchMap } from 'rxjs';
 
 import { serverApiUrl } from 'app/config';
 
@@ -10,7 +10,8 @@ import { Router } from '@angular/router';
 import { WindowRef } from 'app/shared/window/window.service';
 import { saveAs } from 'file-saver/FileSaver';
 import { IIntegration } from 'app/shared/model/integration.model';
-import { IFlow, Flow } from 'app/shared/model/flow.model';
+import { IFlow, Flow, LogLevelType } from 'app/shared/model/flow.model';
+import { traceCollector } from 'app/shared/collect/collectors';
 import { HANDLES_OWN_ERRORS } from 'app/core/interceptor/error-handler.interceptor';
 
 type EntityResponseType = HttpResponse<IFlow>;
@@ -112,7 +113,23 @@ export class FlowService {
   configureAndStart(flowId: number): Observable<HttpResponse<string>> {
     return this.getConfiguration(flowId).pipe(
       switchMap(configuration => this.setConfiguration(flowId, configuration.body, 'true')),
+      switchMap(() => this.applyTrace(flowId)),
       switchMap(() => this.start(flowId)),
+    );
+  }
+
+  /**
+   * Makes the runtime trace the Flow, or stop tracing it, as its Trace setting says. Tracing writes the message after each
+   * Step to the log. Not being able to trace never keeps a Flow from starting.
+   */
+  applyTrace(flowId: number): Observable<unknown> {
+    return this.find(flowId).pipe(
+      switchMap(response =>
+        response.body?.logLevel === LogLevelType.TRACE
+          ? this.http.post(`${this.integrationUrl}/collector/${flowId}/add`, traceCollector(response.body), { responseType: 'text' })
+          : this.http.delete(`${this.integrationUrl}/collector/${flowId}/remove`, { responseType: 'text' }),
+      ),
+      catchError(() => of(null)),
     );
   }
 

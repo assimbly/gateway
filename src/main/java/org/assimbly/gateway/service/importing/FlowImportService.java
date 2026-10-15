@@ -51,7 +51,7 @@ import java.util.Set;
 public class FlowImportService {
 
     /** The languages the Script editor offers. */
-    public static final Set<String> SCRIPT_LANGUAGES = Set.of("groovy", "python", "javascript", "simple", "jslt", "xslt");
+    public static final Set<String> SCRIPT_LANGUAGES = Set.of("groovy", "javascript", "simple", "jslt", "xslt");
 
     private static final String ERROR_HANDLER_OPTIONS = "level=ERROR&showAll=true";
 

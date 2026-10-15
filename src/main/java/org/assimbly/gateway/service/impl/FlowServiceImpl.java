@@ -1,7 +1,10 @@
 package org.assimbly.gateway.service.impl;
 
 import org.assimbly.gateway.domain.Flow;
+import org.assimbly.gateway.domain.Step;
 import org.assimbly.gateway.repository.FlowRepository;
+import org.assimbly.gateway.repository.RouteRepository;
+import org.assimbly.gateway.repository.StepRepository;
 import org.assimbly.gateway.service.FlowService;
 import org.assimbly.gateway.service.api.ApiService;
 import org.assimbly.gateway.service.dto.FlowDTO;
@@ -13,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -30,10 +35,17 @@ public class FlowServiceImpl implements FlowService {
 
     private final ApiService apiService;
 
-    public FlowServiceImpl(FlowRepository flowRepository, FlowMapper flowMapper, ApiService apiService) {
+    private final StepRepository stepRepository;
+
+    private final RouteRepository routeRepository;
+
+    public FlowServiceImpl(FlowRepository flowRepository, FlowMapper flowMapper, ApiService apiService,
+                           StepRepository stepRepository, RouteRepository routeRepository) {
         this.flowRepository = flowRepository;
         this.flowMapper = flowMapper;
         this.apiService = apiService;
+        this.stepRepository = stepRepository;
+        this.routeRepository = routeRepository;
     }
 
     /**
@@ -103,7 +115,8 @@ public class FlowServiceImpl implements FlowService {
     }
 
     /**
-     * Delete the flow by id. A Handler Flow is refused: it is deleted with its Operation.
+     * Delete the flow by id, with the Routes its Steps run that no other Flow uses.
+     * A Handler Flow is refused: it is deleted with its Operation.
      *
      * @param id the id of the entity
      */
@@ -111,7 +124,20 @@ public class FlowServiceImpl implements FlowService {
     public void delete(Long id) {
         log.debug("Request to delete Flow : {}", id);
         apiService.checkFlowDeletable(id);
+
+        List<Integer> routeIds = stepRepository.findByFlowId(id).stream()
+            .map(Step::getRouteId)
+            .filter(Objects::nonNull)
+            .distinct()
+            .filter(routeId -> !stepRepository.existsByRouteIdAndFlowIdNot(routeId, id))
+            .toList();
+
         flowRepository.deleteById(id);
+
+        routeIds.forEach(routeId -> {
+            log.debug("Request to delete Route {} of Flow {}", routeId, id);
+            routeRepository.deleteById(routeId.longValue());
+        });
     }
 
 

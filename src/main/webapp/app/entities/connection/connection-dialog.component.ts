@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -53,16 +53,20 @@ export class ConnectionDialogComponent implements OnInit {
         protected eventManager: EventManager,
         protected alertService: AlertService,
         protected activatedRoute: ActivatedRoute,
-        protected router: Router
+        protected router: Router,
+        private cdr: ChangeDetectorRef
     ) {}
 
     ngOnInit() {
 
         this.isSaving = false;
+        // The Type is fixed once it is known: from the Connection itself, or from the Step's Component
+        this.disableType = !!this.connection.type;
         this.addRequiredConnectionKeys();
         this.connectionService.query().subscribe(
             res => {
-                this.connectionNames = res.body.map(s => s.name);
+                this.connectionNames = res.body.filter(s => s.id !== this.connection.id).map(s => s.name);
+                this.cdr.markForCheck();
             },
             res => this.onError(res.body)
         );
@@ -77,29 +81,28 @@ export class ConnectionDialogComponent implements OnInit {
 
     changeType(cloneHeader: boolean) {
 
+        const newType = this.requiredConnectionKey.find(x => x.name === this.connection.type);
+
         if (typeof this.requiredType !== 'undefined') {
-            this.connectionKeysRemoveList = [];
-            this.requiredType.connectionKeys.forEach(rsk => {
-                this.connectionKeysRemoveList.push(
-                    this.connectionKeys.splice(
-                        this.connectionKeys.indexOf(this.connectionKeys.find(sk => rsk.connectionKeyName === sk.key && sk.id !== undefined)),
-                        1
-                    )[0]
-                );
-            });
+            // Drop the keys only the previous type needed; saved ones are deleted on save
+            const keep = (newType?.connectionKeys ?? []).map(rsk => rsk.connectionKeyName);
+            const drop = this.requiredType.connectionKeys.map(rsk => rsk.connectionKeyName).filter(key => !keep.includes(key));
+            this.connectionKeysRemoveList = this.connectionKeys.filter(sk => drop.includes(sk.key) && sk.id);
+            this.connectionKeys = this.connectionKeys.filter(sk => !drop.includes(sk.key));
         }
 
-        this.requiredType = this.requiredConnectionKey.find(x => x.name === this.connection.type);
+        this.requiredType = newType;
+        if (typeof this.requiredType === 'undefined') {
+            return;
+        }
 
         const requiredConnectionKeys = new Array<ConnectionKeys>();
         this.requiredType.connectionKeys.forEach(sk => {
             const ersk = this.connectionKeys.find(s => s.key === sk.connectionKeyName);
             let rsk = new ConnectionKeys();
             if (typeof ersk !== 'undefined') {
-                if (ersk.value !== '') {
-                    rsk = ersk;
-                    this.connectionKeys.splice(this.connectionKeys.indexOf(ersk), 1);
-                }
+                rsk = ersk;
+                this.connectionKeys.splice(this.connectionKeys.indexOf(ersk), 1);
             }
             rsk.id = cloneHeader ? null : rsk.id;
             rsk.key = sk.connectionKeyName;
@@ -109,6 +112,7 @@ export class ConnectionDialogComponent implements OnInit {
             requiredConnectionKeys.push(rsk);
         });
         this.connectionKeys.unshift(...requiredConnectionKeys);
+        this.mapConnectionKeysKeys();
     }
 
     addConnectionKeys() {
@@ -141,6 +145,7 @@ export class ConnectionDialogComponent implements OnInit {
     deleteConnectionKeys(connectionKey) {
         this.connectionKeysService.delete(connectionKey.id).subscribe(() => {
             this.removeConnectionKeys(this.connectionKeys.indexOf(connectionKey));
+            this.cdr.markForCheck();
         });
     }
 
@@ -169,6 +174,7 @@ export class ConnectionDialogComponent implements OnInit {
                 this.connectionKeys = res.body.filter(sk => sk.connectionId === this.connection.id);
                 this.changeType(cloneHeader);
                 this.connection.id = cloneHeader ? null : this.connection.id;
+                this.cdr.markForCheck();
             });
         } else if (this.connection.type) {
             this.changeType(cloneHeader);

@@ -59,12 +59,14 @@ public class SecurityConfiguration {
                     .permissionsPolicyHeader(Customizer.withDefaults())
             );
 
-        if (env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT))) {
+        boolean development = env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT));
+        // The headless endpoints check their own credentials (Basic header or their own JWT)
+        boolean headless = env.acceptsProfiles(Profiles.of("headless"));
 
-            //permit all for easier testing
-            http.authorizeHttpRequests(authz ->
-                // prettier-ignore
+        http
+            .authorizeHttpRequests(authz -> {
                 authz
+                    // Permit all requests for common static resources locations
                     .requestMatchers(
                         "/css/**",
                         "/js/**",
@@ -76,73 +78,53 @@ public class SecurityConfiguration {
                         "/resources/**"
                     ).permitAll()
 
-
-                    // Specific static file extensions (already covered by atCommonLocations in most cases, but good to be explicit if you have custom paths)
                     .requestMatchers(
                         "/*.js", "/*.txt", "/*.json", "/*.map", "/*.css", "/*.ico", "/*.png", "/*.svg", "/*.webapp"
                     ).permitAll()
 
+                    // Application-specific public paths
+                    .requestMatchers("/index.html").permitAll()
+                    .requestMatchers("/app/**").permitAll()
+                    .requestMatchers("/i18n/**").permitAll()
+                    .requestMatchers("/content/**").permitAll()
+
+                    // API authentication and registration
+                    .requestMatchers(HttpMethod.POST, "/api/authenticate").permitAll()
+                    .requestMatchers("/api/register").permitAll()
+                    .requestMatchers("/api/activate").permitAll()
+                    .requestMatchers("/api/account/reset-password/init").permitAll()
+                    .requestMatchers("/api/account/reset-password/finish").permitAll();
+
+                if (development) {
                     //enable database on dev
-                    .requestMatchers("/h2-console/**").permitAll()
+                    authz.requestMatchers("/h2-console/**").permitAll();
+                }
 
-                    .requestMatchers("/**").permitAll());
-        }else{
+                if (headless) {
+                    authz.requestMatchers("/api/**").permitAll();
+                } else {
+                    authz.requestMatchers("/api/**").authenticated();
+                }
 
-            http
-                .authorizeHttpRequests(authz ->
-                    authz
-                        // Permit all requests for common static resources locations
-                        .requestMatchers(
-                            "/css/**",
-                            "/js/**",
-                            "/images/**",
-                            "/webjars/**",
-                            "/favicon.ico",
-                            "/static/**",
-                            "/public/**",
-                            "/resources/**"
-                        ).permitAll()
+                authz
+                    // Actuator endpoints
+                    .requestMatchers("/health/**").permitAll()
+                    .requestMatchers("/v3/api-docs/**").permitAll() // OpenAPI/Swagger docs (v3 is common for Spring Boot 3)
+                    .requestMatchers("/swagger-ui/**").permitAll() // Swagger UI
+                    .requestMatchers("/management/health").permitAll()
+                    .requestMatchers("/management/health/**").permitAll()
+                    .requestMatchers("/management/info").permitAll()
+                    .requestMatchers("/management/prometheus").permitAll()
+                    .requestMatchers("/management/jhiopenapigroups").permitAll()
+                    .requestMatchers("/management/jolokia").permitAll()
+                    .requestMatchers("/management/jolokia/**").permitAll()
+                    .requestMatchers("/management/hawtio").permitAll()
+                    .requestMatchers("/management/metrics").permitAll()
+                    .requestMatchers("/management/**").authenticated() // Secure other management endpoints
 
-                        .requestMatchers(
-                            "/*.js", "/*.txt", "/*.json", "/*.map", "/*.css", "/*.ico", "/*.png", "/*.svg", "/*.webapp"
-                        ).permitAll()
-
-                        // Application-specific public paths
-                        .requestMatchers("/index.html").permitAll()
-                        .requestMatchers("/app/**").permitAll()
-                        .requestMatchers("/i18n/**").permitAll()
-                        .requestMatchers("/content/**").permitAll()
-
-                        // API authentication and registration
-                        .requestMatchers(HttpMethod.POST, "/api/authenticate").permitAll()
-                        .requestMatchers("/api/register").permitAll()
-                        .requestMatchers("/api/activate").permitAll()
-                        .requestMatchers("/api/account/reset-password/init").permitAll()
-                        .requestMatchers("/api/account/reset-password/finish").permitAll()
-
-                        //.requestMatchers("/api/**").authenticated()
-                        .requestMatchers("/api/**").permitAll()
-
-                        // Actuator endpoints
-                        .requestMatchers("/health/**").permitAll()
-                        .requestMatchers("/v3/api-docs/**").permitAll() // OpenAPI/Swagger docs (v3 is common for Spring Boot 3)
-                        .requestMatchers("/swagger-ui/**").permitAll() // Swagger UI
-                        .requestMatchers("/management/health").permitAll()
-                        .requestMatchers("/management/health/**").permitAll()
-                        .requestMatchers("/management/info").permitAll()
-                        .requestMatchers("/management/prometheus").permitAll()
-                        .requestMatchers("/management/jhiopenapigroups").permitAll()
-                        .requestMatchers("/management/jolokia").permitAll()
-                        .requestMatchers("/management/jolokia/**").permitAll()
-                        .requestMatchers("/management/hawtio").permitAll()
-                        .requestMatchers("/management/metrics").permitAll()
-                        .requestMatchers("/management/**").authenticated() // Secure other management endpoints
-
-                        // Any other request not explicitly matched above requires authentication
-                        .anyRequest().authenticated()
-                );
-
-        }
+                    // Any other request not explicitly matched above requires authentication
+                    .anyRequest().authenticated();
+            });
 
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling(exceptions ->

@@ -52,6 +52,15 @@ public class LoggingAspect {
     }
 
     /**
+     * Pointcut that matches the endpoints returning the tail of the log. Logging their result would write
+     * the tail back into the log, so every refresh of the log viewer would repeat its lines.
+     */
+    @Pointcut("execution(* org.assimbly.gateway.web.rest..*.getLog(..))")
+    public void logTailPointcut() {
+        // Method is empty as this is just a Pointcut, the implementations are in the advices.
+    }
+
+    /**
      * Retrieves the {@link Logger} associated to the given {@link JoinPoint}.
      *
      * @param joinPoint join point we want the logger for.
@@ -95,7 +104,7 @@ public class LoggingAspect {
      * @return result.
      * @throws Throwable throws {@link IllegalArgumentException}.
      */
-    @Around("applicationPackagePointcut() && springBeanPointcut()")
+    @Around("applicationPackagePointcut() && springBeanPointcut() && !logTailPointcut()")
     public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
         Logger log = logger(joinPoint);
         if (log.isDebugEnabled()) {

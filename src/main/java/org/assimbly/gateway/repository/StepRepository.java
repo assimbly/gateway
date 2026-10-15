@@ -16,4 +16,6 @@ public interface StepRepository extends JpaRepository<Step, Long> {
 
 	List<Step> findByFlowId(Long id);
 
+	boolean existsByRouteIdAndFlowIdNot(Integer routeId, Long flowId);
+
 }

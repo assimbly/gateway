@@ -33,7 +33,6 @@ describe('Import files', () => {
     it.each([
       ['job.groovy', 'groovy'],
       ['job.GVY', 'groovy'],
-      ['job.py', 'python'],
       ['job.js', 'javascript'],
       ['job.mjs', 'javascript'],
       ['map.jslt', 'jslt'],
