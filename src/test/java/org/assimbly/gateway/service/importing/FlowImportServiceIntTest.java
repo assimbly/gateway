@@ -321,6 +321,20 @@ class FlowImportServiceIntTest {
     }
 
     @Test
+    void theScriptReadsFromTheLinkTheSourceWritesTo() {
+        FlowImportResultDTO result = flowImportService.importScript(integrationId, "println 'x'", "groovy", null);
+
+        List<Step> steps = stepsOf(result);
+        String sourceLink = result.flowId() + "-" + steps.get(0).getId();
+        assertThat(steps.get(0).getLinks()).extracting(Link::getBound, Link::getName)
+            .containsExactly(org.assertj.core.api.Assertions.tuple("out", sourceLink));
+        // The last Script has no outbound Link, so the runtime ends the Flow after it
+        assertThat(steps.get(1).getLinks()).extracting(Link::getBound, Link::getName)
+            .containsExactly(org.assertj.core.api.Assertions.tuple("in", sourceLink));
+        assertThat(steps.get(2).getLinks()).isEmpty();
+    }
+
+    @Test
     void aScriptWithoutANameGetsOneFromItsLanguage() {
         assertThat(flowImportService.importScript(integrationId, "print('x')", "javascript", null).name()).isEqualTo("script-javascript");
         assertThat(flowImportService.importScript(integrationId, "print('y')", "javascript", " ").name()).isEqualTo("script-javascript-2");

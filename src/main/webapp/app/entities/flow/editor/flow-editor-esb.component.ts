@@ -1636,17 +1636,23 @@ splitOptions4(options: string): string[] {
       });
   }
 
+  /**
+   * A Source, Action or Route links out under its own name; an Action, Sink, Route or Script links in under the name of the
+   * Step before it. A Script links out only when another Step follows it. The Error handler isn't part of the chain.
+   */
   private createLinks$(): Observable<unknown> {
     const requests: Observable<unknown>[] = [];
     let previousStepId = 0;
+    const chain = this.steps.filter(step => step.stepType !== 'ERROR');
 
-    this.steps.forEach(step => {
-      if (step.stepType === 'ACTION' || step.stepType === 'SOURCE' || step.stepType === 'ROUTE') {
+    chain.forEach((step, index) => {
+      const hasNext = index < chain.length - 1;
+      if (step.stepType === 'ACTION' || step.stepType === 'SOURCE' || step.stepType === 'ROUTE' || (step.stepType === 'SCRIPT' && hasNext)) {
         const linkName = this.flow.id + '-' + step.id;
         requests.push(this.linkService.create(this.setLink(linkName, step.id, 'out')));
       }
 
-      if (step.stepType === 'ACTION' || step.stepType === 'SINK' || step.stepType === 'ROUTE') {
+      if (step.stepType === 'ACTION' || step.stepType === 'SINK' || step.stepType === 'ROUTE' || step.stepType === 'SCRIPT') {
         const linkName = this.flow.id + '-' + previousStepId;
         if (previousStepId != 0) {
           requests.push(this.linkService.create(this.setLink(linkName, step.id, 'in')));

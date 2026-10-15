@@ -206,16 +206,20 @@ public class FlowImportService {
 
     /**
      * The Links the Route and Script editors create when they save: a Source, Action or Route has an outbound Link named
-     * after itself, and an Action, Sink or Route an inbound Link named after the Step before it.
+     * after itself, and an Action, Sink, Route or Script an inbound Link named after the Step before it. A Script has an
+     * outbound Link only when another Step follows it. The Error handler isn't part of the chain.
      */
     private void createEditorLinks(Flow flow, List<Step> steps) {
+        List<Step> chain = steps.stream().filter(step -> step.getStepType() != StepType.ERROR).toList();
         Long previousStepId = null;
-        for (Step step : steps) {
+        for (int i = 0; i < chain.size(); i++) {
+            Step step = chain.get(i);
             StepType type = step.getStepType();
-            if (type == StepType.ACTION || type == StepType.SOURCE || type == StepType.ROUTE) {
+            boolean hasNext = i < chain.size() - 1;
+            if (type == StepType.ACTION || type == StepType.SOURCE || type == StepType.ROUTE || (type == StepType.SCRIPT && hasNext)) {
                 link(step, flow.getId() + "-" + step.getId(), "out");
             }
-            if ((type == StepType.ACTION || type == StepType.SINK || type == StepType.ROUTE) && previousStepId != null) {
+            if ((type == StepType.ACTION || type == StepType.SINK || type == StepType.ROUTE || type == StepType.SCRIPT) && previousStepId != null) {
                 link(step, flow.getId() + "-" + previousStepId, "in");
             }
             previousStepId = step.getId();
