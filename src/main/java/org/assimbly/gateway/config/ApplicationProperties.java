@@ -81,6 +81,16 @@ public class ApplicationProperties {
         private String tenant;
         /** Where the runtime serves REST Sources: Try it calls Operations there, and an OpenAPI export names its port. */
         private String restListenerUrl = "https://localhost:9001";
+        /** Whether a new Gateway gets an example Flow and a default broker on its first start. */
+        private boolean firstStartSetup = true;
+
+        public boolean getFirstStartSetup() {
+            return firstStartSetup;
+        }
+
+        public void setFirstStartSetup(boolean firstStartSetup) {
+            this.firstStartSetup = firstStartSetup;
+        }
 
         public String getTenant() {
             return tenant;

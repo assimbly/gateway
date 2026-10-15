@@ -443,6 +443,7 @@ if (project.hasProperty("integration")){
                 exclude 'org/assimbly/gateway/web/rest/integration/**'
 
                 exclude 'org/assimbly/gateway/config/database/**'
+                exclude 'org/assimbly/gateway/config/firststart/**'
 
                 exclude 'org/assimbly/gateway/config/audit/*'
                 exclude 'org/assimbly/gateway/config/exporting/*'

@@ -2,6 +2,7 @@ package org.assimbly.gateway.web.rest.broker;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Lazy;
 import jakarta.annotation.PostConstruct;
 import org.assimbly.brokerrest.ManagedBrokerRuntime;
@@ -26,6 +27,7 @@ import java.util.Optional;
  */
 @Tag(name = "Brokers", description = "Manage the broker configurations")
 @Lazy(false)
+@DependsOn("firstStart") // a new Gateway's default broker must exist before the brokers are autostarted
 @RestController
 @RequestMapping("/api")
 public class BrokerResource {

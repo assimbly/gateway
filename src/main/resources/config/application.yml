@@ -245,6 +245,8 @@ application:
     debugging: false
     cache: true
     base-directory: default
+    # A new Gateway gets an example Flow and a default Artemis broker that starts with it
+    first-start-setup: true
   deploy-directory:
     deploy-on-start: true
     deploy-on-change: true

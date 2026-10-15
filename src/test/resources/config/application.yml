@@ -104,7 +104,10 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
+application:
+    gateway:
+        # Tests set up their own data, and must not start a broker
+        first-start-setup: false
 
 encryption:
     jasypt:
