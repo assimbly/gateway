@@ -169,6 +169,12 @@ public class OpenApiService {
                 }
             }
         }
+        if (operation.declaredResponses().stream().noneMatch(declared -> declared.status().startsWith("2"))) {
+            // A new Handler Flow ends in a Response with status 200, so that is what the Operation answers.
+            ObjectNode success = responses.putObject("200");
+            success.put("description", "The answer of the Handler Flow.");
+            success.putObject("content").putObject(operation.responseMediaType() != null ? operation.responseMediaType() : "application/json");
+        }
         if (!responses.has("500")) {
             ObjectNode problem = responses.putObject("500");
             problem.put("description", "The request failed. The body names the Operation and gives a correlation id to look the failure up with.");
