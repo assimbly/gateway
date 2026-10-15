@@ -48,10 +48,10 @@ module.exports = async (config, options, targetOptions) => {
       new BrowserSyncPlugin(
         {
           host: 'localhost',
-          port: 9000,
+          port: 4300,
           https: tls,
           proxy: {
-            target: `http${tls ? 's' : ''}://localhost:${targetOptions.target === 'serve' ? '9060' : '8080'}`,
+            target: `http${tls ? 's' : ''}://localhost:${targetOptions.target === 'serve' ? '4200' : '8080'}`,
             ws: true,
             proxyOptions: {
               changeOrigin: false, //pass the Host header to the backend unchanged  https://github.com/Browsersync/browser-sync/issues/430
