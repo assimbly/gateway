@@ -21,6 +21,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * REST controller for managing Broker.
@@ -35,6 +38,9 @@ public class BrokerResource {
     private final Logger log = LoggerFactory.getLogger(BrokerResource.class);
 
     private static final String ENTITY_NAME = "broker";
+
+    // Artemis waits here, without end and without logging, while another broker holds the lock on its journal
+    private static final String ARTEMIS_LOCK_CLASS = "org.apache.activemq.artemis.core.server.impl.FileLockNodeManager";
 
     private final BrokerService brokerService;
 
@@ -171,9 +177,43 @@ public class BrokerResource {
 
                 log.info("Autostart broker: {}", brokerType);
 
-                managedBroker.start(brokerType, brokerConfigurationType);
+                autostart(brokerType, brokerConfigurationType);
 
             }
         }
+    }
+
+    /**
+     * Starts the broker and warns while it waits for the lock on its journal, which another broker
+     * (for example a Gateway that is still running) holds. The Gateway doesn't finish starting until then.
+     */
+    private void autostart(String brokerType, String brokerConfigurationType) throws Exception {
+
+        Thread startThread = Thread.currentThread();
+        ScheduledExecutorService watchdog = Executors.newSingleThreadScheduledExecutor(
+            Thread.ofPlatform().name("broker-autostart-watchdog").daemon().factory());
+
+        watchdog.scheduleAtFixedRate(() -> {
+            if (isWaitingForLock(startThread)) {
+                log.warn("Broker {} can't start: another broker holds the lock (server.lock) on its journal directory. " +
+                    "Probably another Gateway is still running, for example from an earlier bootRun. " +
+                    "This Gateway doesn't finish starting until that one is stopped.", brokerType);
+            }
+        }, 10, 30, TimeUnit.SECONDS);
+
+        try {
+            managedBroker.start(brokerType, brokerConfigurationType);
+        } finally {
+            watchdog.shutdownNow();
+        }
+    }
+
+    private static boolean isWaitingForLock(Thread thread) {
+        for (StackTraceElement element : thread.getStackTrace()) {
+            if (ARTEMIS_LOCK_CLASS.equals(element.getClassName()) && "lock".equals(element.getMethodName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
