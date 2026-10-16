@@ -9,8 +9,11 @@ public class EnvironmentValue {
     public static final String ENVIRONMENT_FIELD = "environment";
     public static final String VALUE_FIELD = "value";
     public static final String ENCRYPTED_FIELD = "encrypted";
-    public static final String LAST_UPDATE_FIELD = "last_update";
-    public static final String UPDATED_BY_FIELD = "updatedBy";
+    public static final String UPDATED_AT_FIELD = "updated_at";
+    public static final String UPDATED_BY_FIELD = "updated_by";
+    /** Pre-migration names, still read so a variable written before the cutover keeps its metadata. */
+    public static final String LEGACY_UPDATED_AT_FIELD = "last_update";
+    public static final String LEGACY_UPDATED_BY_FIELD = "updatedBy";
 
     private ObjectId _id;
 
