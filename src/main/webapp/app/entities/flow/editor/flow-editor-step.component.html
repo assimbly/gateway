@@ -65,6 +65,28 @@
   </div>
 </ng-template>
 
+<ng-template #optionValueEditor>
+  @if (optionGroup(editingOption); as group) {
+    <div [formGroup]="group">
+      <div class="modal-header">
+        <h4 class="modal-title">{{ optionTitle(editingOption) }}</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="cancelModal()"></button>
+      </div>
+      <div class="modal-body">
+        <ngx-codemirror
+          class="path-codemirror"
+          formControlName="value"
+          [options]="scriptEditorOptions(optionLanguage)"
+          (codeMirrorLoaded)="refreshCodeMirror($event)">
+        </ngx-codemirror>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-fx btn-fx-secondary" (click)="cancelModal()">Close</button>
+      </div>
+    </div>
+  }
+</ng-template>
+
 <ng-template #uriEditor>
   <div [formGroup]="stepForm">
     <div class="modal-header">
@@ -179,6 +201,7 @@
         <br/>
 
         <!-- path field-->
+        @if (showsPath) {
         <div class="row">
           <div class="col-12">
             <label class="form-control-label" for="field_uri" style="float: left; margin-left: 6px;">Path</label>
@@ -215,6 +238,7 @@
           </button>
         </div>
         <br/>
+        }
 
         <!-- options fields -->
         <div formArrayName="options">
@@ -293,9 +317,15 @@
                          formControlName="value" [placeholder]="optionDefaultValue(idx)" />
                 }
                 @default {
-                  <input type="text" class="form-control" id="field_options-value-{{idx}}" formControlName="value"
-                         [placeholder]="optionDefaultValue(idx)"
-                         title="Value of the option. Click the Camel component button for documentation on valid options."/>
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="field_options-value-{{idx}}" formControlName="value"
+                           [placeholder]="optionDefaultValue(idx)"
+                           title="Value of the option. Click the Camel component button for documentation on valid options."/>
+                    <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-icon" title="Edit in a larger editor"
+                            aria-label="Edit in a larger editor" (click)="openOptionValueModal(idx, optionValueEditor)">
+                      <fa-icon icon="edit"></fa-icon>
+                    </button>
+                  </div>
                 }
               }
               @if (isRequiredOption(idx)) {

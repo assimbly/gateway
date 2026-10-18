@@ -8,7 +8,7 @@ import { PopoverModule } from 'ngx-bootstrap/popover';
 import { CodemirrorComponent, CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { Components } from 'app/shared/camel/component-type';
 import { CatalogueEntry, EndpointRole, NO_MATCH, essentialsFirst, matchRank, roleMismatch, searchCatalogue } from 'app/shared/camel/catalogue';
-import { OptionSchema, PathPart, ValueField, groupOptions, pathRule, requiredOptions, valueFieldOf } from 'app/shared/camel/endpoint';
+import { OptionSchema, PathPart, ValueField, groupOptions, pathRule, requiredOptions, suggestedOptions, valueFieldOf } from 'app/shared/camel/endpoint';
 import { IStep } from 'app/shared/model/step.model';
 import { IMessage } from 'app/shared/model/message.model';
 import { Connection } from 'app/shared/model/connection.model';
@@ -130,7 +130,7 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['componentOptions'] && this.componentOptions?.length) {
-      this.addRequiredOptions();
+      this.addSuggestedOptions();
     }
   }
 
@@ -255,16 +255,17 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   }
 
   /**
-   * Adds an empty row for each required Option of a Step that has no Options yet. A saved Step's own Options are
-   * filled in after its schema arrives, so they are left alone.
+   * Adds an empty row for each suggested Option of a Step that has no Options yet: the required ones, and for a small
+   * Component all of its Common Options. A saved Step's own Options are filled in after its schema arrives, so they
+   * are left alone. Rows left empty aren't saved.
    */
-  private addRequiredOptions(): void {
+  private addSuggestedOptions(): void {
     const formOptions = this.stepForm?.get('options') as FormArray | null;
     if (!formOptions || this.step?.options) {
       return;
     }
     const present = new Set(formOptions.controls.map(option => option.get('key')?.value));
-    requiredOptions(this.componentOptions, this.role)
+    suggestedOptions(this.componentOptions, this.role)
       .filter(name => !present.has(name))
       .forEach(name => {
         const emptyRow = formOptions.controls.findIndex(option => !option.get('key')?.value && !option.get('value')?.value);
@@ -511,6 +512,37 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
 
   openPathModal(templateRef: TemplateRef<any>): void {
     this.modalRef = this.modalService.open(templateRef, { size: 'xl' });
+  }
+
+  /**
+   * Whether the Step shows a Path field. A Component whose catalogue syntax is empty doesn't read a path, such as
+   * Set body; its field still shows while it holds a value, so nothing saved is hidden.
+   */
+  get showsPath(): boolean {
+    return this.uriPlaceholder !== '' || !!this.stepForm.get('uri')?.value || !!this.autoPath;
+  }
+
+  /** The row of the Option whose value is open in the larger editor. */
+  editingOption = -1;
+
+  openOptionValueModal(idx: number, templateRef: TemplateRef<any>): void {
+    this.editingOption = idx;
+    this.openPathModal(templateRef);
+  }
+
+  optionGroup(idx: number): FormGroup | null {
+    return idx >= 0 ? ((this.stepForm.get('options') as FormArray)?.at(idx) as FormGroup) ?? null : null;
+  }
+
+  optionTitle(idx: number): string {
+    const schema = this.optionSchema(idx);
+    return schema?.displayName ?? schema?.name ?? this.optionGroup(idx)?.get('key')?.value ?? 'Option';
+  }
+
+  /** The language a Step's expression Options are written in, from its own `language` Option, for the editor's highlighting. */
+  get optionLanguage(): string {
+    const row = ((this.stepForm.get('options') as FormArray)?.controls ?? []).find(option => option.get('key')?.value === 'language');
+    return `${row?.get('value')?.value || 'simple'}`;
   }
 
   openFullScreenModal(templateRef: TemplateRef<any>): void {
