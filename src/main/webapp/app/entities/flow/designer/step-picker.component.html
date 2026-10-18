@@ -19,6 +19,13 @@
     </div>
     @if (kind !== 'ROUTER') {
       <div class="step-picker-chips" aria-label="Categories">
+        @if (essentialsOf(kind).length) {
+          <button type="button" class="step-picker-chip" [class.active]="category === essentials" [attr.aria-pressed]="category === essentials"
+                  title="Assimbly's own Actions that work on the message, such as Set body or XML to JSON"
+                  (click)="chooseCategory(essentials)">
+            Essentials <span class="step-picker-count">{{ essentialsOf(kind).length }}</span>
+          </button>
+        }
         @if (recentOf(kind).length) {
           <button type="button" class="step-picker-chip" [class.active]="category === 'recent'" [attr.aria-pressed]="category === 'recent'"
                   (click)="chooseCategory('recent')">Recently used</button>

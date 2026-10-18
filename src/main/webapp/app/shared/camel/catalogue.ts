@@ -12,6 +12,23 @@ export interface CatalogueEntry {
   label?: string;
   consumerOnly?: boolean;
   producerOnly?: boolean;
+  /** Set on Assimbly's own steps: whether the step can be a Source, an Action or a Sink. */
+  source?: boolean;
+  action?: boolean;
+  sink?: boolean;
+}
+
+/** The chip for Assimbly's own Actions, which work on the message itself rather than talk to another system. */
+export const ESSENTIALS = 'essentials';
+
+/** Whether a component is one of Assimbly's own Actions that work on the message, such as Set body or XML to JSON. */
+export function isEssential(entry: CatalogueEntry): boolean {
+  return entry.action === true && !entry.source && !entry.sink;
+}
+
+/** The entries with the Essentials first, keeping the order within each group. */
+export function essentialsFirst<T extends CatalogueEntry>(entries: T[]): T[] {
+  return [...entries.filter(isEssential), ...entries.filter(entry => !isEssential(entry))];
 }
 
 /** Which side of an Endpoint a Step plays: a Source receives messages (consumer), Actions and Sinks send them (producer). */

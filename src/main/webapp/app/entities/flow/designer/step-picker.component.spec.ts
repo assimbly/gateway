@@ -1,5 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
+import { ESSENTIALS } from 'app/shared/camel/catalogue';
+
 import { PickedKind, StepPickerComponent } from './step-picker.component';
 
 describe('Step picker', () => {
@@ -48,6 +50,20 @@ describe('Step picker', () => {
     picker.filter = 'else';
 
     expect(picker.matches('ROUTER')).toEqual(['if']);
+  });
+
+  it("lists Assimbly's own Actions first, and offers them as the Essentials chip", () => {
+    expect(picker.matches('ACTION')[0]).toBe('setbody');
+    expect(picker.essentialsOf('ACTION')).toEqual(['setbody']);
+    expect(picker.essentialsOf('SINK')).toEqual([]);
+
+    picker.chooseCategory(ESSENTIALS);
+
+    expect(picker.matches('ACTION')).toEqual(['setbody']);
+  });
+
+  it('shows Set body by its title', () => {
+    expect(picker.entry('setbody').title).toBe('Set body');
   });
 
   it('lists the most used Routers first', () => {

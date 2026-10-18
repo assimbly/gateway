@@ -7,7 +7,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { PopoverModule } from 'ngx-bootstrap/popover';
 import { CodemirrorComponent, CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { Components } from 'app/shared/camel/component-type';
-import { CatalogueEntry, EndpointRole, NO_MATCH, matchRank, roleMismatch, searchCatalogue } from 'app/shared/camel/catalogue';
+import { CatalogueEntry, EndpointRole, NO_MATCH, essentialsFirst, matchRank, roleMismatch, searchCatalogue } from 'app/shared/camel/catalogue';
 import { OptionSchema, PathPart, ValueField, groupOptions, pathRule, requiredOptions, valueFieldOf } from 'app/shared/camel/endpoint';
 import { IStep } from 'app/shared/model/step.model';
 import { IMessage } from 'app/shared/model/message.model';
@@ -170,7 +170,9 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
       return cache.choices;
     }
     const usable = new Set<string>(names ?? []);
-    const choices: ComponentChoice[] = [...usable].map(name => this.componentChoice(this.catalogueEntry(name)));
+    const usableChoices = [...usable].map(name => this.componentChoice(this.catalogueEntry(name)));
+    // Actions list Assimbly's own Actions first, as the step picker does.
+    const choices: ComponentChoice[] = this.stepType === 'ACTION' ? essentialsFirst(usableChoices) : usableChoices;
     if (this.componentSearch.trim()) {
       const others = this.components.types.filter(type => !usable.has(type.name));
       searchCatalogue(others, this.componentSearch).forEach(entry =>
