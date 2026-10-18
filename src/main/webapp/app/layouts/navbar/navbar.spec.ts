@@ -294,6 +294,59 @@ describe('Navbar Component', () => {
     expect(items.indexOf('Log viewer')).toBeGreaterThan(diagnostics);
   });
 
+  it('should show the API definitions under API Explorer instead of Administration', () => {
+    jest.spyOn(profileService, 'getProfileInfo').mockReturnValue(of({ openAPIEnabled: true }));
+    accountService.authenticate({ ...account, authorities: ['ROLE_ADMIN'] });
+    fixture.detectChanges();
+
+    const links = Array.from<HTMLAnchorElement>(fixture.nativeElement.querySelectorAll('#api-menu-items a'));
+    expect(links.map(link => link.textContent?.trim())).toEqual([
+      'Flows',
+      'Broker',
+      'Configuration',
+      'Resources',
+      'Observability',
+      'Management',
+      'All endpoints',
+    ]);
+    expect(links[1].getAttribute('href')).toBe('/explorer/broker');
+    expect(fixture.nativeElement.querySelector('#admin-menu-items a[href="/admin/docs"]')).toBeNull();
+  });
+
+  it('should show API Explorer only to admins with the api-docs profile', () => {
+    jest.spyOn(profileService, 'getProfileInfo').mockReturnValue(of({ openAPIEnabled: true }));
+    accountService.authenticate(account);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#api-menu')).toBeNull();
+
+    accountService.authenticate({ ...account, authorities: ['ROLE_ADMIN'] });
+    comp.openAPIEnabled.set(false);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#api-menu')).toBeNull();
+  });
+
+  it('should treat API Explorer routes as its own group', () => {
+    const currentUrl = jest.spyOn(comp, 'currentUrl');
+
+    currentUrl.mockReturnValue('/explorer/broker');
+    expect(comp.isApiActive()).toBe(true);
+    expect(comp.isAdminActive()).toBe(false);
+    expect(comp.isActivePath('/explorer/broker')).toBe(true);
+    expect(comp.isActivePath('/explorer/integration')).toBe(false);
+
+    currentUrl.mockReturnValue('/admin/metrics');
+    expect(comp.isApiActive()).toBe(false);
+  });
+
+  it('should collapse the other submenus when API Explorer opens', () => {
+    comp.toggleApi();
+    expect(comp.flowsExpanded()).toBe(false);
+    expect(comp.apiExpanded()).toBe(true);
+
+    comp.toggleAdmin();
+    expect(comp.apiExpanded()).toBe(false);
+  });
+
   it('should hide submenu items until the group is expanded', () => {
     accountService.authenticate({ ...account, authorities: ['ROLE_ADMIN'] });
     fixture.detectChanges();

@@ -200,6 +200,64 @@
     }
 
     <ng-container *jhiHasAnyAuthority="'ROLE_ADMIN'">
+      @if (openAPIEnabled()) {
+        @if (iconOnly) {
+          <div ngbDropdown class="app-sidebar__group dropend" placement="end" container="body" data-cy="apiMenu">
+            <button
+              type="button"
+              class="app-sidebar__link app-sidebar__group-toggle"
+              ngbDropdownToggle
+              id="api-menu"
+              [class.active]="isApiActive()"
+              aria-label="API Explorer"
+            >
+              <fa-icon icon="code" [fixedWidth]="true" />
+            </button>
+            <div class="dropdown-menu" ngbDropdownMenu aria-labelledby="api-menu">
+              <ng-container [ngTemplateOutlet]="apiLinks" [ngTemplateOutletContext]="{ itemClass: 'dropdown-item' }" />
+            </div>
+          </div>
+        } @else {
+          <div class="app-sidebar__group" data-cy="apiMenu">
+            <button
+              type="button"
+              class="app-sidebar__link app-sidebar__group-toggle"
+              id="api-menu"
+              [class.active]="isApiActive()"
+              [attr.aria-expanded]="apiExpanded()"
+              aria-controls="api-menu-items"
+              (click)="toggleApi()"
+            >
+              <fa-icon icon="code" [fixedWidth]="true" />
+              <span class="app-sidebar__label" jhiTranslate="global.menu.apiExplorer">API Explorer</span>
+              <fa-icon class="app-sidebar__chevron" [icon]="apiExpanded() ? 'chevron-down' : 'chevron-right'" />
+            </button>
+            <div id="api-menu-items" class="app-sidebar__subnav" [class.app-sidebar__subnav--collapsed]="!apiExpanded()">
+              <ng-container
+                [ngTemplateOutlet]="apiLinks"
+                [ngTemplateOutletContext]="{ itemClass: 'app-sidebar__link app-sidebar__link--nested' }"
+              />
+            </div>
+          </div>
+        }
+
+        <ng-template #apiLinks let-itemClass="itemClass">
+          @for (definition of apiDefinitions; track definition.id) {
+            <a
+              [class]="itemClass"
+              [routerLink]="[apiExplorerPath, definition.id]"
+              [class.active]="isActivePath(apiExplorerPath + '/' + definition.id)"
+              (click)="collapseNavbar()"
+            >
+              <fa-icon [icon]="definition.icon" [fixedWidth]="true" />
+              <span>{{ definition.label }}</span>
+            </a>
+          }
+        </ng-template>
+      }
+    </ng-container>
+
+    <ng-container *jhiHasAnyAuthority="'ROLE_ADMIN'">
       @if (iconOnly) {
         <div ngbDropdown class="app-sidebar__group app-sidebar__group--divided dropend" placement="end" container="body" data-cy="adminMenu">
           <button
@@ -299,12 +357,6 @@
           <fa-icon icon="search" [fixedWidth]="true" />
           <span>Log viewer</span>
         </a>
-        @if (openAPIEnabled()) {
-          <a [class]="itemClass" routerLink="/admin/docs" [class.active]="isActivePath('/admin/docs')" (click)="collapseNavbar()">
-            <fa-icon icon="book" [fixedWidth]="true" />
-            <span jhiTranslate="global.menu.admin.apidocs">API</span>
-          </a>
-        }
         <!-- jhipster-needle-add-element-to-admin-menu - JHipster will add entities to the admin menu here -->
       </ng-template>
     </ng-container>

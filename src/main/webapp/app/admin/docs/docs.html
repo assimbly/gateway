@@ -1,12 +1,14 @@
-<iframe
-  #frame
-  (load)="addToken(frame)"
-  src="swagger-ui/index.html"
-  width="100%"
-  height="900"
-  seamless
-  target="_top"
-  title="Swagger UI"
-  class="border-0"
-  data-cy="swagger-frame"
-></iframe>
+@if (frameSrc(); as src) {
+  <iframe
+    #frame
+    (load)="onLoad(frame)"
+    [src]="src"
+    width="100%"
+    height="900"
+    seamless
+    target="_top"
+    title="API Explorer"
+    class="border-0"
+    data-cy="swagger-frame"
+  ></iframe>
+}

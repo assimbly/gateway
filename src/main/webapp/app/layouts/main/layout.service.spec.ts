@@ -51,8 +51,8 @@ describe('LayoutService', () => {
     it('collapses the other menus when a later route moves to another section', () => {
       const service = TestBed.inject(LayoutService);
 
-      service.syncMenuExpansion({ flows: true, broker: false, admin: false, account: false });
-      service.syncMenuExpansion({ flows: false, broker: true, admin: false, account: false });
+      service.syncMenuExpansion({ flows: true, broker: false, api: false, admin: false, account: false });
+      service.syncMenuExpansion({ flows: false, broker: true, api: false, admin: false, account: false });
 
       expect(service.flowsExpanded()).toBe(false);
       expect(service.brokerExpanded()).toBe(true);
@@ -63,9 +63,9 @@ describe('LayoutService', () => {
     it('keeps a manually opened menu when the route stays in the same section', () => {
       const service = TestBed.inject(LayoutService);
 
-      service.syncMenuExpansion({ flows: true, broker: false, admin: false, account: false });
+      service.syncMenuExpansion({ flows: true, broker: false, api: false, admin: false, account: false });
       service.toggleMenu('admin');
-      service.syncMenuExpansion({ flows: true, broker: false, admin: false, account: false });
+      service.syncMenuExpansion({ flows: true, broker: false, api: false, admin: false, account: false });
 
       expect(service.flowsExpanded()).toBe(false);
       expect(service.adminExpanded()).toBe(true);

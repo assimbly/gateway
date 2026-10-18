@@ -89,19 +89,8 @@ module.exports = async (config, options, targetOptions) => {
     );
   }
 
+  // Swagger UI is served by springdoc (/swagger-ui/**), so it's not copied here.
   const patterns = [
-    {
-      // https://github.com/swagger-api/swagger-ui/blob/v4.6.1/swagger-ui-dist-package/README.md
-      context: require('swagger-ui-dist').getAbsoluteFSPath(),
-      from: '*.{js,css,html,png}',
-      to: 'swagger-ui/',
-      globOptions: { ignore: ['**/index.html'] },
-    },
-    {
-      from: path.join(path.dirname(require.resolve('axios/package.json')), 'dist/axios.min.js'),
-      to: 'swagger-ui/',
-    },
-    { from: './src/main/webapp/swagger-ui/', to: 'swagger-ui/' },
     // jhipster-needle-add-assets-to-webpack - JHipster will add/remove third-party resources in this array
   ];
 

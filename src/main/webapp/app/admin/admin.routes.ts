@@ -1,11 +1,15 @@
-import { Routes } from '@angular/router';
+import { inject } from '@angular/core';
+import { Router, Routes } from '@angular/router';
+
+import { API_EXPLORER_PATH } from './docs/api-definitions';
 /* jhipster-needle-add-admin-module-import - JHipster will add admin modules imports here */
 
 const routes: Routes = [
   {
+    // Moved to the API Explorer. A guard instead of an absolute redirectTo, which would drop the navbar outlet.
     path: 'docs',
-    loadComponent: () => import('./docs/docs'),
-    title: 'global.menu.admin.apidocs',
+    canActivate: [() => inject(Router).createUrlTree([API_EXPLORER_PATH])],
+    children: [],
   },
   {
     path: 'configuration',

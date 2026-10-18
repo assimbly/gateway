@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 import { userRouteAccessService } from 'app/core/auth';
 import { Authority } from 'app/shared/jhipster/constants';
 
+import { API_DEFINITIONS } from './admin/docs/api-definitions';
 import { errorRoute } from './layouts/error/error.route';
 
 const routes: Routes = [
@@ -23,6 +24,21 @@ const routes: Routes = [
     },
     canActivate: [userRouteAccessService],
     loadChildren: () => import('./admin/admin.routes'),
+  },
+  {
+    path: 'explorer',
+    data: {
+      authorities: [Authority.ADMIN],
+    },
+    canActivate: [userRouteAccessService],
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: API_DEFINITIONS[0].id },
+      {
+        path: ':definition',
+        loadComponent: () => import('./admin/docs/docs'),
+        title: 'global.menu.apiExplorer',
+      },
+    ],
   },
   {
     path: 'account',

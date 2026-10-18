@@ -10,6 +10,7 @@ import { TranslateService } from '@ngx-translate/core';
 
 import { filter, map, startWith } from 'rxjs';
 
+import { API_DEFINITIONS, API_EXPLORER_PATH } from 'app/admin/docs/api-definitions';
 import { LANGUAGES } from 'app/config';
 import { AccountService, StateStorageService } from 'app/core/auth';
 import { ProfileService } from 'app/layouts/profiles/profile.service';
@@ -76,6 +77,9 @@ export default class Navbar implements OnInit {
   );
   readonly flowsExpanded = computed(() => this.layout.flowsExpanded());
   readonly brokerExpanded = computed(() => this.layout.brokerExpanded());
+  readonly apiExpanded = computed(() => this.layout.apiExpanded());
+  readonly apiDefinitions = API_DEFINITIONS;
+  readonly apiExplorerPath = API_EXPLORER_PATH;
   readonly adminExpanded = computed(() => this.layout.adminExpanded());
   readonly accountExpanded = computed(() => this.layout.accountExpanded());
 
@@ -144,6 +148,10 @@ export default class Navbar implements OnInit {
     return this.isBrokerPath(this.currentUrl());
   }
 
+  isApiActive(): boolean {
+    return this.isApiPath(this.currentUrl());
+  }
+
   isAdminActive(): boolean {
     return this.isAdminPath(this.currentUrl());
   }
@@ -158,6 +166,10 @@ export default class Navbar implements OnInit {
 
   toggleBroker(): void {
     this.layout.toggleMenu('broker');
+  }
+
+  toggleApi(): void {
+    this.layout.toggleMenu('api');
   }
 
   toggleAdmin(): void {
@@ -191,6 +203,7 @@ export default class Navbar implements OnInit {
     this.layout.syncMenuExpansion({
       flows: this.isFlowsPath(url),
       broker: this.isBrokerPath(url),
+      api: this.isApiPath(url),
       admin: this.isAdminPath(url),
       account: this.isAccountPath(url),
     });
@@ -208,6 +221,11 @@ export default class Navbar implements OnInit {
   private isBrokerPath(url: string): boolean {
     const path = url.split('?')[0];
     return path === '/broker' || path.startsWith('/broker/') || path.startsWith('/queue') || path.startsWith('/topic');
+  }
+
+  private isApiPath(url: string): boolean {
+    const path = url.split('?')[0];
+    return path === API_EXPLORER_PATH || path.startsWith(`${API_EXPLORER_PATH}/`);
   }
 
   private isAdminPath(url: string): boolean {

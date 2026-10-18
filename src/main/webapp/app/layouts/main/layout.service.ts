@@ -4,8 +4,8 @@ import { NavigationEnd, Router } from '@angular/router';
 
 import { filter } from 'rxjs';
 
-export type MenuGroup = 'flows' | 'broker' | 'admin' | 'account';
-const MENU_GROUPS: readonly MenuGroup[] = ['flows', 'broker', 'admin', 'account'];
+export type MenuGroup = 'flows' | 'broker' | 'api' | 'admin' | 'account';
+const MENU_GROUPS: readonly MenuGroup[] = ['flows', 'broker', 'api', 'admin', 'account'];
 
 @Service()
 export class LayoutService {
@@ -26,6 +26,7 @@ export class LayoutService {
   readonly iconOnly = computed(() => this.isDesktop() && this.collapsed());
   readonly flowsExpanded = signal(false);
   readonly brokerExpanded = signal(false);
+  readonly apiExpanded = signal(false);
   readonly adminExpanded = signal(false);
   readonly accountExpanded = signal(false);
   private menuExpansionInitialized = false;
@@ -86,10 +87,11 @@ export class LayoutService {
     this.hamburgerFocusRequestedState.set(false);
   }
 
-  syncMenuExpansion(active: { flows: boolean; broker: boolean; admin: boolean; account: boolean }): void {
+  syncMenuExpansion(active: Record<MenuGroup, boolean>): void {
     if (!this.menuExpansionInitialized) {
       this.flowsExpanded.set(active.flows);
       this.brokerExpanded.set(active.broker);
+      this.apiExpanded.set(active.api);
       this.adminExpanded.set(active.admin);
       this.accountExpanded.set(active.account);
       this.activeGroup = MENU_GROUPS.find(name => active[name]);
@@ -125,6 +127,8 @@ export class LayoutService {
         return this.flowsExpanded;
       case 'broker':
         return this.brokerExpanded;
+      case 'api':
+        return this.apiExpanded;
       case 'admin':
         return this.adminExpanded;
       default:
