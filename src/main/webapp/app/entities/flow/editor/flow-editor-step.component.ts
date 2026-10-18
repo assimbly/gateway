@@ -574,6 +574,13 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   openOptionValueModal(idx: number, templateRef: TemplateRef<any>): void {
     this.editingOption = idx;
     this.openPathModal(templateRef);
+    // A value typed in the larger editor only reaches the form, not the row's own field bound to the same control;
+    // setting it again once the editor closes shows it in the row too.
+    this.modalRef?.hidden.subscribe(() => {
+      const value = this.optionGroup(idx)?.get('value');
+      value?.setValue(value.value);
+      this.cdr.markForCheck();
+    });
   }
 
   optionGroup(idx: number): FormGroup | null {
