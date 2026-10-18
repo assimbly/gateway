@@ -20,7 +20,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { Components } from 'app/shared/camel/component-type';
 import { CatalogueEntry, CategoryChip, NO_MATCH, categoryChips, labelsOf, matchRank, roleMismatch, searchCatalogue } from 'app/shared/camel/catalogue';
 
-import { RESPONSE_COMPONENT, ROUTER_KINDS } from './flow-graph';
+import { RESPONSE_COMPONENT, ROUTER_KINDS, routerKindDescription, routerKindTitle } from './flow-graph';
 
 export type PickedKind = 'ACTION' | 'ROUTER' | 'SINK';
 
@@ -88,7 +88,11 @@ export class StepPickerComponent implements OnChanges {
     this.chipsByKind.clear();
   }
 
-  entry(name: string): CatalogueEntry {
+  /** How a component is shown; a Router kind is shown by its own name, not by a catalogue component of the same id. */
+  entry(name: string, kind?: PickedKind): CatalogueEntry {
+    if (kind === 'ROUTER') {
+      return { name, title: routerKindTitle(name), description: routerKindDescription(name) };
+    }
     return DESIGNER_ENTRIES[name] ?? this.catalogue.get(name) ?? { name };
   }
 
@@ -124,7 +128,7 @@ export class StepPickerComponent implements OnChanges {
     } else if (this.category && kind !== 'ROUTER') {
       names = names.filter(name => labelsOf(this.entry(name)).includes(this.category!));
     }
-    return searchCatalogue(names.map(name => this.entry(name)), this.filter).map(entry => entry.name);
+    return searchCatalogue(names.map(name => this.entry(name, kind)), this.filter).map(entry => entry.name);
   }
 
   /**
@@ -166,7 +170,7 @@ export class StepPickerComponent implements OnChanges {
     let best: { kind: PickedKind; name: string; rank: number } | undefined;
     for (const kind of [this.kind, ...this.kinds]) {
       const name = this.matches(kind)[0];
-      const rank = name === undefined ? NO_MATCH : this.filter.trim() ? matchRank(this.entry(name), this.filter) : 0;
+      const rank = name === undefined ? NO_MATCH : this.filter.trim() ? matchRank(this.entry(name, kind), this.filter) : 0;
       if (name !== undefined && (!best || rank < best.rank)) {
         best = { kind, name, rank };
       }

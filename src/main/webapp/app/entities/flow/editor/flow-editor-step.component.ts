@@ -45,7 +45,7 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   /** On the visual designer's canvas, Steps are added there instead of through this form. */
   @Input() onCanvas = false;
   /** On the canvas, the kind of the Router being edited; it is shown as its component and can't be changed here. */
-  @Input() routerKind?: string;
+  @Input() routerTitle?: string;
   /** On the canvas, whether the Flow keeps a valid shape without this Step; the canvas decides which Steps can go. */
   @Input() deletable = false;
   @Input() formSubmitted = false;

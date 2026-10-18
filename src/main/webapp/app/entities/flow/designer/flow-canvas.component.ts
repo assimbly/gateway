@@ -28,9 +28,9 @@ import {
   openEnds,
   Problem,
   RESPONSE_COMPONENT,
-  routerKind,
   routerOf,
   routerShape,
+  routerTitle,
   StepKind,
 } from './flow-graph';
 import { responseSettings } from './response';
@@ -104,7 +104,7 @@ export class FlowCanvasComponent {
     if (step.componentType?.toLowerCase() === 'flowlink') {
       return 'Call Flow';
     }
-    return step.kind === 'ROUTER' ? routerKind(step) : step.componentType || step.uri || 'choose a component';
+    return step.kind === 'ROUTER' ? routerTitle(step) : step.componentType || step.uri || 'choose a component';
   }
 
   /** What the step kind shows: a Handler Flow's Source is its Operation, and a Response is named as such. */

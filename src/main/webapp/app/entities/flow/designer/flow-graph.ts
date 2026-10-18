@@ -96,12 +96,59 @@ const ROUTER_SHAPES: Record<string, RouterShape> = {
   link: list(false, false),
 };
 
-/** The kinds of Router that can be inserted on the canvas. */
-export const ROUTER_KINDS = Object.keys(ROUTER_SHAPES);
+/**
+ * What each kind of Router is called and does, in the words a user sees; the kind itself stays the id. Ordered by
+ * how often a kind is used, so the picker lists the common ones first.
+ */
+const ROUTER_NAMES: Record<string, { title: string; description: string }> = {
+  content: { title: 'Content router', description: 'Sends each message down the first Branch whose Condition matches.' },
+  if: { title: 'If / else', description: 'Takes the if Branch when the Condition holds, and the Default branch otherwise.' },
+  split: { title: 'Split', description: 'Handles each item of a list, found by an expression, on its own.' },
+  splitandaggregate: {
+    title: 'Split and combine',
+    description: 'Handles each item of a list on its own, then combines the results into one XML or JSON message.',
+  },
+  recipient: { title: 'Recipient list', description: 'Sends a copy of the message to every Branch.' },
+  enrich: { title: 'Enrich', description: 'Fetches extra data on a Branch and merges it into the message.' },
+  wiretap: { title: 'Wiretap', description: 'Sends a copy of the message down a Branch without waiting, and carries on.' },
+  loop: { title: 'Loop', description: 'Repeats a Branch a number of times.' },
+  dowhile: { title: 'Do while', description: 'Repeats a Branch as long as its Condition holds.' },
+  dynamic: { title: 'Dynamic router', description: 'Sends the message to addresses worked out from the message itself.' },
+  link: { title: 'Link', description: 'Hands the message to the Steps it links to.' },
+  splitwithnamespace: {
+    title: 'Split (XML with namespaces)',
+    description: 'Handles each item of an XML list whose expression uses namespaces, on its own.',
+  },
+  splitandaggregatewithnamespace: {
+    title: 'Split and combine (XML with namespaces)',
+    description: 'Like Split and combine, for XML whose expression uses namespaces.',
+  },
+};
+
+/** The kinds of Router that can be inserted on the canvas, the most used first. */
+export const ROUTER_KINDS = [
+  ...Object.keys(ROUTER_NAMES).filter(kind => kind in ROUTER_SHAPES),
+  ...Object.keys(ROUTER_SHAPES).filter(kind => !(kind in ROUTER_NAMES)),
+];
 
 /** The kind of Router a Step is, such as 'if' or 'content'. Imported Steps keep it in the uri. */
 export function routerKind(step: Pick<DesignStep, 'componentType' | 'uri'>): string {
   return (step.componentType || step.uri || '').toLowerCase().replace(/:.*$/, '');
+}
+
+/** What a kind of Router is called, such as 'If / else' for `if`; a kind without a name is shown as itself. */
+export function routerKindTitle(kind: string): string {
+  return ROUTER_NAMES[kind]?.title ?? kind;
+}
+
+/** What a kind of Router does, in one sentence. */
+export function routerKindDescription(kind: string): string | undefined {
+  return ROUTER_NAMES[kind]?.description;
+}
+
+/** What a Router Step is called, such as 'If / else'. */
+export function routerTitle(step: Pick<DesignStep, 'componentType' | 'uri'>): string {
+  return routerKindTitle(routerKind(step));
 }
 
 /** Router kinds the shape table doesn't know are treated as List Routers without a Default branch. */
@@ -365,7 +412,7 @@ export function addBranch(graph: FlowGraph, routerKey: string): EditResult {
   }
   const shape = routerShape(router);
   if (shape.slots === 'fixed') {
-    return rejected(`An ${routerKind(router)} Router has a fixed set of Branches.`);
+    return rejected(`${routerTitle(router)} has a fixed set of Branches.`);
   }
 
   const sink: DesignStep = { key: nextKey(), kind: 'SINK', ...branchEndPosition(graph.steps, router) };
@@ -602,7 +649,7 @@ function renameRefusal(graph: FlowGraph, link: DesignLink, rule: string | undefi
   }
   const shape = routerShape(router);
   if (shape.slots === 'fixed') {
-    return `The Branches of an ${routerKind(router)} Router can't be renamed.`;
+    return `The Branches of ${routerTitle(router)} can't be renamed.`;
   }
   if (link === defaultBranch(graph, router)) {
     return "The Default branch can't be given a name.";

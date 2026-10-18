@@ -26,6 +26,7 @@ import {
   RESPONSE_COMPONENT,
   ROUTER_KINDS,
   routerShape,
+  routerTitle,
   stepsToSave,
   takesCondition,
   updateLink,
@@ -411,7 +412,7 @@ describe('Flow graph', () => {
 
       const result = addBranch(ifRouter, router.key);
 
-      expect(result).toEqual({ outcome: 'rejected', reason: expect.stringContaining('if') });
+      expect(result).toEqual({ outcome: 'rejected', reason: expect.stringContaining('If / else') });
     });
 
     it('refuses to add a Branch to a Step that is not a Router', () => {
@@ -844,6 +845,21 @@ describe('Flow graph', () => {
         graph.steps.some((b, j) => i !== j && Math.abs(a.x! - b.x!) < 150 && Math.abs(a.y! - b.y!) < 120),
       );
       expect(overlapping.map(s => s.key)).toEqual([]);
+    });
+  });
+
+  describe('Router names', () => {
+    it('names every kind of Router in words, not by its id', () => {
+      ROUTER_KINDS.forEach(kind => expect(routerTitle({ componentType: kind })).not.toBe(kind));
+      expect(routerTitle({ componentType: 'if' })).toBe('If / else');
+    });
+
+    it('shows a Router kind it has no name for as itself', () => {
+      expect(routerTitle({ componentType: 'multicast' })).toBe('multicast');
+    });
+
+    it('names an imported Router by the kind in its uri', () => {
+      expect(routerTitle({ uri: 'content:abc' })).toBe('Content router');
     });
   });
 });

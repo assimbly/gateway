@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { canDeleteBranch, canRenameBranch, defaultBranch, DesignLink, FlowGraph, LinkSettings, routerKind, routerOf, takesCondition } from './flow-graph';
+import { canDeleteBranch, canRenameBranch, defaultBranch, DesignLink, FlowGraph, LinkSettings, routerOf, routerTitle, takesCondition } from './flow-graph';
 
 /** Edits the Link leading to a Step: its Branch name and Condition (on a Router) and its transport settings. */
 @Component({
@@ -30,7 +30,7 @@ export class LinkEditorComponent {
 
   get fromLabel(): string {
     const from = this.graph.steps.find(s => s.key === this.link.from);
-    return from ? `${from.kind} ${from.kind === 'ROUTER' ? routerKind(from) : from.componentType || ''}` : '';
+    return from ? `${from.kind} ${from.kind === 'ROUTER' ? routerTitle(from) : from.componentType || ''}` : '';
   }
 
   get toLabel(): string {

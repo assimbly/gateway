@@ -159,7 +159,7 @@
               </ng-template>
             </ng-select>
             <input *ngIf="stepType==='ROUTER'" type="text" class="form-control" id="field_component_type"
-                   readonly [value]="routerKind ?? ''"
+                   readonly [value]="routerTitle ?? ''"
                    title="A Router keeps its kind. To use another kind, delete this Router and add a new one."/>
             <div *ngIf="formSubmitted && componentTypeErrors">
               <div *ngIf="componentTypeErrors.required"

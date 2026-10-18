@@ -38,4 +38,19 @@ describe('Step picker', () => {
 
     expect(picked).toEqual([{ kind: 'ROUTER', componentType: 'content' }]);
   });
+
+  it('shows a Router by its own name and description, not by a catalogue component with the same id', () => {
+    expect(picker.entry('split', 'ROUTER')).toEqual(expect.objectContaining({ title: 'Split', description: expect.stringContaining('each item') }));
+    expect(picker.entry('if', 'ROUTER').title).toBe('If / else');
+  });
+
+  it('finds a Router by words from its name', () => {
+    picker.filter = 'else';
+
+    expect(picker.matches('ROUTER')).toEqual(['if']);
+  });
+
+  it('lists the most used Routers first', () => {
+    expect(picker.matches('ROUTER').slice(0, 3)).toEqual(['content', 'if', 'split']);
+  });
 });

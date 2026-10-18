@@ -72,7 +72,7 @@ import {
   opensOnCanvas,
   Problem,
   problems,
-  routerKind,
+  routerTitle,
   stepsToSave,
   updateLink,
   warnings,
@@ -1906,11 +1906,11 @@ splitOptions4(options: string): string[] {
 		return opensOnCanvas(this.activeEditor);
 	}
 
-	/** The kind of the selected Router, shown read-only as its component. */
-	get selectedRouterKind(): string | undefined {
+	/** What the selected Router is called, shown read-only as its component. */
+	get selectedRouterTitle(): string | undefined {
 		const selection = this.selection;
 		const router = selection.type === 'step' ? this.canvasGraph?.steps.find(s => s.key === selection.key && s.kind === 'ROUTER') : undefined;
-		return router ? routerKind(router) : undefined;
+		return router ? routerTitle(router) : undefined;
 	}
 
 	get selectedStepDeletable(): boolean {
@@ -2172,7 +2172,7 @@ splitOptions4(options: string): string[] {
 		if (
 			step?.kind === 'ROUTER' &&
 			branches > 1 &&
-			!window.confirm(`Delete this ${routerKind(step)} Router? Its Default branch takes its place and its other Branches are deleted.`)
+			!window.confirm(`Delete this ${routerTitle(step)} Router? Its Default branch takes its place and its other Branches are deleted.`)
 		) {
 			return;
 		}

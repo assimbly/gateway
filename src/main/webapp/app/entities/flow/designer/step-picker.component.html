@@ -38,7 +38,7 @@
     }
     <div class="step-picker-list" role="listbox" [attr.aria-label]="labels[kind] + ' components'">
       @for (name of matches(kind); track name) {
-        @let item = entry(name);
+        @let item = entry(name, kind);
         <button type="button" role="option" class="step-picker-item" [title]="item.description ?? ''" (click)="pick(kind, name)">
           <span class="step-picker-item-title">{{ item.title ?? name }}</span>
           @if (item.title) {

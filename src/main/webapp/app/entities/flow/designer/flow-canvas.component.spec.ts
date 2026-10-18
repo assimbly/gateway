@@ -52,7 +52,7 @@ describe('Flow canvas', () => {
     const steps: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('.flow-step'));
 
     expect(steps.map(s => s.querySelector('.flow-step-kind')!.textContent!.trim())).toEqual(['SOURCE', 'ROUTER', 'SINK', 'SINK']);
-    expect(steps.map(s => s.querySelector('.flow-step-label')!.textContent!.trim())).toEqual(['timer', 'content', 'log', 'choose a component']);
+    expect(steps.map(s => s.querySelector('.flow-step-label')!.textContent!.trim())).toEqual(['timer', 'Content router', 'log', 'choose a component']);
     expect(steps[3].classList).toContain('flow-step-problem');
   });
 
