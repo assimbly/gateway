@@ -284,8 +284,14 @@ describe('Navbar Component', () => {
     // Translated labels render as their keys in this test setup.
     expect(items.slice(0, 3)).toEqual(['System', 'Gateways', 'Certificates']);
     expect(items[3]).toContain('userManagement');
-    expect(items[4]).toBe('Diagnostics');
-    expect(items.indexOf('Log viewer')).toBeGreaterThan(4);
+    expect(items[4]).toContain('configuration');
+    const diagnostics = items.indexOf('Diagnostics');
+    expect(diagnostics).toBeGreaterThan(4);
+    const database = items.findIndex(item => item?.includes('database'));
+    if (database !== -1) {
+      expect(database).toBeLessThan(diagnostics);
+    }
+    expect(items.indexOf('Log viewer')).toBeGreaterThan(diagnostics);
   });
 
   it('should hide submenu items until the group is expanded', () => {

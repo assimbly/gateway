@@ -272,6 +272,16 @@
           <fa-icon icon="users" [fixedWidth]="true" />
           <span jhiTranslate="global.menu.admin.userManagement">Users</span>
         </a>
+        <a [class]="itemClass" routerLink="/admin/configuration" [class.active]="isActivePath('/admin/configuration')" (click)="collapseNavbar()">
+          <fa-icon icon="cogs" [fixedWidth]="true" />
+          <span jhiTranslate="global.menu.admin.configuration">Configuration</span>
+        </a>
+        @if (!inProduction()) {
+          <a [class]="itemClass" href="./h2-console/" target="_blank" rel="noopener noreferrer" (click)="collapseNavbar()">
+            <fa-icon icon="database" [fixedWidth]="true" />
+            <span jhiTranslate="global.menu.admin.database">Database</span>
+          </a>
+        }
         <div [class]="sectionClass" id="admin-diagnostics-heading">Diagnostics</div>
         <a [class]="itemClass" routerLink="/admin/health" [class.active]="isActivePath('/admin/health')" (click)="collapseNavbar()">
           <fa-icon icon="heart" [fixedWidth]="true" />
@@ -289,10 +299,6 @@
           <fa-icon icon="search" [fixedWidth]="true" />
           <span>Log viewer</span>
         </a>
-        <a [class]="itemClass" routerLink="/admin/configuration" [class.active]="isActivePath('/admin/configuration')" (click)="collapseNavbar()">
-          <fa-icon icon="cogs" [fixedWidth]="true" />
-          <span jhiTranslate="global.menu.admin.configuration">Configuration</span>
-        </a>
         @if (openAPIEnabled()) {
           <a [class]="itemClass" routerLink="/admin/docs" [class.active]="isActivePath('/admin/docs')" (click)="collapseNavbar()">
             <fa-icon icon="book" [fixedWidth]="true" />
@@ -300,12 +306,6 @@
           </a>
         }
         <!-- jhipster-needle-add-element-to-admin-menu - JHipster will add entities to the admin menu here -->
-        @if (!inProduction()) {
-          <a [class]="itemClass" href="./h2-console/" target="_blank" rel="noopener noreferrer" (click)="collapseNavbar()">
-            <fa-icon icon="database" [fixedWidth]="true" />
-            <span jhiTranslate="global.menu.admin.database">Database</span>
-          </a>
-        }
       </ng-template>
     </ng-container>
   </nav>
