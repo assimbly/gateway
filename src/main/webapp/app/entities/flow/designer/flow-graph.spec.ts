@@ -319,6 +319,26 @@ describe('Flow graph', () => {
       expect(newSink.kind).toBe('SINK');
       expect(newSink.id).toBeUndefined();
     });
+
+    it.each([
+      ['if', 'if'],
+      ['split', 'split'],
+      ['loop', 'loop'],
+    ])('writes the Condition of a new %s Router in the simple language', (kind, branch) => {
+      const graph = edited(insertStep(sourceToSink(), 'step-11', 'ROUTER', kind));
+
+      const router = graph.steps.find(s => s.kind === 'ROUTER')!;
+      expect(graph.links.filter(l => l.from === router.key).map(l => [l.rule, l.language])).toEqual([
+        [undefined, undefined],
+        [branch, 'simple'],
+      ]);
+    });
+
+    it('sets no Condition language on a Router whose Branches take no Condition', () => {
+      const graph = edited(insertStep(sourceToSink(), 'step-11', 'ROUTER', 'enrich'));
+
+      expect(graph.links.every(l => l.language === undefined)).toBe(true);
+    });
   });
 
   describe('adding the next Step after an open end', () => {
@@ -370,6 +390,18 @@ describe('Flow graph', () => {
       expect(openEnds(graph)).toEqual([]);
     });
 
+    it('writes the Condition of a new If / else Router in the simple language', () => {
+      const start = newFlow();
+
+      const graph = edited(appendStep(start, start.steps[0].key, 'ROUTER', 'if'));
+
+      const router = graph.steps.find(s => s.kind === 'ROUTER')!;
+      expect(graph.links.filter(l => l.from === router.key).map(l => [l.rule, l.language])).toEqual([
+        [undefined, undefined],
+        ['if', 'simple'],
+      ]);
+    });
+
     it('refuses to add a Step after a Step that already has a next Step', () => {
       expect(appendStep(sourceToSink(), 'step-10', 'ACTION', 'log').outcome).toBe('rejected');
     });
@@ -395,6 +427,12 @@ describe('Flow graph', () => {
       const names = graph.links.filter(l => l.from === 'step-11').map(l => l.rule);
       expect(names.filter(name => !name)).toHaveLength(1);
       expect(new Set(names).size).toBe(4);
+    });
+
+    it('writes the Condition of a new Content router Branch in the simple language', () => {
+      const graph = edited(addBranch(contentRouterFlow(), 'step-11'));
+
+      expect(graph.links.filter(l => l.from === 'step-11').at(-1)!.language).toBe('simple');
     });
 
     it('does not name the Branches of a Recipient list Router', () => {

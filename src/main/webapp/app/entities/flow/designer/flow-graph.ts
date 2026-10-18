@@ -215,7 +215,7 @@ function withFixedSlotBranches(graph: FlowGraph): FlowGraph {
       return result;
     }
     const sink: DesignStep = { key: nextKey(), kind: 'SINK' };
-    return { ...result, steps: [...result.steps, sink], links: [...result.links, { ...plainLink(step.key, sink.key), rule: shape.branch }] };
+    return { ...result, steps: [...result.steps, sink], links: [...result.links, namedBranch(step.key, sink.key, shape.branch, shape)] };
   }, graph);
 }
 
@@ -327,6 +327,16 @@ const rejected = (reason: string): EditResult => ({ outcome: 'rejected', reason 
 const accepted = (graph: FlowGraph): EditResult => ({ outcome: 'accepted', graph });
 const plainLink = (from: string, to: string): DesignLink => ({ from, to, transport: 'sync' });
 
+/** The language a new Branch's Condition is written in, until the user picks another. */
+export const DEFAULT_CONDITION_LANGUAGE = 'simple';
+
+/** A named Branch of a Router; on a Router that decides on a Condition, it starts in the default Condition language. */
+const namedBranch = (from: string, to: string, rule: string, shape: RouterShape): DesignLink => ({
+  ...plainLink(from, to),
+  rule,
+  ...(shape.takesCondition ? { language: DEFAULT_CONDITION_LANGUAGE } : {}),
+});
+
 /**
  * Inserts a new Action or Router into the Link that leads to `linkTo`.
  * The upstream part of the Link (its Branch name, Condition and settings) now leads to the new Step.
@@ -348,7 +358,7 @@ export function insertStep(graph: FlowGraph, linkTo: string, kind: 'ACTION' | 'R
   if (shape?.slots === 'fixed') {
     const sink: DesignStep = { key: nextKey(), kind: 'SINK', ...branchEndPosition(steps, inserted) };
     steps = [...steps, sink];
-    links = [...links, { ...plainLink(inserted.key, sink.key), rule: shape.branch }];
+    links = [...links, namedBranch(inserted.key, sink.key, shape.branch, shape)];
   }
 
   return accepted({ ...graph, steps, links });
@@ -402,7 +412,7 @@ export function appendStep(graph: FlowGraph, afterKey: string, kind: 'ACTION' | 
     for (const rule of branchRules) {
       const sink: DesignStep = { key: nextKey(), kind: 'SINK', ...nextColumnPosition(steps, appended) };
       steps = [...steps, sink];
-      links = [...links, { ...plainLink(appended.key, sink.key), rule }];
+      links = [...links, rule ? namedBranch(appended.key, sink.key, rule, shape) : plainLink(appended.key, sink.key)];
     }
   }
 
@@ -421,10 +431,7 @@ export function addBranch(graph: FlowGraph, routerKey: string): EditResult {
   }
 
   const sink: DesignStep = { key: nextKey(), kind: 'SINK', ...branchEndPosition(graph.steps, router) };
-  const branch = plainLink(router.key, sink.key);
-  if (shape.hasDefault) {
-    branch.rule = unusedBranchName(graph, router.key);
-  }
+  const branch = shape.hasDefault ? namedBranch(router.key, sink.key, unusedBranchName(graph, router.key), shape) : plainLink(router.key, sink.key);
   return accepted({ ...graph, steps: [...graph.steps, sink], links: [...graph.links, branch] });
 }
 
