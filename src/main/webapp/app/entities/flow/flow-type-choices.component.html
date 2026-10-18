@@ -10,3 +10,16 @@
     </a>
   }
 </div>
+
+<section class="flow-examples" aria-labelledby="flow-examples-heading">
+  <h2 class="flow-examples__heading" id="flow-examples-heading">Or start from an example</h2>
+  <div class="flow-examples__list">
+    @for (example of examples; track example.id) {
+      <a class="flow-example" routerLink="/flow/editor" [queryParams]="{ mode: 'edit', editor: 'flow', template: example.id }"
+         (click)="chosen.emit()">
+        <span class="flow-example__title">{{ example.title }}</span>
+        <span class="flow-example__description">{{ example.description }}</span>
+      </a>
+    }
+  </div>
+</section>

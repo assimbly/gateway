@@ -242,6 +242,11 @@ function hasAmbiguousBranches(flowSteps: IStep[]): boolean {
   return [...branchSettings.values()].some(settings => settings.size > 1);
 }
 
+/** A new Flow laid out from ready-made Steps and Links, such as an Example Flow's; it has no id until it is saved. */
+export function newFlowGraph(steps: DesignStep[], links: DesignLink[]): FlowGraph {
+  return arrangedIfUnplaced({ steps, links, repaired: false });
+}
+
 function arrangedIfUnplaced(graph: FlowGraph): FlowGraph {
   return graph.steps.every(s => s.x !== undefined && s.y !== undefined) ? graph : autoArrange(graph);
 }

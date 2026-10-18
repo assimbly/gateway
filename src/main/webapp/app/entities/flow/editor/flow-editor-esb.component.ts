@@ -44,6 +44,7 @@ import { sourceStepOf } from "../flow-status";
 import { automaticErrorHandlerPath, defaultErrorHandlerStep, errorHandlerPath, errorHandlerPathOnSave } from "./error-handler";
 import { isRouteStep, missingRouteFields, routeToSave } from "./route-step";
 import { ComponentSchemas } from "../component-schemas.service";
+import { FlowTemplate, flowTemplate, templateFlow } from "../templates/flow-templates";
 import { VariableKeysService } from "app/entities/environment-variables/variable-keys.service";
 import { variableWarnings } from "app/shared/camel/variables";
 import { LinkEditorComponent } from "../designer/link-editor.component";
@@ -133,6 +134,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	private readonly variableKeys = inject(VariableKeysService);
 	/** The keys of the Variables, to warn about Steps that refer to one that doesn't exist; null until loaded. */
 	private knownVariables: string[] | null = null;
+	/** The Example Flow a new Flow starts from, from the `template` query parameter. */
+	private template?: FlowTemplate;
 	private readonly apiService = inject(ApiService);
 
 	/** The API and Operation this Flow handles, when it is a Handler Flow: its Source is that Operation. */
@@ -290,10 +293,13 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			this.route.queryParams.subscribe(
 				(params) => {
 					const nextEditor = params["editor"];
-					const editorChanged = !params["id"] && !!this.activeEditor && this.activeEditor !== nextEditor;
+					const nextTemplate = params["id"] ? undefined : flowTemplate(params["template"]);
+					const editorChanged =
+						!params["id"] && !!this.activeEditor && (this.activeEditor !== nextEditor || this.template?.id !== nextTemplate?.id);
 
 					this.activeStep = params["stepid"];
 					this.activeEditor = nextEditor;
+					this.template = nextTemplate;
 
 					if (editorChanged) {
 						this.resetNewFlowEditor();
@@ -447,7 +453,10 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 								// create new route step
                 if(this.useCanvas){
-                    this.loadDesigner(this.flow);
+                    this.loadDesigner(this.flow, this.template);
+                    if (this.template && !this.nameControl.value) {
+                        this.nameControl.setValue(this.template.title);
+                    }
                 }else if(this.activeEditor === 'flow'){
                     this.createNewStep(StepType.SOURCE,this.integrations[0].defaultFromComponentType,0);
                     this.createNewStep(StepType.SINK,this.integrations[0].defaultToComponentType,1);
@@ -1964,8 +1973,10 @@ splitOptions4(options: string): string[] {
 		return this.canvasProblems.length > 0;
 	}
 
-	private loadDesigner(flow: IFlow): void {
-		const graph = loadFlowGraph(flow, this.handler);
+	/** Puts a Flow on the canvas; a new Flow made from an Example Flow starts with that example's Steps and Links. */
+	private loadDesigner(flow: IFlow, template?: FlowTemplate): void {
+		const example = template ? templateFlow(template) : undefined;
+		const graph = example?.graph ?? loadFlowGraph(flow, this.handler);
 
 		this.steps = [];
 		this.stepKeys = [];
@@ -1973,7 +1984,7 @@ splitOptions4(options: string): string[] {
 		(<FormArray>this.editFlowForm.controls.stepsData).clear();
 
 		graph.steps.forEach(designStep => {
-			const saved = (flow.steps ?? []).find(step => step.id != null && step.id === designStep.id);
+			const saved = example?.steps.get(designStep.key) ?? (flow.steps ?? []).find(step => step.id != null && step.id === designStep.id);
 			if (saved) {
 				this.addSavedStepForm(saved, designStep.key);
 			} else {
