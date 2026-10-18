@@ -65,6 +65,28 @@
   </div>
 </ng-template>
 
+<ng-template #variableMenu let-control="control" let-input="input">
+  <div ngbDropdown container="body" placement="bottom-end bottom-start top-end" class="d-flex" (openChange)="variableFilter = ''">
+    <button type="button" class="btn btn-fx btn-fx-ghost font-monospace" ngbDropdownToggle
+            title="Insert a Variable, a named value kept under Flows → Variables" aria-label="Insert a Variable">&#64;&#123;&#125;</button>
+    <div ngbDropdownMenu class="variable-menu">
+      @if ((variableKeys?.length ?? 0) > 6) {
+        <div class="px-2 pb-1">
+          <input type="search" class="form-control form-control-sm" placeholder="Filter Variables" aria-label="Filter Variables"
+                 [value]="variableFilter" (input)="variableFilter = $any($event.target).value" />
+        </div>
+      }
+      @for (key of filteredVariableKeys; track key) {
+        <button type="button" ngbDropdownItem class="font-monospace" (click)="insertVariableInto(control, input, key)">{{ key }}</button>
+      } @empty {
+        <span class="dropdown-item-text small text-muted">{{ variableKeys?.length ? 'No Variable matches.' : 'No Variables yet.' }}</span>
+      }
+      <div class="dropdown-divider"></div>
+      <a ngbDropdownItem routerLink="/environment-variables" target="_blank" rel="noopener">Manage Variables</a>
+    </div>
+  </div>
+</ng-template>
+
 <ng-template #optionValueEditor>
   @if (optionGroup(editingOption); as group) {
     <div [formGroup]="group">
@@ -211,9 +233,12 @@
             </i>
           </div>
           <div class="col-10">
-            <input type="text" class="d-inline-block form-control" list="urilist" formControlName="uri" [value]="uriValue"
-                   [attr.placeholder]="autoPath ?? null"
-                   [attr.aria-describedby]="autoPath ? 'field_uri_auto field_uri_syntax' : 'field_uri_syntax'" />
+            <div class="input-group">
+              <input #uriInput type="text" class="form-control" list="urilist" formControlName="uri" [value]="uriValue"
+                     [attr.placeholder]="autoPath ?? null"
+                     [attr.aria-describedby]="autoPath ? 'field_uri_auto field_uri_syntax' : 'field_uri_syntax'" />
+              <ng-container *ngTemplateOutlet="variableMenu; context: { control: stepForm.get('uri'), input: uriInput }"></ng-container>
+            </div>
             <datalist id="urilist">
               <option *ngFor="let uriStep of uriList" [value]="uriStep.uri">{{uriStep.uri}}</option>
             </datalist>
@@ -318,9 +343,10 @@
                 }
                 @default {
                   <div class="input-group">
-                    <input type="text" class="form-control" id="field_options-value-{{idx}}" formControlName="value"
+                    <input #valueInput type="text" class="form-control" id="field_options-value-{{idx}}" formControlName="value"
                            [placeholder]="optionDefaultValue(idx)"
                            title="Value of the option. Click the Camel component button for documentation on valid options."/>
+                    <ng-container *ngTemplateOutlet="variableMenu; context: { control: optionGroup(idx)?.get('value'), input: valueInput }"></ng-container>
                     <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-icon" title="Edit in a larger editor"
                             aria-label="Edit in a larger editor" (click)="openOptionValueModal(idx, optionValueEditor)">
                       <fa-icon icon="edit"></fa-icon>
@@ -345,6 +371,10 @@
             </button>
           </div>
         </div>
+
+        @if (unknownVariablesWarning; as warning) {
+          <div class="alert alert-warning py-1 px-2 small text-start mb-2" role="status">{{ warning }}</div>
+        }
 
         @if (missingRequiredOptions.length) {
           <div class="alert alert-warning py-1 px-2 small text-start mb-2" role="status">

@@ -44,6 +44,8 @@ import { sourceStepOf } from "../flow-status";
 import { automaticErrorHandlerPath, defaultErrorHandlerStep, errorHandlerPath, errorHandlerPathOnSave } from "./error-handler";
 import { isRouteStep, missingRouteFields, routeToSave } from "./route-step";
 import { ComponentSchemas } from "../component-schemas.service";
+import { VariableKeysService } from "app/entities/environment-variables/variable-keys.service";
+import { variableWarnings } from "app/shared/camel/variables";
 import { LinkEditorComponent } from "../designer/link-editor.component";
 import { ResponseEditorComponent } from "./response-editor.component";
 import { CallFlowEditorComponent, callableFlows } from "./call-flow-editor.component";
@@ -128,6 +130,9 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	private savedFlowName?: string | null;
 	private readonly location = inject(Location);
 	private readonly schemas = inject(ComponentSchemas);
+	private readonly variableKeys = inject(VariableKeysService);
+	/** The keys of the Variables, to warn about Steps that refer to one that doesn't exist; null until loaded. */
+	private knownVariables: string[] | null = null;
 	private readonly apiService = inject(ApiService);
 
 	/** The API and Operation this Flow handles, when it is a Handler Flow: its Source is that Operation. */
@@ -265,6 +270,14 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	) {}
 
 	ngOnInit(): void {
+
+		this.variableKeys
+			.keys()
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe(keys => {
+				this.knownVariables = keys;
+				this.checkCanvas();
+			});
 
 		this.isSaving = false;
 		this.createRoute = 0;
@@ -2063,7 +2076,7 @@ splitOptions4(options: string): string[] {
 	private checkCanvas(): void {
 		if (this.canvasGraph) {
 			this.canvasProblems = problems(this.canvasGraph, this.schemas.pathRule);
-			this.canvasWarnings = warnings(this.canvasGraph);
+			this.canvasWarnings = [...warnings(this.canvasGraph), ...variableWarnings(this.canvasGraph.steps, this.knownVariables)];
 			this.cdr.markForCheck();
 		}
 	}

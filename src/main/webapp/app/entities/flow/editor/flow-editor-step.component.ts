@@ -1,6 +1,8 @@
 import { ChangeDetectorRef, Component, EventEmitter, inject, Injectable, Input, OnChanges, OnDestroy, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
 import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgSelectModule } from '@ng-select/ng-select';
@@ -9,10 +11,12 @@ import { CodemirrorComponent, CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { Components } from 'app/shared/camel/component-type';
 import { CatalogueEntry, EndpointRole, NO_MATCH, essentialsFirst, matchRank, roleMismatch, searchCatalogue } from 'app/shared/camel/catalogue';
 import { OptionSchema, PathPart, ValueField, groupOptions, pathRule, requiredOptions, suggestedOptions, valueFieldOf } from 'app/shared/camel/endpoint';
+import { insertVariable, unknownVariables, unknownVariablesMessage } from 'app/shared/camel/variables';
 import { IStep } from 'app/shared/model/step.model';
 import { IMessage } from 'app/shared/model/message.model';
 import { Connection } from 'app/shared/model/connection.model';
 import { ThemeService } from 'app/core/theme';
+import { VariableKeysService } from 'app/entities/environment-variables/variable-keys.service';
 import { isRouteStep, missingRouteFields } from './route-step';
 
 import 'codemirror/mode/javascript/javascript';
@@ -35,7 +39,7 @@ export class StepEditorRegistry {
 @Component({
   selector: 'jhi-flow-editor-step',
   templateUrl: './flow-editor-step.component.html',
-  imports: [CommonModule, ReactiveFormsModule, NgbModule, FontAwesomeModule, NgSelectModule, PopoverModule, CodemirrorModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgbModule, FontAwesomeModule, NgSelectModule, PopoverModule, CodemirrorModule],
 })
 export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   @Input({ required: true }) step: IStep;
@@ -119,6 +123,48 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
     private stepEditorRegistry: StepEditorRegistry,
   ) {
     this.stepEditorRegistry.editors.push(this);
+    inject(VariableKeysService)
+      .keys()
+      .pipe(takeUntilDestroyed())
+      .subscribe(keys => {
+        this.variableKeys = keys;
+        this.cdr.markForCheck();
+      });
+  }
+
+  /** The keys of the Variables a Path or Option can refer to; null while unknown, so nothing is reported as missing. */
+  variableKeys: string[] | null = null;
+  /** What is typed in the Insert Variable menu to narrow its keys. */
+  variableFilter = '';
+
+  get filteredVariableKeys(): string[] {
+    const filter = this.variableFilter.trim().toLowerCase();
+    return (this.variableKeys ?? []).filter(key => key.toLowerCase().includes(filter));
+  }
+
+  /** Puts a reference to the Variable in a Path or Option value at the cursor, and leaves the cursor after it. */
+  insertVariableInto(control: AbstractControl | null | undefined, input: HTMLInputElement, key: string): void {
+    if (!control) {
+      return;
+    }
+    const { text, cursor } = insertVariable(`${control.value ?? ''}`, key, input.selectionStart ?? undefined);
+    control.setValue(text);
+    control.markAsDirty();
+    this.variableFilter = '';
+    setTimeout(() => {
+      input.focus();
+      input.setSelectionRange(cursor, cursor);
+    });
+  }
+
+  /** What the Step says about the Variables its Path and Options refer to that don't exist, or nothing. */
+  get unknownVariablesWarning(): string | undefined {
+    if (!this.variableKeys) {
+      return undefined;
+    }
+    const values = ((this.stepForm.get('options') as FormArray)?.controls ?? []).map(option => `${option.get('value')?.value ?? ''}`);
+    const unknown = unknownVariables([`${this.stepForm.get('uri')?.value ?? ''}`, ...values], this.variableKeys);
+    return unknown.length ? unknownVariablesMessage(unknown) : undefined;
   }
 
   private choicesCache?: { options: unknown[]; length: number; role: EndpointRole; choices: OptionSchema[] };
