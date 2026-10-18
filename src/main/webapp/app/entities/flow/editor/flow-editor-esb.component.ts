@@ -43,6 +43,19 @@ import { FlowEditorHeaderComponent } from "./flow-editor-header.component";
 import { sourceStepOf } from "../flow-status";
 import { automaticErrorHandlerPath, defaultErrorHandlerStep, errorHandlerPath, errorHandlerPathOnSave } from "./error-handler";
 import { isRouteStep, missingRouteFields, routeToSave } from "./route-step";
+import {
+  DEFAULT_RESULT_LOG,
+  DEFAULT_SCHEDULER_OPTIONS,
+  DEFAULT_SCRIPT_FLOW_VIEW,
+  DEFAULT_SCRIPT_LANGUAGE,
+  SCRIPT_LANGUAGES,
+  ScriptFlowSummary,
+  ScriptFlowView,
+  defaultResultLogStep,
+  nextSchedulerName,
+  scriptFlowSummary,
+  starterScript,
+} from "./script-flow";
 import { ComponentSchemas } from "../component-schemas.service";
 import { LinkEditorComponent } from "../designer/link-editor.component";
 import { ResponseEditorComponent } from "./response-editor.component";
@@ -148,7 +161,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	step: IStep;
 
   public stepTypes = ["SOURCE", "ACTION", "SINK", "ROUTE", "SCRIPT", "CONNECTION", "ERROR"];
-  public languageComponentsNames: Array<any> = ['groovy', 'javascript', 'simple', 'jslt','xslt'];
+  public languageComponentsNames = SCRIPT_LANGUAGES;
   public componentsWithConnection: readonly string[] = COMPONENTS_WITH_CONNECTION;
 
 	panelCollapsed: any = "uno";
@@ -302,11 +315,20 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		this.finished = false;
 		this.nameFieldReady = false;
 		this.formSubmitted = false;
+		this.resetSteps();
+	}
+
+	/**
+	 * Forgets the Steps and what is kept per Step, before they are (re)loaded into a new form: after a save the Flow is
+	 * loaded again, and Options left from before would no longer match the rows of the new form.
+	 */
+	private resetSteps(): void {
 		this.steps = [];
 		this.stepsOptions = [[]];
 		this.componentOptions = [];
 		this.selectedOptions = [[]];
 		this.numberOfSteps = 0;
+		this.errorStep = true;
 		this.componentTypeCamelLinks = [];
 		this.componentTypeAssimblyLinks = [];
 		this.uriPlaceholders = [];
@@ -441,8 +463,10 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
                     this.createNewStep(StepType.ERROR,this.integrations[0].defaultErrorComponentType,2);
                 }else if(this.activeEditor === 'script'){
                     this.createNewStep(StepType.SOURCE,'scheduler',0);
-                    this.createNewStep(StepType.SCRIPT,'groovy',1);
+                    this.createNewStep(StepType.SCRIPT,DEFAULT_SCRIPT_LANGUAGE,1);
+                    this.addStepForm(defaultResultLogStep());
                     this.addStepForm(defaultErrorHandlerStep());
+                    this.applyScriptFlowDefaults();
                 }else if(this.activeEditor === 'route'){
                     this.createNewStep(StepType.ROUTE,'',0);
                     this.createNewStep(StepType.ERROR,'',1);
@@ -460,9 +484,9 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
   loadSteps(){
 
-      if(this.flow.steps.length > 0){
+      this.resetSteps();
 
-        this.steps = [];
+      if(this.flow.steps.length > 0){
 
         let startStep = this.flow.steps.find(step => step.stepType === 'SOURCE');
 
@@ -588,6 +612,37 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 		this.active = index.toString();
 
+  }
+
+  /**
+   * A new Script Flow runs as created: its scheduler gets a name no other scheduler has and fires once a minute, and
+   * its Script Step starts with an example. Runs after the Steps are created, as creating a Step clears these fields.
+   */
+  private applyScriptFlowDefaults(): void {
+    const source = this.steps[0];
+    source.uri = nextSchedulerName(this.allsteps);
+    this.stepFormAt(0).patchValue({ uri: source.uri });
+    this.fillOptions(0, DEFAULT_SCHEDULER_OPTIONS);
+
+    this.stepFormAt(1).patchValue({ uri: starterScript(DEFAULT_SCRIPT_LANGUAGE) });
+  }
+
+  /** Gives a new Step these options (`key=value&key=value`), in the Step, its form rows and the rows the Step editor shows. */
+  private fillOptions(index: number, options: string): void {
+    const pairs = options.split('&').map(pair => pair.split('='));
+    const formOptions = <FormArray>this.stepFormAt(index).controls.options;
+    while (formOptions.length < pairs.length) {
+      formOptions.push(this.initializeOption());
+    }
+    // The Step editor holds this array, so it is refilled rather than replaced.
+    const stepOptions = this.stepsOptions[index];
+    stepOptions.length = 0;
+    pairs.forEach(([key, value], i) => {
+      formOptions.at(i).patchValue({ key, value });
+      stepOptions.push(new Option(key, value));
+    });
+    this.selectedOptions[index] = pairs.map(([key]) => key);
+    this.steps[index].options = options;
   }
 
   setTypeLinks(step: any, stepFormIndex?, e?: Event): void {
@@ -719,11 +774,19 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 			this.clonedHandler = undefined;
 		}
 
-		// The copy logs to its own name and id once it is saved.
-		const errorHandler = this.steps.find(step => step.stepType === StepType.ERROR);
-		if (errorHandler?.uri && errorHandler.uri === errorHandlerPath(this.flow.name, this.flow.id)) {
-			errorHandler.uri = '';
+		// The copy of a Script Flow gets its own scheduler.
+		if (this.activeEditor === 'script') {
+			const sourceIndex = this.steps.findIndex(step => step.stepType === StepType.SOURCE && step.componentType === 'scheduler');
+			if (sourceIndex >= 0) {
+				this.steps[sourceIndex].uri = nextSchedulerName(this.allsteps);
+				this.stepFormAt(sourceIndex).patchValue({ uri: this.steps[sourceIndex].uri });
+			}
 		}
+
+		// The copy logs to its own name and id once it is saved.
+		this.steps
+			.filter(step => this.followsFlowWhenLogging(step) && step.uri && step.uri === errorHandlerPath(this.flow.name, this.flow.id))
+			.forEach(step => (step.uri = ''));
 
 		// reset id and flow name to null
 		this.flow.id = null;
@@ -927,7 +990,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	addStep(step, index): void {
+	addStep(step, index, stepType?: StepType): void {
 
 		let newIndex = index + 1;
 
@@ -961,9 +1024,12 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     if(this.activeEditor === 'flow'){
       newStep.stepType = StepType.ACTION;
       newStep.componentType = 'log';
+    }else if(this.activeEditor === 'script' && stepType === StepType.SINK){
+      newStep.stepType = StepType.SINK;
+      newStep.componentType = DEFAULT_RESULT_LOG.componentType;
     }else if(this.activeEditor === 'script'){
       newStep.stepType = StepType.SCRIPT;
-      newStep.componentType = '';
+      newStep.componentType = DEFAULT_SCRIPT_LANGUAGE;
     }else if(this.activeEditor === 'route'){
       newStep.stepType = StepType.ROUTE;
       newStep.componentType = '';
@@ -977,6 +1043,10 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     // Pass component type as change event so options load for the default component (e.g. log)
     this.setTypeLinks(newStep, newIndex, newStep.componentType as any);
 
+    if (newStep.stepType === StepType.SCRIPT) {
+      this.stepFormAt(newIndex).patchValue({ uri: starterScript(newStep.componentType) });
+    }
+
     this.enableConnection[newIndex] = false;
     this.enableMessage[newIndex] = false;
 
@@ -984,7 +1054,77 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     optionArray.splice(0, 0, '');
     this.selectedOptions.splice(newIndex, 0, optionArray);
 
+    if (newStep.stepType === StepType.SINK && this.activeEditor === 'script') {
+      newStep.uri = '';
+      this.fillOptions(newIndex, DEFAULT_RESULT_LOG.options);
+    }
+
 		this.active = newIndex.toString();
+	}
+
+	/** The last Script of a Script Flow can add a Log Step for the result, while the Flow has none. */
+	canAddLog(index: number): boolean {
+		// The Script view offers it in its summary instead.
+		if (this.activeEditor !== 'script' || this.showsScriptView || this.steps.some(step => step.stepType === StepType.SINK)) {
+			return false;
+		}
+		return index === this.lastScriptIndex;
+	}
+
+	private get lastScriptIndex(): number {
+		return this.steps.map(step => step.stepType).lastIndexOf(StepType.SCRIPT);
+	}
+
+	/** Whether the editor shows only the Script Steps of a Script Flow, with a summary of the others. */
+	get showsScriptView(): boolean {
+		return this.activeEditor === 'script' && this.scriptFlowView === 'script';
+	}
+
+	isShownStep(step: IStep): boolean {
+		return !this.showsScriptView || step.stepType === StepType.SCRIPT;
+	}
+
+	setScriptFlowView(view: ScriptFlowView): void {
+		this.scriptFlowView = view;
+		try {
+			localStorage.setItem(SCRIPT_FLOW_VIEW_KEY, view);
+		} catch {
+			// Without storage the editor simply opens in the Script view next time.
+		}
+	}
+
+	/** The Steps the Script view leaves out, as the user has them in the form. */
+	get scriptSummary(): ScriptFlowSummary {
+		return scriptFlowSummary(
+			this.steps.map((step, index) => {
+				const form = this.stepFormAt(index)?.getRawValue();
+				const options = ((form?.options ?? []) as { key?: string; value?: string }[])
+					.filter(option => option.key && option.value)
+					.map(option => `${option.key}=${option.value}`)
+					.join('&');
+				return { stepType: step.stepType, componentType: form?.componentType, uri: form?.uri, options };
+			}),
+		);
+	}
+
+	/** Whether a Step the Script view leaves out needs the user's attention after a save attempt. */
+	summaryItemInvalid(index: number | undefined): boolean {
+		return this.formSubmitted && index !== undefined && !!this.stepFormAt(index)?.invalid;
+	}
+
+	/** Leaves the Script view for the Flow view, with the Step at this index in view. */
+	showStepInFlowView(index: number): void {
+		this.setScriptFlowView('flow');
+		this.cdr.detectChanges();
+		document.getElementById(`step-card-${index}`)?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+	}
+
+	/** Adds a Log Step after the last Script, from the Script view's summary. */
+	addResultLog(): void {
+		const index = this.lastScriptIndex;
+		if (index >= 0) {
+			this.addStep(this.steps[index], index, StepType.SINK);
+		}
 	}
 
 	removeStep(step, index): void {
@@ -1545,6 +1685,11 @@ splitOptions4(options: string): string[] {
 
 		if (!this.editFlowForm.valid || this.savingFlowFailed) {
 			this.editFlowForm.markAllAsTouched();
+			// A Step the Script view leaves out is shown, so its invalid field can be focused.
+			if (this.steps.some((step, index) => !this.isShownStep(step) && this.stepFormAt(index)?.invalid)) {
+				this.setScriptFlowView('flow');
+				this.cdr.detectChanges();
+			}
 			this.focusFirstInvalid();
 			return;
 		}
@@ -1584,7 +1729,7 @@ splitOptions4(options: string): string[] {
        takeUntilDestroyed(this.destroyRef),
        switchMap(flow => {
          this.flow = flow.body;
-         this.fillErrorHandlerPath();
+         this.fillLogPaths();
          return stepDeletes.length ? forkJoin(stepDeletes) : of([]);
        }),
        switchMap(() => this.stepService.updateMultiple(this.steps)),
@@ -1613,7 +1758,7 @@ splitOptions4(options: string): string[] {
         takeUntilDestroyed(this.destroyRef),
         switchMap(flowUpdated => {
           this.flow = flowUpdated.body;
-          this.fillErrorHandlerPath();
+          this.fillLogPaths();
           this.steps.forEach(step => {
             step.flowId = this.flow.id;
           });
@@ -1954,9 +2099,8 @@ splitOptions4(options: string): string[] {
 	private loadDesigner(flow: IFlow): void {
 		const graph = loadFlowGraph(flow, this.handler);
 
-		this.steps = [];
+		this.resetSteps();
 		this.stepKeys = [];
-		this.numberOfSteps = 0;
 		(<FormArray>this.editFlowForm.controls.stepsData).clear();
 
 		graph.steps.forEach(designStep => {
@@ -2093,6 +2237,8 @@ splitOptions4(options: string): string[] {
 
 	/** Whether the side panel is hidden, to give the canvas the whole width. Hidden by default; remembered in this browser. */
 	sidePanelCollapsed = readPanelCollapsed();
+	/** Whether a Script Flow shows only its scripts or every Step; each viewer keeps their own choice. */
+	scriptFlowView: ScriptFlowView = readScriptFlowView();
 
 	togglePanel(): void {
 		this.setPanelCollapsed(!this.sidePanelCollapsed);
@@ -2279,12 +2425,19 @@ splitOptions4(options: string): string[] {
 		}
 	}
 
-	/** A logging Error Handler logs to FlowName/FlowID; the path is set once the Flow has its id. */
-	private fillErrorHandlerPath(): void {
-		const errorHandler = this.steps.find(step => step.stepType === StepType.ERROR);
-		if (errorHandler) {
-			errorHandler.uri = errorHandlerPathOnSave(errorHandler, this.flow, this.savedFlowName);
-		}
+	/**
+	 * A logging Error Handler, and the Log Step of a Script Flow's result, log to FlowName/FlowID; the path is set once
+	 * the Flow has its id.
+	 */
+	private fillLogPaths(): void {
+		this.steps
+			.filter(step => this.followsFlowWhenLogging(step))
+			.forEach(step => (step.uri = errorHandlerPathOnSave(step, this.flow, this.savedFlowName)));
+	}
+
+	/** The Steps whose path follows the Flow while they log to an empty path: the Error Handler and a Script Flow's Sink. */
+	private followsFlowWhenLogging(step: IStep | undefined): boolean {
+		return step?.stepType === StepType.ERROR || (step?.stepType === StepType.SINK && this.activeEditor === 'script');
 	}
 
 	get nameControl(): FormControl<string> {
@@ -2296,10 +2449,9 @@ splitOptions4(options: string): string[] {
 		return this.useCanvas && this.canvasProblems.length > 0 ? this.canvasProblems[0].message : null;
 	}
 
-	/** The path the Error Handler logs to automatically, while the user leaves it to the Flow. */
-	get errorHandlerAutoPath(): string | undefined {
-		const index = this.steps.findIndex(step => step.stepType === StepType.ERROR);
-		const form = index >= 0 ? this.stepFormAt(index)?.getRawValue() : undefined;
+	/** The path the Step at this index logs to automatically, while the user leaves it to the Flow. */
+	autoLogPath(index: number): string | undefined {
+		const form = this.followsFlowWhenLogging(this.steps[index]) ? this.stepFormAt(index)?.getRawValue() : undefined;
 		return form
 			? automaticErrorHandlerPath({ componentType: form.componentType, uri: form.uri }, { name: this.nameControl.value, id: this.flow?.id }, this.flow?.name)
 			: undefined;
@@ -2352,7 +2504,7 @@ splitOptions4(options: string): string[] {
 				takeUntilDestroyed(this.destroyRef),
 				switchMap(flow => {
 					this.flow = flow.body;
-					this.fillErrorHandlerPath();
+					this.fillLogPaths();
 					stepsInGraph.forEach(step => (step.flowId = this.flow.id));
 					return this.stepService.updateMultiple(stepsInGraph);
 				}),
@@ -2409,6 +2561,16 @@ type AfterSave = 'stay' | 'start' | 'return';
 const ERROR_STEP_KEY = 'error';
 
 const PANEL_COLLAPSED_KEY = 'flow-designer.panel-collapsed';
+
+const SCRIPT_FLOW_VIEW_KEY = 'flow-editor.script-flow-view';
+
+function readScriptFlowView(): ScriptFlowView {
+	try {
+		return localStorage.getItem(SCRIPT_FLOW_VIEW_KEY) === 'flow' ? 'flow' : DEFAULT_SCRIPT_FLOW_VIEW;
+	} catch {
+		return DEFAULT_SCRIPT_FLOW_VIEW;
+	}
+}
 
 function readPanelCollapsed(): boolean {
 	try {

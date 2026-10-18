@@ -4,14 +4,14 @@
   </nav>
   <h2 class="import-page__title">Import a script</h2>
   <p class="import-page__lead">
-    A script becomes a new Flow in the script editor: a scheduler Source, the script and an error handler that logs. Set the schedule in the editor.
+    A script becomes a new Flow in the script editor: a scheduler Source, the script, a Log Step that writes its result to the Log viewer and an error handler that logs. Set the schedule in the editor.
   </p>
 
   <jhi-import-source
     [(text)]="text"
     [(fileName)]="fileName"
     (fileChosen)="onFileChosen($event)"
-    accept=".groovy,.gvy,.js,.mjs,.jslt,.xsl,.xslt,.txt,text/plain"
+    accept=".groovy,.gvy,.js,.mjs,.jslt,.xsl,.xslt,.py,.jactl,.ds,.txt,text/plain"
     kind="a script"
     [rows]="16"
   />
@@ -25,8 +25,8 @@
         [ngModel]="language()"
         (ngModelChange)="language.set($event)"
       >
-        @for (option of languages; track option) {
-          <option [value]="option">{{ option }}</option>
+        @for (option of languages; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
         }
       </select>
     </div>

@@ -100,7 +100,13 @@ public class SecurityConfiguration {
                     authz.requestMatchers("/h2-console/**").permitAll();
                 }
 
-                if (headless) {
+                if (development) {
+                    // The UI still logs in: it asks the account to know who is logged in
+                    authz.requestMatchers("/api/account", "/api/account/**").authenticated();
+                }
+
+                // On dev the API is open, so Swagger UI and curl work without logging in
+                if (headless || development) {
                     authz.requestMatchers("/api/**").permitAll();
                 } else {
                     authz.requestMatchers("/api/**").authenticated();

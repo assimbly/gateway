@@ -124,7 +124,7 @@
           [messageCreated]="messageCreated"
           [connectionCreated]="connectionCreated"
           [uriPlaceholder]="uriPlaceholders[index]"
-          [autoPath]="steps[index]?.stepType === 'ERROR' ? errorHandlerAutoPath : undefined"
+          [autoPath]="autoLogPath(index)"
           [uriPopoverMessage]="uriPopoverMessages[index]"
           [uriList]="URIList[index]"
           [componentOptions]="componentOptions[index]"
@@ -363,11 +363,54 @@
                 <br/>
                 <hr/>
                 <div style="min-height: 44rem;">
+                  @if (activeEditor === 'script') {
+                    <div class="script-flow-bar container">
+                      <div class="btn-group" role="group" aria-label="What the editor shows">
+                        <button type="button" class="btn btn-fx btn-fx-ghost" (click)="setScriptFlowView('script')"
+                                [class.active]="showsScriptView" [attr.aria-pressed]="showsScriptView" title="Show only the scripts">
+                          <fa-icon icon="code"></fa-icon><span>Script</span>
+                        </button>
+                        <button type="button" class="btn btn-fx btn-fx-ghost" (click)="setScriptFlowView('flow')"
+                                [class.active]="!showsScriptView" [attr.aria-pressed]="!showsScriptView"
+                                title="Show every Step: what starts the Flow, the scripts, where the result goes and the Error handler">
+                          <fa-icon icon="sitemap"></fa-icon><span>Flow</span>
+                        </button>
+                      </div>
+                      @if (showsScriptView) {
+                        @let summary = scriptSummary;
+                        <p class="script-flow-summary small text-muted mb-0">
+                          @if (summary.source; as source) {
+                            <span>Starts:
+                              <button type="button" class="btn btn-link btn-sm p-0 align-baseline" [class.text-danger]="summaryItemInvalid(source.index)"
+                                      (click)="showStepInFlowView(source.index)" title="Show this Step in the Flow view">{{ source.text }}</button>
+                            </span>
+                          }
+                          @if (summary.result; as result) {
+                            <span>Result:
+                              <button type="button" class="btn btn-link btn-sm p-0 align-baseline" [class.text-danger]="summaryItemInvalid(result.index)"
+                                      (click)="showStepInFlowView(result.index)" title="Show this Step in the Flow view">{{ result.text }}</button>
+                            </span>
+                          } @else {
+                            <span>Result: not logged —
+                              <button type="button" class="btn btn-link btn-sm p-0 align-baseline" (click)="addResultLog()">Log it</button>
+                            </span>
+                          }
+                          @if (summary.errors; as errors) {
+                            <span>Errors:
+                              <button type="button" class="btn btn-link btn-sm p-0 align-baseline" [class.text-danger]="summaryItemInvalid(errors.index)"
+                                      (click)="showStepInFlowView(errors.index)" title="Show this Step in the Flow view">{{ errors.text }}</button>
+                            </span>
+                          }
+                        </p>
+                      }
+                    </div>
+                  }
                   <ng-container *ngFor="let step of steps; index as index">
                   @if (handler && step.stepType === 'SOURCE') {
                     <ng-container *ngTemplateOutlet="operationSource"></ng-container>
-                  } @else {
+                  } @else if (isShownStep(step)) {
                   <jhi-flow-editor-step
+                    [attr.id]="'step-card-' + index"
                     [step]="step"
                     [index]="index"
                     [stepForm]="stepFormAt(index)"
@@ -382,7 +425,8 @@
                     [messageCreated]="messageCreated"
                     [connectionCreated]="connectionCreated"
                     [uriPlaceholder]="uriPlaceholders[index]"
-                    [autoPath]="step.stepType === 'ERROR' ? errorHandlerAutoPath : undefined"
+                    [autoPath]="autoLogPath(index)"
+                    [canAddLog]="canAddLog(index)"
                     [uriPopoverMessage]="uriPopoverMessages[index]"
                     [uriList]="URIList[index]"
                     [componentOptions]="componentOptions[index]"
@@ -397,7 +441,7 @@
                     [optionsPopoverMessage]="optionsPopoverMessage"
                     [customOptions]="customOptions"
                     (removeStep)="removeStep($event.step, $event.index)"
-                    (addStep)="addStep($event.step, $event.index)"
+                    (addStep)="addStep($event.step, $event.index, $event.stepType)"
                     (addConnection)="addConnection($event.step, $event.index)"
                     (componentTypeChange)="setTypeLinks($event.step, $event.index, $event.componentType)"
                     (createOrEditRoute)="createOrEditRoute($event.step, $event.form)"

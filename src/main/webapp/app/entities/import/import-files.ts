@@ -19,12 +19,8 @@ export function baseName(fileName: string): string {
   return (dot > 0 ? fileName.slice(0, dot) : fileName).trim();
 }
 
-/** The languages the Script editor offers. */
-export const SCRIPT_LANGUAGES = ['groovy', 'javascript', 'simple', 'jslt', 'xslt'] as const;
-
-export type ScriptLanguage = (typeof SCRIPT_LANGUAGES)[number];
-
-const LANGUAGE_BY_EXTENSION: Readonly<Record<string, ScriptLanguage>> = {
+/** The script languages a file extension suggests, by the ids the Script editor uses (see `SCRIPT_LANGUAGES`). */
+const LANGUAGE_BY_EXTENSION: Readonly<Record<string, string>> = {
   groovy: 'groovy',
   gvy: 'groovy',
   js: 'javascript',
@@ -32,10 +28,13 @@ const LANGUAGE_BY_EXTENSION: Readonly<Record<string, ScriptLanguage>> = {
   jslt: 'jslt',
   xsl: 'xslt',
   xslt: 'xslt',
+  py: 'python',
+  jactl: 'jactl',
+  ds: 'datasonnet',
 };
 
 /** The script language a file name suggests, from its extension; undefined when it doesn't suggest one. */
-export function languageOfFile(fileName: string): ScriptLanguage | undefined {
+export function languageOfFile(fileName: string): string | undefined {
   const dot = fileName.lastIndexOf('.');
   return dot < 0 ? undefined : LANGUAGE_BY_EXTENSION[fileName.slice(dot + 1).toLowerCase()];
 }

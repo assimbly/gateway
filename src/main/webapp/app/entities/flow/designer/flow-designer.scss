@@ -20,6 +20,25 @@
   }
 }
 
+// The Script / Flow switch of a Script Flow, and in the Script view the Steps it leaves out, in a line.
+.script-flow-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+  text-align: start;
+
+  .btn-group .btn span {
+    margin-left: 0.35rem;
+  }
+}
+
+.script-flow-summary > span + span::before {
+  content: '\00b7';
+  margin: 0 0.5rem;
+}
+
 .flow-designer-toolbar-end {
   display: flex;
   gap: 0.5rem;

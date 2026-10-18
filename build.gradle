@@ -10,12 +10,14 @@ buildscript {
             credentials {
                 username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
                 password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
+            content { includeGroupAndSubgroups "org.assimbly" }
         }
         maven{  name = "Assimbly Custom Components"
             url = uri("https://maven.pkg.github.com/assimbly/custom-components")
             credentials {
                 username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
                 password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
+            content { includeGroupAndSubgroups "org.assimbly" }
         }
 
     }
@@ -41,8 +43,8 @@ plugins {
     id "org.liquibase.gradle"
     id "io.spring.nohttp"
     id 'de.undercouch.download' version '5.7.0'
-    id "io.github.ben-manes.versions" version "0.63.1"
-    id 'org.graalvm.buildtools.native' version '1.1.13'
+    id "io.github.ben-manes.versions" version "0.66.0"
+    id 'org.graalvm.buildtools.native' version '1.1.14'
     //id("org.openrewrite.rewrite") version("latest.release")
 }
 
@@ -268,23 +270,19 @@ repositories {
     mavenLocal()
     mavenCentral()
 
-    maven{ name = "Assimbly Base"
-        url = uri("https://maven.pkg.github.com/assimbly/base")
-        credentials {
-            username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
-            password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
-    }
     maven{ name = "Assimbly Runtime"
         url = uri("https://maven.pkg.github.com/assimbly/runtime")
         credentials {
             username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
             password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
+        content { includeGroupAndSubgroups "org.assimbly" }
     }
     maven{  name = "Assimbly Custom Components"
         url = uri("https://maven.pkg.github.com/assimbly/custom-components")
         credentials {
             username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
             password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
+        content { includeGroupAndSubgroups "org.assimbly" }
     }
 
 }
@@ -357,7 +355,7 @@ dependencies {
     implementation "org.springframework:spring-context-support"
 
     implementation "tech.jhipster:jhipster-framework:${jhipster_version}"
-    implementation 'org.slf4j:jcl-over-slf4j:2.0.18'
+    implementation 'org.slf4j:jcl-over-slf4j:2.0.20'
 
     //force version 12.9 (same as mapforce)
     implementation 'net.sf.saxon:Saxon-HE:12.9'
@@ -400,7 +398,7 @@ dependencies {
     liquibaseRuntime "com.h2database:h2"
     liquibaseRuntime "com.mysql:mysql-connector-j"
 
-    runtimeOnly "com.h2database:h2:2.5.250"
+    runtimeOnly "com.h2database:h2:2.5.252"
 
     // developmentOnly 'org.springframework.boot:spring-boot-devtools' // disabled: H2 file DB loses recent commits on DevTools RestartClassLoader
 
@@ -531,7 +529,7 @@ dependencyUpdates {
 
 //After upgrading execute Gradle wrapper task: ./gradlew wrapper (gradlew.bat wrapper on Windows)
 wrapper {
-    gradleVersion = "9.7.1"
+    gradleVersion = "9.8.1"
 }
 
 if (project.hasProperty("nodeInstall")) {

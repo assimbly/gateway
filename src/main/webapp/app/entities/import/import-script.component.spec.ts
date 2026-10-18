@@ -37,10 +37,10 @@ describe('Import a script', () => {
 
   afterEach(() => http.verify());
 
-  it('offers the languages of the script editor, Groovy first', () => {
+  it('offers the languages of the script editor alphabetically, with Groovy chosen', () => {
     const options = Array.from<HTMLOptionElement>(fixture.nativeElement.querySelectorAll('#import-script-language option')).map(o => o.value);
 
-    expect(options).toEqual(['groovy', 'javascript', 'simple', 'jslt', 'xslt']);
+    expect(options).toEqual(['datasonnet', 'groovy', 'jactl', 'javascript', 'jslt', 'python', 'simple', 'xslt']);
     expect(page.language()).toBe('groovy');
   });
 

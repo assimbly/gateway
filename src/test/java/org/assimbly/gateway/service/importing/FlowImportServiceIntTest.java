@@ -299,7 +299,7 @@ class FlowImportServiceIntTest {
     // ---- Script ----
 
     @Test
-    void aScriptBecomesAScriptFlowWithASchedulerSourceTheScriptAndAnErrorHandler() {
+    void aScriptBecomesAScriptFlowWithASchedulerSourceTheScriptALogForItsResultAndAnErrorHandler() {
         String script = "def x = 1\nlog.info(\"x=${x}\")";
 
         FlowImportResultDTO result = flowImportService.importScript(integrationId, script, "Groovy", "Nightly Job");
@@ -309,29 +309,34 @@ class FlowImportServiceIntTest {
         assertThat(result.warnings()).isEmpty();
 
         List<Step> steps = stepsOf(result);
-        assertThat(steps).extracting(Step::getStepType).containsExactly(StepType.SOURCE, StepType.SCRIPT, StepType.ERROR);
+        assertThat(steps).extracting(Step::getStepType).containsExactly(StepType.SOURCE, StepType.SCRIPT, StepType.SINK, StepType.ERROR);
         assertThat(steps.get(0).getComponentType()).isEqualTo("scheduler");
         assertThat(steps.get(0).getUri()).isEqualTo("nightly-job");
         assertThat(steps.get(1).getComponentType()).isEqualTo("groovy");
         assertThat(steps.get(1).getUri()).isEqualTo(script);
         assertThat(steps.get(2).getComponentType()).isEqualTo("log");
         assertThat(steps.get(2).getUri()).isEqualTo("Nightly Job/" + result.flowId());
-        assertThat(steps.get(2).getOptions()).isEqualTo("level=ERROR&showAll=true");
+        assertThat(steps.get(2).getOptions()).isEqualTo("showBody=true");
+        assertThat(steps.get(3).getComponentType()).isEqualTo("log");
+        assertThat(steps.get(3).getUri()).isEqualTo("Nightly Job/" + result.flowId());
+        assertThat(steps.get(3).getOptions()).isEqualTo("level=ERROR&showAll=true");
         assertThat(steps.get(0).getLinks()).extracting(Link::getBound).containsExactly("out");
     }
 
     @Test
-    void theScriptReadsFromTheLinkTheSourceWritesTo() {
+    void theScriptReadsFromTheSourceAndTheLogFromTheScript() {
         FlowImportResultDTO result = flowImportService.importScript(integrationId, "println 'x'", "groovy", null);
 
         List<Step> steps = stepsOf(result);
         String sourceLink = result.flowId() + "-" + steps.get(0).getId();
         assertThat(steps.get(0).getLinks()).extracting(Link::getBound, Link::getName)
             .containsExactly(org.assertj.core.api.Assertions.tuple("out", sourceLink));
-        // The last Script has no outbound Link, so the runtime ends the Flow after it
+        String scriptLink = result.flowId() + "-" + steps.get(1).getId();
         assertThat(steps.get(1).getLinks()).extracting(Link::getBound, Link::getName)
-            .containsExactly(org.assertj.core.api.Assertions.tuple("in", sourceLink));
-        assertThat(steps.get(2).getLinks()).isEmpty();
+            .containsExactlyInAnyOrder(org.assertj.core.api.Assertions.tuple("in", sourceLink), org.assertj.core.api.Assertions.tuple("out", scriptLink));
+        assertThat(steps.get(2).getLinks()).extracting(Link::getBound, Link::getName)
+            .containsExactly(org.assertj.core.api.Assertions.tuple("in", scriptLink));
+        assertThat(steps.get(3).getLinks()).isEmpty();
     }
 
     @Test

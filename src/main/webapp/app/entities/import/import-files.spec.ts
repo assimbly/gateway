@@ -38,6 +38,9 @@ describe('Import files', () => {
       ['map.jslt', 'jslt'],
       ['map.xsl', 'xslt'],
       ['map.xslt', 'xslt'],
+      ['job.py', 'python'],
+      ['job.jactl', 'jactl'],
+      ['map.ds', 'datasonnet'],
     ])('suggests %s is %s', (fileName, language) => {
       expect(languageOfFile(fileName)).toBe(language);
     });

@@ -1,6 +1,6 @@
 import { Service, inject } from '@angular/core';
 import { HttpClient, HttpContext, HttpResponse, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable, Observer, Subscription, catchError, of, switchMap } from 'rxjs';
+import { Observable, Observer, Subscription, catchError, map, of, switchMap } from 'rxjs';
 
 import { serverApiUrl } from 'app/config';
 
@@ -13,6 +13,7 @@ import { IIntegration } from 'app/shared/model/integration.model';
 import { IFlow, Flow, LogLevelType } from 'app/shared/model/flow.model';
 import { traceCollector } from 'app/shared/collect/collectors';
 import { HANDLES_OWN_ERRORS } from 'app/core/interceptor/error-handler.interceptor';
+import { ScriptTrial, scriptTrialError, scriptTrialRequest, scriptTrialResult } from './editor/script-flow';
 
 type EntityResponseType = HttpResponse<IFlow>;
 type EntityArrayResponseType = HttpResponse<IFlow[]>;
@@ -107,6 +108,20 @@ export class FlowService {
       headers: new HttpHeaders({ Accept: 'application/xml' }),
     };
     return this.http.get<any>(`${this.validationUrl}/uri`, options);
+  }
+
+  /** Runs a script once on a sample body in the runtime, without starting a Flow; a failure becomes the trial's error. */
+  tryScript(language: string, script: string, sampleBody: string): Observable<ScriptTrial> {
+    return this.http
+      .post(`${this.validationUrl}/script`, scriptTrialRequest(language, script, sampleBody), {
+        headers: new HttpHeaders({ Accept: 'application/json' }),
+        responseType: 'text',
+        context: OWN_ERRORS,
+      })
+      .pipe(
+        map(scriptTrialResult),
+        catchError(error => of(scriptTrialError(error))),
+      );
   }
 
   /** Sends the Flow's saved configuration to the runtime, then starts it. A failure is for the caller to show. */

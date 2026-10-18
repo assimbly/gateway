@@ -5,11 +5,13 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 import { errorMessage } from 'app/entities/api/api.service';
 
-import { SCRIPT_LANGUAGES, ScriptLanguage, baseName, languageOfFile } from './import-files';
+import { DEFAULT_SCRIPT_LANGUAGE, SCRIPT_LANGUAGES } from 'app/entities/flow/editor/script-flow';
+
+import { baseName, languageOfFile } from './import-files';
 import { ImportService } from './import.service';
 import { ImportSourceComponent } from './import-source.component';
 
-/** Import a script into the script editor: a new Flow with a scheduler Source, the script and an error handler. */
+/** Import a script into the script editor: a new Flow with a scheduler Source, the script, a Log Step and an error handler. */
 @Component({
   selector: 'jhi-import-script',
   templateUrl: './import-script.component.html',
@@ -24,7 +26,7 @@ export class ImportScriptComponent {
 
   readonly text = signal('');
   readonly fileName = signal<string | undefined>(undefined);
-  readonly language = signal<ScriptLanguage>('groovy');
+  readonly language = signal(DEFAULT_SCRIPT_LANGUAGE);
   readonly name = signal('');
   readonly importing = signal(false);
   readonly error = signal<string | undefined>(undefined);

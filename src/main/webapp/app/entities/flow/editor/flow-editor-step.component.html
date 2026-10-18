@@ -17,6 +17,9 @@
           @if (canAddScript) {
             <button type="button" ngbDropdownItem (click)="onAddStep()">Script</button>
           }
+          @if (canAddLog) {
+            <button type="button" ngbDropdownItem (click)="onAddLog()">Log the result</button>
+          }
           @if (stepType === 'ROUTE') {
             <button type="button" ngbDropdownItem (click)="onAddStep()">Route</button>
           }
@@ -194,7 +197,11 @@
             <datalist id="urilist">
               <option *ngFor="let uriStep of uriList" [value]="uriStep.uri">{{uriStep.uri}}</option>
             </datalist>
-            @if (autoPath) {
+            @if (autoPath && stepType === 'SINK') {
+              <small class="form-text text-muted d-block text-start" id="field_uri_auto">
+                Writes each result to Administration → Log viewer.
+              </small>
+            } @else if (autoPath) {
               <small class="form-text text-muted d-block text-start" id="field_uri_auto">
                 Automatic: logs to <span class="font-monospace">{{autoPath}}</span>.
                 Type a logger name to use your own.
@@ -371,8 +378,9 @@
         </div>
         <div class="col-10">
           <ng-select *ngIf="stepType==='SCRIPT'"
-                     [items]="languageComponentsNames" [clearable]="false"
+                     [items]="languageComponentsNames" bindLabel="label" bindValue="value" [clearable]="false"
                      formControlName="componentType" id="field_component_type"
+                     (change)="onScriptLanguageChange($event?.value)"
                      style="text-align: left;"></ng-select>
           <div *ngIf="formSubmitted && componentTypeErrors">
             <div *ngIf="componentTypeErrors.required"
@@ -399,10 +407,45 @@
             [options]="scriptEditorOptions(componentType)"
             (codeMirrorLoaded)="refreshCodeMirror($event)">
           </ngx-codemirror>
+          @if (scriptHint; as hint) {
+            <div class="form-text text-start">{{ hint }}</div>
+          }
           <div *ngIf="formSubmitted && uriErrors">
             <div *ngIf="uriErrors.required"
                  class="invalid-field-message">*Script is required.
             </div>
+          </div>
+
+          <div class="script-trial text-start mt-3">
+            @if (showsSampleBody) {
+              <label class="form-control-label" [for]="'field_sample_body_' + index">Sample body</label>
+              <textarea class="form-control font-monospace mb-2" rows="2" [id]="'field_sample_body_' + index"
+                        [formControl]="sampleBody" placeholder="Empty, as a scheduler sends"></textarea>
+            }
+            <div class="d-flex align-items-center gap-3">
+              <button type="button" class="btn btn-fx btn-fx-secondary" (click)="tryScript()" [disabled]="trying"
+                      title="Runs the script once on the sample body, without starting the Flow">
+                {{ trying ? 'Trying…' : 'Try it' }}
+              </button>
+              @if (!showsSampleBody) {
+                <button type="button" class="btn btn-link btn-sm p-0" (click)="sampleBodyOpen = true">With a sample body</button>
+              }
+            </div>
+            @if (trialError !== null) {
+              <div class="script-trial-error mt-2" role="alert">
+                <div class="small text-danger">The script failed</div>
+                <pre class="border border-danger rounded p-2 mb-0 text-danger text-wrap">{{ trialError }}</pre>
+              </div>
+            } @else if (trial) {
+              <div class="script-trial-result mt-2" role="status">
+                <div class="small text-muted">Resulting body</div>
+                @if (trialBody) {
+                  <pre class="border rounded p-2 mb-0 text-wrap">{{ trialBody }}</pre>
+                } @else {
+                  <div class="fst-italic">The script left the body empty.</div>
+                }
+              </div>
+            }
           </div>
         </div>
         <button type="button" class="col-2 btn btn-fx btn-fx-ghost btn-fx-icon"

@@ -51,9 +51,12 @@ import java.util.Set;
 public class FlowImportService {
 
     /** The languages the Script editor offers. */
-    public static final Set<String> SCRIPT_LANGUAGES = Set.of("groovy", "javascript", "simple", "jslt", "xslt");
+    public static final Set<String> SCRIPT_LANGUAGES = Set.of("groovy", "javascript", "simple", "jslt", "xslt", "python", "jactl", "datasonnet");
 
     private static final String ERROR_HANDLER_OPTIONS = "level=ERROR&showAll=true";
+
+    /** The Log Step after a script writes its result, body included, to the Log viewer, as the Script editor makes it. */
+    private static final String RESULT_LOG_OPTIONS = "showBody=true";
 
     private final Logger log = LoggerFactory.getLogger(FlowImportService.class);
 
@@ -133,7 +136,7 @@ public class FlowImportService {
         return result(flow, warnings);
     }
 
-    /** A Script Flow from a script: a scheduler Source, the script and a logging Error handler. */
+    /** A Script Flow from a script: a scheduler Source, the script, a Log Step for its result and a logging Error handler. */
     public FlowImportResultDTO importScript(Long integrationId, String script, String language, String name) {
         Integration integration = integration(integrationId);
         requireContent(script, "The script is empty.");
@@ -149,6 +152,7 @@ public class FlowImportService {
         List<Step> steps = new ArrayList<>();
         steps.add(stepRepository.save(newStep(flow, StepType.SOURCE, "scheduler", schedulerName(flow.getName()), null)));
         steps.add(stepRepository.save(newStep(flow, StepType.SCRIPT, lowerCaseLanguage, script, null)));
+        steps.add(stepRepository.save(newStep(flow, StepType.SINK, "log", flow.getName() + "/" + flow.getId(), RESULT_LOG_OPTIONS)));
         steps.add(stepRepository.save(newStep(flow, StepType.ERROR, "log", flow.getName() + "/" + flow.getId(), ERROR_HANDLER_OPTIONS)));
 
         createEditorLinks(flow, steps);

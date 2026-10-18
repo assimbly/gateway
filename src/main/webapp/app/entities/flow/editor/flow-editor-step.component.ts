@@ -9,11 +9,14 @@ import { CodemirrorComponent, CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { Components } from 'app/shared/camel/component-type';
 import { CatalogueEntry, EndpointRole, NO_MATCH, matchRank, roleMismatch, searchCatalogue } from 'app/shared/camel/catalogue';
 import { OptionSchema, PathPart, ValueField, groupOptions, pathRule, requiredOptions, valueFieldOf } from 'app/shared/camel/endpoint';
-import { IStep } from 'app/shared/model/step.model';
+import { IStep, StepType } from 'app/shared/model/step.model';
 import { IMessage } from 'app/shared/model/message.model';
 import { Connection } from 'app/shared/model/connection.model';
 import { ThemeService } from 'app/core/theme';
 import { isRouteStep, missingRouteFields } from './route-step';
+import { Subscription } from 'rxjs';
+import { FlowService } from '../flow.service';
+import { ScriptLanguageInfo, ScriptTrial, isStarterScript, scriptHint, starterScript } from './script-flow';
 
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/mode/groovy/groovy';
@@ -53,7 +56,7 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   @Input() sourceComponentsNames: Array<any> = [];
   @Input() sinkComponentsNames: Array<any> = [];
   @Input() actionComponentsNames: Array<any> = [];
-  @Input() languageComponentsNames: Array<any> = [];
+  @Input() languageComponentsNames: readonly ScriptLanguageInfo[] = [];
 
   @Input() messages: IMessage[] = [];
   @Input() connections: Connection[] = [];
@@ -63,6 +66,8 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   @Input() uriPlaceholder: string;
   /** The path an Error Handler gets automatically while the user leaves it to the Flow, shown as a hint. */
   @Input() autoPath?: string;
+  /** Whether this Step's add menu offers a Log Step for the result: the last Script of a Script Flow without one. */
+  @Input() canAddLog = false;
   @Input() uriPopoverMessage: string;
   @Input() uriList: IStep[] = [];
   @Input() componentOptions: Array<any> = [];
@@ -78,7 +83,7 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   @Input() customOptions: Array<any> = [];
 
   @Output() removeStep = new EventEmitter<{ step: IStep; index: number }>();
-  @Output() addStep = new EventEmitter<{ step: IStep; index: number }>();
+  @Output() addStep = new EventEmitter<{ step: IStep; index: number; stepType?: StepType }>();
   @Output() addConnection = new EventEmitter<{ step: IStep; index: number }>();
   @Output() componentTypeChange = new EventEmitter<{ step: IStep; index: number; componentType: any }>();
   /** Opens the large Route editor on the Step's form, which holds its Route as `route`, `routeName` and `routeContent`. */
@@ -87,6 +92,16 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   @Output() createOrEditConnection = new EventEmitter<{ step: IStep; connectionType: string; control: AbstractControl }>();
 
   readonly themeService = inject(ThemeService);
+  private readonly flowService = inject(FlowService);
+
+  /** The body "Try it" runs the script on; empty, as a scheduler sends. */
+  readonly sampleBody = new FormControl('', { nonNullable: true });
+  /** Whether the user asked for the sample body; until then "Try it" runs on an empty body. */
+  sampleBodyOpen = false;
+  /** What the last "Try it" gave, until the language changes. */
+  trial: ScriptTrial | null = null;
+  trying = false;
+  private trialSubscription?: Subscription;
   private scriptOptionsKey = '';
   private scriptOptionsCache: Record<string, unknown> | null = null;
   private pathOptionsKey = '';
@@ -278,6 +293,7 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.trialSubscription?.unsubscribe();
     const index = this.stepEditorRegistry.editors.indexOf(this);
     if (index >= 0) {
       this.stepEditorRegistry.editors.splice(index, 1);
@@ -338,14 +354,22 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   }
 
   get hasAddMenu(): boolean {
-    return (this.canAddConnection && !this.enableConnection) || this.canAddAction || this.canAddScript || this.stepType === 'ROUTE';
+    return (
+      (this.canAddConnection && !this.enableConnection) || this.canAddAction || this.canAddScript || this.canAddLog || this.stepType === 'ROUTE'
+    );
   }
 
   get canRemoveStep(): boolean {
     if (this.onCanvas) {
       return this.deletable;
     }
-    return this.stepType === 'ACTION' || this.stepType === 'ROUTER' || this.stepType === 'SCRIPT' || this.stepType === 'ROUTE';
+    return (
+      this.stepType === 'ACTION' ||
+      this.stepType === 'ROUTER' ||
+      this.stepType === 'SCRIPT' ||
+      this.stepType === 'ROUTE' ||
+      (this.stepType === 'SINK' && this.activeEditor === 'script')
+    );
   }
 
   /** A Route, or the Error handler of a Route Flow: a name and a Camel route in XML. */
@@ -391,12 +415,58 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
     this.addStep.emit({ step: this.step, index: this.index });
   }
 
+  onAddLog(): void {
+    this.addStep.emit({ step: this.step, index: this.index, stepType: StepType.SINK });
+  }
+
   onAddConnection(): void {
     this.addConnection.emit({ step: this.step, index: this.index });
   }
 
   onComponentTypeChange(componentType: any): void {
     this.componentTypeChange.emit({ step: this.step, index: this.index, componentType });
+  }
+
+  /** How a script in the chosen language reads the message. */
+  get scriptHint(): string {
+    return scriptHint(this.componentType);
+  }
+
+  /** Another language replaces the script while it is still empty or a starter; a script the user wrote stays. */
+  onScriptLanguageChange(language: string | undefined): void {
+    const script = this.stepForm.get('uri');
+    if (script && isStarterScript(script.value)) {
+      script.setValue(starterScript(language));
+    }
+    this.trialSubscription?.unsubscribe();
+    this.trial = null;
+    this.trying = false;
+  }
+
+  /** The sample body shows once asked for, and stays while it holds one. */
+  get showsSampleBody(): boolean {
+    return this.sampleBodyOpen || this.sampleBody.value !== '';
+  }
+
+  /** The new body the last "Try it" gave; null when it failed or left the body empty. */
+  get trialBody(): string | null {
+    return this.trial?.ok ? (this.trial.body ?? null) : null;
+  }
+
+  /** The error the last "Try it" gave; null when it ran. */
+  get trialError(): string | null {
+    return this.trial && !this.trial.ok ? (this.trial.error ?? '') : null;
+  }
+
+  /** Runs the script once on the sample body in the runtime and shows the new body or the error, without starting the Flow. */
+  tryScript(): void {
+    this.trialSubscription?.unsubscribe();
+    this.trying = true;
+    this.trialSubscription = this.flowService.tryScript(this.componentType ?? '', this.uriValue ?? '', this.sampleBody.value).subscribe(trial => {
+      this.trial = trial;
+      this.trying = false;
+      this.cdr.markForCheck();
+    });
   }
 
   onCreateOrEditRoute(): void {
@@ -489,8 +559,10 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   private scriptEditorMode(componentType: string): string {
     switch ((componentType || '').toLowerCase()) {
       case 'javascript':
+      case 'datasonnet':
         return 'javascript';
       case 'groovy':
+      case 'jactl':
         return 'text/x-groovy';
       case 'java':
         return 'text/x-java';
