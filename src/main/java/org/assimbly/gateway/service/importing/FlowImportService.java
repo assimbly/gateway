@@ -58,6 +58,11 @@ public class FlowImportService {
     /** The Log Step after a script writes its result, body included, to the Log viewer, as the Script editor makes it. */
     private static final String RESULT_LOG_OPTIONS = "showBody=true";
 
+    /** The Source of a Script Flow, as the Script editor makes it: one message with a body the script can greet, sent when the Flow starts. */
+    private static final String SCRIPT_SOURCE_COMPONENT = "once";
+    private static final String SCRIPT_SOURCE_URI = "hello";
+    private static final String SCRIPT_SOURCE_OPTIONS = "body=world";
+
     private final Logger log = LoggerFactory.getLogger(FlowImportService.class);
 
     private final Import dilImport;
@@ -136,7 +141,7 @@ public class FlowImportService {
         return result(flow, warnings);
     }
 
-    /** A Script Flow from a script: a scheduler Source, the script, a Log Step for its result and a logging Error handler. */
+    /** A Script Flow from a script: a once Source, the script, a Log Step for its result and a logging Error handler. */
     public FlowImportResultDTO importScript(Long integrationId, String script, String language, String name) {
         Integration integration = integration(integrationId);
         requireContent(script, "The script is empty.");
@@ -150,7 +155,7 @@ public class FlowImportService {
         Flow flow = newFlow("script", integration, flowName(name, null, "script-" + lowerCaseLanguage));
 
         List<Step> steps = new ArrayList<>();
-        steps.add(stepRepository.save(newStep(flow, StepType.SOURCE, "scheduler", schedulerName(flow.getName()), null)));
+        steps.add(stepRepository.save(newStep(flow, StepType.SOURCE, SCRIPT_SOURCE_COMPONENT, SCRIPT_SOURCE_URI, SCRIPT_SOURCE_OPTIONS)));
         steps.add(stepRepository.save(newStep(flow, StepType.SCRIPT, lowerCaseLanguage, script, null)));
         steps.add(stepRepository.save(newStep(flow, StepType.SINK, "log", flow.getName() + "/" + flow.getId(), RESULT_LOG_OPTIONS)));
         steps.add(stepRepository.save(newStep(flow, StepType.ERROR, "log", flow.getName() + "/" + flow.getId(), ERROR_HANDLER_OPTIONS)));
@@ -255,12 +260,6 @@ public class FlowImportService {
             candidate = name + "-" + n;
         }
         return candidate;
-    }
-
-    /** A Camel scheduler name: lower case letters, digits and dashes. */
-    private static String schedulerName(String flowName) {
-        String name = flowName.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]+", "-").replaceAll("^-|-$", "");
-        return name.isEmpty() ? "scheduler" : name;
     }
 
     private static String describe(Exception e) {

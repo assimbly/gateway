@@ -35,7 +35,7 @@ const IMPORT_CHOICES: readonly ImportChoice[] = [
   {
     title: 'Script',
     accepts: 'Groovy, JavaScript, Python, Jactl, Simple, JSLT, XSLT, DataSonnet',
-    description: 'A script becomes a new Flow with a scheduler Source, the script, a Log Step for its result and an error handler.',
+    description: 'A script becomes a new Flow with a once Source, the script, a Log Step for its result and an error handler.',
     target: 'Script editor',
     icon: 'code',
     link: '/import/script',

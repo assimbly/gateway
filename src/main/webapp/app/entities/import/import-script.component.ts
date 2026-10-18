@@ -11,7 +11,7 @@ import { baseName, languageOfFile } from './import-files';
 import { ImportService } from './import.service';
 import { ImportSourceComponent } from './import-source.component';
 
-/** Import a script into the script editor: a new Flow with a scheduler Source, the script, a Log Step and an error handler. */
+/** Import a script into the script editor: a new Flow with a once Source, the script, a Log Step and an error handler. */
 @Component({
   selector: 'jhi-import-script',
   templateUrl: './import-script.component.html',
