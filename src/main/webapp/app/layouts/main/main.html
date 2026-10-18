@@ -22,6 +22,7 @@
       </button>
     }
     <a class="app-topbar__brand" routerLink="/" (click)="layout.closeMobile()">
+      <img class="app-topbar__brand-icon" [src]="brandIcon()" alt="" aria-hidden="true" />
       <span jhiTranslate="global.title">Gateway</span>
     </a>
     @if (!sidebarVisible()) {

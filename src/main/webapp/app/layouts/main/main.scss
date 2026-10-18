@@ -71,6 +71,9 @@
 }
 
 .app-topbar__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
   color: var(--app-text);
   font-weight: 600;
   text-decoration: none;
@@ -79,6 +82,14 @@
 .app-topbar__brand:hover,
 .app-topbar__brand:focus-visible {
   color: var(--app-text);
+}
+
+.app-topbar__brand-icon {
+  display: block;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex-shrink: 0;
+  object-fit: contain;
 }
 
 .app-topbar__actions {

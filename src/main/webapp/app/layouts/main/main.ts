@@ -6,6 +6,7 @@ import dayjs from 'dayjs/esm';
 
 import { AppPageTitleStrategy } from 'app/app-page-title-strategy';
 import { AccountService } from 'app/core/auth';
+import { ThemeService } from 'app/core/theme';
 import { TranslateDirective } from 'app/shared/language';
 import FooterComponent from '../footer/footer.component';
 import PageRibbon from '../profiles/page-ribbon';
@@ -28,12 +29,14 @@ import { LayoutService } from './layout.service';
 export default class Main implements OnInit {
   readonly layout = inject(LayoutService);
   readonly sidebarVisible = computed(() => this.accountService.isAuthenticated());
+  readonly brandIcon = computed(() => (this.theme.appearance() === 'dark' ? 'logo_darkmode.svg' : 'logo_lightmode.svg'));
 
   private readonly menuToggle = viewChild<ElementRef<HTMLButtonElement>>('menuToggle');
   private renderer: Renderer2;
   private readonly router = inject(Router);
   private readonly appPageTitleStrategy = inject(AppPageTitleStrategy);
   private readonly accountService = inject(AccountService);
+  private readonly theme = inject(ThemeService);
   private readonly translateService = inject(TranslateService);
 
   constructor(rootRenderer: RendererFactory2) {
