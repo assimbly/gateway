@@ -17,6 +17,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { EFMarkerType, FCanvasComponent, FFlowModule, FMinimapComponent, FMoveNodesEvent, FSelectionChangeEvent } from '@foblex/flow';
 
+import { Components } from 'app/shared/camel/component-type';
+
 import {
   defaultBranch,
   DesignLink,
@@ -81,6 +83,8 @@ export class FlowCanvasComponent {
 
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly cdr = inject(ChangeDetectorRef);
+  /** Each component's title from the catalogue, such as 'File' for `file`. */
+  private readonly titles = new Map<string, string>(inject(Components).types.map(type => [type.name, type.title ?? type.name]));
 
   /** Between two Steps only an Action or Router fits; after an open end the Flow can also end in a Sink. */
   readonly insertKinds: PickedKind[] = ['ACTION', 'ROUTER'];
@@ -104,7 +108,21 @@ export class FlowCanvasComponent {
     if (step.componentType?.toLowerCase() === 'flowlink') {
       return 'Call Flow';
     }
-    return step.kind === 'ROUTER' ? routerTitle(step) : step.componentType || step.uri || 'choose a component';
+    if (step.kind === 'ROUTER') {
+      return routerTitle(step);
+    }
+    return step.componentType ? (this.titles.get(step.componentType) ?? step.componentType) : step.uri || 'choose a component';
+  }
+
+  /**
+   * What a Step works on, shown under it: its path, such as a folder or a queue, shortened in the middle when long.
+   * Routers, Responses, Call Flows and the Operation have none.
+   */
+  caption(step: DesignStep): string {
+    if (!step.componentType || !step.uri || step.kind === 'ROUTER' || isResponse(this.graph, step) || isLockedSource(this.graph, step.key)) {
+      return '';
+    }
+    return step.componentType.toLowerCase() === 'flowlink' ? '' : shortened(step.uri, CAPTION_LENGTH);
   }
 
   /** What the step kind shows: a Handler Flow's Source is its Operation, and a Response is named as such. */
@@ -318,3 +336,15 @@ export class FlowCanvasComponent {
 
 /** Space in pixels between the left edge of the canvas and the Source of a new Flow. */
 const START_MARGIN = 48;
+
+/** How many characters of a Step's path fit on one line under it. */
+const CAPTION_LENGTH = 28;
+
+/** The text as it is when it fits, otherwise its start and end around an ellipsis, so both the root and the file show. */
+export function shortened(text: string, max: number): string {
+  if (text.length <= max) {
+    return text;
+  }
+  const head = Math.ceil((max - 1) / 2);
+  return `${text.slice(0, head)}…${text.slice(text.length - (max - 1 - head))}`;
+}

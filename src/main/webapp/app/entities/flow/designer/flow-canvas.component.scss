@@ -84,6 +84,21 @@
   color: var(--app-text, #101828);
 }
 
+.flow-step-caption {
+  // The Step's path, on one line just below the square. Its width stays within a column of the auto-arrange layout.
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 184px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 0.7rem;
+  line-height: 1.2;
+  color: var(--app-text-muted, #667085);
+}
+
 .flow-step-warning {
   position: absolute;
   top: 2px;

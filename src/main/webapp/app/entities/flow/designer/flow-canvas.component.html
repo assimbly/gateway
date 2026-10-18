@@ -45,6 +45,9 @@
           } @else {
             <div class="flow-step-label" [title]="label(step)">{{ label(step) }}</div>
           }
+          @if (caption(step); as path) {
+            <div class="flow-step-caption" [title]="step.uri">{{ path }}</div>
+          }
           @if (problemOf(step); as problem) {
             <span class="flow-step-warning" [title]="problem"><fa-icon icon="exclamation-triangle"></fa-icon></span>
           } @else if (warningOf(step); as warning) {
