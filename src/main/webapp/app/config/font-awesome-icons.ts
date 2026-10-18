@@ -81,6 +81,7 @@ import {
   faPlug,
   faWandMagicSparkles,
   faArrowUpRightFromSquare,
+  faUpRightAndDownLeftFromCenter,
   // jhipster-needle-add-icon-import
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -167,5 +168,6 @@ export const fontAwesomeIcons = [
   faPlug,
   faWandMagicSparkles,
   faArrowUpRightFromSquare,
+  faUpRightAndDownLeftFromCenter,
   // jhipster-needle-add-icon-import
 ];

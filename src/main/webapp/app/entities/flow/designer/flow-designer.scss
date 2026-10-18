@@ -135,35 +135,6 @@
   .form-group.container {
     padding: 0;
   }
-
-  // In the Step form, fields take all the width their icon buttons leave, so the form has the same margin on both sides.
-  jhi-flow-editor-step .row {
-    > .col-10,
-    > .col-5 {
-      flex: 1 1 0;
-      width: auto;
-    }
-
-    > .btn.col-1,
-    > .btn.col-2 {
-      flex: 0 0 auto;
-      width: auto;
-      // A button has no gutter padding of its own; this keeps it inside the row's right edge.
-      margin-right: calc(var(--bs-gutter-x) * 0.5);
-    }
-  }
-
-  // An option's key and value get most of the row, with small gaps and compact buttons, so both stay readable.
-  jhi-flow-editor-step [formarrayname='options'] .row {
-    --bs-gutter-x: 0.5rem;
-
-    > .btn.col-1 {
-      width: 28px;
-      min-width: 28px;
-      padding-right: 0;
-      padding-left: 0;
-    }
-  }
 }
 
 // The Step, Link or Flow editor; it scrolls when it is taller than the space above the minimap.

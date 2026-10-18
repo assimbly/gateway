@@ -119,3 +119,101 @@ describe('Flow editor Script Step', () => {
     return buttons.find(button => button.textContent?.trim() === 'With a sample body');
   }
 });
+
+describe('Flow editor Component Step', () => {
+  let fixture: ComponentFixture<FlowEditorStepComponent>;
+
+  const bridgeErrorHandler = { name: 'bridgeErrorHandler', displayName: 'Bridge error handler', type: 'boolean', defaultValue: false };
+  const expression = { name: 'expression', displayName: 'Expression', type: 'string' };
+
+  function render(componentType: string, uriPlaceholder: string, options: Array<{ key: string; value: string }>): void {
+    TestBed.configureTestingModule({
+      imports: [FlowEditorStepComponent],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting(), StepEditorRegistry],
+    });
+    TestBed.inject(FaIconLibrary).addIcons(...fontAwesomeIcons);
+
+    fixture = TestBed.createComponent(FlowEditorStepComponent);
+    // A saved Step, so no Options are suggested on top of its own.
+    fixture.componentRef.setInput('step', { stepType: StepType.ACTION, componentType, options: 'saved' });
+    fixture.componentRef.setInput('index', 1);
+    fixture.componentRef.setInput(
+      'stepForm',
+      new FormGroup({
+        id: new FormControl(null),
+        stepType: new FormControl('ACTION'),
+        message: new FormControl(null),
+        connection: new FormControl(null),
+        componentType: new FormControl(componentType),
+        uri: new FormControl(''),
+        options: new FormArray(
+          options.map(option => new FormGroup({ key: new FormControl(option.key), value: new FormControl(option.value), defaultValue: new FormControl('') })),
+        ),
+      }),
+    );
+    fixture.componentRef.setInput('stepOptions', options.map(option => ({ ...option })));
+    fixture.componentRef.setInput('componentOptions', [bridgeErrorHandler, expression]);
+    fixture.componentRef.setInput('uriPlaceholder', uriPlaceholder);
+    fixture.detectChanges();
+  }
+
+  function pathField(): HTMLInputElement {
+    return fixture.nativeElement.querySelector('#field_uri_1');
+  }
+
+  afterEach(() => document.body.querySelectorAll('.dropdown-menu').forEach(menu => menu.remove()));
+
+  it("keeps the Path of a Component that doesn't read one in place, read-only", () => {
+    render('setbody', '', []);
+
+    expect(pathField().readOnly).toBe(true);
+    expect(pathField().placeholder).toBe('Set body has no path');
+    expect(fixture.nativeElement.querySelector('[aria-label="Insert a Variable"]')).toBeNull();
+  });
+
+  it('lets a Path be typed, with its actions next to its label', () => {
+    render('file', 'file:directoryName', []);
+
+    expect(pathField().readOnly).toBe(false);
+    const actions: HTMLElement = pathField().closest('.step-field')!.querySelector('.step-field__head .step-field__actions')!;
+    expect(actions.querySelector('[aria-label="Insert a Variable"]')).not.toBeNull();
+    expect(actions.querySelector('[aria-label="Edit the path in a larger editor"]')).not.toBeNull();
+  });
+
+  it('shows an unset switch Option as off by default', () => {
+    render('file', 'file:directoryName', [{ key: 'bridgeErrorHandler', value: '' }]);
+
+    const field: HTMLElement = fixture.nativeElement.querySelector('.option-row__switch');
+    expect(field.textContent).toContain('Off');
+    expect(field.querySelector('.text-muted')?.textContent).toBe('(default)');
+    expect((field.querySelector('[role="switch"]') as HTMLInputElement).checked).toBe(false);
+  });
+
+  it('removes the first Option from its menu', () => {
+    render('file', 'file:directoryName', [{ key: 'expression', value: '${body}' }]);
+
+    menuItem(0, 'Remove option').click();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelectorAll('.option-row').length).toBe(0);
+    expect(fixture.componentInstance.stepOptions.length).toBe(0);
+  });
+
+  it('puts a picked Variable in a switch Option, making it a text field', () => {
+    render('file', 'file:directoryName', [{ key: 'bridgeErrorHandler', value: 'true' }]);
+
+    fixture.componentInstance.insertVariableIntoOption(0, 'flag');
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.optionValue(0)).toBe('@{flag}');
+    expect(fixture.componentInstance.valueField(0)).toBe('text');
+  });
+
+  function menuItem(row: number, text: string): HTMLButtonElement {
+    const toggle: HTMLButtonElement = fixture.nativeElement.querySelectorAll('.option-row [aria-label="More for this option"]')[row];
+    toggle.click();
+    fixture.detectChanges();
+    const items: HTMLButtonElement[] = Array.from(document.body.querySelectorAll('.dropdown-menu.show [ngbdropdownitem]'));
+    return items.find(item => item.textContent?.trim() === text)!;
+  }
+});

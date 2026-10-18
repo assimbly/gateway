@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, inject, Injectable, Input, OnChanges, OnDestroy, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, inject, Injectable, Input, OnChanges, OnDestroy, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -42,6 +42,7 @@ export class StepEditorRegistry {
 @Component({
   selector: 'jhi-flow-editor-step',
   templateUrl: './flow-editor-step.component.html',
+  styleUrl: './flow-editor-step.component.scss',
   imports: [CommonModule, ReactiveFormsModule, RouterLink, NgbModule, FontAwesomeModule, NgSelectModule, PopoverModule, CodemirrorModule],
 })
 export class FlowEditorStepComponent implements OnChanges, OnDestroy {
@@ -97,6 +98,7 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
 
   readonly themeService = inject(ThemeService);
   private readonly flowService = inject(FlowService);
+  private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
 
   /** The body "Try it" runs the script on; empty, as a scheduler sends. */
   readonly sampleBody = new FormControl('', { nonNullable: true });
@@ -158,18 +160,32 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   }
 
   /** Puts a reference to the Variable in a Path or Option value at the cursor, and leaves the cursor after it. */
-  insertVariableInto(control: AbstractControl | null | undefined, input: HTMLInputElement, key: string): void {
+  insertVariableInto(control: AbstractControl | null | undefined, input: HTMLInputElement | null, key: string): void {
     if (!control) {
       return;
     }
-    const { text, cursor } = insertVariable(`${control.value ?? ''}`, key, input.selectionStart ?? undefined);
+    const { text, cursor } = insertVariable(`${control.value ?? ''}`, key, input?.selectionStart ?? undefined);
     control.setValue(text);
     control.markAsDirty();
     this.variableFilter = '';
     setTimeout(() => {
-      input.focus();
-      input.setSelectionRange(cursor, cursor);
+      input?.focus();
+      input?.setSelectionRange(cursor, cursor);
     });
+  }
+
+  /**
+   * Puts a reference to the Variable in an Option's value, at the cursor of its text field. A switch, list or number
+   * field has no cursor, so the reference becomes its value, which turns it into a text field.
+   */
+  insertVariableIntoOption(idx: number, key: string): void {
+    const field = this.host.nativeElement.querySelector(`#field_options-value-${this.index}-${idx}`);
+    const input = field instanceof HTMLInputElement && field.type === 'text' && field.inputMode !== 'numeric' ? field : null;
+    const control = this.optionGroup(idx)?.get('value');
+    if (!input) {
+      control?.setValue('');
+    }
+    this.insertVariableInto(control, input, key);
   }
 
   /** What the Step says about the Variables its Path and Options refer to that don't exist, or nothing. */
@@ -311,7 +327,7 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
       .map(name => this.componentOptions.find(option => option.name === name)?.displayName ?? name);
   }
 
-  private optionValue(idx: number): string {
+  optionValue(idx: number): string {
     return `${(this.stepForm.get('options') as FormArray)?.at(idx)?.get('value')?.value ?? ''}`;
   }
 
@@ -633,11 +649,17 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   }
 
   /**
-   * Whether the Step shows a Path field. A Component whose catalogue syntax is empty doesn't read a path, such as
-   * Set body; its field still shows while it holds a value, so nothing saved is hidden.
+   * Whether the Step's Component doesn't read a path, such as Set body: its catalogue syntax is empty. Its Path field
+   * then stays in place, read-only, so every Step has the same fields; while it holds a value it stays editable.
    */
-  get showsPath(): boolean {
-    return this.uriPlaceholder !== '' || !!this.stepForm.get('uri')?.value || !!this.autoPath;
+  get pathUnused(): boolean {
+    return this.uriPlaceholder === '' && !this.stepForm.get('uri')?.value && !this.autoPath;
+  }
+
+  /** The Component's name as the component list shows it. */
+  get componentLabel(): string {
+    const type = this.componentType ?? '';
+    return this.catalogueEntry(type).title ?? type;
   }
 
   /** The row of the Option whose value is open in the larger editor. */

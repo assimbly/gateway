@@ -1,0 +1,117 @@
+// The Step card: its fields one under the other, each as wide as the card.
+.form-group.container {
+  margin-bottom: 1rem;
+}
+
+.step-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: start;
+}
+
+.step-card__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.step-card__title {
+  margin: 0;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.step-card__remove {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+// A field: its label with the field's actions at the right, and the field at full width below.
+.step-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.step-field__head {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: var(--app-btn-height-sm);
+}
+
+.step-field__label {
+  margin: 0;
+}
+
+.step-field__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+  margin-left: auto;
+}
+
+.step-field__hint {
+  color: var(--app-text-muted);
+  font-size: 0.875em;
+}
+
+// The Path of a Component that doesn't read one: kept in place so every Step has the same fields.
+.step-field__unused {
+  border-style: dashed;
+  background-color: var(--app-disabled-bg);
+  color: var(--app-disabled-text);
+  cursor: not-allowed;
+
+  &::placeholder {
+    color: var(--app-disabled-text);
+    font-style: italic;
+  }
+}
+
+// An Option: its key, its value, and its menu, in the same columns on every row.
+.option-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr) var(--app-btn-height-sm);
+  gap: 0.5rem;
+  align-items: center;
+
+  + .option-row {
+    margin-top: 0.25rem;
+  }
+}
+
+.option-row__required {
+  margin-left: 0.125rem;
+  color: var(--app-danger);
+}
+
+// A switch in a box the size of a text field, so it lines up with the fields of the other rows.
+.option-row__switch {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0;
+  cursor: pointer;
+
+  .form-check {
+    min-height: 0;
+  }
+
+  .form-check-input {
+    margin-top: 0;
+    cursor: pointer;
+  }
+}
+
+.step-add-menu {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.variable-menu__keys {
+  max-height: 16rem;
+  overflow-y: auto;
+}

@@ -22,6 +22,17 @@
         "--offline"
       ],
       "port": 8088
+    },
+    {
+      "name": "start-4201",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "ng",
+        "serve",
+        "--port",
+        "4201"
+      ],
+      "port": 4201
     }
   ]
 }
