@@ -299,7 +299,7 @@ class FlowImportServiceIntTest {
     // ---- Script ----
 
     @Test
-    void aScriptBecomesAScriptFlowWithASchedulerSourceTheScriptALogForItsResultAndAnErrorHandler() {
+    void aScriptBecomesAScriptFlowWithAOnceSourceTheScriptALogForItsResultAndAnErrorHandler() {
         String script = "def x = 1\nlog.info(\"x=${x}\")";
 
         FlowImportResultDTO result = flowImportService.importScript(integrationId, script, "Groovy", "Nightly Job");
@@ -310,8 +310,9 @@ class FlowImportServiceIntTest {
 
         List<Step> steps = stepsOf(result);
         assertThat(steps).extracting(Step::getStepType).containsExactly(StepType.SOURCE, StepType.SCRIPT, StepType.SINK, StepType.ERROR);
-        assertThat(steps.get(0).getComponentType()).isEqualTo("scheduler");
-        assertThat(steps.get(0).getUri()).isEqualTo("nightly-job");
+        assertThat(steps.get(0).getComponentType()).isEqualTo("once");
+        assertThat(steps.get(0).getUri()).isEqualTo("hello");
+        assertThat(steps.get(0).getOptions()).isEqualTo("body=world");
         assertThat(steps.get(1).getComponentType()).isEqualTo("groovy");
         assertThat(steps.get(1).getUri()).isEqualTo(script);
         assertThat(steps.get(2).getComponentType()).isEqualTo("log");
