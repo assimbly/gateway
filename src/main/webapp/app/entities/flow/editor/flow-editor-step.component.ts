@@ -1,18 +1,22 @@
 import { ChangeDetectorRef, Component, EventEmitter, inject, Injectable, Input, OnChanges, OnDestroy, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
 import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { PopoverModule } from 'ngx-bootstrap/popover';
 import { CodemirrorComponent, CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { Components } from 'app/shared/camel/component-type';
-import { CatalogueEntry, EndpointRole, NO_MATCH, matchRank, roleMismatch, searchCatalogue } from 'app/shared/camel/catalogue';
-import { OptionSchema, PathPart, ValueField, groupOptions, pathRule, requiredOptions, valueFieldOf } from 'app/shared/camel/endpoint';
+import { CatalogueEntry, EndpointRole, NO_MATCH, essentialsFirst, matchRank, roleMismatch, searchCatalogue } from 'app/shared/camel/catalogue';
+import { OptionSchema, PathPart, ValueField, groupOptions, pathRule, requiredOptions, suggestedOptions, valueFieldOf } from 'app/shared/camel/endpoint';
+import { insertVariable, unknownVariables, unknownVariablesMessage } from 'app/shared/camel/variables';
 import { IStep, StepType } from 'app/shared/model/step.model';
 import { IMessage } from 'app/shared/model/message.model';
 import { Connection } from 'app/shared/model/connection.model';
 import { ThemeService } from 'app/core/theme';
+import { VariableKeysService } from 'app/entities/environment-variables/variable-keys.service';
 import { isRouteStep, missingRouteFields } from './route-step';
 import { Subscription } from 'rxjs';
 import { FlowService } from '../flow.service';
@@ -38,7 +42,7 @@ export class StepEditorRegistry {
 @Component({
   selector: 'jhi-flow-editor-step',
   templateUrl: './flow-editor-step.component.html',
-  imports: [CommonModule, ReactiveFormsModule, NgbModule, FontAwesomeModule, NgSelectModule, PopoverModule, CodemirrorModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgbModule, FontAwesomeModule, NgSelectModule, PopoverModule, CodemirrorModule],
 })
 export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   @Input({ required: true }) step: IStep;
@@ -134,6 +138,48 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
     private stepEditorRegistry: StepEditorRegistry,
   ) {
     this.stepEditorRegistry.editors.push(this);
+    inject(VariableKeysService)
+      .keys()
+      .pipe(takeUntilDestroyed())
+      .subscribe(keys => {
+        this.variableKeys = keys;
+        this.cdr.markForCheck();
+      });
+  }
+
+  /** The keys of the Variables a Path or Option can refer to; null while unknown, so nothing is reported as missing. */
+  variableKeys: string[] | null = null;
+  /** What is typed in the Insert Variable menu to narrow its keys. */
+  variableFilter = '';
+
+  get filteredVariableKeys(): string[] {
+    const filter = this.variableFilter.trim().toLowerCase();
+    return (this.variableKeys ?? []).filter(key => key.toLowerCase().includes(filter));
+  }
+
+  /** Puts a reference to the Variable in a Path or Option value at the cursor, and leaves the cursor after it. */
+  insertVariableInto(control: AbstractControl | null | undefined, input: HTMLInputElement, key: string): void {
+    if (!control) {
+      return;
+    }
+    const { text, cursor } = insertVariable(`${control.value ?? ''}`, key, input.selectionStart ?? undefined);
+    control.setValue(text);
+    control.markAsDirty();
+    this.variableFilter = '';
+    setTimeout(() => {
+      input.focus();
+      input.setSelectionRange(cursor, cursor);
+    });
+  }
+
+  /** What the Step says about the Variables its Path and Options refer to that don't exist, or nothing. */
+  get unknownVariablesWarning(): string | undefined {
+    if (!this.variableKeys) {
+      return undefined;
+    }
+    const values = ((this.stepForm.get('options') as FormArray)?.controls ?? []).map(option => `${option.get('value')?.value ?? ''}`);
+    const unknown = unknownVariables([`${this.stepForm.get('uri')?.value ?? ''}`, ...values], this.variableKeys);
+    return unknown.length ? unknownVariablesMessage(unknown) : undefined;
   }
 
   private choicesCache?: { options: unknown[]; length: number; role: EndpointRole; choices: OptionSchema[] };
@@ -145,7 +191,7 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['componentOptions'] && this.componentOptions?.length) {
-      this.addRequiredOptions();
+      this.addSuggestedOptions();
     }
   }
 
@@ -185,7 +231,9 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
       return cache.choices;
     }
     const usable = new Set<string>(names ?? []);
-    const choices: ComponentChoice[] = [...usable].map(name => this.componentChoice(this.catalogueEntry(name)));
+    const usableChoices = [...usable].map(name => this.componentChoice(this.catalogueEntry(name)));
+    // Actions list Assimbly's own Actions first, as the step picker does.
+    const choices: ComponentChoice[] = this.stepType === 'ACTION' ? essentialsFirst(usableChoices) : usableChoices;
     if (this.componentSearch.trim()) {
       const others = this.components.types.filter(type => !usable.has(type.name));
       searchCatalogue(others, this.componentSearch).forEach(entry =>
@@ -268,16 +316,17 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   }
 
   /**
-   * Adds an empty row for each required Option of a Step that has no Options yet. A saved Step's own Options are
-   * filled in after its schema arrives, so they are left alone.
+   * Adds an empty row for each suggested Option of a Step that has no Options yet: the required ones, and for a small
+   * Component all of its Common Options. A saved Step's own Options are filled in after its schema arrives, so they
+   * are left alone. Rows left empty aren't saved.
    */
-  private addRequiredOptions(): void {
+  private addSuggestedOptions(): void {
     const formOptions = this.stepForm?.get('options') as FormArray | null;
     if (!formOptions || this.step?.options) {
       return;
     }
     const present = new Set(formOptions.controls.map(option => option.get('key')?.value));
-    requiredOptions(this.componentOptions, this.role)
+    suggestedOptions(this.componentOptions, this.role)
       .filter(name => !present.has(name))
       .forEach(name => {
         const emptyRow = formOptions.controls.findIndex(option => !option.get('key')?.value && !option.get('value')?.value);
@@ -581,6 +630,44 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
 
   openPathModal(templateRef: TemplateRef<any>): void {
     this.modalRef = this.modalService.open(templateRef, { size: 'xl' });
+  }
+
+  /**
+   * Whether the Step shows a Path field. A Component whose catalogue syntax is empty doesn't read a path, such as
+   * Set body; its field still shows while it holds a value, so nothing saved is hidden.
+   */
+  get showsPath(): boolean {
+    return this.uriPlaceholder !== '' || !!this.stepForm.get('uri')?.value || !!this.autoPath;
+  }
+
+  /** The row of the Option whose value is open in the larger editor. */
+  editingOption = -1;
+
+  openOptionValueModal(idx: number, templateRef: TemplateRef<any>): void {
+    this.editingOption = idx;
+    this.openPathModal(templateRef);
+    // A value typed in the larger editor only reaches the form, not the row's own field bound to the same control;
+    // setting it again once the editor closes shows it in the row too.
+    this.modalRef?.hidden.subscribe(() => {
+      const value = this.optionGroup(idx)?.get('value');
+      value?.setValue(value.value);
+      this.cdr.markForCheck();
+    });
+  }
+
+  optionGroup(idx: number): FormGroup | null {
+    return idx >= 0 ? ((this.stepForm.get('options') as FormArray)?.at(idx) as FormGroup) ?? null : null;
+  }
+
+  optionTitle(idx: number): string {
+    const schema = this.optionSchema(idx);
+    return schema?.displayName ?? schema?.name ?? this.optionGroup(idx)?.get('key')?.value ?? 'Option';
+  }
+
+  /** The language a Step's expression Options are written in, from its own `language` Option, for the editor's highlighting. */
+  get optionLanguage(): string {
+    const row = ((this.stepForm.get('options') as FormArray)?.controls ?? []).find(option => option.get('key')?.value === 'language');
+    return `${row?.get('value')?.value || 'simple'}`;
   }
 
   openFullScreenModal(templateRef: TemplateRef<any>): void {

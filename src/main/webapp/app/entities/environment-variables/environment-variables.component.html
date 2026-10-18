@@ -2,7 +2,7 @@
   @if (showEmptyState) {
     <jhi-empty-state
       [heading]="isAdmin ? 'Add your first Variable' : 'No Variables yet'"
-      description="A Variable is a named value, such as a host name or a folder, that Flows can refer to by its key. It keeps the settings that differ per environment out of your Flows."
+      description="A Variable is a named value, such as a host name or a folder. A Flow refers to it as @{key} in a Path or Option, or with the @{} button next to those fields. It keeps the settings that differ per environment out of your Flows."
       [docs]="true"
     >
       <a
@@ -22,7 +22,7 @@
     placeholder="Filter by key or value"
     persistKey="searchVariablesText"
     inputId="searchVariablesId"
-    hint="A Variable is a named value, such as a host name or a folder, that Flows can refer to by its key."
+    hint="A Variable is a named value, such as a host name or a folder. A Flow refers to it as @{key} in a Path or Option."
   >
     <ng-container actions>
       <a
@@ -67,6 +67,16 @@
         } @else {
           <span class="text-muted">—</span>
         }
+      </td>
+      <td>
+        <span class="d-inline-flex align-items-center gap-1">
+          <code>{{ reference(environmentVariables.key) }}</code>
+          <button type="button" class="btn btn-fx btn-fx-sm btn-fx-ghost btn-fx-icon" (click)="copyReference(environmentVariables.key)"
+                  [title]="copiedKey === environmentVariables.key ? 'Copied' : 'Copy ' + reference(environmentVariables.key)"
+                  [attr.aria-label]="'Copy ' + reference(environmentVariables.key)">
+            <fa-icon [icon]="copiedKey === environmentVariables.key ? 'check' : 'copy'"></fa-icon>
+          </button>
+        </span>
       </td>
       <td class="text-end">
         <jhi-row-actions *jhiHasAnyAuthority="'ROLE_ADMIN'">

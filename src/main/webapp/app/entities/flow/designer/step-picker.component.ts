@@ -18,7 +18,19 @@ import { NgbDropdown, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 import { Components } from 'app/shared/camel/component-type';
-import { CatalogueEntry, CategoryChip, NO_MATCH, categoryChips, labelsOf, matchRank, roleMismatch, searchCatalogue } from 'app/shared/camel/catalogue';
+import {
+  CatalogueEntry,
+  CategoryChip,
+  ESSENTIALS,
+  NO_MATCH,
+  categoryChips,
+  essentialsFirst,
+  isEssential,
+  labelsOf,
+  matchRank,
+  roleMismatch,
+  searchCatalogue,
+} from 'app/shared/camel/catalogue';
 
 import { RESPONSE_COMPONENT, ROUTER_KINDS, routerKindDescription, routerKindTitle } from './flow-graph';
 
@@ -79,7 +91,8 @@ export class StepPickerComponent implements OnChanges {
 
   activeKind?: PickedKind;
   filter = '';
-  /** A catalogue label or RECENT; null shows every component. */
+  readonly essentials = ESSENTIALS;
+  /** A catalogue label, ESSENTIALS or RECENT; null shows every component. */
   category: string | null = null;
   showAllCategories = false;
   recent: string[] = readRecent();
@@ -106,6 +119,11 @@ export class StepPickerComponent implements OnChanges {
     return chips;
   }
 
+  /** Assimbly's own Actions that work on the message; only Actions offer them as a chip. */
+  essentialsOf(kind: PickedKind): string[] {
+    return kind === 'ACTION' ? this.componentsOf(kind).filter(name => isEssential(this.entry(name))) : [];
+  }
+
   recentOf(kind: PickedKind): string[] {
     const names = new Set(this.componentsOf(kind));
     return this.recent.filter(name => names.has(name));
@@ -120,15 +138,22 @@ export class StepPickerComponent implements OnChanges {
     return this.activeKind && this.kinds.includes(this.activeKind) ? this.activeKind : this.kinds[0];
   }
 
-  /** The components of a kind in the chosen category that match the search, closest match first. */
+  /**
+   * The components of a kind in the chosen category that match the search, closest match first. Without a search,
+   * Actions list the Essentials first.
+   */
   matches(kind: PickedKind): string[] {
     let names = this.componentsOf(kind);
     if (this.category === RECENT) {
       names = this.recentOf(kind);
+    } else if (this.category === ESSENTIALS) {
+      names = this.essentialsOf(kind);
     } else if (this.category && kind !== 'ROUTER') {
       names = names.filter(name => labelsOf(this.entry(name)).includes(this.category!));
     }
-    return searchCatalogue(names.map(name => this.entry(name, kind)), this.filter).map(entry => entry.name);
+    const entries = names.map(name => this.entry(name, kind));
+    const ordered = kind === 'ACTION' && !this.filter.trim() ? essentialsFirst(entries) : entries;
+    return searchCatalogue(ordered, this.filter).map(entry => entry.name);
   }
 
   /**

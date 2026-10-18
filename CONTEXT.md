@@ -26,6 +26,14 @@ _Avoid_: Send, message sender
 **Draft**:
 A Flow that has been saved but is not yet complete enough to run: a Step has no Component yet or is missing a required part of its path, or a Branch doesn't end in a Sink yet. Missing required Options don't make a Flow a Draft.
 
+**Example Flow**:
+A small, ready-made Visual Flow a new Flow can start from, such as "Folder to folder". It opens in the editor as a new, unsaved Flow with the paths only the user can know left empty, and becomes an ordinary Flow once it is saved.
+_Avoid_: Template (fine in code)
+
+**Variable**:
+A named value, such as a host name or a folder, kept outside the Flows that use it. A Step refers to it as `@{key}` in its path or Options, and the Gateway puts in its value when the Flow is deployed.
+_Avoid_: Environment variable (the name in code), placeholder
+
 **Open end**:
 A Source or Action that has no next Step yet. A new Flow is a single open end: its Source.
 

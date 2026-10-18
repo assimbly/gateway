@@ -1,4 +1,4 @@
-import { OptionSchema, groupOptions, missingPathParts, pathRule, requiredOptions, valueFieldOf } from './endpoint';
+import { OptionSchema, groupOptions, missingPathParts, pathRule, requiredOptions, suggestedOptions, valueFieldOf } from './endpoint';
 
 const sftp: Record<string, Omit<OptionSchema, 'name'>> = {
   host: { kind: 'path', displayName: 'Host', group: 'common', type: 'string', required: true, description: 'Hostname of the FTP server' },
@@ -107,5 +107,34 @@ describe('Endpoint editing', () => {
 
   it('lists the required Options a Step of this role needs', () => {
     expect(requiredOptions(properties, 'producer')).toEqual(['username']);
+  });
+
+  describe('suggested Options', () => {
+    const setbody: OptionSchema[] = [
+      { name: 'language', kind: 'parameter', displayName: 'Language', group: 'common', type: 'string', defaultValue: 'simple' },
+      { name: 'expression', kind: 'parameter', displayName: 'Expression', group: 'common', type: 'string' },
+    ];
+
+    it('suggests every Common Option of a Component with only a few Options', () => {
+      expect(suggestedOptions(setbody, 'producer')).toEqual(['expression', 'language']);
+    });
+
+    it('suggests only the required Options of a Component with many Options', () => {
+      const many: OptionSchema[] = [
+        ...Array.from({ length: 10 }, (_, i) => ({ name: `option${i}`, kind: 'parameter', group: 'common' })),
+        { name: 'host', kind: 'parameter', group: 'common', required: true },
+      ];
+
+      expect(suggestedOptions(many, 'producer')).toEqual(['host']);
+    });
+
+    it("doesn't suggest Options of the other role", () => {
+      const fileLike: OptionSchema[] = [
+        { name: 'delay', kind: 'parameter', group: 'consumer' },
+        { name: 'fileExist', kind: 'parameter', group: 'producer' },
+      ];
+
+      expect(suggestedOptions(fileLike, 'producer')).toEqual(['fileExist']);
+    });
   });
 });

@@ -70,6 +70,23 @@ describe('New Flow dialog', () => {
     expect(levels.slice(1, 4)).toEqual(['Low code', 'Code', 'Design']);
   });
 
+  it('opens a new Visual Flow made from an Example Flow', async () => {
+    const examples: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('.flow-example'));
+    expect(examples.map(e => e.querySelector('.flow-example__title')?.textContent?.trim())).toEqual([
+      'Folder to folder',
+      'Scheduled HTTP call',
+      'Route by content',
+    ]);
+
+    examples[2].click();
+    await fixture.whenStable();
+
+    const url = TestBed.inject(Router).parseUrl(TestBed.inject(Router).url);
+    expect(url.root.children['primary'].segments.map(s => s.path)).toEqual(['flow', 'editor']);
+    expect(url.queryParams).toEqual({ mode: 'edit', editor: 'flow', template: 'route-by-content' });
+    expect(activeModal.close).toHaveBeenCalled();
+  });
+
   function choiceNamed(name: string): HTMLElement {
     const choices: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('a, button'));
     const choice = choices.find(element => element.querySelector('.flow-type-choice__title')?.textContent?.trim() === name);

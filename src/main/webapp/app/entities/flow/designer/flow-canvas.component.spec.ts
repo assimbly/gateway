@@ -52,8 +52,36 @@ describe('Flow canvas', () => {
     const steps: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('.flow-step'));
 
     expect(steps.map(s => s.querySelector('.flow-step-kind')!.textContent!.trim())).toEqual(['SOURCE', 'ROUTER', 'SINK', 'SINK']);
-    expect(steps.map(s => s.querySelector('.flow-step-label')!.textContent!.trim())).toEqual(['timer', 'Content router', 'log', 'choose a component']);
+    expect(steps.map(s => s.querySelector('.flow-step-label')!.textContent!.trim())).toEqual(['Timer', 'Content router', 'Log Data', 'choose a component']);
     expect(steps[3].classList).toContain('flow-step-problem');
+  });
+
+  it('shows the path of a Step under it, shortened in the middle when long', () => {
+    const graph = loadFlowGraph({
+      id: 3,
+      steps: [
+        { id: 20, stepType: 'SOURCE', componentType: 'file', uri: 'C:/messages/in', links: [{ name: '3-21', bound: 'out' }] },
+        {
+          id: 21,
+          stepType: 'SINK',
+          componentType: 'file',
+          uri: 'C:/a/very/long/folder/name/for/outgoing/orders',
+          links: [{ name: '3-21', bound: 'in' }],
+        },
+      ],
+    } as IFlow);
+    fixture.componentRef.setInput('graph', graph);
+    fixture.detectChanges();
+
+    const captions: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('.flow-step-caption'));
+    expect(captions.map(c => c.textContent!.trim())).toEqual(['C:/messages/in', 'C:/a/very/long…tgoing/orders']);
+    expect(captions[1].title).toBe('C:/a/very/long/folder/name/for/outgoing/orders');
+  });
+
+  it('shows no path under a Router', () => {
+    const router = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('.flow-step'))[1];
+
+    expect(router.querySelector('.flow-step-caption')).toBeNull();
   });
 
   it('labels the Branches of a Router with their name and Condition', () => {

@@ -1,4 +1,4 @@
-import { CatalogueEntry, categoryChips, roleMismatch, searchCatalogue } from './catalogue';
+import { CatalogueEntry, categoryChips, essentialsFirst, isEssential, roleMismatch, searchCatalogue } from './catalogue';
 
 const file: CatalogueEntry = { name: 'file', title: 'File', description: 'Read and write files.', label: 'file,core' };
 const sftp: CatalogueEntry = { name: 'sftp', title: 'SFTP', description: 'Upload and download files to/from SFTP servers.', label: 'file' };
@@ -71,6 +71,20 @@ describe('Camel catalogue', () => {
 
     it('lists everything for an empty search', () => {
       expect(searchCatalogue([kafka, file], ' ')).toEqual([kafka, file]);
+    });
+  });
+
+  describe('Essentials', () => {
+    const setbody: CatalogueEntry = { name: 'setbody', title: 'Set body', action: true, source: false, sink: false };
+    const amazonmq: CatalogueEntry = { name: 'amazonmq', title: 'Amazon MQ', action: true, source: true, sink: true };
+    const get: CatalogueEntry = { name: 'get', title: 'GET', action: true, source: true, sink: true };
+
+    it("counts Assimbly's own Actions that work on the message, not the ones that talk to another system", () => {
+      expect([setbody, amazonmq, get, file].filter(isEssential)).toEqual([setbody]);
+    });
+
+    it('lists the Essentials first and keeps the order of the rest', () => {
+      expect(essentialsFirst([file, kafka, setbody])).toEqual([setbody, file, kafka]);
     });
   });
 });

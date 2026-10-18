@@ -137,6 +137,7 @@ In the editor header, the **Completed** counter goes up by one. If something goe
 
 ## Next steps
 
+* Start your next Flow from an example: **Add** offers *Folder to folder*, *Scheduled HTTP call* and *Route by content*.
 * Add an **Action** between the Source and the Sink, for example to change the message with a script or set a header.
 * Add a **Router** to send messages to different Sinks, depending on a condition.
 * Send a test message to a Flow from **Flows → Send**.

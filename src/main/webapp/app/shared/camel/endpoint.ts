@@ -86,6 +86,19 @@ export function requiredOptions(properties: OptionSchema[], role: EndpointRole):
   return properties.filter(option => option.kind !== 'path' && option.required && fitsRole(option, role)).map(option => option.name);
 }
 
+/** A Component with at most this many Options shows them all up front; most of Assimbly's own steps have two to four. */
+export const FEW_OPTIONS = 4;
+
+/**
+ * The Options a new Step starts with as empty rows: the required ones, plus every Common Option when the Component
+ * has only a few Options, so a small step such as Set body shows what it needs without searching the key list.
+ */
+export function suggestedOptions(properties: OptionSchema[], role: EndpointRole): string[] {
+  const options = groupOptions(properties, role);
+  const common = options.length <= FEW_OPTIONS ? options.filter(option => option.heading === 'Common').map(option => option.name) : [];
+  return [...new Set([...requiredOptions(properties, role), ...common])];
+}
+
 export interface PathPart {
   name: string;
   displayName: string;

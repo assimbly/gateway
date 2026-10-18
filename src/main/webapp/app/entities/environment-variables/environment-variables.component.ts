@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
@@ -16,7 +16,9 @@ import { DataTable, DataTableColumn, OverflowActionDirective, PrimaryActionDirec
 import { IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
 import { EnvironmentVariablesDeleteDialogComponent } from './environment-variables-delete-dialog.component';
 import { AccountService } from 'app/core/auth/account.service';
+import { variableRef } from 'app/shared/camel/variables';
 import { EnvironmentVariablesService } from './environment-variables.service';
+import { VariableKeysService } from './variable-keys.service';
 
 @Component({
     selector: 'jhi-environment-variables',
@@ -51,6 +53,7 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
     readonly columns: DataTableColumn[] = [
         { key: 'key', header: 'Key', sortable: true },
         { key: 'value', header: 'Value', sortable: true },
+        { key: 'reference', header: 'Use in a Flow as' },
         { key: 'actions', header: 'Actions', align: 'end' },
     ];
 
@@ -63,6 +66,32 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
         protected cdr: ChangeDetectorRef
     ) {
         this.page = 0;
+    }
+
+    private readonly variableKeys = inject(VariableKeysService);
+
+    /** The key whose reference was just copied, to show that it was. */
+    copiedKey?: string;
+
+    /** How a Flow refers to the Variable. */
+    reference(key: string | undefined): string {
+        return variableRef(key ?? '');
+    }
+
+    copyReference(key: string | undefined): void {
+        navigator.clipboard?.writeText(this.reference(key)).then(
+            () => {
+                this.copiedKey = key;
+                this.cdr.markForCheck();
+                setTimeout(() => {
+                    if (this.copiedKey === key) {
+                        this.copiedKey = undefined;
+                        this.cdr.markForCheck();
+                    }
+                }, 2000);
+            },
+            () => this.alertService.addAlert({ type: 'warning', message: `Couldn't copy. Select ${this.reference(key)} and copy it yourself.` }),
+        );
     }
 
     loadAll() {
@@ -138,7 +167,10 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
     }
 
     registerChangeInEnvironmentVariables() {
-        this.eventSubscriber = this.eventManager.subscribe('environmentVariablesListModification', response => this.loadAll());
+        this.eventSubscriber = this.eventManager.subscribe('environmentVariablesListModification', response => {
+            this.loadAll();
+            this.variableKeys.refresh();
+        });
     }
 
     protected onError(errorMessage: string) {
