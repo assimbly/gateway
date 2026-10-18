@@ -5,14 +5,25 @@
     placeholder="Filter log"
     inputId="searchTextId"
   >
+    <!-- One node in the @if, without whitespace around it (preserveWhitespaces), so it is projected into [extras] -->
+    @if (flowId) {<span extras class="badge text-bg-light border fw-normal d-inline-flex align-items-center gap-1 logviewer-flow">
+        <fa-icon icon="file-alt" /> Flow: {{ flowName || flowId }}
+        <button type="button" class="logviewer-flow__clear" aria-label="Show the whole log" title="Show the whole log" (click)="showAll()">
+          <fa-icon icon="times" />
+        </button>
+      </span>}
     <div
       extras
       class="input-group"
       style="max-width: 12rem"
       data-toggle="tooltip"
-      title="The number of lines returned (default=250, max=10000). Only the last lines of the log file are shown (tail)."
+      [title]="
+        flowId
+          ? 'The number of entries returned (default=250, max=10000). Only the last entries of this Flow are shown.'
+          : 'The number of lines returned (default=250, max=10000). Only the last lines of the log file are shown (tail).'
+      "
     >
-      <span class="input-group-text">Lines:</span>
+      <span class="input-group-text">{{ flowId ? 'Entries:' : 'Lines:' }}</span>
       <input
         type="number"
         name="lines"

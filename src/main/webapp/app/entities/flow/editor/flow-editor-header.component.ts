@@ -27,6 +27,7 @@ import {
 } from '../flow-status';
 import { FlowRowAlerts } from '../flow-row-alerts.component';
 import { FlowAlertsDrawerComponent } from '../flow-alerts-drawer.component';
+import { FlowLogDrawerComponent } from '../flow-log-drawer.component';
 
 const POLL_INTERVAL = 10000;
 
@@ -138,6 +139,13 @@ export class FlowEditorHeaderComponent {
     const id = this.flowId();
     if (id) {
       FlowAlertsDrawerComponent.open(this.offcanvas, { id, name: this.nameControl().value }, () => this.alerts.set(0));
+    }
+  }
+
+  openLog(): void {
+    const id = this.flowId();
+    if (id) {
+      FlowLogDrawerComponent.open(this.offcanvas, { id, name: this.nameControl().value });
     }
   }
 

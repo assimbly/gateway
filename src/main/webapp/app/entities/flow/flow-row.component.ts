@@ -37,6 +37,7 @@ import {
 import { Components } from 'app/shared/camel/component-type';
 import { ComponentSchemas } from './component-schemas.service';
 import { FlowAlertsDrawerComponent } from './flow-alerts-drawer.component';
+import { FlowLogDrawerComponent } from './flow-log-drawer.component';
 
 import { Router } from '@angular/router';
 import dayjs from 'dayjs/esm';
@@ -262,6 +263,11 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
       this.setFlowNumberOfAlerts(0);
       this.changeDetector.detectChanges();
     });
+  }
+
+  /** Opens the drawer with what this Flow logged. */
+  openLog(): void {
+    FlowLogDrawerComponent.open(this.offcanvas, { id: this.flow.id!, name: this.flow.name });
   }
 
   getStatus(id: number) {

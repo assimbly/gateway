@@ -11,8 +11,10 @@ export class LogViewerService {
 
     constructor(protected http: HttpClient) {}
 
-    getLogs(lines: number): Observable<HttpResponse<any>> {
+    /** The last lines of the application log, or with a Flow id the last entries that Flow logged. */
+    getLogs(lines: number, flowId?: number): Observable<HttpResponse<string>> {
         return this.http.get(`${serverApiUrl}api/logs/${this.integrationid}/log/${lines}`, {
+            params: flowId ? { flowId } : {},
             observe: 'response',
             responseType: 'text'
         });

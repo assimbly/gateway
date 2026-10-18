@@ -9,6 +9,26 @@
   flex-shrink: 0;
 }
 
+.logviewer-flow {
+  font-size: 0.875rem;
+  padding: 0.375rem 0.5rem;
+}
+
+.logviewer-flow__clear {
+  margin-left: 0.25rem;
+  padding: 0 0.125rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  opacity: 0.6;
+  line-height: 1;
+
+  &:hover,
+  &:focus-visible {
+    opacity: 1;
+  }
+}
+
 .logviewer-output {
   flex: 1 1 auto;
   min-height: 0;

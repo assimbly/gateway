@@ -1536,3 +1536,8 @@ input:-webkit-autofill:focus {
   color: var(--app-text);
 }
 
+
+// A Flow's log needs room for the log lines; the drawer is wider than the Alerts drawer.
+.offcanvas.flow-log-drawer {
+  --bs-offcanvas-width: min(60rem, 100vw);
+}

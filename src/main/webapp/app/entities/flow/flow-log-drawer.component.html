@@ -1,0 +1,59 @@
+<div class="offcanvas-header">
+  <div>
+    <h4 class="offcanvas-title" id="flow-log-title">Log</h4>
+    <div class="text-muted">{{ flow()?.name }}</div>
+  </div>
+  <button type="button" class="btn-close" aria-label="Close" (click)="activeOffcanvas.dismiss()"></button>
+</div>
+
+<form #logsForm="ngForm" class="flow-log-drawer__toolbar" (ngSubmit)="getLogs()">
+  <jhi-search-toolbar [(query)]="searchText" placeholder="Filter log" inputId="flowLogSearchText">
+    <div
+      extras
+      class="input-group"
+      style="max-width: 12rem"
+      title="The number of entries returned (default=250, max=10000). Only the last entries of this Flow are shown."
+    >
+      <span class="input-group-text">Entries:</span>
+      <input
+        type="number"
+        name="lines"
+        class="form-control"
+        [jhiLogViewerLineValidation]="lines"
+        [(ngModel)]="lines"
+        min="1"
+        max="10000"
+        required
+      />
+    </div>
+    <div actions class="d-flex align-items-center gap-2">
+      <button type="button" class="btn btn-fx btn-fx-ghost" (click)="openInLogViewer()">
+        <fa-icon icon="arrow-up-right-from-square" /><span>Open in Log viewer</span>
+      </button>
+      <button
+        type="submit"
+        class="btn btn-fx btn-fx-secondary"
+        [disabled]="logsForm.form.invalid || loading()"
+        aria-label="Refresh"
+      >
+        <fa-icon icon="sync" [animation]="loading() ? 'spin' : undefined" /><span>Refresh</span>
+      </button>
+    </div>
+  </jhi-search-toolbar>
+</form>
+
+<div class="offcanvas-body flow-log-drawer__body">
+  @if (failed(); as message) {
+    <div class="alert alert-danger py-2" role="alert">{{ message }}</div>
+  }
+  @if (entries().length) {
+    <pre #logArea class="flow-log-drawer__output" [innerHTML]="coloredLog()"></pre>
+  } @else if (loading()) {
+    <p class="text-muted mb-0" role="status">Loading the log…</p>
+  } @else if (!failed()) {
+    <p class="text-muted mb-0">
+      No log entries for this Flow yet. Entries appear when it runs. Steps log at their own level, so check the level of
+      <code>org.assimbly.runtime</code> under Logs.
+    </p>
+  }
+</div>

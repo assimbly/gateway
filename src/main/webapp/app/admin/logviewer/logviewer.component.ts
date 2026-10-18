@@ -1,12 +1,14 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild, ElementRef, inject } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { distinctUntilChanged, map } from 'rxjs';
 
 import { SearchToolbar } from 'app/shared/filter';
 import { LogViewerService } from './logviewer.service';
 import { LogViewerLineValidationDirective } from './logviewer-line-validation.directive';
+import { colorLog, logEntries } from './log-display';
 
 @Component({
     standalone: true,
@@ -19,26 +21,43 @@ export default class LogViewerComponent implements OnInit {
   @ViewChild('logArea', { static: false }) private logArea: ElementRef;
 
   public log = '';
-  public logLines: string[] = [];
+  public logEntries: string[] = [];
   public lines: number;
   public coloredLog: SafeHtml = '';
+
+  /** With a Flow, only the entries that Flow logged. */
+  public flowId?: number;
+  public flowName?: string;
 
   searchText = '';
 
   private readonly changeDetector = inject(ChangeDetectorRef);
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   constructor(private logViewerService: LogViewerService) {}
 
   ngOnInit() {
     this.lines = 250;
-    this.getLogs();
+    // The query params can be emitted again unchanged, as the navbar outlet settles; load the log once per Flow
+    this.route.queryParamMap
+      .pipe(
+        map(params => [params.get('flowId'), params.get('name')] as const),
+        distinctUntilChanged((a, b) => a[0] === b[0] && a[1] === b[1]),
+      )
+      .subscribe(([id, name]) => {
+        const flowId = Number(id);
+        this.flowId = flowId > 0 ? flowId : undefined;
+        this.flowName = this.flowId ? (name ?? undefined) : undefined;
+        this.getLogs();
+      });
   }
 
   getLogs() {
-    this.logViewerService.getLogs(this.lines).subscribe(res => {
+    this.logViewerService.getLogs(this.lines, this.flowId).subscribe(res => {
       this.log = res.body ?? '';
-      this.logLines = this.log.split(/\r?\n/);
+      this.logEntries = logEntries(this.log);
       this.refreshDisplay();
       this.changeDetector.detectChanges();
 
@@ -50,37 +69,16 @@ export default class LogViewerComponent implements OnInit {
     });
   }
 
+  /** Back to the whole application log. */
+  showAll(): void {
+    this.router.navigate([], { relativeTo: this.route, queryParams: {} });
+  }
+
   onFilterChange(): void {
     this.refreshDisplay();
   }
 
   private refreshDisplay(): void {
-    const search = this.searchText.toLocaleLowerCase();
-    const lines = search
-      ? this.logLines.filter(line => line.toLocaleLowerCase().includes(search))
-      : this.logLines;
-
-    const html = lines
-      .map(line => {
-        const escaped = this.escapeHtml(line);
-        if (line.includes(' ERROR ')) {
-          return `<span style="color: red">${escaped}</span>`;
-        }
-        if (line.includes(' WARN ')) {
-          return `<span style="color: orange">${escaped}</span>`;
-        }
-        return escaped;
-      })
-      .join('\n');
-
-    this.coloredLog = this.sanitizer.bypassSecurityTrustHtml(html);
-  }
-
-  private escapeHtml(text: string): string {
-    return text
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+    this.coloredLog = this.sanitizer.bypassSecurityTrustHtml(colorLog(this.logEntries, this.searchText));
   }
 }
