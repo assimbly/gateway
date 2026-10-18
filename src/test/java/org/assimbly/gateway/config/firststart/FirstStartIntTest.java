@@ -68,24 +68,20 @@ class FirstStartIntTest {
     }
 
     @Test
-    void theExampleFlowSendsTheExampleMessageFromATimerToTheLog() throws Exception {
+    void theExampleFlowSendsTheExampleMessageOnceToTheLog() throws Exception {
         Integration integration = firstStart.setUp(true, true);
         Long flowId = flowRepository.findAllByIntegrationId(integration.getId()).get(0).getId();
 
         Document dil = export(flowId);
 
-        Element timer = step(dil, "source");
-        Element setBody = step(dil, "action");
+        Element once = step(dil, "source");
         Element log = step(dil, "sink");
-        assertThat(text(timer, "uri")).isEqualTo("timer:example");
-        assertThat(text(setBody, "uri")).isEqualTo("setbody");
-        assertThat(text(setBody, "options/language")).isEqualTo("constant");
-        assertThat(text(setBody, "options/expression")).isEqualTo("Example flow running");
+        assertThat(text(once, "uri")).isEqualTo("once:example");
+        assertThat(text(once, "options/body")).isEqualTo("Example flow running");
         assertThat(text(log, "uri")).isEqualTo("log:ExampleFlow");
         assertThat(text(log, "options/showBody")).isEqualTo("true");
 
-        assertThat(text(timer, "links/link[bound='out']/id")).isEqualTo(text(setBody, "links/link[bound='in']/id"));
-        assertThat(text(setBody, "links/link[bound='out']/id")).isEqualTo(text(log, "links/link[bound='in']/id"));
+        assertThat(text(once, "links/link[bound='out']/id")).isEqualTo(text(log, "links/link[bound='in']/id"));
         assertThat(text(step(dil, "error"), "uri")).isEqualTo("log:ExampleFlow/" + flowId);
     }
 

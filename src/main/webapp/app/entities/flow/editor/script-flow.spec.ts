@@ -2,6 +2,7 @@ import { StepType } from 'app/shared/model/step.model';
 
 import {
   SCRIPT_LANGUAGES,
+  SCRIPT_STARTER_SOURCE,
   defaultResultLogStep,
   isStarterScript,
   nextSchedulerName,
@@ -101,6 +102,12 @@ describe('Script Flow', () => {
       expect(scriptFlowSummary([scheduler('initialDelay=0&delay=5000')]).source?.text).toBe('scheduler1, every 5 seconds');
       expect(scriptFlowSummary([scheduler('delay=7200000')]).source?.text).toBe('scheduler1, every 2 hours');
       expect(scriptFlowSummary([scheduler('delay=1500')]).source?.text).toBe('scheduler1, every 1500 ms');
+    });
+
+    it('says a once Source fires once, whatever its delay', () => {
+      const once = { stepType: StepType.SOURCE, ...SCRIPT_STARTER_SOURCE };
+      expect(scriptFlowSummary([once]).source?.text).toBe('hello, once when started');
+      expect(scriptFlowSummary([{ ...once, options: 'body=world&delay=60000' }]).source?.text).toBe('hello, once when started');
     });
 
     it('names only the scheduler without a delay', () => {

@@ -112,7 +112,7 @@ public class FirstStart {
         return integration;
     }
 
-    /** A stopped Visual Flow that, once started, logs the example message every 10 seconds. */
+    /** A stopped Visual Flow that logs the example message once each time it is started. */
     private void createExampleFlow(Integration integration) {
         Instant now = Instant.now();
         Flow flow = new Flow();
@@ -127,16 +127,14 @@ public class FirstStart {
         flow.setVersion(1);
         flow.setCreated(now);
         flow.setLastModified(now);
-        flow.setNotes("An example to start from: a timer that logs \"" + EXAMPLE_MESSAGE + "\" every 10 seconds. Start it and check the log.");
+        flow.setNotes("An example to start from: it logs \"" + EXAMPLE_MESSAGE + "\" once when started. Start it and check the log.");
         flow = flowRepository.save(flow);
 
-        Step timer = saveStep(flow, StepType.SOURCE, "timer", "example", "period=10000", 0);
-        Step body = saveStep(flow, StepType.ACTION, "setbody", "", "language=constant&expression=" + EXAMPLE_MESSAGE, 1);
-        Step logger = saveStep(flow, StepType.SINK, "log", EXAMPLE_FLOW_NAME, "showBody=true", 2);
+        Step once = saveStep(flow, StepType.SOURCE, "once", "example", "body=" + EXAMPLE_MESSAGE, 0);
+        Step logger = saveStep(flow, StepType.SINK, "log", EXAMPLE_FLOW_NAME, "showBody=true", 1);
         saveStep(flow, StepType.ERROR, "log", EXAMPLE_FLOW_NAME + "/" + flow.getId(), "level=ERROR&showAll=true", null);
 
-        link(flow, timer, body);
-        link(flow, body, logger);
+        link(flow, once, logger);
     }
 
     private Step saveStep(Flow flow, StepType type, String componentType, String uri, String options, Integer column) {

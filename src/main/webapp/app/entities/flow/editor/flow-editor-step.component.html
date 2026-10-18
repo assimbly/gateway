@@ -458,7 +458,7 @@
             @if (showsSampleBody) {
               <label class="form-control-label" [for]="'field_sample_body_' + index">Sample body</label>
               <textarea class="form-control font-monospace mb-2" rows="2" [id]="'field_sample_body_' + index"
-                        [formControl]="sampleBody" placeholder="Empty, as a scheduler sends"></textarea>
+                        [formControl]="sampleBody" placeholder="Empty: runs the script without a body"></textarea>
             }
             <div class="d-flex align-items-center gap-3">
               <button type="button" class="btn btn-fx btn-fx-secondary" (click)="tryScript()" [disabled]="trying"

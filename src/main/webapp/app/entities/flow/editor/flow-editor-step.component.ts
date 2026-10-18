@@ -100,7 +100,7 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   private readonly flowService = inject(FlowService);
   private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
 
-  /** The body "Try it" runs the script on; empty, as a scheduler sends. */
+  /** The body "Try it" runs the script on; empty sends none. */
   readonly sampleBody = new FormControl('', { nonNullable: true });
   /** Whether the user asked for the sample body; until then "Try it" runs on an empty body. */
   sampleBodyOpen = false;

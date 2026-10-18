@@ -1,11 +1,13 @@
 import { IStep, Step, StepType } from 'app/shared/model/step.model';
 
+import { STARTER_SOURCE } from '../templates/starter-flow';
+
 /** A language a Script Step can be written in, with a small working example and how a script reads the message. */
 export interface ScriptLanguageInfo {
   /** The Step's componentType, as the runtime knows it. */
   readonly value: string;
   readonly label: string;
-  /** A first script for a new Script Step. Except for JSLT and XSLT, it also runs on the empty body a scheduler sends. */
+  /** A first script for a new Script Step. Except for JSLT and XSLT, it also runs on a plain-text body or none. */
   readonly starter: string;
   readonly hint: string;
 }
@@ -29,7 +31,7 @@ export const SCRIPT_LANGUAGES: readonly ScriptLanguageInfo[] = [
     label: 'JSLT',
     starter: '{\n  "message": "Hello world"\n}',
     hint:
-      'Transforms the JSON body into the result: . is the incoming JSON and .name one of its fields. The scheduler sends no body, so put a script before it that makes one.',
+      'Transforms the JSON body into the result: . is the incoming JSON and .name one of its fields. Give the Source a JSON body, or put a script before it that makes one.',
   },
   { value: 'python', label: 'Python', starter: `f"Hello {body or 'world'}"`, hint: BODY_AND_HEADERS },
   {
@@ -49,14 +51,14 @@ export const SCRIPT_LANGUAGES: readonly ScriptLanguageInfo[] = [
       '</xsl:stylesheet>',
     ].join('\n'),
     hint:
-      'Transforms the XML body with this stylesheet; its output becomes the new message body. The scheduler sends no body, so put a script before it that makes one.',
+      'Transforms the XML body with this stylesheet; its output becomes the new message body. Give the Source an XML body, or put a script before it that makes one.',
   },
 ];
 
 export const DEFAULT_SCRIPT_LANGUAGE: string = 'groovy';
 
-/** A new scheduler Source fires once a minute; Camel's own default is every half second. */
-export const DEFAULT_SCHEDULER_OPTIONS = 'delay=60000';
+/** A new Script Flow's Source: the starter, with a body the starter script greets. */
+export const SCRIPT_STARTER_SOURCE = { ...STARTER_SOURCE, options: 'body=world' } as const;
 
 /** The Log Step after the scripts writes their result to the Log viewer; the runtime leaves the body out unless asked. */
 export const DEFAULT_RESULT_LOG = { componentType: 'log', options: 'showBody=true' } as const;
@@ -104,7 +106,7 @@ export interface ScriptTrial {
   readonly error?: string;
 }
 
-/** The runtime's request to run a script once. An empty sample body sends none, as a scheduler does. */
+/** The runtime's request to run a script once. An empty sample body sends none. */
 export function scriptTrialRequest(language: string, script: string, sampleBody: string): unknown {
   return {
     exchange: { headers: {}, properties: {}, body: sampleBody === '' ? null : sampleBody },
@@ -191,6 +193,9 @@ export function scriptFlowSummary(steps: readonly IStep[]): ScriptFlowSummary {
 
 function sourceText(step: IStep): string {
   const name = (step.uri ?? '').trim() || componentOf(step);
+  if (step.componentType?.toLowerCase() === 'once') {
+    return `${name}, once when started`;
+  }
   const delay = Number(optionValue(step.options, 'delay'));
   if (step.componentType?.toLowerCase() !== 'scheduler' || !Number.isFinite(delay) || delay <= 0) {
     return name;

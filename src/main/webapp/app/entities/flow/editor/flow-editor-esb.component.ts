@@ -45,10 +45,10 @@ import { automaticErrorHandlerPath, defaultErrorHandlerStep, errorHandlerPath, e
 import { isRouteStep, missingRouteFields, routeToSave } from "./route-step";
 import {
   DEFAULT_RESULT_LOG,
-  DEFAULT_SCHEDULER_OPTIONS,
   DEFAULT_SCRIPT_FLOW_VIEW,
   DEFAULT_SCRIPT_LANGUAGE,
   SCRIPT_LANGUAGES,
+  SCRIPT_STARTER_SOURCE,
   ScriptFlowSummary,
   ScriptFlowView,
   defaultResultLogStep,
@@ -58,6 +58,7 @@ import {
 } from "./script-flow";
 import { ComponentSchemas } from "../component-schemas.service";
 import { FlowTemplate, flowTemplate, templateFlow } from "../templates/flow-templates";
+import { STARTER_FLOW, STARTER_ROUTE } from "../templates/starter-flow";
 import { VariableKeysService } from "app/entities/environment-variables/variable-keys.service";
 import { variableWarnings } from "app/shared/camel/variables";
 import { LinkEditorComponent } from "../designer/link-editor.component";
@@ -473,18 +474,14 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 								this.numberOfSteps = 1;
 
-								// create new route step
+								// every new Flow starts from the starter Source, or from the Example Flow it was made from
                 if(this.useCanvas){
-                    this.loadDesigner(this.flow, this.template);
+                    this.loadDesigner(this.flow, this.template ?? STARTER_FLOW);
                     if (this.template && !this.nameControl.value) {
                         this.nameControl.setValue(this.template.title);
                     }
-                }else if(this.activeEditor === 'flow'){
-                    this.createNewStep(StepType.SOURCE,this.integrations[0].defaultFromComponentType,0);
-                    this.createNewStep(StepType.SINK,this.integrations[0].defaultToComponentType,1);
-                    this.createNewStep(StepType.ERROR,this.integrations[0].defaultErrorComponentType,2);
                 }else if(this.activeEditor === 'script'){
-                    this.createNewStep(StepType.SOURCE,'scheduler',0);
+                    this.createNewStep(StepType.SOURCE,SCRIPT_STARTER_SOURCE.componentType,0);
                     this.createNewStep(StepType.SCRIPT,DEFAULT_SCRIPT_LANGUAGE,1);
                     this.addStepForm(defaultResultLogStep());
                     this.addStepForm(defaultErrorHandlerStep());
@@ -492,6 +489,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
                 }else if(this.activeEditor === 'route'){
                     this.createNewStep(StepType.ROUTE,'',0);
                     this.createNewStep(StepType.ERROR,'',1);
+                    this.stepFormAt(0).patchValue({ routeContent: STARTER_ROUTE });
                 }
 
 								this.finished = true;
@@ -637,14 +635,14 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * A new Script Flow runs as created: its scheduler gets a name no other scheduler has and fires once a minute, and
-   * its Script Step starts with an example. Runs after the Steps are created, as creating a Step clears these fields.
+   * A new Script Flow runs as created: its once Source sends the script a body when the Flow starts, and its Script
+   * Step starts with an example. Runs after the Steps are created, as creating a Step clears these fields.
    */
   private applyScriptFlowDefaults(): void {
     const source = this.steps[0];
-    source.uri = nextSchedulerName(this.allsteps);
+    source.uri = SCRIPT_STARTER_SOURCE.uri;
     this.stepFormAt(0).patchValue({ uri: source.uri });
-    this.fillOptions(0, DEFAULT_SCHEDULER_OPTIONS);
+    this.fillOptions(0, SCRIPT_STARTER_SOURCE.options);
 
     this.stepFormAt(1).patchValue({ uri: starterScript(DEFAULT_SCRIPT_LANGUAGE) });
   }
