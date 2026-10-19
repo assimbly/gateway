@@ -7,6 +7,7 @@ import { provideTranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 
 import { AccountService } from 'app/core/auth';
+import { ProfileService } from 'app/layouts/profiles/profile.service';
 
 import Login from './login';
 import { LoginService } from './login.service';
@@ -17,6 +18,7 @@ describe('Login', () => {
   let mockRouter: Router;
   let mockAccountService: AccountService;
   let mockLoginService: LoginService;
+  let registration = false;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -36,6 +38,12 @@ describe('Login', () => {
           provide: LoginService,
           useValue: {
             login: vi.fn(() => of({})),
+          },
+        },
+        {
+          provide: ProfileService,
+          useValue: {
+            getProfileInfo: vi.fn(() => of({ registration })),
           },
         },
       ],
@@ -84,6 +92,20 @@ describe('Login', () => {
 
       // THEN
       expect(mockRouter.navigate).toHaveBeenCalledWith(['']);
+    });
+  });
+
+  describe('registration', () => {
+    it('offers no account of your own when an administrator adds users', () => {
+      expect(comp.registration()).toBe(false);
+    });
+
+    it('offers to register when the Gateway lets anyone create an account', () => {
+      registration = true;
+      const open = TestBed.createComponent(Login).componentInstance;
+      registration = false;
+
+      expect(open.registration()).toBe(true);
     });
   });
 

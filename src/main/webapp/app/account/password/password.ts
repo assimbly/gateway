@@ -1,5 +1,6 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 
 import { TranslatePipe } from '@ngx-translate/core';
 
@@ -18,7 +19,11 @@ export default class Password {
   readonly doNotMatch = signal(false);
   readonly error = signal(false);
   readonly success = signal(false);
-  readonly account = inject(AccountService).account;
+  private readonly accountService = inject(AccountService);
+  private readonly router = inject(Router);
+  readonly account = this.accountService.account;
+  /** The user still has a default password: they can't do anything else until they choose a new one. */
+  readonly changeRequired = computed(() => this.account()?.passwordChangeRequired === true);
   passwordForm = new FormGroup({
     currentPassword: new FormControl('', { nonNullable: true, validators: Validators.required }),
     newPassword: new FormControl('', {
@@ -40,8 +45,15 @@ export default class Password {
 
     const { newPassword, confirmPassword, currentPassword } = this.passwordForm.getRawValue();
     if (newPassword === confirmPassword) {
+      const wasRequired = this.changeRequired();
       this.passwordService.save(newPassword, currentPassword).subscribe({
-        next: () => this.success.set(true),
+        next: () => {
+          this.success.set(true);
+          if (wasRequired) {
+            // Read the account again, so the Gateway opens up, and carry on where a new user starts
+            this.accountService.identity(true).subscribe(() => this.router.navigate(['']));
+          }
+        },
         error: () => this.error.set(true),
       });
     } else {

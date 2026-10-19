@@ -50,10 +50,12 @@
         >
       </p>
 
-      <p class="text-muted">
-        <span jhiTranslate="global.messages.info.register.noaccount">You don&apos;t have an account yet?</span>
-        <a routerLink="/account/register" jhiTranslate="global.messages.info.register.link">Register a new account</a>
-      </p>
+      @if (registration()) {
+        <p class="text-muted">
+          <span jhiTranslate="global.messages.info.register.noaccount">You don&apos;t have an account yet?</span>
+          <a routerLink="/account/register" jhiTranslate="global.messages.info.register.link">Register a new account</a>
+        </p>
+      }
     </div>
   </div>
 </div>

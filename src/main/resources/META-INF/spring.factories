@@ -1,0 +1,2 @@
+org.springframework.boot.EnvironmentPostProcessor=\
+org.assimbly.gateway.config.security.GeneratedSecrets

@@ -1,8 +1,10 @@
 import { Component, ElementRef, OnInit, RendererFactory2, Renderer2, computed, effect, inject, viewChild } from '@angular/core';
-import { RouterOutlet, Router, RouterLink } from '@angular/router';
+import { NavigationEnd, RouterOutlet, Router, RouterLink } from '@angular/router';
 import { TranslateService, LangChangeEvent } from '@ngx-translate/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import dayjs from 'dayjs/esm';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { filter, map } from 'rxjs';
 
 import { AppPageTitleStrategy } from 'app/app-page-title-strategy';
 import { AccountService } from 'app/core/auth';
@@ -10,7 +12,10 @@ import { ThemeService } from 'app/core/theme';
 import { TranslateDirective } from 'app/shared/language';
 import FooterComponent from '../footer/footer.component';
 import PageRibbon from '../profiles/page-ribbon';
+import { ProfileService } from '../profiles/profile.service';
 import { LayoutService } from './layout.service';
+
+const PASSWORD_PAGE = '/account/password';
 
 @Component({
   selector: 'jhi-main',
@@ -29,6 +34,13 @@ import { LayoutService } from './layout.service';
 export default class Main implements OnInit {
   readonly layout = inject(LayoutService);
   readonly sidebarVisible = computed(() => this.accountService.isAuthenticated());
+  /** Whether the Gateway lets anyone create an account; otherwise an administrator adds users. */
+  readonly registration = toSignal(
+    inject(ProfileService)
+      .getProfileInfo()
+      .pipe(map(info => info.registration === true)),
+    { initialValue: false },
+  );
   readonly brandIcon = computed(() => (this.theme.appearance() === 'dark' ? 'logo_darkmode.svg' : 'logo_lightmode.svg'));
 
   private readonly menuToggle = viewChild<ElementRef<HTMLButtonElement>>('menuToggle');
@@ -48,6 +60,18 @@ export default class Main implements OnInit {
       }
     });
 
+    // A user who still has a default password stays on the Password page until they choose a new one
+    effect(() => {
+      if (this.accountService.account()?.passwordChangeRequired) {
+        this.toPasswordPage();
+      }
+    });
+    this.router.events.pipe(filter(event => event instanceof NavigationEnd)).subscribe(() => {
+      if (this.accountService.account()?.passwordChangeRequired) {
+        this.toPasswordPage();
+      }
+    });
+
     effect(() => {
       if (this.layout.hamburgerFocusRequested()) {
         queueMicrotask(() => {
@@ -56,6 +80,12 @@ export default class Main implements OnInit {
         });
       }
     });
+  }
+
+  private toPasswordPage(): void {
+    if (!this.router.url.startsWith(PASSWORD_PAGE)) {
+      this.router.navigateByUrl(PASSWORD_PAGE);
+    }
   }
 
   ngOnInit(): void {

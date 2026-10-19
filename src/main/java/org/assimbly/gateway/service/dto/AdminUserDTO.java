@@ -45,6 +45,9 @@ public class AdminUserDTO {
 
     private ThemePreference themePreference;
 
+    /** Read-only: only choosing a new password clears it. */
+    private boolean passwordChangeRequired;
+
     private String createdBy;
 
     private Instant createdDate;
@@ -69,6 +72,7 @@ public class AdminUserDTO {
         this.imageUrl = user.getImageUrl();
         this.langKey = user.getLangKey();
         this.themePreference = ThemePreference.fromNullable(user.getThemePreference());
+        this.passwordChangeRequired = user.isPasswordChangeRequired();
         this.createdBy = user.getCreatedBy();
         this.createdDate = user.getCreatedDate();
         this.lastModifiedBy = user.getLastModifiedBy();
@@ -146,6 +150,14 @@ public class AdminUserDTO {
 
     public void setThemePreference(ThemePreference themePreference) {
         this.themePreference = themePreference;
+    }
+
+    public boolean isPasswordChangeRequired() {
+        return passwordChangeRequired;
+    }
+
+    public void setPasswordChangeRequired(boolean passwordChangeRequired) {
+        this.passwordChangeRequired = passwordChangeRequired;
     }
 
     public String getCreatedBy() {

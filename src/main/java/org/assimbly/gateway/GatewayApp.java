@@ -6,6 +6,7 @@ import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.CommandsUtil;
 import org.assimbly.gateway.config.DefaultProfileUtil;
 import org.assimbly.gateway.config.EncryptionProperties;
+import org.assimbly.gateway.config.security.SecuritySummary;
 import org.assimbly.util.EncryptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,7 @@ import java.net.UnknownHostException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 // @SpringBootApplication
 @SpringBootApplication(scanBasePackages = { "org.assimbly.gateway", "org.assimbly.cookies", "org.assimbly.gateway.web.rest.integration", "org.assimbly.brokerrest", "org.assimbly.integrationrest" })
@@ -103,6 +105,11 @@ public class GatewayApp {
 
         if(encryptionPassword!=null && encryptionAlgorithm != null){
            new EncryptionUtil(encryptionPassword, encryptionAlgorithm);
+        }
+
+        List<String> risks = SecuritySummary.risks(env);
+        if (!risks.isEmpty()) {
+            log.warn("This Gateway is not secured as it should be:\n  - {}", String.join("\n  - ", risks));
         }
 
         if (StringUtils.isBlank(contextPath)) {

@@ -132,9 +132,7 @@ jib {
         mainClass = 'org.assimbly.gateway.GatewayApp'
         ports = ['1000','1616','1617','2000-2003/udp','8088','8443','9000','9001','27017','61616','61617']
         format = 'OCI'
-        environment = [
-            ASSIMBLY_ENCRYPTION_SECRET: System.getenv('ASSIMBLY_ENCRYPTION_SECRET') ?: 'Pl34s3_Ch4ng3!_Th1s_1s_N0t_V3ry_S3c4r3!'
-        ]
+        // No default ASSIMBLY_ENCRYPTION_SECRET: without one, the Gateway generates its own key in /data (see GeneratedSecrets)
     }
     containerizingMode = 'exploded'
     extraDirectories {
@@ -442,6 +440,9 @@ if (project.hasProperty("integration")){
 
                 exclude 'org/assimbly/gateway/config/database/**'
                 exclude 'org/assimbly/gateway/config/firststart/**'
+                // need the Gateway's own database
+                exclude 'org/assimbly/gateway/config/security/LegacySecretMigration.java'
+                exclude 'org/assimbly/gateway/config/security/DefaultPasswordCheck.java'
 
                 exclude 'org/assimbly/gateway/config/audit/*'
                 exclude 'org/assimbly/gateway/config/exporting/*'

@@ -1,5 +1,8 @@
 package org.assimbly.gateway.config;
 
+import org.assimbly.gateway.config.security.PasswordChangeFilter;
+import org.assimbly.gateway.config.security.PasswordChangeGate;
+import org.assimbly.gateway.security.AuthoritiesConstants;
 import org.assimbly.gateway.web.filter.SpaWebFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
@@ -31,12 +35,17 @@ public class SecurityConfiguration {
 
     private final Environment env;
     private final JHipsterProperties jHipsterProperties;
+    private final ApplicationProperties applicationProperties;
     private final JwtAuthenticationConverter jwtAuthenticationConverter;
+    private final PasswordChangeGate passwordChangeGate;
 
-    public SecurityConfiguration(Environment env, JHipsterProperties jHipsterProperties, JwtAuthenticationConverter jwtAuthenticationConverter) {
+    public SecurityConfiguration(Environment env, JHipsterProperties jHipsterProperties, ApplicationProperties applicationProperties,
+                                 JwtAuthenticationConverter jwtAuthenticationConverter, PasswordChangeGate passwordChangeGate) {
         this.env = env;
         this.jHipsterProperties = jHipsterProperties;
+        this.applicationProperties = applicationProperties;
         this.jwtAuthenticationConverter = jwtAuthenticationConverter;
+        this.passwordChangeGate = passwordChangeGate;
     }
 
     @Bean
@@ -62,6 +71,9 @@ public class SecurityConfiguration {
         boolean development = env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT));
         // The headless endpoints check their own credentials (Basic header or their own JWT)
         boolean headless = env.acceptsProfiles(Profiles.of("headless"));
+        // Outside dev and headless, the Gateway is locked down unless its configuration opens something up
+        boolean secured = !development && !headless;
+        ApplicationProperties.Security security = applicationProperties.getSecurity();
 
         http
             .authorizeHttpRequests(authz -> {
@@ -88,12 +100,14 @@ public class SecurityConfiguration {
                     .requestMatchers("/i18n/**").permitAll()
                     .requestMatchers("/content/**").permitAll()
 
-                    // API authentication and registration
+                    // API authentication and password reset
                     .requestMatchers(HttpMethod.POST, "/api/authenticate").permitAll()
-                    .requestMatchers("/api/register").permitAll()
-                    .requestMatchers("/api/activate").permitAll()
                     .requestMatchers("/api/account/reset-password/init").permitAll()
                     .requestMatchers("/api/account/reset-password/finish").permitAll();
+
+                if (!secured || security.isRegistration()) {
+                    authz.requestMatchers("/api/register", "/api/activate").permitAll();
+                }
 
                 if (development) {
                     //enable database on dev
@@ -113,24 +127,43 @@ public class SecurityConfiguration {
                 }
 
                 authz
-                    // Actuator endpoints
+                    // Actuator endpoints: only whether the Gateway is up and what it is, are public
                     .requestMatchers("/health/**").permitAll()
-                    .requestMatchers("/v3/api-docs/**").permitAll() // OpenAPI/Swagger docs (v3 is common for Spring Boot 3)
-                    .requestMatchers("/swagger-ui/**").permitAll() // Swagger UI
                     .requestMatchers("/management/health").permitAll()
                     .requestMatchers("/management/health/**").permitAll()
-                    .requestMatchers("/management/info").permitAll()
-                    .requestMatchers("/management/prometheus").permitAll()
-                    .requestMatchers("/management/jhiopenapigroups").permitAll()
-                    .requestMatchers("/management/jolokia").permitAll()
-                    .requestMatchers("/management/jolokia/**").permitAll()
-                    .requestMatchers("/management/hawtio").permitAll()
-                    .requestMatchers("/management/metrics").permitAll()
-                    .requestMatchers("/management/**").authenticated() // Secure other management endpoints
+                    .requestMatchers("/management/info").permitAll();
 
-                    // Any other request not explicitly matched above requires authentication
-                    .anyRequest().authenticated();
+                if (secured) {
+                    if (security.isPublicPrometheus()) {
+                        authz.requestMatchers("/management/prometheus").permitAll();
+                    }
+                    authz
+                        // Swagger UI itself is static, and the API Explorer frames it; the API description needs a sign-in
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**").authenticated()
+                        // Configuration, environment, threads, JMX (Jolokia): administrators only
+                        .requestMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN);
+                } else {
+                    authz
+                        .requestMatchers("/v3/api-docs/**").permitAll() // OpenAPI/Swagger docs (v3 is common for Spring Boot 3)
+                        .requestMatchers("/swagger-ui/**").permitAll() // Swagger UI
+                        .requestMatchers("/management/prometheus").permitAll()
+                        .requestMatchers("/management/jhiopenapigroups").permitAll()
+                        .requestMatchers("/management/jolokia").permitAll()
+                        .requestMatchers("/management/jolokia/**").permitAll()
+                        .requestMatchers("/management/hawtio").permitAll()
+                        .requestMatchers("/management/metrics").permitAll()
+                        .requestMatchers("/management/**").authenticated(); // Secure other management endpoints
+                }
+
+                // Any other request not explicitly matched above requires authentication
+                authz.anyRequest().authenticated();
             });
+
+        if (secured) {
+            // A user with a default password can only choose a new one
+            http.addFilterAfter(new PasswordChangeFilter(passwordChangeGate), BearerTokenAuthenticationFilter.class);
+        }
 
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling(exceptions ->

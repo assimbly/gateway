@@ -46,7 +46,8 @@ management:
           - liquibase
   endpoint:
     health:
-      show-details: "ALWAYS"
+      # Details (database, disk, brokers) only for administrators; everyone else sees UP or DOWN
+      show-details: when-authorized
       roles: 'ROLE_ADMIN'
       probes:
         enabled: true
@@ -250,9 +251,14 @@ application:
   deploy-directory:
     deploy-on-start: true
     deploy-on-change: true
+  security:
+    # Let anyone create an account from the sign-in page (otherwise an administrator adds users)
+    registration: false
+    # Let Prometheus scrape /management/prometheus without signing in
+    public-prometheus: false
 
 hawtio:
-  authenticationEnabled: false
+  authenticationEnabled: true
   offline: true
 
 camel:

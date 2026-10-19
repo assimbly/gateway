@@ -30,9 +30,11 @@
         <a class="app-topbar__link" routerLink="/login" id="login" data-cy="login">
           <span jhiTranslate="global.menu.account.login">Sign in</span>
         </a>
-        <a class="app-topbar__link" routerLink="/account/register" data-cy="register">
-          <span jhiTranslate="global.menu.account.register">Register</span>
-        </a>
+        @if (registration()) {
+          <a class="app-topbar__link" routerLink="/account/register" data-cy="register">
+            <span jhiTranslate="global.menu.account.register">Register</span>
+          </a>
+        }
       </div>
     }
   </header>

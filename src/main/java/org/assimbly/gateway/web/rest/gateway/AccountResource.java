@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
+import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.domain.User;
 import org.assimbly.gateway.repository.UserRepository;
 import org.assimbly.gateway.security.SecurityUtils;
@@ -18,8 +19,12 @@ import org.assimbly.gateway.web.rest.vm.KeyAndPasswordVM;
 import org.assimbly.gateway.web.rest.vm.ManagedUserVM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import tech.jhipster.config.JHipsterConstants;
 
 import java.util.Optional;
 
@@ -46,10 +51,16 @@ public class AccountResource {
 
     private final MailService mailService;
 
-    public AccountResource(UserRepository userRepository, UserService userService, MailService mailService) {
+    /** Anyone may create an account: on dev, or when application.security.registration is on. */
+    private final boolean registrationOpen;
+
+    public AccountResource(UserRepository userRepository, UserService userService, MailService mailService,
+                           ApplicationProperties applicationProperties, Environment env) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.mailService = mailService;
+        this.registrationOpen = applicationProperties.getSecurity().isRegistration() ||
+            env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT));
     }
 
     /**
@@ -64,6 +75,9 @@ public class AccountResource {
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public void registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
+        if (!registrationOpen) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
         if (isPasswordLengthInvalid(managedUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }

@@ -4,9 +4,11 @@ import jakarta.annotation.PostConstruct;
 import org.apache.camel.CamelContext;
 import org.assimbly.gateway.config.CustomObjectMapperConfig;
 import org.assimbly.gateway.config.EncryptionProperties;
+import org.assimbly.gateway.config.security.BeforeRuntimeStart;
 import org.assimbly.integrationrest.IntegrationRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -25,8 +27,10 @@ public class Integration {
 
     private final IntegrationRuntime integrationRuntime;
 
-    public Integration(IntegrationRuntime integrationRuntime) {
+    public Integration(IntegrationRuntime integrationRuntime, ObjectProvider<BeforeRuntimeStart> beforeRuntimeStart) {
         this.integrationRuntime = integrationRuntime;
+        // Sets them up, and so does their work, before the runtime starts
+        beforeRuntimeStart.orderedStream().forEach(work -> log.debug("Done before the runtime starts: {}", work.getClass().getSimpleName()));
     }
 
     @PostConstruct

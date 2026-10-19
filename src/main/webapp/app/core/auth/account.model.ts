@@ -11,5 +11,7 @@ export class Account {
     public login: string,
     public imageUrl: string | null,
     public themePreference: ThemePreference = 'SYSTEM',
+    /** The user still has a default password, and must choose a new one before using the Gateway. */
+    public passwordChangeRequired?: boolean,
   ) {}
 }

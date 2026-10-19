@@ -80,6 +80,10 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Column(name = "theme_preference", length = 20, nullable = false)
     private ThemePreference themePreference = ThemePreference.SYSTEM;
 
+    /** The user still has a default password, and must choose a new one before using the Gateway. */
+    @Column(name = "password_change_required", nullable = false)
+    private boolean passwordChangeRequired = false;
+
     @Size(max = 20)
     @Column(name = "activation_key", length = 20)
     @JsonIgnore
@@ -207,6 +211,14 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     public void setThemePreference(ThemePreference themePreference) {
         this.themePreference = ThemePreference.fromNullable(themePreference);
+    }
+
+    public boolean isPasswordChangeRequired() {
+        return passwordChangeRequired;
+    }
+
+    public void setPasswordChangeRequired(boolean passwordChangeRequired) {
+        this.passwordChangeRequired = passwordChangeRequired;
     }
 
     public Set<Authority> getAuthorities() {

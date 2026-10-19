@@ -1,6 +1,7 @@
 package org.assimbly.gateway.service;
 
 import org.assimbly.gateway.config.Constants;
+import org.assimbly.gateway.config.security.PasswordChangeGate;
 import org.assimbly.gateway.domain.Authority;
 import org.assimbly.gateway.domain.User;
 import org.assimbly.gateway.domain.enumeration.ThemePreference;
@@ -43,16 +44,20 @@ public class UserService {
 
     private final CacheManager cacheManager;
 
+    private final PasswordChangeGate passwordChangeGate;
+
     public UserService(
         UserRepository userRepository,
         PasswordEncoder passwordEncoder,
         AuthorityRepository authorityRepository,
-        CacheManager cacheManager
+        CacheManager cacheManager,
+        PasswordChangeGate passwordChangeGate
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
+        this.passwordChangeGate = passwordChangeGate;
     }
 
     public Optional<User> activateRegistration(String key) {
@@ -78,6 +83,7 @@ public class UserService {
                 user.setPassword(passwordEncoder.encode(newPassword));
                 user.setResetKey(null);
                 user.setResetDate(null);
+                passwordChosen(user);
                 this.clearUserCaches(user);
                 return user;
             });
@@ -273,11 +279,22 @@ public class UserService {
                 if (!passwordEncoder.matches(currentClearTextPassword, currentEncryptedPassword)) {
                     throw new InvalidPasswordException();
                 }
+                // A default password must really change: not to itself, and not to the login
+                if (user.isPasswordChangeRequired() && (newPassword.equals(currentClearTextPassword) || newPassword.equalsIgnoreCase(user.getLogin()))) {
+                    throw new InvalidPasswordException();
+                }
                 String encryptedPassword = passwordEncoder.encode(newPassword);
                 user.setPassword(encryptedPassword);
+                passwordChosen(user);
                 this.clearUserCaches(user);
                 log.debug("Changed password for User: {}", user);
             });
+    }
+
+    /** The user chose their own password, so they no longer have to. */
+    private void passwordChosen(User user) {
+        user.setPasswordChangeRequired(false);
+        passwordChangeGate.clear(user.getLogin());
     }
 
     @Transactional(readOnly = true)

@@ -1,3 +1,6 @@
+/** A cluster password only this broker knows, made when the Gateway's page loads, instead of a well-known one. */
+const clusterPassword = Array.from(crypto.getRandomValues(new Uint8Array(18)), byte => byte.toString(16).padStart(2, '0')).join('');
+
 export const artemisBrokerConfiguration = `<?xml version='1.0'?>
 <!-- Example broker.xml -->
 
@@ -9,7 +12,7 @@ export const artemisBrokerConfiguration = `<?xml version='1.0'?>
        <persistence-enabled>true</persistence-enabled>
 
        <cluster-user>admin</cluster-user>
-       <cluster-password>admin</cluster-password>
+       <cluster-password>${clusterPassword}</cluster-password>
 
        <!--<journal-type>NIO</journal-type>-->
        <paging-directory>data/paging</paging-directory>

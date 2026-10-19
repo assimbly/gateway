@@ -15,6 +15,7 @@ public class ApplicationProperties {
     public final Documentation documentation = new Documentation();
     public final Gateway gateway = new Gateway();
     public final DeployDirectory deployDirectory = new DeployDirectory();
+    public final Security security = new Security();
 
     public Info getInfo() {
         return info;
@@ -30,6 +31,36 @@ public class ApplicationProperties {
 
     public DeployDirectory getDeployDirectory() {
         return deployDirectory;
+    }
+
+    public Security getSecurity() {
+        return security;
+    }
+
+    /** What the Gateway opens up beyond its secure defaults. */
+    public static class Security {
+
+        /** Lets anyone create an account from the sign-in page. Off: an administrator adds users. */
+        private boolean registration = false;
+
+        /** Lets Prometheus scrape /management/prometheus without signing in. */
+        private boolean publicPrometheus = false;
+
+        public boolean isRegistration() {
+            return registration;
+        }
+
+        public void setRegistration(boolean registration) {
+            this.registration = registration;
+        }
+
+        public boolean isPublicPrometheus() {
+            return publicPrometheus;
+        }
+
+        public void setPublicPrometheus(boolean publicPrometheus) {
+            this.publicPrometheus = publicPrometheus;
+        }
     }
 
 

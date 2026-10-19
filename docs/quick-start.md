@@ -55,9 +55,11 @@ The Gateway is then at **[http://localhost:8088](http://localhost:8088)**. The v
 
 Sign in with username `admin` and password `admin`.
 
-> The default password is for trying things out only. Change it under your account menu → **Password** before you let anyone else use the Gateway.
+Because everyone knows that password, the Gateway first asks you to choose your own: type `admin` as the current password, then your new one twice. Until you do, nothing else works.
 
-After signing in you land on **Flows → Manage**. It's empty, and invites you to create your first Flow.
+After that you land on **Flows → Manage**. It's empty, and invites you to create your first Flow.
+
+> **Secure by default.** On its first start the Gateway generates its own keys for login tokens and for encrypting secrets, and keeps them in `.assimbly/security/secrets.properties` in your home folder (in `/data` with Docker). Keep that file with your database: without it, the stored secrets can't be read. Registration is off: an administrator adds users under **Administration → Users**.
 
 ## 3. Prepare two folders
 

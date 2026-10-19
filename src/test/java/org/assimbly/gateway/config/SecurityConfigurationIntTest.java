@@ -60,8 +60,9 @@ class SecurityConfigurationIntTest {
 
     @Test
     void anApiCallWithAValidTokenIsAnswered() throws Exception {
+        // Not admin: the seeded admin still has its default password, so it can only choose a new one
         String token = tokenProvider.createToken(
-            new UsernamePasswordAuthenticationToken("admin", null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))),
+            new UsernamePasswordAuthenticationToken("operator", null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))),
             false
         );
         mockMvc.perform(get("/api/flows").header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
