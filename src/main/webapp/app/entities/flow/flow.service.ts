@@ -1,6 +1,6 @@
 import { Service, inject } from '@angular/core';
 import { HttpClient, HttpContext, HttpResponse, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable, Observer, Subscription, catchError, map, of, switchMap } from 'rxjs';
+import { Observable, Observer, Subscription, catchError, from, map, of, switchMap, throwError } from 'rxjs';
 
 import { serverApiUrl } from 'app/config';
 
@@ -326,6 +326,33 @@ export class FlowService {
       );
   }
 
+  /**
+   * Downloads the Flows of the Integration as a zip for Fluxygen, one file per Flow, with their secrets encrypted with
+   * the passphrase. All its Flows when `flowIds` is empty. Emits the name of the saved file; a refusal or failure comes
+   * as an error whose message says why.
+   */
+  exportForFluxygen(integrationId: number, flowIds: number[], passphrase: string): Observable<string> {
+    return this.http
+      .post(
+        `${this.environmentUrl}/${integrationId}/fluxygen-export`,
+        { flowIds, passphrase },
+        {
+          headers: new HttpHeaders({ Accept: 'application/zip, text/plain' }),
+          observe: 'response',
+          responseType: 'blob',
+          context: OWN_ERRORS,
+        },
+      )
+      .pipe(
+        map(response => {
+          const fileName = attachmentName(response.headers.get('Content-Disposition')) ?? `assimbly-to-fluxygen-${this.getDate()}.zip`;
+          saveAs(new Blob([response.body], { type: 'application/zip' }), fileName);
+          return fileName;
+        }),
+        catchError(error => from(failureText(error)).pipe(switchMap(message => throwError(() => new Error(message))))),
+      );
+  }
+
   exportFlowConfiguration(flow: IFlow) {
     const url = `${this.environmentUrl}/1/flow/${flow.id}`;
     const exportDate = this.getDate();
@@ -371,4 +398,31 @@ export class FlowService {
     return year + month + day;
   }
 
+}
+
+/** The file name of a `Content-Disposition: attachment; filename="…"` header, or null when it has none. */
+export function attachmentName(contentDisposition: string | null): string | null {
+  const match = /filename="?([^";]+)"?/i.exec(contentDisposition ?? '');
+  return match ? match[1] : null;
+}
+
+/** What a failed export answered, as text: the reason the server gave, or a general message. */
+async function failureText(error: any): Promise<string> {
+  const body = error?.error;
+  let text = '';
+  if (body instanceof Blob) {
+    text = await blobText(body);
+  } else if (typeof body === 'string') {
+    text = body;
+  }
+  return text.trim() || 'The export for Fluxygen failed.';
+}
+
+function blobText(blob: Blob): Promise<string> {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result ?? ''));
+    reader.onerror = () => resolve('');
+    reader.readAsText(blob);
+  });
 }

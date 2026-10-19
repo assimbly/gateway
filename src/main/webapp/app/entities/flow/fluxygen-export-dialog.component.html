@@ -1,0 +1,109 @@
+<form (ngSubmit)="export()" novalidate>
+  <div class="modal-header">
+    <h4 class="modal-title" id="fluxygen-export-title">Export for Fluxygen</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="dismiss()"></button>
+  </div>
+
+  <div class="modal-body">
+    <p class="fluxygen-export__about">
+      Makes a zip that Fluxygen imports: one file per Flow, with its Connections, Messages, Routes and Variables. The Flows go
+      in the <code>groupless</code> group; in Fluxygen you can move them into groups of your own. Placeholders such as
+      <code>&#64;&#123;key&#125;</code> stay as they are.
+    </p>
+    <p class="text-muted fluxygen-export__not-included">
+      Not included: Brokers, Queues and Topics, Certificates and users. Create them again in Fluxygen.
+    </p>
+
+    <fieldset class="mb-3">
+      <legend class="form-label fs-6">Flows</legend>
+      @if (loading()) {
+        <p class="text-muted mb-0" role="status">Loading the Flows…</p>
+      } @else if (flows().length) {
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            id="fluxygen-export-all"
+            name="all"
+            [checked]="allSelected()"
+            (change)="toggleAll($any($event.target).checked)"
+          />
+          <label class="form-check-label" for="fluxygen-export-all">All Flows ({{ selected().size }} of {{ flows().length }})</label>
+        </div>
+        <ul class="list-unstyled ms-4 mb-0 fluxygen-export__flows" style="max-height: 14rem; overflow-y: auto">
+          @for (flow of flows(); track flow.id) {
+            <li class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                [id]="'fluxygen-export-flow-' + flow.id"
+                [name]="'flow-' + flow.id"
+                [checked]="isSelected(flow.id)"
+                (change)="toggle(flow.id, $any($event.target).checked)"
+              />
+              <label class="form-check-label" [for]="'fluxygen-export-flow-' + flow.id">
+                {{ flow.name }} <span class="text-muted">· {{ flow.type }}</span>
+                @if (flow.draft) {
+                  <span class="badge text-bg-warning ms-1 fluxygen-export__draft" title="Its design isn't finished, so it can't start yet">Draft</span>
+                }
+              </label>
+            </li>
+          }
+        </ul>
+        @if (drafts()) {
+          <p class="form-text mb-0">A Draft is exported as it is; finish its design in Fluxygen before you start it.</p>
+        }
+      } @else if (!failed()) {
+        <p class="text-muted mb-0">There are no Flows to export.</p>
+      }
+    </fieldset>
+
+    <div class="mb-3">
+      <label class="form-label" for="fluxygen-export-passphrase">Passphrase</label>
+      <input
+        type="password"
+        class="form-control"
+        id="fluxygen-export-passphrase"
+        name="passphrase"
+        autocomplete="new-password"
+        [minlength]="minLength"
+        aria-describedby="fluxygen-export-passphrase-help"
+        [ngModel]="passphrase()"
+        (ngModelChange)="passphrase.set($event)"
+      />
+      <div class="form-text" id="fluxygen-export-passphrase-help">
+        At least {{ minLength }} characters. It encrypts the secrets in the zip, such as Connection passwords and encrypted
+        Variables. Fluxygen asks for it when you import the zip. It isn't stored anywhere, so keep it safe.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="fluxygen-export-confirmation">Confirm passphrase</label>
+      <input
+        type="password"
+        class="form-control"
+        id="fluxygen-export-confirmation"
+        name="confirmation"
+        autocomplete="new-password"
+        [ngModel]="confirmation()"
+        (ngModelChange)="confirmation.set($event)"
+      />
+    </div>
+
+    @if (submitted() && problem(); as message) {
+      <div class="alert alert-warning py-2 mb-0 fluxygen-export__problem" role="alert">{{ message }}</div>
+    }
+    @if (failed(); as message) {
+      <div class="alert alert-danger py-2 mb-0 fluxygen-export__failed" role="alert">{{ message }}</div>
+    }
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-fx btn-fx-secondary" (click)="dismiss()">
+      <fa-icon icon="ban" /><span>Cancel</span>
+    </button>
+    <button type="submit" class="btn btn-fx btn-fx-primary" [disabled]="exporting() || loading()">
+      <fa-icon [icon]="exporting() ? 'sync' : 'download'" [animation]="exporting() ? 'spin' : undefined" /><span>Export</span>
+    </button>
+  </div>
+</form>

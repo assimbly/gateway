@@ -30,6 +30,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.util.*;
+import java.util.function.UnaryOperator;
 
 @Service
 @Transactional
@@ -85,6 +86,8 @@ public class ExportXML {
     /** The Operation the Flow being exported handles; null when it isn't a Handler Flow. */
     private ApiOperation handledOperation;
 
+    /** What a secret is exported as: a Connection's password or encrypted key, or an encrypted Variable's value. */
+    private UnaryOperator<String> secretMapper = UnaryOperator.identity();
 
     public ExportXML(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
@@ -185,6 +188,23 @@ public class ExportXML {
 
 
     public String getXMLFlowConfiguration(Long id) throws Exception {
+        return getXMLFlowConfiguration(id, UnaryOperator.identity());
+    }
+
+    /**
+     * The DIL of one Flow, with each secret replaced by what {@code secretMapper} makes of it: a Connection's password
+     * or encrypted key, and the value of an encrypted Variable. The secrets are encrypted with this Gateway's key.
+     */
+    public String getXMLFlowConfiguration(Long id, UnaryOperator<String> secretMapper) throws Exception {
+        this.secretMapper = secretMapper;
+        try {
+            return flowConfiguration(id);
+        } finally {
+            this.secretMapper = UnaryOperator.identity();
+        }
+    }
+
+    private String flowConfiguration(Long id) throws Exception {
 
         Optional<Flow> flowOptional = flowRepository.findById(id);
 
@@ -682,12 +702,21 @@ public class ExportXML {
                 String parameterName = connectionKey.getKey();
                 String parameterValue = connectionKey.getValue();
 
+                if (isSecretKey(parameterName, parameterValue)) {
+                    parameterValue = secretMapper.apply(parameterValue);
+                }
+
                 setElement(parameterName, parameterValue, keys);
 
             }
 
         }
 
+    }
+
+    /** The Gateway encrypts a Connection's password; a key imported encrypted stays encrypted too. */
+    private static boolean isSecretKey(String key, String value) {
+        return value != null && ("password".equals(key) || (value.startsWith("ENC(") && value.endsWith(")")));
     }
 
     public void setMessage(String messageId, Message messageDB, Step stepDB) throws Exception {
@@ -770,7 +799,11 @@ public class ExportXML {
                 environmentVariablesList.appendChild(environmentVariableNode);
 
                 setElement("key", environmentVariable.getKey(), environmentVariableNode);
-                setElement("value", environmentVariable.getValue(), environmentVariableNode);
+                String value = environmentVariable.getValue();
+                if (Boolean.TRUE.equals(environmentVariable.isEncrypted()) && value != null) {
+                    value = secretMapper.apply(value);
+                }
+                setElement("value", value, environmentVariableNode);
                 setElement("encrypted", environmentVariable.isEncrypted().toString(), environmentVariableNode);
 
             }

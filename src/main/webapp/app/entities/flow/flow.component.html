@@ -15,6 +15,17 @@
         <fa-icon icon="file-import"></fa-icon>
         <span class="d-none d-md-inline"> Import</span>
       </button>
+      <button
+        type="button"
+        class="btn btn-fx btn-fx-secondary"
+        (click)="openFluxygenExport()"
+        [disabled]="!integrationId || !flows.length"
+        aria-label="Export for Fluxygen"
+        title="Export the Flows as a zip to import into Fluxygen"
+      >
+        <fa-icon icon="file-export"></fa-icon>
+        <span class="d-none d-md-inline"> Export for Fluxygen</span>
+      </button>
       <button class="btn btn-fx btn-fx-secondary" type="button" (click)="reset()" aria-label="Refresh">
         <fa-icon icon="sync"></fa-icon>
         <span class="d-none d-md-inline"> Refresh</span>
