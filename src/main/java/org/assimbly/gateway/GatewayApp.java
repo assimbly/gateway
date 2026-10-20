@@ -7,6 +7,7 @@ import org.assimbly.gateway.config.CommandsUtil;
 import org.assimbly.gateway.config.DefaultProfileUtil;
 import org.assimbly.gateway.config.EncryptionProperties;
 import org.assimbly.gateway.config.security.SecuritySummary;
+import org.assimbly.util.BaseDirectory;
 import org.assimbly.util.EncryptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,8 +33,6 @@ import java.util.List;
 public class GatewayApp {
 
     protected static Logger log = LoggerFactory.getLogger(GatewayApp.class);
-
-    private static final String USER_HOME = System.getProperty("user.home");
 
     private final Environment env;
 
@@ -128,20 +127,10 @@ public class GatewayApp {
 
         String applicationName = "Assimbly";
         String applicationVersion = env.getProperty("application.info.version");
-        String applicationBaseDirectory = env.getProperty("application.gateway.base-directory");
+        String applicationBaseDirectory = BaseDirectory.getInstance().getBaseDirectory();
         String applicationStartupTime = Long.toString(startupTime);
         String javaVersion = Runtime.version().toString();
         String javaWorkingDirectory = Path.of(".").toAbsolutePath().normalize().toString();
-
-        if (applicationBaseDirectory == null || applicationBaseDirectory.equals("default")) {
-            if (isWindows()) {
-                applicationBaseDirectory = USER_HOME + "\\.assimbly";
-            } else {
-                applicationBaseDirectory = USER_HOME + "/.assimbly";
-            }
-        } else if(applicationBaseDirectory.endsWith("/")){
-            applicationBaseDirectory = applicationBaseDirectory + ".assimbly";
-        }
 
        log.info(
             """
@@ -176,10 +165,5 @@ public class GatewayApp {
             contextPath,
             applicationStartupTime
            );
-    }
-
-    public static boolean isWindows() {
-        String operatingSystem = System.getProperty("os.name");
-        return operatingSystem.startsWith("Windows");
     }
 }

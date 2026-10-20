@@ -1,0 +1,54 @@
+// The stats page of a Flow (ViewEncapsulation.None, like the designer it shares its layout with).
+
+.flow-stats-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding: 0.5rem 0;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid var(--app-border);
+
+  .btn span {
+    margin-left: 0.35rem;
+  }
+}
+
+.flow-stats-header__title {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.flow-stats-header__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--app-text-muted);
+}
+
+.flow-stats-header__name {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.flow-stats-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-left: auto;
+}
+
+// The canvas and panel reach down to about the bottom of the window.
+.flow-stats-body {
+  height: max(30rem, calc(100vh - 11rem));
+}
+
+.flow-stats-body .flow-designer-panel {
+  flex-basis: 22rem;
+}

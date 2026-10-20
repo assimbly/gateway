@@ -6,18 +6,19 @@ import { NgbDropdownModule, NgbModal, NgbOffcanvas, NgbTooltip } from '@ng-boots
 
 import { Flow, IFlow } from 'app/shared/model/flow.model';
 import { isDraft, loadFlowGraph, opensOnCanvas } from './designer/flow-graph';
-import { FlowService } from './flow.service';
+import { FlowService, IFlowStats } from './flow.service';
 import { IApiHandler } from 'app/entities/api/api.model';
 import { FlowDeleteDialogComponent } from 'app/entities/flow/flow-delete-dialog.component';
 
-import { Step, StepType } from 'app/shared/model/step.model';
+import { Step } from 'app/shared/model/step.model';
 import { StepService } from '../step/step.service';
 import { IntegrationService } from '../integration/integration.service';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
 import { OverflowActionDirective, PrimaryActionDirective, RowActions, StatusControls, Truncate } from 'app/shared/table';
 import { FlowRowAlerts } from './flow-row-alerts.component';
-import { FlowRowStats, FlowStatsSection } from './flow-row-stats.component';
+import { FlowRowStats } from './flow-row-stats.component';
+import { FlowStatsSection, flowStatsSections } from './flow-stats';
 import {
   FlowAction,
   FlowFailure,
@@ -105,6 +106,8 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
   public flowStatsLoading = false;
   public flowStatsEmpty = false;
   public flowStatsSections: FlowStatsSection[] = [];
+  /** The stats page that shows each Step's stats; only a Flow drawn on the canvas has one. */
+  public detailsLink?: unknown[];
   public flowStatusButton: string;
   public flowStartTime: any;
   public clickButton = false;
@@ -201,6 +204,7 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
     this.setFlowStatusDefaults();
     this.getStatus(this.flow.id);
 
+    this.detailsLink = opensOnCanvas(this.flow.type) ? ['/flow', this.flow.id, 'stats'] : undefined;
     this.steps = this.flow.steps;
     this.getSteps();
     this.checkDraft();
@@ -247,7 +251,7 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
     if (this.destroyed || this.statusFlow !== Status.active) {
       return;
     }
-    this.loadFlowMessages();
+    this.loadFlowTransactions();
   }
 
   pollAlerts(): void {
@@ -374,7 +378,7 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
       this.changeDetector.detectChanges();
     }
     if (this.ran) {
-      this.loadFlowMessages();
+      this.loadFlowTransactions();
     } else {
       this.completedCount = null;
       this.failedCount = null;
@@ -479,24 +483,17 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
     this.flowStatsEmpty = false;
     this.flowStatsSections = [];
 
-    const steps = flow.steps ?? [];
-    const step =
-      steps.find(item => item.stepType === StepType.SOURCE) ??
-      steps.find(item => item.stepType === StepType.SCRIPT) ??
-      steps.find(item => item.stepType === StepType.ROUTE);
-    if (!step?.id) {
+    if (!flow.id) {
       this.flowStatsLoading = false;
       this.flowStatsEmpty = true;
       return;
     }
 
-    const source =
-      step.stepType === StepType.SOURCE ? `${step.componentType}://${step.uri}` : `${flow.id}-${step.id}`;
     this.subscriptions.add(
-      this.flowService.getFlowStats(flow.id, step.id).subscribe({
+      this.flowService.getFlowStats(flow.id).subscribe({
         next: res => {
           if (!this.destroyed) {
-            this.applyFlowStats(res.body, source);
+            this.applyFlowStats(res.body?.flow);
           }
         },
         error: () => {
@@ -511,10 +508,8 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
     );
   }
 
-  private applyFlowStats(res, source: string): void {
-    const step = res?.step;
-    const stats = step?.stats;
-    if (!step || step.status !== 'Started' || !stats) {
+  private applyFlowStats(stats: IFlowStats | undefined): void {
+    if (!stats || stats.status?.toLowerCase() !== 'started') {
       this.flowStatsLoading = false;
       this.flowStatsEmpty = true;
       this.flowStatsSections = [];
@@ -522,120 +517,25 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
-    const pending = stats.pending ?? stats.exchangesInflight ?? 0;
-    const failuresHandled = Number(stats.failuresHandled);
-    const handled = Number.isFinite(failuresHandled) ? failuresHandled : 0;
-    const completed = Number(stats.exchangesCompleted) - handled;
-    const failed = Number(stats.exchangesFailed) + handled;
-    this.flowStatsSections = [
-      {
-        title: 'Runtime',
-        rows: [
-          { label: 'Status', value: String(step.status) },
-          { label: 'Started', value: this.formatStatsTimestamp(stats.startTimestamp) },
-          { label: 'Running for', value: this.formatStatsDuration(step.uptimeMilliseconds ?? stats.uptimeMilliseconds) },
-          { label: 'Idle for', value: this.formatStatsDuration(stats.idleSince) },
-        ],
-      },
-      {
-        title: 'Performance',
-        rows: [
-          { label: 'Average processing', value: this.formatProcessingTime(stats.meanProcessingTime) },
-          { label: 'Minimum', value: this.formatProcessingTime(stats.minProcessingTime) },
-          { label: 'Maximum', value: this.formatProcessingTime(stats.maxProcessingTime) },
-          { label: 'Last', value: this.formatProcessingTime(stats.lastProcessingTime) },
-        ],
-      },
-      {
-        title: 'Messages',
-        rows: [
-          { label: 'Total', value: this.formatCount(stats.exchangesTotal) },
-          { label: 'Completed', value: this.formatCount(completed) },
-          { label: 'Pending', value: this.formatCount(pending) },
-          { label: 'Failed', value: this.formatCount(failed) },
-        ],
-      },
-      {
-        title: 'Activity',
-        rows: [
-          { label: 'First completed', value: this.formatStatsTimestamp(stats.firstExchangeCompletedTimestamp) },
-          { label: 'Last completed', value: this.formatStatsTimestamp(stats.lastExchangeCompletedTimestamp) },
-          { label: 'First failed', value: this.formatStatsTimestamp(stats.firstExchangeFailureTimestamp) },
-          { label: 'Last failed', value: this.formatStatsTimestamp(stats.lastExchangeFailureTimestamp) },
-        ],
-      },
-      {
-        title: 'Source',
-        rows: [],
-        note: source,
-      },
-    ];
+    this.flowStatsSections = flowStatsSections(stats);
     this.flowStatsLoading = false;
     this.flowStatsEmpty = false;
     this.changeDetector.detectChanges();
   }
 
-  private formatStatsTimestamp(value: unknown): string {
-    if (value == null || value === '') {
-      return '—';
-    }
-    const numeric = Number(value);
-    if (Number.isFinite(numeric)) {
-      if (numeric <= 0) {
-        return '—';
-      }
-      const date = dayjs(numeric);
-      return date.isValid() ? date.format('YYYY-MM-DD HH:mm:ss') : '—';
-    }
-    const date = dayjs(String(value));
-    return date.isValid() && date.year() > 1970 ? date.format('YYYY-MM-DD HH:mm:ss') : '—';
-  }
-
-  private formatStatsDuration(value: unknown): string {
-    const milliseconds = Number(value);
-    if (!Number.isFinite(milliseconds) || milliseconds < 0) {
-      return '—';
-    }
-    const totalSeconds = Math.round(milliseconds / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-    const parts: string[] = [];
-    if (hours > 0) {
-      parts.push(`${hours} hour${hours === 1 ? '' : 's'}`);
-    }
-    if (minutes > 0) {
-      parts.push(`${minutes} minute${minutes === 1 ? '' : 's'}`);
-    }
-    if (seconds > 0 || parts.length === 0) {
-      parts.push(`${seconds} second${seconds === 1 ? '' : 's'}`);
-    }
-    return parts.join(' ');
-  }
-
-  private formatProcessingTime(value: unknown): string {
-    const milliseconds = Number(value);
-    return Number.isFinite(milliseconds) && milliseconds >= 0 ? `${milliseconds} ms` : '—';
-  }
-
-  private formatCount(value: unknown): string {
-    const count = Number(value);
-    return Number.isFinite(count) ? String(count) : '0';
-  }
-
-  private loadFlowMessages(): void {
+  private loadFlowTransactions(): void {
     if (!this.flow?.id || this.destroyed) {
       return;
     }
     this.subscriptions.add(
-      this.flowService.getFlowMessages(this.flow.id).subscribe({
+      this.flowService.getFlowTransactions(this.flow.id).subscribe({
         next: response => {
           if (this.destroyed || !this.ran) {
             return;
           }
-          const body = response.body;
-          this.completedCount = body?.completedTransactions ?? null;
-          this.failedCount = body?.failedTransactions ?? null;
+          const transactions = response.body?.flow;
+          this.completedCount = transactions?.completed ?? null;
+          this.failedCount = transactions?.failed ?? null;
           this.reportRuntime();
           this.changeDetector.detectChanges();
         },

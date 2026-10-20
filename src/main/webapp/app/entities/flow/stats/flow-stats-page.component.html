@@ -1,0 +1,76 @@
+<div class="container-fluid flow-designer-page">
+  <header class="flow-stats-header">
+    <a routerLink="/" class="btn btn-fx btn-fx-ghost" title="Back to the Flows">
+      <fa-icon icon="arrow-left" /><span>Flows</span>
+    </a>
+    <div class="flow-stats-header__title">
+      <span class="flow-stats-header__label">Flow stats</span>
+      <h1 class="flow-stats-header__name">{{ flow?.name }}</h1>
+    </div>
+    @if (read) {
+      <span class="badge" [class.text-bg-success]="running" [class.text-bg-secondary]="!running">{{ running ? 'Started' : 'Not running' }}</span>
+    }
+    <div class="flow-stats-header__actions">
+      <button type="button" class="btn btn-fx btn-fx-ghost" (click)="refresh()" [disabled]="!graph" title="Refreshes by itself every 5 seconds">
+        <fa-icon icon="sync" /><span>Refresh</span>
+      </button>
+      @if (flow?.id) {
+        <a *jhiHasAnyAuthority="'ROLE_ADMIN'" class="btn btn-fx btn-fx-primary" [routerLink]="['/flow/editor', flow!.id]" [queryParams]="editorQueryParams">
+          <fa-icon icon="pencil-alt" /><span>Edit Flow</span>
+        </a>
+      }
+    </div>
+  </header>
+
+  @if (loadFailed) {
+    <div class="alert alert-danger">This Flow could not be loaded.</div>
+  }
+
+  @if (graph) {
+    <div class="flow-designer-body flow-stats-body">
+      <div class="flow-designer-canvas">
+        <jhi-flow-canvas
+          [graph]="graph"
+          [readOnly]="true"
+          [selection]="selection"
+          [operationUrl]="operationUrl"
+          [counts]="counts"
+          (selectionChange)="onSelectionChange($event)"
+        ></jhi-flow-canvas>
+        <div class="flow-designer-alerts">
+          @if (read && !running) {
+            <div class="alert alert-info py-2 mb-0">This Flow isn't running. Start it to see stats.</div>
+          }
+        </div>
+      </div>
+      <aside class="flow-designer-panel">
+        <div class="flow-designer-panel-editor">
+          <div class="card bg-light text-start">
+            <div class="card-body">
+              @if (selectedStep; as step) {
+                <h5 class="border-bottom">{{ step.kind }}</h5>
+                <p class="fw-semibold mb-0">{{ stepTitle(step) }}</p>
+                @if (step.uri && step.kind !== 'ROUTER') {
+                  <p class="small text-muted text-break mb-3">{{ step.uri }}</p>
+                } @else {
+                  <div class="mb-3"></div>
+                }
+              } @else {
+                <h5 class="border-bottom">FLOW</h5>
+              }
+              <jhi-flow-stats-sections
+                [loading]="!read"
+                [empty]="read && !running"
+                emptyMessage="There are no stats while the Flow isn't running."
+                [sections]="sections"
+              />
+              @if (running && !selectedStep) {
+                <p class="small text-muted mt-3 mb-0">Select a Step to see its own stats.</p>
+              }
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  }
+</div>

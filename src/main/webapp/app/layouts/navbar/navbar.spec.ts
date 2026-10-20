@@ -381,6 +381,15 @@ describe('Navbar Component', () => {
     expect(labels).not.toContain('Import');
   });
 
+  it('should show every signed-in user the Upgrade to Fluxygen link', () => {
+    accountService.authenticate(account);
+    fixture.detectChanges();
+
+    const link: HTMLAnchorElement = fixture.nativeElement.querySelector('[data-cy="fluxygen"]');
+    expect(link.textContent?.trim()).toBe('Upgrade to Fluxygen');
+    expect(link.getAttribute('href')).toBe('/fluxygen');
+  });
+
   it('should render the light or dark logo as the Gateway icon', () => {
     accountService.authenticate(account);
     const theme = TestBed.inject(ThemeService);

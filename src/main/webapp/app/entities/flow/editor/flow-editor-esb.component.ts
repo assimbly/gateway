@@ -2295,6 +2295,10 @@ splitOptions4(options: string): string[] {
 	}
 
 	private setPanelCollapsed(collapsed: boolean): void {
+		if (this.sidePanelCollapsed && !collapsed) {
+			// The panel takes room from the canvas, so Steps may end up under it.
+			this.flowCanvas?.keepInView();
+		}
 		this.sidePanelCollapsed = collapsed;
 		try {
 			localStorage.setItem(PANEL_COLLAPSED_KEY, String(collapsed));
@@ -2370,6 +2374,7 @@ splitOptions4(options: string): string[] {
 
 	autoArrangeCanvas(): void {
 		this.edit({ outcome: 'accepted', graph: autoArrange(this.designer!.current) });
+		this.flowCanvas?.keepInView();
 	}
 
 	undo(): void {

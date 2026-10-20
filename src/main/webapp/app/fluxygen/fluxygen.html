@@ -1,0 +1,81 @@
+<article class="fluxygen" aria-labelledby="fluxygen-title">
+  <header class="fluxygen__hero">
+    <p class="fluxygen__eyebrow">Upgrade</p>
+    <h2 class="fluxygen__title" id="fluxygen-title">Fluxygen: Assimbly, fully managed</h2>
+    <p class="fluxygen__lead">
+      Fluxygen is an integration platform built on Assimbly. Your Flows run on the same engine (Apache Camel and ActiveMQ), but Fluxygen
+      hosts, secures, monitors and upgrades it for you. It also adds the tools teams need to run integrations in production.
+    </p>
+    <div class="fluxygen__actions">
+      <a class="btn btn-fx btn-fx-primary fluxygen__try" [href]="urls.tryIt" target="_blank" rel="noopener noreferrer">
+        <fa-icon icon="rocket" /><span>Try it yourself</span>
+      </a>
+      <a class="btn btn-fx btn-fx-secondary" [href]="urls.demo" target="_blank" rel="noopener noreferrer">
+        <span>Schedule a demo</span><fa-icon icon="arrow-up-right-from-square" />
+      </a>
+    </div>
+  </header>
+
+  <section class="fluxygen__section" aria-labelledby="fluxygen-stack-title">
+    <h3 class="fluxygen__heading" id="fluxygen-stack-title">Same engine, more platform</h3>
+    <ul class="fluxygen__stack">
+      @for (part of stack; track part.name) {
+      <li class="fluxygen__part" [class.fluxygen__part--engine]="part.engine">
+        <span class="fluxygen__part-name">{{ part.name }}</span>
+        <span class="fluxygen__part-detail">{{ part.detail }}</span>
+      </li>
+      }
+    </ul>
+    <p class="fluxygen__note">The highlighted parts are what you run today. Fluxygen adds the rest around them.</p>
+  </section>
+
+  <div class="fluxygen__columns">
+    <section class="fluxygen__section fluxygen__card" aria-labelledby="fluxygen-managed-title">
+      <h3 class="fluxygen__heading" id="fluxygen-managed-title"><fa-icon icon="cloud" [fixedWidth]="true" /> We run it for you</h3>
+      <ul class="fluxygen__list">
+        @for (item of managed; track item) {
+        <li><fa-icon icon="check" [fixedWidth]="true" /><span>{{ item }}</span></li>
+        }
+      </ul>
+    </section>
+
+    <section class="fluxygen__section fluxygen__card" aria-labelledby="fluxygen-features-title">
+      <h3 class="fluxygen__heading" id="fluxygen-features-title">
+        <fa-icon icon="wand-magic-sparkles" [fixedWidth]="true" /> More to build with
+      </h3>
+      <ul class="fluxygen__list">
+        @for (item of features; track item) {
+        <li><fa-icon icon="check" [fixedWidth]="true" /><span>{{ item }}</span></li>
+        }
+      </ul>
+    </section>
+  </div>
+
+  <section class="fluxygen__section" aria-labelledby="fluxygen-steps-title">
+    <h3 class="fluxygen__heading" id="fluxygen-steps-title">Upgrade in three steps</h3>
+    <ol class="fluxygen__steps">
+      <li>
+        <strong>Try Fluxygen</strong>
+        <span>Start with <a [href]="urls.tryIt" target="_blank" rel="noopener noreferrer">Try it yourself</a> on fluxygen.com.</span>
+      </li>
+      <li>
+        <strong>Export your Flows</strong>
+        <span>
+          On the <a routerLink="/" class="fluxygen__flows">Flows list</a>, <em>Export for Fluxygen</em> makes a zip that Fluxygen imports.
+        </span>
+      </li>
+      <li>
+        <strong>Import and go live</strong>
+        <span>Import the zip in Fluxygen with your passphrase, then set up Brokers, Certificates and users there.</span>
+      </li>
+    </ol>
+  </section>
+
+  <footer class="fluxygen__more">
+    <span>Find out more:</span>
+    <a [href]="urls.technology" target="_blank" rel="noopener noreferrer">How it works</a>
+    <a [href]="urls.product" target="_blank" rel="noopener noreferrer">Product</a>
+    <a [href]="urls.pricing" target="_blank" rel="noopener noreferrer">Pricing</a>
+    <a [href]="urls.academy" target="_blank" rel="noopener noreferrer">Academy</a>
+  </footer>
+</article>

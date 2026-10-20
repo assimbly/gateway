@@ -15,6 +15,50 @@ import { traceCollector } from 'app/shared/collect/collectors';
 import { HANDLES_OWN_ERRORS } from 'app/core/interceptor/error-handler.interceptor';
 import { ScriptTrial, scriptTrialError, scriptTrialRequest, scriptTrialResult } from './editor/script-flow';
 
+/** Message counts of a Flow, as transactions (once per message) or exchanges (once per step). */
+export interface IFlowCounts {
+  total: number;
+  completed: number;
+  failed: number;
+  pending: number;
+}
+
+/** The Flow's full stats: transactions count each message once, exchanges count it once per step. */
+export interface IFlowStats {
+  id: string;
+  status?: string;
+  uptimeMillis?: number;
+  lastCompleted?: number;
+  lastFailed?: number;
+  meanProcessingTime?: number;
+  maxProcessingTime?: number;
+  lastProcessingTime?: number;
+  transactionsTotal: number;
+  transactionsCompleted: number;
+  transactionsFailed: number;
+  transactionsPending: number;
+  exchangesTotal: number;
+  exchangesCompleted: number;
+  exchangesFailed: number;
+  exchangesPending: number;
+}
+
+/** The exchanges of one Step; `id` is the Step's runtime route id without the Flow id in front. */
+export interface IStepCounts extends IFlowCounts {
+  id: string;
+}
+
+/** The runtime's stats of one Step, as far as they are shown; the counters are Camel's own. */
+export interface IStepStats {
+  id: string;
+  status?: string;
+  stats?: {
+    meanProcessingTime?: number;
+    maxProcessingTime?: number;
+    lastProcessingTime?: number;
+  };
+}
+
 type EntityResponseType = HttpResponse<IFlow>;
 type EntityArrayResponseType = HttpResponse<IFlow[]>;
 
@@ -172,14 +216,12 @@ export class FlowService {
     return this.http.get(`${this.integrationUrl}/flow/${flowId}/status`, { observe: 'response', responseType: 'text' });
   }
 
-  getFlowMessages(flowId: number): Observable<HttpResponse<{ completedTransactions: number; failedTransactions: number }>> {
-    return this.http.get<{ completedTransactions: number; failedTransactions: number }>(
-      `${this.integrationUrl}/flow/${flowId}/messages`,
-      {
-        headers: new HttpHeaders({ Accept: 'application/json', IncludeSteps: 'false' }),
-        observe: 'response',
-      }
-    );
+  /** Transactions count each message once, however many steps it passes. */
+  getFlowTransactions(flowId: number): Observable<HttpResponse<{ flow: IFlowCounts }>> {
+    return this.http.get<{ flow: IFlowCounts }>(`${this.integrationUrl}/flow/${flowId}/transactions`, {
+      headers: new HttpHeaders({ Accept: 'application/json' }),
+      observe: 'response',
+    });
   }
 
   /** Clears the Flow's Alerts for everyone. */
@@ -213,13 +255,27 @@ export class FlowService {
     });
   }
 
-  getFlowStats(flowId: number, stepid: number): Observable<HttpResponse<any>> {
-    return this.http.get(`${this.integrationUrl}/flow/${flowId}/step/${stepid}/stats`,
-        {
-          headers: new HttpHeaders({ FullStats: 'true', Accept: 'application/json' }),
-          observe: 'response'
-        })
+  getFlowStats(flowId: number): Observable<HttpResponse<{ flow: IFlowStats }>> {
+    return this.http.get<{ flow: IFlowStats }>(`${this.integrationUrl}/flow/${flowId}/stats`, {
+      headers: new HttpHeaders({ FullStats: 'true', Accept: 'application/json' }),
+      observe: 'response',
+      context: OWN_ERRORS,
+    });
+  }
 
+  /** The Flow's exchanges with those of each Step. */
+  getFlowExchanges(flowId: number): Observable<{ flow: IFlowCounts & { steps?: IStepCounts[] } }> {
+    return this.http.get<{ flow: IFlowCounts & { steps?: IStepCounts[] } }>(`${this.integrationUrl}/flow/${flowId}/exchanges`, {
+      headers: new HttpHeaders({ IncludeSteps: 'true', Accept: 'application/json' }),
+      context: OWN_ERRORS,
+    });
+  }
+
+  getStepStats(flowId: number, stepId: number): Observable<{ step: IStepStats }> {
+    return this.http.get<{ step: IStepStats }>(`${this.integrationUrl}/flow/${flowId}/step/${stepId}/stats`, {
+      headers: new HttpHeaders({ FullStats: 'true', Accept: 'application/json' }),
+      context: OWN_ERRORS,
+    });
   }
 
   getComponentOptions(componentType: String, stepType?: String): Observable<any> {

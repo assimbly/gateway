@@ -45,6 +45,11 @@ const routes: Routes = [
     loadChildren: () => import('./account/account.route'),
   },
   {
+    path: 'fluxygen',
+    canActivate: [userRouteAccessService],
+    loadComponent: () => import('./fluxygen/fluxygen'),
+  },
+  {
     path: 'login',
     loadComponent: () => import('./login/login'),
     title: 'login.title',

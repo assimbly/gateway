@@ -33,7 +33,7 @@ describe('Export for Fluxygen dialog', () => {
     activeModal = { close: jest.fn(), dismiss: jest.fn() };
     TestBed.configureTestingModule({
       imports: [FluxygenExportDialogComponent],
-      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting(), { provide: NgbActiveModal, useValue: activeModal }],
+      providers: [provideRouter([{ path: 'fluxygen', children: [] }]), provideHttpClient(), provideHttpClientTesting(), { provide: NgbActiveModal, useValue: activeModal }],
     });
     TestBed.inject(FaIconLibrary).addIcons(...fontAwesomeIcons);
     http = TestBed.inject(HttpTestingController);
@@ -100,6 +100,18 @@ describe('Export for Fluxygen dialog', () => {
     expect(text).toContain('@{key}');
     expect(text).toContain('Not included: Brokers, Queues and Topics, Certificates and users');
     expect(text).toContain('Fluxygen asks for it when you import the zip');
+  });
+
+  it('introduces Fluxygen and closes when the user opens What is Fluxygen?', () => {
+    const link = element<HTMLAnchorElement>('.fluxygen-export__intro a');
+
+    expect(element('.fluxygen-export__intro').textContent).toContain('managed platform built on Assimbly');
+    expect(link.textContent?.trim()).toBe('What is Fluxygen?');
+    expect(link.getAttribute('href')).toBe('/fluxygen');
+
+    link.click();
+
+    expect(activeModal.dismiss).toHaveBeenCalled();
   });
 
   it('refuses a passphrase shorter than 12 characters', async () => {

@@ -111,6 +111,39 @@
   color: var(--app-warning, #f79009);
 }
 
+// The messages a Step completed and failed, as round badges on its top right corner.
+.flow-step-counts {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  display: flex;
+  gap: 2px;
+  pointer-events: auto;
+}
+
+.flow-step-count {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  border: 2px solid var(--app-bg, #f8f9fb);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+}
+
+.flow-step-count--completed {
+  // Fixed colours: white on the dark theme's lighter success and danger colours would be hard to read.
+  background: #079455;
+}
+
+.flow-step-count--failed {
+  background: #d92d20;
+}
+
 .flow-connector {
   position: absolute;
   top: 50%;

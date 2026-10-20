@@ -1,9 +1,9 @@
 package org.assimbly.gateway.config.security;
 
 import org.apache.commons.logging.Log;
+import org.assimbly.gateway.config.BaseDirectorySetting;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.context.config.ConfigDataEnvironmentPostProcessor;
 import org.springframework.boot.logging.DeferredLogFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -51,8 +51,8 @@ public class GeneratedSecrets implements EnvironmentPostProcessor, Ordered {
 
     @Override
     public int getOrder() {
-        // After the configuration files are read, so their secrets are known
-        return ConfigDataEnvironmentPostProcessor.ORDER + 1;
+        // After the configuration files are read, so their secrets are known, and after the base directory is set
+        return BaseDirectorySetting.ORDER + 1;
     }
 
     @Override

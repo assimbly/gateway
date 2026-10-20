@@ -115,6 +115,31 @@ describe('Flow canvas', () => {
     expect(canvas.openStepPicker({ type: 'flow' })).toBe(true);
   });
 
+  it('shows no message counts unless it is given them', () => {
+    expect(fixture.nativeElement.querySelectorAll('.flow-step-counts')).toHaveLength(0);
+  });
+
+  it('shows the completed and failed messages of each Step as badges, but no badge for none', () => {
+    fixture.componentRef.setInput(
+      'counts',
+      new Map([
+        ['step-10', { total: 1234, completed: 1234, failed: 0, pending: 0 }],
+        ['step-11', { total: 5, completed: 3, failed: 2, pending: 0 }],
+      ]),
+    );
+    fixture.detectChanges();
+
+    const steps: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('.flow-step'));
+    const badges = (step: HTMLElement) => Array.from(step.querySelectorAll<HTMLElement>('.flow-step-count')).map(b => [b.className.split('--')[1], b.textContent!.trim(), b.title]);
+
+    expect(badges(steps[0])).toEqual([['completed', '1.2k', '1,234 completed']]);
+    expect(badges(steps[1])).toEqual([
+      ['completed', '3', '3 completed'],
+      ['failed', '2', '2 failed'],
+    ]);
+    expect(steps[2].querySelector('.flow-step-counts')).toBeNull();
+  });
+
   it('reports which Step was clicked', () => {
     const selections: DesignerSelection[] = [];
     fixture.componentInstance.selectionChange.subscribe(selection => selections.push(selection));

@@ -53,6 +53,16 @@
           } @else if (warningOf(step); as warning) {
             <span class="flow-step-warning flow-step-warning--soft" [title]="warning"><fa-icon icon="exclamation-circle"></fa-icon></span>
           }
+          @if (counts?.get(step.key); as count) {
+            <div class="flow-step-counts">
+              @if (count.completed > 0) {
+                <span class="flow-step-count flow-step-count--completed" [title]="countTitle(count.completed, 'completed')">{{ compactCount(count.completed) }}</span>
+              }
+              @if (count.failed > 0) {
+                <span class="flow-step-count flow-step-count--failed" [title]="countTitle(count.failed, 'failed')">{{ compactCount(count.failed) }}</span>
+              }
+            </div>
+          }
           @if (canAddBranch(step) && !readOnly) {
             <button type="button" fDragBlocker class="flow-plus flow-add-branch" title="Add a Branch" aria-label="Add a Branch"
                     (click)="$event.stopPropagation(); addBranch.emit(step.key)" (dblclick)="$event.stopPropagation()">

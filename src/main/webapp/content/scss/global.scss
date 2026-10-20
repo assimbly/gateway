@@ -456,7 +456,8 @@ ng-dropdown-panel > div {
 */
 
 .popover.flow-stats-popover {
-  max-width: 28rem;
+  width: 26rem;
+  max-width: calc(100vw - 2rem);
 }
 
 .popover.flow-stats-popover .popover-body {
@@ -474,9 +475,9 @@ ng-dropdown-panel > div {
 }
 
 .flow-stats-note {
-  margin: 0;
-  font-size: 0.84rem;
-  word-break: break-all;
+  margin: 0.35rem 0 0;
+  font-size: 0.76rem;
+  color: var(--app-text-muted);
 }
 
 .flow-stats-section h6 {
@@ -512,6 +513,24 @@ ng-dropdown-panel > div {
   text-align: right;
   font-variant-numeric: tabular-nums;
   word-break: break-word;
+}
+
+.flow-stats-section thead th {
+  padding-right: 0;
+  padding-left: 1rem;
+  text-align: right;
+  font-size: 0.72rem;
+}
+
+.flow-stats-section tbody td + td {
+  padding-left: 1rem;
+}
+
+.flow-stats-details {
+  display: inline-block;
+  margin-top: 0.85rem;
+  font-size: 0.84rem;
+  font-weight: 600;
 }
 
 .invalid-field-message {

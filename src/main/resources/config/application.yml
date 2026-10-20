@@ -245,6 +245,8 @@ application:
     tracing: false
     debugging: false
     cache: true
+    # The folder that holds .assimbly (database, security, broker, logs). 'default' is the user's home folder.
+    # Also set with the environment variable APPLICATION_GATEWAY_BASE_DIRECTORY or the start argument -d=<folder>.
     base-directory: default
     # A new Gateway gets an example Flow and a default Artemis broker that starts with it
     first-start-setup: true

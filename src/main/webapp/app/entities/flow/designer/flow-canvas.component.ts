@@ -36,6 +36,8 @@ import {
   StepKind,
 } from './flow-graph';
 import { responseSettings } from './response';
+import { IFlowCounts } from '../flow.service';
+import { compactCount } from '../flow-stats';
 import { PickedKind, StepComponents, StepPickerComponent } from './step-picker.component';
 
 /** What the right-hand panel shows: a Step, the Link leading to a Step, or the Flow settings. */
@@ -62,6 +64,8 @@ export class FlowCanvasComponent {
   /** The full URL a Handler Flow's Operation is served on; the Operation's label links to it. */
   @Input() operationUrl?: string;
   @Input() components: StepComponents = { actions: [], sinks: [] };
+  /** The messages each Step completed and failed, by Step key, shown as badges; the editor shows none. */
+  @Input() counts?: ReadonlyMap<string, IFlowCounts>;
 
   @Output() selectionChange = new EventEmitter<DesignerSelection>();
   /** A Step was double-clicked, to show or hide its editor. */
@@ -145,6 +149,13 @@ export class FlowCanvasComponent {
       this.withResponse = { from: this.components, components: { ...this.components, sinks: [RESPONSE_COMPONENT, ...this.components.sinks] } };
     }
     return this.withResponse.components;
+  }
+
+  readonly compactCount = compactCount;
+
+  /** A count in full, for the badge's tooltip, such as "1,234 completed". */
+  countTitle(count: number, what: string): string {
+    return `${count.toLocaleString('en-US')} ${what}`;
   }
 
   warningOf(step: DesignStep): string | undefined {
@@ -297,6 +308,27 @@ export class FlowCanvasComponent {
       const inView = !!flow && !!node && node.left >= flow.left && node.right + 40 <= flow.right && node.top >= flow.top && node.bottom <= flow.bottom;
       if (node && !inView) {
         this.canvas?.centerGroupOrNode(key, false);
+      }
+    });
+  }
+
+  /**
+   * Fits the Flow into view again when part of it is hidden, for example after the side panel opened over the
+   * canvas or Auto-arrange moved the Steps. A Flow that is fully in view stays where the user put it.
+   */
+  keepInView(): void {
+    setTimeout(() => {
+      const flow = this.host.nativeElement.querySelector('f-flow')?.getBoundingClientRect();
+      if (!flow?.width) {
+        return;
+      }
+      const nodes: HTMLElement[] = Array.from(this.host.nativeElement.querySelectorAll('[data-step-key]'));
+      const hidden = nodes.some(element => {
+        const node = element.getBoundingClientRect();
+        return node.left < flow.left || node.right > flow.right || node.top < flow.top || node.bottom > flow.bottom;
+      });
+      if (hidden) {
+        this.canvas?.fitToScreen({ x: 80, y: 80 }, false, false, 1);
       }
     });
   }

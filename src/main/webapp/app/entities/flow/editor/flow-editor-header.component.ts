@@ -186,12 +186,12 @@ export class FlowEditorHeaderComponent {
         }
         this.ran.set(this.ran() || hasRun(status.body));
         this.alerts.set(alerts.body?.total ?? 0);
-        return this.ran() ? this.flowService.getFlowMessages(id) : of(null);
+        return this.ran() ? this.flowService.getFlowTransactions(id) : of(null);
       }),
-      map(messages => {
-        if (messages) {
-          this.completed.set(messages.body?.completedTransactions ?? null);
-          this.failed.set(messages.body?.failedTransactions ?? null);
+      map(transactions => {
+        if (transactions) {
+          this.completed.set(transactions.body?.flow?.completed ?? null);
+          this.failed.set(transactions.body?.flow?.failed ?? null);
         }
       }),
       catchError(() => EMPTY),

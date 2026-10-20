@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -51,7 +52,7 @@ export function exportFlowOf(flow: IFlow): ExportFlow {
 @Component({
   selector: 'jhi-fluxygen-export-dialog',
   templateUrl: './fluxygen-export-dialog.component.html',
-  imports: [FormsModule, FontAwesomeModule],
+  imports: [FormsModule, FontAwesomeModule, RouterLink],
 })
 export class FluxygenExportDialogComponent {
   readonly minLength = MIN_PASSPHRASE_LENGTH;

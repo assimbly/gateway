@@ -10,6 +10,7 @@ import { FlowComponent } from './flow.component';
 import { FlowUpdateComponent } from './flow-update.component';
 import { FlowEditorComponent } from './editor/flow-editor.component';
 import { FlowMessageSenderComponent } from './sender/flow-message-sender.component';
+import { FlowStatsPageComponent } from './stats/flow-stats-page.component';
 
 @Injectable({ providedIn: 'root' })
 export class FlowResolve implements Resolve<IFlow> {
@@ -42,6 +43,15 @@ const flowRoute: Routes = [
     component: FlowMessageSenderComponent,
     data: {
       authorities: ['ROLE_ADMIN'],
+      pageTitle: 'global.title',
+    },
+    canActivate: [userRouteAccessService],
+  },
+  {
+    path: 'flow/:id/stats',
+    component: FlowStatsPageComponent,
+    data: {
+      authorities: ['ROLE_USER'],
       pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],

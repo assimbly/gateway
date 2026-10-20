@@ -363,6 +363,23 @@
   </nav>
 
   @if (accountRef !== null) {
+    <a
+      class="app-sidebar__link app-sidebar__upgrade"
+      routerLink="/fluxygen"
+      [class.active]="isActivePath('/fluxygen')"
+      [attr.aria-label]="iconOnly ? 'Upgrade to Fluxygen' : null"
+      [ngbTooltip]="iconOnly ? 'Upgrade to Fluxygen' : ''"
+      [disableTooltip]="!iconOnly"
+      placement="end"
+      (click)="collapseNavbar()"
+      data-cy="fluxygen"
+    >
+      <fa-icon icon="rocket" [fixedWidth]="true" />
+      @if (!iconOnly) {
+        <span class="app-sidebar__label">Upgrade to Fluxygen</span>
+      }
+    </a>
+
     <div class="app-sidebar__account" data-cy="accountMenu">
       @if (iconOnly) {
         <div ngbDropdown class="app-sidebar__group dropend" placement="end" container="body">
