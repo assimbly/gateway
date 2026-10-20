@@ -1,1 +1,39 @@
+name: Release Daily Next App Snapshot
 
+on:
+  workflow_dispatch:
+
+jobs:
+  getversion:
+    runs-on: ubuntu-latest
+    outputs:
+      milestone: ${{ steps.gradle-version.outputs.milestone }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: next-app
+        
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+
+      - name: Get Gradle Project Version
+        id: gradle-version
+        run: |
+          VERSION=$(./gradlew -q printVersion)
+          echo "Gradle version: $VERSION"
+          echo "milestone=$VERSION" >> "$GITHUB_OUTPUT"
+
+        
+  call-release:
+    needs: getversion 
+    uses: ./.github/workflows/release.yml
+    secrets: inherit
+    with:
+      branch: 'next-app'
+      milestone: ${{needs.getversion.outputs.milestone}}
+      tag: 'next-app'
+      jdk: '25'
