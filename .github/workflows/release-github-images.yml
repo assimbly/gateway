@@ -1,1 +1,128 @@
+name: Release Docker Images on GitHub (ghcr.io)
 
+on:
+  workflow_dispatch:
+    inputs:
+      image:
+        description: 'Image name (pushed as ghcr.io/assimbly/<image>)'
+        default: 'assimbly-runtime'
+        type: string
+      module:
+        description: 'Gradle profile for the module to build (e.g. headless, broker)'
+        default: 'headless'
+        type: string
+      branch:
+        description: 'Branch to use'
+        default: 'develop'
+        type: string
+      tag:
+        description: 'Tag to use'
+        default: 'develop'
+        type: string
+      jdk:
+        description: 'Java (JDK) version to use'
+        default: '21'
+        type: string
+  workflow_call:
+    inputs:
+      image:
+        description: 'Image name (pushed as ghcr.io/assimbly/<image>)'
+        default: 'assimbly-runtime'
+        type: string
+      module:
+        description: 'Gradle profile for the module to build (e.g. headless, broker)'
+        default: 'headless'
+        type: string
+      branch:
+        description: 'Branch to use'
+        default: 'develop'
+        type: string
+      tag:
+        description: 'Tag to use'
+        default: 'develop'
+        type: string
+      jdk:
+        description: 'Java (JDK) version to use'
+        default: '21'
+        type: string
+
+jobs:
+  publish_docker_images:
+    runs-on: ubuntu-latest
+
+    # Needed so GITHUB_TOKEN may push to ghcr.io
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+
+      - name: Checkout the code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ inputs.jdk }}
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Setup Maven settings.xml
+        uses: whelk-io/maven-settings-xml-action@v20
+        with:
+          repositories: >
+            [
+              {
+                "id": "maven",
+                "name": "Maven Central",
+                "url": "https://repo1.maven.org/maven2"
+              },
+              {
+                "id": "github",
+                "name": "Assimbly Runtime Repository",
+                "url": "https://maven.pkg.github.com/assimbly/runtime",
+                "snapshots": { "enabled": "true" }
+              },
+              {
+                "id": "github",
+                "name": "Assimbly Custom-Components Repository",
+                "url": "https://maven.pkg.github.com/assimbly/custom-components",
+                "snapshots": { "enabled": "true" }
+              }
+            ]
+          servers: >
+            [
+              {
+                "id": "github",
+                "username": "assimbly",
+                "password": "${{ secrets.GITHUB_TOKEN }}"
+              }
+            ]
+
+      - name: Remove HTTP blocker from the built in settings.xml
+        run: |
+          export MAVEN_PATH=$(mvn -X | grep "home" | head -1 | cut -d " " -f 3)
+          echo '<?xml version="1.0" encoding="UTF-8"?>' > "$MAVEN_PATH/conf/settings.xml"
+          echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 https://maven.apache.org/xsd/settings-1.2.0.xsd">' >> "$MAVEN_PATH/conf/settings.xml"
+          echo '</settings>' >> "$MAVEN_PATH/conf/settings.xml"
+
+      - name: Build and push the docker image to ghcr.io
+        env:
+          IMAGE: ${{ inputs.image }}
+          MODULE: ${{ inputs.module }}
+          VERSION_TAG: ${{ inputs.tag }}
+          REGISTRY_USER: ${{ github.actor }}
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ./gradlew clean bootJar jib \
+            -Djib.to.image="ghcr.io/assimbly/${IMAGE}:${VERSION_TAG}" \
+            -Djib.from.platforms=linux/amd64,linux/arm64 \
+            -Djib.container.format=Docker \
+            -Djib.container.user=root \
+            -Djib.to.auth.username="$REGISTRY_USER" \
+            -Djib.to.auth.password="$REGISTRY_TOKEN" \
+            -Papi-docs -Pprod -Pfull "-P${MODULE}"
