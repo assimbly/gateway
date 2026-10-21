@@ -1,9 +1,9 @@
-<div ngbDropdown container="body" placement="bottom-start bottom-end top-start top-end" autoClose="outside" class="d-inline-block"
+<div ngbDropdown container="body" placement="bottom-start bottom-end" autoClose="outside" class="d-inline-block"
      (openChange)="onOpenChange($event)">
-  <button type="button" class="flow-plus" ngbDropdownToggle [attr.aria-label]="title" [title]="title">
+  <button #toggle type="button" class="flow-plus" ngbDropdownToggle [attr.aria-label]="title" [title]="title">
     <fa-icon icon="plus"></fa-icon>
   </button>
-  <div ngbDropdownMenu class="step-picker">
+  <div ngbDropdownMenu class="step-picker" [style.max-height.px]="maxHeight">
     <input #search type="search" class="form-control form-control-sm" placeholder="Search components…" aria-label="Search components"
            [(ngModel)]="filter" (keydown.enter)="$event.preventDefault(); pickFirstMatch()" />
     <div class="step-picker-kinds" role="tablist">

@@ -2,6 +2,16 @@
   width: 24rem;
   max-width: calc(100vw - 2rem);
   padding: 0.5rem;
+
+  // A column, so the list takes what is left of the menu's max-height and scrolls.
+  &.show {
+    display: flex;
+    flex-direction: column;
+  }
+
+  > * {
+    flex: none;
+  }
 }
 
 .step-picker-kinds {
@@ -32,6 +42,8 @@
 }
 
 .step-picker-list {
+  flex: 0 1 auto;
+  min-height: 0;
   max-height: 18rem;
   overflow-y: auto;
 }

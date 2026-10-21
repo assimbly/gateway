@@ -1,4 +1,4 @@
-import { CatalogueEntry, categoryChips, essentialsFirst, isEssential, roleMismatch, searchCatalogue } from './catalogue';
+import { CatalogueEntry, categoryChips, closestFirst, essentialsFirst, isEssential, roleMismatch, searchCatalogue } from './catalogue';
 
 const file: CatalogueEntry = { name: 'file', title: 'File', description: 'Read and write files.', label: 'file,core' };
 const sftp: CatalogueEntry = { name: 'sftp', title: 'SFTP', description: 'Upload and download files to/from SFTP servers.', label: 'file' };
@@ -67,6 +67,17 @@ describe('Camel catalogue', () => {
       expect(searchCatalogue([kafka, file, sftp], 'file').map(entry => entry.name)).toEqual(['file', 'sftp']);
       expect(searchCatalogue([kafka, file, sftp], 'Apache').map(entry => entry.name)).toEqual(['kafka']);
       expect(searchCatalogue([kafka, file, sftp], 'SFTP').map(entry => entry.name)).toEqual(['sftp']);
+    });
+
+    it('puts an exact or closest id or title on top, above components that only mention it', () => {
+      const filter: CatalogueEntry = { name: 'filter', title: 'Filter', description: 'Only lets matching messages through.' };
+      const ftp: CatalogueEntry = { name: 'ftp', title: 'FTP', description: 'Upload and download files to/from FTP servers.' };
+      expect(searchCatalogue([sftp, filter, ftp, file], 'file').map(entry => entry.name)).toEqual(['file', 'sftp', 'ftp']);
+      expect(searchCatalogue([sftp, filter, ftp, file], 'fil ').map(entry => entry.name)).toEqual(['file', 'filter', 'sftp', 'ftp']);
+    });
+
+    it('keeps entries that do not match at the end when only sorting', () => {
+      expect(closestFirst([kafka, sftp, file], 'file').map(entry => entry.name)).toEqual(['file', 'sftp', 'kafka']);
     });
 
     it('lists everything for an empty search', () => {

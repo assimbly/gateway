@@ -9,8 +9,20 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { PopoverModule } from 'ngx-bootstrap/popover';
 import { CodemirrorComponent, CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { Components } from 'app/shared/camel/component-type';
-import { CatalogueEntry, EndpointRole, NO_MATCH, essentialsFirst, matchRank, roleMismatch, searchCatalogue } from 'app/shared/camel/catalogue';
-import { OptionSchema, PathPart, ValueField, groupOptions, pathRule, requiredOptions, suggestedOptions, valueFieldOf } from 'app/shared/camel/endpoint';
+import { CatalogueEntry, EndpointRole, NO_MATCH, closestFirst, essentialsFirst, matchRank, roleMismatch, searchCatalogue } from 'app/shared/camel/catalogue';
+import {
+  DEFAULT_LANGUAGE,
+  LANGUAGE_OPTION,
+  OptionSchema,
+  PathPart,
+  ValueField,
+  groupOptions,
+  pathRule,
+  requiredOptions,
+  suggestedOptions,
+  valueChoicesOf,
+  valueFieldOf,
+} from 'app/shared/camel/endpoint';
 import { insertVariable, unknownVariables, unknownVariablesMessage } from 'app/shared/camel/variables';
 import { IStep, StepType } from 'app/shared/model/step.model';
 import { IMessage } from 'app/shared/model/message.model';
@@ -249,12 +261,14 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
     const usable = new Set<string>(names ?? []);
     const usableChoices = [...usable].map(name => this.componentChoice(this.catalogueEntry(name)));
     // Actions list Assimbly's own Actions first, as the step picker does.
-    const choices: ComponentChoice[] = this.stepType === 'ACTION' ? essentialsFirst(usableChoices) : usableChoices;
+    let choices: ComponentChoice[] = this.stepType === 'ACTION' ? essentialsFirst(usableChoices) : usableChoices;
     if (this.componentSearch.trim()) {
       const others = this.components.types.filter(type => !usable.has(type.name));
       searchCatalogue(others, this.componentSearch).forEach(entry =>
         choices.push(this.componentChoice(entry, roleMismatch(entry, this.role) ?? `${entry.title ?? entry.name} isn't available for this Step.`)),
       );
+      // ng-select only filters, so the closest match is put on top here; at equal closeness usable components stay first.
+      choices = closestFirst(choices, this.componentSearch);
     }
     this.componentChoicesCache = { names, role: this.role, search: this.componentSearch, choices };
     return choices;
@@ -274,13 +288,17 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   }
 
   optionSchema(idx: number): OptionSchema | undefined {
-    const key = (this.stepForm.get('options') as FormArray)?.at(idx)?.get('key')?.value;
+    const key = this.optionKey(idx);
     return key ? (this.componentOptions ?? []).find(option => option.name === key) : undefined;
+  }
+
+  private optionKey(idx: number): string | undefined {
+    return (this.stepForm.get('options') as FormArray)?.at(idx)?.get('key')?.value ?? undefined;
   }
 
   /** The field for an Option's value; a placeholder such as `{{flag}}` in a boolean Option keeps a text field. */
   valueField(idx: number): ValueField {
-    const field = valueFieldOf(this.optionSchema(idx));
+    const field = valueFieldOf(this.optionSchema(idx) ?? { name: this.optionKey(idx) });
     const value = this.optionValue(idx);
     return field === 'switch' && value !== '' && value !== 'true' && value !== 'false' ? 'text' : field;
   }
@@ -313,7 +331,7 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
 
   /** The enum values, plus a value typed earlier that the catalogue doesn't list, such as a placeholder. */
   choicesOf(idx: number): readonly string[] {
-    const values = this.optionSchema(idx)?.enum ?? [];
+    const values = valueChoicesOf(this.optionSchema(idx) ?? { name: this.optionKey(idx) });
     const value = this.optionValue(idx);
     return value && !values.includes(value) ? [...values, value] : values;
   }
@@ -354,7 +372,16 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
         if (this.stepOptions[row]) {
           this.stepOptions[row].key = name;
         }
+        this.fillDefaultLanguage(row);
       });
+  }
+
+  /** A `language` Option starts on Simple, so the language is in plain sight. */
+  private fillDefaultLanguage(idx: number): void {
+    const value = (this.stepForm.get('options') as FormArray).at(idx).get('value')!;
+    if (this.optionKey(idx) === LANGUAGE_OPTION && !value.value) {
+      value.setValue(DEFAULT_LANGUAGE);
+    }
   }
 
   ngOnDestroy(): void {
@@ -754,6 +781,7 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
     } else {
       (formOptions.at(optionIndex) as FormGroup).controls.defaultValue.patchValue('');
     }
+    this.fillDefaultLanguage(optionIndex);
   }
 
   addOptionTag = (name): any => {

@@ -63,8 +63,22 @@ export function groupOptions<T extends OptionSchema>(properties: T[], role: Endp
     );
 }
 
+/** The Option that picks the expression language of steps such as Set header and Set body. */
+export const LANGUAGE_OPTION = 'language';
+/** The expression languages a `language` Option offers; Simple is the default. */
+export const EXPRESSION_LANGUAGES: readonly string[] = ['constant', 'simple', 'groovy', 'xpath', 'jsonpath', 'header', 'exchangeProperty', 'javascript'];
+export const DEFAULT_LANGUAGE = 'simple';
+
+/** The values an Option's value is chosen from: its enum, or the expression languages for a `language` Option without one. */
+export function valueChoicesOf(option: Pick<OptionSchema, 'enum'> & { name?: string }): readonly string[] {
+  if (option.enum?.length) {
+    return option.enum;
+  }
+  return option.name === LANGUAGE_OPTION ? EXPRESSION_LANGUAGES : [];
+}
+
 /** The field an Option's value is entered in, from its type. An Option the schema doesn't know gets a text field. */
-export function valueFieldOf(option: Pick<OptionSchema, 'type' | 'enum' | 'secret'> | undefined): ValueField {
+export function valueFieldOf(option: (Pick<OptionSchema, 'type' | 'enum' | 'secret'> & { name?: string }) | undefined): ValueField {
   if (option?.secret) {
     return 'secret';
   }
@@ -77,7 +91,7 @@ export function valueFieldOf(option: Pick<OptionSchema, 'type' | 'enum' | 'secre
     case 'number':
       return 'number';
     default:
-      return option?.enum?.length ? 'choice' : 'text';
+      return option && valueChoicesOf(option).length ? 'choice' : 'text';
   }
 }
 

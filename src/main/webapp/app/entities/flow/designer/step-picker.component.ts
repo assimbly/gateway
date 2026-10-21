@@ -47,6 +47,9 @@ export const RECENT = 'recent';
 const RECENT_KEY = 'step-picker.recent';
 const RECENT_MAX = 8;
 const CHIPS_SHOWN = 6;
+/** The menu always opens below the +; it shrinks to the room left in the window, but not below this. */
+const MIN_MENU_HEIGHT = 240;
+const MENU_MARGIN = 12;
 
 /** Entries the designer offers that aren't Camel components of their own. */
 const DESIGNER_ENTRIES: Record<string, CatalogueEntry> = {
@@ -80,6 +83,7 @@ export class StepPickerComponent implements OnChanges {
   @Output() picked = new EventEmitter<{ kind: PickedKind; componentType: string }>();
 
   @ViewChild('search') search?: ElementRef<HTMLInputElement>;
+  @ViewChild('toggle') toggle?: ElementRef<HTMLButtonElement>;
   @ViewChild(NgbDropdown) dropdown?: NgbDropdown;
 
   readonly labels: Record<PickedKind, string> = { ACTION: 'Action', ROUTER: 'Router', SINK: 'Sink' };
@@ -96,6 +100,8 @@ export class StepPickerComponent implements OnChanges {
   category: string | null = null;
   showAllCategories = false;
   recent: string[] = readRecent();
+  /** The menu's height limit, so it fits below the + where the window allows. */
+  maxHeight?: number;
 
   ngOnChanges(): void {
     this.chipsByKind.clear();
@@ -184,6 +190,8 @@ export class StepPickerComponent implements OnChanges {
       this.category = null;
       this.showAllCategories = false;
       this.recent = readRecent();
+      const below = window.innerHeight - (this.toggle?.nativeElement.getBoundingClientRect().bottom ?? 0) - MENU_MARGIN;
+      this.maxHeight = Math.max(MIN_MENU_HEIGHT, below);
       // The field can only take focus once the open menu is rendered. Without preventScroll the browser would
       // scroll the canvas to show the field, which throws off where Foblex draws Links.
       afterNextRender(() => this.search?.nativeElement.focus({ preventScroll: true }), { injector: this.injector });

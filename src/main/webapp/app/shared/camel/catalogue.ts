@@ -73,11 +73,25 @@ export function searchCatalogue<T extends CatalogueEntry>(entries: T[], query: s
   if (!query.trim()) {
     return entries;
   }
+  return closestFirst(entries, query).filter(entry => matchRank(entry, query) < NO_MATCH);
+}
+
+/**
+ * The entries sorted by how closely they match the query, keeping their order otherwise; entries that don't match go
+ * last. Within a rank, a shorter matching id or title comes first, so `fil` finds `file` before `filter`.
+ */
+export function closestFirst<T extends CatalogueEntry>(entries: T[], query: string): T[] {
+  const q = query.trim().toLowerCase();
   return entries
-    .map(entry => ({ entry, rank: matchRank(entry, query) }))
-    .filter(ranked => ranked.rank < NO_MATCH)
-    .sort((a, b) => a.rank - b.rank)
+    .map(entry => ({ entry, rank: matchRank(entry, q), length: matchLength(entry, q) }))
+    .sort((a, b) => a.rank - b.rank || a.length - b.length)
     .map(ranked => ranked.entry);
+}
+
+/** The length of the shortest id or title that contains the query; 0 when only the description does. */
+function matchLength(entry: CatalogueEntry, q: string): number {
+  const lengths = [entry.name, entry.title ?? ''].filter(name => name.toLowerCase().includes(q)).map(name => name.length);
+  return lengths.length ? Math.min(...lengths) : 0;
 }
 
 export const NO_MATCH = 4;

@@ -209,6 +209,23 @@ describe('Flow editor Component Step', () => {
     expect(fixture.componentInstance.valueField(0)).toBe('text');
   });
 
+  it('offers the expression languages for a language Option', () => {
+    render('setheader', 'setheader:name', [{ key: 'language', value: 'jsonpath' }]);
+
+    const select: HTMLSelectElement = fixture.nativeElement.querySelector('#field_options-value-1-0');
+    const choices = Array.from(select.options).map(option => option.textContent?.trim());
+    expect(choices).toEqual(expect.arrayContaining(['constant', 'simple', 'groovy', 'xpath', 'jsonpath']));
+    expect(select.options[select.selectedIndex].textContent?.trim()).toBe('jsonpath');
+  });
+
+  it('starts a language Option on Simple', () => {
+    render('setheader', 'setheader:name', [{ key: 'language', value: '' }]);
+
+    fixture.componentInstance.changeOptionSelection('language', 0);
+
+    expect(fixture.componentInstance.optionValue(0)).toBe('simple');
+  });
+
   function menuItem(row: number, text: string): HTMLButtonElement {
     const toggle: HTMLButtonElement = fixture.nativeElement.querySelectorAll('.option-row [aria-label="More for this option"]')[row];
     toggle.click();

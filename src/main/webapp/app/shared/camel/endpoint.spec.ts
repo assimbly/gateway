@@ -60,6 +60,7 @@ describe('Endpoint editing', () => {
       [{ type: 'number' }, 'number'],
       [{ type: 'string', secret: true }, 'secret'],
       [{ type: 'string' }, 'text'],
+      [{ name: 'language', type: 'string' }, 'choice'],
       [{ type: 'duration' }, 'text'],
       [undefined, 'text'],
     ] as const)('gives an Option of %o a %s field', (option, field) => {

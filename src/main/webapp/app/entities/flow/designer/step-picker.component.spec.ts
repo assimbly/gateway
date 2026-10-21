@@ -14,10 +14,12 @@ describe('Step picker', () => {
     picker.components = { actions: ['azure-files', 'file', 'log', 'setbody'], sinks: ['azure-files', 'file', 'ftp'] };
   });
 
-  it('lists an exact match first, then the names that start with the search', () => {
+  it('lists an exact match first, then the names that start with the search, shortest first', () => {
     picker.filter = 'f';
+    expect(picker.matches('SINK')).toEqual(['ftp', 'file', 'azure-files']);
 
-    expect(picker.matches('SINK')).toEqual(['file', 'ftp', 'azure-files']);
+    picker.filter = 'file';
+    expect(picker.matches('SINK')).toEqual(['file', 'azure-files', 'ftp']);
   });
 
   it('picks the first match of the chosen kind on Enter', () => {
