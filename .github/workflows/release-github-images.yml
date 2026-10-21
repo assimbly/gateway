@@ -116,7 +116,8 @@ jobs:
           MODULE: ${{ inputs.module }}
           VERSION_TAG: ${{ inputs.tag }}
           REGISTRY_USER: ${{ github.actor }}
-          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Pushes with the RELEASE_TOKEN PAT: GITHUB_TOKEN has no write access to these existing packages
+          REGISTRY_TOKEN: ${{ secrets.RELEASE_TOKEN }}
           # build.gradle reads GITHUB_ACTOR/GITHUB_TOKEN to resolve dependencies from maven.pkg.github.com
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
