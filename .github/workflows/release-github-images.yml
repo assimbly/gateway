@@ -117,6 +117,8 @@ jobs:
           VERSION_TAG: ${{ inputs.tag }}
           REGISTRY_USER: ${{ github.actor }}
           REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # build.gradle reads GITHUB_ACTOR/GITHUB_TOKEN to resolve dependencies from maven.pkg.github.com
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ./gradlew clean bootJar jib \
             -Djib.to.image="ghcr.io/assimbly/${IMAGE}:${VERSION_TAG}" \
