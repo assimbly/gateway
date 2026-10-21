@@ -26,10 +26,10 @@
       <span class="badge text-bg-secondary" [ngbTooltip]="draftReason()">Draft</span>
     }
     @if (flowId()) {
-      <span class="flow-editor-header__counter"
+      <span class="flow-editor-header__counter" data-tour="flow-completed"
         >Completed <strong>{{ completedLabel() }}</strong></span
       >
-      <span class="flow-editor-header__counter"
+      <span class="flow-editor-header__counter" data-tour="flow-failed"
         >Failed <strong>{{ failedLabel() }}</strong></span
       >
     }
@@ -38,7 +38,7 @@
 
   <div class="flow-editor-header__actions">
     @if (flowId()) {
-      <button type="button" class="btn btn-fx btn-fx-ghost" (click)="openLog()" ngbTooltip="What this Flow logged">
+      <button type="button" class="btn btn-fx btn-fx-ghost" data-tour="flow-log" (click)="openLog()" ngbTooltip="What this Flow logged">
         <fa-icon icon="file-alt" /><span>Log</span>
       </button>
     }
@@ -48,18 +48,33 @@
       </button>
     </span>
     @if (running()) {
-      <button type="button" class="btn btn-fx" [ngClass]="toneClass()" [disabled]="busy()" (click)="stop()" [ngbTooltip]="state().label">
+      <button
+        type="button"
+        class="btn btn-fx"
+        data-tour="flow-stop"
+        [ngClass]="toneClass()"
+        [disabled]="busy()"
+        (click)="stop()"
+        [ngbTooltip]="state().label"
+      >
         <fa-icon icon="stop" /><span>Stop</span>
       </button>
     } @else {
       <span [ngbTooltip]="startBlocked() ?? (flowId() ? state().label : '')">
-        <button type="button" class="btn btn-fx" [ngClass]="toneClass()" [disabled]="busy() || startBlocked() !== null" (click)="start()">
+        <button
+          type="button"
+          class="btn btn-fx"
+          data-tour="flow-start"
+          [ngClass]="toneClass()"
+          [disabled]="busy() || startBlocked() !== null"
+          (click)="start()"
+        >
           <fa-icon icon="play" /><span>Start</span>
         </button>
       </span>
     }
     <div class="btn-group" ngbDropdown placement="bottom-end" container="body">
-      <button type="button" class="btn btn-fx btn-fx-primary" [disabled]="saving()" (click)="save.emit()">
+      <button type="button" class="btn btn-fx btn-fx-primary" data-tour="flow-save" [disabled]="saving()" (click)="save.emit()">
         <fa-icon icon="save" /><span>Save</span>
       </button>
       <button

@@ -89,8 +89,8 @@ export class FlowService {
   }
 
   /** The Flow with this name, or a 404 when there is none. */
-  findByName(name: string): Observable<EntityResponseType> {
-    return this.http.get<IFlow>(`${this.resourceUrl}/byname`, { params: new HttpParams().set('name', name), observe: 'response' });
+  findByName(name: string, context?: HttpContext): Observable<EntityResponseType> {
+    return this.http.get<IFlow>(`${this.resourceUrl}/byname`, { params: new HttpParams().set('name', name), observe: 'response', context });
   }
 
   query(req?: any): Observable<EntityArrayResponseType> {
@@ -212,15 +212,16 @@ export class FlowService {
     return this.http.get(`${this.integrationUrl}/flow/${flowId}/stop`, { observe: 'response', responseType: 'text', context: OWN_ERRORS });
   }
 
-  getFlowStatus(flowId: number): Observable<HttpResponse<string>> {
-    return this.http.get(`${this.integrationUrl}/flow/${flowId}/status`, { observe: 'response', responseType: 'text' });
+  getFlowStatus(flowId: number, context?: HttpContext): Observable<HttpResponse<string>> {
+    return this.http.get(`${this.integrationUrl}/flow/${flowId}/status`, { observe: 'response', responseType: 'text', context });
   }
 
   /** Transactions count each message once, however many steps it passes. */
-  getFlowTransactions(flowId: number): Observable<HttpResponse<{ flow: IFlowCounts }>> {
+  getFlowTransactions(flowId: number, context?: HttpContext): Observable<HttpResponse<{ flow: IFlowCounts }>> {
     return this.http.get<{ flow: IFlowCounts }>(`${this.integrationUrl}/flow/${flowId}/transactions`, {
       headers: new HttpHeaders({ Accept: 'application/json' }),
       observe: 'response',
+      context,
     });
   }
 
@@ -229,11 +230,17 @@ export class FlowService {
     return this.http.delete<void>(`${this.resourceUrl}/${flowId}/alerts`, { observe: 'response' });
   }
 
-  getFlowAlertsPage(flowId: number, offset: number, limit: number): Observable<HttpResponse<{ total: number; messages: string[] }>> {
+  getFlowAlertsPage(
+    flowId: number,
+    offset: number,
+    limit: number,
+    context?: HttpContext,
+  ): Observable<HttpResponse<{ total: number; messages: string[] }>> {
     const params = new HttpParams().set('offset', offset).set('limit', limit);
     return this.http.get<{ total: number; messages: string[] }>(`${this.resourceUrl}/${flowId}/alerts`, {
       params,
       observe: 'response',
+      context,
     });
   }
 

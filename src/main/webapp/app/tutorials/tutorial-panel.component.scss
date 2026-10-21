@@ -1,0 +1,244 @@
+:host {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: 24rem;
+  height: 100vh;
+  background: var(--app-surface);
+  color: var(--app-text);
+  border-left: 1px solid var(--app-border);
+}
+
+// next to a narrow page the panel lies over it
+@media (max-width: 991.98px) {
+  :host {
+    position: fixed;
+    inset: 0 0 0 auto;
+    z-index: 1035;
+    // 100% of the viewport without its scrollbar, which 100vw includes
+    width: min(24rem, 100%);
+    box-shadow: -0.5rem 0 1.5rem rgb(0 0 0 / 20%);
+  }
+}
+
+.tutorial-panel__header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.5rem;
+  height: 3.5rem;
+  padding: 0 0.75rem 0 1rem;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.tutorial-panel__title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  font-size: 1rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tutorial-panel__progress {
+  flex-shrink: 0;
+  height: 3px;
+  background: var(--app-border);
+}
+
+.tutorial-panel__progress-bar {
+  height: 100%;
+  background: var(--app-primary);
+  transition: width 0.2s ease;
+}
+
+.tutorial-panel__content {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.tutorial-panel__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tutorial-panel__choice {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--app-border);
+  border-radius: 0.25rem;
+  background: var(--app-surface-elevated);
+  color: inherit;
+  text-align: left;
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--app-primary);
+    background: var(--app-hover);
+  }
+}
+
+.tutorial-panel__choice-title {
+  font-weight: 600;
+}
+
+.tutorial-panel__choice-meta,
+.tutorial-panel__step-count {
+  color: var(--app-text-muted);
+  font-size: 0.875rem;
+}
+
+.tutorial-panel__step-title {
+  margin: 0.25rem 0 0.75rem;
+  font-size: 1.25rem;
+}
+
+.tutorial-panel__hint {
+  margin: 1rem 0 0;
+  padding: 0.5rem 0.75rem;
+  border-left: 3px solid var(--app-info);
+  background: var(--app-code-bg);
+  font-size: 0.875rem;
+}
+
+.tutorial-panel__footer {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--app-border);
+}
+
+.tutorial-panel__status {
+  font-size: 0.875rem;
+}
+
+.tutorial-panel__done {
+  color: var(--app-success);
+  font-weight: 600;
+}
+
+.tutorial-panel__nav {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+// the rendered Markdown
+.tutorial-panel__body {
+  font-size: 0.9375rem;
+  line-height: 1.55;
+
+  ::ng-deep {
+    h2,
+    h3,
+    h4 {
+      margin: 1rem 0 0.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    p,
+    ul,
+    ol,
+    table,
+    pre,
+    blockquote {
+      margin-bottom: 0.75rem;
+    }
+
+    ul,
+    ol {
+      padding-left: 1.25rem;
+    }
+
+    li + li {
+      margin-top: 0.25rem;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      margin: 0.25rem 0;
+      border: 1px solid var(--app-border);
+      border-radius: 0.25rem;
+    }
+
+    code {
+      padding: 0.1rem 0.25rem;
+      border-radius: 0.2rem;
+      background: var(--app-code-bg);
+      color: inherit;
+      font-size: 0.85em;
+    }
+
+    pre {
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.25rem;
+      background: var(--app-code-bg);
+      white-space: pre-wrap;
+
+      code {
+        padding: 0;
+        background: none;
+      }
+    }
+
+    blockquote {
+      padding: 0.5rem 0.75rem;
+      border-left: 3px solid var(--app-border);
+      color: var(--app-text-muted);
+
+      p:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    table {
+      width: 100%;
+      font-size: 0.875rem;
+
+      th,
+      td {
+        padding: 0.25rem 0.5rem 0.25rem 0;
+        border-bottom: 1px solid var(--app-border);
+        vertical-align: top;
+      }
+    }
+
+    .tutorial-show {
+      display: inline-flex;
+      align-items: center;
+      margin-left: 0.25rem;
+      padding: 0 0.5rem;
+      border: 1px solid var(--app-primary);
+      border-radius: 1rem;
+      background: transparent;
+      color: var(--app-primary-accessible);
+      font-size: 0.8125rem;
+      line-height: 1.5rem;
+      white-space: nowrap;
+      vertical-align: baseline;
+
+      &:hover,
+      &:focus-visible {
+        background: var(--app-primary);
+        color: var(--app-primary-contrast);
+      }
+    }
+  }
+}

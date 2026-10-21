@@ -1,0 +1,16 @@
+[
+  {
+    "id": "quick-start",
+    "title": "Quick start",
+    "minutes": 10,
+    "fixtures": {
+      "ExampleFlow": "ExampleFlow.xml"
+    }
+  },
+  {
+    "id": "tutorial1",
+    "title": "Tutorial 1: Your first Flow and debugging it",
+    "minutes": 20,
+    "fixtures": {}
+  }
+]

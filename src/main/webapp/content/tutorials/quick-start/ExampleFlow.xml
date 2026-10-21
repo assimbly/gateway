@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ExampleFlow, the Flow a new Gateway creates on its first start. Import it on Flows > Manage when your Gateway doesn't have it. -->
+<dil>
+  <integrations>
+    <integration>
+      <id>1</id>
+      <name>quick-start</name>
+      <type>FULL</type>
+      <flows>
+        <flow>
+          <id>example-flow</id>
+          <name>ExampleFlow</name>
+          <type>flow</type>
+          <version>1</version>
+          <options>
+            <autostart>false</autostart>
+            <parallelProcessing>false</parallelProcessing>
+            <maximumRedeliveries>0</maximumRedeliveries>
+            <redeliveryDelay>3000</redeliveryDelay>
+            <logLevel>OFF</logLevel>
+          </options>
+          <notes>An example to start from: it logs "Example flow running" once when started. Start it and check the log.</notes>
+          <steps>
+            <step>
+              <id>source</id>
+              <type>source</type>
+              <uri>once:example</uri>
+              <coordinates><x>0</x><y>0</y></coordinates>
+              <options><body>Example flow running</body></options>
+              <links><link><id>sink</id><bound>out</bound><transport>sync</transport></link></links>
+            </step>
+            <step>
+              <id>sink</id>
+              <type>sink</type>
+              <uri>log:ExampleFlow</uri>
+              <coordinates><x>200</x><y>0</y></coordinates>
+              <options><showBody>true</showBody></options>
+              <links><link><id>sink</id><bound>in</bound><transport>sync</transport></link></links>
+            </step>
+            <step>
+              <id>error</id>
+              <type>error</type>
+              <uri>log:ExampleFlow</uri>
+              <options><level>ERROR</level><showAll>true</showAll></options>
+            </step>
+          </steps>
+        </flow>
+      </flows>
+    </integration>
+  </integrations>
+  <core/>
+</dil>

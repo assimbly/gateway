@@ -14,7 +14,7 @@ const environment = {
 };
 
 module.exports = {
-  transformIgnorePatterns: ['node_modules/(?!.*\\.mjs$|dayjs/esm)'],
+  transformIgnorePatterns: ['node_modules/(?!.*\\.mjs$|dayjs/esm|marked)'],
   preset: 'jest-preset-angular',
   setupFilesAfterEnv: ['<rootDir>/src/main/webapp/setup-jest.ts'],
   globals: {

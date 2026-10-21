@@ -1,0 +1,107 @@
+@let tutorial = tutorials.tutorial();
+@let step = tutorials.step();
+
+<header class="tutorial-panel__header">
+  @if (tutorial) {
+    <button
+      type="button"
+      class="btn btn-fx btn-fx-sm btn-fx-icon btn-fx-ghost"
+      aria-label="All tutorials"
+      title="All tutorials"
+      (click)="tutorials.leave()"
+    >
+      <fa-icon icon="arrow-left" />
+    </button>
+  }
+  <h2 class="tutorial-panel__title" id="tutorial-panel-title">{{ tutorial ? tutorial.title : 'Tutorials' }}</h2>
+  <button type="button" class="btn-close" aria-label="Close tutorials" (click)="panel.close()"></button>
+</header>
+
+@if (tutorials.error(); as error) {
+  <div class="alert alert-warning m-3 mb-0" role="alert">{{ error }}</div>
+}
+
+@if (!tutorial) {
+  <div class="tutorial-panel__content">
+    <p class="text-muted">Learn the Gateway by doing: each tutorial walks you through it here, next to the screens it's about.</p>
+    <ul class="tutorial-panel__list">
+      @for (summary of tutorials.summaries(); track summary.id) {
+        <li>
+          <button type="button" class="tutorial-panel__choice" (click)="tutorials.start(summary.id)">
+            <span class="tutorial-panel__choice-title">{{ summary.title }}</span>
+            <span class="tutorial-panel__choice-meta">
+              About {{ summary.minutes }} minutes
+              @if (tutorials.isFinished(summary.id)) {
+                · <fa-icon icon="check" /> Done
+              } @else if (tutorials.isStarted(summary.id)) {
+                · In progress
+              }
+            </span>
+          </button>
+        </li>
+      }
+    </ul>
+  </div>
+} @else if (step) {
+  @let index = tutorials.stepIndex();
+  @let count = tutorial.steps.length;
+
+  <div class="tutorial-panel__progress" role="progressbar" [attr.aria-valuenow]="index + 1" aria-valuemin="1" [attr.aria-valuemax]="count">
+    <div class="tutorial-panel__progress-bar" [style.width.%]="((index + 1) / count) * 100"></div>
+  </div>
+
+  <div class="tutorial-panel__content">
+    @for (missing of tutorials.missingFixtures(); track missing) {
+      <div class="alert alert-info d-flex align-items-center gap-2" role="status">
+        <span class="flex-grow-1"
+          >This tutorial uses the Flow <strong>{{ missing }}</strong
+          >, which this Gateway doesn't have.</span
+        >
+        <button
+          type="button"
+          class="btn btn-fx btn-fx-sm btn-fx-primary"
+          [disabled]="tutorials.addingFixture() === missing"
+          (click)="tutorials.addFixture(missing)"
+        >
+          Add {{ missing }}
+        </button>
+      </div>
+    }
+
+    @if (index > 0) {
+      <div class="tutorial-panel__step-count">Step {{ index }} of {{ count - 1 }}</div>
+      <h3 class="tutorial-panel__step-title">{{ step.title }}</h3>
+    }
+
+    <div class="tutorial-panel__body" [innerHTML]="html()" (click)="onBodyClick($event)"></div>
+
+    @if (notFound()) {
+      <p class="tutorial-panel__hint" role="status">
+        <fa-icon icon="info-circle" /> That isn't on this page. Follow the step to get there first, then click
+        <strong>Show me</strong> again.
+      </p>
+    }
+  </div>
+
+  <footer class="tutorial-panel__footer">
+    <div class="tutorial-panel__status" aria-live="polite">
+      @if (tutorials.stepDone() && step.check) {
+        <span class="tutorial-panel__done"><fa-icon icon="check" /> Done</span>
+      } @else if (tutorials.checking()) {
+        <span class="text-muted"><fa-icon icon="spinner" animation="spin" /> Ticks off once you've done it</span>
+      }
+    </div>
+    <div class="tutorial-panel__nav">
+      <button type="button" class="btn btn-fx btn-fx-ghost" [disabled]="index === 0" (click)="tutorials.previous()">Back</button>
+      <button
+        type="button"
+        class="btn btn-fx"
+        [class.btn-fx-primary]="tutorials.stepDone() || !step.check"
+        [class.btn-fx-secondary]="!tutorials.stepDone() && step.check"
+        (click)="tutorials.next()"
+      >
+        {{ index === 0 ? 'Start' : tutorials.isLast() ? 'Finish' : 'Next' }}
+      </button>
+    </div>
+  </footer>
+}

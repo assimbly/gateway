@@ -12,6 +12,8 @@ import { ThemeService } from 'app/core/theme';
 import { TranslateDirective } from 'app/shared/language';
 import FooterComponent from '../footer/footer.component';
 import PageRibbon from '../profiles/page-ribbon';
+import { TutorialPanelComponent } from 'app/tutorials/tutorial-panel.component';
+import { TutorialPanelState } from 'app/tutorials/tutorial-panel.state';
 import { ProfileService } from '../profiles/profile.service';
 import { LayoutService } from './layout.service';
 
@@ -23,7 +25,7 @@ const PASSWORD_PAGE = '/account/password';
   templateUrl: './main.html',
   styleUrl: './main.scss',
   providers: [AppPageTitleStrategy],
-  imports: [RouterOutlet, RouterLink, FontAwesomeModule, FooterComponent, PageRibbon, TranslateDirective],
+  imports: [RouterOutlet, RouterLink, FontAwesomeModule, FooterComponent, PageRibbon, TranslateDirective, TutorialPanelComponent],
   host: {
     class: 'app-shell',
     '[class.app-shell--collapsed]': 'layout.iconOnly()',
@@ -33,6 +35,7 @@ const PASSWORD_PAGE = '/account/password';
 })
 export default class Main implements OnInit {
   readonly layout = inject(LayoutService);
+  readonly tutorialPanel = inject(TutorialPanelState);
   readonly sidebarVisible = computed(() => this.accountService.isAuthenticated());
   /** Whether the Gateway lets anyone create an account; otherwise an administrator adds users. */
   readonly registration = toSignal(

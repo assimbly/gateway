@@ -363,6 +363,25 @@
   </nav>
 
   @if (accountRef !== null) {
+    @if (type === 'INTEGRATION' || type === 'FULL') {
+      <button
+        type="button"
+        class="app-sidebar__link"
+        [class.active]="tutorialPanel.open()"
+        [attr.aria-pressed]="tutorialPanel.open()"
+        [attr.aria-label]="iconOnly ? 'Tutorials' : null"
+        [ngbTooltip]="iconOnly ? 'Tutorials' : ''"
+        [disableTooltip]="!iconOnly"
+        placement="end"
+        (click)="tutorialPanel.toggle(); collapseNavbar()"
+        data-cy="tutorials"
+      >
+        <fa-icon icon="graduation-cap" [fixedWidth]="true" />
+        @if (!iconOnly) {
+          <span class="app-sidebar__label">Tutorials</span>
+        }
+      </button>
+    }
     <a
       class="app-sidebar__link app-sidebar__upgrade"
       routerLink="/fluxygen"

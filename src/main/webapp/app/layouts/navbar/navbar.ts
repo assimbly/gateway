@@ -19,6 +19,7 @@ import { HasAnyAuthorityDirective } from 'app/shared/auth';
 import { TranslateDirective } from 'app/shared/language';
 import { LayoutService } from 'app/layouts/main/layout.service';
 import { ThemeService } from 'app/core/theme';
+import { TutorialPanelState } from 'app/tutorials/tutorial-panel.state';
 
 import { environment } from 'environments/environment';
 
@@ -54,6 +55,7 @@ export default class Navbar implements OnInit {
   readonly account = inject(AccountService).account;
   readonly type = environment.TYPE;
   readonly layout = inject(LayoutService);
+  readonly tutorialPanel = inject(TutorialPanelState);
   private readonly theme = inject(ThemeService);
   readonly brandIcon = computed(() => (this.theme.appearance() === 'dark' ? 'logo_darkmode.svg' : 'logo_lightmode.svg'));
   readonly sidebarVisible = computed(() => this.account() !== null);

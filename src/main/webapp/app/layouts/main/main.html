@@ -47,3 +47,9 @@
     <jhi-footer></jhi-footer>
   </div>
 </div>
+
+@if (sidebarVisible() && tutorialPanel.open()) {
+  @defer {
+    <jhi-tutorial-panel />
+  }
+}

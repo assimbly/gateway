@@ -1,15 +1,22 @@
 # Quick start
 
-Welcome to Assimbly Gateway 6! In about 10 minutes you will have the Gateway running and your first Flow moving files from one folder to another.
+<!-- tutorial: {"id":"quick-start","title":"Quick start","minutes":10,"fixtures":{"ExampleFlow":"ExampleFlow.xml"}} -->
+
+Welcome to Assimbly Gateway 6! In about 10 minutes you will have the Gateway running and see a first Flow at work.
 
 **What you'll do:**
 
 1. Start the Gateway
 2. Sign in
-3. Build a Flow on the visual canvas
-4. Start it and watch a file go through
+3. Open *ExampleFlow*, the Flow every new Gateway comes with
+4. Start it and find its message in the log
+
+<!-- web-only -->
+> You can also follow this guide inside the Gateway: click **Tutorials** in the menu. It shows each step next to the screen it's about and ticks it off once you've done it.
 
 ## Prerequisites
+
+<!-- step: {"skip":true} -->
 
 You need **Java 25** (or newer) and a [release of the Assimbly Gateway](https://github.com/assimbly/gateway/releases). Prefer containers? See [Run with Docker](#run-with-docker) instead.
 
@@ -28,6 +35,8 @@ openjdk version "25" 2025-09-16 LTS
 If it doesn't, install Java 25 from [Adoptium](https://adoptium.net/).
 
 ## 1. Start the Gateway
+
+<!-- step: {"skip":true} -->
 
 Open a terminal, go to the folder that contains the downloaded jar and start it:
 
@@ -49,47 +58,40 @@ Keep the terminal open: the Gateway stops when you close it (press `Ctrl+C` to s
 docker run -p 8088:8088 -v assimbly-data:/data assimbly/gateway-full
 ```
 
-The Gateway is then at **[http://localhost:8088](http://localhost:8088)**. The volume keeps your Flows when the container is replaced. Because the Gateway then runs inside a container, it can only see folders you mount into it. To follow this guide with Docker, add `-v <your folder>/messages:/messages` to the command and use `/messages/in` and `/messages/out` as paths below.
+The Gateway is then at **[http://localhost:8088](http://localhost:8088)**. The volume keeps your Flows when the container is replaced.
 
 ## 2. Sign in
+
+<!-- step: {"skip":true} -->
 
 Sign in with username `admin` and password `admin`.
 
 Because everyone knows that password, the Gateway first asks you to choose your own: type `admin` as the current password, then your new one twice. Until you do, nothing else works.
 
-After that you land on **Flows → Manage**. It's empty, and invites you to create your first Flow.
+After that you land on **Flows → Manage**.
 
 > **Secure by default.** On its first start the Gateway generates its own keys for login tokens and for encrypting secrets, and keeps them in `.assimbly/security/secrets.properties` in your home folder (in `/data` with Docker). Keep that file with your database: without it, the stored secrets can't be read. Registration is off: an administrator adds users under **Administration → Users**.
 
-## 3. Prepare two folders
+## 3. Meet ExampleFlow
 
-The Flow you build picks up files from an `in` folder and drops them in an `out` folder. Create both:
+<!-- step: {"check":"flowExists:ExampleFlow"} -->
 
-**Windows (PowerShell)**
+On its first start the Gateway created *ExampleFlow*, a small Flow to try things out. You find it on **Flows → Manage**. <!-- show: tr[data-flow-name="ExampleFlow"] -->
 
-```powershell
-mkdir C:\messages\in, C:\messages\out
-```
+Each row shows a Flow with its status, the buttons to start and stop it, and how many messages it handled (**Completed**) or failed to handle (**Failed**).
 
-**Linux / macOS**
+> **No ExampleFlow?** The Gateway only creates it when it starts for the first time with an empty database. In the **Tutorials** panel, click **Add ExampleFlow**, or import [ExampleFlow.xml](https://github.com/assimbly/documentation/blob/master/tutorials/v6/quick-start/ExampleFlow.xml) with **Import** on **Flows → Manage**.
 
-```bash
-mkdir -p ~/messages/in ~/messages/out
-```
+## 4. Open it
 
-## 4. Create your first Flow
+1. Click *ExampleFlow* in the list. <!-- show: tr[data-flow-name="ExampleFlow"] td a -->
 
-1. Choose **Visual** (marked *No code · recommended*) on the *Create your first Flow* page. Later you can also use **Add** on the Manage page.
-2. Next to **Flow name** at the top, type `TestFlow`.
-3. Click the **Source** on the canvas. A panel opens on the right where you configure it:
-   * **Component:** `File`
-   * **Path:** the `in` folder, as a full path. Use forward slashes, also on Windows: `C:/messages/in` or `/home/<you>/messages/in`
-4. Click the **+** after the Source and add a **Sink**:
-   * **Component:** `File`
-   * **Path:** the `out` folder: `C:/messages/out` or `/home/<you>/messages/out`
-5. Click **Save**.
+The editor opens. The canvas shows the two Steps of the Flow:
 
-You now have a Flow of two Steps: a Source that receives messages and a Sink that delivers them.
+* The **Source** is where messages enter the Flow. Its Component is **Once**: when the Flow starts, it sends one message with the text `Example flow running`. <!-- show: .flow-step-source -->
+* The **Sink** is where messages leave the Flow. Its Component is **Log Data**: it writes each message it gets to the Gateway log. <!-- show: .flow-step-sink -->
+
+2. Double-click a Step to see its settings in the panel on the right. (Or click **Show editor**.) <!-- show: [aria-controls="flow-designer-panel"] -->
 
 | Term | Meaning |
 |------|---------|
@@ -97,51 +99,52 @@ You now have a Flow of two Steps: a Source that receives messages and a Sink tha
 | **Step** | One block on the canvas: a Source, an Action, a Router or a Sink. |
 | **Component** | The kind of system a Step talks to, such as File, SFTP, HTTP or Kafka. |
 
-**Good to know**
+## 5. Start it
 
-* A Flow that isn't complete yet, for example a Source without a Sink, is saved as a **Draft**. It shows a *Draft* badge in the header and can't be started until it's finished.
-* Errors are handled by the Flow's **Error handler**. For a new Flow it writes the error to the Gateway log. You can change it from the toolbar of the editor.
+<!-- step: {"check":"flowStatus:ExampleFlow:started"} -->
 
-## 5. Start the Flow and test it
+1. Click **Start** at the top right of the editor. <!-- show: [data-tour="flow-start"] -->
 
-1. Click **Start** at the top right of the editor. The button turns green once the Flow is running. (Or use **Save & start** from the menu next to **Save**.)
-2. Put a text file in your `in` folder, for example:
+The button turns green once the Flow is running. Right away the Source sends its message to the Sink, and the **Completed** counter in the header goes up by one. <!-- show: [data-tour="flow-completed"] -->
 
-   **Windows (PowerShell)**
+## 6. Find its message in the log
 
-   ```powershell
-   "Hello Assimbly" | Out-File C:\messages\in\test.txt
-   ```
+<!-- step: {"check":"flowLog:ExampleFlow:Example flow running"} -->
 
-   **Linux / macOS**
+1. Click **Log** in the editor header. <!-- show: [data-tour="flow-log"] -->
 
-   ```bash
-   echo "Hello Assimbly" > ~/messages/in/test.txt
-   ```
+A panel opens with what this Flow logged: that it was started, and the message the Sink wrote, `Example flow running`.
 
-3. Within a second the file is picked up by the Source and appears in the `out` folder.
+> You see the same lines in the terminal where you started the Gateway, and under **Administration → Log viewer**.
 
-In the editor header, the **Completed** counter goes up by one. If something goes wrong, the **Failed** counter goes up and an alert badge appears. Click it to see what happened.
+## 7. Stop it
 
-> Camel's File component moves the files it has picked up to a hidden `.camel` subfolder of the `in` folder, so the same file is not processed twice.
+<!-- step: {"check":"flowStatus:ExampleFlow:stopped"} -->
 
-**Done!** You built and ran your first Flow. Go to **Flows → Manage** to see it in the list, where you can start, pause, stop, clone, export or delete it.
+1. Close the log panel.
+2. Click **Stop** at the top right of the editor. <!-- show: [data-tour="flow-stop"] -->
+
+**Done!** You ran your first Flow. Go to **Flows → Manage** to see it in the list, where you can start, pause, stop, clone, export or delete it.
+
+Next, build a Flow of your own in [Tutorial 1: Your first Flow and debugging it](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow).
 
 ## Troubleshooting
+
+<!-- step: {"skip":true} -->
 
 | Problem | What to check |
 |---------|---------------|
 | `java -version` shows an older version | Install Java 25 and make sure it is the first Java on your `PATH`. |
 | The page doesn't load | Check that the terminal is still running and that you use the right port (`8080` for the jar, `8088` for Docker). |
-| **Start** is disabled | The Flow is a Draft. Hover over the **Draft** badge to see what is missing, such as a Step without a Component or Path. |
-| The Flow runs but no file arrives | Check that both paths exist and are written exactly as you created them. Open the alert badge for the error. |
+| There is no *ExampleFlow* | See *No ExampleFlow?* in [step 3](#3-meet-exampleflow). |
 | The Flow shows *Error* after starting | Click the **Error** badge for the Step that failed to start and the reason. |
 
 ## Next steps
 
+<!-- step: {"skip":true} -->
+
+* Build a Flow that moves files and learn to debug it in [Tutorial 1](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow).
 * Start your next Flow from an example: **Add** offers *Folder to folder*, *Scheduled HTTP call* and *Route by content*.
-* Add an **Action** between the Source and the Sink, for example to change the message with a script or set a header.
-* Add a **Router** to send messages to different Sinks, depending on a condition.
 * Send a test message to a Flow from **Flows → Send**.
 * Design a REST API in **APIs**.
 * Read the [user guide](https://github.com/assimbly/gateway/wiki/user-guide) or follow one of the [tutorials](https://github.com/assimbly/gateway/wiki/tutorials).

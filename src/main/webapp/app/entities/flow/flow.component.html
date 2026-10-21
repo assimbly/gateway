@@ -58,6 +58,7 @@
         jhi-flow-row
         *ngFor="let flow of filteredFlows; trackBy: trackId"
         [flow]="flow"
+        [attr.data-flow-name]="flow.name"
         [handler]="handlers[flow.id!]"
         (runtimeChange)="onRuntimeChange(flow.id!, $event)"
       ></tr>

@@ -32,13 +32,13 @@
 </ng-template>
 
 @if (failure) {
-  <button type="button" class="badge bg-danger text-white border-0" title="Show the error" (click)="openError(errorModal)">
+  <button type="button" class="badge bg-danger text-white border-0" data-tour="flow-error-badge" title="Show the error" (click)="openError(errorModal)">
     <fa-icon icon="exclamation-triangle"></fa-icon>
     Error
   </button>
 }
 @if (numberOfAlerts > 0) {
-  <button type="button" class="badge bg-warning text-dark border-0" (click)="alertsOpen.emit()">
+  <button type="button" class="badge bg-warning text-dark border-0" data-tour="flow-alert-badge" (click)="alertsOpen.emit()">
     <fa-icon icon="exclamation-triangle"></fa-icon>
     Alert ({{ numberOfAlerts }})
   </button>
