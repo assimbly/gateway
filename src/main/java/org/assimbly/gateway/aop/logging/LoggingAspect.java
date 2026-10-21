@@ -52,11 +52,17 @@ public class LoggingAspect {
     }
 
     /**
-     * Pointcut that matches the endpoints returning the tail of the log. Logging their result would write
-     * the tail back into the log, so every refresh of the log viewer would repeat its lines.
+     * Pointcut that matches the calls the UI polls: the tail of the log, a Flow's alerts and stats. Logging the
+     * tail would write it back into the log, so every refresh of the log viewer would repeat its lines; the
+     * other polls would fill the log with the same few lines every few seconds.
      */
-    @Pointcut("execution(* org.assimbly.gateway.web.rest..*.getLog(..))")
-    public void logTailPointcut() {
+    @Pointcut(
+        "execution(* org.assimbly.gateway.web.rest..*.getLog(..))" +
+        " || execution(* org.assimbly.gateway.web.rest..*.getFlowAlerts(..))" +
+        " || execution(* org.assimbly.gateway.service..FlowAlertLogService.page(..))" +
+        " || execution(* org.assimbly.gateway.web.rest..*.get*Stats(..))"
+    )
+    public void pollingPointcut() {
         // Method is empty as this is just a Pointcut, the implementations are in the advices.
     }
 
@@ -104,7 +110,7 @@ public class LoggingAspect {
      * @return result.
      * @throws Throwable throws {@link IllegalArgumentException}.
      */
-    @Around("applicationPackagePointcut() && springBeanPointcut() && !logTailPointcut()")
+    @Around("applicationPackagePointcut() && springBeanPointcut() && !pollingPointcut()")
     public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
         Logger log = logger(joinPoint);
         if (log.isDebugEnabled()) {

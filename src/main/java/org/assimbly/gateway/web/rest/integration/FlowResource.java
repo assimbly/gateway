@@ -182,7 +182,7 @@ public class FlowResource {
         @RequestParam(value = "offset", defaultValue = "0") int offset,
         @RequestParam(value = "limit", defaultValue = "10") int limit
     ) {
-        log.debug("REST request to get alerts for Flow : {}", id);
+        log.trace("REST request to get alerts for Flow : {}", id);
         return ResponseEntity.ok(flowAlertLogService.page(id, offset, limit));
     }
 

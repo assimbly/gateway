@@ -17,7 +17,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** In dev, REST calls are logged with their result, except the log tail: logging it would write the log into the log again. */
+/**
+ * In dev, REST calls are logged with their result, except what the UI polls: the log tail, which would write the log into
+ * the log again, and a Flow's alerts and stats, which would fill the log.
+ */
 class LoggingAspectTest {
 
     private final ListAppender<ILoggingEvent> appender = new ListAppender<>();
@@ -50,6 +53,14 @@ class LoggingAspectTest {
     }
 
     @Test
+    void polledAlertsAndStatsAreNotLogged() {
+        endpoints.getFlowAlerts();
+        endpoints.getJvmStats();
+
+        assertThat(messages()).isEmpty();
+    }
+
+    @Test
     void otherCallsAreLoggedWithTheirResult() {
         endpoints.getFlow();
 
@@ -69,6 +80,14 @@ class LoggingAspectTest {
 
         public String getFlow() {
             return "flow";
+        }
+
+        public String getFlowAlerts() {
+            return "alerts";
+        }
+
+        public String getJvmStats() {
+            return "stats";
         }
     }
 }
