@@ -31,10 +31,10 @@ java -jar gateway-6.0.0.jar
 Or run it with Docker (amd64 and arm64):
 
 ```bash
-docker run -p 8088:8088 -v assimbly-data:/data assimbly/gateway-full
+docker run -p 8080:8088 -p 9001:9001 -v assimbly-data:/data assimbly/gateway-full
 ```
 
-Open [http://localhost:8080](http://localhost:8080) ([http://localhost:8088](http://localhost:8088) with Docker), sign
+Open [http://localhost:8080](http://localhost:8080), sign
 in with `admin` / `admin` and choose your own password. Then click **Tutorials** and run your first Flow in five
 minutes.
 

@@ -17,8 +17,10 @@ import {
   PathPart,
   ValueField,
   groupOptions,
+  pathLabel,
   pathRule,
   requiredOptions,
+  splitHttpUrl,
   suggestedOptions,
   valueChoicesOf,
   valueFieldOf,
@@ -103,6 +105,8 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   @Output() addStep = new EventEmitter<{ step: IStep; index: number; stepType?: StepType }>();
   @Output() addConnection = new EventEmitter<{ step: IStep; index: number }>();
   @Output() componentTypeChange = new EventEmitter<{ step: IStep; index: number; componentType: any }>();
+  /** The Component changed between HTTP and HTTPS to match a pasted URL, keeping the path and Options. */
+  @Output() schemeChange = new EventEmitter<{ step: IStep; index: number }>();
   /** Opens the large Route editor on the Step's form, which holds its Route as `route`, `routeName` and `routeContent`. */
   @Output() createOrEditRoute = new EventEmitter<{ step: IStep; form: FormGroup }>();
   @Output() createOrEditMessage = new EventEmitter<{ step: IStep; control: AbstractControl }>();
@@ -248,6 +252,11 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
       this.pathPartsCache = { syntax, options, parts: syntax ? pathRule(syntax, options).parts : [] };
     }
     return this.pathPartsCache.parts;
+  }
+
+  /** What the Path field is called for this Component, such as Directory Name for File. */
+  get pathFieldLabel(): string {
+    return pathLabel(this.pathParts);
   }
 
   /**
@@ -538,6 +547,23 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
 
   onComponentTypeChange(componentType: any): void {
     this.componentTypeChange.emit({ step: this.step, index: this.index, componentType });
+  }
+
+  /**
+   * A full URL in an HTTP(S) Step, such as one pasted from a browser, becomes the address without its scheme, on the
+   * Component the scheme names; the path and Options stay, as HTTP and HTTPS take the same ones.
+   */
+  normalizeHttpUrl(): void {
+    const split = splitHttpUrl(this.componentType, this.uriValue);
+    if (!split) {
+      return;
+    }
+    this.stepForm.get('uri')?.setValue(split.uri);
+    if (split.componentType !== this.componentType) {
+      this.stepForm.get('componentType')?.setValue(split.componentType);
+      this.step.componentType = split.componentType;
+      this.schemeChange.emit({ step: this.step, index: this.index });
+    }
   }
 
   /** How a script in the chosen language reads the message. */

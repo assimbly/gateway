@@ -41,7 +41,7 @@ It takes about 15 minutes.
 
 1. Click the **Sink** on the canvas. <!-- show: .flow-step-sink --> Its settings open on the right. (Don't see them? Click **Show editor**.)
 2. Click **Component**, type `sjms` and choose **Simple JMS**. <!-- show: [formcontrolname="componentType"] -->
-3. Set **Path** to `OrdersQueue`, the name of the queue. <!-- show: [formcontrolname="uri"] -->
+3. Set **Destination Name** to `OrdersQueue`, the name of the queue. <!-- show: [formcontrolname="uri"] -->
 
 You don't have to create the queue first: the broker creates it the first time a Flow uses it.
 
@@ -75,21 +75,11 @@ A JMS component needs to know which broker to talk to. That's what a **Connectio
 <!-- step: {"check":"queueMessages:OrdersQueue"} -->
 
 1. Click **Save**, <!-- show: [data-tour="flow-save"] --> then **Start**. <!-- show: [data-tour="flow-start"] -->
-2. Put three files in the `in` folder:
+2. Click **Send test message**. <!-- show: [data-tour="flow-send-test"] -->
+3. Under **Body**, type `Order 1` and click **Send**. <!-- show: [title="Send (Ctrl+Enter)"] --> Do the same with `Order 2` and `Order 3`.
+4. Click **Back**.
 
-   **Windows (PowerShell)**
-
-   ```powershell
-   1..3 | ForEach-Object { "Order $_" | Out-File C:\messages\in\order-$_.txt }
-   ```
-
-   **Linux / macOS**
-
-   ```bash
-   for i in 1 2 3; do echo "Order $i" > ~/messages/in/order-$i.txt; done
-   ```
-
-*FileToQueue* picks up the files and puts them on the queue: **Completed** goes to 3. <!-- show: [data-tour="flow-completed"] --> Nobody takes them off yet, because the Flow that does isn't there yet.
+*FileToQueue* picks up the three files and puts them on the queue: **Completed** goes to 3. <!-- show: [data-tour="flow-completed"] --> Nobody takes them off yet, because the Flow that does isn't there yet.
 
 ## Step 5: See the messages wait
 
@@ -111,7 +101,7 @@ The messages stay on the queue until a Flow takes them off.
 2. Next to **Flow name**, type `QueueToFile`. <!-- show: #field_flowName -->
 3. Click the **Source** on the canvas. <!-- show: .flow-step-source -->
 4. Click **Component**, type `sjms` and choose **Simple JMS**. <!-- show: [formcontrolname="componentType"] -->
-5. Set **Path** to `OrdersQueue`. <!-- show: [formcontrolname="uri"] -->
+5. Set **Destination Name** to `OrdersQueue`. <!-- show: [formcontrolname="uri"] -->
 6. Under **Connection**, choose `LocalBroker`. <!-- show: [formcontrolname="connection"] --> You create a Connection once; after that, every Flow can use it.
 
 ![The Source takes messages off OrdersQueue](03-source-queue.png)
@@ -124,13 +114,13 @@ The Sink of this Flow is still the File component of *TestFlow*: it writes to `C
 
 1. Click **Save**, <!-- show: [data-tour="flow-save"] --> then **Start**. <!-- show: [data-tour="flow-start"] -->
 
-*QueueToFile* takes the waiting messages off the queue right away: **Completed** goes to 3. <!-- show: [data-tour="flow-completed"] --> In the `out` folder you now find `order-1.txt`, `order-2.txt` and `order-3.txt`, with their original names.
+*QueueToFile* takes the waiting messages off the queue right away: **Completed** goes to 3. <!-- show: [data-tour="flow-completed"] --> In the `out` folder you now find three files, one for each order.
 
 2. Check **Broker → Endpoints** once more. *OrdersQueue* is empty and has 1 consumer: the running *QueueToFile*.
 
 ![The queue is empty](07-queue-empty.png)
 
-With both Flows running, every new file in the `in` folder travels through the queue to the `out` folder right away. Try it! Or stop *QueueToFile*, drop a few files and watch them wait on the queue until you start it again.
+With both Flows running, every new file in the `in` folder travels through the queue to the `out` folder right away. Try it with **Send test message** on *FileToQueue*! Or stop *QueueToFile*, send a few messages and watch them wait on the queue until you start it again.
 
 When you're done, stop both Flows on **Flows → Manage**.
 
@@ -143,4 +133,7 @@ When you're done, stop both Flows on **Flows → Manage**.
 | Connection *LocalBroker* | **Connection** field of a JMS Step | Tells the JMS component how to reach the broker. Create it once, use it in every Flow. |
 | *OrdersQueue* | **Broker → Endpoints** | Holds the messages until a Flow takes them off. |
 
-**Done!** You built your first Flows with message queueing. Continue with [Tutorial 7: Create a simple route](https://github.com/assimbly/gateway/wiki/tutorial6-simple-route).
+**Done!** You built your first Flows with message queueing.
+
+<!-- web-only -->
+> Continue with [Tutorial 7: Create a simple route](https://github.com/assimbly/gateway/wiki/tutorial6-simple-route).

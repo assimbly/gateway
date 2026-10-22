@@ -94,7 +94,7 @@
                 @for (operation of api.operations; track operation.id) {
                   <tr [class.api-operation--selected]="isSelected(operation)" (click)="select(operation)">
                     <td>
-                      <button type="button" class="btn btn-link p-0" (click)="$event.stopPropagation(); select(operation)"
+                      <button type="button" class="btn btn-link p-0" data-tour="operation-edit" (click)="$event.stopPropagation(); select(operation)"
                               [attr.aria-label]="'Edit ' + operation.method + ' ' + operation.fullPath">
                         <span [class]="methodClass(operation.method)">{{ operation.method }}</span>
                       </button>

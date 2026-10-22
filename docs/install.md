@@ -39,10 +39,12 @@ Keep the terminal open: the Gateway stops when you close it (press `Ctrl+C` to s
 ### Run with Docker
 
 ```
-docker run -p 8088:8088 -v assimbly-data:/data assimbly/gateway-full
+docker run -p 8080:8088 -p 9001:9001 -v assimbly-data:/data assimbly/gateway-full
 ```
 
-The Gateway is then at **[http://localhost:8088](http://localhost:8088)**. The volume keeps your Flows when the container is replaced. The Gateway in the container only sees folders you mount into it, for example `-v <your folder>/messages:/messages`.
+The Gateway is then at **[http://localhost:8080](http://localhost:8080)**, like the jar. Port `9001` serves the REST APIs you create. The volume keeps your Flows when the container is replaced. The Gateway in the container only sees folders you mount into it, for example `-v <your folder>/messages:/messages`.
+
+> Other systems that send messages to the built-in broker need its port too: add `-p 61616:61616`, on a network you trust.
 
 ## Sign in
 
@@ -59,4 +61,4 @@ After that you land on **Flows → Manage**.
 | Problem | What to check |
 |---------|---------------|
 | `java -version` shows an older version | Install Java 25 and make sure it is the first Java on your `PATH`. |
-| The page doesn't load | Check that the terminal is still running and that you use the right port (`8080` for the jar, `8088` for Docker). |
+| The page doesn't load | Check that the terminal is still running and that you use the right port: `8080`, or the one you chose. |

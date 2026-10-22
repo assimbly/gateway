@@ -80,26 +80,24 @@ The Gateway already built the Flow: the **Operation** receives the request and t
 
 ![The API is running](06-api-running.png)
 
-2. Click the path `/greetings/{name}`. <!-- show: [data-tour="operation-url"] --> Your API opens in a new tab of the browser.
-3. The browser warns that the connection isn't private: the Gateway on your own machine uses its own certificate. Click **Advanced** and continue to `localhost`.
+2. Click **GET** in the row of the Operation. <!-- show: [data-tour="operation-edit"] --> Its panel opens on the right.
+3. Under **Try it**, type `World` next to **name**, and click **Send**. <!-- show: [data-tour="api-try-send"] -->
 
-You see:
-
-```json
-{"message": "Hello {name}!"}
-```
-
-4. In the address bar, replace `{name}` with your own name, for example `World`, and press Enter:
+The Gateway calls your API and shows the answer, with status `200`:
 
 ```json
 {"message": "Hello World!"}
 ```
 
+Try your own name too.
+
+> **Call it from outside the Gateway.** Click the path `/greetings/{name}` in the row of the Operation. <!-- show: [data-tour="operation-url"] --> Your API opens in a new tab of the browser. Replace `{name}` in the address bar with a name. The browser warns that the connection isn't private, because the Gateway on your own machine uses its own certificate: click **Advanced** and continue to `localhost`. With Docker, the `docker run` command needs `-p 9001:9001`.
+
 ## Step 5: Export the API as an OpenAPI file
 
 Give the people who will call your API its contract:
 
-1. Back in the Gateway, click **Export OpenAPI** on the API page. <!-- show: #export-openapi -->
+1. Click **Export OpenAPI** on the API page. <!-- show: #export-openapi -->
 2. Choose **Export as YAML**.
 
 You get `Greetings-openapi.yaml`, which starts like this:

@@ -43,7 +43,7 @@
       </button>
     }
     <span [ngbTooltip]="testMessageBlocked() ?? ''">
-      <button type="button" class="btn btn-fx btn-fx-ghost" [disabled]="testMessageBlocked() !== null" (click)="sendTestMessage()">
+      <button type="button" class="btn btn-fx btn-fx-ghost" data-tour="flow-send-test" [disabled]="testMessageBlocked() !== null" (click)="sendTestMessage()">
         <fa-icon icon="paper-plane" /><span>Send test message</span>
       </button>
     </span>

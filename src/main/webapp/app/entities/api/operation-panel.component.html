@@ -218,7 +218,7 @@
     <label class="form-label small mb-0" for="try-body">Body</label>
     <textarea id="try-body" class="form-control form-control-sm font-monospace" rows="5" [(ngModel)]="tryBody"></textarea>
   }
-  <button type="button" class="btn btn-fx btn-fx-secondary btn-fx-sm mt-2" (click)="sendTry()" [disabled]="trying">
+  <button type="button" class="btn btn-fx btn-fx-secondary btn-fx-sm mt-2" data-tour="api-try-send" (click)="sendTry()" [disabled]="trying">
     <fa-icon icon="paper-plane"></fa-icon> Send
   </button>
   @if (tryError) {

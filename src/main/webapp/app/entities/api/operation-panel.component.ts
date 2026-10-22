@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, inject } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -48,6 +48,8 @@ export class OperationPanelComponent implements OnChanges {
 
   private readonly apiService = inject(ApiService);
   private readonly themeService = inject(ThemeService);
+  /** The panel is OnPush: what a request answers is shown once it is marked. */
+  private readonly cdr = inject(ChangeDetectorRef);
 
   readonly methods = METHODS;
   readonly parameterTypes = PARAMETER_TYPES;
@@ -161,10 +163,12 @@ export class OperationPanelComponent implements OnChanges {
       next: saved => {
         this.saving = false;
         this.saved.emit(saved);
+        this.cdr.markForCheck();
       },
       error: error => {
         this.saving = false;
         this.message = errorMessage(error);
+        this.cdr.markForCheck();
       },
     });
   }
@@ -176,7 +180,10 @@ export class OperationPanelComponent implements OnChanges {
     }
     this.apiService.deleteOperation(this.api.id!, operation.id!).subscribe({
       next: () => this.deleted.emit(),
-      error: error => (this.message = errorMessage(error)),
+      error: error => {
+        this.message = errorMessage(error);
+        this.cdr.markForCheck();
+      },
     });
   }
 
@@ -203,10 +210,12 @@ export class OperationPanelComponent implements OnChanges {
         next: result => {
           this.trying = false;
           this.tryResult = result;
+          this.cdr.markForCheck();
         },
         error: error => {
           this.trying = false;
           this.tryError = errorMessage(error);
+          this.cdr.markForCheck();
         },
       });
   }

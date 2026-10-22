@@ -133,10 +133,40 @@ export function pathRule(syntax: string, properties: OptionSchema[]): PathRule {
   const byName = new Map(properties.filter(p => p.kind === 'path').map(p => [p.name, p]));
   const parts = (rest.match(/[A-Za-z0-9_]+/g) ?? []).map(name => {
     const property = byName.get(name);
-    return { name, displayName: property?.displayName ?? name, description: property?.description, required: !!property?.required };
+    return { name, displayName: property?.displayName ?? titleOf(name), description: property?.description, required: !!property?.required };
   });
   const delimiters = [...new Set(rest.replace(/[A-Za-z0-9_]+/g, ''))].join('');
   return { syntax, parts, delimiters };
+}
+
+/** A path part the schema doesn't describe, such as Set header's `headerName`, named as Camel would: Header Name. */
+function titleOf(name: string): string {
+  const words = name.replace(/([a-z0-9])([A-Z])/g, '$1 $2');
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+/**
+ * What the Path field is called for a Component: the name of its path part when a single value fills it, such as
+ * Directory Name for File or Destination Name for JMS (whose optional Destination Type can be left out); otherwise
+ * Path, as a path such as SFTP's `host:port/directoryName` holds several values.
+ */
+export function pathLabel(parts: PathPart[]): string {
+  const last = parts.at(-1);
+  const single = parts.length === 1 || (!!last?.required && parts.filter(part => part.required).length === 1);
+  return single && last ? last.displayName : 'Path';
+}
+
+/**
+ * A full URL in the path of an HTTP or HTTPS Step, such as one pasted from a browser: the address without its
+ * scheme, and the Component that scheme names. Null when the path has no scheme or the Step isn't HTTP(S).
+ */
+export function splitHttpUrl(componentType: string | null | undefined, path: string | null | undefined): { componentType: string; uri: string } | null {
+  const type = componentType?.toLowerCase();
+  const match = /^\s*(https?):\/\/(.*)$/i.exec(path ?? '');
+  if ((type !== 'http' && type !== 'https') || !match) {
+    return null;
+  }
+  return { componentType: match[1].toLowerCase(), uri: match[2].trim() };
 }
 
 /**

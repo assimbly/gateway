@@ -220,7 +220,7 @@
 
         <div class="step-field">
           <div class="step-field__head">
-            <label class="step-field__label" for="field_uri_{{index}}">Path</label>
+            <label class="step-field__label" for="field_uri_{{index}}">{{pathFieldLabel}}</label>
             @if (!pathUnused) {
               <i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="pathPopover" container="body" placement="right">
                 <fa-icon icon="info-circle"></fa-icon>
@@ -236,7 +236,7 @@
             }
           </div>
           <input #uriInput type="text" class="form-control" id="field_uri_{{index}}" [attr.list]="'urilist_' + index"
-                 formControlName="uri" [value]="uriValue"
+                 formControlName="uri" [value]="uriValue" (blur)="normalizeHttpUrl()"
                  [readonly]="pathUnused" [class.step-field__unused]="pathUnused"
                  [attr.placeholder]="pathUnused ? componentLabel + ' has no path' : (autoPath ?? null)"
                  [attr.aria-describedby]="autoPath ? 'field_uri_auto_' + index + ' field_uri_syntax_' + index : 'field_uri_syntax_' + index" />
@@ -257,7 +257,7 @@
             <small class="step-field__hint font-monospace" id="field_uri_syntax_{{index}}">{{uriPlaceholder}}</small>
           }
           @if (formSubmitted && uriErrors?.required) {
-            <div class="invalid-field-message">*Context path is required.</div>
+            <div class="invalid-field-message">*{{pathFieldLabel}} is required.</div>
           }
         </div>
 

@@ -41,7 +41,7 @@ The calculator is a SOAP web service. It only accepts a request when its `Conten
 
 Its settings open on the right:
 
-3. Set **Path**, the name of the header, to `Content-Type`. <!-- show: [formcontrolname="uri"] -->
+3. Set **Header Name** to `Content-Type`. <!-- show: [formcontrolname="uri"] -->
 4. Under **Options**, type `text/xml` next to **Value**. <!-- show: .option-row + .option-row -->
 
 ![Configure the Set header Action](02-set-header.png)
@@ -50,7 +50,7 @@ Its settings open on the right:
 
 1. Click the **+** on the line just before the Sink. <!-- show: .flow-step-sink -->
 2. Type `http` in the search box and choose **HTTP**.
-3. Set **Path** to `www.dneonline.com/calculator.asmx`. <!-- show: [formcontrolname="uri"] -->
+3. Set **Http Uri** to the address of the service, `http://www.dneonline.com/calculator.asmx`. <!-- show: [formcontrolname="uri"] -->
 4. Under **Options**, choose **Http Method** in the list and select **POST**. <!-- show: .option-row -->
 
 ![Configure the HTTP Action](03-http-action.png)
@@ -63,7 +63,8 @@ You save the Flow in the next step, right before you start it.
 
 1. Is *TestFlow* running? Stop it on **Flows → Manage** first, or it picks up the file before *Calculator* can.
 2. In the editor of *Calculator*, click **Save**, <!-- show: [data-tour="flow-save"] --> then **Start**. <!-- show: [data-tour="flow-start"] -->
-3. Save this request as `calculator.xml` in the `C:\messages\in` folder. It asks the service to add 2 and 2:
+3. Click **Send test message**. <!-- show: [data-tour="flow-send-test"] --> The Send page opens with the Source of *Calculator* as destination.
+4. Under **Body**, paste this request. It asks the service to add 2 and 2: <!-- show: .body-codemirror -->
 
    ```xml
    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">
@@ -77,15 +78,17 @@ You save the Flow in the next step, right before you start it.
    </soapenv:Envelope>
    ```
 
-Within a few seconds **Completed** goes up. <!-- show: [data-tour="flow-completed"] -->
+5. Click **Send**, <!-- show: [title="Send (Ctrl+Enter)"] --> then **Back**.
+
+The Gateway writes the request as a file in the `in` folder, and *Calculator* picks it up. Within a few seconds **Completed** goes up. <!-- show: [data-tour="flow-completed"] -->
 
 ![The Flow has processed the request](04-flow-running.png)
 
-> **Failed** went up instead? Click the **Alert** badge. `Connect to http://www.dneonline.com:80 failed` means the free service didn't answer in time: put the file in the `in` folder again.
+> **Failed** went up instead? Click the **Alert** badge. `Connect to http://www.dneonline.com:80 failed` means the free service didn't answer in time: send the message again.
 
 ## Step 5: Read the reply
 
-Open `calculator.xml` in the `C:\messages\out` folder. It now holds the reply of the service:
+Open the newest file in the `C:\messages\out` folder. It holds the reply of the service:
 
 ```xml
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -99,7 +102,7 @@ Open `calculator.xml` in the `C:\messages\out` folder. It now holds the reply of
 
 The answer is in `<AddResult>`: 2 + 2 = 4.
 
-Try other numbers, or change `Add` into `Multiply`, `Subtract` or `Divide` in both tags.
+Try other numbers with **Send test message**, or change `Add` into `Multiply`, `Subtract` or `Divide` in both tags.
 
 When you're done, click **Stop**. <!-- show: [data-tour="flow-stop"] -->
 

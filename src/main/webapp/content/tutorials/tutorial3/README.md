@@ -34,7 +34,7 @@ It takes about 10 minutes.
 
 1. Click the **Source** on the canvas. <!-- show: .flow-step-source --> Its settings open on the right. (Don't see them? Click **Show editor**.)
 2. Click **Component**, type `sched` and choose **Scheduler**. <!-- show: [formcontrolname="componentType"] -->
-3. Set **Path** to `weather`. It's just a name for the scheduler. <!-- show: [formcontrolname="uri"] -->
+3. Set **Name** to `weather`. It's just a name for the scheduler. <!-- show: [formcontrolname="uri"] -->
 4. Under **Options**, choose **Delay** in the list and type `30000`. <!-- show: .option-row -->
 
 ![Configure the Scheduler](01-scheduler-source.png)
@@ -44,11 +44,11 @@ The delay is in milliseconds, so the Flow runs every 30 seconds. The first run s
 ## Step 3: Call the REST API
 
 1. Click the **+** on the line between the Source and the Sink. <!-- show: [aria-label="Insert a Step here"] -->
-2. Type `https` in the search box and choose **HTTPS (Secure)**.
-3. Set **Path** to: <!-- show: [formcontrolname="uri"] -->
+2. Type `http` in the search box and choose **HTTP**.
+3. Set **Http Uri** to the address of the API: <!-- show: [formcontrolname="uri"] -->
 
    ```
-   api.open-meteo.com/v1/forecast?latitude=52.37&longitude=4.89&current=temperature_2m,wind_speed_10m
+   https://api.open-meteo.com/v1/forecast?latitude=52.37&longitude=4.89&current=temperature_2m,wind_speed_10m
    ```
 
    It asks for the current temperature and wind speed in the center of Amsterdam.
@@ -57,7 +57,7 @@ The delay is in milliseconds, so the Flow runs every 30 seconds. The first run s
 
 ![Configure the HTTPS Action](02-https-action.png)
 
-> **HTTP or HTTPS?** Choose the one that matches the address of the API. Open-Meteo uses `https://`, so you choose **HTTPS (Secure)**, and type the address without `https://`.
+> **HTTP or HTTPS?** You don't have to choose. When you click elsewhere, the Step takes `https://` off the address and switches to **HTTPS (Secure)**, the Component that matches it. Paste an address that starts with `http://` and it uses **HTTP**.
 
 ## Step 4: Give the saved file a fixed name
 
@@ -102,7 +102,7 @@ Every 30 seconds the Flow calls the API again and overwrites `weather.json` with
 
 > **No file?** Click the **Alert** badge in the editor header to see the error.
 
-**Try it yourself:** get the weather of your own town. Change `latitude` and `longitude` in the **Path** of the HTTPS Action, click **Save**, then **Stop** and **Start**.
+**Try it yourself:** get the weather of your own town. Change `latitude` and `longitude` in the **Http Uri** of the HTTPS Action, click **Save**, then **Stop** and **Start**.
 
 When you're done, click **Stop**. <!-- show: [data-tour="flow-stop"] --> Otherwise the Flow keeps calling the API.
 

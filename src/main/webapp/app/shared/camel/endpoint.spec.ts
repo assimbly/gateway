@@ -1,4 +1,4 @@
-import { OptionSchema, groupOptions, missingPathParts, pathRule, requiredOptions, suggestedOptions, valueFieldOf } from './endpoint';
+import { OptionSchema, groupOptions, missingPathParts, pathLabel, pathRule, requiredOptions, splitHttpUrl, suggestedOptions, valueFieldOf } from './endpoint';
 
 const sftp: Record<string, Omit<OptionSchema, 'name'>> = {
   host: { kind: 'path', displayName: 'Host', group: 'common', type: 'string', required: true, description: 'Hostname of the FTP server' },
@@ -103,6 +103,51 @@ describe('Endpoint editing', () => {
       const file = pathRule('file:directoryName', [{ name: 'directoryName', kind: 'path', displayName: 'Directory Name', required: true }]);
 
       expect(missingPathParts(file, 'C:\\messages\\in')).toEqual([]);
+    });
+  });
+
+  describe('full URLs in HTTP(S) Steps', () => {
+    it('takes the scheme off and picks the Component it names', () => {
+      expect(splitHttpUrl('http', 'https://api.open-meteo.com/v1/forecast?latitude=52.37')).toEqual({
+        componentType: 'https',
+        uri: 'api.open-meteo.com/v1/forecast?latitude=52.37',
+      });
+      expect(splitHttpUrl('https', ' HTTP://www.dneonline.com/calculator.asmx ')).toEqual({
+        componentType: 'http',
+        uri: 'www.dneonline.com/calculator.asmx',
+      });
+    });
+
+    it('leaves a path without a scheme, or another Component, alone', () => {
+      expect(splitHttpUrl('https', 'api.open-meteo.com/v1/forecast')).toBeNull();
+      expect(splitHttpUrl('file', 'https://example.com')).toBeNull();
+      expect(splitHttpUrl('http', null)).toBeNull();
+    });
+  });
+
+  describe('Path label', () => {
+    it('names the Path field after the one value it takes', () => {
+      expect(pathLabel(pathRule('file:directoryName', [{ name: 'directoryName', kind: 'path', displayName: 'Directory Name' }]).parts)).toBe(
+        'Directory Name',
+      );
+    });
+
+    it('names it after the required last part when the optional parts before it can be left out', () => {
+      const jms = pathRule('jms:destinationType:destinationName', [
+        { name: 'destinationType', kind: 'path', displayName: 'Destination Type', required: false },
+        { name: 'destinationName', kind: 'path', displayName: 'Destination Name', required: true },
+      ]);
+
+      expect(pathLabel(jms.parts)).toBe('Destination Name');
+    });
+
+    it("names a path part the schema doesn't describe after its syntax", () => {
+      expect(pathLabel(pathRule('headerName', []).parts)).toBe('Header Name');
+    });
+
+    it('keeps Path for a path of several values, or none', () => {
+      expect(pathLabel(pathRule('sftp:host:port/directoryName', properties).parts)).toBe('Path');
+      expect(pathLabel([])).toBe('Path');
     });
   });
 
