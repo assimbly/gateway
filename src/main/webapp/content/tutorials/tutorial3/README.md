@@ -32,8 +32,6 @@ It takes about 10 minutes.
 
 ## Step 2: Use a Scheduler as Source
 
-<!-- step: {"check":"flowStep:Weather:scheduler"} -->
-
 1. Click the **Source** on the canvas. <!-- show: .flow-step-source --> Its settings open on the right. (Don't see them? Click **Show editor**.)
 2. Click **Component**, type `sched` and choose **Scheduler**. <!-- show: [formcontrolname="componentType"] -->
 3. Set **Path** to `weather`. It's just a name for the scheduler. <!-- show: [formcontrolname="uri"] -->
@@ -41,13 +39,9 @@ It takes about 10 minutes.
 
 ![Configure the Scheduler](01-scheduler-source.png)
 
-5. Click **Save**. <!-- show: [data-tour="flow-save"] -->
-
 The delay is in milliseconds, so the Flow runs every 30 seconds. The first run starts a second after you start the Flow.
 
 ## Step 3: Call the REST API
-
-<!-- step: {"check":"flowStep:Weather:api.open-meteo.com"} -->
 
 1. Click the **+** on the line between the Source and the Sink. <!-- show: [aria-label="Insert a Step here"] -->
 2. Type `https` in the search box and choose **HTTPS (Secure)**.
@@ -63,8 +57,6 @@ The delay is in milliseconds, so the Flow runs every 30 seconds. The first run s
 
 ![Configure the HTTPS Action](02-https-action.png)
 
-5. Click **Save**. <!-- show: [data-tour="flow-save"] -->
-
 > **HTTP or HTTPS?** Choose the one that matches the address of the API. Open-Meteo uses `https://`, so you choose **HTTPS (Secure)**, and type the address without `https://`.
 
 ## Step 4: Give the saved file a fixed name
@@ -76,13 +68,13 @@ The Sink saves each answer as a new file with a generated name. Give it a fixed 
 
 ![Configure the Sink](03-sink-file-name.png)
 
-3. Click **Save**. <!-- show: [data-tour="flow-save"] -->
+You save the Flow in the next step, right before you start it.
 
-## Step 5: Start the Flow and read the weather
+## Step 5: Save and start the Flow, and read the weather
 
 <!-- step: {"check":"flowCompleted:Weather"} -->
 
-1. Click **Start**. <!-- show: [data-tour="flow-start"] -->
+1. Click **Save**, <!-- show: [data-tour="flow-save"] --> then **Start**. <!-- show: [data-tour="flow-start"] -->
 
 After a second the Flow makes its first call, and **Completed** goes up: <!-- show: [data-tour="flow-completed"] -->
 

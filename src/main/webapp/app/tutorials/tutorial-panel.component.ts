@@ -48,8 +48,13 @@ export class TutorialPanelComponent implements OnInit, OnDestroy {
     clearHighlight();
   }
 
-  /** A Show me button in the step points at its element, with the line it stands in. */
+  /** A Show me button in the step points at its element, with the line it stands in; a value or code block is copied. */
   onBodyClick(event: MouseEvent): void {
+    const copyable = (event.target as Element | null)?.closest<HTMLElement>('[data-tour-copy]');
+    if (copyable) {
+      copy(copyable);
+      return;
+    }
     const button = (event.target as Element | null)?.closest<HTMLElement>('[data-tour-show]');
     const selector = button?.dataset['tourShow'];
     if (!button || !selector) {
@@ -57,6 +62,40 @@ export class TutorialPanelComponent implements OnInit, OnDestroy {
     }
     this.notFound.set(false);
     void highlight(selector, describe(button)).then(found => this.notFound.set(!found));
+  }
+}
+
+/**
+ * Copies a value, or the code block next to a Copy button, to the clipboard. The value is selected as well, so it can
+ * still be copied with Ctrl+C where the browser doesn't give the page the clipboard.
+ */
+function copy(copyable: HTMLElement): void {
+  const button = copyable.matches('button');
+  const source = button ? copyable.parentElement?.querySelector('pre') : copyable;
+  if (!source) {
+    return;
+  }
+  const range = document.createRange();
+  range.selectNodeContents(source);
+  window.getSelection()?.removeAllRanges();
+  window.getSelection()?.addRange(range);
+  const copied = (): void => {
+    copyable.classList.add('is-copied');
+    if (button) {
+      copyable.textContent = 'Copied';
+    }
+    setTimeout(() => {
+      copyable.classList.remove('is-copied');
+      if (button) {
+        copyable.textContent = 'Copy';
+      }
+    }, 1500);
+  };
+  // copying the selection works where the page has no clipboard permission, such as an embedded browser
+  if (document.execCommand('copy')) {
+    copied();
+  } else {
+    void navigator.clipboard?.writeText(source.textContent?.replace(/\n$/, '') ?? '').then(copied, () => undefined);
   }
 }
 

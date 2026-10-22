@@ -198,6 +198,61 @@
       }
     }
 
+    // a value is copied with a click
+    .tutorial-copy {
+      position: relative;
+      cursor: copy;
+
+      &:hover {
+        outline: 1px solid var(--app-primary);
+      }
+
+      &.is-copied::after {
+        content: 'Copied';
+        position: absolute;
+        bottom: calc(100% + 0.25rem);
+        left: 50%;
+        padding: 0 0.375rem;
+        border-radius: 0.25rem;
+        background: var(--app-text);
+        color: var(--app-surface);
+        font-family: var(--bs-body-font-family);
+        font-size: 0.75rem;
+        line-height: 1.25rem;
+        white-space: nowrap;
+        transform: translateX(-50%);
+        pointer-events: none;
+      }
+    }
+
+    .tutorial-code {
+      position: relative;
+
+      pre {
+        padding-right: 4rem;
+      }
+    }
+
+    .tutorial-code__copy {
+      position: absolute;
+      top: 0.375rem;
+      right: 0.375rem;
+      padding: 0 0.5rem;
+      border: 1px solid var(--app-border);
+      border-radius: 0.25rem;
+      background: var(--app-surface);
+      color: var(--app-text-muted);
+      font-size: 0.75rem;
+      line-height: 1.375rem;
+
+      &:hover,
+      &:focus-visible,
+      &.is-copied {
+        border-color: var(--app-primary);
+        color: var(--app-primary-accessible);
+      }
+    }
+
     blockquote {
       padding: 0.5rem 0.75rem;
       border-left: 3px solid var(--app-border);

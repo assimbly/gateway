@@ -59,6 +59,14 @@ describe('parseTutorial', () => {
     expect(button?.dataset['tourShow']).toBe('tr[data-flow-name="ExampleFlow"]');
   });
 
+  it('makes code copyable', () => {
+    const html = htmlOf(parseTutorial(`${MARKDOWN}\nSet **Path** to \`www.dneonline.com\`.\n\n\`\`\`xml\n<a/>\n\`\`\`\n`).steps[2].html);
+    expect(html.querySelector('p code')?.hasAttribute('data-tour-copy')).toBe(true);
+    const block = html.querySelector('.tutorial-code');
+    expect(block?.querySelector('button')?.hasAttribute('data-tour-copy')).toBe(true);
+    expect(block?.querySelector('pre code')?.hasAttribute('data-tour-copy')).toBe(false);
+  });
+
   it('serves images from next to the tutorial and opens other pages in a new tab', () => {
     const html = htmlOf(tutorial.steps[1].html);
     expect(html.querySelector('img')?.getAttribute('src')).toBe('content/tutorials/quick-start/01-list.png');

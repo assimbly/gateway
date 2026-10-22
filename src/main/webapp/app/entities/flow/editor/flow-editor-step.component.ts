@@ -1,11 +1,11 @@
-import { ChangeDetectorRef, Component, ElementRef, EventEmitter, inject, Injectable, Input, OnChanges, OnDestroy, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
+import { afterNextRender, ChangeDetectorRef, Component, ElementRef, EventEmitter, inject, Injectable, Injector, Input, OnChanges, OnDestroy, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { NgSelectModule } from '@ng-select/ng-select';
+import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select';
 import { PopoverModule } from 'ngx-bootstrap/popover';
 import { CodemirrorComponent, CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { Components } from 'app/shared/camel/component-type';
@@ -145,6 +145,8 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   hoveredOption: any;
   modalRef: NgbModalRef | null;
 
+  private readonly injector = inject(Injector);
+
   constructor(
     private modalService: NgbModal,
     private components: Components,
@@ -275,6 +277,25 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   }
 
   readonly matchesComponent = (term: string, item: ComponentChoice): boolean => matchRank(item, term) < NO_MATCH;
+
+  /**
+   * Searching puts the closest match on top, but ng-select keeps its scroll position when its items change, which
+   * leaves that match out of sight. Once the new order is rendered, it is marked and scrolled into view.
+   */
+  onComponentSearch(term: string, select: NgSelectComponent): void {
+    this.componentSearch = term;
+    afterNextRender(
+      () => {
+        const closest = select.itemsList.filteredItems.find(item => !item.disabled);
+        if (closest) {
+          select.itemsList.markItem(closest);
+          select.dropdownPanel()?.scrollTo(closest);
+          select.detectChanges();
+        }
+      },
+      { injector: this.injector },
+    );
+  }
 
   /** Compares an enum value with the empty "Default" entry, which a new row holds as null and a loaded row as ''. */
   readonly sameValue = (a: unknown, b: unknown): boolean => (a ?? '') === (b ?? '');

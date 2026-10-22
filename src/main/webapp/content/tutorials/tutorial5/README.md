@@ -69,6 +69,8 @@ To change the broker, you would edit the file, click **Save**, then **Restart** 
 2. Click **Add**. <!-- show: [aria-label="Add"] -->
 3. Set **Name** to `HelloQueue`. <!-- show: #field_name -->
 
+   > **Tip:** to create several queues at once, type their names as a comma-separated list, for example `HelloQueue,OrdersQueue,InvoicesQueue`.
+
 ![Create a queue](04-create-queue.png)
 
 4. Click **Save**. <!-- show: #save-entity -->

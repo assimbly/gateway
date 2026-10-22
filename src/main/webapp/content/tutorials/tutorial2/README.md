@@ -32,8 +32,6 @@ It takes about 10 minutes.
 
 ## Step 2: Say the request is XML
 
-<!-- step: {"check":"flowStep:Calculator:setheader"} -->
-
 The calculator is a SOAP web service. It only accepts a request when its `Content-Type` header says it's XML.
 
 1. Click the **+** on the line between the Source and the Sink. <!-- show: [aria-label="Insert a Step here"] -->
@@ -48,11 +46,7 @@ Its settings open on the right:
 
 ![Configure the Set header Action](02-set-header.png)
 
-5. Click **Save**. <!-- show: [data-tour="flow-save"] -->
-
 ## Step 3: Call the web service
-
-<!-- step: {"check":"flowStep:Calculator:dneonline.com"} -->
 
 1. Click the **+** on the line just before the Sink. <!-- show: .flow-step-sink -->
 2. Type `http` in the search box and choose **HTTP**.
@@ -61,14 +55,14 @@ Its settings open on the right:
 
 ![Configure the HTTP Action](03-http-action.png)
 
-5. Click **Save**. <!-- show: [data-tour="flow-save"] -->
+You save the Flow in the next step, right before you start it.
 
 ## Step 4: Send a request
 
 <!-- step: {"check":"flowCompleted:Calculator"} -->
 
 1. Is *TestFlow* running? Stop it on **Flows → Manage** first, or it picks up the file before *Calculator* can.
-2. In the editor of *Calculator*, click **Start**. <!-- show: [data-tour="flow-start"] -->
+2. In the editor of *Calculator*, click **Save**, <!-- show: [data-tour="flow-save"] --> then **Start**. <!-- show: [data-tour="flow-start"] -->
 3. Save this request as `calculator.xml` in the `C:\messages\in` folder. It asks the service to add 2 and 2:
 
    ```xml

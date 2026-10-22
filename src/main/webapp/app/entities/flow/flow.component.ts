@@ -160,7 +160,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.registerChangeInFlows();
     this.registerChangeCreatedIntegration();
     this.registerDeletedFlows();
-    this.polls.add(interval(15000).subscribe(() => this.flowRows?.forEach(row => row.pollMessages())));
+    this.polls.add(interval(10000).subscribe(() => this.flowRows?.forEach(row => row.pollMessages())));
     this.polls.add(interval(10000).subscribe(() => this.flowRows?.forEach(row => row.pollAlerts())));
   }
 

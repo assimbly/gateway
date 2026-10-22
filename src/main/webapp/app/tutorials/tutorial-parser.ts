@@ -58,6 +58,10 @@ function render(markdown: string, id: string): string {
   const html = marked.parse(withButtons, { async: false, gfm: true });
   return (
     html
+      // values such as a path or a URL are copied with a click, a code block with its Copy button
+      .replace(/(?<!<pre>)<code>/g, '<code class="tutorial-copy" data-tour-copy title="Click to copy">')
+      .replace(/<pre>/g, '<div class="tutorial-code"><button type="button" class="tutorial-code__copy" data-tour-copy>Copy</button><pre>')
+      .replace(/<\/pre>/g, '</pre></div>')
       // images sit next to the tutorial
       .replace(/(<img\s[^>]*?src=")(?![a-z]+:|\/|#)([^"]+)"/gi, `$1${TUTORIALS_URL}${id}/$2"`)
       // other pages open next to the Gateway, not in its place

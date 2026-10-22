@@ -71,6 +71,9 @@
     @if (index > 0) {
       <div class="tutorial-panel__step-count">Step {{ index }} of {{ count - 1 }}</div>
       <h3 class="tutorial-panel__step-title">{{ step.title }}</h3>
+    } @else {
+      <div class="tutorial-panel__step-count">Overview</div>
+      <h3 class="tutorial-panel__step-title">What you'll learn</h3>
     }
 
     <div class="tutorial-panel__body" [innerHTML]="html()" (click)="onBodyClick($event)"></div>
@@ -89,6 +92,8 @@
         <span class="tutorial-panel__done"><fa-icon icon="check" /> Done</span>
       } @else if (tutorials.checking()) {
         <span class="text-muted"><fa-icon icon="spinner" animation="spin" /> Ticks off once you've done it</span>
+      } @else if (index === 0) {
+        <span class="text-muted">Click <strong>Start</strong> to begin</span>
       }
     </div>
     <div class="tutorial-panel__nav">

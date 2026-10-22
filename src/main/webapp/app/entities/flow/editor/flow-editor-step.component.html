@@ -196,8 +196,8 @@
                    readonly [value]="routerTitle ?? ''"
                    title="A Router keeps its kind. To use another kind, delete this Router and add a new one."/>
           } @else {
-            <ng-select [items]="componentChoices" bindValue="name" bindLabel="label" [clearable]="false"
-                       [searchFn]="matchesComponent" (search)="componentSearch = $event.term" (close)="componentSearch = ''"
+            <ng-select #componentSelect [items]="componentChoices" bindValue="name" bindLabel="label" [clearable]="false"
+                       [searchFn]="matchesComponent" (search)="onComponentSearch($event.term, componentSelect)" (close)="componentSearch = ''"
                        formControlName="componentType" labelForId="field_component_type"
                        (change)="onComponentTypeChange($event?.name)">
               <ng-template ng-option-tmp let-item="item">
