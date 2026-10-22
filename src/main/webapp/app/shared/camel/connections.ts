@@ -285,6 +285,7 @@ export class Connections {
            valueType: 'list',
            placeholder: '',
            isRequired: true,
+           defaultValue: 'true',
          },
       ],
     },

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, inject, signal } from '@angular/core';
+import { Component, ElementRef, Injector, OnInit, ViewEncapsulation, afterNextRender, inject, signal, viewChild } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -30,6 +30,8 @@ export class ApiDetailComponent implements OnInit {
   private readonly handlerFlows = inject(HandlerFlowsService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly injector = inject(Injector);
+  private readonly nameInput = viewChild<ElementRef<HTMLInputElement>>('nameInput');
 
   readonly api = signal<IApi | undefined>(undefined);
   readonly states = signal<Map<number, HandlerFlowState>>(new Map());
@@ -62,6 +64,8 @@ export class ApiDetailComponent implements OnInit {
       } else {
         this.api.set({ name: '', basePath: '/', operations: [] });
         this.form.reset({ name: '', basePath: '/', versionLabel: '1.0', description: '' });
+        // a new API starts with its name; the field is there once the API is rendered
+        afterNextRender(() => this.nameInput()?.nativeElement.focus(), { injector: this.injector });
       }
     });
   }

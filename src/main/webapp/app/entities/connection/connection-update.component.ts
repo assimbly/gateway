@@ -108,6 +108,7 @@ export class ConnectionUpdateComponent implements OnInit {
       rsk.valueType = sk.valueType;
       rsk.placeholder = sk.placeholder;
       rsk.isRequired = sk.isRequired;
+      rsk.value = rsk.value || sk.defaultValue;
       requiredConnectionKeys.push(rsk);
     });
     this.connectionKeys.unshift(...requiredConnectionKeys);

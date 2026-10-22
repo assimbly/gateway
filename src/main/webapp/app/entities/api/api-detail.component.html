@@ -9,7 +9,7 @@
         <div class="api-header">
           <div>
             <label class="form-label" for="api-name">Name</label>
-            <input id="api-name" class="form-control" formControlName="name" required
+            <input #nameInput id="api-name" class="form-control" formControlName="name" required
                    [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid" />
           </div>
           <div>

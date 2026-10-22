@@ -113,6 +113,7 @@ export class ConnectionKeysComponent implements OnInit, OnChanges {
                 rsk.valueType = sk.valueType;
                 rsk.placeholder = sk.placeholder;
                 rsk.isRequired = sk.isRequired;
+                rsk.value = rsk.value || sk.defaultValue;
                 requiredConnectionKeys.push(rsk);
             });
             this.connectionKeys.unshift(...requiredConnectionKeys);
@@ -227,4 +228,6 @@ export interface ConnectionKeyInformation {
     valueType: string;
     placeholder: string;
     isRequired: boolean;
+    /** What a new key of this kind starts with, such as `true` for pooled. */
+    defaultValue?: string;
 }
