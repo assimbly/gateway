@@ -131,4 +131,4 @@ When you're done, stop *sayHello* with **Stop** in its editor.
 | Operation `GET /{name}` | **New Operation** | Defines what clients can call, and creates the Handler Flow. |
 | Handler Flow *sayHello* | Flow editor | **Operation** receives the request, **Set body** writes the answer, **Response** sends it back. |
 
-**Done!** Continue with [Tutorial 5: Manage the broker](https://github.com/assimbly/gateway/wiki/tutorial6-manage-the-broker).
+**Done!** Continue with [Tutorial 5: Manage the broker](https://github.com/assimbly/gateway/wiki/tutorial6-create-a-new-broker).

@@ -5,7 +5,7 @@
 Run your first Flow in 5 minutes.
 
 <!-- web-only -->
-> The Gateway isn't running yet? [Install](https://github.com/assimbly/gateway/wiki/install) it first. You can also follow this quick start inside the Gateway: click **Tutorials** in the menu.
+> The Gateway isn't running yet? [Install and start it](https://github.com/assimbly/gateway/wiki/quick-start) first. You can also follow this quick start inside the Gateway: click **Tutorials** in the menu.
 
 ## Open ExampleFlow
 
