@@ -138,7 +138,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		});
 	}
 	@ViewChild(FlowEditorHeaderComponent) header?: FlowEditorHeaderComponent;
-	/** Set by Save & start: start the Flow once it is saved. */
+	/** Set by Save & start or Save & restart: start or restart the Flow once it is saved. */
 	/** What happens once the Flow is saved: stay in the editor, start the Flow, or go back to Manage. */
 	private afterSaveAction: AfterSave = 'stay';
 	/** The Flow's name as it was last saved, which a default Error Handler path follows. */
@@ -738,6 +738,12 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
         if(this.componentsWithConnection.includes(componentType)){
           this.enableConnection[stepFormIndex] = true;
           this.filterConnections(componentType, stepFormIndex);
+          // a newly chosen Component takes the one Connection there is for it, such as the Gateway broker for JMS
+          const [onlyConnection, ...others] = this.filterConnection[stepFormIndex];
+          if (typeof e !== 'undefined' && onlyConnection && others.length === 0) {
+            step.connectionId = onlyConnection.id;
+            stepForm?.controls.connection.patchValue(onlyConnection.id);
+          }
         }else{
           this.enableConnection[stepFormIndex] = false;
         }
@@ -2429,8 +2435,8 @@ splitOptions4(options: string): string[] {
 
 	/**
 	 * Save & manage goes back to Manage. Otherwise the editor stays: the URL gets the Flow's id (a new Flow only has
-	 * one now), and the Flow is loaded again so every Step has its saved id. Save & start then starts it; a failed
-	 * start shows as Error.
+	 * one now), and the Flow is loaded again so every Step has its saved id. Save & start then starts it, and Save &
+	 * restart restarts the running Flow; a failed start shows as Error.
 	 */
 	private afterSave(): void {
 		this.savingFlowSuccess = true;
@@ -2449,6 +2455,8 @@ splitOptions4(options: string): string[] {
 		this.load(this.flow.id);
 		if (then === 'start') {
 			this.header?.start(this.flow.id);
+		} else if (then === 'restart') {
+			this.header?.restart(this.flow.id);
 		}
 	}
 
@@ -2582,7 +2590,7 @@ splitOptions4(options: string): string[] {
 
 }
 
-type AfterSave = 'stay' | 'start' | 'return';
+type AfterSave = 'stay' | 'start' | 'restart' | 'return';
 
 /** The graph key of a Flow's Error Step, which has its own Error handler panel rather than a place on the canvas. */
 const ERROR_STEP_KEY = 'error';

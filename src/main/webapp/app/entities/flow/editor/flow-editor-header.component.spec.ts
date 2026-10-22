@@ -79,6 +79,29 @@ describe('Flow editor header', () => {
     expect(saveAndReturn).toHaveBeenCalled();
   });
 
+  it('saves and restarts a running Flow, so the change takes effect', () => {
+    fixture.componentInstance.status.set('active');
+    fixture.detectChanges();
+    const saveAndRestart = jest.fn();
+    fixture.componentInstance.saveAndRestart.subscribe(saveAndRestart);
+
+    buttonNamed('Save & restart').click();
+
+    expect(saveAndRestart).toHaveBeenCalled();
+    expect(buttonNamed('Save without restarting')).toBeTruthy();
+    expect(() => buttonNamed('Save & start')).toThrow();
+  });
+
+  it('restarts the Flow with its saved configuration', () => {
+    const restart = jest.spyOn(TestBed.inject(FlowService), 'configureAndRestart').mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
+    fixture.componentRef.setInput('flowId', 7);
+    fixture.detectChanges();
+
+    fixture.componentInstance.restart();
+
+    expect(restart).toHaveBeenCalledWith(7);
+  });
+
   it('turns Start red and offers the error when the Flow fails to start', () => {
     const answer = JSON.stringify({ flow: { status: 'failed', installed: { total: 2, failed: 1 }, steps: [{ status: 'error', uri: 'file://in', message: 'Busy' }] } });
     jest

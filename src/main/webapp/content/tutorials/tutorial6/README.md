@@ -23,11 +23,8 @@ It takes about 15 minutes.
 
 <!-- step: {"check":"flowExists:TestFlow"} -->
 
-* You need *TestFlow* from [Tutorial 1](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow): it moves files from `C:/messages/in` to `C:/messages/out`. No *TestFlow*? Click **Add TestFlow** in the Tutorials panel, or import [TestFlow.xml](https://github.com/assimbly/documentation/blob/master/tutorials/v6/tutorial6/TestFlow.xml) with **Import** on **Flows → Manage**.
-* Make sure *TestFlow* is stopped on **Flows → Manage**. Otherwise it picks up the files before the new Flows can.
+* You need *TestFlow* from [Tutorial 1](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow): it moves files from `@{messages}/in` to `@{messages}/out`. No *TestFlow*? Click **Add TestFlow** in the Tutorials panel, or import [TestFlow.xml](https://github.com/assimbly/documentation/blob/master/tutorials/v6/tutorial6/TestFlow.xml) with **Import** on **Flows → Manage**.
 * You need a running broker, such as the *default* broker that comes with the Gateway. [Tutorial 5](https://github.com/assimbly/gateway/wiki/tutorial6-create-a-new-broker) shows where to check it.
-
-> On Linux or macOS, use `/home/<you>/messages/...` wherever this tutorial says `C:/messages/...`. Added *TestFlow* from the file? Change the paths of its Source and Sink after you've cloned it.
 
 ## Step 1: Clone TestFlow
 
@@ -36,6 +33,9 @@ It takes about 15 minutes.
 1. Go to **Flows → Manage**.
 2. In the row of *TestFlow*, click **⋮** (*More actions*) and choose **Clone**. <!-- show: tr[data-flow-name="TestFlow"] [aria-label="More actions"] -->
 3. Next to **Flow name**, type `FileToQueue`. <!-- show: #field_flowName -->
+4. Click the **Source** on the canvas <!-- show: .flow-step-source --> and change **Directory Name** to `@{messages}/orders`. <!-- show: [formcontrolname="uri"] -->
+
+*FileToQueue* gets a folder of its own, so *TestFlow* doesn't pick up its files, even when it runs.
 
 ## Step 2: Put the files on a queue
 
@@ -43,34 +43,15 @@ It takes about 15 minutes.
 2. Click **Component**, type `sjms` and choose **Simple JMS**. <!-- show: [formcontrolname="componentType"] -->
 3. Set **Destination Name** to `OrdersQueue`, the name of the queue. <!-- show: [formcontrolname="uri"] -->
 
+4. Check that **Connection** says *Gateway broker*. <!-- show: [formcontrolname="connection"] -->
+
 You don't have to create the queue first: the broker creates it the first time a Flow uses it.
 
-## Step 3: Connect to the broker
+A JMS component needs to know which broker to talk to. That's what a **Connection** is for. The Gateway comes with one to its built-in broker, *Gateway broker*, and picks it for you when it's the only one.
 
-<!-- step: {"check":"connectionExists:LocalBroker"} -->
+> **No Connection selected?** Choose one, or click **+** next to **Connection** <!-- show: [data-tour="step-new-connection"] --> and fill it in: **url** `tcp://localhost:61616`, **username** and **password** `admin`, **jmsprovider** `ActiveMQ Artemis` and **pooled** `true`.
 
-A JMS component needs to know which broker to talk to. That's what a **Connection** is for, and the Sink now has a **Connection** field.
-
-1. Click the **+** next to **Connection**. <!-- show: [data-tour="step-new-connection"] --> The window *Create or edit a Connection* opens.
-2. Fill it in:
-   * **Name:** `LocalBroker`
-   * **url:** `tcp://localhost:61616`, the address of the broker that runs in the Gateway
-   * **username:** `admin`
-   * **password:** `admin`
-   * **jmsprovider:** `ActiveMQ Artemis`
-   * **pooled:** `true`, so the connection reuses open connections, which is faster
-
-![Create the connection](01-new-connection.png)
-
-3. Click **Save**.
-
-*LocalBroker* is now selected under **Connection**:
-
-![The Sink puts messages on OrdersQueue](02-sink-queue.png)
-
-> The username and password are those of the broker. If you changed them in the broker's configuration, use your own.
-
-## Step 4: Start it and send files
+## Step 3: Start it and send files
 
 <!-- step: {"check":"queueMessages:OrdersQueue"} -->
 
@@ -81,7 +62,7 @@ A JMS component needs to know which broker to talk to. That's what a **Connectio
 
 *FileToQueue* picks up the three files and puts them on the queue: **Completed** goes to 3. <!-- show: [data-tour="flow-completed"] --> Nobody takes them off yet, because the Flow that does isn't there yet.
 
-## Step 5: See the messages wait
+## Step 4: See the messages wait
 
 <!-- step: {"check":"route:endpointName=OrdersQueue"} -->
 
@@ -95,20 +76,20 @@ A JMS component needs to know which broker to talk to. That's what a **Connectio
 
 The messages stay on the queue until a Flow takes them off.
 
-## Step 6: Build the Flow that takes messages off the queue
+## Step 5: Build the Flow that takes messages off the queue
 
 1. Go to **Flows → Manage** and clone *TestFlow* once more. <!-- show: tr[data-flow-name="TestFlow"] [aria-label="More actions"] -->
 2. Next to **Flow name**, type `QueueToFile`. <!-- show: #field_flowName -->
 3. Click the **Source** on the canvas. <!-- show: .flow-step-source -->
 4. Click **Component**, type `sjms` and choose **Simple JMS**. <!-- show: [formcontrolname="componentType"] -->
 5. Set **Destination Name** to `OrdersQueue`. <!-- show: [formcontrolname="uri"] -->
-6. Under **Connection**, choose `LocalBroker`. <!-- show: [formcontrolname="connection"] --> You create a Connection once; after that, every Flow can use it.
+6. **Connection** says *Gateway broker* again. <!-- show: [formcontrolname="connection"] --> A Connection is set up once; after that, every Flow can use it.
 
 ![The Source takes messages off OrdersQueue](03-source-queue.png)
 
-The Sink of this Flow is still the File component of *TestFlow*: it writes to `C:/messages/out`.
+The Sink of this Flow is still the File component of *TestFlow*: it writes to `@{messages}/out`.
 
-## Step 7: Start it and watch the queue empty
+## Step 6: Start it and watch the queue empty
 
 <!-- step: {"check":"flowCompleted:QueueToFile"} -->
 
@@ -130,7 +111,7 @@ When you're done, stop both Flows on **Flows → Manage**.
 |------|-------|--------------|
 | **Simple JMS** Sink | *FileToQueue* | Puts every message on *OrdersQueue*. |
 | **Simple JMS** Source | *QueueToFile* | Takes every message off *OrdersQueue*. |
-| Connection *LocalBroker* | **Connection** field of a JMS Step | Tells the JMS component how to reach the broker. Create it once, use it in every Flow. |
+| Connection *Gateway broker* | **Connection** field of a JMS Step | Tells the JMS component how to reach the broker. The Gateway comes with it; every Flow can use it. |
 | *OrdersQueue* | **Broker → Endpoints** | Holds the messages until a Flow takes them off. |
 
 **Done!** You built your first Flows with message queueing.

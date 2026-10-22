@@ -17,10 +17,8 @@ It takes about 10 minutes.
 
 <!-- step: {"check":"flowExists:TestFlow"} -->
 
-* You need *TestFlow* from [Tutorial 1](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow): it moves files from `C:/messages/in` to `C:/messages/out`. No *TestFlow*? Click **Add TestFlow** in the Tutorials panel, or import [TestFlow.xml](https://github.com/assimbly/documentation/blob/master/tutorials/v6/tutorial3/TestFlow.xml) with **Import** on **Flows → Manage**.
+* You need *TestFlow* from [Tutorial 1](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow): it moves files from `@{messages}/in` to `@{messages}/out`. No *TestFlow*? Click **Add TestFlow** in the Tutorials panel, or import [TestFlow.xml](https://github.com/assimbly/documentation/blob/master/tutorials/v6/tutorial3/TestFlow.xml) with **Import** on **Flows → Manage**.
 * The Gateway needs internet access. It calls the [Open-Meteo](https://open-meteo.com/) weather API, which is free and needs no account or API key.
-
-> On Linux or macOS, use `/home/<you>/messages/...` wherever this tutorial says `C:/messages/...`. Added *TestFlow* from the file? Change the path of its Sink after you've cloned it in step 1.
 
 ## Step 1: Clone TestFlow
 
@@ -80,7 +78,7 @@ After a second the Flow makes its first call, and **Completed** goes up: <!-- sh
 
 ![The Flow is running](04-flow-running.png)
 
-2. Open `weather.json` in the `C:\messages\out` folder. It holds the answer of the API, for example (shortened):
+2. Open `weather.json` in the `out` folder of your messages folder. It holds the answer of the API, for example (shortened):
 
 ```json
 {
@@ -102,7 +100,7 @@ Every 30 seconds the Flow calls the API again and overwrites `weather.json` with
 
 > **No file?** Click the **Alert** badge in the editor header to see the error.
 
-**Try it yourself:** get the weather of your own town. Change `latitude` and `longitude` in the **Http Uri** of the HTTPS Action, click **Save**, then **Stop** and **Start**.
+**Try it yourself:** get the weather of your own town. Change `latitude` and `longitude` in the **Http Uri** of the HTTPS Action and click **Save & restart**. <!-- show: [data-tour="flow-save"] --> Saving a running Flow restarts it, so the change takes effect right away.
 
 When you're done, click **Stop**. <!-- show: [data-tour="flow-stop"] --> Otherwise the Flow keeps calling the API.
 

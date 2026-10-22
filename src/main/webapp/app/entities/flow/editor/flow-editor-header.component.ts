@@ -62,6 +62,8 @@ export class FlowEditorHeaderComponent {
 
   readonly save = output<void>();
   readonly saveAndStart = output<void>();
+  /** Saves the running Flow and restarts it, so the change takes effect; the primary action while it runs. */
+  readonly saveAndRestart = output<void>();
   /** Saves the Flow and goes back to the Manage page. */
   readonly saveAndReturn = output<void>();
 
@@ -126,6 +128,13 @@ export class FlowEditorHeaderComponent {
       return;
     }
     this.run(this.flowService.configureAndStart(id));
+  }
+
+  /** Restarts the saved Flow with its saved configuration. */
+  restart(id = this.flowId()): void {
+    if (id) {
+      this.run(this.flowService.configureAndRestart(id));
+    }
   }
 
   stop(): void {

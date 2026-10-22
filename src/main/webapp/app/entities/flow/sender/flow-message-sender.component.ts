@@ -4,7 +4,9 @@ import { FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Va
 import { ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Observable, defer, forkJoin, from, of } from 'rxjs';
-import { catchError, concatMap, map, switchMap } from 'rxjs/operators';
+import { catchError, concatMap, map, switchMap, take } from 'rxjs/operators';
+import { VariableKeysService } from 'app/entities/environment-variables/variable-keys.service';
+import { referencedVariables, resolveVariables } from 'app/shared/camel/variables';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgSelectModule } from '@ng-select/ng-select';
@@ -72,6 +74,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     private readonly connectionPopupService = inject(ConnectionPopupService);
     private readonly modalService = inject(NgbModal);
     private readonly cdr = inject(ChangeDetectorRef);
+    private readonly variables = inject(VariableKeysService);
     private readonly components = inject(Components);
     private readonly connectionsList = inject(Connections);
     readonly themeService = inject(ThemeService);
@@ -510,12 +513,16 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         const keys$: Observable<string> = connectionId
             ? this.connectionService.getConnectionKeys(parseInt(connectionId, 10)).pipe(map(res => JSON.stringify(res.body)))
             : of('');
+        // the runtime doesn't know Variables, so a Source such as file://@{messages}/in gets their values here
+        const uri$: Observable<string> = referencedVariables(uri).length
+            ? this.variables.values().pipe(take(1), map(values => resolveVariables(uri, values ?? {})))
+            : of(uri);
 
-        keys$
+        forkJoin([keys$, uri$])
             .pipe(
                 // one message after the other, so the answers come in the order of the messages
-                switchMap(connectionKeys =>
-                    from(messages).pipe(concatMap(message => this.sendOne(uri, exchangePattern, connectionId, connectionKeys, message)))
+                switchMap(([connectionKeys, resolvedUri]) =>
+                    from(messages).pipe(concatMap(message => this.sendOne(resolvedUri, exchangePattern, connectionId, connectionKeys, message)))
                 )
             )
             .subscribe({

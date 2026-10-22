@@ -14,6 +14,14 @@ export function referencedVariables(text: string | null | undefined): string[] {
   return [...new Set(keys)];
 }
 
+/**
+ * The text with each reference to a known Variable replaced by its value, as `Export.placeholdersReplacement` does,
+ * for a page that sends to an endpoint itself rather than through an exported Flow. Unknown references stay.
+ */
+export function resolveVariables(text: string, values: Record<string, string>): string {
+  return text.replace(/@\{([^}]+)\}/g, (ref, key: string) => values[key.trim()] ?? ref);
+}
+
 /** The keys the texts refer to that no Variable has, each once. */
 export function unknownVariables(texts: (string | null | undefined)[], keys: Iterable<string>): string[] {
   const known = new Set(keys);

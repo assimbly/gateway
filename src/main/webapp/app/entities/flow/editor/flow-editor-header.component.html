@@ -74,9 +74,16 @@
       </span>
     }
     <div class="btn-group" ngbDropdown placement="bottom-end" container="body">
-      <button type="button" class="btn btn-fx btn-fx-primary" data-tour="flow-save" [disabled]="saving()" (click)="save.emit()">
-        <fa-icon icon="save" /><span>Save</span>
-      </button>
+      @if (running()) {
+        <button type="button" class="btn btn-fx btn-fx-primary" data-tour="flow-save" [disabled]="saving() || busy()" (click)="saveAndRestart.emit()"
+                ngbTooltip="Save the Flow and restart it, so the change takes effect">
+          <fa-icon icon="save" /><span>Save &amp; restart</span>
+        </button>
+      } @else {
+        <button type="button" class="btn btn-fx btn-fx-primary" data-tour="flow-save" [disabled]="saving()" (click)="save.emit()">
+          <fa-icon icon="save" /><span>Save</span>
+        </button>
+      }
       <button
         type="button"
         class="btn btn-fx btn-fx-primary btn-fx-icon flow-editor-header__save-menu"
@@ -87,9 +94,14 @@
         <fa-icon icon="chevron-down" />
       </button>
       <div ngbDropdownMenu>
-        <span [ngbTooltip]="draftReason() ? 'This Flow is a Draft: ' + draftReason() : ''">
-          <button type="button" ngbDropdownItem [disabled]="draftReason() !== null" (click)="saveAndStart.emit()">Save &amp; start</button>
-        </span>
+        @if (!running()) {
+          <span [ngbTooltip]="draftReason() ? 'This Flow is a Draft: ' + draftReason() : ''">
+            <button type="button" ngbDropdownItem [disabled]="draftReason() !== null" (click)="saveAndStart.emit()">Save &amp; start</button>
+          </span>
+        }
+        @if (running()) {
+          <button type="button" ngbDropdownItem (click)="save.emit()" ngbTooltip="The running Flow keeps its previous configuration until it is restarted">Save without restarting</button>
+        }
         <button type="button" ngbDropdownItem (click)="saveAndReturn.emit()">Save &amp; manage</button>
       </div>
     </div>

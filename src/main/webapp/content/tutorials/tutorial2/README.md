@@ -17,10 +17,8 @@ It takes about 10 minutes.
 
 <!-- step: {"check":"flowExists:TestFlow"} -->
 
-* You need *TestFlow* from [Tutorial 1](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow): it moves files from `C:/messages/in` to `C:/messages/out`. No *TestFlow*? Click **Add TestFlow** in the Tutorials panel, or import [TestFlow.xml](https://github.com/assimbly/documentation/blob/master/tutorials/v6/tutorial2/TestFlow.xml) with **Import** on **Flows → Manage**.
+* You need *TestFlow* from [Tutorial 1](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow): it moves files from `@{messages}/in` to `@{messages}/out`. No *TestFlow*? Click **Add TestFlow** in the Tutorials panel, or import [TestFlow.xml](https://github.com/assimbly/documentation/blob/master/tutorials/v6/tutorial2/TestFlow.xml) with **Import** on **Flows → Manage**.
 * The Gateway needs internet access: it calls `www.dneonline.com`.
-
-> On Linux or macOS, use `/home/<you>/messages/...` wherever this tutorial says `C:/messages/...`. Added *TestFlow* from the file? Change the paths of its Source and Sink after you've cloned it in step 1.
 
 ## Step 1: Clone TestFlow
 
@@ -29,6 +27,9 @@ It takes about 10 minutes.
 1. Go to **Flows → Manage**.
 2. In the row of *TestFlow*, click **⋮** (*More actions*) and choose **Clone**. <!-- show: tr[data-flow-name="TestFlow"] [aria-label="More actions"] -->
 3. Next to **Flow name**, type `Calculator`. <!-- show: #field_flowName -->
+4. Click the **Source** on the canvas <!-- show: .flow-step-source --> and change **Directory Name** to `@{messages}/calculator`. <!-- show: [formcontrolname="uri"] -->
+
+*Calculator* gets a folder of its own, so *TestFlow* doesn't pick up its requests, even when it runs.
 
 ## Step 2: Say the request is XML
 
@@ -61,10 +62,9 @@ You save the Flow in the next step, right before you start it.
 
 <!-- step: {"check":"flowCompleted:Calculator"} -->
 
-1. Is *TestFlow* running? Stop it on **Flows → Manage** first, or it picks up the file before *Calculator* can.
-2. In the editor of *Calculator*, click **Save**, <!-- show: [data-tour="flow-save"] --> then **Start**. <!-- show: [data-tour="flow-start"] -->
-3. Click **Send test message**. <!-- show: [data-tour="flow-send-test"] --> The Send page opens with the Source of *Calculator* as destination.
-4. Under **Body**, paste this request. It asks the service to add 2 and 2: <!-- show: .body-codemirror -->
+1. Click **Save**, <!-- show: [data-tour="flow-save"] --> then **Start**. <!-- show: [data-tour="flow-start"] -->
+2. Click **Send test message**. <!-- show: [data-tour="flow-send-test"] --> The Send page opens with the Source of *Calculator* as destination.
+3. Under **Body**, paste this request. It asks the service to add 2 and 2: <!-- show: .body-codemirror -->
 
    ```xml
    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">
@@ -78,9 +78,9 @@ You save the Flow in the next step, right before you start it.
    </soapenv:Envelope>
    ```
 
-5. Click **Send**, <!-- show: [title="Send (Ctrl+Enter)"] --> then **Back**.
+4. Click **Send**, <!-- show: [title="Send (Ctrl+Enter)"] --> then **Back**.
 
-The Gateway writes the request as a file in the `in` folder, and *Calculator* picks it up. Within a few seconds **Completed** goes up. <!-- show: [data-tour="flow-completed"] -->
+The Gateway writes the request as a file in the `calculator` folder, and *Calculator* picks it up. Within a few seconds **Completed** goes up. <!-- show: [data-tour="flow-completed"] -->
 
 ![The Flow has processed the request](04-flow-running.png)
 
@@ -88,7 +88,7 @@ The Gateway writes the request as a file in the `in` folder, and *Calculator* pi
 
 ## Step 5: Read the reply
 
-Open the newest file in the `C:\messages\out` folder. It holds the reply of the service:
+Open the newest file in the `out` folder of your messages folder. It holds the reply of the service:
 
 ```xml
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -110,7 +110,7 @@ When you're done, click **Stop**. <!-- show: [data-tour="flow-stop"] -->
 
 | Step | Component | What it does |
 |------|-----------|--------------|
-| Source | **File** | Picks up the request from the `in` folder. |
+| Source | **File** | Picks up the request from the `calculator` folder. |
 | Action | **Set header** | Sets `Content-Type: text/xml`, so the service knows the request is XML. |
 | Action | **HTTP** | Sends the request to the service and waits for the reply. The reply becomes the message. |
 | Sink | **File** | Saves the reply in the `out` folder. |

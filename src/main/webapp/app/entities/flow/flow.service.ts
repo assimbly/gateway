@@ -177,6 +177,11 @@ export class FlowService {
     );
   }
 
+  /** Stops the running Flow and starts it with its saved configuration, so a change made while it ran takes effect. */
+  configureAndRestart(flowId: number): Observable<HttpResponse<string>> {
+    return this.stop(flowId).pipe(switchMap(() => this.configureAndStart(flowId)));
+  }
+
   /**
    * Makes the runtime trace the Flow, or stop tracing it, as its Trace setting says. Tracing writes the message after each
    * Step to the log. Not being able to trace never keeps a Flow from starting.

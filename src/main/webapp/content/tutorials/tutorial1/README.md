@@ -27,9 +27,9 @@ It takes about 15 minutes.
 ## Before you start
 
 * Complete the [Quick start](https://github.com/assimbly/gateway/wiki/quick-start). You need the Gateway running and to be signed in.
-* Make sure the folder `C:\messages\out2` does **not** exist. Part 2 relies on it being missing.
+* Make sure your messages folder has no `out2` folder. Part 2 relies on it being missing.
 
-> On Linux or macOS, use `/home/<you>/messages/...` wherever this tutorial says `C:/messages/...`. Running the Gateway with Docker? Use `/messages/in`, `/messages/out` and `/messages/out2`. To see the files on your own machine, add `-v <your folder>/messages:/messages` to the `docker run` command.
+> **Your messages folder.** The tutorials keep their files in the folder `messages` in your home folder: `C:\Users\<you>\messages` on Windows, `/home/<you>/messages` on Linux, `/Users/<you>/messages` on macOS and `/data/messages` in Docker. A Flow refers to it as `@{messages}`, a **Variable** the Gateway creates for you, so the same Flow works on every machine. You find it under **Flows → Variables**.
 
 ## Part 1: Build a Flow
 
@@ -42,10 +42,10 @@ You build *TestFlow*: it picks up each file from an `in` folder and drops it in 
 3. Next to **Flow name** at the top, type `TestFlow`. <!-- show: #field_flowName -->
 4. Click the **Source** on the canvas. <!-- show: .flow-step-source --> A panel opens on the right where you configure it. (Don't see the panel? Click **Show editor**.) <!-- show: [aria-controls="flow-designer-panel"] -->
    * **Component:** `File`
-   * **Directory Name:** the `in` folder, as a full path. Use forward slashes, also on Windows: `C:/messages/in` or `/home/<you>/messages/in` <!-- show: [formcontrolname="uri"] -->
+   * **Directory Name:** `@{messages}/in`, the `in` folder in your messages folder <!-- show: [formcontrolname="uri"] -->
 5. Click the **Sink** on the canvas. <!-- show: .flow-step-sink --> A new Flow's Sink writes each message to the log. Change it so it writes files instead:
    * **Component:** `File`
-   * **Directory Name:** the `out` folder: `C:/messages/out` or `/home/<you>/messages/out`
+   * **Directory Name:** `@{messages}/out`
 
 The folders don't have to exist: the File component creates them when the Flow starts.
 
@@ -57,7 +57,7 @@ You now have a Flow of two Steps: a Source that receives messages and a Sink tha
 
 1. Click **Save**. <!-- show: [data-tour="flow-save"] -->
 2. Click **Start** at the top right of the editor. <!-- show: [data-tour="flow-start"] --> The button turns green once the Flow is running. (**Save & start** in the menu next to **Save** does both in one click.)
-3. Click **Send test message**. <!-- show: [data-tour="flow-send-test"] --> The Send page opens with the Source of *TestFlow* as destination: `file://C:/messages/in`.
+3. Click **Send test message**. <!-- show: [data-tour="flow-send-test"] --> The Send page opens with the Source of *TestFlow* as destination: `file://@{messages}/in`.
 4. Under **Body**, type `Hello Assimbly`, <!-- show: .body-codemirror --> then click **Send**. <!-- show: [title="Send (Ctrl+Enter)"] -->
 
 The Gateway writes your message as a file in the `in` folder. Within a second the Source picks it up and the Sink drops it in the `out` folder.
@@ -92,7 +92,7 @@ Change the copy so it can't deliver its files:
 
 1. Next to **Flow name**, type `DebugFlow`. <!-- show: #field_flowName -->
 2. Click the **Sink** on the canvas. <!-- show: .flow-step-sink --> Its settings open in the panel on the right. (Don't see the panel? Click **Show editor**.)
-3. Change **Directory Name** to `C:/messages/out2`. <!-- show: [formcontrolname="uri"] -->
+3. Change **Directory Name** to `@{messages}/out2`. <!-- show: [formcontrolname="uri"] -->
 4. Under **Options**, choose **Auto Create** in the list and turn the switch **Off**. <!-- show: .option-row -->
 
 ![Configure the Sink](02-configure-sink.png)
@@ -111,7 +111,7 @@ Errors can also happen when a Flow starts. *TestFlow* is still running, so you r
 
 ![Error on start](06-start-error.png)
 
-Both Flows read from the same folder, `C:/messages/in`. Only one Source at a time may listen to the same file endpoint, so the second Flow can't start: `Multiple consumers for the same endpoint is not allowed`.
+Both Flows read from the same folder, `@{messages}/in`. Only one Source at a time may listen to the same file endpoint, so the second Flow can't start: `Multiple consumers for the same endpoint is not allowed`.
 
 ## Step 6: Send a message and watch it fail
 
@@ -130,7 +130,7 @@ The Source picks up the file, but the Sink can't store it. In the editor header 
 
 ![Alert details](04-alert-details.png)
 
-`Cannot store file: C:\messages\out2\...` tells you exactly what went wrong: the Sink can't write to the `out2` folder. Click **Clear** to remove the alerts once you've read them.
+`Cannot store file: ...messages\out2\...` tells you exactly what went wrong: the Sink can't write to the `out2` folder. Click **Clear** to remove the alerts once you've read them.
 
 > **Where did my file go?** The Flow's **Error handler** takes care of failed messages. By default it writes the error to the Gateway log, after which the file is moved to the hidden `.camel` subfolder of the `in` folder, just like a file that was delivered. To do something else with failed messages, click **Error handler** in the editor toolbar.
 

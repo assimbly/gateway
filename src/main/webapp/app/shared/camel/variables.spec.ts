@@ -1,4 +1,4 @@
-import { insertVariable, referencedVariables, unknownVariables, variableRef, variableWarnings } from './variables';
+import { insertVariable, referencedVariables, resolveVariables, unknownVariables, variableRef, variableWarnings } from './variables';
 
 describe('Variables', () => {
   it('refers to a Variable as @{key}', () => {
@@ -30,5 +30,10 @@ describe('Variables', () => {
   it('puts a reference in at the cursor', () => {
     expect(insertVariable('/out', 'Host', 0)).toEqual({ text: '@{Host}/out', cursor: 7 });
     expect(insertVariable('C:/', 'Folder')).toEqual({ text: 'C:/@{Folder}', cursor: 12 });
+  });
+
+  it('puts in the values of known Variables and keeps unknown references', () => {
+    expect(resolveVariables('@{messages}/in?x=@{ other }', { messages: 'C:/Users/me/messages', other: '1' })).toBe('C:/Users/me/messages/in?x=1');
+    expect(resolveVariables('@{missing}/in', {})).toBe('@{missing}/in');
   });
 });
