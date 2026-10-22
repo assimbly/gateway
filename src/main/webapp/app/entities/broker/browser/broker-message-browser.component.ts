@@ -5,7 +5,7 @@ import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/ht
 import { Subscription } from 'rxjs';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgbModal, NgbNavChangeEvent, NgbNavModule, NgbModalRef, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
@@ -38,6 +38,7 @@ import { CodemirrorComponent } from "@ctrl/ngx-codemirror";
     CommonModule,
     FormsModule,
     FontAwesomeModule,
+    RouterLink,
     NgbNavModule,
     NgbDropdownModule,
     InfiniteScrollModule,

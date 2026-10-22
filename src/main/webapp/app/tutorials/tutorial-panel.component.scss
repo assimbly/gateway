@@ -114,6 +114,23 @@
   font-size: 1.25rem;
 }
 
+// where the step's files are, for a step about the messages folder
+.tutorial-panel__folder {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0 0 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-left: 3px solid var(--app-info);
+  background: var(--app-code-bg);
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+
+  ::ng-deep code {
+    background: var(--app-surface);
+  }
+}
+
 .tutorial-panel__hint {
   margin: 1rem 0 0;
   padding: 0.5rem 0.75rem;
@@ -147,8 +164,9 @@
   margin-left: auto;
 }
 
-// the rendered Markdown
-.tutorial-panel__body {
+// the rendered Markdown, and the values the panel adds to it
+.tutorial-panel__body,
+.tutorial-panel__folder {
   font-size: 0.9375rem;
   line-height: 1.55;
 

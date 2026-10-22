@@ -102,7 +102,7 @@ The first run starts a second after you start the Flow. After that, the **Comple
 
 ![The Flow is running](04-flow-running.png)
 
-2. Open `clock.txt` in the `out` folder of your messages folder:
+2. Open `clock.txt` in `@{messages}/out`, the `out` folder of your messages folder: `C:\Users\<you>\messages\out` on Windows. (The Variable `messages` under **Flows → Variables** holds the path of your messages folder.)
 
    ```
    Hello from Assimbly! The time is 14:05:10
@@ -114,7 +114,7 @@ Open it again a little later: the time has changed.
 
 **Try it yourself:**
 
-* Add the date: change the Simple script to `Hello from Assimbly! It is ${date:now:yyyy-MM-dd HH:mm:ss}`. Click **Save & restart** to run it with the new script.
+* Add the date: change the Simple script to `Hello from Assimbly! It is ${date:now:yyyy-MM-dd HH:mm:ss}`. Click **Save & restart** to run it with the new script. <!-- show: [data-tour="flow-save-start"] -->
 * Break the Groovy script on purpose, for example by writing to a folder that doesn't exist. The **Failed** counter goes up and an **Alert** badge appears. See [Tutorial 1](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow) for finding the error.
 
 When you're done, click **Stop**. <!-- show: [data-tour="flow-stop"] --> Otherwise the Flow keeps writing the file every 10 seconds.

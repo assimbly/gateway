@@ -79,6 +79,17 @@
       <h3 class="tutorial-panel__step-title">What you'll learn</h3>
     }
 
+    @if (messagesFolder() && mentionsMessagesFolder()) {
+      <p class="tutorial-panel__folder" (click)="onBodyClick($event)">
+        <fa-icon icon="folder-open" />
+        <span
+          >Your messages folder, <code>{{ '@{messages}' }}</code
+          >, is <code class="tutorial-copy" data-tour-copy title="Click to copy">{{ messagesFolder() }}</code
+          >. So <code>{{ '@{messages}/out' }}</code> is the <code>out</code> folder in it.</span
+        >
+      </p>
+    }
+
     <div class="tutorial-panel__body" [innerHTML]="html()" (click)="onBodyClick($event)"></div>
 
     @if (notFound()) {

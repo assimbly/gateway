@@ -143,6 +143,17 @@ describe('BrokerMessageSenderComponent', () => {
         expect(fixture.nativeElement.querySelector('.alert-danger')).toBeNull();
     });
 
+    it('links the endpoint in the success message to its messages', () => {
+        create({ endpointName: 'TestQ', endpointType: 'queue', brokerType: 'artemis' });
+
+        comp.send();
+        fixture.detectChanges();
+
+        const link = fixture.nativeElement.querySelector('.alert-success a') as HTMLAnchorElement;
+        expect(link.textContent).toBe('TestQ');
+        expect(link.getAttribute('href')).toBe('/broker/browser/message-browser?endpointName=TestQ&endpointType=queue&brokerType=artemis');
+    });
+
     it('shows the error when sending fails', () => {
         create();
         jest.spyOn(brokerService, 'sendMessage').mockReturnValue(

@@ -35,15 +35,16 @@
   <br />
 </div>
 
-<div class="row">
-  <div class="col-9">
-    <h4 style="margin-left: 0.7em">
+<!-- the actions wrap below the subtitle when they don't fit next to it -->
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+  <div>
+    <h4 class="mb-0" style="margin-left: 0.7em">
       <b
         ><i>{{ subtitle }}</i></b
       >
     </h4>
   </div>
-  <div class="col-3 d-flex justify-content-end gap-2">
+  <div class="d-flex justify-content-end gap-2 ms-auto">
     <div ngbDropdown class="d-inline-block" *ngIf="messages?.length > 0">
       <button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle>
         <fa-icon icon="bars"></fa-icon>
@@ -63,6 +64,15 @@
         <button ngbDropdownItem (click)="saveMessage(selectedMessage, false)">Message</button>
         <button ngbDropdownItem (click)="saveAllMessages()">All Messages</button>
       </div>
+    </div>
+
+    <div>
+      <a class="btn btn-fx btn-fx-primary"
+         [routerLink]="['/broker/sender/message-sender']" [queryParams]="{ endpointName: endpointName, endpointType: endpointType, brokerType: brokerType }"
+         [title]="'Send a message to ' + (endpointType === 'topic' ? 'topic ' : 'queue ') + endpointName">
+        <fa-icon icon="paper-plane"></fa-icon>
+        <span>Send</span>
+      </a>
     </div>
 
     <div>

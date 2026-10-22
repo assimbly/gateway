@@ -63,7 +63,7 @@ export class FlowEditorHeaderComponent {
 
   readonly save = output<void>();
   readonly saveAndStart = output<void>();
-  /** Saves the running Flow and restarts it, so the change takes effect; the primary action while it runs. */
+  /** Saves the running Flow and restarts it, so the change takes effect; Save alone keeps it on its previous configuration. */
   readonly saveAndRestart = output<void>();
   /** Saves the Flow and goes back to the Manage page. */
   readonly saveAndReturn = output<void>();

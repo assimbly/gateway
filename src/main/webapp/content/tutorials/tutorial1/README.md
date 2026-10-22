@@ -56,11 +56,11 @@ You now have a Flow of two Steps: a Source that receives messages and a Sink tha
 <!-- step: {"check":"flowCompleted:TestFlow"} -->
 
 1. Click **Save**. <!-- show: [data-tour="flow-save"] -->
-2. Click **Start** at the top right of the editor. <!-- show: [data-tour="flow-start"] --> The button turns green once the Flow is running. (**Save & start** in the menu next to **Save** does both in one click.)
+2. Click **Start** at the top right of the editor. <!-- show: [data-tour="flow-start"] --> The button turns green once the Flow is running. (Next time, **Save & start** does both in one click.) <!-- show: [data-tour="flow-save-start"] -->
 3. Click **Send test message**. <!-- show: [data-tour="flow-send-test"] --> The Send page opens with the Source of *TestFlow* as destination: `file://@{messages}/in`.
 4. Under **Body**, type `Hello Assimbly`, <!-- show: .body-codemirror --> then click **Send**. <!-- show: [title="Send (Ctrl+Enter)"] -->
 
-The Gateway writes your message as a file in the `in` folder. Within a second the Source picks it up and the Sink drops it in the `out` folder.
+The Gateway writes your message as a file in the `in` folder. Within a second the Source picks it up and the Sink drops it in the `out` folder: `@{messages}/out`, for example `C:\Users\<you>\messages\out` on Windows. Open it to see your message.
 
 5. Click **Back**. In the editor header, the **Completed** counter went up by one. <!-- show: [data-tour="flow-completed"] -->
 

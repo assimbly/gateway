@@ -88,7 +88,9 @@ The Gateway writes the request as a file in the `calculator` folder, and *Calcul
 
 ## Step 5: Read the reply
 
-Open the newest file in the `out` folder of your messages folder. It holds the reply of the service:
+The Sink saved the reply in `@{messages}/out`: the `out` folder of your messages folder. On Windows that's `C:\Users\<you>\messages\out`. Not sure where your messages folder is? The Variable `messages` under **Flows → Variables** holds its path, and the Tutorials panel shows it at the top of this step.
+
+Open the newest file in that folder. It holds the reply of the service:
 
 ```xml
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">

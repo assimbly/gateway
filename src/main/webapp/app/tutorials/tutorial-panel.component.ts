@@ -1,6 +1,10 @@
 import { Component, OnDestroy, OnInit, computed, effect, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { DomSanitizer } from '@angular/platform-browser';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { map } from 'rxjs';
+
+import { VariableKeysService } from 'app/entities/environment-variables/variable-keys.service';
 
 import { clearHighlight, highlight } from './tutorial-highlight';
 import { TutorialPanelState } from './tutorial-panel.state';
@@ -26,6 +30,7 @@ export class TutorialPanelComponent implements OnInit, OnDestroy {
   readonly tutorials = inject(TutorialService);
   readonly panel = inject(TutorialPanelState);
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly variables = inject(VariableKeysService);
 
   // the tutorials are first-party Markdown bundled with the Gateway; their Show me buttons need their data attribute
   /** The tutorials by track, such as Get started and Messaging. */
@@ -33,6 +38,10 @@ export class TutorialPanelComponent implements OnInit, OnDestroy {
   readonly html = computed(() => this.sanitizer.bypassSecurityTrustHtml(this.tutorials.step()?.html ?? ''));
   /** Whether the last Show me found nothing on this page. */
   readonly notFound = signal(false);
+  /** Where the Variable `messages` points: the folder the tutorials keep their files in, or undefined when unknown. */
+  readonly messagesFolder = toSignal(this.variables.values().pipe(map(values => values?.['messages'] || undefined)));
+  /** Whether the open step is about files in the messages folder, so the panel says where that folder is. */
+  readonly mentionsMessagesFolder = computed(() => /@\{messages\}|messages folder/.test(this.tutorials.step()?.html ?? ''));
 
   constructor() {
     effect(() => {

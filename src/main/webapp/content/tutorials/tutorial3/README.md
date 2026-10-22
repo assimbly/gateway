@@ -78,7 +78,7 @@ After a second the Flow makes its first call, and **Completed** goes up: <!-- sh
 
 ![The Flow is running](04-flow-running.png)
 
-2. Open `weather.json` in the `out` folder of your messages folder. It holds the answer of the API, for example (shortened):
+2. Open `weather.json` in `@{messages}/out`, the `out` folder of your messages folder: `C:\Users\<you>\messages\out` on Windows. (The Variable `messages` under **Flows → Variables** holds the path of your messages folder.) It holds the answer of the API, for example (shortened):
 
 ```json
 {
@@ -100,7 +100,7 @@ Every 30 seconds the Flow calls the API again and overwrites `weather.json` with
 
 > **No file?** Click the **Alert** badge in the editor header to see the error.
 
-**Try it yourself:** get the weather of your own town. Change `latitude` and `longitude` in the **Http Uri** of the HTTPS Action and click **Save & restart**. <!-- show: [data-tour="flow-save"] --> Saving a running Flow restarts it, so the change takes effect right away.
+**Try it yourself:** get the weather of your own town. Change `latitude` and `longitude` in the **Http Uri** of the HTTPS Action and click **Save & restart**. <!-- show: [data-tour="flow-save-start"] --> It saves the Flow and restarts it, so the change takes effect right away. (**Save** alone keeps the running Flow on its previous configuration until you restart it.)
 
 When you're done, click **Stop**. <!-- show: [data-tour="flow-stop"] --> Otherwise the Flow keeps calling the API.
 

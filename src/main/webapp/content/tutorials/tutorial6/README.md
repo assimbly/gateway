@@ -95,7 +95,7 @@ The Sink of this Flow is still the File component of *TestFlow*: it writes to `@
 
 1. Click **Save**, <!-- show: [data-tour="flow-save"] --> then **Start**. <!-- show: [data-tour="flow-start"] -->
 
-*QueueToFile* takes the waiting messages off the queue right away: **Completed** goes to 3. <!-- show: [data-tour="flow-completed"] --> In the `out` folder you now find three files, one for each order.
+*QueueToFile* takes the waiting messages off the queue right away: **Completed** goes to 3. <!-- show: [data-tour="flow-completed"] --> In the `out` folder of your messages folder (`@{messages}/out`) you now find three files, one for each order.
 
 2. Check **Broker → Endpoints** once more. *OrdersQueue* is empty and has 1 consumer: the running *QueueToFile*.
 

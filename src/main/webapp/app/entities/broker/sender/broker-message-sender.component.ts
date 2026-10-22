@@ -179,7 +179,11 @@ export class BrokerMessageSenderComponent implements OnInit, OnDestroy {
         const endpointType = this.selectedEndpointType;
         const messages = this.uploaded.messagesToSend();
 
-        this.state.start(messages.length, endpointType + ' ' + destination);
+        this.state.start(messages.length, endpointType + ' ' + destination, {
+            text: destination,
+            commands: ['/broker/browser/message-browser'],
+            queryParams: { endpointName: destination, endpointType, brokerType: this.brokerType },
+        });
         messages.forEach(message => this.sendMessage(destination, endpointType, message));
     }
 

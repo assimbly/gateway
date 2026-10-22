@@ -35,10 +35,15 @@ describe('Flow editor header', () => {
     expect(buttonNamed('Save').disabled).toBe(false);
   });
 
-  it('allows Save & start once the Flow is complete', () => {
+  it('saves and starts a complete Flow with a button of its own', () => {
     fixture.detectChanges();
+    const saveAndStart = jest.fn();
+    fixture.componentInstance.saveAndStart.subscribe(saveAndStart);
 
-    expect(buttonNamed('Save & start').disabled).toBe(false);
+    buttonNamed('Save & start').click();
+
+    expect(saveAndStart).toHaveBeenCalled();
+    expect(buttonNamed('Save & start').hasAttribute('ngbdropdownitem')).toBe(false);
   });
 
   it('renames the Flow from its labelled name field', () => {
@@ -88,7 +93,7 @@ describe('Flow editor header', () => {
     buttonNamed('Save & restart').click();
 
     expect(saveAndRestart).toHaveBeenCalled();
-    expect(buttonNamed('Save without restarting')).toBeTruthy();
+    expect(buttonNamed('Save').disabled).toBe(false);
     expect(() => buttonNamed('Save & start')).toThrow();
   });
 

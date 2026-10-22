@@ -97,7 +97,7 @@ The route editor opens. Instead of a canvas, it has a field to write the route i
 
 5. Click **Send**. <!-- show: [title="Send (Ctrl+Enter)"] -->
 
-The Gateway writes the list as a file in the `route` folder. Your route picks it up and moves it to the `out` folder of your messages folder. Open *SimpleRoute* again: its **Completed** counter went up.
+The Gateway writes the list as a file in the `route` folder. Your route picks it up and moves it to the `out` folder of your messages folder: `@{messages}/out`. Open *SimpleRoute* again: its **Completed** counter went up.
 
 ![The route is running](03-route-running.png)
 

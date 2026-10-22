@@ -1,12 +1,23 @@
 import { computed, signal } from '@angular/core';
+import { Params } from '@angular/router';
 
 /** How long to wait for an answer of a send before telling the user that no answer came. */
 export const SEND_TIMEOUT_MS = 30000;
+
+/** A page to open the target on, such as the browser of the queue a message went to. */
+export interface SendTargetLink {
+  /** The end of the target that is the link, such as the name of the queue. */
+  text: string;
+  commands: string[];
+  queryParams?: Params;
+}
 
 export interface SendResult {
   status: 'sending' | 'success' | 'failed';
   /** Where the message goes, e.g. "queue TestQ" or "file://tmp". */
   target: string;
+  /** Opens the target, e.g. "TestQ" of "queue TestQ" links to its messages. */
+  link?: SendTargetLink;
   total: number;
   succeeded: number;
   failed: number;
@@ -35,8 +46,8 @@ export class SendState {
   readonly result = signal<SendResult | null>(null);
   readonly sending = computed(() => this.result()?.status === 'sending');
 
-  start(total: number, target: string): void {
-    this.result.set({ status: 'sending', target, total, succeeded: 0, failed: 0 });
+  start(total: number, target: string, link?: SendTargetLink): void {
+    this.result.set({ status: 'sending', target, ...(link ? { link } : {}), total, succeeded: 0, failed: 0 });
   }
 
   succeed(): void {
