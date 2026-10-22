@@ -16,6 +16,7 @@ const target = join(root, 'src/main/webapp/content/tutorials');
 const TUTORIALS = [
   { markdown: join(root, 'docs/quick-start.md'), assets: join(docs, 'tutorials/v6/quick-start') },
   { markdown: join(docs, 'tutorials/v6/tutorial1/README.md'), assets: join(docs, 'tutorials/v6/tutorial1') },
+  { markdown: join(docs, 'tutorials/v6/tutorial2/README.md'), assets: join(docs, 'tutorials/v6/tutorial2') },
 ];
 
 const ASSET = /\.(png|jpe?g|gif|svg|xml|json)$/i;

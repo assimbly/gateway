@@ -20,6 +20,7 @@ const LOG_ENTRIES = 200;
  * as `kind:arguments`:
  *
  * - `flowExists:<name>`: there is a Flow with this name
+ * - `flowStep:<name>:<text>`: the saved Flow has a Step whose component or path contains the text
  * - `flowStatus:<name>:<status>`: the Flow is started, stopped, paused…
  * - `flowCompleted:<name>`, `flowFailed:<name>`, `flowAlerts:<name>`: the count went up since the step opened
  * - `flowLog:<name>:<text>`: the Flow's log contains the text
@@ -44,6 +45,15 @@ export class TutorialChecks {
     switch (kind) {
       case 'flowExists':
         return this.flowId(name).pipe(map(id => id !== undefined));
+      case 'flowStep':
+        return this.flowService.findByName(name, QUIET).pipe(
+          map(response =>
+            (response.body?.steps ?? []).some(step =>
+              `${step.componentType ?? ''} ${step.uri ?? ''}`.toLowerCase().includes(value.toLowerCase()),
+            ),
+          ),
+          catchError(() => of(false)),
+        );
       case 'flowStatus':
         return this.withFlow(name, id =>
           this.flowService.getFlowStatus(id, QUIET).pipe(map(response => runtimeStatusOf(response.body) === runtimeStatusOf(value))),

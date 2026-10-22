@@ -12,5 +12,13 @@
     "title": "Tutorial 1: Your first Flow and debugging it",
     "minutes": 20,
     "fixtures": {}
+  },
+  {
+    "id": "tutorial2",
+    "title": "Tutorial 2: Request/Reply",
+    "minutes": 10,
+    "fixtures": {
+      "TestFlow": "TestFlow.xml"
+    }
   }
 ]

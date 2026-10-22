@@ -50,6 +50,24 @@ describe('TutorialChecks', () => {
     expect(await missing).toBe(false);
   });
 
+  it('passes flowStep when a saved Step has the text in its component or path', async () => {
+    const steps = [
+      { componentType: 'file', uri: 'C:/messages/in' },
+      { componentType: 'setheader', uri: 'Content-Type' },
+    ];
+    const header = firstValueFrom(checks.passes('flowStep:Calculator:setheader'));
+    http.expectOne(req => req.url.endsWith('api/flows/byname')).flush({ id: 5, name: 'Calculator', steps });
+    expect(await header).toBe(true);
+
+    const service = firstValueFrom(checks.passes('flowStep:Calculator:dneonline.com'));
+    http.expectOne(req => req.url.endsWith('api/flows/byname')).flush({ id: 5, name: 'Calculator', steps });
+    expect(await service).toBe(false);
+
+    const missing = firstValueFrom(checks.passes('flowStep:Calculator:setheader'));
+    flow('Calculator');
+    expect(await missing).toBe(false);
+  });
+
   it('passes flowStatus when the runtime reports that status', async () => {
     const started = firstValueFrom(checks.passes('flowStatus:ExampleFlow:started'));
     flow('ExampleFlow', 7);

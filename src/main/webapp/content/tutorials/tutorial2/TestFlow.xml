@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TestFlow, as Tutorial 1 builds it: it moves files from C:/messages/in to C:/messages/out. Import it on Flows > Manage when your Gateway doesn't have it. -->
+<dil>
+  <integrations>
+    <integration>
+      <id>1</id>
+      <name>tutorial2</name>
+      <type>FULL</type>
+      <flows>
+        <flow>
+          <id>test-flow</id>
+          <name>TestFlow</name>
+          <type>flow</type>
+          <version>1</version>
+          <options>
+            <autostart>false</autostart>
+            <parallelProcessing>false</parallelProcessing>
+            <maximumRedeliveries>0</maximumRedeliveries>
+            <redeliveryDelay>3000</redeliveryDelay>
+            <logLevel>OFF</logLevel>
+          </options>
+          <notes>Moves each file from C:/messages/in to C:/messages/out. The tutorials start from this Flow.</notes>
+          <steps>
+            <step>
+              <id>source</id>
+              <type>source</type>
+              <uri>file:C:/messages/in</uri>
+              <coordinates><x>0</x><y>0</y></coordinates>
+              <links><link><id>sink</id><bound>out</bound><transport>sync</transport></link></links>
+            </step>
+            <step>
+              <id>sink</id>
+              <type>sink</type>
+              <uri>file:C:/messages/out</uri>
+              <coordinates><x>200</x><y>0</y></coordinates>
+              <links><link><id>sink</id><bound>in</bound><transport>sync</transport></link></links>
+            </step>
+            <step>
+              <id>error</id>
+              <type>error</type>
+              <uri>log:TestFlow</uri>
+              <options><level>ERROR</level><showAll>true</showAll></options>
+            </step>
+          </steps>
+        </flow>
+      </flows>
+    </integration>
+  </integrations>
+  <core/>
+</dil>

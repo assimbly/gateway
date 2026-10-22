@@ -11,7 +11,7 @@ The Quick start and the tutorials can be followed in a Tutorials panel docked ne
   - `<!-- web-only -->` before a block only the written tutorial needs.
 - **A committed copy.** `npm run tutorials:sync` (`scripts/tutorials/sync.mjs`) copies each tutorial with its images and fixture Flows into `src/main/webapp/content/tutorials/` and lists them in `index.json`. The copy is committed, so a build doesn't need the documentation repository, and a Gateway shows the tutorials of its own version.
 - **Kept apart from the app.** The feature lives in `app/tutorials/` and loads when the panel first opens, so marked and Driver.js stay out of the main bundle. The shell knows only whether the panel is open (`TutorialPanelState`).
-- **Checks read the Gateway as it is.** A check is `kind:arguments` (`flowExists`, `flowStatus`, `flowCompleted`, `flowFailed`, `flowAlerts`, `flowLog`, `route`), asked every 3 seconds through the existing services, with errors kept out of the page's alerts. A step without a check is ticked off when the user moves on.
+- **Checks read the Gateway as it is.** A check is `kind:arguments` (`flowExists`, `flowStep`, `flowStatus`, `flowCompleted`, `flowFailed`, `flowAlerts`, `flowLog`, `route`), asked every 3 seconds through the existing services, with errors kept out of the page's alerts. A step without a check is ticked off when the user moves on.
 - **Stable anchors.** Show me selectors use ids and labels that are already there, or inert `data-tour` attributes added to the templates for this. `tutorial-anchors.spec.ts` fails when a tutorial points at an anchor no template has any more.
 - **Fixtures.** A tutorial can name the Flows it starts from with a DIL file next to it. The panel offers to import one the Gateway doesn't have, for example *ExampleFlow*.
 
@@ -19,9 +19,10 @@ The Quick start and the tutorials can be followed in a Tutorials panel docked ne
 
 Keep it simple:
 
+- **Clear.** Few words. One action per line, in the words of the screen, with a Show me where it helps. Explain only what the user needs for the next step.
+- **One capability at a time.** A tutorial shows one use case or capability of Assimbly, such as calling a web service or putting messages on a queue. What it only needs to start from, such as *TestFlow*, is a fixture, not a part of the tutorial.
+- **5 to 15 minutes.** The Quick start takes 5, and uses only what a new Gateway already has (*ExampleFlow*). A tutorial that takes longer shows more than one thing: split it.
 - Start where the user is: the Gateway is running and they're signed in. Installing and signing in are in `docs/install.md`, not in a tutorial.
-- Few words. One action per line, in the words of the screen, with a Show me where it helps. Explain only what the user needs for the next step.
-- The Quick start takes 5 minutes, and uses only what a new Gateway already has (*ExampleFlow*).
 - Give each step a check where the Gateway can tell it was done.
 
 ## Consequences
