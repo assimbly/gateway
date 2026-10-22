@@ -5,6 +5,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbActiveOffcanvas, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import dayjs from 'dayjs/esm';
 
+import { explainError } from './flow-errors';
 import { FlowService } from './flow.service';
 
 const PAGE_SIZE = 10;
@@ -41,6 +42,8 @@ export class FlowAlertsDrawerComponent {
   readonly clearing = signal(false);
   readonly failed = signal<string | null>(null);
   readonly expanded = signal(new Set<number>());
+  /** A common error said in plain words, with what to do about it. */
+  readonly explain = explainError;
 
   readonly activeOffcanvas = inject(NgbActiveOffcanvas);
   private readonly flowService = inject(FlowService);

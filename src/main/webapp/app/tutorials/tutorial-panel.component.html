@@ -24,23 +24,26 @@
 @if (!tutorial) {
   <div class="tutorial-panel__content">
     <p class="text-muted">Learn the Gateway by doing: each tutorial walks you through it here, next to the screens it's about.</p>
-    <ul class="tutorial-panel__list">
-      @for (summary of tutorials.summaries(); track summary.id) {
-        <li>
-          <button type="button" class="tutorial-panel__choice" (click)="tutorials.start(summary.id)">
-            <span class="tutorial-panel__choice-title">{{ summary.title }}</span>
-            <span class="tutorial-panel__choice-meta">
-              About {{ summary.minutes }} minutes
-              @if (tutorials.isFinished(summary.id)) {
-                · <fa-icon icon="check" /> Done
-              } @else if (tutorials.isStarted(summary.id)) {
-                · In progress
-              }
-            </span>
-          </button>
-        </li>
-      }
-    </ul>
+    @for (track of tracks(); track track.name) {
+      <h3 class="tutorial-panel__track">{{ track.name }}</h3>
+      <ul class="tutorial-panel__list">
+        @for (summary of track.tutorials; track summary.id) {
+          <li>
+            <button type="button" class="tutorial-panel__choice" (click)="tutorials.start(summary.id)">
+              <span class="tutorial-panel__choice-title">{{ summary.title }}</span>
+              <span class="tutorial-panel__choice-meta">
+                About {{ summary.minutes }} minutes
+                @if (tutorials.isFinished(summary.id)) {
+                  · <fa-icon icon="check" /> Done
+                } @else if (tutorials.isStarted(summary.id)) {
+                  · In progress
+                }
+              </span>
+            </button>
+          </li>
+        }
+      </ul>
+    }
   </div>
 } @else if (step) {
   @let index = tutorials.stepIndex();

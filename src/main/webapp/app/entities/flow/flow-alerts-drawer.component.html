@@ -41,6 +41,9 @@
           >
             {{ alert.message }}
           </button>
+          @if (explain(alert.message); as explanation) {
+            <p class="flow-alerts-drawer__explanation">{{ explanation.meaning }} {{ explanation.fix }}</p>
+          }
         </li>
       }
     </ol>

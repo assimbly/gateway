@@ -2,7 +2,7 @@
   @if (hasAddMenu) {
   <div class="step-add-menu">
     <div ngbDropdown placement="bottom-end">
-      <button type="button" class="btn btn-fx btn-fx-primary" ngbDropdownToggle>
+      <button type="button" class="btn btn-fx btn-fx-primary" data-tour="step-add" ngbDropdownToggle>
         <fa-icon icon="plus"></fa-icon>
         Add
       </button>
@@ -403,6 +403,7 @@
           </div>
           <ngx-codemirror
             class="route-codemirror-inline"
+            data-tour="route-content"
             id="field_routeContent_{{index}}"
             formControlName="routeContent"
             [options]="routeEditorOptions()"
@@ -443,6 +444,7 @@
           <ngx-codemirror
             #scriptEditor
             class="script-codemirror"
+            data-tour="script-content"
             formControlName="uri"
             [options]="scriptEditorOptions(componentType)"
             (codeMirrorLoaded)="refreshCodeMirror($event)">
@@ -461,7 +463,7 @@
                         [formControl]="sampleBody" placeholder="Empty: runs the script without a body"></textarea>
             }
             <div class="d-flex align-items-center gap-3">
-              <button type="button" class="btn btn-fx btn-fx-secondary" (click)="tryScript()" [disabled]="trying"
+              <button type="button" class="btn btn-fx btn-fx-secondary" data-tour="script-try" (click)="tryScript()" [disabled]="trying"
                       title="Runs the script once on the sample body, without starting the Flow">
                 {{ trying ? 'Trying…' : 'Try it' }}
               </button>

@@ -372,7 +372,7 @@
                                 [class.active]="showsScriptView" [attr.aria-pressed]="showsScriptView" title="Show only the scripts">
                           <fa-icon icon="code"></fa-icon><span>Script</span>
                         </button>
-                        <button type="button" class="btn btn-fx btn-fx-ghost" (click)="setScriptFlowView('flow')"
+                        <button type="button" class="btn btn-fx btn-fx-ghost" data-tour="script-flow-view" (click)="setScriptFlowView('flow')"
                                 [class.active]="!showsScriptView" [attr.aria-pressed]="!showsScriptView"
                                 title="Show every Step: what starts the Flow, the scripts, where the result goes and the Error handler">
                           <fa-icon icon="sitemap"></fa-icon><span>Flow</span>

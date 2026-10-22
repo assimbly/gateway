@@ -1,6 +1,6 @@
 # Tutorial 2: Request/Reply
 
-<!-- tutorial: {"id":"tutorial2","wiki":"tutorial6-request-reply","title":"Tutorial 2: Request/Reply","minutes":10,"fixtures":{"TestFlow":"TestFlow.xml"}} -->
+<!-- tutorial: {"id":"tutorial2","wiki":"tutorial6-request-reply","title":"Tutorial 2: Request/Reply","minutes":10,"track":"Connect systems","fixtures":{"TestFlow":"TestFlow.xml"}} -->
 
 Build a Flow that calls a web service and saves its reply. You ask a public calculator service for 2 + 2 and get the answer back as a file.
 

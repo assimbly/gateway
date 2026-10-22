@@ -5,6 +5,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { clearHighlight, highlight } from './tutorial-highlight';
 import { TutorialPanelState } from './tutorial-panel.state';
 import { TutorialService } from './tutorial.service';
+import { groupByTrack } from './tutorial-tracks';
 
 /**
  * The Tutorials panel, docked next to the page: the list of tutorials, then the open tutorial one step at a time, with
@@ -27,6 +28,8 @@ export class TutorialPanelComponent implements OnInit, OnDestroy {
   private readonly sanitizer = inject(DomSanitizer);
 
   // the tutorials are first-party Markdown bundled with the Gateway; their Show me buttons need their data attribute
+  /** The tutorials by track, such as Get started and Messaging. */
+  readonly tracks = computed(() => groupByTrack(this.tutorials.summaries()));
   readonly html = computed(() => this.sanitizer.bypassSecurityTrustHtml(this.tutorials.step()?.html ?? ''));
   /** Whether the last Show me found nothing on this page. */
   readonly notFound = signal(false);

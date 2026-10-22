@@ -1,6 +1,6 @@
 # Tutorial 6: Message Queueing
 
-<!-- tutorial: {"id":"tutorial6","wiki":"tutorial6-message-queueing","title":"Tutorial 6: Message Queueing","minutes":15,"fixtures":{"TestFlow":"TestFlow.xml"}} -->
+<!-- tutorial: {"id":"tutorial6","wiki":"tutorial6-message-queueing","title":"Tutorial 6: Message Queueing","minutes":15,"track":"Messaging","fixtures":{"TestFlow":"TestFlow.xml"}} -->
 
 Put a queue between two Flows. The first Flow puts files on a queue, the second takes them off and writes them to a folder. You'll see why queues are useful: when the receiving Flow isn't running, messages wait on the queue until it is.
 
@@ -114,7 +114,4 @@ When you're done, stop both Flows on **Flows → Manage**.
 | Connection *Gateway broker* | **Connection** field of a JMS Step | Tells the JMS component how to reach the broker. The Gateway comes with it; every Flow can use it. |
 | *OrdersQueue* | **Broker → Endpoints** | Holds the messages until a Flow takes them off. |
 
-**Done!** You built your first Flows with message queueing.
-
-<!-- web-only -->
-> Continue with [Tutorial 7: Create a simple route](https://github.com/assimbly/gateway/wiki/tutorial6-simple-route).
+**Done!** You built your first Flows with message queueing. Know Camel? Continue with [Tutorial 7: Create a simple route](https://github.com/assimbly/gateway/wiki/tutorial6-simple-route).

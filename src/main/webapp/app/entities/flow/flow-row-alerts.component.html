@@ -6,6 +6,9 @@
   <div class="modal-body">
     <div class="flow-error-detail">
       <p>{{ failure?.summary }}</p>
+      @if (!failure?.steps?.length && explain(failure?.summary); as explanation) {
+        <p class="flow-error-detail__explanation">{{ explanation.meaning }} {{ explanation.fix }}</p>
+      }
       @if (failure?.steps?.length) {
         <table class="table table-sm">
           <tbody>
@@ -14,6 +17,12 @@
                 <tr>
                   <td><b>Endpoint</b></td>
                   <td class="font-monospace">{{ step.uri }}</td>
+                </tr>
+              }
+              @if (explain(step.message); as explanation) {
+                <tr>
+                  <td><b>What it means</b></td>
+                  <td class="flow-error-detail__explanation">{{ explanation.meaning }} {{ explanation.fix }}</td>
                 </tr>
               }
               <tr>

@@ -1,6 +1,6 @@
 # Tutorial 1: Your first Flow and debugging it
 
-<!-- tutorial: {"id":"tutorial1","wiki":"tutorial6-debugging-a-flow","title":"Tutorial 1: Your first Flow and debugging it","minutes":15} -->
+<!-- tutorial: {"id":"tutorial1","wiki":"tutorial6-debugging-a-flow","title":"Tutorial 1: Your first Flow and debugging it","minutes":15,"track":"Get started"} -->
 
 In the first part of this tutorial you build *TestFlow*, a Flow that moves files from one folder to another, and watch a file go through. In the second part you break a copy of it on purpose and find out what went wrong. You learn where Assimbly Gateway 6 shows errors: the error details of a Flow that doesn't start, the counters and alerts in the editor, and the log.
 
@@ -70,6 +70,7 @@ The Gateway writes your message as a file in the `in` folder. Within a second th
 
 * A Flow that isn't complete yet, for example a Source without a Sink, is saved as a **Draft**. It shows a *Draft* badge in the header and can't be started until it's finished. Hover over the badge to see what is missing.
 * Errors are handled by the Flow's **Error handler**. For a new Flow it writes the error to the Gateway log. You can change it from the toolbar of the editor.
+* Every Flow runs as an [Apache Camel](https://camel.apache.org/) route. Click **Camel route** in the editor header to see the route of a running Flow, and to copy or download it. <!-- show: [data-tour="flow-camel-route"] -->
 
 ## Part 2: Debug a Flow
 

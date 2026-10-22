@@ -559,6 +559,11 @@ ng-dropdown-panel > div {
   overflow-wrap: anywhere;
 }
 
+/* What a common error means and what to do, above the runtime's own message. */
+.flow-error-detail__explanation {
+  font-weight: 500;
+}
+
 
 @media (min-width: 768px) {
   .flow-btns .btn {
@@ -1561,4 +1566,16 @@ input:-webkit-autofill:focus {
 // A Flow's log needs room for the log lines; the drawer is wider than the Alerts drawer.
 .offcanvas.flow-log-drawer {
   --bs-offcanvas-width: min(60rem, 100vw);
+}
+
+// The Camel route of a Flow, as the runtime built it: scrolls on its own, long URIs wrap.
+.camel-route {
+  overflow: auto;
+  padding: 0.75rem;
+  border: 1px solid var(--app-border);
+  border-radius: 0.375rem;
+  background-color: var(--app-surface);
+  font-size: 0.8125rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }

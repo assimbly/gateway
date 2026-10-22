@@ -28,6 +28,7 @@ import {
 import { FlowRowAlerts } from '../flow-row-alerts.component';
 import { FlowAlertsDrawerComponent } from '../flow-alerts-drawer.component';
 import { FlowLogDrawerComponent } from '../flow-log-drawer.component';
+import { CamelRouteDrawerComponent } from '../camel-route-drawer.component';
 
 const POLL_INTERVAL = 10000;
 
@@ -155,6 +156,14 @@ export class FlowEditorHeaderComponent {
     const id = this.flowId();
     if (id) {
       FlowLogDrawerComponent.open(this.offcanvas, { id, name: this.nameControl().value });
+    }
+  }
+
+  /** Shows the Camel route the runtime built for the Flow. */
+  openCamelRoute(): void {
+    const id = this.flowId();
+    if (id) {
+      CamelRouteDrawerComponent.open(this.offcanvas, { id, name: this.nameControl().value });
     }
   }
 

@@ -1,0 +1,84 @@
+import { Component, inject, signal } from '@angular/core';
+
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { NgbActiveOffcanvas, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+
+import { hasRoute, maskSecrets, routeFileName } from './camel-route';
+import { LogFlow } from './flow-log-drawer.component';
+import { FlowService } from './flow.service';
+
+/**
+ * The Camel route the runtime built for a Flow, in a side drawer: Camel's XML DSL with the Steps expanded and the
+ * Variables put in, secrets hidden, to read, copy or download. A Flow that isn't loaded has no route yet.
+ */
+@Component({
+  selector: 'jhi-camel-route-drawer',
+  templateUrl: './camel-route-drawer.component.html',
+  imports: [FontAwesomeModule],
+})
+export class CamelRouteDrawerComponent {
+  readonly flow = signal<LogFlow | undefined>(undefined);
+  readonly route = signal<string | null>(null);
+  readonly loading = signal(false);
+  readonly failed = signal<string | null>(null);
+  readonly copied = signal(false);
+
+  readonly activeOffcanvas = inject(NgbActiveOffcanvas);
+  private readonly flowService = inject(FlowService);
+
+  /** Opens a drawer with the Camel route of a Flow. */
+  static open(offcanvas: NgbOffcanvas, flow: LogFlow): void {
+    const ref = offcanvas.open(CamelRouteDrawerComponent, {
+      position: 'end',
+      ariaLabelledBy: 'camel-route-title',
+      panelClass: 'flow-log-drawer',
+    });
+    const drawer: CamelRouteDrawerComponent = ref.componentInstance;
+    drawer.flow.set(flow);
+    drawer.load();
+  }
+
+  load(): void {
+    const flow = this.flow();
+    if (!flow) {
+      return;
+    }
+    this.loading.set(true);
+    this.failed.set(null);
+    this.flowService.getCamelRoute(flow.id).subscribe({
+      next: response => {
+        const answer = response.body;
+        this.route.set(hasRoute(answer) ? maskSecrets(answer) : null);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.route.set(null);
+        this.failed.set("Couldn't load the route from the runtime.");
+        this.loading.set(false);
+      },
+    });
+  }
+
+  copy(): void {
+    const route = this.route();
+    if (route) {
+      navigator.clipboard?.writeText(route).then(() => {
+        this.copied.set(true);
+        setTimeout(() => this.copied.set(false), 2000);
+      });
+    }
+  }
+
+  download(): void {
+    const route = this.route();
+    if (!route) {
+      return;
+    }
+    const url = URL.createObjectURL(new Blob([route], { type: 'application/xml' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = routeFileName(this.flow()?.name);
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+}

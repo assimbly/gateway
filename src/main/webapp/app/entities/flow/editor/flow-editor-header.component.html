@@ -41,6 +41,9 @@
       <button type="button" class="btn btn-fx btn-fx-ghost" data-tour="flow-log" (click)="openLog()" ngbTooltip="What this Flow logged">
         <fa-icon icon="file-alt" /><span>Log</span>
       </button>
+      <button type="button" class="btn btn-fx btn-fx-ghost" data-tour="flow-camel-route" (click)="openCamelRoute()" ngbTooltip="The Camel route the runtime built from this Flow">
+        <fa-icon icon="code" /><span>Camel route</span>
+      </button>
     }
     <span [ngbTooltip]="testMessageBlocked() ?? ''">
       <button type="button" class="btn btn-fx btn-fx-ghost" data-tour="flow-send-test" [disabled]="testMessageBlocked() !== null" (click)="sendTestMessage()">

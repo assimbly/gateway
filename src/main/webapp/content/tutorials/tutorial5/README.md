@@ -1,6 +1,6 @@
 # Tutorial 5: Manage the broker
 
-<!-- tutorial: {"id":"tutorial5","wiki":"tutorial6-create-a-new-broker","title":"Tutorial 5: Manage the broker","minutes":10} -->
+<!-- tutorial: {"id":"tutorial5","wiki":"tutorial6-create-a-new-broker","title":"Tutorial 5: Manage the broker","minutes":10,"track":"Messaging"} -->
 
 The Gateway has a message broker built in. Get to know it: check that it runs, stop and start it, look at its configuration, add a queue, send a message to it and read the message back.
 

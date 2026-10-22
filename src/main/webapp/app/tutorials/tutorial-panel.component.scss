@@ -62,6 +62,15 @@
   overflow-y: auto;
 }
 
+.tutorial-panel__track {
+  margin: 1.25rem 0 0.5rem;
+  color: var(--app-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .tutorial-panel__list {
   display: flex;
   flex-direction: column;

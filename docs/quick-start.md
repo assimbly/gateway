@@ -1,6 +1,6 @@
 # Quick start
 
-<!-- tutorial: {"id":"quick-start","wiki":"quick-start","title":"Quick start","minutes":5,"fixtures":{"ExampleFlow":"ExampleFlow.xml"}} -->
+<!-- tutorial: {"id":"quick-start","wiki":"quick-start","title":"Quick start","minutes":5,"track":"Get started","fixtures":{"ExampleFlow":"ExampleFlow.xml"}} -->
 
 Run your first Flow in 5 minutes.
 

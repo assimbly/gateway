@@ -5,7 +5,7 @@ The Quick start and the tutorials can be followed in a Tutorials panel docked ne
 ## Setup
 
 - **One source.** A tutorial is plain Markdown: in the documentation repository (`tutorials/v6/<tutorial>/README.md`), or in this repository for the Quick start (`docs/quick-start.md`). HTML comments, which GitHub doesn't show, steer the panel:
-  - `<!-- tutorial: {"id", "wiki", "title", "minutes", "fixtures"} -->` under the title. `wiki` is the name of the tutorial's page on the Gateway wiki: a link to it in another tutorial, such as the next one, opens it in the panel, so the user stays in the Gateway.
+  - `<!-- tutorial: {"id", "wiki", "title", "minutes", "track", "fixtures"} -->` under the title. `wiki` is the name of the tutorial's page on the Gateway wiki: a link to it in another tutorial, such as the next one, opens it in the panel, so the user stays in the Gateway. `track`, such as *Get started* or *Messaging*, is the heading the panel lists the tutorial under.
   - `<!-- step: {"check": "…"} -->` or `<!-- step: {"skip": true} -->` under a `##` heading
   - `<!-- show: <css selector> -->` in a line, which becomes a Show me button
   - `<!-- web-only -->` before a block only the written tutorial needs.

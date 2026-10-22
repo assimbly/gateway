@@ -21,6 +21,10 @@ const TUTORIALS = [
   { markdown: join(docs, 'tutorials/v6/tutorial4/README.md'), assets: join(docs, 'tutorials/v6/tutorial4') },
   { markdown: join(docs, 'tutorials/v6/tutorial5/README.md'), assets: join(docs, 'tutorials/v6/tutorial5') },
   { markdown: join(docs, 'tutorials/v6/tutorial6/README.md'), assets: join(docs, 'tutorials/v6/tutorial6') },
+  { markdown: join(docs, 'tutorials/v6/tutorial7/README.md'), assets: join(docs, 'tutorials/v6/tutorial7') },
+  { markdown: join(docs, 'tutorials/v6/tutorial8/README.md'), assets: join(docs, 'tutorials/v6/tutorial8') },
+  { markdown: join(docs, 'tutorials/v6/tutorial9/README.md'), assets: join(docs, 'tutorials/v6/tutorial9') },
+  { markdown: join(docs, 'tutorials/v6/tutorial10/README.md'), assets: join(docs, 'tutorials/v6/tutorial10') },
 ];
 
 const ASSET = /\.(png|jpe?g|gif|svg|xml|json)$/i;
@@ -41,14 +45,14 @@ const index = TUTORIALS.map(({ markdown, assets }) => {
   if (!header) {
     throw new Error(`${markdown} has no <!-- tutorial: {...} --> comment`);
   }
-  const { id, wiki, title, minutes, fixtures } = JSON.parse(header[1]);
+  const { id, wiki, title, minutes, track, fixtures } = JSON.parse(header[1]);
   const folder = join(target, id);
   mkdirSync(folder, { recursive: true });
   writeFileSync(join(folder, 'README.md'), text);
   const copied = existsSync(assets) ? readdirSync(assets).filter(file => ASSET.test(file)) : [];
   copied.forEach(file => copyFileSync(join(assets, file), join(folder, file)));
   console.log(`${id}: README.md${copied.length ? ', ' + copied.join(', ') : ''}`);
-  return { id, ...(wiki ? { wiki } : {}), title, minutes, fixtures: fixtures ?? {} };
+  return { id, ...(wiki ? { wiki } : {}), title, minutes, ...(track ? { track } : {}), fixtures: fixtures ?? {} };
 });
 
 writeFileSync(join(target, 'index.json'), JSON.stringify(index, null, 2) + '\n');

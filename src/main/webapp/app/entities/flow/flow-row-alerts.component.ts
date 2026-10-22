@@ -2,6 +2,7 @@ import { Component, Input, TemplateRef, output } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
+import { explainError } from './flow-errors';
 import { FlowFailure } from './flow-status';
 
 /** The Error and Alert badges of a Flow, in its row and in the editor header. */
@@ -17,6 +18,8 @@ export class FlowRowAlerts {
   @Input() failure: FlowFailure | null = null;
   @Input() numberOfAlerts = 0;
   readonly alertsOpen = output<void>();
+  /** A common error said in plain words, with what to do about it. */
+  readonly explain = explainError;
 
   constructor(private modalService: NgbModal) {}
 

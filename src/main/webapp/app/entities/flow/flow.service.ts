@@ -177,6 +177,16 @@ export class FlowService {
     );
   }
 
+  /** The Camel routes the runtime built for a loaded Flow, as Camel XML; `0` when the Flow isn't loaded. */
+  getCamelRoute(flowId: number): Observable<HttpResponse<string>> {
+    return this.http.get(`${this.integrationUrl}/flow/${flowId}/route`, {
+      headers: new HttpHeaders({ Accept: 'application/xml' }),
+      observe: 'response',
+      responseType: 'text',
+      context: OWN_ERRORS,
+    });
+  }
+
   /** Stops the running Flow and starts it with its saved configuration, so a change made while it ran takes effect. */
   configureAndRestart(flowId: number): Observable<HttpResponse<string>> {
     return this.stop(flowId).pipe(switchMap(() => this.configureAndStart(flowId)));
