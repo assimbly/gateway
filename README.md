@@ -8,7 +8,7 @@
 on a canvas, without writing code. Powered by [Apache Camel](https://camel.apache.org/) and
 [Apache ActiveMQ](https://activemq.apache.org/).
 
-<!-- TODO: add a screenshot of the Flow designer, e.g. ![The Flow designer](docs/images/flow-designer.png) -->
+![A Flow in the Flow designer: a File Source, a Content router and two File Sinks, with the Source's settings beside the canvas](docs/images/flow-designer.png)
 
 ## Features
 
