@@ -39,6 +39,7 @@
       *ngFor="let address of filteredAddresses; trackBy: trackId"
       [address]="address"
       [brokerType]="brokerType"
+      [attr.data-endpoint-name]="address.name"
       endpointType="queue"
     ></tr>
   </jhi-data-table>

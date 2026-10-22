@@ -39,6 +39,10 @@ describe('tutorial anchors', () => {
   it('a Flows list row carries the name of its Flow', () => {
     expect(templates).toContain('[attr.data-flow-name]="flow.name"');
   });
+
+  it('a queue row carries the name of its queue', () => {
+    expect(templates).toContain('[attr.data-endpoint-name]="address.name"');
+  });
 });
 
 function htmlFiles(folder: string): string[] {

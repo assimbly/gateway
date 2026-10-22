@@ -128,6 +128,52 @@ describe('TutorialChecks', () => {
     expect(await logged).toBe(true);
   });
 
+  /** Answers the lookup of the Gateway's broker and, when it has one, the queues on it. */
+  function queues(list: { name: string; numberOfMessages: number }[]): void {
+    http.expectOne(req => req.url.endsWith('api/brokers')).flush([{ id: 4, name: 'default', type: 'artemis' }]);
+    const request = http.expectOne(req => req.url.endsWith('api/brokers/artemis/queues'));
+    expect(request.request.context.get(HANDLES_OWN_ERRORS)).toBe(true);
+    request.flush({ queues: { queue: list } });
+  }
+
+  it('passes brokerStatus when the broker reports that status', async () => {
+    const stopped = firstValueFrom(checks.passes('brokerStatus:stopped'));
+    http.expectOne(req => req.url.endsWith('api/brokers')).flush([{ id: 4, name: 'default', type: 'artemis' }]);
+    http.expectOne(req => req.url.endsWith('api/brokers/4/status') && req.params.get('brokerType') === 'artemis').flush('stopped');
+    expect(await stopped).toBe(true);
+
+    const noBroker = firstValueFrom(checks.passes('brokerStatus:stopped'));
+    http.expectOne(req => req.url.endsWith('api/brokers')).flush([]);
+    expect(await noBroker).toBe(false);
+  });
+
+  it('passes queueExists when the broker has the queue', async () => {
+    const present = firstValueFrom(checks.passes('queueExists:HelloQueue'));
+    queues([
+      { name: 'DLQ', numberOfMessages: 0 },
+      { name: 'HelloQueue', numberOfMessages: 0 },
+    ]);
+    expect(await present).toBe(true);
+
+    const missing = firstValueFrom(checks.passes('queueExists:HelloQueue'));
+    queues([{ name: 'DLQ', numberOfMessages: 0 }]);
+    expect(await missing).toBe(false);
+  });
+
+  it('passes queueMessages once the queue has more messages than when the step opened', async () => {
+    const baseline = firstValueFrom(checks.baseline('queueMessages:HelloQueue'));
+    queues([{ name: 'HelloQueue', numberOfMessages: 2 }]);
+    expect(await baseline).toBe(2);
+
+    const same = firstValueFrom(checks.passes('queueMessages:HelloQueue', 2));
+    queues([{ name: 'HelloQueue', numberOfMessages: 2 }]);
+    expect(await same).toBe(false);
+
+    const more = firstValueFrom(checks.passes('queueMessages:HelloQueue', 2));
+    queues([{ name: 'HelloQueue', numberOfMessages: 3 }]);
+    expect(await more).toBe(true);
+  });
+
   it('passes route when the address of the page contains the text', async () => {
     jest.spyOn(TestBed.inject(Router), 'url', 'get').mockReturnValue('/flow/editor/7?mode=clone');
     expect(await firstValueFrom(checks.passes('route:mode=clone'))).toBe(true);

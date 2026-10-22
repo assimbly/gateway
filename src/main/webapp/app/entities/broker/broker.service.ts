@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { serverApiUrl } from 'app/config';
@@ -61,18 +61,20 @@ export class BrokerService {
         });
     }
 
-    getBrokers(): Observable<HttpResponse<IBroker[]>> {
+    getBrokers(context?: HttpContext): Observable<HttpResponse<IBroker[]>> {
         return this.http.get<IBroker[]>(`${this.resourceUrl}`, {
             headers: new HttpHeaders({ PlaceholderReplacement: 'true', Accept: 'application/json' }),
-            observe: 'response'
+            observe: 'response',
+            context
         });
     }
 
-    getBrokerStatus(id: number, brokerType: string): Observable<HttpResponse<string>> {
+    getBrokerStatus(id: number, brokerType: string, context?: HttpContext): Observable<HttpResponse<string>> {
         return this.http.get(`${this.resourceUrl}/${id}/status`, {
             observe: 'response',
             responseType: 'text',
-            params: { brokerType }
+            params: { brokerType },
+            context
         });
     }
 

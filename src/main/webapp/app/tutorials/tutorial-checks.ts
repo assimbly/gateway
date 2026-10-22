@@ -7,8 +7,11 @@ import { Observable, catchError, map, of, switchMap } from 'rxjs';
 import { LogViewerService } from 'app/admin/logviewer/logviewer.service';
 import { ApiService } from 'app/entities/api/api.service';
 import { HANDLES_OWN_ERRORS } from 'app/core/interceptor/error-handler.interceptor';
+import { BrokerService } from 'app/entities/broker/broker.service';
 import { FlowService } from 'app/entities/flow/flow.service';
 import { runtimeStatusOf } from 'app/entities/flow/flow-status';
+import { QueueService } from 'app/entities/queue/queue.service';
+import { IAddress } from 'app/shared/model/address.model';
 
 /** A check runs every few seconds, and a Flow that isn't there (yet) is an answer, not an error to show. */
 const QUIET = new HttpContext().set(HANDLES_OWN_ERRORS, true);
@@ -26,6 +29,9 @@ const LOG_ENTRIES = 200;
  * - `flowStatus:<name>:<status>`: the Flow is started, stopped, paused…
  * - `flowCompleted:<name>`, `flowFailed:<name>`, `flowAlerts:<name>`: the count went up since the step opened
  * - `flowLog:<name>:<text>`: the Flow's log contains the text
+ * - `brokerStatus:<status>`: the Gateway's broker is started or stopped
+ * - `queueExists:<name>`: the broker has a queue with this name
+ * - `queueMessages:<name>`: the number of messages on the queue went up since the step opened
  * - `route:<text>`: the address of the page contains the text
  *
  * A check the panel doesn't know never passes, so the user moves on themselves.
@@ -33,13 +39,18 @@ const LOG_ENTRIES = 200;
 @Service()
 export class TutorialChecks {
   private readonly apiService = inject(ApiService);
+  private readonly brokerService = inject(BrokerService);
   private readonly flowService = inject(FlowService);
+  private readonly queueService = inject(QueueService);
   private readonly logViewerService = inject(LogViewerService);
   private readonly router = inject(Router);
 
   /** What a counting check compares with: the count when the step opened, or 0 when the Flow isn't there yet. */
   baseline(check: string): Observable<number> {
     const { kind, name } = parseCheck(check);
+    if (kind === 'queueMessages') {
+      return this.queueMessages(name);
+    }
     return kind === 'flowCompleted' || kind === 'flowFailed' || kind === 'flowAlerts' ? this.count(kind, name) : of(0);
   }
 
@@ -74,6 +85,19 @@ export class TutorialChecks {
         return this.withFlow(name, id =>
           this.logViewerService.getLogs(LOG_ENTRIES, id, QUIET).pipe(map(response => (response.body ?? '').includes(value))),
         );
+      case 'brokerStatus':
+        return this.brokerService.getBrokers(QUIET).pipe(
+          switchMap(response => {
+            const broker = response.body?.[0];
+            return broker?.id && broker.type ? this.brokerService.getBrokerStatus(broker.id, broker.type, QUIET) : of(undefined);
+          }),
+          map(response => response?.body === name),
+          catchError(() => of(false)),
+        );
+      case 'queueExists':
+        return this.queues().pipe(map(queues => queues.some(queue => queue.name === name)));
+      case 'queueMessages':
+        return this.queueMessages(name).pipe(map(count => count > baseline));
       case 'route':
         return of(this.router.url.includes(name));
       default:
@@ -97,6 +121,21 @@ export class TutorialChecks {
     );
     // a Flow that never ran has no counts yet
     return counted.pipe(catchError(() => of(0)));
+  }
+
+  private queueMessages(name: string): Observable<number> {
+    return this.queues().pipe(map(queues => queues.find(queue => queue.name === name)?.numberOfMessages ?? 0));
+  }
+
+  /** The queues on the broker of this Gateway, or none when it has no broker or the broker is stopped. */
+  private queues(): Observable<IAddress[]> {
+    return this.brokerService.getBrokers(QUIET).pipe(
+      switchMap(response => {
+        const type = response.body?.[0]?.type;
+        return type ? this.queueService.getAllQueues(type, QUIET).pipe(map(queues => queues.body?.queues?.queue ?? [])) : of([]);
+      }),
+      catchError(() => of([])),
+    );
   }
 
   private withFlow(name: string, check: (id: number) => Observable<boolean>): Observable<boolean> {

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, Observer } from 'rxjs';
 
 import { serverApiUrl } from 'app/config';
@@ -49,11 +49,12 @@ export class QueueService {
     return this.http.delete(`${this.queuesResourceUrl}/${id}`, { observe: 'response' });
   }
 
-  getAllQueues(brokerType: string): Observable<HttpResponse<IRootQueueAddress>> {
+  getAllQueues(brokerType: string, context?: HttpContext): Observable<HttpResponse<IRootQueueAddress>> {
     if (brokerType != null && brokerType != '') {
       return this.http.get<IRootQueueAddress>(`${this.brokersResourceUrl}/${brokerType}/queues`, {
         headers: new HttpHeaders({ PlaceholderReplacement: 'true', Accept: 'application/json' }),
         observe: 'response',
+        context,
       });
     } else {
       return null;
