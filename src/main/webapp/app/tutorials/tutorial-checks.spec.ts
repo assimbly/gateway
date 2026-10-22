@@ -50,6 +50,18 @@ describe('TutorialChecks', () => {
     expect(await missing).toBe(false);
   });
 
+  it('passes apiExists when there is an API with the name, in any case', async () => {
+    const present = firstValueFrom(checks.passes('apiExists:Greetings'));
+    const request = http.expectOne(req => req.url.endsWith('api/apis'));
+    expect(request.request.context.get(HANDLES_OWN_ERRORS)).toBe(true);
+    request.flush([{ id: 1, name: 'greetings' }]);
+    expect(await present).toBe(true);
+
+    const missing = firstValueFrom(checks.passes('apiExists:Greetings'));
+    http.expectOne(req => req.url.endsWith('api/apis')).flush([]);
+    expect(await missing).toBe(false);
+  });
+
   it('passes flowStep when a saved Step has the text in its component or path', async () => {
     const steps = [
       { componentType: 'file', uri: 'C:/messages/in' },

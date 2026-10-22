@@ -20,5 +20,19 @@
     "fixtures": {
       "TestFlow": "TestFlow.xml"
     }
+  },
+  {
+    "id": "tutorial3",
+    "title": "Tutorial 3: Calling a REST API",
+    "minutes": 10,
+    "fixtures": {
+      "TestFlow": "TestFlow.xml"
+    }
+  },
+  {
+    "id": "tutorial4",
+    "title": "Tutorial 4: Creating a REST API",
+    "minutes": 10,
+    "fixtures": {}
   }
 ]

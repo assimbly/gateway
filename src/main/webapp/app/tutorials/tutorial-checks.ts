@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { Observable, catchError, map, of, switchMap } from 'rxjs';
 
 import { LogViewerService } from 'app/admin/logviewer/logviewer.service';
+import { ApiService } from 'app/entities/api/api.service';
 import { HANDLES_OWN_ERRORS } from 'app/core/interceptor/error-handler.interceptor';
 import { FlowService } from 'app/entities/flow/flow.service';
 import { runtimeStatusOf } from 'app/entities/flow/flow-status';
@@ -20,6 +21,7 @@ const LOG_ENTRIES = 200;
  * as `kind:arguments`:
  *
  * - `flowExists:<name>`: there is a Flow with this name
+ * - `apiExists:<name>`: there is an API with this name, in any case
  * - `flowStep:<name>:<text>`: the saved Flow has a Step whose component or path contains the text
  * - `flowStatus:<name>:<status>`: the Flow is started, stopped, paused…
  * - `flowCompleted:<name>`, `flowFailed:<name>`, `flowAlerts:<name>`: the count went up since the step opened
@@ -30,6 +32,7 @@ const LOG_ENTRIES = 200;
  */
 @Service()
 export class TutorialChecks {
+  private readonly apiService = inject(ApiService);
   private readonly flowService = inject(FlowService);
   private readonly logViewerService = inject(LogViewerService);
   private readonly router = inject(Router);
@@ -45,6 +48,11 @@ export class TutorialChecks {
     switch (kind) {
       case 'flowExists':
         return this.flowId(name).pipe(map(id => id !== undefined));
+      case 'apiExists':
+        return this.apiService.query(QUIET).pipe(
+          map(apis => apis.some(api => api.name?.toLowerCase() === name.toLowerCase())),
+          catchError(() => of(false)),
+        );
       case 'flowStep':
         return this.flowService.findByName(name, QUIET).pipe(
           map(response =>

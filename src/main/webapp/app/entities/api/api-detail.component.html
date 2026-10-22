@@ -29,7 +29,7 @@
           </div>
         </div>
         <div class="d-flex gap-2">
-          <button type="submit" class="btn btn-fx btn-fx-primary" [disabled]="saving || (!isNew && form.pristine)">
+          <button type="submit" class="btn btn-fx btn-fx-primary" data-tour="api-save" [disabled]="saving || (!isNew && form.pristine)">
             <fa-icon icon="save"></fa-icon> {{ isNew ? 'Create API' : 'Save' }}
           </button>
           @if (!isNew) {
@@ -61,7 +61,7 @@
               · <span [class]="'api-status api-status--' + s.tone">{{ s.label }}</span>
             }
           </span>
-          <button type="button" class="btn btn-fx btn-fx-primary" (click)="newOperation()">
+          <button type="button" class="btn btn-fx btn-fx-primary" data-tour="api-new-operation" (click)="newOperation()">
             <fa-icon icon="plus"></fa-icon> New Operation
           </button>
           <div ngbDropdown class="d-inline-block">
@@ -101,7 +101,7 @@
                     </td>
                     <td>
                       @if (urlOf(operation); as url) {
-                        <a [href]="url" target="_blank" rel="noopener" (click)="$event.stopPropagation()" [ngbTooltip]="'Open ' + url + ' in a new tab'">
+                        <a [href]="url" target="_blank" rel="noopener" data-tour="operation-url" (click)="$event.stopPropagation()" [ngbTooltip]="'Open ' + url + ' in a new tab'">
                           <code>{{ operation.fullPath }}</code>
                         </a>
                       } @else {
@@ -110,7 +110,7 @@
                     </td>
                     <td class="text-muted">{{ operation.summary }}</td>
                     <td class="text-nowrap">
-                      <a [routerLink]="['/flow/editor', operation.handlerFlowId]" [queryParams]="handlerFlowQueryParams(operation)"
+                      <a [routerLink]="['/flow/editor', operation.handlerFlowId]" [queryParams]="handlerFlowQueryParams(operation)" data-tour="operation-handler-flow"
                          (click)="$event.stopPropagation()">{{ operation.handlerFlowName }}</a>
                     </td>
                     <td class="text-nowrap">

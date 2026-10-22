@@ -196,7 +196,7 @@
   }
 
   <div class="d-flex gap-2 mt-3">
-    <button type="submit" class="btn btn-fx btn-fx-primary" [disabled]="saving">
+    <button type="submit" class="btn btn-fx btn-fx-primary" data-tour="operation-save" [disabled]="saving">
       <fa-icon icon="save"></fa-icon> {{ isNew ? 'Add Operation' : 'Save' }}
     </button>
     @if (!isNew) {
