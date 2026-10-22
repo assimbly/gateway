@@ -3,6 +3,8 @@ export interface TutorialSummary {
   id: string;
   title: string;
   minutes: number;
+  /** The name of its page on the Gateway wiki, such as `tutorial6-debugging-a-flow`: a link there opens the tutorial in the panel. */
+  wiki?: string;
   /** The Flows the tutorial starts from, by name, with the DIL file next to the tutorial that adds each one. */
   fixtures: Record<string, string>;
 }

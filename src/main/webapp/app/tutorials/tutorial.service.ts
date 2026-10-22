@@ -18,6 +18,9 @@ const QUIET = new HttpContext().set(HANDLES_OWN_ERRORS, true);
 /** How often the check of the open step asks the Gateway, in milliseconds. */
 export const CHECK_INTERVAL = 3000;
 
+/** A page of the Gateway wiki, where the written tutorials are published. */
+const WIKI_PAGE = /^https:\/\/github\.com\/assimbly\/gateway\/wiki\/([^/?#]+)/;
+
 interface Progress {
   step: number;
   done: number[];
@@ -129,6 +132,24 @@ export class TutorialService {
   restart(): void {
     this.done.set(new Set());
     this.go(0);
+  }
+
+  /**
+   * The written tutorials link to each other's wiki pages. A link to a tutorial the panel has opens it here instead,
+   * after finishing this one when the link is on its last step, such as "Next, build your own Flow in Tutorial 1".
+   * Returns whether the link was a tutorial's.
+   */
+  follow(href: string): boolean {
+    const page = WIKI_PAGE.exec(href)?.[1];
+    const linked = page ? this.summaries().find(summary => summary.wiki === page) : undefined;
+    if (!linked) {
+      return false;
+    }
+    if (this.tutorial() && this.isLast()) {
+      this.next();
+    }
+    this.start(linked.id);
+    return true;
   }
 
   /** Imports a Flow the tutorial starts from, from the DIL file next to it. */

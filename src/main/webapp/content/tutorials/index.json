@@ -1,6 +1,7 @@
 [
   {
     "id": "quick-start",
+    "wiki": "quick-start",
     "title": "Quick start",
     "minutes": 5,
     "fixtures": {
@@ -9,12 +10,14 @@
   },
   {
     "id": "tutorial1",
+    "wiki": "tutorial6-debugging-a-flow",
     "title": "Tutorial 1: Your first Flow and debugging it",
     "minutes": 20,
     "fixtures": {}
   },
   {
     "id": "tutorial2",
+    "wiki": "tutorial6-request-reply",
     "title": "Tutorial 2: Request/Reply",
     "minutes": 10,
     "fixtures": {
@@ -23,6 +26,7 @@
   },
   {
     "id": "tutorial3",
+    "wiki": "tutorial6-calling-a-rest-api",
     "title": "Tutorial 3: Calling a REST API",
     "minutes": 10,
     "fixtures": {
@@ -31,18 +35,21 @@
   },
   {
     "id": "tutorial4",
+    "wiki": "tutorial6-creating-a-rest-api",
     "title": "Tutorial 4: Creating a REST API",
     "minutes": 10,
     "fixtures": {}
   },
   {
     "id": "tutorial5",
+    "wiki": "tutorial6-create-a-new-broker",
     "title": "Tutorial 5: Manage the broker",
     "minutes": 10,
     "fixtures": {}
   },
   {
     "id": "tutorial6",
+    "wiki": "tutorial6-message-queueing",
     "title": "Tutorial 6: Message Queueing",
     "minutes": 15,
     "fixtures": {

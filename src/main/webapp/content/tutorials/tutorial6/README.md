@@ -1,6 +1,6 @@
 # Tutorial 6: Message Queueing
 
-<!-- tutorial: {"id":"tutorial6","title":"Tutorial 6: Message Queueing","minutes":15,"fixtures":{"TestFlow":"TestFlow.xml"}} -->
+<!-- tutorial: {"id":"tutorial6","wiki":"tutorial6-message-queueing","title":"Tutorial 6: Message Queueing","minutes":15,"fixtures":{"TestFlow":"TestFlow.xml"}} -->
 
 Put a queue between two Flows. The first Flow puts files on a queue, the second takes them off and writes them to a folder. You'll see why queues are useful: when the receiving Flow isn't running, messages wait on the queue until it is.
 

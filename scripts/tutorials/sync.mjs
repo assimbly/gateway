@@ -41,14 +41,14 @@ const index = TUTORIALS.map(({ markdown, assets }) => {
   if (!header) {
     throw new Error(`${markdown} has no <!-- tutorial: {...} --> comment`);
   }
-  const { id, title, minutes, fixtures } = JSON.parse(header[1]);
+  const { id, wiki, title, minutes, fixtures } = JSON.parse(header[1]);
   const folder = join(target, id);
   mkdirSync(folder, { recursive: true });
   writeFileSync(join(folder, 'README.md'), text);
   const copied = existsSync(assets) ? readdirSync(assets).filter(file => ASSET.test(file)) : [];
   copied.forEach(file => copyFileSync(join(assets, file), join(folder, file)));
   console.log(`${id}: README.md${copied.length ? ', ' + copied.join(', ') : ''}`);
-  return { id, title, minutes, fixtures: fixtures ?? {} };
+  return { id, ...(wiki ? { wiki } : {}), title, minutes, fixtures: fixtures ?? {} };
 });
 
 writeFileSync(join(target, 'index.json'), JSON.stringify(index, null, 2) + '\n');

@@ -1,6 +1,6 @@
 # Tutorial 3: Calling a REST API
 
-<!-- tutorial: {"id":"tutorial3","title":"Tutorial 3: Calling a REST API","minutes":10,"fixtures":{"TestFlow":"TestFlow.xml"}} -->
+<!-- tutorial: {"id":"tutorial3","wiki":"tutorial6-calling-a-rest-api","title":"Tutorial 3: Calling a REST API","minutes":10,"fixtures":{"TestFlow":"TestFlow.xml"}} -->
 
 Build a Flow that calls a REST API on a schedule. Every 30 seconds it asks a free weather service for the current weather in Amsterdam and saves the answer as a JSON file.
 

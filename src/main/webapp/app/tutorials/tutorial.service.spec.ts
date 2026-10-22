@@ -131,6 +131,24 @@ describe('TutorialService', () => {
     expect(service.isFinished('quick-start')).toBe(true);
   });
 
+  it('opens a tutorial its wiki page is linked to, after finishing the one with the link on its last step', () => {
+    service.load();
+    http.expectOne('content/tutorials/index.json').flush([
+      { id: 'quick-start', wiki: 'quick-start', title: 'Quick start', minutes: 10, fixtures: {} },
+      { id: 'tutorial1', wiki: 'tutorial6-debugging-a-flow', title: 'Tutorial 1', minutes: 20, fixtures: {} },
+    ]);
+    start();
+    service.go(2);
+
+    expect(service.follow('https://github.com/assimbly/gateway/wiki/tutorial6-simple-route')).toBe(false);
+    expect(service.follow('https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow')).toBe(true);
+    http.expectOne('content/tutorials/tutorial1/README.md').flush(MARKDOWN.replace('"quick-start"', '"tutorial1"'));
+
+    expect(service.isFinished('quick-start')).toBe(true);
+    expect(service.tutorial()?.id).toBe('tutorial1');
+    expect(stored().active).toBe('tutorial1');
+  });
+
   it('offers to add a Flow the tutorial starts from when the Gateway does not have it', () => {
     exists = false;
     const broadcast = jest.spyOn(TestBed.inject(EventManager), 'broadcast');

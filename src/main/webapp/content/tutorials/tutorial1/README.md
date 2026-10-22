@@ -1,6 +1,6 @@
 # Tutorial 1: Your first Flow and debugging it
 
-<!-- tutorial: {"id":"tutorial1","title":"Tutorial 1: Your first Flow and debugging it","minutes":20} -->
+<!-- tutorial: {"id":"tutorial1","wiki":"tutorial6-debugging-a-flow","title":"Tutorial 1: Your first Flow and debugging it","minutes":20} -->
 
 In the first part of this tutorial you build *TestFlow*, a Flow that moves files from one folder to another, and watch a file go through. In the second part you break a copy of it on purpose and find out what went wrong. You learn where Assimbly Gateway 6 shows errors: the error details of a Flow that doesn't start, the counters and alerts in the editor, and the log.
 

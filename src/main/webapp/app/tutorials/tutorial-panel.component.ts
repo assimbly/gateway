@@ -48,8 +48,16 @@ export class TutorialPanelComponent implements OnInit, OnDestroy {
     clearHighlight();
   }
 
-  /** A Show me button in the step points at its element, with the line it stands in; a value or code block is copied. */
+  /**
+   * A Show me button in the step points at its element, with the line it stands in; a value or code block is copied;
+   * a link to another tutorial opens it in the panel.
+   */
   onBodyClick(event: MouseEvent): void {
+    const link = (event.target as Element | null)?.closest<HTMLAnchorElement>('a[href]');
+    if (link && this.tutorials.follow(link.href)) {
+      event.preventDefault();
+      return;
+    }
     const copyable = (event.target as Element | null)?.closest<HTMLElement>('[data-tour-copy]');
     if (copyable) {
       copy(copyable);

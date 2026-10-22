@@ -1,6 +1,6 @@
 # Tutorial 4: Creating a REST API
 
-<!-- tutorial: {"id":"tutorial4","title":"Tutorial 4: Creating a REST API","minutes":10} -->
+<!-- tutorial: {"id":"tutorial4","wiki":"tutorial6-creating-a-rest-api","title":"Tutorial 4: Creating a REST API","minutes":10} -->
 
 In [Tutorial 3](https://github.com/assimbly/gateway/wiki/tutorial6-calling-a-rest-api) the Gateway called someone else's API. Now you turn things around: you create a REST API that others can call. It says hello to whoever calls it.
 
