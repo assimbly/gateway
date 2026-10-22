@@ -20,6 +20,7 @@ const TUTORIALS = [
   { markdown: join(docs, 'tutorials/v6/tutorial3/README.md'), assets: join(docs, 'tutorials/v6/tutorial3') },
   { markdown: join(docs, 'tutorials/v6/tutorial4/README.md'), assets: join(docs, 'tutorials/v6/tutorial4') },
   { markdown: join(docs, 'tutorials/v6/tutorial5/README.md'), assets: join(docs, 'tutorials/v6/tutorial5') },
+  { markdown: join(docs, 'tutorials/v6/tutorial6/README.md'), assets: join(docs, 'tutorials/v6/tutorial6') },
 ];
 
 const ASSET = /\.(png|jpe?g|gif|svg|xml|json)$/i;

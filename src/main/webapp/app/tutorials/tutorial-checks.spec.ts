@@ -62,6 +62,18 @@ describe('TutorialChecks', () => {
     expect(await missing).toBe(false);
   });
 
+  it('passes connectionExists when there is a Connection with the name', async () => {
+    const present = firstValueFrom(checks.passes('connectionExists:LocalBroker'));
+    const request = http.expectOne(req => req.url.endsWith('api/connections/getallconnections'));
+    expect(request.request.context.get(HANDLES_OWN_ERRORS)).toBe(true);
+    request.flush([{ id: 1, name: 'LocalBroker', type: 'SJMS' }]);
+    expect(await present).toBe(true);
+
+    const missing = firstValueFrom(checks.passes('connectionExists:LocalBroker'));
+    http.expectOne(req => req.url.endsWith('api/connections/getallconnections')).flush([]);
+    expect(await missing).toBe(false);
+  });
+
   it('passes flowStep when a saved Step has the text in its component or path', async () => {
     const steps = [
       { componentType: 'file', uri: 'C:/messages/in' },

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { serverApiUrl } from 'app/config';
@@ -37,8 +37,8 @@ export class ConnectionService {
         return this.http.get<any>(`${this.resourceUrl}/${id}/keys`, { observe: 'response' });
     }
 
-    getAllConnections(): Observable<EntityArrayResponseType> {
-        return this.http.get<IConnection[]>(`${this.resourceUrl}/getallconnections`, { observe: 'response' });
+    getAllConnections(context?: HttpContext): Observable<EntityArrayResponseType> {
+        return this.http.get<IConnection[]>(`${this.resourceUrl}/getallconnections`, { observe: 'response', context });
     }
 
     delete(id: number): Observable<HttpResponse<any>> {

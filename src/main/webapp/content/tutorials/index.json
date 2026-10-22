@@ -40,5 +40,13 @@
     "title": "Tutorial 5: Manage the broker",
     "minutes": 10,
     "fixtures": {}
+  },
+  {
+    "id": "tutorial6",
+    "title": "Tutorial 6: Message Queueing",
+    "minutes": 15,
+    "fixtures": {
+      "TestFlow": "TestFlow.xml"
+    }
   }
 ]

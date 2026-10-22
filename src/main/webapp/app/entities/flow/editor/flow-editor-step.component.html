@@ -522,7 +522,7 @@
                 <fa-icon icon="edit"></fa-icon>
               </button>
             } @else {
-              <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm"
+              <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm" data-tour="step-new-connection"
                       [title]="connectionCreated ? 'New connection' : 'Create connection'"
                       [attr.aria-label]="connectionCreated ? 'New connection' : 'Create connection'"
                       (click)="onCreateOrEditConnection()"

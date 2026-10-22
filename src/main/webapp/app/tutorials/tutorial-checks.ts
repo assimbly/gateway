@@ -8,6 +8,7 @@ import { LogViewerService } from 'app/admin/logviewer/logviewer.service';
 import { ApiService } from 'app/entities/api/api.service';
 import { HANDLES_OWN_ERRORS } from 'app/core/interceptor/error-handler.interceptor';
 import { BrokerService } from 'app/entities/broker/broker.service';
+import { ConnectionService } from 'app/entities/connection/connection.service';
 import { FlowService } from 'app/entities/flow/flow.service';
 import { runtimeStatusOf } from 'app/entities/flow/flow-status';
 import { QueueService } from 'app/entities/queue/queue.service';
@@ -25,6 +26,7 @@ const LOG_ENTRIES = 200;
  *
  * - `flowExists:<name>`: there is a Flow with this name
  * - `apiExists:<name>`: there is an API with this name, in any case
+ * - `connectionExists:<name>`: there is a Connection with this name
  * - `flowStep:<name>:<text>`: the saved Flow has a Step whose component or path contains the text
  * - `flowStatus:<name>:<status>`: the Flow is started, stopped, paused…
  * - `flowCompleted:<name>`, `flowFailed:<name>`, `flowAlerts:<name>`: the count went up since the step opened
@@ -40,6 +42,7 @@ const LOG_ENTRIES = 200;
 export class TutorialChecks {
   private readonly apiService = inject(ApiService);
   private readonly brokerService = inject(BrokerService);
+  private readonly connectionService = inject(ConnectionService);
   private readonly flowService = inject(FlowService);
   private readonly queueService = inject(QueueService);
   private readonly logViewerService = inject(LogViewerService);
@@ -62,6 +65,11 @@ export class TutorialChecks {
       case 'apiExists':
         return this.apiService.query(QUIET).pipe(
           map(apis => apis.some(api => api.name?.toLowerCase() === name.toLowerCase())),
+          catchError(() => of(false)),
+        );
+      case 'connectionExists':
+        return this.connectionService.getAllConnections(QUIET).pipe(
+          map(response => (response.body ?? []).some(connection => connection.name === name)),
           catchError(() => of(false)),
         );
       case 'flowStep':
