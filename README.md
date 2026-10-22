@@ -20,7 +20,7 @@ The main [design](https://github.com/assimbly/gateway/wiki/design) goals are:
 
 ## Getting started
 
-Create your first flow with the [Quick start guide](https://github.com/assimbly/gateway/wiki/quick-start).
+[Install](https://github.com/assimbly/gateway/wiki/install) the Gateway, then run your first flow with the [Quick start guide](https://github.com/assimbly/gateway/wiki/quick-start).
 
 ## Downloads
 

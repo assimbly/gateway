@@ -2,7 +2,7 @@
   {
     "id": "quick-start",
     "title": "Quick start",
-    "minutes": 10,
+    "minutes": 5,
     "fixtures": {
       "ExampleFlow": "ExampleFlow.xml"
     }
