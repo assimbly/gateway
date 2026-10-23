@@ -2,14 +2,11 @@
 
 <!-- tutorial: {"id":"tutorial7","wiki":"tutorial6-simple-route","title":"Tutorial 7: Create a simple route","minutes":10,"track":"For Camel developers"} -->
 
-So far you built every Flow on the visual canvas. Under the hood, the Gateway runs those Flows as [Apache Camel](https://camel.apache.org/) routes. If you already know Camel, you can also write a route yourself. In this tutorial you write your first one.
+**What you'll learn**
 
-**What you'll do:**
-
-1. Create a Camel route Flow
-2. Write a route in XML
-3. Run it and send it a file
-4. Find its log message
+* Write a Camel route in XML
+* Run it as a Flow
+* Find its log message
 
 It takes about 10 minutes.
 
@@ -18,10 +15,11 @@ It takes about 10 minutes.
 
 ## Before you start
 
-* You need the Gateway running and to be signed in. The [Quick start](https://github.com/assimbly/gateway/wiki/quick-start) shows how.
-* You don't need to know Camel to follow along, but it helps. The [Camel routes](https://camel.apache.org/manual/routes.html) page of the Camel manual is a good start.
+* Camel knowledge helps, but isn't needed: the [Camel routes](https://camel.apache.org/manual/routes.html) page is a good start
 
 ## How it works
+
+Under the hood, the Gateway runs every Flow as an [Apache Camel](https://camel.apache.org/) route. If you know Camel, you can also write a route yourself.
 
 A Camel route describes in a few lines where messages come from, what happens to them and where they go. The route you write moves files from one folder to another and logs the name of each file:
 

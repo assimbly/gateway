@@ -2,17 +2,15 @@
 
 <!-- tutorial: {"id":"tutorial6","wiki":"tutorial6-message-queueing","title":"Tutorial 6: Message Queueing","minutes":15,"track":"Messaging","fixtures":{"TestFlow":"TestFlow.xml"}} -->
 
-Put a queue between two Flows. The first Flow puts files on a queue, the second takes them off and writes them to a folder. You'll see why queues are useful: when the receiving Flow isn't running, messages wait on the queue until it is.
+**What you'll learn**
 
-**FileToQueue:** **File (Source)** → **Simple JMS (Sink)**, which puts each file on *OrdersQueue*
+* Put messages on a queue from a Flow
+* Take them off with another Flow
+* See messages wait while the receiver is stopped
 
-**QueueToFile:** **Simple JMS (Source)** → **File (Sink)**, which takes each message off *OrdersQueue*
+**FileToQueue:** **File** → **Simple JMS**, onto *OrdersQueue*
 
-The two Flows don't know about each other, only the queue. In real integrations the two sides are often different systems, such as a web shop and an ERP system. A queue between them:
-
-* **Buffers.** When the receiver is down or slow, messages wait instead of getting lost.
-* **Decouples.** You can stop, change or replace one Flow without touching the other.
-* **Spreads the load.** Several Flows can take messages off the same queue.
+**QueueToFile:** **Simple JMS** → **File**, off *OrdersQueue*
 
 It takes about 15 minutes.
 
@@ -21,14 +19,14 @@ It takes about 15 minutes.
 
 ## Before you start
 
-<!-- step: {"check":"flowExists:TestFlow"} -->
-
-* You need *TestFlow* from [Tutorial 1](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow): it moves files from `@{messages}/in` to `@{messages}/out`. No *TestFlow*? Click **Add TestFlow** in the Tutorials panel, or import [TestFlow.xml](https://github.com/assimbly/documentation/blob/master/tutorials/v6/tutorial6/TestFlow.xml) with **Import** on **Flows → Manage**.
-* You need a running broker, such as the *default* broker that comes with the Gateway. [Tutorial 5](https://github.com/assimbly/gateway/wiki/tutorial6-create-a-new-broker) shows where to check it.
+* *TestFlow* from [Tutorial 1](https://github.com/assimbly/gateway/wiki/tutorial6-your-first-flow). No *TestFlow*? Click **Add TestFlow** in the Tutorials panel, or import [TestFlow.xml](https://github.com/assimbly/documentation/blob/master/tutorials/v6/tutorial6/TestFlow.xml) on **Flows → Manage**.
+* A running broker, such as the *default* one: see [Tutorial 5](https://github.com/assimbly/gateway/wiki/tutorial6-create-a-new-broker)
 
 ## Step 1: Clone TestFlow
 
 <!-- step: {"check":"route:mode=clone"} -->
+
+You put a queue between two Flows: the first puts files on it, the second takes them off and writes them to a folder.
 
 1. Go to **Flows → Manage**.
 2. In the row of *TestFlow*, click **⋮** (*More actions*) and choose **Clone**. <!-- show: tr[data-flow-name="TestFlow"] [aria-label="More actions"] -->
@@ -104,6 +102,12 @@ The Sink of this Flow is still the File component of *TestFlow*: it writes to `@
 With both Flows running, every new file in the `in` folder travels through the queue to the `out` folder right away. Try it with **Send test message** on *FileToQueue*! Or stop *QueueToFile*, send a few messages and watch them wait on the queue until you start it again.
 
 When you're done, stop both Flows on **Flows → Manage**.
+
+**Why a queue?** The two Flows don't know about each other, only the queue. In real integrations the two sides are often different systems, such as a web shop and an ERP system. A queue between them:
+
+* **Buffers.** When the receiver is down or slow, messages wait instead of getting lost.
+* **Decouples.** You can stop, change or replace one Flow without touching the other.
+* **Spreads the load.** Several Flows can take messages off the same queue.
 
 ## Summary
 

@@ -280,6 +280,25 @@
       }
     }
 
+    // what a tutorial needs, on its overview: there when you want it, out of the way when you don't
+    .tutorial-prerequisites {
+      margin-bottom: 0.75rem;
+      color: var(--app-text-muted);
+
+      summary {
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      &[open] summary {
+        margin-bottom: 0.5rem;
+      }
+
+      ul:last-child {
+        margin-bottom: 0;
+      }
+    }
+
     blockquote {
       padding: 0.5rem 0.75rem;
       border-left: 3px solid var(--app-border);

@@ -73,6 +73,22 @@ describe('parseTutorial', () => {
     expect(html.querySelector('a')?.getAttribute('target')).toBe('_blank');
   });
 
+  it('folds Before you start into the overview, collapsed', () => {
+    const markdown = MARKDOWN.replace('## Prerequisites', '## Before you start\n\n<!-- step: {"check":"flowExists:TestFlow"} -->\n\n* *TestFlow*\n\n## Prerequisites');
+    const steps = parseTutorial(markdown).steps;
+    expect(steps.map(step => step.title)).toEqual(['Quick start', 'Meet ExampleFlow', 'Open it']);
+    const details = htmlOf(steps[0].html).querySelector('details.tutorial-prerequisites');
+    expect(details?.hasAttribute('open')).toBe(false);
+    expect(details?.querySelector('summary')?.textContent).toBe('Before you start');
+    expect(details?.querySelector('li')?.textContent).toBe('TestFlow');
+  });
+
+  it("leaves the What you'll learn label to the panel", () => {
+    const html = parseTutorial(MARKDOWN.replace('Welcome to the Gateway.', "**What you'll learn**\n\n* Build a Flow")).steps[0].html;
+    expect(html).not.toContain('What you');
+    expect(htmlOf(html).querySelector('li')?.textContent).toBe('Build a Flow');
+  });
+
   it('needs the header comment', () => {
     expect(() => parseTutorial('# No header\n\n## Step')).toThrow();
   });

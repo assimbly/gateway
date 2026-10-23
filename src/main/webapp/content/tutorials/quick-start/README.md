@@ -43,4 +43,4 @@ You see `Example flow running`.
 
 Close the log and click **Stop**. <!-- show: [data-tour="flow-stop"] -->
 
-**Done!** Next, build your own Flow in [Tutorial 1](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow).
+**Done!** Next, build your own Flow in [Tutorial 1](https://github.com/assimbly/gateway/wiki/tutorial6-your-first-flow).

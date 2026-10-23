@@ -2,9 +2,11 @@
 
 <!-- tutorial: {"id":"tutorial3","wiki":"tutorial6-calling-a-rest-api","title":"Tutorial 3: Calling a REST API","minutes":10,"track":"Connect systems","fixtures":{"TestFlow":"TestFlow.xml"}} -->
 
-Build a Flow that calls a REST API on a schedule. Every 30 seconds it asks a free weather service for the current weather in Amsterdam and saves the answer as a JSON file.
+**What you'll learn**
 
-A call that fetches data doesn't need a file to start it, only a trigger. A **Scheduler** Source is that trigger: it starts the Flow at a fixed interval with an empty message.
+* Start a Flow on a timer with a **Scheduler**
+* Call a REST API with **HTTPS**
+* Save the answer under a fixed file name
 
 **Scheduler (Source)** → **HTTPS (Action)** → **File (Sink)**
 
@@ -15,14 +17,14 @@ It takes about 10 minutes.
 
 ## Before you start
 
-<!-- step: {"check":"flowExists:TestFlow"} -->
-
-* You need *TestFlow* from [Tutorial 1](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow): it moves files from `@{messages}/in` to `@{messages}/out`. No *TestFlow*? Click **Add TestFlow** in the Tutorials panel, or import [TestFlow.xml](https://github.com/assimbly/documentation/blob/master/tutorials/v6/tutorial3/TestFlow.xml) with **Import** on **Flows → Manage**.
-* The Gateway needs internet access. It calls the [Open-Meteo](https://open-meteo.com/) weather API, which is free and needs no account or API key.
+* *TestFlow* from [Tutorial 1](https://github.com/assimbly/gateway/wiki/tutorial6-your-first-flow). No *TestFlow*? Click **Add TestFlow** in the Tutorials panel, or import [TestFlow.xml](https://github.com/assimbly/documentation/blob/master/tutorials/v6/tutorial3/TestFlow.xml) on **Flows → Manage**.
+* Internet access: the Flow calls the free [Open-Meteo](https://open-meteo.com/) weather API (no account or key needed)
 
 ## Step 1: Clone TestFlow
 
 <!-- step: {"check":"route:mode=clone"} -->
+
+You build a Flow that asks a weather service for the current weather in Amsterdam every 30 seconds, and saves the answer as a JSON file.
 
 1. Go to **Flows → Manage**.
 2. In the row of *TestFlow*, click **⋮** (*More actions*) and choose **Clone**. <!-- show: tr[data-flow-name="TestFlow"] [aria-label="More actions"] -->

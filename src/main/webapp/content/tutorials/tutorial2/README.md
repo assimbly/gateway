@@ -1,12 +1,12 @@
-# Tutorial 2: Request/Reply
+# Tutorial 2: Debugging a Flow
 
-<!-- tutorial: {"id":"tutorial2","wiki":"tutorial6-request-reply","title":"Tutorial 2: Request/Reply","minutes":10,"track":"Connect systems","fixtures":{"TestFlow":"TestFlow.xml"}} -->
+<!-- tutorial: {"id":"tutorial2","wiki":"tutorial6-debugging-a-flow","title":"Tutorial 2: Debugging a Flow","minutes":10,"track":"Get started","fixtures":{"TestFlow":"TestFlow.xml"}} -->
 
-Build a Flow that calls a web service and saves its reply. You ask a public calculator service for 2 + 2 and get the answer back as a file.
+**What you'll learn**
 
-In the middle of the Flow, an Action sends the message to the service and waits for the answer. The answer replaces the message, so the Sink saves the reply instead of the request:
-
-**File (Source)** → **Set header** → **HTTP** → **File (Sink)**
+* Find out why a Flow doesn't start
+* Spot failed messages: counters and alerts
+* Find the full error in the log
 
 It takes about 10 minutes.
 
@@ -15,106 +15,100 @@ It takes about 10 minutes.
 
 ## Before you start
 
-<!-- step: {"check":"flowExists:TestFlow"} -->
+* *TestFlow* from [Tutorial 1](https://github.com/assimbly/gateway/wiki/tutorial6-your-first-flow). No *TestFlow*? Click **Add TestFlow** in the Tutorials panel, or import [TestFlow.xml](https://github.com/assimbly/documentation/blob/master/tutorials/v6/tutorial2/TestFlow.xml) on **Flows → Manage**.
+* No `out2` folder in your messages folder
 
-* You need *TestFlow* from [Tutorial 1](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow): it moves files from `@{messages}/in` to `@{messages}/out`. No *TestFlow*? Click **Add TestFlow** in the Tutorials panel, or import [TestFlow.xml](https://github.com/assimbly/documentation/blob/master/tutorials/v6/tutorial2/TestFlow.xml) with **Import** on **Flows → Manage**.
-* The Gateway needs internet access: it calls `www.dneonline.com`.
-
-## Step 1: Clone TestFlow
+## Step 1: Clone the TestFlow
 
 <!-- step: {"check":"route:mode=clone"} -->
 
-1. Go to **Flows → Manage**.
-2. In the row of *TestFlow*, click **⋮** (*More actions*) and choose **Clone**. <!-- show: tr[data-flow-name="TestFlow"] [aria-label="More actions"] -->
-3. Next to **Flow name**, type `Calculator`. <!-- show: #field_flowName -->
-4. Click the **Source** on the canvas <!-- show: .flow-step-source --> and change **Directory Name** to `@{messages}/calculator`. <!-- show: [formcontrolname="uri"] -->
+You make a copy of *TestFlow* that can't deliver its files, and find out what goes wrong.
 
-*Calculator* gets a folder of its own, so *TestFlow* doesn't pick up its requests, even when it runs.
+1. Go to **Flows → Manage**. If *TestFlow* isn't running, click **▶** in its row: you need it running in step 3.
+2. In the row of *TestFlow*, click **⋮** (*More actions*) <!-- show: tr[data-flow-name="TestFlow"] [aria-label="More actions"] --> and choose **Clone**.
 
-## Step 2: Say the request is XML
+![Clone the TestFlow](01-clone-flow.png)
 
-The calculator is a SOAP web service. It only accepts a request when its `Content-Type` header says it's XML.
+The editor opens with a copy of *TestFlow*. Everything is copied except the name, which is empty.
 
-1. Click the **+** on the line between the Source and the Sink. <!-- show: [aria-label="Insert a Step here"] -->
-2. Type `header` in the search box and choose **Set header**.
+## Step 2: Make the Sink fail
 
-![Add an Action](01-add-action.png)
+Change the copy so it can't deliver its files:
 
-Its settings open on the right:
+1. Next to **Flow name**, type `DebugFlow`. <!-- show: #field_flowName -->
+2. Click the **Sink** on the canvas. <!-- show: .flow-step-sink --> Its settings open in the panel on the right. (Don't see the panel? Click **Show editor**.)
+3. Change **Directory Name** to `@{messages}/out2`. <!-- show: [formcontrolname="uri"] -->
+4. Under **Options**, choose **Auto Create** in the list and turn the switch **Off**. <!-- show: .option-row -->
 
-3. Set **Header Name** to `Content-Type`. <!-- show: [formcontrolname="uri"] -->
-4. Under **Options**, type `text/xml` next to **Value**. <!-- show: .option-row + .option-row -->
+![Configure the Sink](02-configure-sink.png)
 
-![Configure the Set header Action](02-set-header.png)
+Normally the File component creates a missing folder for you. With **Auto Create** off it can't, so every file this Flow tries to deliver fails.
 
-## Step 3: Call the web service
+## Step 3: Find out why a Flow doesn't start
 
-1. Click the **+** on the line just before the Sink. <!-- show: .flow-step-sink -->
-2. Type `http` in the search box and choose **HTTP**.
-3. Set **Http Uri** to the address of the service, `http://www.dneonline.com/calculator.asmx`. <!-- show: [formcontrolname="uri"] -->
-4. Under **Options**, choose **Http Method** in the list and select **POST**. <!-- show: .option-row -->
+<!-- step: {"check":"flowExists:DebugFlow"} -->
 
-![Configure the HTTP Action](03-http-action.png)
-
-You save the Flow in the next step, right before you start it.
-
-## Step 4: Send a request
-
-<!-- step: {"check":"flowCompleted:Calculator"} -->
+Errors can also happen when a Flow starts. *TestFlow* is still running, so you run into one right away:
 
 1. Click **Save**, <!-- show: [data-tour="flow-save"] --> then **Start**. <!-- show: [data-tour="flow-start"] -->
-2. Click **Send test message**. <!-- show: [data-tour="flow-send-test"] --> The Send page opens with the Source of *Calculator* as destination.
-3. Under **Body**, paste this request. It asks the service to add 2 and 2: <!-- show: .body-codemirror -->
 
-   ```xml
-   <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">
-      <soapenv:Header/>
-      <soapenv:Body>
-         <tem:Add>
-            <tem:intA>2</tem:intA>
-            <tem:intB>2</tem:intB>
-         </tem:Add>
-      </soapenv:Body>
-   </soapenv:Envelope>
-   ```
+*DebugFlow* doesn't start. Instead a red **Error** badge appears in the header. Click it to see why: <!-- show: [data-tour="flow-error-badge"] -->
 
-4. Click **Send**, <!-- show: [title="Send (Ctrl+Enter)"] --> then **Back**.
+![Error on start](06-start-error.png)
 
-The Gateway writes the request as a file in the `calculator` folder, and *Calculator* picks it up. Within a few seconds **Completed** goes up. <!-- show: [data-tour="flow-completed"] -->
+Both Flows read from the same folder, `@{messages}/in`. Only one Source at a time may listen to the same file endpoint, so the second Flow can't start: `Multiple consumers for the same endpoint is not allowed`.
 
-![The Flow has processed the request](04-flow-running.png)
+## Step 4: Send a message and watch it fail
 
-> **Failed** went up instead? Click the **Alert** badge. `Connect to http://www.dneonline.com:80 failed` means the free service didn't answer in time: send the message again.
+<!-- step: {"check":"flowFailed:DebugFlow"} -->
 
-## Step 5: Read the reply
+1. Stop *TestFlow*, so *DebugFlow* can listen to the `in` folder: go to **Flows → Manage** and click **■** in its row. <!-- show: tr[data-flow-name="TestFlow"] [aria-label="Stop"] -->
+2. Click *DebugFlow* to open it, and click **Start**. <!-- show: [data-tour="flow-start"] --> This time the button turns green: the Flow is running.
+3. Click **Send test message**, <!-- show: [data-tour="flow-send-test"] --> type `Hello Assimbly` under **Body** and click **Send**. <!-- show: [title="Send (Ctrl+Enter)"] -->
+4. Click **Back**.
 
-The Sink saved the reply in `@{messages}/out`: the `out` folder of your messages folder. On Windows that's `C:\Users\<you>\messages\out`. Not sure where your messages folder is? The Variable `messages` under **Flows → Variables** holds its path, and the Tutorials panel shows it at the top of this step.
+The Source picks up the file, but the Sink can't store it. In the editor header the **Failed** counter goes up <!-- show: [data-tour="flow-failed"] --> and a yellow **Alert** badge appears:
 
-Open the newest file in that folder. It holds the reply of the service:
+![The Flow fails](03-flow-failed.png)
 
-```xml
-<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <soap:Body>
-      <AddResponse xmlns="http://tempuri.org/">
-         <AddResult>4</AddResult>
-      </AddResponse>
-   </soap:Body>
-</soap:Envelope>
-```
+5. Click the **Alert** badge. <!-- show: [data-tour="flow-alert-badge"] --> The *Alerts* panel lists the errors of this Flow:
 
-The answer is in `<AddResult>`: 2 + 2 = 4.
+![Alert details](04-alert-details.png)
 
-Try other numbers with **Send test message**, or change `Add` into `Multiply`, `Subtract` or `Divide` in both tags.
+`Cannot store file: ...messages\out2\...` tells you exactly what went wrong: the Sink can't write to the `out2` folder. Click **Clear** to remove the alerts once you've read them.
 
-When you're done, click **Stop**. <!-- show: [data-tour="flow-stop"] -->
+> **Where did my file go?** The Flow's **Error handler** takes care of failed messages. By default it writes the error to the Gateway log, after which the file is moved to the hidden `.camel` subfolder of the `in` folder, just like a file that was delivered. To do something else with failed messages, click **Error handler** in the editor toolbar.
+
+## Step 5: Find the full error in the log
+
+<!-- step: {"check":"flowLog:DebugFlow:Cannot store file"} -->
+
+An alert is a one-line summary. The full details, such as the headers of the message and the stack trace, are in the Gateway log. You see the log in the terminal where you started the Gateway, or in your browser:
+
+1. In the editor header of *DebugFlow*, click **Log**. <!-- show: [data-tour="flow-log"] --> A panel opens with the log of this Flow only.
+2. Type `Cannot store file` in the filter box. <!-- show: #flowLogSearchText -->
+
+![The error in the log of the Flow](05-flow-log.png)
+
+You find two entries:
+
+* The first is written by the Flow's error handler. It shows the failed message: its headers, its body and the exception that was caught, followed by the stack trace.
+* The second says **Failed delivery** and gives the exception: `GenericFileOperationFailedException: Cannot store file`.
+
+> The panel shows the last entries of the log (the **Entries** field). Can't find the error? Raise **Entries**, or send another test message and click **Refresh**. **Open in Log viewer** shows the same entries in **Administration → Log viewer**, where you can clear the Flow filter to see the whole Gateway log. On **Flows → Manage** you find the same panel under **⋮** → **View log**.
+
+To fix the Flow, you would create the `out2` folder or turn **Auto Create** back on.
+
+When you're done, close the log panel and click **Stop**. <!-- show: [data-tour="flow-stop"] -->
 
 ## Summary
 
-| Step | Component | What it does |
-|------|-----------|--------------|
-| Source | **File** | Picks up the request from the `calculator` folder. |
-| Action | **Set header** | Sets `Content-Type: text/xml`, so the service knows the request is XML. |
-| Action | **HTTP** | Sends the request to the service and waits for the reply. The reply becomes the message. |
-| Sink | **File** | Saves the reply in the `out` folder. |
+| Where | What it tells you |
+|-------|-------------------|
+| **Error** badge | Why a Flow or one of its Steps didn't start. |
+| **Completed** / **Failed** counters | How many messages went through the Flow, and how many failed. |
+| **Alert** badge | The latest errors of messages, one line each. |
+| **Log** in the editor header (or **Administration → Log viewer**, or the terminal) | The full error, with the message headers and the stack trace. |
+| **Send test message** in the editor header | Sends a message to the Source of a running Flow, so you can try it without leaving the Gateway. |
 
-**Done!** Continue with [Tutorial 3: Calling a REST API](https://github.com/assimbly/gateway/wiki/tutorial6-calling-a-rest-api).
+**Done!** You can find out why a Flow fails. Continue with [Tutorial 3: Calling a REST API](https://github.com/assimbly/gateway/wiki/tutorial6-calling-a-rest-api).

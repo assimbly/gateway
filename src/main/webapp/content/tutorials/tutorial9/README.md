@@ -2,26 +2,20 @@
 
 <!-- tutorial: {"id":"tutorial9","wiki":"tutorial6-running-scripts","title":"Tutorial 9: Running scripts","minutes":10,"track":"For Camel developers"} -->
 
-Sometimes a few lines of code are quicker than a Flow of Steps. A **Script** Flow runs your own script: for example in Camel's Simple language, Groovy, JavaScript, Python, JSLT or XSLT. In this tutorial you build a small clock: every 10 seconds one script writes a greeting with the current time, and a second script saves it to a file.
+**What you'll learn**
 
-**What you'll do:**
-
-1. Create a Script Flow
-2. Set the Source that triggers the scripts
-3. Write a script in Simple
-4. Add a script in Groovy
-5. Start the Flow and read the result
+* Create a Script Flow
+* Write scripts in Simple and Groovy
+* Chain scripts one after another
 
 It takes about 10 minutes.
 
 <!-- web-only -->
 > You can also follow this tutorial inside the Gateway: click **Tutorials** in the menu. It shows each step next to the screen it's about and ticks it off once you've done it.
 
-## Before you start
-
-* You need the Gateway running and to be signed in. The [Quick start](https://github.com/assimbly/gateway/wiki/quick-start) shows how.
-
 ## How it works
+
+Sometimes a few lines of code are quicker than a Flow of Steps. A **Script** Flow runs your own script: for example in Camel's Simple language, Groovy, JavaScript, Python, JSLT or XSLT. You build a small clock: every 10 seconds one script writes a greeting with the current time, and a second script saves it to a file.
 
 A Script Flow has four parts:
 
@@ -115,7 +109,7 @@ Open it again a little later: the time has changed.
 **Try it yourself:**
 
 * Add the date: change the Simple script to `Hello from Assimbly! It is ${date:now:yyyy-MM-dd HH:mm:ss}`. Click **Save & restart** to run it with the new script. <!-- show: [data-tour="flow-save-start"] -->
-* Break the Groovy script on purpose, for example by writing to a folder that doesn't exist. The **Failed** counter goes up and an **Alert** badge appears. See [Tutorial 1](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow) for finding the error.
+* Break the Groovy script on purpose, for example by writing to a folder that doesn't exist. The **Failed** counter goes up and an **Alert** badge appears. See [Tutorial 2](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow) for finding the error.
 
 When you're done, click **Stop**. <!-- show: [data-tour="flow-stop"] --> Otherwise the Flow keeps writing the file every 10 seconds.
 

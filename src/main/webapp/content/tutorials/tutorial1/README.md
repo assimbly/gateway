@@ -1,41 +1,27 @@
-# Tutorial 1: Your first Flow and debugging it
+# Tutorial 1: Your first Flow
 
-<!-- tutorial: {"id":"tutorial1","wiki":"tutorial6-debugging-a-flow","title":"Tutorial 1: Your first Flow and debugging it","minutes":15,"track":"Get started"} -->
+<!-- tutorial: {"id":"tutorial1","wiki":"tutorial6-your-first-flow","title":"Tutorial 1: Your first Flow","minutes":5,"track":"Get started"} -->
 
-In the first part of this tutorial you build *TestFlow*, a Flow that moves files from one folder to another, and watch a file go through. In the second part you break a copy of it on purpose and find out what went wrong. You learn where Assimbly Gateway 6 shows errors: the error details of a Flow that doesn't start, the counters and alerts in the editor, and the log.
+**What you'll learn**
 
-**What you'll do:**
+* Build a Flow on the canvas
+* Start it and send it a message
+* See the message arrive
 
-*Part 1: Build a Flow*
+**File (Source)** → **File (Sink)**
 
-1. Create *TestFlow*
-2. Save it, start it and send a message
-
-*Part 2: Debug a Flow*
-
-3. Clone *TestFlow*
-4. Change its Sink so it can't deliver files
-5. Find out why a Flow doesn't start
-6. Send a message and watch it fail
-7. Find the full error in the log
-
-It takes about 15 minutes.
+It takes about 5 minutes.
 
 <!-- web-only -->
 > You can also follow this tutorial inside the Gateway: click **Tutorials** in the menu. It shows each step next to the screen it's about and ticks it off once you've done it.
 
 ## Before you start
 
-* Complete the [Quick start](https://github.com/assimbly/gateway/wiki/quick-start). You need the Gateway running and to be signed in.
-* Make sure your messages folder has no `out2` folder. Part 2 relies on it being missing.
-
-> **Your messages folder.** The tutorials keep their files in the folder `messages` in your home folder: `C:\Users\<you>\messages` on Windows, `/home/<you>/messages` on Linux, `/Users/<you>/messages` on macOS and `/data/messages` in Docker. A Flow refers to it as `@{messages}`, a **Variable** the Gateway creates for you, so the same Flow works on every machine. You find it under **Flows → Variables**.
-
-## Part 1: Build a Flow
-
-You build *TestFlow*: it picks up each file from an `in` folder and drops it in an `out` folder. The other tutorials start from this Flow too.
+* The Gateway running, and you signed in: see the [Quick start](https://github.com/assimbly/gateway/wiki/quick-start)
 
 ## Step 1: Create TestFlow
+
+You build *TestFlow*: it picks up each file from an `in` folder and drops it in an `out` folder. The other tutorials start from this Flow too.
 
 1. Go to **Flows → Manage** and click **Add**. <!-- show: [aria-label="Add"] -->
 2. Choose **Visual** (marked *No code · recommended*). <!-- show: a.flow-type-choice -->
@@ -48,6 +34,8 @@ You build *TestFlow*: it picks up each file from an `in` folder and drops it in 
    * **Directory Name:** `@{messages}/out`
 
 The folders don't have to exist: the File component creates them when the Flow starts.
+
+> **Your messages folder.** The tutorials keep their files in the folder `messages` in your home folder: `C:\Users\<you>\messages` on Windows, `/home/<you>/messages` on Linux, `/Users/<you>/messages` on macOS and `/data/messages` in Docker. A Flow refers to it as `@{messages}`, a **Variable** the Gateway creates for you, so the same Flow works on every machine. You find it under **Flows → Variables**.
 
 You now have a Flow of two Steps: a Source that receives messages and a Sink that delivers them. There's no need to save in between: you save the Flow in the next step, right before you start it.
 
@@ -72,99 +60,4 @@ The Gateway writes your message as a file in the `in` folder. Within a second th
 * Errors are handled by the Flow's **Error handler**. For a new Flow it writes the error to the Gateway log. You can change it from the toolbar of the editor.
 * Every Flow runs as an [Apache Camel](https://camel.apache.org/) route. Click **Camel route** in the editor header to see the route of a running Flow, and to copy or download it. <!-- show: [data-tour="flow-camel-route"] -->
 
-## Part 2: Debug a Flow
-
-*TestFlow* works. Now you make a copy that can't deliver its files, and find out what goes wrong. Leave *TestFlow* running: you need it in step 5.
-
-## Step 3: Clone the TestFlow
-
-<!-- step: {"check":"route:mode=clone"} -->
-
-1. Go to **Flows → Manage**.
-2. In the row of *TestFlow*, click **⋮** (*More actions*) <!-- show: tr[data-flow-name="TestFlow"] [aria-label="More actions"] --> and choose **Clone**.
-
-![Clone the TestFlow](01-clone-flow.png)
-
-The editor opens with a copy of *TestFlow*. Everything is copied except the name, which is empty.
-
-## Step 4: Make the Sink fail
-
-Change the copy so it can't deliver its files:
-
-1. Next to **Flow name**, type `DebugFlow`. <!-- show: #field_flowName -->
-2. Click the **Sink** on the canvas. <!-- show: .flow-step-sink --> Its settings open in the panel on the right. (Don't see the panel? Click **Show editor**.)
-3. Change **Directory Name** to `@{messages}/out2`. <!-- show: [formcontrolname="uri"] -->
-4. Under **Options**, choose **Auto Create** in the list and turn the switch **Off**. <!-- show: .option-row -->
-
-![Configure the Sink](02-configure-sink.png)
-
-Normally the File component creates a missing folder for you. With **Auto Create** off it can't, so every file this Flow tries to deliver fails.
-
-## Step 5: Find out why a Flow doesn't start
-
-<!-- step: {"check":"flowExists:DebugFlow"} -->
-
-Errors can also happen when a Flow starts. *TestFlow* is still running, so you run into one right away:
-
-1. Click **Save**, <!-- show: [data-tour="flow-save"] --> then **Start**. <!-- show: [data-tour="flow-start"] -->
-
-*DebugFlow* doesn't start. Instead a red **Error** badge appears in the header. Click it to see why: <!-- show: [data-tour="flow-error-badge"] -->
-
-![Error on start](06-start-error.png)
-
-Both Flows read from the same folder, `@{messages}/in`. Only one Source at a time may listen to the same file endpoint, so the second Flow can't start: `Multiple consumers for the same endpoint is not allowed`.
-
-## Step 6: Send a message and watch it fail
-
-<!-- step: {"check":"flowFailed:DebugFlow"} -->
-
-1. Stop *TestFlow*, so *DebugFlow* can listen to the `in` folder: go to **Flows → Manage** and click **■** in its row. <!-- show: tr[data-flow-name="TestFlow"] [aria-label="Stop"] -->
-2. Click *DebugFlow* to open it, and click **Start**. <!-- show: [data-tour="flow-start"] --> This time the button turns green: the Flow is running.
-3. Click **Send test message**, <!-- show: [data-tour="flow-send-test"] --> type `Hello Assimbly` under **Body** and click **Send**. <!-- show: [title="Send (Ctrl+Enter)"] -->
-4. Click **Back**.
-
-The Source picks up the file, but the Sink can't store it. In the editor header the **Failed** counter goes up <!-- show: [data-tour="flow-failed"] --> and a yellow **Alert** badge appears:
-
-![The Flow fails](03-flow-failed.png)
-
-5. Click the **Alert** badge. <!-- show: [data-tour="flow-alert-badge"] --> The *Alerts* panel lists the errors of this Flow:
-
-![Alert details](04-alert-details.png)
-
-`Cannot store file: ...messages\out2\...` tells you exactly what went wrong: the Sink can't write to the `out2` folder. Click **Clear** to remove the alerts once you've read them.
-
-> **Where did my file go?** The Flow's **Error handler** takes care of failed messages. By default it writes the error to the Gateway log, after which the file is moved to the hidden `.camel` subfolder of the `in` folder, just like a file that was delivered. To do something else with failed messages, click **Error handler** in the editor toolbar.
-
-## Step 7: Find the full error in the log
-
-<!-- step: {"check":"flowLog:DebugFlow:Cannot store file"} -->
-
-An alert is a one-line summary. The full details, such as the headers of the message and the stack trace, are in the Gateway log. You see the log in the terminal where you started the Gateway, or in your browser:
-
-1. In the editor header of *DebugFlow*, click **Log**. <!-- show: [data-tour="flow-log"] --> A panel opens with the log of this Flow only.
-2. Type `Cannot store file` in the filter box. <!-- show: #flowLogSearchText -->
-
-![The error in the log of the Flow](05-flow-log.png)
-
-You find two entries:
-
-* The first is written by the Flow's error handler. It shows the failed message: its headers, its body and the exception that was caught, followed by the stack trace.
-* The second says **Failed delivery** and gives the exception: `GenericFileOperationFailedException: Cannot store file`.
-
-> The panel shows the last entries of the log (the **Entries** field). Can't find the error? Raise **Entries**, or send another test message and click **Refresh**. **Open in Log viewer** shows the same entries in **Administration → Log viewer**, where you can clear the Flow filter to see the whole Gateway log. On **Flows → Manage** you find the same panel under **⋮** → **View log**.
-
-To fix the Flow, you would create the `out2` folder or turn **Auto Create** back on.
-
-When you're done, close the log panel and click **Stop**. <!-- show: [data-tour="flow-stop"] -->
-
-## Summary
-
-| Where | What it tells you |
-|-------|-------------------|
-| **Error** badge | Why a Flow or one of its Steps didn't start. |
-| **Completed** / **Failed** counters | How many messages went through the Flow, and how many failed. |
-| **Alert** badge | The latest errors of messages, one line each. |
-| **Log** in the editor header (or **Administration → Log viewer**, or the terminal) | The full error, with the message headers and the stack trace. |
-| **Send test message** in the editor header | Sends a message to the Source of a running Flow, so you can try it without leaving the Gateway. |
-
-**Done!** You built a Flow and can find out why one fails. Continue with [Tutorial 2: Request/Reply](https://github.com/assimbly/gateway/wiki/tutorial6-request-reply).
+**Done!** You built your first Flow. Leave *TestFlow* running and continue with [Tutorial 2: Debugging a Flow](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow), where you break a copy of it on purpose.

@@ -2,14 +2,11 @@
 
 <!-- tutorial: {"id":"tutorial10","wiki":"tutorial6-using-the-api","title":"Tutorial 10: Using the API","minutes":15,"track":"Automation"} -->
 
-Everything you did in the previous tutorials, you did by clicking in the browser. Behind every click, the browser calls the Gateway's REST API. You can call that API yourself too, from a script, a scheduler or another application. In this tutorial you start, check and stop a Flow without opening the user interface.
+**What you'll learn**
 
-**What you'll do:**
-
-1. Explore the API documentation
-2. Log in and get a token
-3. Try the API in the browser
-4. Start and stop a Flow from the command line
+* Find the Gateway's API documentation
+* Log in and get a token
+* Start and stop a Flow from the command line
 
 It takes about 15 minutes.
 
@@ -18,12 +15,12 @@ It takes about 15 minutes.
 
 ## Before you start
 
-* Complete [Tutorial 1](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow), at least part 1. You need the Gateway running and the *TestFlow*.
-* Make sure *TestFlow* is stopped (see **Flows → Manage**).
-
-> The examples use `http://localhost:8080`, where the Gateway runs by default. Running it on another port? Use yours.
+* *TestFlow* from [Tutorial 1](https://github.com/assimbly/gateway/wiki/tutorial6-your-first-flow), stopped (see **Flows → Manage**)
+* The examples use `http://localhost:8080`, where the Gateway runs by default. Another port? Use yours.
 
 ## Step 1: Explore the API documentation
+
+Behind every click in the browser, the browser calls the Gateway's REST API. You can call that API yourself too, from a script, a scheduler or another application: here you start, check and stop a Flow without opening the user interface.
 
 <!-- step: {"check":"route:/explorer/integration"} -->
 

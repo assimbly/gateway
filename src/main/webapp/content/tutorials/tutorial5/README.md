@@ -2,24 +2,30 @@
 
 <!-- tutorial: {"id":"tutorial5","wiki":"tutorial6-create-a-new-broker","title":"Tutorial 5: Manage the broker","minutes":10,"track":"Messaging"} -->
 
-The Gateway has a message broker built in. Get to know it: check that it runs, stop and start it, look at its configuration, add a queue, send a message to it and read the message back.
+**What you'll learn**
 
-A **broker** is a message server. Instead of sending a message straight to another system, you put it on the broker, and the broker keeps it until someone picks it up. The sender and the receiver don't need to be online at the same time.
-
-* A **queue** is a named place on the broker where messages wait. Each message is picked up by one receiver.
-* A **topic** is like a queue, but every subscriber gets its own copy of each message.
-* The Gateway calls queues and topics **Endpoints**.
-
-You stop the broker for a moment, so use a Gateway you're trying out, not one that handles real messages.
+* Check, stop and start the built-in broker
+* Create a queue
+* Send a message to it and read it back
 
 It takes about 10 minutes.
 
 <!-- web-only -->
 > You can also follow this tutorial inside the Gateway: click **Tutorials** in the menu. It shows each step next to the screen it's about and ticks it off once you've done it.
 
+## Before you start
+
+* A Gateway you're trying out, not one that handles real messages: you stop the broker for a moment
+
 ## Step 1: Look at the broker
 
 <!-- step: {"check":"route:/broker"} -->
+
+A **broker** is a message server. Instead of sending a message straight to another system, you put it on the broker, and the broker keeps it until someone picks it up. The sender and the receiver don't need to be online at the same time.
+
+* A **queue** is a named place on the broker where messages wait. Each message is picked up by one receiver.
+* A **topic** is like a queue, but every subscriber gets its own copy of each message.
+* The Gateway calls queues and topics **Endpoints**.
 
 Go to **Broker → Manage**. The Gateway created the broker *default* when it first started: an [ActiveMQ Artemis](https://activemq.apache.org/components/artemis/) broker that starts with the Gateway.
 

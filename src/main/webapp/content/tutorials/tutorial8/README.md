@@ -2,15 +2,11 @@
 
 <!-- tutorial: {"id":"tutorial8","wiki":"tutorial6-routes-with-split","title":"Tutorial 8: A route with queues and a split","minutes":15,"track":"For Camel developers"} -->
 
-In [Tutorial 7](https://github.com/assimbly/gateway/wiki/tutorial6-simple-route) you wrote a route of a few lines. In this tutorial you combine three routes in one Flow. Together they take a list of names from a queue, split it into one message per name, and put each name on another queue.
+**What you'll learn**
 
-**What you'll do:**
-
-1. Create a Camel route Flow
-2. Write a route that reads from a queue
-3. Write a route that splits the message
-4. Write a route that writes to a queue
-5. Send a list of names and see it split
+* Combine three routes in one Flow
+* Read from and write to queues in a route
+* Split a message into one per item
 
 It takes about 15 minutes.
 
@@ -19,12 +15,12 @@ It takes about 15 minutes.
 
 ## Before you start
 
-* Complete [Tutorial 7](https://github.com/assimbly/gateway/wiki/tutorial6-simple-route), so you know the route editor.
-* You need the broker that comes with the Gateway, running, and the Connection to it: *Gateway broker*. Created your own Connection in [Tutorial 6](https://github.com/assimbly/gateway/wiki/tutorial6-message-queueing)? Use that one wherever this tutorial says *Gateway broker*.
+* [Tutorial 7](https://github.com/assimbly/gateway/wiki/tutorial6-simple-route), so you know the route editor
+* The built-in broker running, with its Connection *Gateway broker* (or your own Connection from [Tutorial 6](https://github.com/assimbly/gateway/wiki/tutorial6-message-queueing))
 
 ## How it works
 
-The Flow *SplitNames* has three routes. They pass messages to each other with `direct:` endpoints, which connect routes within the same Gateway:
+The Flow *SplitNames* takes a list of names from a queue, splits it into one message per name, and puts each name on another queue. It has three routes. They pass messages to each other with `direct:` endpoints, which connect routes within the same Gateway:
 
 **InboundXML:** queue *NamesIn* → `direct:split`
 

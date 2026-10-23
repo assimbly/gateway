@@ -2,13 +2,11 @@
 
 <!-- tutorial: {"id":"tutorial4","wiki":"tutorial6-creating-a-rest-api","title":"Tutorial 4: Creating a REST API","minutes":10,"track":"Connect systems"} -->
 
-In [Tutorial 3](https://github.com/assimbly/gateway/wiki/tutorial6-calling-a-rest-api) the Gateway called someone else's API. Now you turn things around: you create a REST API that others can call. It says hello to whoever calls it.
+**What you'll learn**
 
-On the **APIs** page you design an API the way you would write an [OpenAPI](https://www.openapis.org/) contract:
-
-* An **API** groups Operations under one base path, for example `/greetings`.
-* An **Operation** is one method and path that clients can call, for example `GET /greetings/{name}`.
-* A **Handler Flow** answers an Operation. The Gateway creates it when you add the Operation.
+* Create a REST API that others can call
+* Add an Operation and answer it with a Flow
+* Call your API
 
 It takes about 10 minutes.
 
@@ -18,6 +16,12 @@ It takes about 10 minutes.
 ## Step 1: Create the API
 
 <!-- step: {"check":"apiExists:Greetings"} -->
+
+In [Tutorial 3](https://github.com/assimbly/gateway/wiki/tutorial6-calling-a-rest-api) the Gateway called someone else's API. Now you create one that says hello to whoever calls it. On the **APIs** page you design it like an [OpenAPI](https://www.openapis.org/) contract:
+
+* An **API** groups Operations under one base path, for example `/greetings`.
+* An **Operation** is one method and path that clients can call, for example `GET /greetings/{name}`.
+* A **Handler Flow** answers an Operation. The Gateway creates it when you add the Operation.
 
 1. Click **APIs** in the menu on the left. <!-- show: .app-sidebar__link[href="/rest-apis"] -->
 2. Click **Add**. <!-- show: a[href="/rest-apis/new"] -->

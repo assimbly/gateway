@@ -11,6 +11,9 @@ const SHOW = /<!--\s*show:\s*([\s\S]*?)\s*-->/g;
 /** A block only the written tutorial needs, such as the hint to follow it in the Gateway: the comment and the lines up to the next blank one. */
 const WEB_ONLY = /<!--\s*web-only\s*-->\n(?:[^\n]+\n?)*/g;
 const SECTION = /^## /m;
+/** The label the written tutorial puts above what you'll learn; the panel has a heading of its own for it. */
+const LEARN_LABEL = /^\*\*What you'll learn:?\*\*[ \t]*$/m;
+const PREREQUISITES = /^Before you start$/i;
 
 interface StepMeta {
   check?: string;
@@ -19,8 +22,9 @@ interface StepMeta {
 
 /**
  * A tutorial from its Markdown, as the documentation repository has it: the introduction and every `##` section that
- * isn't marked `<!-- step: {"skip":true} -->` become the steps of the panel. The HTML comments that steer the panel are
- * invisible on GitHub, so the same file is the written tutorial.
+ * isn't marked `<!-- step: {"skip":true} -->` become the steps of the panel. A `## Before you start` section isn't a step
+ * of its own: it folds into the introduction, collapsed. The HTML comments that steer the panel are invisible on GitHub,
+ * so the same file is the written tutorial.
  */
 export function parseTutorial(markdown: string): Tutorial {
   const text = markdown.replace(/\r\n?/g, '\n');
@@ -31,14 +35,17 @@ export function parseTutorial(markdown: string): Tutorial {
   const { id, title, minutes, fixtures } = JSON.parse(header[1]) as Tutorial;
 
   const [intro, ...sections] = text.replace(TUTORIAL_HEADER, '').replace(WEB_ONLY, '').split(SECTION);
-  const steps: TutorialStep[] = [{ title, html: render(intro.replace(/^# .*$/m, ''), id) }];
+  const overview: TutorialStep = { title, html: render(intro.replace(/^# .*$/m, '').replace(LEARN_LABEL, ''), id) };
+  const steps: TutorialStep[] = [overview];
   for (const section of sections) {
     const newline = section.indexOf('\n');
     // the panel numbers its steps itself, so "3. Meet ExampleFlow" and "Step 2: Create TestFlow" lose their numbers
     const heading = (newline < 0 ? section : section.slice(0, newline)).trim().replace(/^(?:\d+\.|Step \d+:)\s*/, '');
     const body = newline < 0 ? '' : section.slice(newline + 1);
     const meta = stepMeta(body);
-    if (!meta.skip) {
+    if (PREREQUISITES.test(heading)) {
+      overview.html += `<details class="tutorial-prerequisites"><summary>${heading}</summary>${render(body.replace(STEP_META, ''), id)}</details>`;
+    } else if (!meta.skip) {
       steps.push({ title: heading, html: render(body.replace(STEP_META, ''), id), ...(meta.check ? { check: meta.check } : {}) });
     }
   }
