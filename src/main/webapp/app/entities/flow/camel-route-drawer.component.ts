@@ -20,6 +20,8 @@ import { FlowService } from './flow.service';
   selector: 'jhi-camel-route-drawer',
   templateUrl: './camel-route-drawer.component.html',
   imports: [FormsModule, FontAwesomeModule, CodemirrorModule],
+  // The drawer puts this element between .offcanvas and the body: it has to fill the drawer for the editor to get a height.
+  host: { class: 'd-flex flex-column h-100 overflow-hidden' },
 })
 export class CamelRouteDrawerComponent {
   readonly flow = signal<LogFlow | undefined>(undefined);
