@@ -462,6 +462,11 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
     return this.stepForm?.get('uri')?.errors;
   }
 
+  /** A Route, and the Error handler of a Route Flow, have no Component to filter on, so they offer every Connection. */
+  get connectionChoices(): Connection[] {
+    return this.isRouteStep ? this.connections : this.filterConnection;
+  }
+
   /** A Step whose Component needs a Connection gets the Connection field by itself; only Route and Script Steps add one. */
   get canAddConnection(): boolean {
     return !this.isComponentStep;

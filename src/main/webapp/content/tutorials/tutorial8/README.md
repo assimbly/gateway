@@ -37,30 +37,33 @@ You could write it all in one route. Splitting it up keeps each route small, and
 1. Go to **Flows → Manage**, click **Add** <!-- show: [aria-label="Add"] --> and choose **Camel route**. <!-- show: a.flow-type-choice[href*="editor=route"] -->
 2. Next to **Flow name**, type `SplitNames`. <!-- show: #field_flowName -->
 3. Set **Route name** to `InboundXML`. <!-- show: [formcontrolname="routeName"] -->
-4. Click **Add** next to the route and choose **Connection**. <!-- show: [data-tour="step-add"] --> A **Connection** field appears.
-5. In **Connection**, choose *Gateway broker*. <!-- show: [formcontrolname="connection"] -->
 
-> The JMS endpoints of a route (`sjms:`, `sjms2:`, `jms:` and `activemq:`) use the Connection you choose here. Only when an endpoint needs another Connection, you name that one in the URI yourself, with `connectionFactory=#<id>`. You find a Connection's id with the **Edit connection** icon above the **Connection** field.
+Under the route is the **Error handler**. Leave it empty: it's not one of the three routes.
 
 ## Step 2: Write the inbound route
 
-Replace the example route in the **Route** field of *InboundXML* with this route: <!-- show: [data-tour="route-content"] -->
+1. Replace the example route in the **Route** field of *InboundXML* with this route: <!-- show: [data-tour="route-content"] -->
 
-```xml
-<route>
-    <from uri="sjms:NamesIn"/>
-    <log message="Received a list of names"/>
-    <to uri="direct:split"/>
-</route>
-```
+   ```xml
+   <route>
+       <from uri="sjms:NamesIn"/>
+       <log message="Received a list of names"/>
+       <to uri="direct:split"/>
+   </route>
+   ```
+
+   It takes each message from the queue *NamesIn* and passes it on to `direct:split`.
+
+2. Click **Add** next to the route and choose **Connection**. <!-- show: [data-tour="step-add"] --> A **Connection** field appears.
+3. In **Connection**, choose *Gateway broker*. <!-- show: [formcontrolname="connection"] -->
 
 ![The inbound route](02-inbound-route.png)
 
-It takes each message from the queue *NamesIn* and passes it on to `direct:split`.
+> The JMS endpoints of a route (`sjms:`, `sjms2:`, `jms:` and `activemq:`) use the Connection you choose here. Only when an endpoint needs another Connection, you name that one in the URI yourself, with `connectionFactory=#<id>`. You find a Connection's id with the **Edit connection** icon above the **Connection** field.
 
 ## Step 3: Write the split route
 
-1. Click **Add** next to *InboundXML* and choose **Route**. <!-- show: [data-tour="step-add"] --> A new, empty route appears under it.
+1. Click **Add** next to *InboundXML* and choose **Route**. <!-- show: [data-tour="step-add"] --> A new, empty route appears under it, above the Error handler.
 2. Set **Route name** to `SplitXML` and copy this route into its **Route** field:
 
 ```xml
@@ -79,7 +82,7 @@ The `<split>` uses the [XPath](https://camel.apache.org/components/latest/langua
 
 <!-- step: {"check":"flowStatus:SplitNames:started"} -->
 
-1. Click **Add** next to *SplitXML* and choose **Route**.
+1. Click **Add** next to *SplitXML* and choose **Route**. A new, empty route appears under it, above the Error handler.
 2. Set **Route name** to `OutboundXML` and copy this route into its **Route** field:
 
 ```xml

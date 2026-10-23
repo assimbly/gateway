@@ -234,3 +234,53 @@ describe('Flow editor Component Step', () => {
     return items.find(item => item.textContent?.trim() === text)!;
   }
 });
+
+describe('Flow editor Route Step', () => {
+  const broker = { id: 1, name: 'Gateway broker', type: 'ActiveMQ' };
+  const database = { id: 2, name: 'Orders database', type: 'SQL' };
+
+  function render(stepType: StepType, activeEditor: string): FlowEditorStepComponent {
+    TestBed.configureTestingModule({
+      imports: [FlowEditorStepComponent],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting(), StepEditorRegistry],
+    });
+    TestBed.inject(FaIconLibrary).addIcons(...fontAwesomeIcons);
+
+    const fixture = TestBed.createComponent(FlowEditorStepComponent);
+    fixture.componentRef.setInput('step', { stepType, componentType: '' });
+    fixture.componentRef.setInput('index', 1);
+    fixture.componentRef.setInput(
+      'stepForm',
+      new FormGroup({
+        id: new FormControl(null),
+        stepType: new FormControl(stepType),
+        message: new FormControl(null),
+        connection: new FormControl(null),
+        componentType: new FormControl(''),
+        uri: new FormControl(''),
+        route: new FormControl(null),
+        routeName: new FormControl(''),
+        routeContent: new FormControl(''),
+        options: new FormArray([]),
+      }),
+    );
+    fixture.componentRef.setInput('activeEditor', activeEditor);
+    fixture.componentRef.setInput('connections', [broker, database]);
+    fixture.componentRef.setInput('filterConnection', []);
+    fixture.componentRef.setInput('enableConnection', true);
+    fixture.detectChanges();
+    return fixture.componentInstance;
+  }
+
+  it('offers every Connection to a Route', () => {
+    expect(render(StepType.ROUTE, 'route').connectionChoices).toEqual([broker, database]);
+  });
+
+  it('offers every Connection to the Error handler of a Route Flow', () => {
+    expect(render(StepType.ERROR, 'route').connectionChoices).toEqual([broker, database]);
+  });
+
+  it('offers the Error handler of a visual Flow only the Connections of its Component', () => {
+    expect(render(StepType.ERROR, 'flow').connectionChoices).toEqual([]);
+  });
+});

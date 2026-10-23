@@ -534,7 +534,7 @@
             }
           </div>
         </div>
-        <ng-select [items]="stepType === 'ROUTE' ? connections : filterConnection" bindLabel="name" bindValue="id"
+        <ng-select [items]="connectionChoices" bindLabel="name" bindValue="id"
                    formControlName="connection" labelForId="field_connection_{{index}}"
                    dropdownPosition="top"></ng-select>
       </div>

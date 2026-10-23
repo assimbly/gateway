@@ -19,9 +19,7 @@ It takes about 10 minutes.
 
 ## How it works
 
-Under the hood, the Gateway runs every Flow as an [Apache Camel](https://camel.apache.org/) route. If you know Camel, you can also write a route yourself.
-
-A Camel route describes in a few lines where messages come from, what happens to them and where they go. The route you write moves files from one folder to another and logs the name of each file:
+Under the hood, the Gateway runs every Flow as an [Apache Camel](https://camel.apache.org/) route. You can also write one yourself. The route in this tutorial moves files from one folder to another and logs the name of each file:
 
 ```xml
 <route>
@@ -31,13 +29,11 @@ A Camel route describes in a few lines where messages come from, what happens to
 </route>
 ```
 
-| Line | What it does |
-|------|--------------|
-| `<from uri="file:@{messages}/route"/>` | Picks up files from the `route` folder, like a Source. |
-| `<log message="..."/>` | Writes a line to the log. Camel replaces `${header.CamelFileName}` with the name of the file. |
-| `<to uri="file:@{messages}/out"/>` | Writes the file to the `out` folder, like a Sink. |
+* `<from>` picks up files from the `route` folder, like a Source.
+* `<log>` writes a line to the log, with the name of the file in place of `${header.CamelFileName}`.
+* `<to>` writes the file to the `out` folder, like a Sink.
 
-The URIs are the same as the **Component** and **Directory Name** of a File Step in the visual editor: `file` is the component, `@{messages}/route` the folder. `@{messages}` is the Variable the Gateway puts in for your messages folder (see **Flows → Variables**), so the route works on every machine.
+`@{messages}` is the Variable for your messages folder (see **Flows → Variables**).
 
 ## Step 1: Create a Camel route Flow
 
@@ -56,7 +52,15 @@ The route editor opens. Instead of a canvas, it has a field to write the route i
 
 1. Next to **Flow name**, type `SimpleRoute`. <!-- show: #field_flowName -->
 2. Set **Route name** to `MoveFiles`. <!-- show: [formcontrolname="routeName"] -->
-3. Replace the example in the **Route** field with the route from *How it works*. <!-- show: [data-tour="route-content"] -->
+3. Replace the example in the **Route** field with this route: <!-- show: [data-tour="route-content"] -->
+
+   ```xml
+   <route>
+       <from uri="file:@{messages}/route"/>
+       <log message="Received file ${header.CamelFileName}"/>
+       <to uri="file:@{messages}/out"/>
+   </route>
+   ```
 
 ![The route](02-route.png)
 
