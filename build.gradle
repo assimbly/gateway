@@ -313,7 +313,7 @@ dependencies {
     implementation "tools.jackson.datatype:jackson-datatype-hibernate7"
     implementation "tools.jackson.datatype:jackson-datatype-hppc"
     implementation "tools.jackson.core:jackson-databind"
-    implementation "tools.jackson.module:jackson-module-afterburner"
+    implementation "tools.jackson.module:jackson-module-blackbird"
     implementation "tools.jackson.module:jackson-module-jakarta-xmlbind-annotations"
     implementation "com.mattbertolini:liquibase-slf4j:${liquibase_slf4j_version}"
     implementation "com.mysql:mysql-connector-j"
