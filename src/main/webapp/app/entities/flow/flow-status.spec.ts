@@ -3,10 +3,12 @@ import { IStep } from 'app/shared/model/step.model';
 import {
   countLabel,
   failureOfError,
+  firstRouteStepOf,
   flowFailureOf,
   flowTypeLabel,
   hasRun,
   flowStatusView,
+  routeSourceOf,
   runtimeStatusOf,
   sourceStepOf,
   testMessageBlocked,
@@ -71,7 +73,7 @@ describe('Flows list row status', () => {
     );
   });
 
-  it('blocks a test message to a Flow without a Source, such as a Route Flow', () => {
+  it('blocks a test message to a Flow without a Source', () => {
     expect(testMessageBlocked('active', null)).toBe('This Flow has no Source to send a test message to.');
   });
 
@@ -79,6 +81,24 @@ describe('Flows list row status', () => {
     expect(sourceStepOf([{ stepType: 'SINK' }, { stepType: 'SOURCE', componentType: 'file' }] as IStep[])?.componentType).toBe('file');
     expect(sourceStepOf([{ stepType: 'FROM', componentType: 'sftp' }] as IStep[])?.componentType).toBe('sftp');
     expect(sourceStepOf([{ stepType: 'ROUTE' }] as IStep[])).toBeUndefined();
+  });
+
+  it('takes the first Route of a Route Flow in place of its Source, not its Error handler', () => {
+    const steps = [{ stepType: 'ERROR', id: 1 }, { stepType: 'ROUTE', id: 2 }, { stepType: 'ROUTE', id: 3 }] as IStep[];
+    expect(firstRouteStepOf(steps)?.id).toBe(2);
+    expect(firstRouteStepOf([{ stepType: 'SOURCE' }] as IStep[])).toBeUndefined();
+  });
+
+  it.each([
+    ['<route>\n  <from uri="sjms:NamesIn"/>\n  <to uri="direct:split"/>\n</route>', { componentType: 'sjms', uri: 'NamesIn', options: '' }],
+    ["<route><from id='in' uri='file://C:/messages/in?noop=true&amp;delay=500'/></route>", { componentType: 'file', uri: 'C:/messages/in', options: 'noop=true&delay=500' }],
+    ['<route><from\n    uri="timer:tick?period=1000"/></route>', { componentType: 'timer', uri: 'tick', options: 'period=1000' }],
+  ])('reads where the route %j reads from', (xml, source) => {
+    expect(routeSourceOf(xml)).toEqual(source);
+  });
+
+  it.each([undefined, '', '<route><to uri="sjms:Out"/></route>', 'not xml'])('reads no Source from %j', xml => {
+    expect(routeSourceOf(xml)).toBeUndefined();
   });
 
   it('blocks a test message to a Source whose Component only receives, such as a Scheduler', () => {

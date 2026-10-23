@@ -51,7 +51,8 @@
       </button>
       <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
         <button ngbDropdownItem (click)="openModal(moveMessageModal)">Move</button>
-        <button ngbDropdownItem (click)="deleteMessage(selectedMessage)">Delete</button>
+        <button ngbDropdownItem (click)="clearMessage(selectedMessage)" title="Remove the selected message">Clear</button>
+        <button ngbDropdownItem (click)="clearAllMessages()" [title]="'Remove all messages from ' + endpointType + ' ' + endpointName">Clear all</button>
       </div>
     </div>
 

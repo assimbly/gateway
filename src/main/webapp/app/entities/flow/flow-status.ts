@@ -92,6 +92,28 @@ export function sourceStepOf(steps: IStep[] | null | undefined): IStep | undefin
   return steps?.find(step => step.stepType === StepType.SOURCE || step.stepType === StepType.FROM);
 }
 
+/** The first Route of a Route Flow. It takes the place of the Source: a test message goes to where it reads from. */
+export function firstRouteStepOf(steps: IStep[] | null | undefined): IStep | undefined {
+  return steps?.find(step => step.stepType === StepType.ROUTE);
+}
+
+/** Where a Camel route in XML reads from: the Component, path and Options of the uri of its `<from>`. */
+export interface RouteSource {
+  componentType: string;
+  uri: string;
+  options: string;
+}
+
+/** The Endpoint the `<from>` of a Camel route in XML reads from, such as `sjms:NamesIn`. Undefined when it has none. */
+export function routeSourceOf(xml: string | null | undefined): RouteSource | undefined {
+  const from = /<from\b[^>]*?\buri\s*=\s*(["'])(.*?)\1/s.exec(xml ?? '')?.[2];
+  const endpoint = from
+    ?.replace(/&amp;/g, '&')
+    .trim()
+    .match(/^([a-z][\w+.-]*):(?:\/\/)?([^?]*)(?:\?(.*))?$/i);
+  return endpoint ? { componentType: endpoint[1].toLowerCase(), uri: endpoint[2], options: endpoint[3] ?? '' } : undefined;
+}
+
 /**
  * Why a test message can't be sent to the Flow's Source now, or null when it can. A test message is sent to the
  * Source's Endpoint, so the Flow has to be running, have a Source, and the Source's Component has to accept messages

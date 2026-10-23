@@ -40,7 +40,7 @@ import { CodemirrorModule } from "@ctrl/ngx-codemirror";
 import { ThemeService } from "app/core/theme";
 import { FlowCanvasComponent, DesignerSelection } from "../designer/flow-canvas.component";
 import { FlowEditorHeaderComponent } from "./flow-editor-header.component";
-import { sourceStepOf } from "../flow-status";
+import { firstRouteStepOf, routeSourceOf, sourceStepOf } from "../flow-status";
 import { automaticErrorHandlerPath, defaultErrorHandlerStep, errorHandlerPath, errorHandlerPathOnSave } from "./error-handler";
 import { isRouteStep, missingRouteFields, routeToSave } from "./route-step";
 import {
@@ -2492,8 +2492,14 @@ splitOptions4(options: string): string[] {
 			: undefined;
 	}
 
+	/** The Component a test message goes to: the Source's, or in a Route Flow that of the first Route's `<from>`. */
 	get sourceComponent(): string | undefined {
-		return sourceStepOf(this.steps)?.componentType;
+		const source = sourceStepOf(this.steps)?.componentType;
+		if (source) {
+			return source;
+		}
+		const route = firstRouteStepOf(this.steps);
+		return route ? routeSourceOf(this.stepFormAt(this.steps.indexOf(route))?.value.routeContent)?.componentType : undefined;
 	}
 
 	@HostListener('window:beforeunload', ['$event'])

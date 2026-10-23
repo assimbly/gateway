@@ -9,6 +9,7 @@ import { provideTranslateService } from '@ngx-translate/core';
 
 import { fontAwesomeIcons } from 'app/config/font-awesome-icons';
 import { ConnectionService } from 'app/entities/connection/connection.service';
+import { RouteService } from 'app/entities/route/route.service';
 import { StepService } from 'app/entities/step/step.service';
 
 import { FlowService } from '../flow.service';
@@ -26,7 +27,9 @@ describe('FlowMessageSenderComponent', () => {
 
     const ok = (body: unknown, status = 200) => of(new HttpResponse({ body, status })) as any;
 
-    function create(queryParams: Record<string, string> = {}): void {
+    const fileSource = [{ stepType: 'SOURCE', componentType: 'file', uri: 'tmp/in', options: 'fileName=a.txt&noop=true' }];
+
+    function create(queryParams: Record<string, string> = {}, steps: unknown[] = fileSource): void {
         TestBed.configureTestingModule({
             providers: [
                 provideTranslateService(),
@@ -51,10 +54,9 @@ describe('FlowMessageSenderComponent', () => {
                 },
             })
         );
-        jest.spyOn(flowService, 'find').mockReturnValue(
-            ok({
-                steps: [{ stepType: 'SOURCE', componentType: 'file', uri: 'tmp/in', options: 'fileName=a.txt&noop=true' }],
-            })
+        jest.spyOn(flowService, 'find').mockReturnValue(ok({ steps }));
+        jest.spyOn(TestBed.inject(RouteService), 'find').mockReturnValue(
+            ok({ id: 7, name: 'InboundXML', content: '<route>\n    <from uri="sjms:NamesIn"/>\n    <to uri="direct:split"/>\n</route>' })
         );
         jest.spyOn(flowService, 'send').mockReturnValue(ok('sent'));
         jest.spyOn(flowService, 'sendRequest').mockReturnValue(ok('reply'));
@@ -173,6 +175,18 @@ describe('FlowMessageSenderComponent', () => {
         // the option that the component does not know can still be shown
         expect(comp.componentOptions.map(o => o.name)).toContain('noop');
         expect(fixture.nativeElement.textContent).toContain('Back');
+    });
+
+    it('pre-fills where the first Route of a Route Flow reads from, with its Connection', () => {
+        create({ flowId: '5' }, [
+            { stepType: 'ERROR', routeId: 6 },
+            { stepType: 'ROUTE', routeId: 7, connectionId: 1 },
+        ]);
+
+        expect(TestBed.inject(RouteService).find).toHaveBeenCalledWith(7);
+        expect(form().componentType.value).toBe('sjms');
+        expect(form().uri.value).toBe('NamesIn');
+        expect(form().connection.value).toBe(1);
     });
 
     it('requires a connection for a component that needs one, and sends its keys', () => {

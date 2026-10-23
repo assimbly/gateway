@@ -22,6 +22,8 @@ import { AccountService } from 'app/core/auth/account.service';
 import { ThemeService } from 'app/core/theme';
 import { ITEMS_PER_PAGE } from 'app/config/pagination.constants';
 import { BrokerService } from 'app/entities/broker/broker.service';
+import { QueueClearDialogComponent } from 'app/entities/queue/queue-clear-dialog.component';
+import { TopicClearDialogComponent } from 'app/entities/topic/topic-clear-dialog.component';
 
 import { saveAs } from 'file-saver/FileSaver';
 import { IBroker } from 'app/shared/model/broker.model';
@@ -335,12 +337,27 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     this.loadMessages();
   }
 
-  deleteMessage(message: IMessage) {
+  clearMessage(message: IMessage) {
     this.brokerService.deleteMessage(this.brokerType, this.endpointName, message.messageid).subscribe(
       (res: HttpResponse<any>) => {
         this.loadMessages();
       },
       (res: HttpErrorResponse) => this.onError(res.message)
+    );
+  }
+
+  /** Asks to remove every message from the queue or topic, as its row on the broker page does, and shows what's left. */
+  clearAllMessages() {
+    const dialog = this.endpointType === 'topic' ? TopicClearDialogComponent : QueueClearDialogComponent;
+    const modalRef = this.modalService.open(dialog);
+    modalRef.componentInstance.address = { name: this.endpointName };
+    modalRef.componentInstance.brokerType = this.brokerType;
+    modalRef.result.then(
+      () => {
+        this.page = 1;
+        this.loadMessages();
+      },
+      () => undefined
     );
   }
 

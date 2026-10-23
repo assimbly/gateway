@@ -27,6 +27,7 @@ import {
   RuntimeStatus,
   countLabel,
   failureOfError,
+  firstRouteStepOf,
   flowEventOf,
   flowFailureOf,
   flowStatusView,
@@ -167,9 +168,15 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
     return this.state.disabled.includes(action);
   }
 
-  /** Why the ⋮ menu's Send test message is unavailable, or null when it can be sent. */
+  /**
+   * Why the ⋮ menu's Send test message is unavailable, or null when it can be sent. A Route Flow sends to its first
+   * Route, whose `<from>` the list doesn't have: the Send page reads it.
+   */
   get testMessageBlocked(): string | null {
     const source = sourceStepOf(this.flow.steps)?.componentType;
+    if (!source && firstRouteStepOf(this.flow.steps)) {
+      return testMessageBlocked(this.statusFlow, { name: 'route' });
+    }
     return testMessageBlocked(this.statusFlow, source ? (this.components.types.find(type => type.name === source) ?? { name: source }) : null);
   }
 

@@ -32,7 +32,8 @@ import { BodyMode, SendMessage, UploadedMessages, detectResponseMode } from 'app
 
 import { ApiService } from 'app/entities/api/api.service';
 import { FlowService } from '../flow.service';
-import { sourceStepOf } from '../flow-status';
+import { RouteService } from 'app/entities/route/route.service';
+import { firstRouteStepOf, routeSourceOf, sourceStepOf } from '../flow-status';
 import { RestTarget, restHostOf, restTargetOf } from './rest-target';
 
 /** The answer to a message that was sent with the exchange pattern Request and Reply. */
@@ -70,6 +71,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     private readonly flowService = inject(FlowService);
     private readonly apiService = inject(ApiService);
     private readonly stepService = inject(StepService);
+    private readonly routeService = inject(RouteService);
     private readonly connectionService = inject(ConnectionService);
     private readonly connectionPopupService = inject(ConnectionPopupService);
     private readonly modalService = inject(NgbModal);
@@ -202,26 +204,47 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         });
     }
 
-    /** Sends the test message to the Flow's Source: its Component, path, Options and Connection. */
+    /**
+     * Sends the test message to the Flow's Source: its Component, path, Options and Connection. A Route Flow has no
+     * Source, so it goes to where its first Route reads from, with that Route's Connection.
+     */
     private prefillFromFlowSource(flowId: number): void {
         this.flowService.find(flowId).subscribe(response => {
-            const source = sourceStepOf(response.body?.steps);
-            if (!source?.componentType) {
-                return;
-            }
-            this.setComponentType(source.componentType);
-            this.messageSenderForm.controls.uri.setValue(source.uri || null);
-            this.setOptionsFromString(source.options);
-            if (source.connectionId) {
-                this.messageSenderForm.controls.connection.setValue(source.connectionId);
-            }
-            this.cdr.detectChanges();
-
-            const restTarget = source.componentType.toLowerCase() === 'rest' ? restTargetOf(source.uri, source.options) : undefined;
-            if (restTarget) {
-                this.prefillRest(restTarget);
+            const steps = response.body?.steps;
+            const source = sourceStepOf(steps);
+            const route = firstRouteStepOf(steps);
+            if (!source && route?.routeId) {
+                this.routeService.find(route.routeId).subscribe({
+                    next: saved => {
+                        const from = routeSourceOf(saved.body?.content);
+                        if (from) {
+                            this.prefillSource({ ...from, connectionId: route.connectionId });
+                        }
+                    },
+                    error: () => undefined,
+                });
+            } else if (source) {
+                this.prefillSource(source);
             }
         });
+    }
+
+    private prefillSource(source: Pick<IStep, 'componentType' | 'uri' | 'options' | 'connectionId'>): void {
+        if (!source.componentType) {
+            return;
+        }
+        this.setComponentType(source.componentType);
+        this.messageSenderForm.controls.uri.setValue(source.uri || null);
+        this.setOptionsFromString(source.options);
+        if (source.connectionId) {
+            this.messageSenderForm.controls.connection.setValue(source.connectionId);
+        }
+        this.cdr.detectChanges();
+
+        const restTarget = source.componentType.toLowerCase() === 'rest' ? restTargetOf(source.uri, source.options) : undefined;
+        if (restTarget) {
+            this.prefillRest(restTarget);
+        }
     }
 
     /**

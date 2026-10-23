@@ -56,6 +56,19 @@ describe('Tutorial panel', () => {
     fixture.detectChanges();
   }
 
+  it('copies a code block without the line break it ends with', () => {
+    // jsdom has no clipboard; copying the selection is what the panel tries first
+    document.execCommand = jest.fn(() => true);
+    open(
+      '<div class="tutorial-code"><button type="button" class="tutorial-code__copy" data-tour-copy>Copy</button>' +
+        '<pre><code class="language-xml">&lt;route&gt;\n    &lt;to uri="sjms:NamesOut"/&gt;\n&lt;/route&gt;\n</code></pre></div>',
+    );
+
+    fixture.nativeElement.querySelector('.tutorial-code__copy').click();
+
+    expect(window.getSelection()?.toString()).toBe('<route>\n    <to uri="sjms:NamesOut"/>\n</route>');
+  });
+
   it('says where the messages folder is on a step about it', () => {
     open('<p>Open the newest file in <code>@{messages}/out</code>.</p>');
 

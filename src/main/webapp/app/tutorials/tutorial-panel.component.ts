@@ -97,6 +97,7 @@ function copy(copyable: HTMLElement): void {
   }
   const range = document.createRange();
   range.selectNodeContents(source);
+  endBeforeTrailingWhitespace(range, source);
   window.getSelection()?.removeAllRanges();
   window.getSelection()?.addRange(range);
   const copied = (): void => {
@@ -115,7 +116,20 @@ function copy(copyable: HTMLElement): void {
   if (document.execCommand('copy')) {
     copied();
   } else {
-    void navigator.clipboard?.writeText(source.textContent?.replace(/\n$/, '') ?? '').then(copied, () => undefined);
+    void navigator.clipboard?.writeText(range.toString()).then(copied, () => undefined);
+  }
+}
+
+/** Ends the range at the last character that isn't whitespace, such as the line break a code block ends with. */
+function endBeforeTrailingWhitespace(range: Range, source: HTMLElement): void {
+  const walker = document.createTreeWalker(source, NodeFilter.SHOW_TEXT);
+  const texts: Text[] = [];
+  while (walker.nextNode()) {
+    texts.push(walker.currentNode as Text);
+  }
+  const last = texts.reverse().find(text => text.data.trim() !== '');
+  if (last) {
+    range.setEnd(last, last.data.trimEnd().length);
   }
 }
 
