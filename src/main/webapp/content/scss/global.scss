@@ -1568,14 +1568,21 @@ input:-webkit-autofill:focus {
   --bs-offcanvas-width: min(60rem, 100vw);
 }
 
-// The Camel route of a Flow, as the runtime built it: scrolls on its own, long URIs wrap.
+// The Camel route of a Flow, as the runtime built it, in a read-only editor that fills the drawer and scrolls on its own.
 .camel-route {
-  overflow: auto;
-  padding: 0.75rem;
+  position: relative;
+  min-height: 0;
+}
+
+.camel-route ngx-codemirror,
+.camel-route .CodeMirror {
+  position: absolute;
+  inset: 0;
+}
+
+.camel-route .CodeMirror {
+  height: auto;
   border: 1px solid var(--app-border);
   border-radius: 0.375rem;
-  background-color: var(--app-surface);
   font-size: 0.8125rem;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
 }

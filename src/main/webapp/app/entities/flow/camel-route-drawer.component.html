@@ -26,7 +26,15 @@
     <div class="alert alert-danger py-2" role="alert">{{ message }}</div>
   }
   @if (route(); as xml) {
-    <pre class="camel-route flex-grow-1 mb-0" data-tour="camel-route"><code>{{ xml }}</code></pre>
+    <div class="camel-route flex-grow-1" data-tour="camel-route">
+      <ngx-codemirror
+        name="camel-route"
+        [ngModel]="xml"
+        [ngModelOptions]="{ standalone: true }"
+        [options]="editorOptions()"
+        (codeMirrorLoaded)="refreshCodeMirror($event)"
+      ></ngx-codemirror>
+    </div>
   } @else if (loading()) {
     <p class="text-muted mb-0" role="status">Loading the route…</p>
   } @else if (!failed()) {

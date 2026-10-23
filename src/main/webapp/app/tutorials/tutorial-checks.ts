@@ -73,7 +73,7 @@ export class TutorialChecks {
           catchError(() => of(false)),
         );
       case 'flowStep':
-        return this.flowService.findByName(name, QUIET).pipe(
+        return this.flowService.findByName(name, QUIET, true).pipe(
           map(response =>
             (response.body?.steps ?? []).some(step =>
               `${step.componentType ?? ''} ${step.uri ?? ''}`.toLowerCase().includes(value.toLowerCase()),
@@ -153,8 +153,9 @@ export class TutorialChecks {
     );
   }
 
+  /** The Flow the tutorial names, in any case: a user who types "Testflow" for "TestFlow" has still made it. */
   private flowId(name: string): Observable<number | undefined> {
-    return this.flowService.findByName(name, QUIET).pipe(
+    return this.flowService.findByName(name, QUIET, true).pipe(
       map(response => response.body?.id ?? undefined),
       catchError(() => of(undefined)),
     );

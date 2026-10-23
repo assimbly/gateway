@@ -1,7 +1,12 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
+import { CodemirrorModule } from '@ctrl/ngx-codemirror';
+import 'codemirror/mode/xml/xml';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbActiveOffcanvas, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+
+import { ThemeService } from 'app/core/theme';
 
 import { hasRoute, maskSecrets, routeFileName } from './camel-route';
 import { LogFlow } from './flow-log-drawer.component';
@@ -14,7 +19,7 @@ import { FlowService } from './flow.service';
 @Component({
   selector: 'jhi-camel-route-drawer',
   templateUrl: './camel-route-drawer.component.html',
-  imports: [FontAwesomeModule],
+  imports: [FormsModule, FontAwesomeModule, CodemirrorModule],
 })
 export class CamelRouteDrawerComponent {
   readonly flow = signal<LogFlow | undefined>(undefined);
@@ -25,6 +30,29 @@ export class CamelRouteDrawerComponent {
 
   readonly activeOffcanvas = inject(NgbActiveOffcanvas);
   private readonly flowService = inject(FlowService);
+  private readonly themeService = inject(ThemeService);
+
+  /** A read-only XML editor with line numbers; long URIs wrap. */
+  readonly editorOptions = computed(() => ({
+    lineNumbers: true,
+    lineWrapping: true,
+    readOnly: true,
+    mode: 'application/xml',
+    theme: this.themeService.editorTheme(),
+  }));
+
+  /** CodeMirror does not draw itself correctly (no line numbers) until it is refreshed once it is visible. */
+  refreshCodeMirror(editor: { codeMirror?: { refresh: () => void } }): void {
+    const codeMirror = editor?.codeMirror;
+    if (!codeMirror) {
+      return;
+    }
+    const refresh = () => codeMirror.refresh();
+    requestAnimationFrame(() => {
+      refresh();
+      setTimeout(refresh);
+    });
+  }
 
   /** Opens a drawer with the Camel route of a Flow. */
   static open(offcanvas: NgbOffcanvas, flow: LogFlow): void {

@@ -88,9 +88,13 @@ export class FlowService {
     return this.http.get<IFlow>(`${this.resourceUrl}/${flowId}`, { observe: 'response' });
   }
 
-  /** The Flow with this name, or a 404 when there is none. */
-  findByName(name: string, context?: HttpContext): Observable<EntityResponseType> {
-    return this.http.get<IFlow>(`${this.resourceUrl}/byname`, { params: new HttpParams().set('name', name), observe: 'response', context });
+  /** The Flow with this name, or a 404 when there is none. With ignoreCase, "Testflow" is found for "TestFlow" too. */
+  findByName(name: string, context?: HttpContext, ignoreCase = false): Observable<EntityResponseType> {
+    let params = new HttpParams().set('name', name);
+    if (ignoreCase) {
+      params = params.set('ignoreCase', true);
+    }
+    return this.http.get<IFlow>(`${this.resourceUrl}/byname`, { params, observe: 'response', context });
   }
 
   query(req?: any): Observable<EntityArrayResponseType> {

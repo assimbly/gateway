@@ -52,6 +52,15 @@ public interface FlowService {
     Optional<FlowDTO> findByName(String name);
 
     /**
+     * Get the flow with this name or, when there is none and ignoreCase is set, the flow with this name in any case.
+     *
+     * @param name the name of the entity
+     * @param ignoreCase whether "Testflow" is found for "TestFlow"
+     * @return the entity
+     */
+    Optional<FlowDTO> findByName(String name, boolean ignoreCase);
+
+    /**
      * Delete the "id" flow.
      *
      * @param id the id of the entity

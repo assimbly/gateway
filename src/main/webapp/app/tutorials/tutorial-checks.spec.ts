@@ -25,6 +25,7 @@ describe('TutorialChecks', () => {
   function flow(name: string, id?: number): void {
     const request = http.expectOne(req => req.url.endsWith('api/flows/byname') && req.params.get('name') === name);
     expect(request.request.context.get(HANDLES_OWN_ERRORS)).toBe(true);
+    expect(request.request.params.get('ignoreCase')).toBe('true');
     if (id === undefined) {
       request.flush('', { status: 404, statusText: 'Not Found' });
     } else {
