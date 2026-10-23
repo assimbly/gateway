@@ -81,3 +81,25 @@ describe('Flow log drawer', () => {
     expect(navigate).toHaveBeenCalledWith(['/admin/logviewer'], { queryParams: { flowId: 1853, name: 'MyScript' } });
   });
 });
+
+describe('Flow log in a page', () => {
+  it('loads the log of the Flow it is given, without a drawer to close', () => {
+    TestBed.configureTestingModule({
+      imports: [FlowLogDrawerComponent],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
+    });
+    TestBed.inject(FaIconLibrary).addIcons(...fontAwesomeIcons);
+    const http = TestBed.inject(HttpTestingController);
+    const fixture = TestBed.createComponent(FlowLogDrawerComponent);
+    fixture.componentRef.setInput('flowId', 1853);
+    fixture.componentRef.setInput('flowName', 'MyScript');
+
+    fixture.detectChanges();
+    http.expectOne(request => request.url === 'api/logs/1/log/250' && request.params.get('flowId') === '1853').flush(LOG);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.offcanvas-header')).toBeNull();
+    expect(fixture.nativeElement.querySelector('pre').textContent).toContain('Started flow successfully');
+    http.verify();
+  });
+});

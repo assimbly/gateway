@@ -1,4 +1,4 @@
-import { Component, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, computed, effect, inject, input, signal, untracked, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Router } from '@angular/router';
@@ -19,7 +19,8 @@ export interface LogFlow {
 
 /**
  * A Flow's entries in the application log in a side drawer: what its Log Steps and Error Handler logged and when it was
- * started or stopped, newest at the bottom, with the filter and Refresh of the Log viewer.
+ * started or stopped, newest at the bottom, with the filter and Refresh of the Log viewer. The visual editor also shows
+ * it in a tab, given the Flow by its inputs.
  */
 @Component({
   selector: 'jhi-flow-log-drawer',
@@ -35,13 +36,30 @@ export class FlowLogDrawerComponent {
   readonly flow = signal<LogFlow | undefined>(undefined);
   readonly coloredLog = computed<SafeHtml>(() => this.sanitizer.bypassSecurityTrustHtml(colorLog(this.entries(), this.searchText())));
 
+  /** Shown in a page rather than a drawer: the Flow to show the log of. */
+  readonly flowId = input<number | null | undefined>();
+  readonly flowName = input<string | null | undefined>();
+
   lines = 250;
 
-  readonly activeOffcanvas = inject(NgbActiveOffcanvas);
+  /** The drawer the log is shown in; null when it is shown in a page. */
+  readonly activeOffcanvas = inject(NgbActiveOffcanvas, { optional: true });
   private readonly logViewerService = inject(LogViewerService);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly router = inject(Router);
   private readonly logArea = viewChild<ElementRef<HTMLElement>>('logArea');
+
+  constructor() {
+    effect(() => {
+      const id = this.flowId();
+      if (id) {
+        untracked(() => {
+          this.flow.set({ id, name: this.flowName() });
+          this.getLogs();
+        });
+      }
+    });
+  }
 
   /** Opens a drawer with the log of a Flow. */
   static open(offcanvas: NgbOffcanvas, flow: LogFlow): void {
@@ -86,7 +104,7 @@ export class FlowLogDrawerComponent {
     if (!flow) {
       return;
     }
-    this.activeOffcanvas.dismiss();
+    this.activeOffcanvas?.dismiss();
     this.router.navigate(['/admin/logviewer'], { queryParams: { flowId: flow.id, name: flow.name || null } });
   }
 }

@@ -1,10 +1,12 @@
-<div class="offcanvas-header">
-  <div>
-    <h4 class="offcanvas-title" id="flow-log-title">Log</h4>
-    <div class="text-muted">{{ flow()?.name }}</div>
+@if (activeOffcanvas; as drawer) {
+  <div class="offcanvas-header">
+    <div>
+      <h4 class="offcanvas-title" id="flow-log-title">Log</h4>
+      <div class="text-muted">{{ flow()?.name }}</div>
+    </div>
+    <button type="button" class="btn-close" aria-label="Close" (click)="drawer.dismiss()"></button>
   </div>
-  <button type="button" class="btn-close" aria-label="Close" (click)="activeOffcanvas.dismiss()"></button>
-</div>
+}
 
 <form #logsForm="ngForm" class="flow-log-drawer__toolbar" (ngSubmit)="getLogs()">
   <jhi-search-toolbar [(query)]="searchText" placeholder="Filter log" inputId="flowLogSearchText">

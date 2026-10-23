@@ -45,30 +45,13 @@
       </div>
       <aside class="flow-designer-panel">
         <div class="flow-designer-panel-editor">
-          <div class="card bg-light text-start">
-            <div class="card-body">
-              @if (selectedStep; as step) {
-                <h5 class="border-bottom">{{ step.kind }}</h5>
-                <p class="fw-semibold mb-0">{{ stepTitle(step) }}</p>
-                @if (step.uri && step.kind !== 'ROUTER') {
-                  <p class="small text-muted text-break mb-3">{{ step.uri }}</p>
-                } @else {
-                  <div class="mb-3"></div>
-                }
-              } @else {
-                <h5 class="border-bottom">FLOW</h5>
-              }
-              <jhi-flow-stats-sections
-                [loading]="!read"
-                [empty]="read && !running"
-                emptyMessage="There are no stats while the Flow isn't running."
-                [sections]="sections"
-              />
-              @if (running && !selectedStep) {
-                <p class="small text-muted mt-3 mb-0">Select a Step to see its own stats.</p>
-              }
-            </div>
-          </div>
+          <jhi-flow-run-stats
+            [flowId]="flow?.id"
+            [graph]="graph"
+            [selection]="selection"
+            (countsChange)="onCountsChange($event)"
+            (runningChange)="onRunningChange($event)"
+          />
         </div>
       </aside>
     </div>

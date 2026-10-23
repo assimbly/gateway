@@ -1,10 +1,12 @@
-<div class="offcanvas-header">
-  <div>
-    <h4 class="offcanvas-title" id="camel-route-title">Camel route</h4>
-    <div class="text-muted">{{ flow()?.name }}</div>
+@if (activeOffcanvas; as drawer) {
+  <div class="offcanvas-header">
+    <div>
+      <h4 class="offcanvas-title" id="camel-route-title">Camel route</h4>
+      <div class="text-muted">{{ flow()?.name }}</div>
+    </div>
+    <button type="button" class="btn-close" aria-label="Close" (click)="drawer.dismiss()"></button>
   </div>
-  <button type="button" class="btn-close" aria-label="Close" (click)="activeOffcanvas.dismiss()"></button>
-</div>
+}
 
 <div class="offcanvas-body d-flex flex-column gap-2">
   <p class="text-muted small mb-0">
