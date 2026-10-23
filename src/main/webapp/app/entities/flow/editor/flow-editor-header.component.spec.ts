@@ -6,6 +6,7 @@ import { provideRouter } from '@angular/router';
 import { throwError } from 'rxjs';
 
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { fontAwesomeIcons } from 'app/config/font-awesome-icons';
 
@@ -122,6 +123,78 @@ describe('Flow editor header', () => {
     expect(buttonNamed('Error')).toBeTruthy();
     expect(fixture.componentInstance.failure()).toEqual({ summary: '1 of 2 Steps failed to start.', steps: [{ uri: 'file://in', message: 'Busy' }] });
   });
+
+  it('saves and starts on Ctrl+Enter and Cmd+Enter, also while typing the name', () => {
+    fixture.detectChanges();
+    const saveAndStart = jest.fn();
+    fixture.componentInstance.saveAndStart.subscribe(saveAndStart);
+
+    const event = ctrlEnter();
+    fixture.nativeElement.querySelector('#field_flowName').dispatchEvent(event);
+    document.dispatchEvent(ctrlEnter({ ctrlKey: false, metaKey: true }));
+
+    expect(saveAndStart).toHaveBeenCalledTimes(2);
+    expect(event.defaultPrevented).toBe(true);
+  });
+
+  it('saves and restarts on Ctrl+Enter while the Flow runs', () => {
+    fixture.componentInstance.status.set('active');
+    fixture.detectChanges();
+    const saveAndStart = jest.fn();
+    const saveAndRestart = jest.fn();
+    fixture.componentInstance.saveAndStart.subscribe(saveAndStart);
+    fixture.componentInstance.saveAndRestart.subscribe(saveAndRestart);
+
+    document.dispatchEvent(ctrlEnter());
+
+    expect(saveAndRestart).toHaveBeenCalled();
+    expect(saveAndStart).not.toHaveBeenCalled();
+  });
+
+  it('does nothing on Ctrl+Enter while Save & start is disabled', () => {
+    fixture.componentRef.setInput('draftReason', 'The Source has no Component yet.');
+    fixture.detectChanges();
+    const saveAndStart = jest.fn();
+    fixture.componentInstance.saveAndStart.subscribe(saveAndStart);
+
+    document.dispatchEvent(ctrlEnter());
+    fixture.componentRef.setInput('draftReason', null);
+    fixture.componentRef.setInput('saving', true);
+    fixture.detectChanges();
+    document.dispatchEvent(ctrlEnter());
+
+    expect(saveAndStart).not.toHaveBeenCalled();
+  });
+
+  it('leaves Ctrl+Enter to a dialog on top of the editor', () => {
+    jest.spyOn(TestBed.inject(NgbModal), 'hasOpenModals').mockReturnValue(true);
+    fixture.detectChanges();
+    const saveAndStart = jest.fn();
+    fixture.componentInstance.saveAndStart.subscribe(saveAndStart);
+
+    const event = ctrlEnter();
+    document.dispatchEvent(event);
+
+    expect(saveAndStart).not.toHaveBeenCalled();
+    expect(event.defaultPrevented).toBe(false);
+  });
+
+  it('stops the running Flow on Ctrl+Shift+Enter', () => {
+    const stop = jest.spyOn(TestBed.inject(FlowService), 'stop').mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
+    fixture.componentRef.setInput('flowId', 7);
+    fixture.detectChanges();
+
+    document.dispatchEvent(ctrlEnter({ shiftKey: true }));
+    expect(stop).not.toHaveBeenCalled();
+
+    fixture.componentInstance.status.set('active');
+    document.dispatchEvent(ctrlEnter({ shiftKey: true }));
+    expect(stop).toHaveBeenCalledWith(7);
+  });
+
+  function ctrlEnter(init: KeyboardEventInit = {}): KeyboardEvent {
+    return new KeyboardEvent('keydown', { key: 'Enter', ctrlKey: true, bubbles: true, cancelable: true, ...init });
+  }
 
   function buttonNamed(label: string): HTMLButtonElement {
     const buttons: HTMLButtonElement[] = Array.from(fixture.nativeElement.querySelectorAll('button'));

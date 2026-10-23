@@ -58,7 +58,8 @@
         [ngClass]="toneClass()"
         [disabled]="busy()"
         (click)="stop()"
-        [ngbTooltip]="state().label"
+        [ngbTooltip]="state().label + ' · Stop (Ctrl+Shift+Enter)'"
+        aria-keyshortcuts="Control+Shift+Enter"
       >
         <fa-icon icon="stop" /><span>Stop</span>
       </button>
@@ -83,18 +84,20 @@
         data-tour="flow-save-start"
         [disabled]="saving() || busy()"
         (click)="saveAndRestart.emit()"
-        ngbTooltip="Save the Flow and restart it, so the change takes effect"
+        ngbTooltip="Save the Flow and restart it, so the change takes effect (Ctrl+Enter)"
+        aria-keyshortcuts="Control+Enter"
       >
         <fa-icon icon="redo" /><span>Save &amp; restart</span>
       </button>
     } @else {
-      <span [ngbTooltip]="draftReason() ? 'This Flow is a Draft: ' + draftReason() : 'Save the Flow and start it'">
+      <span [ngbTooltip]="draftReason() ? 'This Flow is a Draft: ' + draftReason() : 'Save the Flow and start it (Ctrl+Enter)'">
         <button
           type="button"
           class="btn btn-fx btn-fx-secondary"
           data-tour="flow-save-start"
           [disabled]="saving() || busy() || draftReason() !== null"
           (click)="saveAndStart.emit()"
+          aria-keyshortcuts="Control+Enter"
         >
           <fa-icon icon="play" /><span>Save &amp; start</span>
         </button>

@@ -6,10 +6,11 @@ import { NgClass } from '@angular/common';
 import { Router } from '@angular/router';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { NgbDropdownModule, NgbOffcanvas, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbModal, NgbOffcanvas, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { EMPTY, Observable, Subject, catchError, forkJoin, map, merge, of, switchMap, timer } from 'rxjs';
 
 import { Components } from 'app/shared/camel/component-type';
+import { isRunShortcut, isStopShortcut } from 'app/shared/keyboard';
 import { StatusControlsTone } from 'app/shared/table';
 
 import { FlowService } from '../flow.service';
@@ -48,6 +49,9 @@ const TONE_CLASS: Record<StatusControlsTone, string> = {
   templateUrl: './flow-editor-header.component.html',
   styleUrl: './flow-editor-header.component.scss',
   imports: [NgClass, ReactiveFormsModule, FontAwesomeModule, NgbDropdownModule, NgbTooltip, FlowRowAlerts],
+  host: {
+    '(document:keydown)': 'onKeydown($event)',
+  },
 })
 export class FlowEditorHeaderComponent {
   readonly nameControl = input.required<FormControl<string>>();
@@ -107,6 +111,7 @@ export class FlowEditorHeaderComponent {
   private readonly components = inject(Components);
   private readonly router = inject(Router);
   private readonly offcanvas = inject(NgbOffcanvas);
+  private readonly modals = inject(NgbModal);
   private readonly nameInput = viewChild<ElementRef<HTMLInputElement>>('nameInput');
   private readonly refresh = new Subject<void>();
 
@@ -121,6 +126,31 @@ export class FlowEditorHeaderComponent {
 
   focusName(): void {
     this.nameInput()?.nativeElement.focus();
+  }
+
+  /**
+   * Ctrl+Enter (Cmd+Enter) does what the Save & start button does, or Save & restart while the Flow runs;
+   * Ctrl+Shift+Enter stops the Flow. Like Ctrl+S they also work while typing in a field or code editor, and only when
+   * their button is enabled. A dialog or drawer on top of the editor keeps the keys.
+   */
+  onKeydown(event: KeyboardEvent): void {
+    const run = isRunShortcut(event);
+    if ((!run && !isStopShortcut(event)) || this.modals.hasOpenModals() || this.offcanvas.hasOpenOffcanvas()) {
+      return;
+    }
+    event.preventDefault();
+    if (this.busy() || (run && this.saving())) {
+      return;
+    }
+    if (!run) {
+      if (this.running()) {
+        this.stop();
+      }
+    } else if (this.running()) {
+      this.saveAndRestart.emit();
+    } else if (this.draftReason() === null) {
+      this.saveAndStart.emit();
+    }
   }
 
   /** Starts the saved Flow. When the start fails the Flow shows the Error status. */
