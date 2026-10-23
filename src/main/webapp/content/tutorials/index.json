@@ -21,7 +21,7 @@
     "id": "tutorial2",
     "wiki": "tutorial6-debugging-a-flow",
     "title": "Tutorial 2: Debugging a Flow",
-    "minutes": 10,
+    "minutes": 8,
     "track": "Get started",
     "fixtures": {
       "TestFlow": "TestFlow.xml"

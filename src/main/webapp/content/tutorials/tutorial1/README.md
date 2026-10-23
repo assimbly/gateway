@@ -26,31 +26,36 @@ You build *TestFlow*: it picks up each file from an `in` folder and drops it in 
 1. Go to **Flows → Manage** and click **Add**. <!-- show: [aria-label="Add"] -->
 2. Choose **Visual** (marked *No code · recommended*). <!-- show: a.flow-type-choice -->
 3. Next to **Flow name** at the top, type `TestFlow`. <!-- show: #field_flowName -->
-4. Click the **Source** on the canvas. <!-- show: .flow-step-source --> A panel opens on the right where you configure it. (Don't see the panel? Click **Show editor**.) <!-- show: [aria-controls="flow-designer-panel"] -->
+
+The canvas shows a new Flow of two Steps: a Source that receives messages and a Sink that delivers them. You configure them in the next step.
+
+## Step 2: Configure the Source and the Sink
+
+<!-- step: {"check":"flowStep:TestFlow:/out"} -->
+
+1. Click the **Source** on the canvas. <!-- show: .flow-step-source --> A panel opens on the right where you configure it. (Don't see the panel? Click **Show editor**.) <!-- show: [aria-controls="flow-designer-panel"] -->
    * **Component:** `File`
    * **Directory Name:** `@{messages}/in`, the `in` folder in your messages folder <!-- show: [formcontrolname="uri"] -->
-5. Click the **Sink** on the canvas. <!-- show: .flow-step-sink --> A new Flow's Sink writes each message to the log. Change it so it writes files instead:
+2. Click the **Sink** on the canvas. <!-- show: .flow-step-sink --> A new Flow's Sink writes each message to the log. Change it so it writes files instead:
    * **Component:** `File`
    * **Directory Name:** `@{messages}/out`
+3. Click **Save**. <!-- show: [data-tour="flow-save"] -->
 
 The folders don't have to exist: the File component creates them when the Flow starts.
 
 > **Your messages folder.** The tutorials keep their files in the folder `messages` in your home folder: `C:\Users\<you>\messages` on Windows, `/home/<you>/messages` on Linux, `/Users/<you>/messages` on macOS and `/data/messages` in Docker. A Flow refers to it as `@{messages}`, a **Variable** the Gateway creates for you, so the same Flow works on every machine. You find it under **Flows → Variables**.
 
-You now have a Flow of two Steps: a Source that receives messages and a Sink that delivers them. There's no need to save in between: you save the Flow in the next step, right before you start it.
-
-## Step 2: Save it, start it and send a message
+## Step 3: Start it and send a message
 
 <!-- step: {"check":"flowCompleted:TestFlow"} -->
 
-1. Click **Save**. <!-- show: [data-tour="flow-save"] -->
-2. Click **Start** at the top right of the editor. <!-- show: [data-tour="flow-start"] --> The button turns green once the Flow is running. (Next time, **Save & start** does both in one click.) <!-- show: [data-tour="flow-save-start"] -->
-3. Click **Send test message**. <!-- show: [data-tour="flow-send-test"] --> The Send page opens with the Source of *TestFlow* as destination: `file://@{messages}/in`.
-4. Under **Body**, type `Hello Assimbly`, <!-- show: .body-codemirror --> then click **Send**. <!-- show: [title="Send (Ctrl+Enter)"] -->
+1. Click **Start** at the top right of the editor. <!-- show: [data-tour="flow-start"] --> The button turns green once the Flow is running. (Next time, **Save & start** saves and starts in one click.) <!-- show: [data-tour="flow-save-start"] -->
+2. Click **Send test message**. <!-- show: [data-tour="flow-send-test"] --> The Send page opens with the Source of *TestFlow* as destination: `file://@{messages}/in`.
+3. Under **Body**, type `Hello Assimbly`, <!-- show: .body-codemirror --> then click **Send**. <!-- show: [title="Send (Ctrl+Enter)"] -->
 
 The Gateway writes your message as a file in the `in` folder. Within a second the Source picks it up and the Sink drops it in the `out` folder: `@{messages}/out`, for example `C:\Users\<you>\messages\out` on Windows. Open it to see your message.
 
-5. Click **Back**. In the editor header, the **Completed** counter went up by one. <!-- show: [data-tour="flow-completed"] -->
+4. Click **Back**. In the editor header, the **Completed** counter went up by one. <!-- show: [data-tour="flow-completed"] -->
 
 > You can also drop any file in the `in` folder yourself. Camel's File component moves the files it has picked up to a hidden `.camel` subfolder of the `in` folder, so the same file is not processed twice.
 

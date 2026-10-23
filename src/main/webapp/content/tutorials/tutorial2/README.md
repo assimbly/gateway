@@ -1,14 +1,13 @@
 # Tutorial 2: Debugging a Flow
 
-<!-- tutorial: {"id":"tutorial2","wiki":"tutorial6-debugging-a-flow","title":"Tutorial 2: Debugging a Flow","minutes":10,"track":"Get started","fixtures":{"TestFlow":"TestFlow.xml"}} -->
+<!-- tutorial: {"id":"tutorial2","wiki":"tutorial6-debugging-a-flow","title":"Tutorial 2: Debugging a Flow","minutes":8,"track":"Get started","fixtures":{"TestFlow":"TestFlow.xml"}} -->
 
 **What you'll learn**
 
 * Find out why a Flow doesn't start
 * Spot failed messages: counters and alerts
-* Find the full error in the log
 
-It takes about 10 minutes.
+It takes about 8 minutes.
 
 <!-- web-only -->
 > You can also follow this tutorial inside the Gateway: click **Tutorials** in the menu. It shows each step next to the screen it's about and ticks it off once you've done it.
@@ -79,27 +78,9 @@ The Source picks up the file, but the Sink can't store it. In the editor header 
 
 > **Where did my file go?** The Flow's **Error handler** takes care of failed messages. By default it writes the error to the Gateway log, after which the file is moved to the hidden `.camel` subfolder of the `in` folder, just like a file that was delivered. To do something else with failed messages, click **Error handler** in the editor toolbar.
 
-## Step 5: Find the full error in the log
-
-<!-- step: {"check":"flowLog:DebugFlow:Cannot store file"} -->
-
-An alert is a one-line summary. The full details, such as the headers of the message and the stack trace, are in the Gateway log. You see the log in the terminal where you started the Gateway, or in your browser:
-
-1. In the editor header of *DebugFlow*, click **Log**. <!-- show: [data-tour="flow-log"] --> A panel opens with the log of this Flow only.
-2. Type `Cannot store file` in the filter box. <!-- show: #flowLogSearchText -->
-
-![The error in the log of the Flow](05-flow-log.png)
-
-You find two entries:
-
-* The first is written by the Flow's error handler. It shows the failed message: its headers, its body and the exception that was caught, followed by the stack trace.
-* The second says **Failed delivery** and gives the exception: `GenericFileOperationFailedException: Cannot store file`.
-
-> The panel shows the last entries of the log (the **Entries** field). Can't find the error? Raise **Entries**, or send another test message and click **Refresh**. **Open in Log viewer** shows the same entries in **Administration → Log viewer**, where you can clear the Flow filter to see the whole Gateway log. On **Flows → Manage** you find the same panel under **⋮** → **View log**.
-
 To fix the Flow, you would create the `out2` folder or turn **Auto Create** back on.
 
-When you're done, close the log panel and click **Stop**. <!-- show: [data-tour="flow-stop"] -->
+When you're done, click **Stop**. <!-- show: [data-tour="flow-stop"] -->
 
 ## Summary
 
@@ -108,7 +89,6 @@ When you're done, close the log panel and click **Stop**. <!-- show: [data-tour=
 | **Error** badge | Why a Flow or one of its Steps didn't start. |
 | **Completed** / **Failed** counters | How many messages went through the Flow, and how many failed. |
 | **Alert** badge | The latest errors of messages, one line each. |
-| **Log** in the editor header (or **Administration → Log viewer**, or the terminal) | The full error, with the message headers and the stack trace. |
 | **Send test message** in the editor header | Sends a message to the Source of a running Flow, so you can try it without leaving the Gateway. |
 
 **Done!** You can find out why a Flow fails. Continue with [Tutorial 3: Calling a REST API](https://github.com/assimbly/gateway/wiki/tutorial6-calling-a-rest-api).
