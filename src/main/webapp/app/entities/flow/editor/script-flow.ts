@@ -81,6 +81,31 @@ function languageOf(language: string | null | undefined): ScriptLanguageInfo | u
   return SCRIPT_LANGUAGES.find(info => info.value === value);
 }
 
+/** The language's name, as the editor shows it; an unknown language by its value. */
+export function scriptLanguageLabel(language: string | null | undefined): string {
+  return languageOf(language)?.label ?? language ?? '';
+}
+
+/** The CodeMirror mode a script in this language is shown in. */
+export function scriptEditorMode(language: string | null | undefined): string {
+  switch ((language ?? '').toLowerCase()) {
+    case 'javascript':
+    case 'datasonnet':
+      return 'javascript';
+    case 'groovy':
+    case 'jactl':
+      return 'text/x-groovy';
+    case 'java':
+      return 'text/x-java';
+    case 'python':
+      return 'text/x-python';
+    case 'xslt':
+      return 'application/xml';
+    default:
+      return 'text';
+  }
+}
+
 /** The example a new Script Step in this language starts with; empty for an unknown language. */
 export function starterScript(language: string | null | undefined): string {
   return languageOf(language)?.starter ?? '';
@@ -160,12 +185,7 @@ export function nextSchedulerName(steps: readonly IStep[] | null | undefined): s
   return `scheduler${n}`;
 }
 
-/** What a Script Flow's editor shows: only its Script Steps, or every Step. */
-export type ScriptFlowView = 'script' | 'flow';
-
-export const DEFAULT_SCRIPT_FLOW_VIEW: ScriptFlowView = 'script';
-
-/** A Step that the Script view leaves out, in a word, and where it is among the Steps. */
+/** A Step of a Script Flow other than its Scripts, in a word, and where it is among the Steps. */
 export interface ScriptFlowSummaryItem {
   readonly index: number;
   readonly text: string;

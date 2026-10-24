@@ -49,12 +49,8 @@ export function entryStepOf(graph: FlowGraph): string | undefined {
   return entry?.id != null ? String(entry.id) : undefined;
 }
 
-/**
- * What each Step of the graph did in the run, by Step key. Steps are matched by their saved id, since a Step added
- * in this editor keeps its `new-N` key after saving. A Step that ran more than once, as in a split, shows a failed
- * run if it had one, else its first.
- */
-export function runResultsByStepKey(graph: FlowGraph, run: FlowTestRun): Map<string, StepRunMark> {
+/** What each Step did in the run, by its saved id. A Step that ran more than once, as in a split, shows a failed run if it had one, else its first. */
+export function stepRunsById(run: FlowTestRun): Map<string, StepRun> {
   const runs = new Map<string, StepRun>();
   run.steps.forEach(stepRun => {
     const known = runs.get(stepRun.stepId);
@@ -62,6 +58,15 @@ export function runResultsByStepKey(graph: FlowGraph, run: FlowTestRun): Map<str
       runs.set(stepRun.stepId, stepRun);
     }
   });
+  return runs;
+}
+
+/**
+ * What each Step of the graph did in the run, by Step key. Steps are matched by their saved id, since a Step added
+ * in this editor keeps its `new-N` key after saving.
+ */
+export function runResultsByStepKey(graph: FlowGraph, run: FlowTestRun): Map<string, StepRunMark> {
+  const runs = stepRunsById(run);
   const marks = new Map<string, StepRunMark>();
   graph.steps.forEach(step => {
     if (step.kind === 'SOURCE') {

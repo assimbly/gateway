@@ -347,16 +347,26 @@ describe('Flow editor Route Step', () => {
     expect(removeConnectionButton()).toBeNull();
   });
 
-  it('offers a Script the next Script and the Log in a menu, without the Connection', () => {
+  it('leaves adding a Script to the list below the Scripts, and reveals its Connection in place', () => {
     render(StepType.SCRIPT, 'script', false);
-    fixture.componentRef.setInput('canAddLog', true);
+
+    expect(addButton()).toBeNull();
+    expect(addConnectionLink()).not.toBeNull();
+  });
+
+  it('can remove a Script while the Flow has others, and drag it by its handle', () => {
+    render(StepType.SCRIPT, 'script');
+    const remove = () => fixture.nativeElement.querySelector('.step-card__remove');
+    const drag = () => fixture.nativeElement.querySelector('.step-card__drag');
+    expect(remove()).toBeNull();
+    expect(drag()).toBeNull();
+
+    fixture.componentRef.setInput('deletable', true);
+    fixture.componentRef.setInput('draggable', true);
     fixture.detectChanges();
 
-    addButton().click();
-    fixture.detectChanges();
-    const items = Array.from(document.body.querySelectorAll('.dropdown-menu.show [ngbdropdownitem]')).map(item => item.textContent?.trim());
-    expect(items).toEqual(['Script', 'Log the result']);
-    expect(addConnectionLink()).not.toBeNull();
+    expect(remove().getAttribute('aria-label')).toBe('Remove step');
+    expect(drag().getAttribute('aria-label')).toBe('Drag to move this Script');
   });
 
   it('offers every Connection to a Route', () => {

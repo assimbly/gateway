@@ -35,7 +35,7 @@ import { VariableKeysService } from 'app/entities/environment-variables/variable
 import { isRouteStep, missingRouteFields } from './route-step';
 import { Subscription } from 'rxjs';
 import { FlowService } from '../flow.service';
-import { ScriptLanguageInfo, ScriptTrial, isStarterScript, scriptHint, starterScript } from './script-flow';
+import { ScriptLanguageInfo, ScriptTrial, isStarterScript, scriptEditorMode, scriptHint, starterScript } from './script-flow';
 
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/mode/groovy/groovy';
@@ -69,9 +69,12 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   @Input() onCanvas = false;
   /** On the canvas, the kind of the Router being edited; it is shown as its component and can't be changed here. */
   @Input() routerTitle?: string;
-  /** On the canvas, whether the Flow keeps a valid shape without this Step; the canvas decides which Steps can go. */
+  /**
+   * On the canvas, whether the Flow keeps a valid shape without this Step; the canvas decides which Steps can go. In the
+   * Route and Script editors, whether the Flow has another Route or Script.
+   */
   @Input() deletable = false;
-  /** The Route editor lets each Route be dragged to another place by its handle. */
+  /** The Route and Script editors let each Route or Script be dragged to another place by its handle. */
   @Input() draggable = false;
   @Input() formSubmitted = false;
 
@@ -88,8 +91,6 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   @Input() uriPlaceholder: string;
   /** The path an Error Handler gets automatically while the user leaves it to the Flow, shown as a hint. */
   @Input() autoPath?: string;
-  /** Whether this Step's add menu offers a Log Step for the result: the last Script of a Script Flow without one. */
-  @Input() canAddLog = false;
   @Input() uriPopoverMessage: string;
   @Input() uriList: IStep[] = [];
   @Input() componentOptions: Array<any> = [];
@@ -480,21 +481,11 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
     return !this.onCanvas && (this.stepType === 'ACTION' || (this.stepType === 'SOURCE' && this.activeEditor === 'flow'));
   }
 
-  get canAddScript(): boolean {
-    return this.stepType === 'SCRIPT' || (this.stepType === 'SOURCE' && this.activeEditor === 'script');
-  }
-
   /** The Steps that can be added after this one; a single one gets a plain button labelled with `button`. */
   get addItems(): { label: string; button: string; add: () => void }[] {
     const items: { label: string; button: string; add: () => void }[] = [];
     if (this.canAddAction) {
       items.push({ label: 'Action', button: 'Add action', add: () => this.onAddStep() });
-    }
-    if (this.canAddScript) {
-      items.push({ label: 'Script', button: 'Add script', add: () => this.onAddStep() });
-    }
-    if (this.canAddLog) {
-      items.push({ label: 'Log the result', button: 'Log the result', add: () => this.onAddLog() });
     }
     return items;
   }
@@ -517,7 +508,10 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
     );
   }
 
-  /** The remove button: the first Step of a form editor stays, except a Route while the Flow has others (`deletable`). */
+  /**
+   * The remove button: the first Step of a form editor stays. A Route or a Script can go while the Flow has another
+   * one (`deletable`).
+   */
   get showsRemove(): boolean {
     if (!this.canRemoveStep) {
       return false;
@@ -525,12 +519,17 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
     if (this.onCanvas) {
       return true;
     }
-    return this.stepType === 'ROUTE' ? this.deletable : this.index > 0;
+    return this.stepType === 'ROUTE' || this.stepType === 'SCRIPT' ? this.deletable : this.index > 0;
   }
 
   /** A Route, or the Error handler of a Route Flow: a name and a Camel route in XML. */
   get isRouteStep(): boolean {
     return isRouteStep(this.stepType, this.activeEditor);
+  }
+
+  /** What the drag handle moves. */
+  get dragLabel(): string {
+    return this.stepType === 'SCRIPT' ? 'Drag to move this Script' : 'Drag to move this Route';
   }
 
   get routeStepLabel(): string {
@@ -569,10 +568,6 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
 
   onAddStep(): void {
     this.addStep.emit({ step: this.step, index: this.index });
-  }
-
-  onAddLog(): void {
-    this.addStep.emit({ step: this.step, index: this.index, stepType: StepType.SINK });
   }
 
   onAddConnection(): void {
@@ -692,7 +687,7 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
       gutters: ['CodeMirror-linenumbers'],
       lineWrapping: true,
       theme,
-      mode: this.scriptEditorMode(componentType),
+      mode: scriptEditorMode(componentType),
     };
     return this.scriptOptionsCache;
   }
@@ -731,25 +726,6 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
       placeholder,
     };
     return this.pathOptionsCache;
-  }
-
-  private scriptEditorMode(componentType: string): string {
-    switch ((componentType || '').toLowerCase()) {
-      case 'javascript':
-      case 'datasonnet':
-        return 'javascript';
-      case 'groovy':
-      case 'jactl':
-        return 'text/x-groovy';
-      case 'java':
-        return 'text/x-java';
-      case 'python':
-        return 'text/x-python';
-      case 'xslt':
-        return 'application/xml';
-      default:
-        return 'text';
-    }
   }
 
   openModal(templateRef: TemplateRef<any>): void {

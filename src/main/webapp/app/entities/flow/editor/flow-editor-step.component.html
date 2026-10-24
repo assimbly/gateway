@@ -145,7 +145,7 @@
       <div class="step-card__head">
         @if (draggable) {
           <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm step-card__drag" cdkDragHandle
-                  title="Drag to move this Route" aria-label="Drag to move this Route">
+                  [title]="dragLabel" [attr.aria-label]="dragLabel">
             <fa-icon icon="grip-vertical"></fa-icon>
           </button>
         }
@@ -488,8 +488,6 @@
             }
           </div>
         </div>
-
-        <ng-container *ngTemplateOutlet="addStepMenu"></ng-container>
       }
 
       <div class="step-field" [style.display]="enableMessage ? '' : 'none'">

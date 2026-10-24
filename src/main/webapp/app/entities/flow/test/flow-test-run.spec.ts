@@ -2,7 +2,7 @@ import { IFlow } from 'app/shared/model/flow.model';
 import { IStep } from 'app/shared/model/step.model';
 
 import { loadFlowGraph } from '../designer/flow-graph';
-import { FlowTestRun, StepRun, entryStepOf, graphShape, headersOf, runResultsByStepKey, shortDuration } from './flow-test-run';
+import { FlowTestRun, StepRun, entryStepOf, graphShape, headersOf, runResultsByStepKey, shortDuration, stepRunsById } from './flow-test-run';
 
 const flow: IFlow = {
   id: 1,
@@ -55,6 +55,13 @@ describe('Flow test run', () => {
     const marks = runResultsByStepKey(loadFlowGraph(flow), run([stepRun('11'), stepRun('11', 'failed'), stepRun('11')]));
 
     expect(marks.get('step-11')).toEqual(expect.objectContaining({ status: 'failed' }));
+  });
+
+  it('keeps the run of each Step by its saved id, for an editor without a graph', () => {
+    const runs = stepRunsById(run([stepRun('21'), stepRun('22', 'failed'), stepRun('21', 'failed')]));
+
+    expect([...runs.keys()]).toEqual(['21', '22']);
+    expect(runs.get('21')).toEqual(expect.objectContaining({ status: 'failed' }));
   });
 
   it("doesn't see moving a Step as a change of the Flow, but does see a change of its settings", () => {

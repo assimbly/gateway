@@ -22,8 +22,9 @@ interface Blocked {
 /**
  * The Test panel of the visual editor: sends one message through the running Flow, from the Step after the Source,
  * and shows what came back. The editor marks each Step on the canvas with what it did; selecting a Step shows here
- * the message it got and passed on. The Route editor uses it too, without a graph: the message goes into its first
- * Route, and only the response comes back, as a Route has no Steps inside.
+ * the message it got and passed on. The Route and Script editors use it too, without a graph. In a Route Flow the
+ * message goes into its first Route, and only the response comes back, as a Route has no Steps inside. In a Script
+ * Flow it goes into its first Script, and the editor shows what each Script made of it.
  */
 @Component({
   selector: 'jhi-flow-test-panel',
@@ -36,8 +37,10 @@ export class FlowTestPanelComponent {
   readonly flowId = input<number | null | undefined>();
   /** The visual Flow; a Route Flow has none and names its entry instead. */
   readonly graph = input<FlowGraph | undefined>();
-  /** The Step the message goes into, when there is no graph: the first Route of a Route Flow. */
+  /** The Step the message goes into, when there is no graph: the first Route of a Route Flow, or the first Script of a Script Flow. */
   readonly entryStepId = input<string | undefined>();
+  /** What `entryStepId` is. */
+  readonly entryKind = input<'route' | 'script'>('route');
   /** The key of the Step selected on the canvas, whose messages are shown. */
   readonly selectedKey = input<string | undefined>();
   readonly running = input(false);
@@ -65,7 +68,10 @@ export class FlowTestPanelComponent {
   private readonly flowService = inject(FlowService);
 
   /** Whether the panel tests a Route Flow: the message goes into its first Route, and there are no Steps to select. */
-  readonly routes = computed(() => !this.graph());
+  readonly routes = computed(() => !this.graph() && this.entryKind() === 'route');
+
+  /** Whether the panel tests a Script Flow: the message goes into its first Script, and the editor shows each Script's result. */
+  readonly scripts = computed(() => !this.graph() && this.entryKind() === 'script');
 
   readonly entryStep = computed(() => {
     const graph = this.graph();
@@ -80,7 +86,7 @@ export class FlowTestPanelComponent {
       return { text: `This Flow is a Draft: ${this.draftReason()}` };
     }
     if (!this.entryStep()) {
-      return { text: this.routes() ? 'Save the Flow first.' : 'Link a Step after the Source and save the Flow first.' };
+      return { text: this.graph() ? 'Link a Step after the Source and save the Flow first.' : 'Save the Flow first.' };
     }
     return this.running() ? null : { text: 'Start the Flow to test it.', action: 'start' };
   });

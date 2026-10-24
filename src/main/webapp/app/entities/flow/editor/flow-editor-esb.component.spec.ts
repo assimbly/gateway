@@ -252,3 +252,148 @@ describe('Route editor', () => {
     expect(url()).toBe('/flow/editor/7?mode=edit&editor=route&id=7&view=test');
   });
 });
+
+describe('Script editor', () => {
+  const serializer = new DefaultUrlSerializer();
+
+  function stepForm(id: number, stepType: StepType, componentType: string): FormGroup {
+    return new FormGroup({
+      id: new FormControl(id),
+      stepType: new FormControl(stepType),
+      componentType: new FormControl(componentType),
+      uri: new FormControl(''),
+    });
+  }
+
+  /** A saved Script Flow: its Source, Scripts 2 and 3, the Log of the result and the Error handler, without rendering it. */
+  function editor(): { component: FlowEditorEsbComponent; url: () => string } {
+    const component = Object.create(FlowEditorEsbComponent.prototype) as FlowEditorEsbComponent;
+    let url = '/flow/editor/7?mode=edit&editor=script&id=7';
+    const types: [StepType, string][] = [
+      [StepType.SOURCE, 'scheduler'],
+      [StepType.SCRIPT, 'simple'],
+      [StepType.SCRIPT, 'groovy'],
+      [StepType.SINK, 'log'],
+      [StepType.ERROR, 'log'],
+    ];
+    Object.assign(component, {
+      viewMode: 'design',
+      testView: 'flow',
+      testPanelTab: 'test',
+      scriptTab: 'scripts',
+      sidePanelCollapsed: true,
+      selection: { type: 'flow' },
+      flow: { id: 7 },
+      activeEditor: 'script',
+      steps: types.map(([stepType], i) => new Step(i + 1, stepType)),
+      stepsToDelete: [],
+      numberOfSteps: 5,
+      stepsOptions: [['s'], ['a'], ['b'], ['l'], ['e']],
+      componentOptions: [],
+      selectedOptions: [],
+      enableConnection: [false, true, false, false, false],
+      enableMessage: [],
+      filterConnection: [],
+      connectionType: [],
+      uriPlaceholders: [],
+      uriPopoverMessages: [],
+      URIList: [],
+      componentTypeCamelLinks: [],
+      editFlowForm: new FormGroup({ stepsData: new FormArray(types.map(([stepType, componentType], i) => stepForm(i + 1, stepType, componentType))) }),
+      cdr: { markForCheck: jest.fn(), detectChanges: jest.fn() },
+      router: { parseUrl: (path: string) => serializer.parse(path), serializeUrl: (tree: UrlTree) => serializer.serialize(tree) },
+      location: { path: () => url, replaceState: (next: string) => (url = next) },
+    });
+    return { component, url: () => url };
+  }
+
+  const stepRun = (stepId: string, status: 'completed' | 'failed') => ({
+    stepId,
+    status,
+    startedAt: '2026-10-24T10:00:00Z',
+    ownMillis: 2,
+    totalMillis: 5,
+    in: { body: '', headers: {}, truncated: false },
+    out: status === 'completed' ? { body: 'Hello', headers: {}, truncated: false } : null,
+    error: status === 'failed' ? 'No such property: x' : null,
+  });
+
+  it('moves a Script among the Scripts, with everything it has at its place, and the test message follows the first one', () => {
+    const { component } = editor();
+    expect(component.scriptEntryStepId).toBe('2');
+
+    component.moveScript(1, 0);
+
+    expect(component.steps.map(step => step.id)).toEqual([1, 3, 2, 4, 5]);
+    expect(component.enableConnection).toEqual([false, false, true, false, false]);
+    expect(component.scriptLanguage(1)).toBe('Groovy');
+    expect(component.scriptEntryStepId).toBe('3');
+    expect(component.editFlowForm.dirty).toBe(true);
+  });
+
+  it('lets a Script be moved and removed while the Flow has another', () => {
+    const { component } = editor();
+    expect([1, 2, 3, 4].map(index => component.isMovableListStep(index))).toEqual([true, true, false, false]);
+
+    component.removeStep(component.steps[1], 1);
+
+    expect(component.scriptIndices).toEqual([1]);
+    expect(component.isMovableListStep(1)).toBe(false);
+  });
+
+  it('shows the Source and the Log of the result on their own tab', () => {
+    const { component } = editor();
+
+    expect(component.scriptEndIndices).toEqual([0, 3]);
+    expect(component.hasResultStep).toBe(true);
+  });
+
+  it('opens the tab of the first Step that needs attention after a failed save', () => {
+    const { component } = editor();
+    const stepsData = component.editFlowForm.controls.stepsData as FormArray;
+
+    stepsData.at(3).setErrors({ required: true });
+    (component as any).showInvalidCodeTab();
+    expect(component.scriptTab).toBe('source');
+
+    stepsData.at(3).setErrors(null);
+    stepsData.at(4).setErrors({ required: true });
+    (component as any).showInvalidCodeTab();
+    expect(component.scriptTab).toBe('errorHandler');
+  });
+
+  it('shows what each Script made of the test message, and which ones it never reached', () => {
+    const { component } = editor();
+
+    component.onTestRan({ runId: 'r', status: 'failed', durationMillis: 4, response: null, steps: [stepRun('2', 'failed')] });
+
+    expect(component.scriptRun(1)?.error).toBe('No such property: x');
+    expect(component.scriptUnreached(1)).toBe(false);
+    expect(component.scriptRun(2)).toBeUndefined();
+    expect(component.scriptUnreached(2)).toBe(true);
+  });
+
+  it('has a Code and a Test mode, kept in the URL, and forgets the last run once the Scripts are saved', () => {
+    const { component, url } = editor();
+    component.setMode('test');
+
+    expect(component.viewMode).toBe('test');
+    expect(component.testTabs.map(tab => tab.label)).toEqual(['Scripts', 'Log', 'Camel route']);
+    expect(url()).toBe('/flow/editor/7?mode=edit&editor=script&id=7&view=test');
+
+    component.onTestRan({ runId: 'r', status: 'completed', durationMillis: 4, response: null, steps: [stepRun('2', 'completed')] });
+    const restart = jest.fn();
+    Object.assign(component, {
+      afterSaveAction: 'restart',
+      header: { restart },
+      load: jest.fn(),
+      router: { ...(component as any).router, createUrlTree: () => serializer.parse('/flow/editor/7?mode=edit&editor=script&id=7&view=test') },
+    });
+    (component as any).afterSave();
+
+    expect(restart).toHaveBeenCalledWith(7);
+    expect(component.viewMode).toBe('test');
+    expect(component.testRun).toBeUndefined();
+    expect(component.scriptRun(1)).toBeUndefined();
+  });
+});

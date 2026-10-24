@@ -46,21 +46,21 @@ import { FlowTestPanelComponent } from "../test/flow-test-panel.component";
 import { FlowRunStatsComponent } from "../stats/flow-run-stats.component";
 import { FlowLogDrawerComponent } from "../flow-log-drawer.component";
 import { CamelRouteDrawerComponent } from "../camel-route-drawer.component";
-import { FlowTestRun, StepRunMark, graphShape, runResultsByStepKey } from "../test/flow-test-run";
+import { FlowTestRun, StepRun, StepRunMark, graphShape, runResultsByStepKey, shortDuration, stepRunsById } from "../test/flow-test-run";
 import { automaticErrorHandlerPath, defaultErrorHandlerStep, errorHandlerPath, errorHandlerPathOnSave } from "./error-handler";
 import { isRouteConfiguration, isRouteStep, missingRouteFields, nextRouteName, routeToSave } from "./route-step";
 import { CdkDrag, CdkDragPlaceholder, CdkDropList, moveItemInArray } from "@angular/cdk/drag-drop";
 import {
   DEFAULT_RESULT_LOG,
-  DEFAULT_SCRIPT_FLOW_VIEW,
   DEFAULT_SCRIPT_LANGUAGE,
   SCRIPT_LANGUAGES,
   SCRIPT_STARTER_SOURCE,
   ScriptFlowSummary,
-  ScriptFlowView,
   defaultResultLogStep,
   nextSchedulerName,
+  scriptEditorMode,
   scriptFlowSummary,
+  scriptLanguageLabel,
   starterScript,
 } from "./script-flow";
 import { ComponentSchemas } from "../component-schemas.service";
@@ -185,7 +185,6 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	panelCollapsed: any = "uno";
 	public isCollapsed = true;
 	active: string;
-	active2: any;
 	disabled = true;
 	activeStep: any;
 	activeEditor: string;
@@ -1104,38 +1103,51 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		this.active = newIndex.toString();
 	}
 
-	/** The last Script of a Script Flow can add a Log Step for the result, while the Flow has none. */
-	canAddLog(index: number): boolean {
-		// The Script view offers it in its summary instead.
-		if (this.activeEditor !== 'script' || this.showsScriptView || this.steps.some(step => step.stepType === StepType.SINK)) {
-			return false;
-		}
-		return index === this.lastScriptIndex;
+	// Script editor
+	//
+	// Code edits the Scripts, the Source and where the result goes, the Error handler and the Notes, each on a tab. Test
+	// shows the Scripts read-only, each with what it made of the test message, beside the Test panel and the stats.
+
+	scriptTab: ScriptTab = 'scripts';
+
+	readonly scriptTabs = [
+		{ id: 'scripts', label: 'Scripts', icon: 'code' },
+		{ id: 'source', label: 'Source & result', icon: 'sign-in-alt' },
+		{ id: 'errorHandler', label: 'Error handler', icon: 'exclamation-triangle' },
+		{ id: 'notes', label: 'Notes', icon: 'file-alt' },
+	] as const;
+
+	showScriptTab(tab: ScriptTab): void {
+		this.scriptTab = tab;
+		this.scrollCodeToTop();
+		this.cdr.markForCheck();
 	}
 
+	/** The indices of the Scripts of a Script Flow, in their order. */
+	get scriptIndices(): number[] {
+		return this.steps.flatMap((step, index) => (step.stepType === StepType.SCRIPT ? [index] : []));
+	}
+
+	get scriptCount(): number {
+		return this.scriptIndices.length;
+	}
+
+	/** The Steps on the Source & result tab: the Source and, when the Flow has one, the Sink. */
+	get scriptEndIndices(): number[] {
+		return this.steps.flatMap((step, index) => (step.stepType === StepType.SOURCE || step.stepType === StepType.SINK ? [index] : []));
+	}
+
+	get hasResultStep(): boolean {
+		return this.steps.some(step => step.stepType === StepType.SINK);
+	}
+
+	/** Where a new Script or the Log of the result goes after: the last Script, or the Source of a Flow without Scripts. */
 	private get lastScriptIndex(): number {
-		return this.steps.map(step => step.stepType).lastIndexOf(StepType.SCRIPT);
+		const last = this.steps.map(step => step.stepType).lastIndexOf(StepType.SCRIPT);
+		return last >= 0 ? last : this.steps.findIndex(step => step.stepType === StepType.SOURCE);
 	}
 
-	/** Whether the editor shows only the Script Steps of a Script Flow, with a summary of the others. */
-	get showsScriptView(): boolean {
-		return this.activeEditor === 'script' && this.scriptFlowView === 'script';
-	}
-
-	isShownStep(step: IStep): boolean {
-		return !this.showsScriptView || step.stepType === StepType.SCRIPT;
-	}
-
-	setScriptFlowView(view: ScriptFlowView): void {
-		this.scriptFlowView = view;
-		try {
-			localStorage.setItem(SCRIPT_FLOW_VIEW_KEY, view);
-		} catch {
-			// Without storage the editor simply opens in the Script view next time.
-		}
-	}
-
-	/** The Steps the Script view leaves out, as the user has them in the form. */
+	/** The Steps the Scripts tab sums up, as the user has them in the form. */
 	get scriptSummary(): ScriptFlowSummary {
 		return scriptFlowSummary(
 			this.steps.map((step, index) => {
@@ -1149,25 +1161,75 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		);
 	}
 
-	/** Whether a Step the Script view leaves out needs the user's attention after a save attempt. */
+	/** Whether a Step the Scripts tab sums up needs the user's attention after a save attempt. */
 	summaryItemInvalid(index: number | undefined): boolean {
 		return this.formSubmitted && index !== undefined && !!this.stepFormAt(index)?.invalid;
 	}
 
-	/** Leaves the Script view for the Flow view, with the Step at this index in view. */
-	showStepInFlowView(index: number): void {
-		this.setScriptFlowView('flow');
+	/** Shows the tab of a Step the Scripts tab sums up, with the Step in view. */
+	showSummaryStep(index: number): void {
+		this.showScriptTab(this.steps[index]?.stepType === StepType.ERROR ? 'errorHandler' : 'source');
 		this.cdr.detectChanges();
 		document.getElementById(`step-card-${index}`)?.scrollIntoView({ block: 'start', behavior: 'smooth' });
 	}
 
-	/** Adds a Log Step after the last Script, from the Script view's summary. */
+	/** Adds a Script after the last one, before the Sink, and puts its code in view. */
+	addScript(): void {
+		const last = this.lastScriptIndex;
+		this.addStep(this.steps[last], last);
+		this.cdr.detectChanges();
+		const card = document.getElementById(`step-card-${last + 1}`);
+		card?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+		// The code editor of the new Script is made after the view is.
+		setTimeout(() => card?.querySelector<HTMLElement & { CodeMirror?: { focus: () => void } }>('.CodeMirror')?.CodeMirror?.focus());
+	}
+
+	/** Adds a Log Step after the last Script for the result, from the Source & result tab. */
 	addResultLog(): void {
 		const index = this.lastScriptIndex;
 		if (index >= 0) {
 			this.addStep(this.steps[index], index, StepType.SINK);
+			this.cdr.markForCheck();
 		}
 	}
+
+	/** The saved id of the Step a test message goes into: the first Script, past the Source; or the Sink of a Flow without Scripts. */
+	get scriptEntryStepId(): string | undefined {
+		const entry = this.steps.find(step => step.stepType === StepType.SCRIPT) ?? this.steps.find(step => step.stepType === StepType.SINK);
+		return entry?.id != null ? String(entry.id) : undefined;
+	}
+
+	/** What the Script at this index did with the last test message; undefined when it didn't run or there is no run. */
+	scriptRun(index: number): StepRun | undefined {
+		const id = this.steps[index]?.id;
+		return id != null ? this.stepRuns?.get(String(id)) : undefined;
+	}
+
+	/** Whether the last test message never got to the Script at this index. */
+	scriptUnreached(index: number): boolean {
+		return !!this.stepRuns && !this.scriptRun(index);
+	}
+
+	/** The language the Script at this index is written in, by its name. */
+	scriptLanguage(index: number): string {
+		return scriptLanguageLabel(this.stepFormAt(index)?.value.componentType);
+	}
+
+	readonly duration = shortDuration;
+
+	/** The read-only editor options of a Script in Test, in its language and the editor's theme. */
+	readOnlyScriptOptions(language: string | null | undefined): Record<string, unknown> {
+		const theme = this.themeService.editorTheme();
+		const key = `${language}|${theme}`;
+		let options = this.readOnlyScriptOptionsCache.get(key);
+		if (!options) {
+			options = { mode: scriptEditorMode(language), theme, lineNumbers: true, lineWrapping: true, readOnly: true, viewportMargin: Infinity };
+			this.readOnlyScriptOptionsCache.set(key, options);
+		}
+		return options;
+	}
+
+	private readonly readOnlyScriptOptionsCache = new Map<string, Record<string, unknown>>();
 
 	removeStep(step, index): void {
 
@@ -1219,6 +1281,12 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		return this.routeIndices.length;
 	}
 
+	/** In the lists of the Route and Script editors, a Route or Script can be moved and removed while the Flow has another. */
+	isMovableListStep(index: number): boolean {
+		const stepType = this.steps[index]?.stepType;
+		return (stepType === StepType.ROUTE && this.routeCount > 1) || (stepType === StepType.SCRIPT && this.scriptCount > 1);
+	}
+
 	/** The names typed in the Routes, read from the form, which also has a Route that is being added. */
 	private typedRouteNames(): string[] {
 		const stepsData = this.editFlowForm.controls.stepsData as FormArray;
@@ -1237,12 +1305,22 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		name?.focus({ preventScroll: true });
 	}
 
-	/**
-	 * Moves the Route at one place in the list to another. Each Step's per-index state moves along with it; the order
-	 * is saved as the links between the Steps, which follow `steps`.
-	 */
+	/** Moves the Route at one place in the list to another. */
 	moveRoute(from: number, to: number): void {
-		const indices = this.routeIndices;
+		this.moveListedStep(this.routeIndices, from, to);
+	}
+
+	/** Moves the Script at one place in the list to another. */
+	moveScript(from: number, to: number): void {
+		this.moveListedStep(this.scriptIndices, from, to);
+	}
+
+	/**
+	 * Moves the Step at one place in a list of the Route or Script editor, which has the Steps at these indices, to
+	 * another. Each Step's per-index state moves along with it; the order is saved as the links between the Steps,
+	 * which follow `steps`.
+	 */
+	private moveListedStep(indices: number[], from: number, to: number): void {
 		if (from === to || from < 0 || to < 0 || from >= indices.length || to >= indices.length) {
 			return;
 		}
@@ -1276,7 +1354,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		this.cdr.markForCheck();
 		// The moved editors measured themselves in their old place.
 		setTimeout(() =>
-			document.querySelectorAll<HTMLElement & { CodeMirror?: { refresh: () => void } }>('.route-flow-list .CodeMirror').forEach(el => el.CodeMirror?.refresh()),
+			document.querySelectorAll<HTMLElement & { CodeMirror?: { refresh: () => void } }>('.code-flow-list .CodeMirror').forEach(el => el.CodeMirror?.refresh()),
 		);
 	}
 
@@ -1768,11 +1846,8 @@ splitOptions4(options: string): string[] {
 				return true;
 			});
 			if (!invalid) {
-				if (!switchedTab && this.activeEditor === 'route') {
-					this.showInvalidRouteTab();
-					this.focusFirstInvalid(true);
-				} else if (!switchedTab && this.active2 !== 'STEPS') {
-					this.active2 = 'STEPS';
+				if (!switchedTab && !this.useCanvas) {
+					this.showInvalidCodeTab();
 					this.focusFirstInvalid(true);
 				}
 				return;
@@ -1810,11 +1885,6 @@ splitOptions4(options: string): string[] {
 
 		if (!this.editFlowForm.valid || this.savingFlowFailed) {
 			this.editFlowForm.markAllAsTouched();
-			// A Step the Script view leaves out is shown, so its invalid field can be focused.
-			if (this.steps.some((step, index) => !this.isShownStep(step) && this.stepFormAt(index)?.invalid)) {
-				this.setScriptFlowView('flow');
-				this.cdr.detectChanges();
-			}
 			this.focusFirstInvalid();
 			return;
 		}
@@ -2373,8 +2443,6 @@ splitOptions4(options: string): string[] {
 
 	/** Whether the side panel is hidden, to give the canvas the whole width. Hidden by default; remembered in this browser. */
 	sidePanelCollapsed = readPanelCollapsed();
-	/** Whether a Script Flow shows only its scripts or every Step; each viewer keeps their own choice. */
-	scriptFlowView: ScriptFlowView = readScriptFlowView();
 
 	togglePanel(): void {
 		this.setPanelCollapsed(!this.sidePanelCollapsed);
@@ -2405,9 +2473,12 @@ splitOptions4(options: string): string[] {
 	/** The completed and failed messages of each Step, while the Flow runs. */
 	runCounts?: Map<string, IFlowCounts>;
 
-	/** What Test shows: the Flow (on the canvas, or its Routes), its Log and the Camel route the runtime built. */
+	/** What Test shows: the Flow (on the canvas, or its Routes or Scripts), its Log and the Camel route the runtime built. */
 	get testTabs(): readonly { id: 'flow' | 'log' | 'route'; label: string; icon: string }[] {
-		return this.useCanvas ? CANVAS_TEST_TABS : ROUTE_TEST_TABS;
+		if (this.useCanvas) {
+			return CANVAS_TEST_TABS;
+		}
+		return this.activeEditor === 'script' ? SCRIPT_TEST_TABS : ROUTE_TEST_TABS;
 	}
 
 	// Route editor
@@ -2425,7 +2496,13 @@ splitOptions4(options: string): string[] {
 
 	showRouteTab(tab: 'routes' | 'errorHandler' | 'notes'): void {
 		this.routeTab = tab;
+		this.scrollCodeToTop();
 		this.cdr.markForCheck();
+	}
+
+	/** A tab of the Route or Script editor opens at its top, not where the last tab was scrolled to. */
+	private scrollCodeToTop(): void {
+		document.querySelector('.code-flow-pane')?.scrollTo({ top: 0 });
 	}
 
 	/** The saved id of the Route a test message goes into: the first one that is a route, not a routeConfiguration. */
@@ -2447,11 +2524,17 @@ splitOptions4(options: string): string[] {
 	private readOnlyRouteOptionsCache?: Record<string, unknown>;
 
 	/** After a failed save, Code with the tab that has the first invalid Step, so its field can be focused. */
-	private showInvalidRouteTab(): void {
+	private showInvalidCodeTab(): void {
 		this.setMode('design');
 		const stepsData = this.editFlowForm.controls.stepsData as FormArray;
 		const firstInvalid = stepsData.controls.findIndex(form => form.invalid);
-		this.routeTab = firstInvalid >= 0 && this.steps[firstInvalid]?.stepType === StepType.ERROR ? 'errorHandler' : 'routes';
+		const stepType = this.steps[firstInvalid]?.stepType;
+		if (this.activeEditor === 'script') {
+			this.scriptTab =
+				stepType === StepType.ERROR ? 'errorHandler' : stepType === StepType.SOURCE || stepType === StepType.SINK ? 'source' : 'scripts';
+		} else {
+			this.routeTab = stepType === StepType.ERROR ? 'errorHandler' : 'routes';
+		}
 		this.cdr.detectChanges();
 	}
 
@@ -2512,6 +2595,8 @@ splitOptions4(options: string): string[] {
 	testOpen = false;
 	testRun?: FlowTestRun;
 	testMarks?: Map<string, StepRunMark>;
+	/** What each Step did in the last test run, by its saved id, in an editor without a canvas. */
+	private stepRuns?: Map<string, StepRun>;
 	private testedShape?: string;
 
 	isTestOpen(): boolean {
@@ -2528,7 +2613,8 @@ splitOptions4(options: string): string[] {
 	onTestRan(run: FlowTestRun): void {
 		this.testRun = run;
 		if (!this.canvasGraph) {
-			// A Route Flow has no canvas to mark.
+			// A Route or Script Flow has no canvas to mark; the Script editor shows each Script's run.
+			this.stepRuns = stepRunsById(run);
 			this.cdr.markForCheck();
 			return;
 		}
@@ -2550,6 +2636,7 @@ splitOptions4(options: string): string[] {
 	private clearTestRun(): void {
 		this.testRun = undefined;
 		this.testMarks = undefined;
+		this.stepRuns = undefined;
 		this.testedShape = undefined;
 	}
 
@@ -2752,9 +2839,13 @@ splitOptions4(options: string): string[] {
 			queryParams: { mode: 'edit', editor: this.activeEditor, id: this.flow.id, view: this.viewMode === 'test' ? 'test' : undefined },
 		});
 		this.location.replaceState(this.router.serializeUrl(url));
-		// Save & Test: the visual and Route editors go on to test the Flow they start.
+		// Save & Test: the editors go on to test the Flow they start.
 		if (this.hasModes && (then === 'start' || then === 'restart')) {
 			this.setMode('test');
+		}
+		if (this.activeEditor === 'script') {
+			// What each Script made of the last test message was made by the Scripts as they were.
+			this.clearTestRun();
 		}
 		if (this.useCanvas && this.designer) {
 			this.refreshCanvas();
@@ -2929,16 +3020,6 @@ const ERROR_STEP_KEY = 'error';
 
 const PANEL_COLLAPSED_KEY = 'flow-designer.panel-collapsed';
 
-const SCRIPT_FLOW_VIEW_KEY = 'flow-editor.script-flow-view';
-
-function readScriptFlowView(): ScriptFlowView {
-	try {
-		return localStorage.getItem(SCRIPT_FLOW_VIEW_KEY) === 'flow' ? 'flow' : DEFAULT_SCRIPT_FLOW_VIEW;
-	} catch {
-		return DEFAULT_SCRIPT_FLOW_VIEW;
-	}
-}
-
 function readPanelCollapsed(): boolean {
 	try {
 		return localStorage.getItem(PANEL_COLLAPSED_KEY) !== 'false';
@@ -2956,9 +3037,15 @@ const CANVAS_TEST_TABS = [
 /** The Route editor shows its Routes where the visual editor shows its canvas. */
 const ROUTE_TEST_TABS = [{ id: 'flow', label: 'Routes', icon: 'list' }, ...CANVAS_TEST_TABS.slice(1)] as const;
 
-/** The editors with a Design (or Code) and a Test mode: the visual editor and the Route editor. */
+/** The Script editor shows its Scripts there. */
+const SCRIPT_TEST_TABS = [{ id: 'flow', label: 'Scripts', icon: 'code' }, ...CANVAS_TEST_TABS.slice(1)] as const;
+
+/** What the Script editor shows in Code. */
+type ScriptTab = 'scripts' | 'source' | 'errorHandler' | 'notes';
+
+/** The editors with a Design (or Code) and a Test mode: the visual editor, the Route editor and the Script editor. */
 function hasModes(editor: string | undefined): boolean {
-	return opensOnCanvas(editor) || editor === 'route';
+	return opensOnCanvas(editor) || editor === 'route' || editor === 'script';
 }
 
 /** The height in pixels the designer never shrinks below, however small the window. */

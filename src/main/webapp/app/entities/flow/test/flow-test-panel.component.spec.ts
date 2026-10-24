@@ -193,6 +193,41 @@ describe('Flow test panel', () => {
     });
   });
 
+  describe('of a Script Flow', () => {
+    beforeEach(() => {
+      fixture.componentRef.setInput('graph', undefined);
+      fixture.componentRef.setInput('entryStepId', '31');
+      fixture.componentRef.setInput('entryKind', 'script');
+    });
+
+    it('runs the message into the first Script', () => {
+      fixture.detectChanges();
+
+      runButton().click();
+
+      expect(http.expectOne('api/flows/7/test-runs').request.body).toEqual({ entryStepId: '31', body: '', headers: {} });
+    });
+
+    it('shows the response and counts the Step runs, leaving each Script to the editor', () => {
+      fixture.componentRef.setInput('run', FAILED_RUN);
+      fixture.detectChanges();
+
+      const content = fixture.nativeElement.textContent;
+      expect(content).toContain('into the first Script');
+      expect(text('[data-cy="test-summary"]')).toContain('Step runs completed');
+      expect(content).toContain('Each Script shows what it made of the message.');
+      expect(content).not.toContain('Select a Step on the canvas');
+      expect(content).toContain("Send to the Source's endpoint instead");
+    });
+
+    it('asks to save a Script that has no id yet', () => {
+      fixture.componentRef.setInput('entryStepId', undefined);
+      fixture.detectChanges();
+
+      expect(text('[data-cy="test-blocked"]')).toBe('Save the Flow first.');
+    });
+  });
+
   function runButton(): HTMLButtonElement {
     return fixture.nativeElement.querySelector('[data-cy="test-run"]');
   }

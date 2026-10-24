@@ -39,12 +39,12 @@ The Flow you build looks like this:
 
 ![Add a Script Flow](01-add-flow.png)
 
-The script editor opens. Like the route editor of [Tutorial 7](https://github.com/assimbly/gateway/wiki/tutorial6-simple-route), it has a form instead of a canvas. It opens on the **Script** view, which shows only the scripts. The line next to it sums up the other parts: *Starts: hello, once when started · Result: Log viewer · Errors: logged*.
+The script editor opens. Like the route editor of [Tutorial 7](https://github.com/assimbly/gateway/wiki/tutorial6-simple-route), it has a form instead of a canvas, with the tabs **Scripts**, **Source & result**, **Error handler** and **Notes**. It opens on **Scripts**, which shows only the scripts. The line above them sums up the other parts: *Starts: hello, once when started · Result: Log viewer · Errors: logged*.
 
 ## Step 2: Set the Source
 
 1. Next to **Flow name**, type `Clock`. <!-- show: #field_flowName -->
-2. Click **Flow** (or the link after **Starts:**). <!-- show: [data-tour="script-flow-view"] --> Now you see all four parts, starting with the **Source**.
+2. Click the **Source & result** tab (or the link after **Starts:**). <!-- show: [data-cy="script-tab-source"] --> Here are the **Source**, which starts the Flow, and the **Sink**, which gets the result of the scripts.
 3. Under **Source**, click **Component**, type `sched` and choose **Scheduler**. <!-- show: [formcontrolname="componentType"] -->
 4. Set **Name** to `clock`. This is just a name for the scheduler. <!-- show: [formcontrolname="uri"] -->
 5. Under **Options**, choose **Delay** in the list and type `10000`. <!-- show: .option-row -->
@@ -55,7 +55,7 @@ The delay is in milliseconds, so the scripts run once every 10 seconds. You know
 
 ## Step 3: Write a script in Simple
 
-1. Under **Script**, set **Language** to **Simple**. (A new script starts in Groovy.)
+1. Click the **Scripts** tab. <!-- show: [data-cy="script-tab-scripts"] --> Under **Script**, set **Language** to **Simple**. (A new script starts in Groovy.)
 2. Replace the example in the **Script** field with: <!-- show: [data-tour="script-content"] -->
 
    ```

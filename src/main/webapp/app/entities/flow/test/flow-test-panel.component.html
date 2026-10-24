@@ -7,6 +7,9 @@
     @if (routes()) {
       Runs one message through the running Flow, into the first Route, past its <code>from</code> endpoint. The Routes do what they always
       do: they write files, call APIs and put messages on queues.
+    } @else if (scripts()) {
+      Runs one message through the running Flow, into the first Script, past the Source. The Steps do what they always do: they write files,
+      call APIs and put messages on queues.
     } @else {
       Runs one message through the running Flow, from the Step after the Source. The Steps do what they always do: they write files, call
       APIs and put messages on queues.
@@ -67,7 +70,9 @@
         }
         <h6 class="flow-test__title">Response</h6>
         <ng-container *ngTemplateOutlet="message; context: { $implicit: result.response }"></ng-container>
-        @if (!routes()) {
+        @if (scripts()) {
+          <p class="text-muted small mb-0">Each Script shows what it made of the message.</p>
+        } @else if (!routes()) {
           <p class="text-muted small mb-0">Select a Step on the canvas to see the message it got and passed on.</p>
         }
       }

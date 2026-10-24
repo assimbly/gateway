@@ -20,20 +20,7 @@
   }
 }
 
-// The Script / Flow switch of a Script Flow, and in the Script view the Steps it leaves out, in a line.
-.script-flow-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1rem;
-  align-items: center;
-  margin-bottom: 1rem;
-  text-align: start;
-
-  .btn-group .btn span {
-    margin-left: 0.35rem;
-  }
-}
-
+// Above the Scripts, the Steps on the other tabs, in a line.
 .script-flow-summary > span + span::before {
   content: '\00b7';
   margin: 0 0.5rem;
@@ -302,8 +289,9 @@
   gap: 0.5rem 0.75rem;
 }
 
-// The Route editor: its Routes, Error handler or Notes in Code, and its Routes read-only beside the panel in Test.
-.route-flow-pane {
+// The Route and Script editors: a tab of their Steps or Notes in Code, and their Routes or Scripts read-only beside the
+// panel in Test.
+.code-flow-pane {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
@@ -326,36 +314,36 @@
   }
 }
 
-.route-flow-alerts {
+.code-flow-alerts {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.route-flow-list {
+.code-flow-list {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
-.route-flow-item.cdk-drag-preview {
+.code-flow-item.cdk-drag-preview {
   box-shadow: 0 8px 24px rgb(16 24 40 / 18%);
   border-radius: 8px;
   opacity: 0.95;
 }
 
-.route-flow-item__placeholder {
+.code-flow-item__placeholder {
   min-height: 5rem;
   border: 2px dashed var(--app-border, #d0d5dd);
   border-radius: 8px;
   background: var(--app-hover);
 }
 
-.route-flow-list.cdk-drop-list-dragging .route-flow-item:not(.cdk-drag-placeholder) {
+.code-flow-list.cdk-drop-list-dragging .code-flow-item:not(.cdk-drag-placeholder) {
   transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
 }
 
-.route-flow-add {
+.code-flow-add {
   display: flex;
   justify-content: center;
   padding-bottom: 0.5rem;
@@ -365,12 +353,12 @@
   }
 }
 
-.route-flow-intro {
+.code-flow-intro {
   margin: 0;
 }
 
 // The Notes fill the pane.
-.route-flow-notes {
+.code-flow-notes {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
@@ -390,10 +378,34 @@
   }
 }
 
-.route-flow-read-only__name {
+.code-flow-read-only__name {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.5rem;
   font-weight: 600;
+}
+
+// A Script in Test is as tall as its code, up to the height of a Route.
+.code-flow-read-only .script-codemirror {
+  .CodeMirror {
+    height: auto;
+  }
+
+  .CodeMirror-scroll {
+    max-height: calc(24lh + 8px);
+  }
+}
+
+// What a Script made of the test message, under its code.
+.code-flow-run {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+
+  pre {
+    max-height: 12rem;
+    overflow: auto;
+  }
 }
