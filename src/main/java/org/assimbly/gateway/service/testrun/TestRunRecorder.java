@@ -166,7 +166,7 @@ public class TestRunRecorder extends EventNotifierSupport {
     public static final class Run {
 
         /** Stands in on the stack for a step past {@link #MAX_STEPS}, which isn't recorded. */
-        private static final Recorded SKIPPED = new Recorded(null, null, 0, null);
+        private static final Recorded SKIPPED = new Recorded(null, null, 0, null, false);
 
         private final String id;
         private final long createdNanos;
@@ -201,7 +201,7 @@ public class TestRunRecorder extends EventNotifierSupport {
                 stack.push(SKIPPED);
                 return;
             }
-            Recorded step = new Recorded(stepId, Instant.now(), now, message);
+            Recorded step = new Recorded(stepId, Instant.now(), now, message, exchange.getExchangeExtension().isFailureHandled());
             steps.add(step);
             stack.push(step);
         }
@@ -226,6 +226,8 @@ public class TestRunRecorder extends EventNotifierSupport {
                 step.ownEndNanos = now;
             }
             step.endNanos = now;
+            // The Flow's Error handler takes the failure inside the step, which then completes; it failed all the same.
+            failed = failed || (!step.failureHandledBefore && exchange.getExchangeExtension().isFailureHandled());
             step.status = failed ? "failed" : "completed";
             if (failed) {
                 step.error = errorOf(exchange);
@@ -258,17 +260,20 @@ public class TestRunRecorder extends EventNotifierSupport {
         private final Instant startedAt;
         private final long startNanos;
         private final TestRunResult.Message in;
+        /** Whether an earlier failure was already handled when this step started, so it isn't this step's. */
+        private final boolean failureHandledBefore;
         private TestRunResult.Message out;
         private long ownEndNanos = -1;
         private long endNanos = -1;
         private String status = "running";
         private String error;
 
-        private Recorded(String stepId, Instant startedAt, long startNanos, TestRunResult.Message in) {
+        private Recorded(String stepId, Instant startedAt, long startNanos, TestRunResult.Message in, boolean failureHandledBefore) {
             this.stepId = stepId;
             this.startedAt = startedAt;
             this.startNanos = startNanos;
             this.in = in;
+            this.failureHandledBefore = failureHandledBefore;
         }
     }
 }

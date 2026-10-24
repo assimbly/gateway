@@ -94,10 +94,11 @@ public class FlowTestRunService {
             }
 
             var steps = run.steps();
-            boolean failed = timedOut || exchange.isFailed() || run.hasFailedStep();
+            // A failure the Flow's Error handler took leaves the exchange without an exception, but it failed all the same.
+            boolean failed = timedOut || exchange.isFailed() || exchange.getExchangeExtension().isFailureHandled() || run.hasFailedStep();
             String error = timedOut
                 ? "The Flow didn't answer within " + RESPONSE_TIMEOUT.toSeconds() + " seconds."
-                : TestRunRecorder.errorOf(exchange);
+                : failed ? TestRunRecorder.errorOf(exchange) : null;
             if (error == null && failed) {
                 error = steps.stream().map(TestRunResult.Step::error).filter(stepError -> stepError != null).findFirst().orElse(null);
             }

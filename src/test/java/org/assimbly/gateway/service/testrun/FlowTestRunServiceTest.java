@@ -43,6 +43,31 @@ class FlowTestRunServiceTest {
                         .delay(60).syncDelayed()
                         .setBody(simple("${body} C"))
                     .end();
+
+                // Flow 3 hands a failing message to its Error handler, as every Flow does by default.
+                from("direct:3-30").routeId("3-30").group("3")
+                    .errorHandler(deadLetterChannel("direct:3-error"))
+                    .step("step-30")
+                        .setBody(simple("${body} A"))
+                        .to("direct:3-31")
+                    .end();
+                from("direct:3-31").routeId("3-31").group("3")
+                    .errorHandler(deadLetterChannel("direct:3-error"))
+                    .step("step-31")
+                        .throwException(new IllegalStateException("Cannot store file"))
+                    .end();
+                from("direct:3-error").routeId("3-error").group("3")
+                    .setBody(constant("handled"));
+
+                // Flow 4 catches the exception in its own route and carries on.
+                from("direct:4-40").routeId("4-40").group("4")
+                    .step("step-40")
+                        .doTry()
+                            .throwException(new IllegalStateException("Expected"))
+                        .doCatch(IllegalStateException.class)
+                            .setBody(constant("caught"))
+                        .end()
+                    .end();
             }
         });
         context.start();
@@ -102,6 +127,27 @@ class FlowTestRunServiceTest {
         assertThat(failing.status()).isEqualTo("failed");
         assertThat(failing.error()).isEqualTo("Boom");
         assertThat(failing.in().body()).isEqualTo("Hi A");
+    }
+
+    @Test
+    void failureTheErrorHandlerTookIsStillAFailure() {
+        TestRunResult result = service.run("3", "30", new TestRunRequest("30", "Hi", Map.of()));
+
+        assertThat(result.status()).isEqualTo("failed");
+        assertThat(result.error()).isEqualTo("Cannot store file");
+        TestRunResult.Step failing = result.steps().stream().filter(step -> "31".equals(step.stepId())).findFirst().orElseThrow();
+        assertThat(failing.status()).isEqualTo("failed");
+        assertThat(failing.error()).isEqualTo("Cannot store file");
+    }
+
+    @Test
+    void exceptionTheRouteCaughtItselfIsNoFailure() {
+        TestRunResult result = service.run("4", "40", new TestRunRequest("40", "Hi", Map.of()));
+
+        assertThat(result.status()).isEqualTo("completed");
+        assertThat(result.error()).isNull();
+        assertThat(result.steps()).extracting(TestRunResult.Step::status).containsOnly("completed");
+        assertThat(result.response().body()).isEqualTo("caught");
     }
 
     @Test
