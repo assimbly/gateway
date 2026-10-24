@@ -112,7 +112,7 @@ Open it again a little later: the time has changed.
 * Click **Run** in the *Test* panel. Each Script shows what it made of the message, under **Resulting body**.
 * Break the Groovy script on purpose, for example by writing to a folder that doesn't exist. **Failed** goes up on the **Stats** tab and an **Alerts** badge appears. See [Tutorial 2](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow) for finding the error.
 
-When you're done, click **Stop**. <!-- show: [data-tour="flow-status-controls"] --> Otherwise the Flow keeps writing the file every 10 seconds.
+When you're done, click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] --> Otherwise the Flow keeps writing the file every 10 seconds.
 
 ## Summary
 

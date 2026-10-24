@@ -261,18 +261,18 @@ describe('Flow editor header', () => {
       expect(modeChange.mock.calls).toEqual([['test'], ['test']]);
     });
 
-    it('shows whether the Flow runs, with Start or Stop, in Design as well', () => {
+    it('starts and stops with the controls of the Flows list in Design as well', () => {
       fixture.detectChanges();
-      const runState = () => fixture.nativeElement.querySelector('[data-cy="run-state"]').textContent.replace(/s+/g, ' ').trim();
-      expect(runState()).toBe('Stopped Start');
+      expect(controlNamed('Start').disabled).toBe(false);
 
       fixture.componentInstance.status.set('active');
       fixture.detectChanges();
       const stop = jest.spyOn(TestBed.inject(FlowService), 'stop').mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
-      expect(runState()).toBe('Running Stop');
-      buttonNamed('Stop').click();
+      expect(fixture.nativeElement.querySelector('.visually-hidden').textContent).toBe('Running');
+      controlNamed('Stop').click();
 
       expect(stop).toHaveBeenCalledWith(7);
+      expect(buttonNamed('Save')).toBeTruthy();
     });
 
     it('calls the editing mode Code in the Route editor', () => {
@@ -297,17 +297,17 @@ describe('Flow editor header', () => {
       expect(modeChange).not.toHaveBeenCalled();
     });
 
-    it('tests with labelled Stop, Pause and Restart', () => {
+    it('tests with the start, pause and stop controls of the Flows list', () => {
       fixture.componentRef.setInput('mode', 'test');
       fixture.componentInstance.status.set('active');
       fixture.detectChanges();
       const pause = jest.spyOn(TestBed.inject(FlowService), 'pause').mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
 
       expect(fixture.nativeElement.querySelector('[role="switch"]').getAttribute('aria-checked')).toBe('true');
-      expect(buttonNamed('Stop')).toBeTruthy();
-      expect(buttonNamed('Restart')).toBeTruthy();
+      expect(controlNamed('Stop')).toBeTruthy();
+      expect(controlNamed('Restart')).toBeTruthy();
       expect(() => buttonNamed('Save')).toThrow();
-      buttonNamed('Pause').click();
+      controlNamed('Pause').click();
 
       expect(pause).toHaveBeenCalledWith(7);
     });
@@ -318,7 +318,7 @@ describe('Flow editor header', () => {
       fixture.detectChanges();
       const resume = jest.spyOn(TestBed.inject(FlowService), 'resume').mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
 
-      buttonNamed('Resume').click();
+      controlNamed('Resume').click();
 
       expect(resume).toHaveBeenCalledWith(7);
     });
@@ -328,8 +328,16 @@ describe('Flow editor header', () => {
       fixture.componentRef.setInput('draftReason', 'The Source has no Component yet.');
       fixture.detectChanges();
 
-      expect(buttonNamed('Start').disabled).toBe(true);
+      expect(controlNamed('Start').disabled).toBe(true);
     });
+
+    function controlNamed(label: string): HTMLButtonElement {
+      const button = fixture.nativeElement.querySelector(`jhi-status-controls button[aria-label="${label}"]`);
+      if (!button) {
+        throw new Error(`No control named ${label}`);
+      }
+      return button;
+    }
   });
 
   function ctrlEnter(init: KeyboardEventInit = {}): KeyboardEvent {

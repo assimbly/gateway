@@ -41,38 +41,27 @@
       </button>
     </span>
 
-    <!-- Whether the Flow runs, and Start or Stop: in Design as well as in Test. -->
+    <!-- The controls of the Flows list, in Design as well as in Test: their colour shows whether the Flow runs. -->
     @if (flowId()) {
-      <div class="flow-editor-header__run" data-tour="flow-status-controls" data-cy="run-state">
-        <span class="flow-editor-header__run-state" [ngClass]="'flow-editor-header__run-state--' + state().tone">
-          <span class="flow-editor-header__run-dot" aria-hidden="true"></span>{{ state().label }}
-        </span>
-        @if (running()) {
-          <button
-            type="button"
-            class="btn btn-fx btn-fx-sm btn-fx-secondary"
-            data-tour="flow-stop"
-            [disabled]="busy()"
-            (click)="stop()"
-            ngbTooltip="Stop the Flow (Ctrl+Shift+Enter)"
-            aria-keyshortcuts="Control+Shift+Enter"
-          >
-            <fa-icon icon="stop" /><span>Stop</span>
-          </button>
-        } @else {
-          <span [ngbTooltip]="startBlocked() ?? 'Start the saved Flow'">
-            <button
-              type="button"
-              class="btn btn-fx btn-fx-sm btn-fx-secondary"
-              data-tour="flow-start"
-              [disabled]="busy() || startBlocked() !== null"
-              (click)="start()"
-            >
-              <fa-icon icon="play" /><span>Start</span>
-            </button>
-          </span>
-        }
-      </div>
+      <span class="visually-hidden">{{ state().label }}</span>
+      <jhi-status-controls
+        data-tour="flow-status-controls"
+        [busy]="busy()"
+        [tone]="state().tone"
+        [showStart]="shows('start')"
+        [startDisabled]="disabled('start') || startBlocked() !== null"
+        [showPause]="shows('pause')"
+        [pauseDisabled]="disabled('pause')"
+        [showResume]="shows('resume')"
+        [showStop]="shows('stop')"
+        [stopDisabled]="disabled('stop')"
+        [showRestart]="shows('restart')"
+        (start)="start()"
+        (pause)="pause()"
+        (resume)="resume()"
+        (stop)="stop()"
+        (restart)="restart()"
+      />
     }
   }
 
@@ -102,24 +91,8 @@
 
   <div class="flow-editor-header__actions">
     @if (modes()) {
-      @if (mode() === 'test') {
-        <!-- Start and Stop are next to the mode switch; a running Flow can also be paused or restarted here. -->
-        @if (shows('pause') && !disabled('pause')) {
-          <button type="button" class="btn btn-fx btn-fx-ghost" [disabled]="busy()" (click)="pause()" ngbTooltip="Stop taking in new messages for a while">
-            <fa-icon icon="pause" /><span>Pause</span>
-          </button>
-        }
-        @if (shows('resume')) {
-          <button type="button" class="btn btn-fx btn-fx-ghost" [disabled]="busy()" (click)="resume()" ngbTooltip="Take in new messages again">
-            <fa-icon icon="step-forward" /><span>Resume</span>
-          </button>
-        }
-        @if (shows('restart')) {
-          <button type="button" class="btn btn-fx btn-fx-ghost" [disabled]="busy()" (click)="restart()" ngbTooltip="Restart the Flow with its saved configuration">
-            <fa-icon icon="sync" /><span>Restart</span>
-          </button>
-        }
-      } @else {
+      <!-- Test has the status controls next to the mode switch only; Design saves as well. -->
+      @if (mode() === 'design') {
         @if (running()) {
           <button
             type="button"

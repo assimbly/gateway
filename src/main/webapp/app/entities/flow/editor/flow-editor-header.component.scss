@@ -88,42 +88,6 @@
   }
 }
 
-// Whether the Flow runs, with Start or Stop, next to the Design/Test switch.
-.flow-editor-header__run {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.flow-editor-header__run-state {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--app-text-muted);
-  white-space: nowrap;
-}
-
-.flow-editor-header__run-dot {
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
-  background: currentColor;
-}
-
-.flow-editor-header__run-state--started {
-  color: var(--app-success);
-}
-
-.flow-editor-header__run-state--paused {
-  color: var(--app-warning);
-}
-
-.flow-editor-header__run-state--failed {
-  color: var(--app-danger);
-}
-
 .flow-editor-header__save-state {
   display: inline-flex;
   align-items: center;

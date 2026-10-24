@@ -12,7 +12,7 @@ import { EMPTY, Observable, Subject, catchError, forkJoin, map, merge, of, switc
 
 import { Components } from 'app/shared/camel/component-type';
 import { isPlainKey, isRunShortcut, isStopShortcut, isTypingTarget } from 'app/shared/keyboard';
-import { StatusControlsTone } from 'app/shared/table';
+import { StatusControls, StatusControlsTone } from 'app/shared/table';
 
 import { FlowService } from '../flow.service';
 import {
@@ -56,7 +56,7 @@ const TONE_CLASS: Record<StatusControlsTone, string> = {
   selector: 'jhi-flow-editor-header',
   templateUrl: './flow-editor-header.component.html',
   styleUrl: './flow-editor-header.component.scss',
-  imports: [NgClass, ReactiveFormsModule, FontAwesomeModule, NgbDropdownModule, NgbTooltip, FlowRowAlerts],
+  imports: [NgClass, ReactiveFormsModule, FontAwesomeModule, NgbDropdownModule, NgbTooltip, FlowRowAlerts, StatusControls],
   host: {
     '(document:keydown)': 'onKeydown($event)',
   },
