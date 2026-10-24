@@ -95,3 +95,63 @@
   gap: 0.375rem;
   margin-left: auto;
 }
+
+// The Design/Test toggle of the visual editor: a pill whose thumb slides under the active mode.
+.flow-mode-toggle {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  height: var(--app-btn-height, 2.25rem);
+  padding: 3px;
+  border: 1px solid var(--app-border);
+  border-radius: 999px;
+  background: var(--app-hover);
+  color: var(--app-text-muted);
+  font-size: var(--app-btn-font-size, 0.875rem);
+  font-weight: 600;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 0.15rem color-mix(in srgb, var(--app-focus) 40%, transparent);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.flow-mode-toggle__thumb {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  border-radius: 999px;
+  background: var(--app-surface);
+  box-shadow: 0 1px 2px rgb(16 24 40 / 15%);
+  transition: transform 0.2s ease;
+
+  .flow-mode-toggle--test & {
+    transform: translateX(100%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+.flow-mode-toggle__option {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0 0.875rem;
+  transition: color 0.2s ease;
+
+  &.is-active {
+    color: var(--app-primary-accessible, var(--app-primary));
+  }
+}

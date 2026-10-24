@@ -1,6 +1,6 @@
 <div class="row justify-content-center">
 	<div class="col-8">
-		<form [formGroup]="environmentVariablesForm" name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm" class="needs-validation">
+		<form (jhiSaveShortcut)="save()" [saveShortcutDisabled]="isSaving || environmentVariablesForm.invalid" [formGroup]="environmentVariablesForm" name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm" class="needs-validation">
 		    <h2 id="myEnvironmentVariablesLabel">{{ environmentVariables.id ? 'Edit Variable' : 'Create Variable' }}</h2>
             <jhi-alert-error></jhi-alert-error>
             <div class="form-group" hidden>

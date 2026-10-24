@@ -629,6 +629,25 @@ export function moveStep(graph: FlowGraph, key: string, x: number, y: number): E
   return target ? accepted(replaceStep(graph, { ...target, x, y })) : rejected('There is no such Step.');
 }
 
+export interface StepMove {
+  key: string;
+  x: number;
+  y: number;
+}
+
+/** Moves the Steps that were dragged together as one edit, so a single undo puts them all back. */
+export function moveSteps(graph: FlowGraph, moves: StepMove[]): EditResult {
+  let moved = graph;
+  for (const { key, x, y } of moves) {
+    const result = moveStep(moved, key, x, y);
+    if (result.outcome === 'rejected') {
+      return result;
+    }
+    moved = result.graph;
+  }
+  return accepted(moved);
+}
+
 /** Edits the Link to `linkTo`. Branch names are fixed on Fixed-slot Routers, and the Default branch has none. */
 export function updateLink(graph: FlowGraph, linkTo: string, settings: Partial<LinkSettings>): EditResult {
   const link = graph.links.find(l => l.to === linkTo);

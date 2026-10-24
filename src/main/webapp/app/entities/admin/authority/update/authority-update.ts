@@ -7,6 +7,7 @@ import { Observable, finalize } from 'rxjs';
 
 import { AlertError } from 'app/shared/alert';
 import { TranslateDirective } from 'app/shared/language';
+import { SaveShortcutDirective } from 'app/shared/keyboard';
 import { IAuthority } from '../authority.model';
 import { AuthorityService } from '../service/authority.service';
 
@@ -15,7 +16,7 @@ import { AuthorityFormGroup, AuthorityFormService } from './authority-form.servi
 @Component({
   selector: 'jhi-authority-update',
   templateUrl: './authority-update.html',
-  imports: [TranslateDirective, FontAwesomeModule, AlertError, ReactiveFormsModule],
+  imports: [TranslateDirective, FontAwesomeModule, AlertError, ReactiveFormsModule, SaveShortcutDirective],
 })
 export class AuthorityUpdate implements OnInit {
   readonly isSaving = signal(false);

@@ -32,6 +32,8 @@
              [fNodeDraggingDisabled]="readOnly" [fMinimapClass]="['flow-minimap-' + step.kind.toLowerCase()]"
              class="flow-step" [ngClass]="'flow-step-' + step.kind.toLowerCase()"
              [class.flow-step-problem]="hasProblem(step)" [class.flow-step-selected]="isSelected(step)"
+             [class.flow-step-run-ok]="runOf(step)?.status === 'completed'" [class.flow-step-run-failed]="runOf(step)?.status === 'failed'"
+             [class.flow-step-run-unreached]="runResults?.get(step.key) === 'unreached'"
              (click)="selectionChange.emit({ type: 'step', key: step.key })" (dblclick)="openStep.emit(step.key)">
           @if (step.kind !== 'SOURCE') {
             <div fConnector fConnectorType="target" [fConnectorId]="'in-' + step.key" [fConnectorDisabled]="true"
@@ -61,6 +63,13 @@
               @if (count.failed > 0) {
                 <span class="flow-step-count flow-step-count--failed" [title]="countTitle(count.failed, 'failed')">{{ compactCount(count.failed) }}</span>
               }
+            </div>
+          }
+          @if (runResults?.get(step.key) === 'input') {
+            <div class="flow-step-run flow-step-run--input" title="The test message starts after the Source">Test input</div>
+          } @else if (runOf(step); as run) {
+            <div class="flow-step-run" [class.flow-step-run--failed]="run.status === 'failed'" [title]="runTitle(run)">
+              <fa-icon [icon]="run.status === 'failed' ? 'times' : 'check'"></fa-icon>{{ shortDuration(run.ownMillis) }}
             </div>
           }
           @if (canAddBranch(step) && !readOnly) {

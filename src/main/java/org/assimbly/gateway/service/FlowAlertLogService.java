@@ -13,6 +13,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -31,6 +34,14 @@ public class FlowAlertLogService {
     private static final Logger log = LoggerFactory.getLogger(FlowAlertLogService.class);
 
     private static final String ALERT_LOG_SUFFIX = "_alerts.log";
+
+    /** The names of the daily alert logs and the time before each alert, as the runtime writes them. */
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
+    private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z");
+
+    /** At most this many alerts are added at once, each at most this long. */
+    static final int MAX_ADDED = 20;
+    static final int MAX_LENGTH = 4000;
 
     /** Where cleared alert logs go, inside the flow's alert directory. {@link #page} doesn't look into it. */
     static final String CLEARED_DIR = "cleared";
@@ -57,6 +68,34 @@ public class FlowAlertLogService {
         int to = Math.min(from + safeLimit, lines.size());
         page.setMessages(new ArrayList<>(lines.subList(from, to)));
         return page;
+    }
+
+    /**
+     * Adds alerts to a flow's alert log of today, like the runtime writes them: one line each, after the time. The
+     * Gateway adds what the runtime doesn't log itself, such as why a flow didn't start. Line breaks become spaces;
+     * long messages and many messages at once are cut off.
+     *
+     * @throws UncheckedIOException when the alert log can't be written
+     */
+    public synchronized void add(long flowId, List<String> messages) {
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.systemDefault());
+        String timestamp = now.format(TIMESTAMP_FORMAT);
+        List<String> lines = messages.stream()
+            .map(message -> message == null ? "" : message.replaceAll("\\s+", " ").trim())
+            .filter(message -> !message.isEmpty())
+            .limit(MAX_ADDED)
+            .map(message -> timestamp + " : " + (message.length() > MAX_LENGTH ? message.substring(0, MAX_LENGTH) + "…" : message))
+            .toList();
+        if (lines.isEmpty()) {
+            return;
+        }
+        Path file = alertsRoot.resolve(Long.toString(flowId)).resolve(now.format(DATE_FORMAT) + ALERT_LOG_SUFFIX);
+        try {
+            Files.createDirectories(file.getParent());
+            Files.write(file, lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            throw new UncheckedIOException("Could not add alerts to flow " + flowId, e);
+        }
     }
 
     /**

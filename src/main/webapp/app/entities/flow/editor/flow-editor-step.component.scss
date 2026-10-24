@@ -27,6 +27,19 @@
   margin-left: auto;
 }
 
+// The handle a Route is dragged by, in line with its name field.
+.step-card__drag {
+  flex: 0 0 auto;
+  align-self: flex-end;
+  margin-bottom: 0.25rem;
+  color: var(--app-text-muted);
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
 // A field: its label with the field's actions at the right, and the field at full width below.
 .step-field {
   display: flex;

@@ -1,12 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
-import { faCodeBranch, faCogs, faExclamationTriangle, faPlus, faSignInAlt, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faCodeBranch, faCogs, faExclamationTriangle, faPlus, faSignInAlt, faSignOutAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 import { IFlow } from 'app/shared/model/flow.model';
 import { IStep } from 'app/shared/model/step.model';
 
 import { DesignerSelection, FlowCanvasComponent } from './flow-canvas.component';
 import { loadFlowGraph } from './flow-graph';
+import { StepRunMark } from '../test/flow-test-run';
 
 const contentRouterFlow: IFlow = {
   id: 1,
@@ -40,7 +41,7 @@ describe('Flow canvas', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({ imports: [FlowCanvasComponent] });
-    TestBed.inject(FaIconLibrary).addIcons(faPlus, faExclamationTriangle, faSignInAlt, faCogs, faCodeBranch, faSignOutAlt);
+    TestBed.inject(FaIconLibrary).addIcons(faPlus, faExclamationTriangle, faSignInAlt, faCogs, faCodeBranch, faSignOutAlt, faCheck, faTimes);
     fixture = TestBed.createComponent(FlowCanvasComponent);
     const graph = loadFlowGraph(contentRouterFlow);
     fixture.componentRef.setInput('graph', graph);
@@ -147,5 +148,28 @@ describe('Flow canvas', () => {
     fixture.nativeElement.querySelectorAll('.flow-step')[1].click();
 
     expect(selections).toEqual([{ type: 'step', key: 'step-11' }]);
+  });
+
+  it('marks what each Step did in a test run: the Source gave the input, a Step failed, a Step was never reached', () => {
+    const message = { body: 'x', headers: {}, truncated: false };
+    fixture.componentRef.setInput(
+      'runResults',
+      new Map<string, StepRunMark>([
+        ['step-10', 'input'],
+        ['step-11', { stepId: '11', status: 'completed', startedAt: '', ownMillis: 4, totalMillis: 1500, in: message, out: message }],
+        ['step-12', { stepId: '12', status: 'failed', startedAt: '', ownMillis: 1200, totalMillis: 1200, in: message, out: null, error: 'Disk full' }],
+        ['step-13', 'unreached'],
+      ]),
+    );
+    fixture.detectChanges();
+
+    const steps: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('.flow-step'));
+    const badge = (step: HTMLElement) => step.querySelector<HTMLElement>('.flow-step-run')?.textContent!.trim();
+
+    expect(steps.map(badge)).toEqual(['Test input', '4 ms', '1.2 s', undefined]);
+    expect(steps[1].classList).toContain('flow-step-run-ok');
+    expect(steps[2].classList).toContain('flow-step-run-failed');
+    expect(steps[2].querySelector<HTMLElement>('.flow-step-run')!.title).toBe('Failed: Disk full. 1.2 s in this Step, 1.2 s with the Steps after it.');
+    expect(steps[3].classList).toContain('flow-step-run-unreached');
   });
 });

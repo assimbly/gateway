@@ -254,3 +254,146 @@
     display: none;
   }
 }
+
+// The tabs of Test: the Visual flow, its Log and Camel route; and the Test | Stats tabs of its side panel.
+.flow-designer-tabs,
+.flow-designer-panel-tabs {
+  display: flex;
+  gap: 0.25rem;
+
+  .btn span {
+    margin-left: 0.35rem;
+  }
+
+  .btn.active {
+    color: var(--app-primary-accessible, var(--app-primary));
+    box-shadow: inset 0 -2px 0 var(--app-primary);
+  }
+}
+
+.flow-designer-panel-tabs {
+  flex: 0 0 auto;
+  border-bottom: 1px solid var(--app-border);
+}
+
+// The Log or Camel route of Test, in place of the canvas and its panel.
+.flow-designer-view {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid var(--app-border, #d0d5dd);
+  border-radius: 8px;
+  background: var(--app-surface);
+
+  > * {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding-top: 0.75rem;
+  }
+}
+
+.flow-designer-unsaved {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+
+// The Route editor: its Routes, Error handler or Notes in Code, and its Routes read-only beside the panel in Test.
+.route-flow-pane {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+  text-align: start;
+
+  .form-group.container {
+    max-width: none;
+    margin-bottom: 0;
+    padding: 0;
+  }
+
+  // The Routes are what the editor is about, so their code gets room.
+  .route-codemirror-inline .CodeMirror-scroll {
+    max-height: calc(24lh + 8px);
+  }
+}
+
+.route-flow-alerts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.route-flow-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.route-flow-item.cdk-drag-preview {
+  box-shadow: 0 8px 24px rgb(16 24 40 / 18%);
+  border-radius: 8px;
+  opacity: 0.95;
+}
+
+.route-flow-item__placeholder {
+  min-height: 5rem;
+  border: 2px dashed var(--app-border, #d0d5dd);
+  border-radius: 8px;
+  background: var(--app-hover);
+}
+
+.route-flow-list.cdk-drop-list-dragging .route-flow-item:not(.cdk-drag-placeholder) {
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.route-flow-add {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 0.5rem;
+
+  .btn span {
+    margin-left: 0.35rem;
+  }
+}
+
+.route-flow-intro {
+  margin: 0;
+}
+
+// The Notes fill the pane.
+.route-flow-notes {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+
+  .notes-codemirror {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 10rem;
+
+    .CodeMirror {
+      flex: 1 1 auto;
+      height: auto;
+      min-height: 0;
+    }
+  }
+}
+
+.route-flow-read-only__name {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}

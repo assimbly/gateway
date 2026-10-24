@@ -34,10 +34,12 @@ import {
   routerShape,
   routerTitle,
   StepKind,
+  StepMove,
 } from './flow-graph';
 import { responseSettings } from './response';
 import { IFlowCounts } from '../flow.service';
 import { compactCount } from '../flow-stats';
+import { StepRun, StepRunMark, shortDuration } from '../test/flow-test-run';
 import { PickedKind, StepComponents, StepPickerComponent } from './step-picker.component';
 
 /** What the right-hand panel shows: a Step, the Link leading to a Step, or the Flow settings. */
@@ -66,6 +68,8 @@ export class FlowCanvasComponent {
   @Input() components: StepComponents = { actions: [], sinks: [] };
   /** The messages each Step completed and failed, by Step key, shown as badges; the editor shows none. */
   @Input() counts?: ReadonlyMap<string, IFlowCounts>;
+  /** What each Step did in the last test run, by Step key, shown as a badge with its time. */
+  @Input() runResults?: ReadonlyMap<string, StepRunMark>;
 
   @Output() selectionChange = new EventEmitter<DesignerSelection>();
   /** A Step was double-clicked, to show or hide its editor. */
@@ -73,7 +77,7 @@ export class FlowCanvasComponent {
   @Output() insertStep = new EventEmitter<{ linkTo: string; kind: 'ACTION' | 'ROUTER'; componentType: string }>();
   @Output() appendStep = new EventEmitter<{ after: string; kind: PickedKind; componentType: string }>();
   @Output() addBranch = new EventEmitter<string>();
-  @Output() moveStep = new EventEmitter<{ key: string; x: number; y: number }>();
+  @Output() moveSteps = new EventEmitter<StepMove[]>();
 
   @ViewChild(FCanvasComponent) canvas?: FCanvasComponent;
   @ViewChild(FMinimapComponent) private minimapComponent?: FMinimapComponent;
@@ -153,6 +157,19 @@ export class FlowCanvasComponent {
 
   readonly compactCount = compactCount;
 
+  readonly shortDuration = shortDuration;
+
+  /** What the Step did in the last test run; nothing when it didn't run or there was no run. */
+  runOf(step: DesignStep): StepRun | undefined {
+    const mark = this.runResults?.get(step.key);
+    return typeof mark === 'object' ? mark : undefined;
+  }
+
+  runTitle(run: StepRun): string {
+    const what = run.status === 'failed' ? `Failed: ${run.error ?? 'no message'}` : run.status === 'running' ? 'Still running' : 'Completed';
+    return `${what}. ${shortDuration(run.ownMillis)} in this Step, ${shortDuration(run.totalMillis)} with the Steps after it.`;
+  }
+
   /** A count in full, for the badge's tooltip, such as "1,234 completed". */
   countTitle(count: number, what: string): string {
     return `${count.toLocaleString('en-US')} ${what}`;
@@ -215,7 +232,7 @@ export class FlowCanvasComponent {
   }
 
   onMoveNodes(event: FMoveNodesEvent): void {
-    event.nodes.forEach(node => this.moveStep.emit({ key: node.id, x: Math.round(node.position.x), y: Math.round(node.position.y) }));
+    this.moveSteps.emit(event.nodes.map(node => ({ key: node.id, x: Math.round(node.position.x), y: Math.round(node.position.y) })));
   }
 
   private fitted = false;

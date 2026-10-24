@@ -12,12 +12,13 @@ import { AlertError } from 'app/shared/alert';
 import { QueueService } from './queue.service';
 import { Address, IAddress } from 'app/shared/model/address.model';
 import { IBroker } from 'app/shared/model/broker.model';
+import { SaveShortcutDirective } from 'app/shared/keyboard';
 import { PopoverModule } from 'ngx-bootstrap/popover';
 
 @Component({
     selector: 'jhi-queue-update',
     templateUrl: './queue-update.component.html',
-    imports: [ReactiveFormsModule, FontAwesomeModule, AlertError, PopoverModule],
+    imports: [ReactiveFormsModule, FontAwesomeModule, AlertError, PopoverModule, SaveShortcutDirective],
 })
 export class QueueUpdateComponent implements OnInit {
     isSaving = false;

@@ -1,11 +1,10 @@
-import { Component, Input, TemplateRef, output } from '@angular/core';
+import { Component, Input, output } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { explainError } from './flow-errors';
-import { FlowFailure } from './flow-status';
-
-/** The Error and Alert badges of a Flow, in its row and in the editor header. */
+/**
+ * The one badge of a Flow's Alerts, in its row and in the editor header: red Error while the Flow failed to start, stop
+ * and so on, otherwise yellow Alerts, with their number. It opens the Alerts drawer, which says what went wrong.
+ */
 @Component({
   selector: 'jhi-flow-row-alerts',
   templateUrl: './flow-row-alerts.component.html',
@@ -13,17 +12,8 @@ import { FlowFailure } from './flow-status';
   host: { style: 'display: contents' },
 })
 export class FlowRowAlerts {
-  @Input() flowName: string;
-  /** Why the Flow didn't start, or null. */
-  @Input() failure: FlowFailure | null = null;
+  /** Whether the Flow failed the last time it was started, stopped and so on. */
+  @Input() failed = false;
   @Input() numberOfAlerts = 0;
   readonly alertsOpen = output<void>();
-  /** A common error said in plain words, with what to do about it. */
-  readonly explain = explainError;
-
-  constructor(private modalService: NgbModal) {}
-
-  openError(content: TemplateRef<unknown>): void {
-    this.modalService.open(content, { centered: true, size: 'lg' });
-  }
 }

@@ -3,18 +3,15 @@ import { Router } from '@angular/router';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbActiveOffcanvas, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
-import dayjs from 'dayjs/esm';
 
+import { FlowAlert, parseAlert } from './flow-alerts';
 import { explainError } from './flow-errors';
 import { FlowService } from './flow.service';
 
 const PAGE_SIZE = 10;
 
-interface Alert {
-  /** When the alert was written, or undefined when the line has no timestamp. */
-  at?: dayjs.Dayjs;
-  message: string;
-}
+/** Longer errors are shown in three lines until Show all. */
+const LONG_ERROR = 200;
 
 /** The Flow a drawer shows the Alerts of. */
 export interface AlertsFlow {
@@ -24,8 +21,9 @@ export interface AlertsFlow {
 }
 
 /**
- * A Flow's Alerts in a side drawer, newest first: relative times with the full timestamp on hover, long messages on
- * one line until expanded, Open Flow, and Clear, which clears them for everyone.
+ * A Flow's Alerts in a side drawer, newest first: why the Flow failed to start, stop and so on, and the messages that
+ * failed. Every Alert shows the same fields: its time, the Endpoint when known, the error to copy and, for a common
+ * error, what it means. Open Flow, and Clear, which clears them for everyone.
  */
 @Component({
   selector: 'jhi-flow-alerts-drawer',
@@ -36,12 +34,14 @@ export interface AlertsFlow {
 export class FlowAlertsDrawerComponent {
   readonly cleared = output<void>();
 
-  readonly alerts = signal<Alert[]>([]);
+  readonly alerts = signal<FlowAlert[]>([]);
   readonly total = signal(0);
   readonly loading = signal(false);
   readonly clearing = signal(false);
   readonly failed = signal<string | null>(null);
   readonly expanded = signal(new Set<number>());
+  /** The Alert whose error was just copied. */
+  readonly copied = signal<number | null>(null);
   /** A common error said in plain words, with what to do about it. */
   readonly explain = explainError;
 
@@ -97,6 +97,10 @@ export class FlowAlertsDrawerComponent {
     }
   }
 
+  isLong(alert: FlowAlert): boolean {
+    return alert.message.length > LONG_ERROR;
+  }
+
   toggle(index: number): void {
     this.expanded.update(expanded => {
       const next = new Set(expanded);
@@ -105,12 +109,33 @@ export class FlowAlertsDrawerComponent {
     });
   }
 
-  relative(alert: Alert): string {
+  /**
+   * Copies an error. It is selected as well, so it can still be copied with Ctrl+C where the browser doesn't give the
+   * page the clipboard.
+   */
+  copy(source: HTMLElement, index: number): void {
+    const range = document.createRange();
+    range.selectNodeContents(source);
+    window.getSelection()?.removeAllRanges();
+    window.getSelection()?.addRange(range);
+    const copied = (): void => {
+      this.copied.set(index);
+      setTimeout(() => this.copied.update(current => (current === index ? null : current)), 2000);
+    };
+    // copying the selection works where the page has no clipboard permission, such as an embedded browser
+    if (document.execCommand('copy')) {
+      copied();
+    } else {
+      void navigator.clipboard?.writeText(source.textContent ?? '').then(copied, () => undefined);
+    }
+  }
+
+  relative(alert: FlowAlert): string {
     return alert.at ? alert.at.fromNow() : '';
   }
 
-  timestamp(alert: Alert): string {
-    return alert.at ? alert.at.format('YYYY-MM-DD HH:mm:ss Z') : '';
+  timestamp(alert: FlowAlert): string {
+    return alert.at ? alert.at.format('YYYY-MM-DD HH:mm:ss') : '';
   }
 
   openFlow(): void {
@@ -142,16 +167,4 @@ export class FlowAlertsDrawerComponent {
       },
     });
   }
-}
-
-/** Reads an alert line, `2026-03-06 09:53:13 +0100 : Cannot store file`, into its time and message. */
-function parseAlert(line: string): Alert {
-  const separator = line.indexOf(' : ');
-  if (separator > 0) {
-    const at = dayjs(line.slice(0, separator), 'YYYY-MM-DD HH:mm:ss ZZ');
-    if (at.isValid()) {
-      return { at, message: line.slice(separator + 3) };
-    }
-  }
-  return { message: line };
 }

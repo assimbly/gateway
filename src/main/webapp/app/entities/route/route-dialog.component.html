@@ -1,6 +1,6 @@
 <div name="editForm" class="route-dialog">
     <div class="modal-body">
-	<form role="form" [formGroup]="editForm" novalidate>
+	<form (jhiSaveShortcut)="save(true)" [saveShortcutDisabled]="editForm.invalid || isSaving" role="form" [formGroup]="editForm" novalidate>
         <jhi-alert-error></jhi-alert-error>
         <div class="form-group" *ngIf="!show" [hidden]="!editForm.get('id')!.value">
             <label for="id">ID</label>

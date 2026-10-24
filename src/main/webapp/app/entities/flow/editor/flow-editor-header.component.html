@@ -21,11 +21,32 @@
     }
   </div>
 
+  @if (modes()) {
+    <span class="flow-editor-header__mode" [ngbTooltip]="flowId() ? 'Switch between ' + designLabel() + ' and Test (T)' : 'Save the Flow first.'">
+      <button
+        type="button"
+        role="switch"
+        class="flow-mode-toggle"
+        data-cy="mode-toggle"
+        [class.flow-mode-toggle--test]="mode() === 'test'"
+        [attr.aria-checked]="mode() === 'test'"
+        aria-label="Test mode"
+        aria-keyshortcuts="T"
+        [disabled]="!flowId()"
+        (click)="toggleMode()"
+      >
+        <span class="flow-mode-toggle__thumb" aria-hidden="true"></span>
+        <span class="flow-mode-toggle__option" [class.is-active]="mode() === 'design'"><fa-icon [icon]="designIcon()" /><span>{{ designLabel() }}</span></span>
+        <span class="flow-mode-toggle__option" [class.is-active]="mode() === 'test'"><fa-icon icon="flask" /><span>Test</span></span>
+      </button>
+    </span>
+  }
+
   <div class="flow-editor-header__status">
     @if (state().draft) {
       <span class="badge text-bg-secondary" [ngbTooltip]="draftReason()">Draft</span>
     }
-    @if (flowId()) {
+    @if (flowId() && !modes()) {
       <span class="flow-editor-header__counter" data-tour="flow-completed"
         >Completed <strong>{{ completedLabel() }}</strong></span
       >
@@ -33,99 +54,178 @@
         >Failed <strong>{{ failedLabel() }}</strong></span
       >
     }
-    <jhi-flow-row-alerts [flowName]="nameControl().value" [failure]="failure()" [numberOfAlerts]="alerts()" (alertsOpen)="openAlerts()" />
+    <jhi-flow-row-alerts [failed]="!!failure()" [numberOfAlerts]="alerts()" (alertsOpen)="openAlerts()" />
   </div>
 
   <div class="flow-editor-header__actions">
-    @if (flowId()) {
-      <button type="button" class="btn btn-fx btn-fx-ghost" data-tour="flow-log" (click)="openLog()" ngbTooltip="What this Flow logged">
-        <fa-icon icon="file-alt" /><span>Log</span>
-      </button>
-      <button type="button" class="btn btn-fx btn-fx-ghost" data-tour="flow-camel-route" (click)="openCamelRoute()" ngbTooltip="The Camel route the runtime built from this Flow">
-        <fa-icon icon="code" /><span>Camel route</span>
-      </button>
-    }
-    <span [ngbTooltip]="testMessageBlocked() ?? ''">
-      <button type="button" class="btn btn-fx btn-fx-ghost" data-tour="flow-send-test" [disabled]="testMessageBlocked() !== null" (click)="sendTestMessage()">
-        <fa-icon icon="paper-plane" /><span>Send test message</span>
-      </button>
-    </span>
-    @if (running()) {
-      <button
-        type="button"
-        class="btn btn-fx"
-        data-tour="flow-stop"
-        [ngClass]="toneClass()"
-        [disabled]="busy()"
-        (click)="stop()"
-        [ngbTooltip]="state().label + ' · Stop (Ctrl+Shift+Enter)'"
-        aria-keyshortcuts="Control+Shift+Enter"
-      >
-        <fa-icon icon="stop" /><span>Stop</span>
-      </button>
+    @if (modes()) {
+      @if (mode() === 'test') {
+        <span class="visually-hidden">{{ state().label }}</span>
+        <jhi-status-controls
+          data-tour="flow-status-controls"
+          [busy]="busy() || !flowId()"
+          [tone]="state().tone"
+          [showStart]="shows('start')"
+          [startDisabled]="disabled('start') || startBlocked() !== null"
+          [showPause]="shows('pause')"
+          [pauseDisabled]="disabled('pause')"
+          [showResume]="shows('resume')"
+          [showStop]="shows('stop')"
+          [stopDisabled]="disabled('stop')"
+          [showRestart]="shows('restart')"
+          (start)="start()"
+          (pause)="pause()"
+          (resume)="resume()"
+          (stop)="stop()"
+          (restart)="restart()"
+        />
+      } @else {
+        @if (running()) {
+          <button
+            type="button"
+            class="btn btn-fx btn-fx-secondary"
+            data-tour="flow-save-test"
+            [disabled]="saving() || busy()"
+            (click)="saveAndRestart.emit()"
+            ngbTooltip="Save the Flow, restart it so the change takes effect, and test it (Ctrl+Enter)"
+            aria-keyshortcuts="Control+Enter"
+          >
+            <fa-icon icon="flask" /><span>Save &amp; Test</span>
+          </button>
+        } @else {
+          <span [ngbTooltip]="draftReason() ? 'This Flow is a Draft: ' + draftReason() : 'Save the Flow, start it and test it (Ctrl+Enter)'">
+            <button
+              type="button"
+              class="btn btn-fx btn-fx-secondary"
+              data-tour="flow-save-test"
+              [disabled]="saving() || busy() || draftReason() !== null"
+              (click)="saveAndStart.emit()"
+              aria-keyshortcuts="Control+Enter"
+            >
+              <fa-icon icon="flask" /><span>Save &amp; Test</span>
+            </button>
+          </span>
+        }
+        <div class="btn-group" ngbDropdown placement="bottom-end" container="body">
+          <button
+            type="button"
+            class="btn btn-fx btn-fx-primary"
+            data-tour="flow-save"
+            [disabled]="saving()"
+            (click)="save.emit()"
+            [attr.title]="running() ? null : 'Save (Ctrl+S)'"
+            aria-keyshortcuts="Control+S"
+            [ngbTooltip]="running() ? 'The running Flow keeps its previous configuration until it is restarted' : ''"
+          >
+            <fa-icon icon="save" /><span>Save</span>
+          </button>
+          <button
+            type="button"
+            class="btn btn-fx btn-fx-primary btn-fx-icon flow-editor-header__save-menu"
+            ngbDropdownToggle
+            [disabled]="saving()"
+            aria-label="More save options"
+          >
+            <fa-icon icon="chevron-down" />
+          </button>
+          <div ngbDropdownMenu>
+            <button type="button" ngbDropdownItem (click)="saveAndReturn.emit()">Save &amp; manage</button>
+          </div>
+        </div>
+      }
     } @else {
-      <span [ngbTooltip]="startBlocked() ?? (flowId() ? state().label : '')">
+      @if (flowId()) {
+        <button type="button" class="btn btn-fx btn-fx-ghost" data-tour="flow-log" (click)="openLog()" ngbTooltip="What this Flow logged">
+          <fa-icon icon="file-alt" /><span>Log</span>
+        </button>
+        <button type="button" class="btn btn-fx btn-fx-ghost" data-tour="flow-camel-route" (click)="openCamelRoute()" ngbTooltip="The Camel route the runtime built from this Flow">
+          <fa-icon icon="code" /><span>Camel route</span>
+        </button>
+      }
+      <span [ngbTooltip]="testMessageBlocked() ?? ''">
+        <button type="button" class="btn btn-fx btn-fx-ghost" data-tour="flow-send-test" [disabled]="testMessageBlocked() !== null" (click)="sendTestMessage()">
+          <fa-icon icon="paper-plane" /><span>Send test message</span>
+        </button>
+      </span>
+      @if (running()) {
         <button
           type="button"
           class="btn btn-fx"
-          data-tour="flow-start"
+          data-tour="flow-stop"
           [ngClass]="toneClass()"
-          [disabled]="busy() || startBlocked() !== null"
-          (click)="start()"
+          [disabled]="busy()"
+          (click)="stop()"
+          [ngbTooltip]="state().label + ' · Stop (Ctrl+Shift+Enter)'"
+          aria-keyshortcuts="Control+Shift+Enter"
         >
-          <fa-icon icon="play" /><span>Start</span>
+          <fa-icon icon="stop" /><span>Stop</span>
         </button>
-      </span>
-    }
-    @if (running()) {
-      <button
-        type="button"
-        class="btn btn-fx btn-fx-secondary"
-        data-tour="flow-save-start"
-        [disabled]="saving() || busy()"
-        (click)="saveAndRestart.emit()"
-        ngbTooltip="Save the Flow and restart it, so the change takes effect (Ctrl+Enter)"
-        aria-keyshortcuts="Control+Enter"
-      >
-        <fa-icon icon="redo" /><span>Save &amp; restart</span>
-      </button>
-    } @else {
-      <span [ngbTooltip]="draftReason() ? 'This Flow is a Draft: ' + draftReason() : 'Save the Flow and start it (Ctrl+Enter)'">
+      } @else {
+        <span [ngbTooltip]="startBlocked() ?? (flowId() ? state().label : '')">
+          <button
+            type="button"
+            class="btn btn-fx"
+            data-tour="flow-start"
+            [ngClass]="toneClass()"
+            [disabled]="busy() || startBlocked() !== null"
+            (click)="start()"
+          >
+            <fa-icon icon="play" /><span>Start</span>
+          </button>
+        </span>
+      }
+      @if (running()) {
         <button
           type="button"
           class="btn btn-fx btn-fx-secondary"
           data-tour="flow-save-start"
-          [disabled]="saving() || busy() || draftReason() !== null"
-          (click)="saveAndStart.emit()"
+          [disabled]="saving() || busy()"
+          (click)="saveAndRestart.emit()"
+          ngbTooltip="Save the Flow and restart it, so the change takes effect (Ctrl+Enter)"
           aria-keyshortcuts="Control+Enter"
         >
-          <fa-icon icon="play" /><span>Save &amp; start</span>
+          <fa-icon icon="redo" /><span>Save &amp; restart</span>
         </button>
-      </span>
-    }
-    <div class="btn-group" ngbDropdown placement="bottom-end" container="body">
-      <button
-        type="button"
-        class="btn btn-fx btn-fx-primary"
-        data-tour="flow-save"
-        [disabled]="saving()"
-        (click)="save.emit()"
-        [ngbTooltip]="running() ? 'The running Flow keeps its previous configuration until it is restarted' : ''"
-      >
-        <fa-icon icon="save" /><span>Save</span>
-      </button>
-      <button
-        type="button"
-        class="btn btn-fx btn-fx-primary btn-fx-icon flow-editor-header__save-menu"
-        ngbDropdownToggle
-        [disabled]="saving()"
-        aria-label="More save options"
-      >
-        <fa-icon icon="chevron-down" />
-      </button>
-      <div ngbDropdownMenu>
-        <button type="button" ngbDropdownItem (click)="saveAndReturn.emit()">Save &amp; manage</button>
+      } @else {
+        <span [ngbTooltip]="draftReason() ? 'This Flow is a Draft: ' + draftReason() : 'Save the Flow and start it (Ctrl+Enter)'">
+          <button
+            type="button"
+            class="btn btn-fx btn-fx-secondary"
+            data-tour="flow-save-start"
+            [disabled]="saving() || busy() || draftReason() !== null"
+            (click)="saveAndStart.emit()"
+            aria-keyshortcuts="Control+Enter"
+          >
+            <fa-icon icon="play" /><span>Save &amp; start</span>
+          </button>
+        </span>
+      }
+      <div class="btn-group" ngbDropdown placement="bottom-end" container="body">
+        <button
+          type="button"
+          class="btn btn-fx btn-fx-primary"
+          data-tour="flow-save"
+          [disabled]="saving()"
+          (click)="save.emit()"
+          [attr.title]="running() ? null : 'Save (Ctrl+S)'"
+          aria-keyshortcuts="Control+S"
+          [ngbTooltip]="running() ? 'The running Flow keeps its previous configuration until it is restarted' : ''"
+        >
+          <fa-icon icon="save" /><span>Save</span>
+        </button>
+        <button
+          type="button"
+          class="btn btn-fx btn-fx-primary btn-fx-icon flow-editor-header__save-menu"
+          ngbDropdownToggle
+          [disabled]="saving()"
+          aria-label="More save options"
+        >
+          <fa-icon icon="chevron-down" />
+        </button>
+        <div ngbDropdownMenu>
+          <button type="button" ngbDropdownItem (click)="saveAndReturn.emit()">Save &amp; manage</button>
+        </div>
       </div>
-    </div>
+    }
   </div>
 </header>

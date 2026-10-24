@@ -1,0 +1,78 @@
+:host {
+  display: block;
+}
+
+.flow-test {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.flow-test__header,
+.flow-test__actions,
+.flow-test__notice,
+.flow-test__step-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.flow-test__actions,
+.flow-test__step-status {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.flow-test__summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--app-success, #079455);
+  background: color-mix(in srgb, var(--app-success, #079455) 10%, transparent);
+}
+
+.flow-test__summary--failed {
+  color: var(--app-danger, #d92d20);
+  background: color-mix(in srgb, var(--app-danger, #d92d20) 10%, transparent);
+}
+
+.flow-test__title {
+  margin: 0;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: var(--app-text-muted, #667085);
+}
+
+.flow-test__step {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.flow-test__body {
+  max-height: 16rem;
+  margin: 0;
+  padding: 0.5rem;
+  overflow: auto;
+  border: 1px solid var(--app-border, #e4e7ec);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.flow-test__headers th {
+  width: 40%;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.flow-test__headers td,
+.flow-test__error {
+  word-break: break-word;
+}

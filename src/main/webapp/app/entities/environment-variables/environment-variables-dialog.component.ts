@@ -17,11 +17,12 @@ import { IIntegration } from 'app/shared/model/integration.model';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { forbiddenEnvironmentKeysValidator } from './environment-variables-validation.directive';
 import { IEnvironmentVariables, EnvironmentVariables } from 'app/shared/model/environment-variables.model';
+import { SaveShortcutDirective } from 'app/shared/keyboard';
 
 @Component({
     selector: 'jhi-environment-variables-dialog',
     templateUrl: './environment-variables-dialog.component.html',
-    imports: [CommonModule, ReactiveFormsModule, AlertError],
+    imports: [CommonModule, ReactiveFormsModule, AlertError, SaveShortcutDirective],
 })
 export class EnvironmentVariablesDialogComponent implements OnInit {
     environmentVariables: IEnvironmentVariables = new EnvironmentVariables();

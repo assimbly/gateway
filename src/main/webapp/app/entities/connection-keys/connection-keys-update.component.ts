@@ -10,12 +10,13 @@ import { AlertError } from 'app/shared/alert';
 import { IConnectionKeys } from 'app/shared/model/connection-keys.model';
 import { ConnectionKeysService } from './connection-keys.service';
 import { IConnection } from 'app/shared/model/connection.model';
+import { SaveShortcutDirective } from 'app/shared/keyboard';
 import { ConnectionService } from 'app/entities/connection/connection.service';
 
 @Component({
     selector: 'jhi-connection-keys-update',
     templateUrl: './connection-keys-update.component.html',
-    imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError],
+    imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, SaveShortcutDirective],
 })
 export class ConnectionKeysUpdateComponent implements OnInit {
     connectionKeys: IConnectionKeys;

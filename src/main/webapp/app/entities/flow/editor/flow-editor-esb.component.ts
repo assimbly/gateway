@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, DestroyRef, ElementRef, HostListener, OnD
 import { CommonModule, Location } from "@angular/common";
 import { AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
-import { NgbModal, NgbModalRef, NgbModule } from "@ng-bootstrap/ng-bootstrap";
+import { NgbModal, NgbModalRef, NgbModule, NgbOffcanvas } from "@ng-bootstrap/ng-bootstrap";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { PopoverModule } from "ngx-bootstrap/popover";
 import { AlertService } from "app/core/util/alert.service";
@@ -34,15 +34,22 @@ import { MessageService } from '../../message/message.service';
 import { IntegrationService } from "../../integration/integration.service";
 import { RouteService } from "../../route/route.service";
 import { ConnectionService } from '../../connection/connection.service';
-import { FlowService } from "../flow.service";
+import { FlowService, IFlowCounts } from "../flow.service";
 import { FieldTabDirective } from "app/shared/form/field-tab.directive";
+import { SaveShortcutDirective, isTypingTarget } from "app/shared/keyboard";
 import { CodemirrorModule } from "@ctrl/ngx-codemirror";
 import { ThemeService } from "app/core/theme";
 import { FlowCanvasComponent, DesignerSelection } from "../designer/flow-canvas.component";
-import { FlowEditorHeaderComponent } from "./flow-editor-header.component";
-import { firstRouteStepOf, routeSourceOf, sourceStepOf } from "../flow-status";
+import { EditorMode, FlowEditorHeaderComponent } from "./flow-editor-header.component";
+import { FlowFailure, failureProblems, firstRouteStepOf, routeSourceOf, sourceStepOf } from "../flow-status";
+import { FlowTestPanelComponent } from "../test/flow-test-panel.component";
+import { FlowRunStatsComponent } from "../stats/flow-run-stats.component";
+import { FlowLogDrawerComponent } from "../flow-log-drawer.component";
+import { CamelRouteDrawerComponent } from "../camel-route-drawer.component";
+import { FlowTestRun, StepRunMark, graphShape, runResultsByStepKey } from "../test/flow-test-run";
 import { automaticErrorHandlerPath, defaultErrorHandlerStep, errorHandlerPath, errorHandlerPathOnSave } from "./error-handler";
-import { isRouteStep, missingRouteFields, routeToSave } from "./route-step";
+import { isRouteConfiguration, isRouteStep, missingRouteFields, nextRouteName, routeToSave } from "./route-step";
+import { CdkDrag, CdkDragPlaceholder, CdkDropList, moveItemInArray } from "@angular/cdk/drag-drop";
 import {
   DEFAULT_RESULT_LOG,
   DEFAULT_SCRIPT_FLOW_VIEW,
@@ -85,11 +92,12 @@ import {
   LinkSettings,
   linksToSave,
   loadFlowGraph,
-  moveStep,
+  moveSteps,
   opensOnCanvas,
   Problem,
   problems,
   routerTitle,
+  StepMove,
   stepsToSave,
   updateLink,
   warnings,
@@ -101,7 +109,7 @@ import {
   styleUrl: '../designer/flow-designer.scss',
   encapsulation: ViewEncapsulation.None,
   providers: [StepEditorRegistry],
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, NgbModule, FontAwesomeModule, PopoverModule, AlertError, FlowEditorStepComponent, FieldTabDirective, CodemirrorModule, FlowCanvasComponent, LinkEditorComponent, FlowEditorHeaderComponent, ResponseEditorComponent, CallFlowEditorComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, NgbModule, FontAwesomeModule, PopoverModule, AlertError, FlowEditorStepComponent, FieldTabDirective, SaveShortcutDirective, CodemirrorModule, FlowCanvasComponent, LinkEditorComponent, FlowEditorHeaderComponent, ResponseEditorComponent, CallFlowEditorComponent, FlowTestPanelComponent, FlowRunStatsComponent, FlowLogDrawerComponent, CamelRouteDrawerComponent, CdkDropList, CdkDrag, CdkDragPlaceholder],
 })
 export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
@@ -151,6 +159,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	/** The Example Flow a new Flow starts from, from the `template` query parameter. */
 	private template?: FlowTemplate;
 	private readonly apiService = inject(ApiService);
+	private readonly offcanvas = inject(NgbOffcanvas);
 
 	/** The API and Operation this Flow handles, when it is a Handler Flow: its Source is that Operation. */
 	handler?: IApiHandler;
@@ -313,6 +322,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 					this.activeStep = params["stepid"];
 					this.activeEditor = nextEditor;
+					this.applyMode(params["id"] && hasModes(nextEditor) && params["view"] === "test" ? "test" : "design");
 					this.template = nextTemplate;
 
 					if (editorChanged) {
@@ -489,7 +499,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
                 }else if(this.activeEditor === 'route'){
                     this.createNewStep(StepType.ROUTE,'',0);
                     this.createNewStep(StepType.ERROR,'',1);
-                    this.stepFormAt(0).patchValue({ routeContent: STARTER_ROUTE });
+                    this.stepFormAt(0).patchValue({ routeName: nextRouteName([]), routeContent: STARTER_ROUTE });
                 }
 
 								this.finished = true;
@@ -1061,10 +1071,16 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
       newStep.componentType = '';
     }
 
+		// Named before it joins the form, so it takes the first name the other Routes don't use.
+		const routeName = newStep.stepType === StepType.ROUTE ? nextRouteName(this.typedRouteNames()) : '';
+
 		(<FormArray>this.editFlowForm.controls.stepsData).insert(
 			newIndex,
 			this.initializeStepData(newStep),
 		);
+		if (routeName) {
+			this.stepFormAt(newIndex).patchValue({ routeName });
+		}
 
     // Pass component type as change event so options load for the default component (e.g. log)
     this.setTypeLinks(newStep, newIndex, newStep.componentType as any);
@@ -1155,11 +1171,12 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 	removeStep(step, index): void {
 
-    this.stepsToDelete.push(step);
+		// The first Step stays, except a Route while the Flow has other Routes.
+		if (index === 0 && !(step.stepType === StepType.ROUTE && this.routeCount > 1)) {
+			return;
+		}
 
-		if (index === 0) {
-  			return;
- 		}
+    this.stepsToDelete.push(step);
 
 		this.numberOfSteps = this.numberOfSteps - 1;
 
@@ -1186,11 +1203,81 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		this.stepsOptions.splice(i, 1);
 		this.componentOptions.splice(i, 1);
 		this.selectedOptions.splice(i, 1);
+		[this.uriPlaceholders, this.uriPopoverMessages, this.URIList, this.componentTypeCamelLinks, this.filterConnection, this.connectionType]
+			.forEach(perStep => perStep.splice(i, 1));
 		this.editFlowForm.removeControl(index);
 		(<FormArray>this.editFlowForm.controls.stepsData).removeAt(i);
+		this.editFlowForm.markAsDirty();
+	}
 
+	/** The indices of the Routes of a Route Flow, in their order; the Error handler comes after them. */
+	get routeIndices(): number[] {
+		return this.steps.flatMap((step, index) => (step.stepType === StepType.ROUTE ? [index] : []));
+	}
 
+	get routeCount(): number {
+		return this.routeIndices.length;
+	}
 
+	/** The names typed in the Routes, read from the form, which also has a Route that is being added. */
+	private typedRouteNames(): string[] {
+		const stepsData = this.editFlowForm.controls.stepsData as FormArray;
+		return stepsData.controls.filter(form => form.value.stepType === StepType.ROUTE).map(form => form.value.routeName);
+	}
+
+	/** Adds a Route after the last one, before the Error handler, and puts its name in view. */
+	addRoute(): void {
+		const indices = this.routeIndices;
+		const last = indices.length ? indices[indices.length - 1] : -1;
+		this.addStep(this.steps[last], last);
+		const added = last + 1;
+		this.cdr.detectChanges();
+		const name = document.getElementById(`field_routeName_${added}`) as HTMLInputElement | null;
+		name?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+		name?.focus({ preventScroll: true });
+	}
+
+	/**
+	 * Moves the Route at one place in the list to another. Each Step's per-index state moves along with it; the order
+	 * is saved as the links between the Steps, which follow `steps`.
+	 */
+	moveRoute(from: number, to: number): void {
+		const indices = this.routeIndices;
+		if (from === to || from < 0 || to < 0 || from >= indices.length || to >= indices.length) {
+			return;
+		}
+		const fromIndex = indices[from];
+		const toIndex = indices[to];
+		[
+			this.steps,
+			this.stepsOptions,
+			this.componentOptions,
+			this.selectedOptions,
+			this.enableConnection,
+			this.enableMessage,
+			this.filterConnection,
+			this.connectionType,
+			this.uriPlaceholders,
+			this.uriPopoverMessages,
+			this.URIList,
+			this.componentTypeCamelLinks,
+		].forEach(perStep => {
+			// A sparse array is filled up first, so every Step keeps its own entry.
+			while (perStep.length <= Math.max(fromIndex, toIndex)) {
+				perStep.push(undefined);
+			}
+			moveItemInArray(perStep, fromIndex, toIndex);
+		});
+		const stepsData = this.editFlowForm.controls.stepsData as FormArray;
+		const form = stepsData.at(fromIndex);
+		stepsData.removeAt(fromIndex, { emitEvent: false });
+		stepsData.insert(toIndex, form);
+		this.editFlowForm.markAsDirty();
+		this.cdr.markForCheck();
+		// The moved editors measured themselves in their old place.
+		setTimeout(() =>
+			document.querySelectorAll<HTMLElement & { CodeMirror?: { refresh: () => void } }>('.route-flow-list .CodeMirror').forEach(el => el.CodeMirror?.refresh()),
+		);
 	}
 
 	/** A Step shows its Connection when it has one, or when its Component needs one. */
@@ -1200,6 +1287,15 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 	addConnection(step, index): void {
 	     this.enableConnection[index] = true;
+	}
+
+	/** A Connection added to a Step is no longer needed: it is hidden again and the Step is saved without it. */
+	removeConnection(step, index): void {
+		this.enableConnection[index] = false;
+		step.connectionId = null;
+		const connection = this.stepFormAt(index).controls.connection;
+		connection.setValue(null);
+		connection.markAsDirty();
 	}
 
 	addMessage(step, index): void {
@@ -1672,7 +1768,10 @@ splitOptions4(options: string): string[] {
 				return true;
 			});
 			if (!invalid) {
-				if (!switchedTab && this.active2 !== 'STEPS') {
+				if (!switchedTab && this.activeEditor === 'route') {
+					this.showInvalidRouteTab();
+					this.focusFirstInvalid(true);
+				} else if (!switchedTab && this.active2 !== 'STEPS') {
 					this.active2 = 'STEPS';
 					this.focusFirstInvalid(true);
 				}
@@ -2077,6 +2176,11 @@ splitOptions4(options: string): string[] {
 		return opensOnCanvas(this.activeEditor);
 	}
 
+	/** The visual editor and the Route editor switch between Design (Code) and Test. */
+	get hasModes(): boolean {
+		return hasModes(this.activeEditor);
+	}
+
 	/** What the selected Router is called, shown read-only as its component. */
 	get selectedRouterTitle(): string | undefined {
 		const selection = this.selection;
@@ -2227,6 +2331,10 @@ splitOptions4(options: string): string[] {
 			return;
 		}
 		this.canvasGraph = this.syncedGraph();
+		if (this.testRun && graphShape(this.canvasGraph) !== this.testedShape) {
+			// The Flow changed since the test ran, so what the Steps show of it would mislead.
+			this.clearTestRun();
+		}
 		this.checkCanvas();
 		// Required path parts are known once a Component's schema is read; check again when new ones arrive.
 		this.schemas.load(this.canvasGraph.steps.map(step => step.componentType)).subscribe(() => this.checkCanvas());
@@ -2272,10 +2380,189 @@ splitOptions4(options: string): string[] {
 		this.setPanelCollapsed(!this.sidePanelCollapsed);
 	}
 
-	/** A double-click on a Step shows it in the side panel when the panel is hidden, and hides the panel when it is shown. */
+	/**
+	 * A double-click on a Step shows it in the side panel when the panel is hidden, and hides the panel when it is shown.
+	 * In Test it goes back to Design to edit the Step.
+	 */
 	toggleStepEditor(key: string): void {
+		const fromTest = this.viewMode === 'test';
+		this.setMode('design');
 		this.onSelectionChange({ type: 'step', key });
-		this.setPanelCollapsed(!this.sidePanelCollapsed);
+		this.setPanelCollapsed(fromTest ? false : !this.sidePanelCollapsed);
+	}
+
+	// Modes
+	//
+	// Design edits the Flow on the canvas. Test runs the saved Flow: the canvas is read-only and shows the messages each
+	// Step completed and failed, the toolbar has the Flow's Log and Camel route, and the side panel the Test panel and
+	// the stats. The mode is in the URL (view=test), so a reload keeps it.
+
+	viewMode: EditorMode = 'design';
+	/** What Test shows in place of the canvas. */
+	testView: 'flow' | 'log' | 'route' = 'flow';
+	/** What the side panel shows in Test. */
+	testPanelTab: 'test' | 'stats' = 'test';
+	/** The completed and failed messages of each Step, while the Flow runs. */
+	runCounts?: Map<string, IFlowCounts>;
+
+	/** What Test shows: the Flow (on the canvas, or its Routes), its Log and the Camel route the runtime built. */
+	get testTabs(): readonly { id: 'flow' | 'log' | 'route'; label: string; icon: string }[] {
+		return this.useCanvas ? CANVAS_TEST_TABS : ROUTE_TEST_TABS;
+	}
+
+	// Route editor
+	//
+	// Code edits the Routes, the Error handler and the Notes, each on a tab. Test shows the Routes read-only beside the
+	// Test panel and the stats, like the visual editor shows its canvas.
+
+	routeTab: 'routes' | 'errorHandler' | 'notes' = 'routes';
+
+	readonly routeTabs = [
+		{ id: 'routes', label: 'Routes', icon: 'list' },
+		{ id: 'errorHandler', label: 'Error handler', icon: 'exclamation-triangle' },
+		{ id: 'notes', label: 'Notes', icon: 'file-alt' },
+	] as const;
+
+	showRouteTab(tab: 'routes' | 'errorHandler' | 'notes'): void {
+		this.routeTab = tab;
+		this.cdr.markForCheck();
+	}
+
+	/** The saved id of the Route a test message goes into: the first one that is a route, not a routeConfiguration. */
+	get routeEntryStepId(): string | undefined {
+		const index = this.routeIndices.find(i => !isRouteConfiguration(this.stepFormAt(i)?.value.routeContent));
+		const id = index === undefined ? undefined : this.steps[index].id;
+		return id != null ? String(id) : undefined;
+	}
+
+	/** The read-only editor options of the Routes in Test, in the editor's theme. */
+	readOnlyRouteOptions(): Record<string, unknown> {
+		const theme = this.themeService.editorTheme();
+		if (this.readOnlyRouteOptionsCache?.['theme'] !== theme) {
+			this.readOnlyRouteOptionsCache = { mode: 'xml', theme, lineNumbers: true, readOnly: true, viewportMargin: Infinity };
+		}
+		return this.readOnlyRouteOptionsCache;
+	}
+
+	private readOnlyRouteOptionsCache?: Record<string, unknown>;
+
+	/** After a failed save, Code with the tab that has the first invalid Step, so its field can be focused. */
+	private showInvalidRouteTab(): void {
+		this.setMode('design');
+		const stepsData = this.editFlowForm.controls.stepsData as FormArray;
+		const firstInvalid = stepsData.controls.findIndex(form => form.invalid);
+		this.routeTab = firstInvalid >= 0 && this.steps[firstInvalid]?.stepType === StepType.ERROR ? 'errorHandler' : 'routes';
+		this.cdr.detectChanges();
+	}
+
+	showTestView(view: 'flow' | 'log' | 'route'): void {
+		this.testView = view;
+		this.cdr.markForCheck();
+	}
+
+	/** Switches the mode; a new Flow has nothing to test until it is saved. */
+	setMode(mode: EditorMode): void {
+		if (mode === this.viewMode || (mode === 'test' && !this.flow?.id)) {
+			return;
+		}
+		this.applyMode(mode);
+		const url = this.router.parseUrl(this.location.path());
+		url.queryParams = { ...url.queryParams };
+		if (mode === 'test') {
+			url.queryParams['view'] = 'test';
+		} else {
+			delete url.queryParams['view'];
+		}
+		// Not through the router: its query params would load the Flow again and drop the unsaved changes.
+		this.location.replaceState(this.router.serializeUrl(url));
+		this.cdr.markForCheck();
+	}
+
+	private applyMode(mode: EditorMode): void {
+		this.viewMode = mode;
+		this.testOpen = mode === 'test';
+		if (mode === 'test') {
+			// Test always opens with its panel; Design keeps the choice this browser remembered.
+			if (this.sidePanelCollapsed) {
+				this.flowCanvas?.keepInView();
+			}
+			this.sidePanelCollapsed = false;
+		} else {
+			this.sidePanelCollapsed = readPanelCollapsed();
+			this.testView = 'flow';
+			this.runCounts = undefined;
+		}
+	}
+
+	onRunCountsChange(counts: Map<string, IFlowCounts> | undefined): void {
+		this.runCounts = counts;
+		this.cdr.markForCheck();
+	}
+
+	/** Save & start, or Save & restart while the Flow runs: Test runs the saved Flow. */
+	saveAndTest(): void {
+		this.save(this.header?.running() ? 'restart' : 'start');
+	}
+
+	// Test panel
+	//
+	// Test mode shows it in the side panel, whatever is selected: selecting a Step shows what that Step did in the last
+	// test run. The run is kept here, so the canvas can mark each Step, until the Flow changes.
+
+	testOpen = false;
+	testRun?: FlowTestRun;
+	testMarks?: Map<string, StepRunMark>;
+	private testedShape?: string;
+
+	isTestOpen(): boolean {
+		return !this.sidePanelCollapsed && this.testOpen;
+	}
+
+	openTest(): void {
+		this.setMode('test');
+		this.testPanelTab = 'test';
+		this.setPanelCollapsed(false);
+		this.cdr.markForCheck();
+	}
+
+	onTestRan(run: FlowTestRun): void {
+		this.testRun = run;
+		if (!this.canvasGraph) {
+			// A Route Flow has no canvas to mark.
+			this.cdr.markForCheck();
+			return;
+		}
+		this.testMarks = runResultsByStepKey(this.canvasGraph, run);
+		this.testedShape = graphShape(this.canvasGraph);
+		this.cdr.markForCheck();
+	}
+
+	/** Edit Step in the Test panel goes back to Design with the Step's settings. */
+	editStepFromTest(key: string): void {
+		this.setMode('design');
+		this.onSelectionChange({ type: 'step', key });
+	}
+
+	get selectedStepKey(): string | undefined {
+		return this.selection.type === 'step' ? this.selection.key : undefined;
+	}
+
+	private clearTestRun(): void {
+		this.testRun = undefined;
+		this.testMarks = undefined;
+		this.testedShape = undefined;
+	}
+
+	private failedStart?: { failure: FlowFailure | null; problems: Problem[]; graph?: FlowGraph; base: Problem[] };
+
+	/** The canvas problems, with the Steps a failed start named; kept while neither changes, so the canvas isn't redrawn. */
+	problemsWithFailure(failure: FlowFailure | null): Problem[] {
+		const last = this.failedStart;
+		if (!last || last.failure !== failure || last.graph !== this.canvasGraph || last.base !== this.canvasProblems) {
+			const named = this.canvasGraph ? failureProblems(this.canvasGraph.steps, failure) : [];
+			this.failedStart = { failure, graph: this.canvasGraph, base: this.canvasProblems, problems: named.length ? [...this.canvasProblems, ...named] : this.canvasProblems };
+		}
+		return this.failedStart.problems;
 	}
 
 	/** What the side panel shows while no Step or Link is selected: the Flow settings or its Error handler. */
@@ -2283,7 +2570,7 @@ splitOptions4(options: string): string[] {
 
 	/** Whether the side panel shows this part of the Flow settings. */
 	isFlowPanelOpen(panel: 'settings' | 'errorHandler'): boolean {
-		return !this.sidePanelCollapsed && this.selection.type === 'flow' && this.flowPanel === panel;
+		return !this.sidePanelCollapsed && !this.testOpen && this.selection.type === 'flow' && this.flowPanel === panel;
 	}
 
 	openFlowSettings(): void {
@@ -2295,6 +2582,7 @@ splitOptions4(options: string): string[] {
 	}
 
 	private openFlowPanel(panel: 'settings' | 'errorHandler'): void {
+		this.testOpen = false;
 		this.onSelectionChange({ type: 'flow' });
 		this.flowPanel = panel;
 		this.setPanelCollapsed(false);
@@ -2306,6 +2594,9 @@ splitOptions4(options: string): string[] {
 			this.flowCanvas?.keepInView();
 		}
 		this.sidePanelCollapsed = collapsed;
+		if (this.viewMode !== 'design') {
+			return;
+		}
 		try {
 			localStorage.setItem(PANEL_COLLAPSED_KEY, String(collapsed));
 		} catch {
@@ -2367,8 +2658,8 @@ splitOptions4(options: string): string[] {
 		}
 	}
 
-	onMoveStep(event: { key: string; x: number; y: number }): void {
-		this.edit(moveStep(this.designer!.current, event.key, event.x, event.y));
+	onMoveSteps(moves: StepMove[]): void {
+		this.edit(moveSteps(this.designer!.current, moves));
 	}
 
 	onLinkChange(settings: Partial<LinkSettings>): void {
@@ -2397,7 +2688,25 @@ splitOptions4(options: string): string[] {
 	@HostListener('document:keydown', ['$event'])
 	onDesignerKeydown(event: KeyboardEvent): void {
 		const target = event.target as HTMLElement;
-		if (!this.designer || target.closest('input, textarea, select, [contenteditable], .CodeMirror')) {
+		if (!this.designer || isTypingTarget(target) || this.viewMode !== 'design') {
+			return;
+		}
+		// A dialog or drawer on top of the canvas has the keys; Ctrl+S is the form's own shortcut (jhiSaveShortcut).
+		const covered = this.modalService.hasOpenModals() || this.offcanvas.hasOpenOffcanvas();
+		if ((event.ctrlKey || event.metaKey) && ['z', 'y'].includes(event.key.toLowerCase())) {
+			// Always kept from the browser: its own undo would take back text typed earlier in a field of the editor.
+			event.preventDefault();
+			if (covered) {
+				return;
+			}
+			if (event.key.toLowerCase() === 'z' && !event.shiftKey) {
+				this.undo();
+			} else {
+				this.redo();
+			}
+			return;
+		}
+		if (covered) {
 			return;
 		}
 		// Space adds a Step, like the + that fits the selection. On a focused button or link, Space keeps its usual meaning.
@@ -2407,24 +2716,14 @@ splitOptions4(options: string): string[] {
 			}
 			return;
 		}
-		if (event.key === 'Delete' && !event.ctrlKey && !event.metaKey) {
+		// Backspace too: a Mac keyboard's delete key sends it.
+		if ((event.key === 'Delete' || event.key === 'Backspace') && !event.ctrlKey && !event.metaKey) {
 			const selection = this.selection;
 			if (selection.type === 'step') {
 				this.onDeleteStep(selection.key);
 			} else if (selection.type === 'link') {
 				this.onDeleteBranch(selection.to);
 			}
-			return;
-		}
-		if (!(event.ctrlKey || event.metaKey)) {
-			return;
-		}
-		if (event.key.toLowerCase() === 'z' && !event.shiftKey) {
-			event.preventDefault();
-			this.undo();
-		} else if (event.key.toLowerCase() === 'y' || (event.key.toLowerCase() === 'z' && event.shiftKey)) {
-			event.preventDefault();
-			this.redo();
 		}
 	}
 
@@ -2435,8 +2734,9 @@ splitOptions4(options: string): string[] {
 
 	/**
 	 * Save & manage goes back to Manage. Otherwise the editor stays: the URL gets the Flow's id (a new Flow only has
-	 * one now), and the Flow is loaded again so every Step has its saved id. Save & start then starts it, and Save &
-	 * restart restarts the running Flow; a failed start shows as Error.
+	 * one now). A Visual Flow keeps its Steps and undo history (they already have their saved ids); other Flows are
+	 * loaded again so every Step has its saved id. Save & start then starts it, and Save & restart restarts the running
+	 * Flow; a failed start shows as Error.
 	 */
 	private afterSave(): void {
 		this.savingFlowSuccess = true;
@@ -2449,10 +2749,18 @@ splitOptions4(options: string): string[] {
 			return;
 		}
 		const url = this.router.createUrlTree(['/flow/editor', this.flow.id], {
-			queryParams: { mode: 'edit', editor: this.activeEditor, id: this.flow.id },
+			queryParams: { mode: 'edit', editor: this.activeEditor, id: this.flow.id, view: this.viewMode === 'test' ? 'test' : undefined },
 		});
 		this.location.replaceState(this.router.serializeUrl(url));
-		this.load(this.flow.id);
+		// Save & Test: the visual and Route editors go on to test the Flow they start.
+		if (this.hasModes && (then === 'start' || then === 'restart')) {
+			this.setMode('test');
+		}
+		if (this.useCanvas && this.designer) {
+			this.refreshCanvas();
+		} else {
+			this.load(this.flow.id);
+		}
 		if (then === 'start') {
 			this.header?.start(this.flow.id);
 		} else if (then === 'restart') {
@@ -2538,6 +2846,7 @@ splitOptions4(options: string): string[] {
 		}
 
 		this.isSaving = true;
+		let savedIds = new Map<string, number>();
 		const flowSaved$ = this.flow.id ? this.flowService.update(this.flow) : this.flowService.create(this.flow);
 
 		flowSaved$
@@ -2551,6 +2860,7 @@ splitOptions4(options: string): string[] {
 				}),
 				switchMap(saved => {
 					const stepIds = new Map<string, number>(keys.map((key, i) => [key, saved.body[i].id]));
+					savedIds = stepIds;
 					const linkDeletes = [...saved.body, ...removedSteps].map(step => this.linkService.deleteByStepId(step.id));
 					return forkJoin(linkDeletes).pipe(map(() => stepIds));
 				}),
@@ -2566,6 +2876,7 @@ splitOptions4(options: string): string[] {
 			.subscribe({
 				next: () => {
 					this.designer!.markSaved();
+					this.adoptSavedIds(savedIds);
 					this.afterSave();
 				},
 				error: () => {
@@ -2573,6 +2884,21 @@ splitOptions4(options: string): string[] {
 					this.isSaving = false;
 				},
 			});
+	}
+
+	/**
+	 * Gives the Flow and every Step, and their forms, the id they were saved with, so editing goes on with the same undo
+	 * history. A Step that isn't in the graph has been deleted (or was never saved) and loses its id: undoing its
+	 * deletion saves it as a new Step.
+	 */
+	private adoptSavedIds(stepIds: Map<string, number>): void {
+		this.editFlowForm.controls.id.setValue(this.flow.id, { emitEvent: false });
+		this.stepKeys.forEach((key, index) => {
+			const id = stepIds.get(key);
+			this.steps[index].id = id;
+			this.stepFormAt(index)?.controls.id.setValue(id ?? null, { emitEvent: false });
+		});
+		this.cdr.markForCheck();
 	}
 
 	ngOnDestroy() {
@@ -2619,6 +2945,20 @@ function readPanelCollapsed(): boolean {
 	} catch {
 		return true;
 	}
+}
+
+const CANVAS_TEST_TABS = [
+	{ id: 'flow', label: 'Visual flow', icon: 'sitemap' },
+	{ id: 'log', label: 'Log', icon: 'file-alt' },
+	{ id: 'route', label: 'Camel route', icon: 'code' },
+] as const;
+
+/** The Route editor shows its Routes where the visual editor shows its canvas. */
+const ROUTE_TEST_TABS = [{ id: 'flow', label: 'Routes', icon: 'list' }, ...CANVAS_TEST_TABS.slice(1)] as const;
+
+/** The editors with a Design (or Code) and a Test mode: the visual editor and the Route editor. */
+function hasModes(editor: string | undefined): boolean {
+	return opensOnCanvas(editor) || editor === 'route';
 }
 
 /** The height in pixels the designer never shrinks below, however small the window. */

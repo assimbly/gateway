@@ -1,7 +1,7 @@
 <div class="row justify-content-center">
   <div class="col-8">
 
-    <form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
+    <form (jhiSaveShortcut)="save()" [saveShortcutDisabled]="editForm.form.invalid || isSaving" name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
       <div class="row">
         <div class="col-10">
           <h2 id="jhi-broker-heading">{{ broker?.id ? 'Edit Broker' : 'Create Broker' }}</h2>

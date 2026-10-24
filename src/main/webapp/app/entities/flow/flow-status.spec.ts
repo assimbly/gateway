@@ -3,6 +3,7 @@ import { IStep } from 'app/shared/model/step.model';
 import {
   countLabel,
   failureOfError,
+  failureProblems,
   firstRouteStepOf,
   flowFailureOf,
   flowTypeLabel,
@@ -133,8 +134,19 @@ describe('Flows list row status', () => {
     it('says how many Steps failed, and which, without the stack trace', () => {
       expect(flowFailureOf(answer)).toEqual({
         summary: '1 of 3 Steps failed to start.',
-        steps: [{ uri: 'file://C:\messages\in', message: 'Multiple consumers' }],
+        steps: [{ id: '2', uri: 'file://C:\messages\in', message: 'Multiple consumers' }],
       });
+    });
+
+    it('marks the Step that failed to start on the canvas, by its saved id', () => {
+      const steps = [
+        { key: 'step-1', id: 1 },
+        { key: 'new-3', id: 2 },
+        { key: 'new-4' },
+      ];
+
+      expect(failureProblems(steps, flowFailureOf(answer))).toEqual([{ stepKey: 'new-3', message: 'Failed to start: Multiple consumers' }]);
+      expect(failureProblems(steps, null)).toEqual([]);
     });
 
     it('is no failure when the Flow started', () => {

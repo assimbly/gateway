@@ -10,6 +10,7 @@ import { AuthorityService } from 'app/entities/admin/authority/service/authority
 import { AlertError } from 'app/shared/alert';
 import { RoleLabelPipe } from 'app/shared/auth';
 import { FindLanguageFromKeyPipe, TranslateDirective } from 'app/shared/language';
+import { SaveShortcutDirective } from 'app/shared/keyboard';
 import { UserManagementService } from '../service/user-management.service';
 import { IUserManagement, NewUserManagement } from '../user-management.model';
 
@@ -18,7 +19,7 @@ import { UserManagementFormGroup, UserManagementFormService } from './user-manag
 @Component({
   selector: 'jhi-user-management-update',
   templateUrl: './user-management-update.html',
-  imports: [TranslateDirective, FindLanguageFromKeyPipe, FontAwesomeModule, AlertError, ReactiveFormsModule, RoleLabelPipe],
+  imports: [TranslateDirective, FindLanguageFromKeyPipe, FontAwesomeModule, AlertError, ReactiveFormsModule, RoleLabelPipe, SaveShortcutDirective],
 })
 export class UserManagementUpdate implements OnInit {
   readonly isSaving = signal(false);

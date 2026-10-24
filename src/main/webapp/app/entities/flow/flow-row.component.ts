@@ -268,10 +268,14 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
     this.getFlowNumberOfAlerts(this.flow.id);
   }
 
-  /** Opens the Alerts drawer; once they are cleared the row's count goes to zero. */
+  /** Opens the Alerts drawer; once they are cleared the row's count goes to zero and an Error becomes Stopped. */
   openAlerts(): void {
     FlowAlertsDrawerComponent.open(this.offcanvas, { id: this.flow.id!, name: this.flow.name, type: this.flow.type }, () => {
+      this.failure = null;
       this.setFlowNumberOfAlerts(0);
+      if (this.statusFlow === Status.inactiveError) {
+        this.setFlowStatus('stopped');
+      }
       this.changeDetector.detectChanges();
     });
   }
@@ -371,6 +375,8 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
         this.isFlowStarted = this.isFlowPaused = false;
         this.flowStatusButton = `Failed`;
         this.failure = failureOfError(this.statusMessage);
+        // The failure is an Alert now: count it.
+        this.getFlowNumberOfAlerts(this.flow.id);
         break;
       default:
         this.statusFlow = Status.inactive;
@@ -818,9 +824,8 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
     let configured = false;
     this.subscriptions.add(
       this.flowService
-        .getConfiguration(this.flow.id)
+        .configure(this.flow.id)
         .pipe(
-          switchMap(data => this.flowService.setConfiguration(this.flow.id, data.body, 'true')),
           tap(() => {
             configured = true;
           }),

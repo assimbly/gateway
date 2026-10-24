@@ -22,11 +22,12 @@ import { RequiredConnectionKey } from '../connection-keys/connection-keys.compon
 import { ConnectionPopupService } from 'app/entities/connection/connection-popup.service';
 import { Connections } from '../../shared/camel/connections';
 import { FieldTabDirective } from 'app/shared/form/field-tab.directive';
+import { SaveShortcutDirective } from 'app/shared/keyboard';
 
 @Component({
     selector: 'jhi-connection-dialog',
     templateUrl: './connection-dialog.component.html',
-    imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, ForbiddenConnectionNamesValidatorDirective, ForbiddenConnectionKeysValidatorDirective, FieldTabDirective],
+    imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, ForbiddenConnectionNamesValidatorDirective, ForbiddenConnectionKeysValidatorDirective, FieldTabDirective, SaveShortcutDirective],
 })
 export class ConnectionDialogComponent implements OnInit {
 

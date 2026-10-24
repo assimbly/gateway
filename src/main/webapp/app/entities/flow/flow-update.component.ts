@@ -12,12 +12,13 @@ import { AlertService } from 'app/core/util/alert.service';
 import { IFlow, LogLevelType } from 'app/shared/model/flow.model';
 import { FlowService } from './flow.service';
 import { IIntegration } from 'app/shared/model/integration.model';
+import { SaveShortcutDirective } from 'app/shared/keyboard';
 import { IntegrationService } from 'app/entities/integration/integration.service';
 
 @Component({
   selector: 'jhi-flow-update',
   templateUrl: './flow-update.component.html',
-  imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError],
+  imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, SaveShortcutDirective],
 })
 export class FlowUpdateComponent implements OnInit {
   flow: IFlow;

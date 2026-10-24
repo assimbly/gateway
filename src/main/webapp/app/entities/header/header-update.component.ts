@@ -10,12 +10,13 @@ import { AlertError } from 'app/shared/alert';
 import { IHeader } from 'app/shared/model/header.model';
 import { HeaderService } from './header.service';
 import { IMessage } from 'app/shared/model/message.model';
+import { SaveShortcutDirective } from 'app/shared/keyboard';
 import { MessageService } from 'app/entities/message/message.service';
 
 @Component({
     selector: 'jhi-header-update',
     templateUrl: './header-update.component.html',
-    imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError],
+    imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, SaveShortcutDirective],
 })
 export class HeaderUpdateComponent implements OnInit {
     header: IHeader;

@@ -1,5 +1,13 @@
 <ng-template #addStepMenu>
-  @if (hasAddMenu) {
+  @let items = addItems;
+  @if (items.length === 1) {
+  <div class="step-add-menu">
+    <button type="button" class="btn btn-fx btn-fx-primary" data-tour="step-add" (click)="items[0].add()">
+      <fa-icon icon="plus"></fa-icon>
+      {{ items[0].button }}
+    </button>
+  </div>
+  } @else if (items.length > 1) {
   <div class="step-add-menu">
     <div ngbDropdown placement="bottom-end">
       <button type="button" class="btn btn-fx btn-fx-primary" data-tour="step-add" ngbDropdownToggle>
@@ -7,20 +15,8 @@
         Add
       </button>
       <div ngbDropdownMenu>
-        @if (canAddConnection && !enableConnection) {
-          <button type="button" ngbDropdownItem (click)="onAddConnection()">Connection</button>
-        }
-        @if (canAddAction) {
-          <button type="button" ngbDropdownItem (click)="onAddStep()">Action</button>
-        }
-        @if (canAddScript) {
-          <button type="button" ngbDropdownItem (click)="onAddStep()">Script</button>
-        }
-        @if (canAddLog) {
-          <button type="button" ngbDropdownItem (click)="onAddLog()">Log the result</button>
-        }
-        @if (stepType === 'ROUTE') {
-          <button type="button" ngbDropdownItem (click)="onAddStep()">Route</button>
+        @for (item of items; track item.label) {
+          <button type="button" ngbDropdownItem (click)="item.add()">{{ item.label }}</button>
         }
       </div>
     </div>
@@ -147,6 +143,12 @@
     <div class="card-body step-card">
 
       <div class="step-card__head">
+        @if (draggable) {
+          <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm step-card__drag" cdkDragHandle
+                  title="Drag to move this Route" aria-label="Drag to move this Route">
+            <fa-icon icon="grip-vertical"></fa-icon>
+          </button>
+        }
         @if (isRouteStep) {
           <div class="step-name text-start">
             <label class="step-name__label" for="field_routeName_{{index}}">{{ routeStepLabel }} name</label>
@@ -163,9 +165,9 @@
         } @else {
           <h5 class="step-card__title">{{ step.stepType === 'ERROR' ? 'ERROR HANDLER' : step.stepType }}</h5>
         }
-        @if (canRemoveStep && (onCanvas || index > 0)) {
-          <button title="Remove step" type="button" class="btn btn-close step-card__remove" aria-label="Remove step"
-                  (click)="onRemoveStep()">
+        @if (showsRemove) {
+          <button [title]="stepType === 'ROUTE' ? 'Remove route' : 'Remove step'" type="button" class="btn btn-close step-card__remove"
+                  [attr.aria-label]="stepType === 'ROUTE' ? 'Remove route' : 'Remove step'" (click)="onRemoveStep()">
           </button>
         }
       </div>
@@ -387,14 +389,14 @@
       @if (isRouteStep) {
         <div class="step-field">
           <div class="step-field__head">
-            <label class="step-field__label" for="field_routeContent_{{index}}">Route</label>
+            <label class="step-field__label" for="field_routeContent_{{index}}">Camel route</label>
             @if (stepType === 'ERROR') {
               <i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info" [popover]="errorHandlerPopover">
                 <fa-icon icon="info-circle"></fa-icon>
               </i>
             }
             <div class="step-field__actions">
-              <button title="Edit route" type="button" aria-label="Edit route"
+              <button title="Edit the Camel route in a larger editor" type="button" aria-label="Edit the Camel route in a larger editor"
                       class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm"
                       (click)="onCreateOrEditRoute()">
                 <fa-icon icon="up-right-and-down-left-from-center"></fa-icon>
@@ -410,11 +412,9 @@
             (codeMirrorLoaded)="refreshCodeMirror($event)">
           </ngx-codemirror>
           @if (routeContentMissing) {
-            <div class="invalid-field-message">*Route is required.</div>
+            <div class="invalid-field-message">*The Camel route is required.</div>
           }
         </div>
-
-        <ng-container *ngTemplateOutlet="addStepMenu"></ng-container>
       }
 
       <!-- script -->
@@ -514,6 +514,14 @@
                    labelForId="field_message_{{index}}" dropdownPosition="top"></ng-select>
       </div>
 
+      @if (showsAddConnection) {
+        <div class="text-start">
+          <button type="button" class="btn btn-link btn-sm p-0" data-tour="step-add-connection" (click)="onAddConnection()">
+            <fa-icon icon="plus"></fa-icon> Connection
+          </button>
+        </div>
+      }
+
       <div class="step-field" [style.display]="enableConnection ? '' : 'none'">
         <div class="step-field__head">
           <label class="step-field__label" for="field_connection_{{index}}">Connection</label>
@@ -530,6 +538,13 @@
                       (click)="onCreateOrEditConnection()"
                       [disabled]="connectionDisabled">
                 <fa-icon icon="plus"></fa-icon>
+              </button>
+            }
+            @if (canAddConnection) {
+              <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm" data-tour="step-remove-connection"
+                      title="Remove connection" aria-label="Remove connection"
+                      (click)="onRemoveConnection()">
+                <fa-icon icon="times"></fa-icon>
               </button>
             }
           </div>

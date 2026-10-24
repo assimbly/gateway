@@ -1,4 +1,4 @@
-<form [formGroup]="environmentVariablesForm" (ngSubmit)="save()" class="needs-validation">
+<form (jhiSaveShortcut)="save()" [saveShortcutDisabled]="environmentVariablesForm.invalid || isSaving" [formGroup]="environmentVariablesForm" (ngSubmit)="save()" class="needs-validation">
 
     <div class="modal-header">
         <h4 class="modal-title" id="myEnvironmentVariablesLabel">Variable</h4>

@@ -21,6 +21,7 @@ import {
   linksToSave,
   loadFlowGraph,
   moveStep,
+  moveSteps,
   openEnds,
   problems,
   RESPONSE_COMPONENT,
@@ -581,6 +582,21 @@ describe('Flow graph', () => {
       const graph = edited(moveStep(sourceToSink(), 'step-10', 15, 30));
 
       expect(graph.steps.find(s => s.key === 'step-10')).toMatchObject({ x: 15, y: 30 });
+    });
+
+    it('moves Steps dragged together in one edit', () => {
+      const graph = edited(
+        moveSteps(sourceToSink(), [
+          { key: 'step-10', x: 15, y: 30 },
+          { key: 'step-11', x: 215, y: 30 },
+        ]),
+      );
+
+      expect(graph.steps.map(s => ({ key: s.key, x: s.x, y: s.y }))).toEqual([
+        { key: 'step-10', x: 15, y: 30 },
+        { key: 'step-11', x: 215, y: 30 },
+      ]);
+      expect(moveSteps(sourceToSink(), [{ key: 'gone', x: 0, y: 0 }]).outcome).toBe('rejected');
     });
 
     it("edits a Branch's name, Condition and settings", () => {

@@ -14,12 +14,13 @@ import { FlowService } from 'app/entities/flow/flow.service';
 import { IConnection } from 'app/shared/model/connection.model';
 import { ConnectionService } from 'app/entities/connection/connection.service';
 import { IMessage } from 'app/shared/model/message.model';
+import { SaveShortcutDirective } from 'app/shared/keyboard';
 import { MessageService } from 'app/entities/message/message.service';
 
 @Component({
   selector: 'jhi-step-update',
   templateUrl: './step-update.component.html',
-  imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError],
+  imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, SaveShortcutDirective],
 })
 export class StepUpdateComponent implements OnInit {
     step: IStep;

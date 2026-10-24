@@ -9,12 +9,13 @@ import { ThemePreference, ThemeService } from 'app/core/theme';
 import { AlertError } from 'app/shared/alert';
 import { FindLanguageFromKeyPipe, TranslateDirective } from 'app/shared/language';
 import ThemeSelector from 'app/shared/theme/theme-selector';
+import { SaveShortcutDirective } from 'app/shared/keyboard';
 
 const initialAccount: Account = {} as Account;
 
 @Component({
   selector: 'jhi-settings',
-  imports: [TranslateDirective, TranslatePipe, FindLanguageFromKeyPipe, AlertError, ReactiveFormsModule, ThemeSelector],
+  imports: [TranslateDirective, TranslatePipe, FindLanguageFromKeyPipe, AlertError, ReactiveFormsModule, ThemeSelector, SaveShortcutDirective],
   templateUrl: './settings.html',
 })
 export default class Settings implements OnInit {

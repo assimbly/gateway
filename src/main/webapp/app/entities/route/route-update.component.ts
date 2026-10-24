@@ -11,6 +11,7 @@ import { FileLoadError, DataUtils } from 'app/core/util/data-util.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { IRoute, Route } from 'app/shared/model/route.model';
+import { SaveShortcutDirective } from 'app/shared/keyboard';
 import { RouteService } from './route.service';
 import { ThemeService } from 'app/core/theme';
 // import { AlertError } from 'app/shared/alert/alert-error.model';
@@ -18,7 +19,7 @@ import { ThemeService } from 'app/core/theme';
 @Component({
     selector: 'jhi-route-update',
     templateUrl: './route-update.component.html',
-    imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, CodemirrorModule],
+    imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, CodemirrorModule, SaveShortcutDirective],
 })
 export class RouteUpdateComponent implements OnInit {
     isSaving = false;

@@ -39,12 +39,7 @@
         >Draft</a
       >
     }
-    <jhi-flow-row-alerts
-      [flowName]="flow.name"
-      [failure]="failure"
-      [numberOfAlerts]="numberOfAlerts"
-      (alertsOpen)="openAlerts()"
-    />
+    <jhi-flow-row-alerts [failed]="!!failure" [numberOfAlerts]="numberOfAlerts" (alertsOpen)="openAlerts()" />
   </div>
 </td>
 <td class="text-end table-fx-numeric">{{ count(completedCount) }}</td>

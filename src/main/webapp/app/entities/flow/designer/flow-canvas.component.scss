@@ -144,6 +144,44 @@
   background: #d92d20;
 }
 
+// What a Step did in the last test run: a tick or cross and its time, on its top left corner.
+.flow-step-run {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  border: 2px solid var(--app-bg, #f8f9fb);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 16px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  background: #079455;
+}
+
+.flow-step-run--failed {
+  background: #d92d20;
+}
+
+.flow-step-run--input {
+  background: #475467;
+}
+
+.flow-step-run-failed {
+  border-color: #d92d20;
+  box-shadow: 0 0 0 2px color-mix(in srgb, #d92d20 35%, transparent);
+}
+
+.flow-step-run-unreached {
+  opacity: 0.45;
+}
+
 .flow-connector {
   position: absolute;
   top: 50%;

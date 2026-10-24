@@ -17,6 +17,7 @@
   >
     <fa-icon icon="check" /><span>Clear</span>
   </button>
+  <span class="flow-alerts-drawer__hint">Newest first. Clear removes them for everyone.</span>
 </div>
 
 <div class="offcanvas-body flow-alerts-drawer__body" (scroll)="onScroll($event)">
@@ -26,24 +27,54 @@
   @if (alerts().length) {
     <ol class="flow-alerts-drawer__list">
       @for (alert of alerts(); track $index) {
-        <li class="flow-alerts-drawer__alert">
-          @if (alert.at) {
-            <time class="flow-alerts-drawer__time" [attr.datetime]="alert.at.toISOString()" [title]="timestamp(alert)">{{
-              relative(alert)
-            }}</time>
-          }
-          <button
-            type="button"
-            class="flow-alerts-drawer__message"
-            [class.flow-alerts-drawer__message--expanded]="expanded().has($index)"
-            [attr.aria-expanded]="expanded().has($index)"
-            (click)="toggle($index)"
-          >
-            {{ alert.message }}
-          </button>
-          @if (explain(alert.message); as explanation) {
-            <p class="flow-alerts-drawer__explanation">{{ explanation.meaning }} {{ explanation.fix }}</p>
-          }
+        <li class="flow-alerts-drawer__alert" data-tour="flow-alert">
+          <div class="flow-alerts-drawer__head">
+            <span class="badge" [class.text-bg-danger]="alert.kind === 'flow'" [class.text-bg-warning]="alert.kind === 'message'">{{
+              alert.title
+            }}</span>
+            @if (alert.at) {
+              <time class="flow-alerts-drawer__time" [attr.datetime]="alert.at.toISOString()">{{ timestamp(alert) }} · {{ relative(alert) }}</time>
+            }
+          </div>
+          <dl class="flow-alerts-drawer__fields">
+            @if (alert.endpoint) {
+              <dt>Endpoint</dt>
+              <dd><code class="flow-alerts-drawer__endpoint">{{ alert.endpoint }}</code></dd>
+            }
+            <dt>Error</dt>
+            <dd>
+              <div class="flow-alerts-drawer__error">
+                <code
+                  #error
+                  class="flow-alerts-drawer__message"
+                  [class.flow-alerts-drawer__message--clamped]="isLong(alert) && !expanded().has($index)"
+                  >{{ alert.message }}</code
+                >
+                <button
+                  type="button"
+                  class="btn btn-fx btn-fx-sm btn-fx-ghost flow-alerts-drawer__copy"
+                  [title]="copied() === $index ? 'Copied' : 'Copy the error'"
+                  (click)="copy(error, $index)"
+                >
+                  <fa-icon [icon]="copied() === $index ? 'check' : 'copy'" /><span>{{ copied() === $index ? 'Copied' : 'Copy' }}</span>
+                </button>
+              </div>
+              @if (isLong(alert)) {
+                <button
+                  type="button"
+                  class="btn btn-link btn-sm p-0 flow-alerts-drawer__more"
+                  [attr.aria-expanded]="expanded().has($index)"
+                  (click)="toggle($index)"
+                >
+                  {{ expanded().has($index) ? 'Show less' : 'Show all' }}
+                </button>
+              }
+            </dd>
+            @if (explain(alert.message); as explanation) {
+              <dt>What it means</dt>
+              <dd>{{ explanation.meaning }} {{ explanation.fix }}</dd>
+            }
+          </dl>
         </li>
       }
     </ol>

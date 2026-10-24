@@ -1,6 +1,6 @@
 import { Service, inject } from '@angular/core';
 import { HttpClient, HttpContext, HttpResponse, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable, Observer, Subscription, catchError, from, map, of, switchMap, throwError } from 'rxjs';
+import { MonoTypeOperatorFunction, Observable, Observer, Subscription, catchError, from, map, of, pipe, switchMap, throwError } from 'rxjs';
 
 import { serverApiUrl } from 'app/config';
 
@@ -14,6 +14,9 @@ import { IFlow, Flow, LogLevelType } from 'app/shared/model/flow.model';
 import { traceCollector } from 'app/shared/collect/collectors';
 import { HANDLES_OWN_ERRORS } from 'app/core/interceptor/error-handler.interceptor';
 import { ScriptTrial, scriptTrialError, scriptTrialRequest, scriptTrialResult } from './editor/script-flow';
+import { FlowTestRun, TestRunRequest } from './test/flow-test-run';
+import { FlowVerb, failureLines } from './flow-alerts';
+import { FlowFailure, failureOfError, flowFailureOf } from './flow-status';
 
 /** Message counts of a Flow, as transactions (once per message) or exchanges (once per step). */
 export interface IFlowCounts {
@@ -172,12 +175,24 @@ export class FlowService {
       );
   }
 
+  /** Runs one test message through the running Flow and answers what each Step did; a failure is for the caller to show. */
+  testRun(flowId: number, request: TestRunRequest): Observable<FlowTestRun> {
+    return this.http.post<FlowTestRun>(`${this.resourceUrl}/${flowId}/test-runs`, request, { context: OWN_ERRORS });
+  }
+
   /** Sends the Flow's saved configuration to the runtime, then starts it. A failure is for the caller to show. */
   configureAndStart(flowId: number): Observable<HttpResponse<string>> {
-    return this.getConfiguration(flowId).pipe(
-      switchMap(configuration => this.setConfiguration(flowId, configuration.body, 'true')),
+    return this.configure(flowId).pipe(
       switchMap(() => this.applyTrace(flowId)),
       switchMap(() => this.start(flowId)),
+    );
+  }
+
+  /** Sends the Flow's saved configuration to the runtime, to start it next; a failure is kept as an Alert. */
+  configure(flowId: number): Observable<unknown> {
+    return this.getConfiguration(flowId).pipe(
+      switchMap(configuration => this.setConfiguration(flowId, configuration.body, 'true')),
+      catchError(error => this.recordFailure(flowId, 'configure', errorFailure(error)).pipe(switchMap(() => throwError(() => error)))),
     );
   }
 
@@ -212,23 +227,33 @@ export class FlowService {
   }
 
   start(flowId: number): Observable<HttpResponse<string>> {
-    return this.http.get(`${this.integrationUrl}/flow/${flowId}/start`, { observe: 'response', responseType: 'text', context: OWN_ERRORS });
+    return this.http
+      .get(`${this.integrationUrl}/flow/${flowId}/start`, { observe: 'response', responseType: 'text', context: OWN_ERRORS })
+      .pipe(this.recordingFailures(flowId, 'start'));
   }
 
   pause(flowId: number): Observable<HttpResponse<string>> {
-    return this.http.get(`${this.integrationUrl}/flow/${flowId}/pause`, { observe: 'response', responseType: 'text', context: OWN_ERRORS });
+    return this.http
+      .get(`${this.integrationUrl}/flow/${flowId}/pause`, { observe: 'response', responseType: 'text', context: OWN_ERRORS })
+      .pipe(this.recordingFailures(flowId, 'pause'));
   }
 
   resume(flowId: number): Observable<HttpResponse<string>> {
-    return this.http.get(`${this.integrationUrl}/flow/${flowId}/resume`, { observe: 'response', responseType: 'text', context: OWN_ERRORS });
+    return this.http
+      .get(`${this.integrationUrl}/flow/${flowId}/resume`, { observe: 'response', responseType: 'text', context: OWN_ERRORS })
+      .pipe(this.recordingFailures(flowId, 'resume'));
   }
 
   restart(flowId: number): Observable<HttpResponse<string>> {
-    return this.http.get(`${this.integrationUrl}/flow/${flowId}/restart`, { observe: 'response', responseType: 'text', context: OWN_ERRORS });
+    return this.http
+      .get(`${this.integrationUrl}/flow/${flowId}/restart`, { observe: 'response', responseType: 'text', context: OWN_ERRORS })
+      .pipe(this.recordingFailures(flowId, 'restart'));
   }
 
   stop(flowId: number): Observable<HttpResponse<string>> {
-    return this.http.get(`${this.integrationUrl}/flow/${flowId}/stop`, { observe: 'response', responseType: 'text', context: OWN_ERRORS });
+    return this.http
+      .get(`${this.integrationUrl}/flow/${flowId}/stop`, { observe: 'response', responseType: 'text', context: OWN_ERRORS })
+      .pipe(this.recordingFailures(flowId, 'stop'));
   }
 
   getFlowStatus(flowId: number, context?: HttpContext): Observable<HttpResponse<string>> {
@@ -242,6 +267,29 @@ export class FlowService {
       observe: 'response',
       context,
     });
+  }
+
+  /** Adds Alerts to the Flow, one line each; the Gateway puts the time before them. */
+  addFlowAlerts(flowId: number, lines: string[]): Observable<HttpResponse<void>> {
+    return this.http.post<void>(`${this.resourceUrl}/${flowId}/alerts`, lines, { observe: 'response', context: OWN_ERRORS });
+  }
+
+  /**
+   * Keeps why the Flow failed as an Alert, when the runtime's answer reports a failure or the call fails, and only then
+   * gives the answer or the error: the caller then counts the Alert with the others. Not being able to keep it is ignored.
+   */
+  private recordingFailures(flowId: number, verb: FlowVerb): MonoTypeOperatorFunction<HttpResponse<string>> {
+    return pipe(
+      switchMap(response => {
+        const failure = flowFailureOf(response.body);
+        return failure ? this.recordFailure(flowId, verb, failure).pipe(map(() => response)) : of(response);
+      }),
+      catchError(error => this.recordFailure(flowId, verb, errorFailure(error)).pipe(switchMap(() => throwError(() => error)))),
+    );
+  }
+
+  private recordFailure(flowId: number, verb: FlowVerb, failure: FlowFailure): Observable<unknown> {
+    return this.addFlowAlerts(flowId, failureLines(verb, failure)).pipe(catchError(() => of(null)));
   }
 
   /** Clears the Flow's Alerts for everyone. */
@@ -489,6 +537,11 @@ export function attachmentName(contentDisposition: string | null): string | null
 }
 
 /** What a failed export answered, as text: the reason the server gave, or a general message. */
+/** Why a call failed: what the runtime answered, or else the HTTP error itself. */
+function errorFailure(error: any): FlowFailure {
+  return flowFailureOf(error?.error) ?? (error?.message ? { summary: error.message, steps: [] } : failureOfError(undefined));
+}
+
 async function failureText(error: any): Promise<string> {
   const body = error?.error;
   let text = '';

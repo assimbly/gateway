@@ -13,6 +13,7 @@ import { ForbiddenMessageNamesValidatorDirective } from './message-validation.di
 
 import { IMessage, Message } from 'app/shared/model/message.model';
 import { IHeader, Header } from 'app/shared/model/header.model';
+import { SaveShortcutDirective } from 'app/shared/keyboard';
 import { MessageService } from './message.service';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
@@ -24,7 +25,7 @@ import { MessagePopupService } from 'app/entities/message/message-popup.service'
 @Component({
   selector: 'jhi-message-dialog',
   templateUrl: './message-dialog.component.html',
-  imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, ForbiddenHeaderValidatorDirective, ForbiddenMessageNamesValidatorDirective],
+  imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, ForbiddenHeaderValidatorDirective, ForbiddenMessageNamesValidatorDirective, SaveShortcutDirective],
 })
 export class MessageDialogComponent implements OnInit {
   message: IMessage;

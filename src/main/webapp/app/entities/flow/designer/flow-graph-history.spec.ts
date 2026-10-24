@@ -58,4 +58,16 @@ describe('Flow graph history', () => {
     history.undo();
     expect(history.hasUnsavedChanges).toBe(true);
   });
+
+  it('can still undo what was made before a save', () => {
+    const history = new FlowGraphHistory(loadFlowGraph(sourceToSink()));
+    history.apply(insertStep(history.current, 'step-11', 'ACTION', 'setbody'));
+    history.markSaved();
+
+    expect(history.canUndo).toBe(true);
+    history.undo();
+    expect(history.current.steps).toHaveLength(2);
+    history.redo();
+    expect(history.hasUnsavedChanges).toBe(false);
+  });
 });

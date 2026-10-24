@@ -239,14 +239,16 @@ describe('Flow editor Route Step', () => {
   const broker = { id: 1, name: 'Gateway broker', type: 'ActiveMQ' };
   const database = { id: 2, name: 'Orders database', type: 'SQL' };
 
-  function render(stepType: StepType, activeEditor: string): FlowEditorStepComponent {
+  let fixture: ComponentFixture<FlowEditorStepComponent>;
+
+  function render(stepType: StepType, activeEditor: string, enableConnection = true): FlowEditorStepComponent {
     TestBed.configureTestingModule({
       imports: [FlowEditorStepComponent],
       providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting(), StepEditorRegistry],
     });
     TestBed.inject(FaIconLibrary).addIcons(...fontAwesomeIcons);
 
-    const fixture = TestBed.createComponent(FlowEditorStepComponent);
+    fixture = TestBed.createComponent(FlowEditorStepComponent);
     fixture.componentRef.setInput('step', { stepType, componentType: '' });
     fixture.componentRef.setInput('index', 1);
     fixture.componentRef.setInput(
@@ -267,10 +269,95 @@ describe('Flow editor Route Step', () => {
     fixture.componentRef.setInput('activeEditor', activeEditor);
     fixture.componentRef.setInput('connections', [broker, database]);
     fixture.componentRef.setInput('filterConnection', []);
-    fixture.componentRef.setInput('enableConnection', true);
+    fixture.componentRef.setInput('enableConnection', enableConnection);
     fixture.detectChanges();
     return fixture.componentInstance;
   }
+
+  afterEach(() => document.body.querySelectorAll('.dropdown-menu').forEach(menu => menu.remove()));
+
+  function addButton(): HTMLButtonElement {
+    return fixture.nativeElement.querySelector('[data-tour="step-add"]');
+  }
+
+  function addConnectionLink(): HTMLButtonElement | null {
+    return fixture.nativeElement.querySelector('[data-tour="step-add-connection"]');
+  }
+
+  function removeConnectionButton(): HTMLButtonElement | null {
+    return fixture.nativeElement.querySelector('[data-tour="step-remove-connection"]');
+  }
+
+  it('leaves adding a Route to the list below the Routes, and calls its code the Camel route', () => {
+    render(StepType.ROUTE, 'route');
+
+    expect(addButton()).toBeNull();
+    expect(fixture.nativeElement.querySelector('label[for="field_routeContent_1"]').textContent.trim()).toBe('Camel route');
+  });
+
+  it('can remove even the first Route while the Flow has others, and drag it by its handle', () => {
+    render(StepType.ROUTE, 'route');
+    fixture.componentRef.setInput('index', 0);
+    fixture.detectChanges();
+    const remove = () => fixture.nativeElement.querySelector('.step-card__remove');
+    expect(remove()).toBeNull();
+    expect(fixture.nativeElement.querySelector('.step-card__drag')).toBeNull();
+
+    fixture.componentRef.setInput('deletable', true);
+    fixture.componentRef.setInput('draggable', true);
+    fixture.detectChanges();
+
+    expect(remove().getAttribute('aria-label')).toBe('Remove route');
+    expect(fixture.nativeElement.querySelector('.step-card__drag')).not.toBeNull();
+  });
+
+  it('reveals the Connection of a Route in place', () => {
+    const step = render(StepType.ROUTE, 'route', false);
+    const added = jest.fn();
+    step.addConnection.subscribe(added);
+
+    addConnectionLink()!.click();
+    expect(added).toHaveBeenCalledWith({ step: step.step, index: 1 });
+  });
+
+  it('hides the Connection link once the Connection is shown', () => {
+    render(StepType.ROUTE, 'route');
+
+    expect(addConnectionLink()).toBeNull();
+  });
+
+  it('removes the Connection added to a Route', () => {
+    const step = render(StepType.ROUTE, 'route');
+    const removed = jest.fn();
+    step.removeConnection.subscribe(removed);
+
+    removeConnectionButton()!.click();
+    expect(removed).toHaveBeenCalledWith({ step: step.step, index: 1 });
+  });
+
+  it('removes the Connection added to the Error handler of a Route Flow', () => {
+    render(StepType.ERROR, 'route');
+
+    expect(removeConnectionButton()?.getAttribute('aria-label')).toBe('Remove connection');
+  });
+
+  it("keeps the Connection of a Component that needs one, so it can't be removed", () => {
+    render(StepType.ACTION, 'flow');
+
+    expect(removeConnectionButton()).toBeNull();
+  });
+
+  it('offers a Script the next Script and the Log in a menu, without the Connection', () => {
+    render(StepType.SCRIPT, 'script', false);
+    fixture.componentRef.setInput('canAddLog', true);
+    fixture.detectChanges();
+
+    addButton().click();
+    fixture.detectChanges();
+    const items = Array.from(document.body.querySelectorAll('.dropdown-menu.show [ngbdropdownitem]')).map(item => item.textContent?.trim());
+    expect(items).toEqual(['Script', 'Log the result']);
+    expect(addConnectionLink()).not.toBeNull();
+  });
 
   it('offers every Connection to a Route', () => {
     expect(render(StepType.ROUTE, 'route').connectionChoices).toEqual([broker, database]);

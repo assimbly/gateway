@@ -8,6 +8,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select';
 import { PopoverModule } from 'ngx-bootstrap/popover';
 import { CodemirrorComponent, CodemirrorModule } from '@ctrl/ngx-codemirror';
+import { CdkDragHandle } from '@angular/cdk/drag-drop';
 import { Components } from 'app/shared/camel/component-type';
 import { CatalogueEntry, EndpointRole, NO_MATCH, closestFirst, essentialsFirst, matchRank, roleMismatch, searchCatalogue } from 'app/shared/camel/catalogue';
 import {
@@ -57,7 +58,7 @@ export class StepEditorRegistry {
   selector: 'jhi-flow-editor-step',
   templateUrl: './flow-editor-step.component.html',
   styleUrl: './flow-editor-step.component.scss',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgbModule, FontAwesomeModule, NgSelectModule, PopoverModule, CodemirrorModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgbModule, FontAwesomeModule, NgSelectModule, PopoverModule, CodemirrorModule, CdkDragHandle],
 })
 export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   @Input({ required: true }) step: IStep;
@@ -70,6 +71,8 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   @Input() routerTitle?: string;
   /** On the canvas, whether the Flow keeps a valid shape without this Step; the canvas decides which Steps can go. */
   @Input() deletable = false;
+  /** The Route editor lets each Route be dragged to another place by its handle. */
+  @Input() draggable = false;
   @Input() formSubmitted = false;
 
   @Input() sourceComponentsNames: Array<any> = [];
@@ -104,6 +107,7 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   @Output() removeStep = new EventEmitter<{ step: IStep; index: number }>();
   @Output() addStep = new EventEmitter<{ step: IStep; index: number; stepType?: StepType }>();
   @Output() addConnection = new EventEmitter<{ step: IStep; index: number }>();
+  @Output() removeConnection = new EventEmitter<{ step: IStep; index: number }>();
   @Output() componentTypeChange = new EventEmitter<{ step: IStep; index: number; componentType: any }>();
   /** The Component changed between HTTP and HTTPS to match a pasted URL, keeping the path and Options. */
   @Output() schemeChange = new EventEmitter<{ step: IStep; index: number }>();
@@ -480,10 +484,24 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
     return this.stepType === 'SCRIPT' || (this.stepType === 'SOURCE' && this.activeEditor === 'script');
   }
 
-  get hasAddMenu(): boolean {
-    return (
-      (this.canAddConnection && !this.enableConnection) || this.canAddAction || this.canAddScript || this.canAddLog || this.stepType === 'ROUTE'
-    );
+  /** The Steps that can be added after this one; a single one gets a plain button labelled with `button`. */
+  get addItems(): { label: string; button: string; add: () => void }[] {
+    const items: { label: string; button: string; add: () => void }[] = [];
+    if (this.canAddAction) {
+      items.push({ label: 'Action', button: 'Add action', add: () => this.onAddStep() });
+    }
+    if (this.canAddScript) {
+      items.push({ label: 'Script', button: 'Add script', add: () => this.onAddStep() });
+    }
+    if (this.canAddLog) {
+      items.push({ label: 'Log the result', button: 'Log the result', add: () => this.onAddLog() });
+    }
+    return items;
+  }
+
+  /** A Connection is a field of this Step, so it is revealed in place rather than from the Add menu. */
+  get showsAddConnection(): boolean {
+    return this.canAddConnection && !this.enableConnection;
   }
 
   get canRemoveStep(): boolean {
@@ -497,6 +515,17 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
       this.stepType === 'ROUTE' ||
       (this.stepType === 'SINK' && this.activeEditor === 'script')
     );
+  }
+
+  /** The remove button: the first Step of a form editor stays, except a Route while the Flow has others (`deletable`). */
+  get showsRemove(): boolean {
+    if (!this.canRemoveStep) {
+      return false;
+    }
+    if (this.onCanvas) {
+      return true;
+    }
+    return this.stepType === 'ROUTE' ? this.deletable : this.index > 0;
   }
 
   /** A Route, or the Error handler of a Route Flow: a name and a Camel route in XML. */
@@ -548,6 +577,10 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
 
   onAddConnection(): void {
     this.addConnection.emit({ step: this.step, index: this.index });
+  }
+
+  onRemoveConnection(): void {
+    this.removeConnection.emit({ step: this.step, index: this.index });
   }
 
   onComponentTypeChange(componentType: any): void {

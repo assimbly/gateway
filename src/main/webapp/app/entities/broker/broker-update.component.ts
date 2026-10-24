@@ -12,6 +12,7 @@ import { PopoverModule } from 'ngx-bootstrap/popover';
 import { CodemirrorComponent, CodemirrorModule } from '@ctrl/ngx-codemirror';
 
 import { IBroker } from 'app/shared/model/broker.model';
+import { SaveShortcutDirective } from 'app/shared/keyboard';
 import { BrokerService } from './broker.service';
 import { ThemeService } from 'app/core/theme';
 
@@ -22,7 +23,7 @@ import 'codemirror/addon/edit/closetag';
 @Component({
     selector: 'jhi-broker-update',
     templateUrl: './broker-update.component.html',
-    imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, NgbModule, PopoverModule, CodemirrorModule],
+    imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, NgbModule, PopoverModule, CodemirrorModule, SaveShortcutDirective],
 })
 export class BrokerUpdateComponent implements OnInit {
     @ViewChild('codeEditor') private codeEditor?: CodemirrorComponent;

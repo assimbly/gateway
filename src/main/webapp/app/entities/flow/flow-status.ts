@@ -135,10 +135,10 @@ export function testMessageBlocked(
   return null;
 }
 
-/** Why a Flow didn't start: a one-line summary and, per failed Step, its Endpoint and the runtime's message. */
+/** Why a Flow didn't start: a one-line summary and, per failed Step, its id, Endpoint and the runtime's message. */
 export interface FlowFailure {
   summary: string;
-  steps: Array<{ uri?: string; message: string }>;
+  steps: Array<{ id?: string; uri?: string; message: string }>;
 }
 
 const DEFAULT_FAILURE = 'The Flow could not be started.';
@@ -153,8 +153,10 @@ export function flowFailureOf(answer: unknown): FlowFailure | null {
     const text = typeof answer === 'string' ? answer.trim() : '';
     return text ? { summary: text, steps: [] } : null;
   }
-  const steps: Array<{ uri?: string; message: string; status?: string }> = Array.isArray(flow?.steps) ? flow.steps : [];
-  const failedSteps = steps.filter(step => step?.status === 'error').map(step => ({ uri: step.uri || undefined, message: step.message ?? 'Failed.' }));
+  const steps: Array<{ id?: string | number; uri?: string; message: string; status?: string }> = Array.isArray(flow?.steps) ? flow.steps : [];
+  const failedSteps = steps
+    .filter(step => step?.status === 'error')
+    .map(step => ({ ...(step.id != null && step.id !== '' ? { id: String(step.id) } : {}), uri: step.uri || undefined, message: step.message ?? 'Failed.' }));
   const installed = flow?.installed;
   const failed = flow?.status === 'failed' || flow?.status === 'error' || failedSteps.length > 0 || Number(installed?.failed) > 0;
   if (!failed) {
@@ -165,6 +167,18 @@ export function flowFailureOf(answer: unknown): FlowFailure | null {
       ? `${installed.failed} of ${installed.total} Steps failed to start.`
       : (flow?.message ?? DEFAULT_FAILURE);
   return { summary, steps: failedSteps };
+}
+
+/** The Steps a failed start names, as problems on the canvas: matched by saved Step id, by Step key. */
+export function failureProblems(steps: ReadonlyArray<{ key: string; id?: number }>, failure: FlowFailure | null): Array<{ stepKey: string; message: string }> {
+  if (!failure) {
+    return [];
+  }
+  const keys = new Map(steps.filter(step => step.id != null).map(step => [String(step.id), step.key]));
+  return failure.steps.flatMap(step => {
+    const key = step.id ? keys.get(step.id) : undefined;
+    return key ? [{ stepKey: key, message: `Failed to start: ${step.message}` }] : [];
+  });
 }
 
 /** The failure of a call that failed: what its answer says, or a general message when it says nothing. */

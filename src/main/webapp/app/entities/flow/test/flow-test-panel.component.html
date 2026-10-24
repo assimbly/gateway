@@ -1,0 +1,138 @@
+<section class="flow-test" aria-labelledby="flow-test-title">
+  <div class="flow-test__header">
+    <h5 id="flow-test-title" class="mb-0"><fa-icon icon="flask"></fa-icon> Test</h5>
+    <button type="button" class="btn-close" aria-label="Close the Test panel" (click)="closed.emit()"></button>
+  </div>
+  <p class="text-muted small mb-0">
+    @if (routes()) {
+      Runs one message through the running Flow, into the first Route, past its <code>from</code> endpoint. The Routes do what they always
+      do: they write files, call APIs and put messages on queues.
+    } @else {
+      Runs one message through the running Flow, from the Step after the Source. The Steps do what they always do: they write files, call
+      APIs and put messages on queues.
+    }
+  </p>
+
+  @if (blocked(); as reason) {
+    <div class="alert alert-secondary py-2 mb-0 small flow-test__notice" data-cy="test-blocked">
+      <span>{{ reason.text }}</span>
+      @if (reason.action === 'start') {
+        <button type="button" class="btn btn-fx btn-fx-sm btn-fx-success" (click)="start.emit()"><fa-icon icon="play"></fa-icon><span>Start</span></button>
+      }
+    </div>
+  } @else if (unsaved()) {
+    <div class="alert alert-warning py-2 mb-0 small flow-test__notice" data-cy="test-unsaved">
+      <span>A test runs the saved Flow, without your unsaved changes.</span>
+      <button type="button" class="btn btn-fx btn-fx-sm btn-fx-secondary" (click)="saveAndRun.emit()">Save &amp; restart</button>
+    </div>
+  }
+
+  <jhi-send-message-editor [(body)]="body" [(headers)]="headers" [(bodyMode)]="bodyMode" />
+
+  <div class="flow-test__actions">
+    <button type="button" class="btn btn-fx btn-fx-primary" data-cy="test-run" [disabled]="!!blocked() || pending()" (click)="runTest()">
+      <fa-icon [icon]="pending() ? 'sync' : run() ? 'redo' : 'play'" [animation]="pending() ? 'spin' : undefined"></fa-icon><span>{{ pending() ? 'Running…' : run() ? 'Run again' : 'Run' }}</span>
+    </button>
+    @if (flowId() && !routes()) {
+      <a class="small" routerLink="/flow/message-sender" [queryParams]="{ flowId: flowId() }">Send to the Source's endpoint instead</a>
+    }
+  </div>
+
+  @if (failure(); as error) {
+    <div class="alert alert-danger py-2 mb-0 small" role="alert">{{ error }}</div>
+  }
+
+  @if (run(); as result) {
+    <div class="flow-test__summary" [class.flow-test__summary--failed]="result.status === 'failed'" data-cy="test-summary">
+      <fa-icon [icon]="result.status === 'failed' ? 'times' : 'check'"></fa-icon>
+      <span>
+        {{ result.status === 'failed' ? 'Failed' : 'Passed' }} in {{ duration(result.durationMillis) }}@if (!routes()) { ·
+        {{ passedSteps() }} of {{ result.steps.length }} Step runs completed}
+      </span>
+    </div>
+
+    @switch (selectedMark()) {
+      @case ('input') {
+        <p class="small mb-0">This is the Source. The test message starts at the Step after it.</p>
+      }
+      @case ('unreached') {
+        <p class="small mb-0" data-cy="test-unreached">The message didn't reach this Step.</p>
+        @if (selectedKey(); as key) {
+          <button type="button" class="btn btn-fx btn-fx-sm btn-fx-ghost align-self-start" (click)="editStep.emit(key)">Edit Step</button>
+        }
+      }
+      @case (undefined) {
+        @if (result.error; as error) {
+          <ng-container *ngTemplateOutlet="errorDetail; context: { $implicit: error }"></ng-container>
+        }
+        <h6 class="flow-test__title">Response</h6>
+        <ng-container *ngTemplateOutlet="message; context: { $implicit: result.response }"></ng-container>
+        @if (!routes()) {
+          <p class="text-muted small mb-0">Select a Step on the canvas to see the message it got and passed on.</p>
+        }
+      }
+      @default {
+        @if (stepRun(selectedMark()); as step) {
+          <div class="flow-test__step" data-cy="test-step">
+            <div class="flow-test__step-status">
+              <span class="badge" [class.text-bg-success]="step.status === 'completed'" [class.text-bg-danger]="step.status === 'failed'"
+                    [class.text-bg-secondary]="step.status === 'running'">{{ step.status }}</span>
+              <span class="small text-muted" title="This Step alone, and with the Steps after it">
+                {{ duration(step.ownMillis) }} · {{ duration(step.totalMillis) }} with the Steps after it
+              </span>
+            </div>
+            @if (step.error; as error) {
+              <ng-container *ngTemplateOutlet="errorDetail; context: { $implicit: error }"></ng-container>
+            }
+            <div class="btn-group btn-group-sm align-self-start" role="tablist">
+              <button type="button" role="tab" class="btn btn-outline-secondary" [class.active]="messageTab() === 'in'"
+                      [attr.aria-selected]="messageTab() === 'in'" (click)="messageTab.set('in')">In</button>
+              <button type="button" role="tab" class="btn btn-outline-secondary" [class.active]="messageTab() === 'out'"
+                      [attr.aria-selected]="messageTab() === 'out'" (click)="messageTab.set('out')">Out</button>
+            </div>
+            @if (shownMessage(step); as shown) {
+              <ng-container *ngTemplateOutlet="message; context: { $implicit: shown }"></ng-container>
+            } @else {
+              <p class="small text-muted mb-0">This Step passed no message on.</p>
+            }
+            @if (selectedKey(); as key) {
+              <button type="button" class="btn btn-fx btn-fx-sm btn-fx-ghost align-self-start" (click)="editStep.emit(key)">Edit Step</button>
+            }
+          </div>
+        }
+      }
+    }
+  }
+</section>
+
+<ng-template #message let-message>
+  @if (message) {
+    <pre class="flow-test__body" data-cy="test-body">{{ message.body || '(empty)' }}</pre>
+    @if (message.truncated) {
+      <p class="small text-muted mb-0">The body is cut short.</p>
+    }
+    @if (headerEntries(message).length) {
+      <table class="table table-sm small mb-0 flow-test__headers">
+        <tbody>
+          @for (header of headerEntries(message); track header[0]) {
+            <tr>
+              <th scope="row">{{ header[0] }}</th>
+              <td>{{ header[1] }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  } @else {
+    <p class="small text-muted mb-0">No message came back.</p>
+  }
+</ng-template>
+
+<ng-template #errorDetail let-error>
+  <div class="alert alert-danger py-2 mb-0 small" role="alert" data-cy="test-error">
+    @if (explain(error); as explanation) {
+      <p class="mb-1"><b>{{ explanation.meaning }}</b> {{ explanation.fix }}</p>
+    }
+    <p class="mb-0 flow-test__error">{{ error }}</p>
+  </div>
+</ng-template>

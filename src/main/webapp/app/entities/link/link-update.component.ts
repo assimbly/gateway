@@ -9,12 +9,13 @@ import { AlertError } from 'app/shared/alert';
 import { ILink } from 'app/shared/model/link.model';
 import { LinkService } from './link.service';
 import { IStep } from 'app/shared/model/step.model';
+import { SaveShortcutDirective } from 'app/shared/keyboard';
 import { StepService } from 'app/entities/step/step.service';
 
 @Component({
     selector: 'jhi-link-update',
     templateUrl: './link-update.component.html',
-    imports: [FormsModule, FontAwesomeModule, AlertError],
+    imports: [FormsModule, FontAwesomeModule, AlertError, SaveShortcutDirective],
 })
 export class LinkUpdateComponent implements OnInit {
     link: ILink;

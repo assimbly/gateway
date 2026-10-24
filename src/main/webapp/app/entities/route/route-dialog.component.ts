@@ -13,6 +13,7 @@ import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { ForbiddenRouteNamesValidatorDirective } from './route-validation.directive';
 
 import { IRoute, Route } from 'app/shared/model/route.model';
+import { SaveShortcutDirective } from 'app/shared/keyboard';
 import { RouteService } from './route.service';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
@@ -24,7 +25,7 @@ import 'codemirror/addon/edit/closetag';
 @Component({
     selector: 'jhi-route-dialog',
     templateUrl: './route-dialog.component.html',
-    imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, AlertError, CodemirrorModule, ForbiddenRouteNamesValidatorDirective],
+    imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, AlertError, CodemirrorModule, ForbiddenRouteNamesValidatorDirective, SaveShortcutDirective],
 })
 export class RouteDialogComponent implements OnInit {
     readonly themeService = inject(ThemeService);

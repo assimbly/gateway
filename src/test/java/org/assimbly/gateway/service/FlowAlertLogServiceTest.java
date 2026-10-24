@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FlowAlertLogServiceTest {
 
@@ -88,6 +89,40 @@ public class FlowAlertLogServiceTest {
             }).sorted().toList();
             assertEquals(List.of("after", "before"), contents);
         }
+    }
+
+    @Test
+    public void addedAlertsGoToTodaysLogAfterTheTimeAndAreClearedLikeTheOthers() throws Exception {
+        Path flowDir = tempDir.resolve("1204");
+        Files.createDirectories(flowDir);
+        Files.writeString(flowDir.resolve("20260920_alerts.log"), "2026-09-20 10:00:00 +0200 : Cannot store file\n", StandardCharsets.UTF_8);
+        FlowAlertLogService service = new FlowAlertLogService(tempDir);
+
+        service.add(1204, List.of("Failed to start [file://in]: Multiple consumers\r\nfor the same endpoint", "  ", "Failed to start: busy"));
+
+        String today = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.BASIC_ISO_DATE);
+        List<String> written = Files.readAllLines(flowDir.resolve(today + "_alerts.log"));
+        assertEquals(2, written.size());
+        assertTrue(written.get(0).matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [+-]\\d{4} : Failed to start \\[file://in\\]: Multiple consumers for the same endpoint"));
+
+        List<String> page = service.page(1204, 0, 10).getMessages();
+        assertEquals(3, page.size());
+        assertTrue(page.get(0).endsWith(" : Failed to start: busy"));
+        assertEquals("2026-09-20 10:00:00 +0200 : Cannot store file", page.get(2));
+
+        service.clear(1204);
+        assertEquals(0, service.page(1204, 0, 10).getTotal());
+    }
+
+    @Test
+    public void addingCutsOffLongAndManyAlerts() {
+        FlowAlertLogService service = new FlowAlertLogService(tempDir);
+
+        service.add(1205, IntStream.range(0, 30).mapToObj(i -> "x".repeat(5000)).toList());
+
+        List<String> page = service.page(1205, 0, 10).getMessages();
+        assertEquals(FlowAlertLogService.MAX_ADDED, service.page(1205, 0, 0).getTotal());
+        assertTrue(page.get(0).endsWith("x".repeat(FlowAlertLogService.MAX_LENGTH) + "…"));
     }
 
     @Test

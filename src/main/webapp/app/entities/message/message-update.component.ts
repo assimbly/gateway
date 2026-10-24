@@ -12,6 +12,7 @@ import { ForbiddenMessageNamesValidatorDirective } from './message-validation.di
 
 import { IMessage, Message } from 'app/shared/model/message.model';
 import { IHeader, Header } from 'app/shared/model/header.model';
+import { SaveShortcutDirective } from 'app/shared/keyboard';
 import { MessageService } from './message.service';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { HeaderService } from '../header/header.service';
@@ -20,7 +21,7 @@ import { filter } from 'rxjs/operators';
 @Component({
   selector: 'jhi-message-update',
   templateUrl: './message-update.component.html',
-  imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, ForbiddenHeaderValidatorDirective, ForbiddenMessageNamesValidatorDirective],
+  imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, ForbiddenHeaderValidatorDirective, ForbiddenMessageNamesValidatorDirective, SaveShortcutDirective],
 })
 export class MessageUpdateComponent implements OnInit {
   message: IMessage;

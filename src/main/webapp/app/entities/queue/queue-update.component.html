@@ -4,7 +4,7 @@
 
 <div class="row justify-content-center">
     <div class="col-8">
-        <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+        <form (jhiSaveShortcut)="save()" [saveShortcutDisabled]="editForm.invalid || isSaving" name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
             <h2 id="jhi-queue-heading">Create Queue</h2>
 
             <div class="row">

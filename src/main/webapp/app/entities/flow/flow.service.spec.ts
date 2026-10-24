@@ -50,4 +50,47 @@ describe('FlowService', () => {
       expect(trial).toEqual({ ok: false, error: 'ReferenceError: foo is not defined' });
     });
   });
+
+  describe('keeping why a Flow failed as an Alert', () => {
+    const startUrl = `${serverApiUrl}api/integration/flow/7/start`;
+    const alertsUrl = `${serverApiUrl}api/flows/7/alerts`;
+
+    it('adds an Alert per failed Step, and only then gives the answer', () => {
+      const answer = JSON.stringify({
+        flow: { installed: { total: 2, failed: 1 }, steps: [{ id: 3, uri: 'file://in', status: 'error', message: 'Multiple consumers' }] },
+      });
+      let body: string | null | undefined;
+      service.start(7).subscribe(response => (body = response.body));
+
+      httpMock.expectOne(startUrl).flush(answer);
+      const alerts = httpMock.expectOne({ method: 'POST', url: alertsUrl });
+      expect(alerts.request.body).toEqual(['Failed to start [file://in]: Multiple consumers']);
+      expect(body).toBeUndefined();
+      alerts.flush(null, { status: 204, statusText: 'No Content' });
+
+      expect(body).toBe(answer);
+    });
+
+    it('adds an Alert when the call fails, then still fails, also when the Alert could not be added', () => {
+      let error: unknown;
+      service.stop(7).subscribe({ error: err => (error = err) });
+
+      httpMock.expectOne(`${serverApiUrl}api/integration/flow/7/stop`).flush('Runtime is busy', { status: 500, statusText: 'Server Error' });
+      const alerts = httpMock.expectOne({ method: 'POST', url: alertsUrl });
+      expect(alerts.request.body).toEqual(['Failed to stop: Runtime is busy']);
+      alerts.flush(null, { status: 500, statusText: 'Server Error' });
+
+      expect(error).toBeTruthy();
+    });
+
+    it('adds nothing when the Flow started', () => {
+      let body: string | null | undefined;
+      service.start(7).subscribe(response => (body = response.body));
+
+      httpMock.expectOne(startUrl).flush('{"flow":{"event":"started"}}');
+
+      expect(body).toBe('{"flow":{"event":"started"}}');
+      httpMock.expectNone(alertsUrl);
+    });
+  });
 });

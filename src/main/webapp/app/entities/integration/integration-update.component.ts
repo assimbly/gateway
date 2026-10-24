@@ -9,6 +9,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AlertError } from 'app/shared/alert';
 import { PopoverModule } from 'ngx-bootstrap/popover';
 import { IIntegration, EnvironmentType, GatewayType } from 'app/shared/model/integration.model';
+import { SaveShortcutDirective } from 'app/shared/keyboard';
 import { IntegrationService } from './integration.service';
 import { Components } from '../../shared/camel/component-type';
 import { Router } from '@angular/router';
@@ -16,7 +17,7 @@ import { Router } from '@angular/router';
 @Component({
     selector: 'jhi-integration-update',
     templateUrl: './integration-update.component.html',
-    imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, PopoverModule],
+    imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, PopoverModule, SaveShortcutDirective],
 })
 export class IntegrationUpdateComponent implements OnInit {
     integration: IIntegration;

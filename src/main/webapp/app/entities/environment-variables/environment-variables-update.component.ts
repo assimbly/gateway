@@ -12,13 +12,14 @@ import { EnvironmentVariables, IEnvironmentVariables } from 'app/shared/model/en
 import { EnvironmentVariablesService } from './environment-variables.service';
 import { IntegrationService } from 'app/entities/integration/integration.service';
 import { IIntegration } from 'app/shared/model/integration.model';
+import { SaveShortcutDirective } from 'app/shared/keyboard';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { forbiddenEnvironmentKeysValidator } from './environment-variables-validation.directive';
 
 @Component({
     selector: 'jhi-environment-variables-update',
     templateUrl: './environment-variables-update.component.html',
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, FontAwesomeModule, AlertError],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, FontAwesomeModule, AlertError, SaveShortcutDirective],
 })
 export class EnvironmentVariablesUpdateComponent implements OnInit {
     environmentVariables: IEnvironmentVariables = new EnvironmentVariables();
