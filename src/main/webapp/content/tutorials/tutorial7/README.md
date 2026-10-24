@@ -19,18 +19,18 @@ It takes about 10 minutes.
 
 ## How it works
 
-Under the hood, the Gateway runs every Flow as an [Apache Camel](https://camel.apache.org/) route. You can also write one yourself. The route in this tutorial moves files from one folder to another and logs the name of each file:
+Under the hood, the Gateway runs every Flow as an [Apache Camel](https://camel.apache.org/) route. You can also write one yourself. The route in this tutorial moves files from one folder to another and logs what is in each file:
 
 ```xml
 <route>
     <from uri="file:@{messages}/route"/>
-    <log message="Received file ${header.CamelFileName}"/>
+    <log message="Received: ${body}"/>
     <to uri="file:@{messages}/out"/>
 </route>
 ```
 
 * `<from>` picks up files from the `route` folder, like a Source.
-* `<log>` writes a line to the log, with the name of the file in place of `${header.CamelFileName}`.
+* `<log>` writes a line to the log, with the content of the message in place of `${body}`.
 * `<to>` writes the file to the `out` folder, like a Sink.
 
 `@{messages}` is the Variable for your messages folder (see **Flows → Variables**).
@@ -52,12 +52,12 @@ The route editor opens. Instead of a canvas, it has a field to write the route i
 
 1. Next to **Flow name**, type `SimpleRoute`. <!-- show: #field_flowName -->
 2. Set **Route name** to `MoveFiles`. <!-- show: [formcontrolname="routeName"] -->
-3. Replace the example in the **Route** field with this route: <!-- show: [data-tour="route-content"] -->
+3. Replace the example in the **Camel route** field with this route: <!-- show: [data-tour="route-content"] -->
 
    ```xml
    <route>
        <from uri="file:@{messages}/route"/>
-       <log message="Received file ${header.CamelFileName}"/>
+       <log message="Received: ${body}"/>
        <to uri="file:@{messages}/out"/>
    </route>
    ```
@@ -67,54 +67,35 @@ The route editor opens. Instead of a canvas, it has a field to write the route i
 4. Click **Save**. <!-- show: [data-tour="flow-save"] -->
 
 > **Tips**
-> * Click the **Edit route** icon above the field to write the route in a full-screen editor.
-> * With **Add** you add more routes to the same Flow, for example routes that call each other. You do that in Tutorial 8.
-> * Under **Error handler name** you can write a route that handles errors. Leave it empty to use the default error handling.
+> * Click the **Edit** icon above the field to write the route in a larger editor.
+> * With **Add route** you add more routes to the same Flow, for example routes that call each other. You do that in Tutorial 8.
+> * On the **Error handler** tab you can write a route that handles errors. Leave it empty to use the default error handling.
 
-## Step 3: Run the route and send it a file
+## Step 3: Run the route and send it a message
 
 <!-- step: {"check":"flowCompleted:SimpleRoute"} -->
 
-1. Click **Start**. <!-- show: [data-tour="flow-start"] -->
-2. Go to **Flows → Send**. <!-- show: .app-sidebar__link[href="/flow/message-sender"] --> On this page you send a message to any endpoint.
-3. Keep **Component** on `file` and type `@{messages}/route` as **Path**. Press Enter.
-4. Under **Body**, paste this list of names: <!-- show: .body-codemirror -->
+1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] --> It saves the Flow, starts it and switches from **Code** to **Test**. Your route is shown read-only, with the *Test* panel next to it.
+2. Under **Body**, type `Hello Camel` <!-- show: .flow-test .body-codemirror --> and click **Run**. <!-- show: [data-cy="test-run"] -->
 
-   ```xml
-   <names>
-       <name>
-          <firstname>John</firstname>
-          <lastname>Doe</lastname>
-       </name>
-       <name>
-          <firstname>Michael</firstname>
-          <lastname>Kay</lastname>
-       </name>
-       <name>
-          <firstname>Jane</firstname>
-          <lastname>Smith</lastname>
-       </name>
-   </names>
-   ```
-
-5. Click **Send**. <!-- show: [title="Send (Ctrl+Enter)"] -->
-
-The Gateway writes the list as a file in the `route` folder. Your route picks it up and moves it to the `out` folder of your messages folder: `@{messages}/out`. Open *SimpleRoute* again: its **Completed** counter went up.
+The message goes into your route right after its `<from>`. The route logs it and writes it to the `out` folder of your messages folder: `@{messages}/out`. The panel shows **Passed**.
 
 ![The route is running](03-route-running.png)
 
+> **And the `<from>`?** It picks up every file in the `route` folder. Drop a file there yourself, and the route logs its content and moves it to `out` too.
+
 ## Step 4: Find the log message
 
-<!-- step: {"check":"flowLog:SimpleRoute:Received file"} -->
+<!-- step: {"check":"flowLog:SimpleRoute:Received"} -->
 
-1. Open *SimpleRoute* on **Flows → Manage** and click **Log** in the editor header. <!-- show: [data-tour="flow-log"] -->
-2. Type `Received file` in the filter box. <!-- show: #flowLogSearchText -->
+1. Click the **Log** tab. <!-- show: [data-cy="test-view-log"] -->
+2. Type `Received` in the filter box. <!-- show: #flowLogSearchText -->
 
-There it is: `Received file ...`, written by the `<log>` line of your route, followed by the name of the file.
+There it is: `Received: Hello Camel`, written by the `<log>` line of your route.
 
-> **See it as Camel runs it.** Click **Camel route** in the editor header to see the route the runtime built, with `@{messages}` filled in. <!-- show: [data-tour="flow-camel-route"] --> It works for visual Flows too: open *TestFlow*, start it and click **Camel route** to see the Camel route behind the canvas, ready to copy or download.
+> **See it as Camel runs it.** Click the **Camel route** tab to see the route the runtime built, with `@{messages}` filled in. <!-- show: [data-cy="test-view-route"] --> It works for visual Flows too: open *TestFlow* in **Test** and click **Camel route** to see the Camel route behind the canvas, ready to copy or download.
 
-When you're done, close the log and click **Stop**. <!-- show: [data-tour="flow-stop"] -->
+When you're done, click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] -->
 
 ## Visual Flow or Camel route?
 

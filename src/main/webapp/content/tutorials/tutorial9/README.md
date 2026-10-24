@@ -70,7 +70,7 @@ The delay is in milliseconds, so the scripts run once every 10 seconds. You know
 
 <!-- step: {"check":"flowExists:Clock"} -->
 
-1. Click **Add** next to the script and choose **Script**. A second **Script** appears. Its **Language** is already **Groovy**.
+1. Click **Add script** under the script. A second **Script** appears. Its **Language** is already **Groovy**.
 2. Type this in its **Script** field:
 
    ```groovy
@@ -90,9 +90,9 @@ The delay is in milliseconds, so the scripts run once every 10 seconds. You know
 
 <!-- step: {"check":"flowCompleted:Clock"} -->
 
-1. Click **Start**. <!-- show: [data-tour="flow-start"] -->
+1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] --> It saves the Flow, starts it and switches from **Code** to **Test**.
 
-The first run starts a second after you start the Flow. After that, the **Completed** counter goes up every 10 seconds: <!-- show: [data-tour="flow-completed"] -->
+The first run starts a second after you start the Flow. After that, the scripts run every 10 seconds: the **Stats** tab <!-- show: [data-cy="panel-stats"] --> counts each run under **Completed**.
 
 ![The Flow is running](04-flow-running.png)
 
@@ -104,14 +104,15 @@ The first run starts a second after you start the Flow. After that, the **Comple
 
 Open it again a little later: the time has changed.
 
-3. Click **Log** in the editor header. <!-- show: [data-tour="flow-log"] --> The **Sink** wrote each greeting to the log of this Flow, after `Body:`.
+3. Click the **Log** tab. <!-- show: [data-cy="test-view-log"] --> The **Sink** wrote each greeting to the log of this Flow, after `Body:`.
 
 **Try it yourself:**
 
-* Add the date: change the Simple script to `Hello from Assimbly! It is ${date:now:yyyy-MM-dd HH:mm:ss}`. Click **Save & restart** to run it with the new script. <!-- show: [data-tour="flow-save-start"] -->
-* Break the Groovy script on purpose, for example by writing to a folder that doesn't exist. The **Failed** counter goes up and an **Alert** badge appears. See [Tutorial 2](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow) for finding the error.
+* Add the date: click **Code**, <!-- show: [data-cy="mode-toggle"] --> change the Simple script to `Hello from Assimbly! It is ${date:now:yyyy-MM-dd HH:mm:ss}` and click **Save & Test** to run it with the new script. <!-- show: [data-tour="flow-save-test"] -->
+* Click **Run** in the *Test* panel. Each Script shows what it made of the message, under **Resulting body**.
+* Break the Groovy script on purpose, for example by writing to a folder that doesn't exist. **Failed** goes up on the **Stats** tab and an **Alerts** badge appears. See [Tutorial 2](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow) for finding the error.
 
-When you're done, click **Stop**. <!-- show: [data-tour="flow-stop"] --> Otherwise the Flow keeps writing the file every 10 seconds.
+When you're done, click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] --> Otherwise the Flow keeps writing the file every 10 seconds.
 
 ## Summary
 

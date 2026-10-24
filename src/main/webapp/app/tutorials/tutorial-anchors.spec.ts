@@ -25,7 +25,18 @@ describe('tutorial anchors', () => {
   it.each([...new Set(selectors.flatMap(selector => [...selector.matchAll(/\[data-tour="([^"]+)"\]/g)].map(match => match[1])))])(
     'a template has data-tour="%s"',
     name => {
-      expect(templates).toContain(`data-tour="${name}"`);
+      // Also as one of the names a binding picks from, as in [attr.data-tour]="failed ? 'a' : 'b'".
+      expect(templates).toMatch(new RegExp(`data-tour="${name}"|\\[attr\\.data-tour\\]="[^"]*'${name}'`));
+    },
+  );
+
+  it.each([...new Set(selectors.flatMap(selector => [...selector.matchAll(/\[data-cy="([^"]+)"\]/g)].map(match => match[1])))])(
+    'a template has data-cy="%s"',
+    name => {
+      // Also as a bound name that starts with a fixed prefix, as in [attr.data-cy]="'test-view-' + tab.id", or with a
+      // prefix handed to a template, as in context: { cy: 'script-tab-' }.
+      const prefixes = [...templates.matchAll(/\[attr\.data-cy\]="'([\w-]+)' \+|\bcy: '([\w-]+)'/g)].map(match => match[1] ?? match[2]);
+      expect(templates.includes(`data-cy="${name}"`) || prefixes.some(prefix => name.startsWith(prefix))).toBe(true);
     },
   );
 

@@ -25,15 +25,17 @@ It has two Steps:
 
 <!-- step: {"check":"flowStatus:ExampleFlow:started"} -->
 
-Click **Start**. <!-- show: [data-tour="flow-start"] -->
+Click **Test** at the top. <!-- show: [data-cy="mode-toggle"] --> In **Test** you run the Flow and see what it does.
 
-**Completed** goes to 1: the message went through. <!-- show: [data-tour="flow-completed"] -->
+Click **▶** (Start). <!-- show: [data-tour="flow-status-controls"] -->
+
+A **1** appears on both Steps: the message went through.
 
 ## See the message
 
 <!-- step: {"check":"flowLog:ExampleFlow:Example flow running"} -->
 
-Click **Log**. <!-- show: [data-tour="flow-log"] -->
+Click the **Log** tab. <!-- show: [data-cy="test-view-log"] -->
 
 You see `Example flow running`.
 
@@ -41,6 +43,6 @@ You see `Example flow running`.
 
 <!-- step: {"check":"flowStatus:ExampleFlow:stopped"} -->
 
-Close the log and click **Stop**. <!-- show: [data-tour="flow-stop"] -->
+Click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] -->
 
 **Done!** Next, build your own Flow in [Tutorial 1](https://github.com/assimbly/gateway/wiki/tutorial6-your-first-flow).

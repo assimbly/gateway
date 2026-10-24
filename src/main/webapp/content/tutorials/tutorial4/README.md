@@ -72,7 +72,7 @@ The Gateway already built the Flow: the **Operation** receives the request and t
 
 ![Configure the Set body Action](05-set-body.png)
 
-5. Click **Save**, <!-- show: [data-tour="flow-save"] --> then **Start**. <!-- show: [data-tour="flow-start"] -->
+5. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] --> It saves the Flow, starts it and switches to **Test**.
 
 > **What does `${header.name}` do?** The Gateway puts every path parameter in a header with the same name, and `${header.name}` reads it. It's Camel's [Simple language](https://camel.apache.org/components/latest/languages/simple-language.html), which Set body uses by default, so leave **Language** empty.
 
@@ -123,7 +123,7 @@ paths:
 
 Tools such as Postman, Insomnia or Swagger UI can import this file. It also works the other way around: **Import** on the **APIs** page creates an API from an OpenAPI file.
 
-When you're done, stop *sayHello* with **Stop** in its editor.
+When you're done, stop *sayHello*: on **Flows → Manage**, click **■** in its row.
 
 ## Summary
 

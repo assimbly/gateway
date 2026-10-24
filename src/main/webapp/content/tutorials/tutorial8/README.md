@@ -38,11 +38,11 @@ You could write it all in one route. Splitting it up keeps each route small, and
 2. Next to **Flow name**, type `SplitNames`. <!-- show: #field_flowName -->
 3. Set **Route name** to `InboundXML`. <!-- show: [formcontrolname="routeName"] -->
 
-Under the route is the **Error handler**. Leave it empty: it's not one of the three routes.
+The **Error handler** tab holds a route for failed messages. Leave it empty: it's not one of the three routes.
 
 ## Step 2: Write the inbound route
 
-1. Replace the example route in the **Route** field of *InboundXML* with this route: <!-- show: [data-tour="route-content"] -->
+1. Replace the example route in the **Camel route** field of *InboundXML* with this route: <!-- show: [data-tour="route-content"] -->
 
    ```xml
    <route>
@@ -54,7 +54,7 @@ Under the route is the **Error handler**. Leave it empty: it's not one of the th
 
    It takes each message from the queue *NamesIn* and passes it on to `direct:split`.
 
-2. Click **Add** next to the route and choose **Connection**. <!-- show: [data-tour="step-add"] --> A **Connection** field appears.
+2. Click **+ Connection** under the route. <!-- show: [data-tour="step-add-connection"] --> A **Connection** field appears.
 3. In **Connection**, choose *Gateway broker*. <!-- show: [formcontrolname="connection"] -->
 
 ![The inbound route](02-inbound-route.png)
@@ -63,8 +63,8 @@ Under the route is the **Error handler**. Leave it empty: it's not one of the th
 
 ## Step 3: Write the split route
 
-1. Click **Add** next to *InboundXML* and choose **Route**. <!-- show: [data-tour="step-add"] --> A new, empty route appears under it, above the Error handler.
-2. Set **Route name** to `SplitXML` and copy this route into its **Route** field:
+1. Click **Add route** under *InboundXML*. <!-- show: [data-tour="step-add"] --> A new route appears under it.
+2. Set **Route name** to `SplitXML` and copy this route into its **Camel route** field:
 
 ```xml
 <route>
@@ -82,8 +82,8 @@ The `<split>` uses the [XPath](https://camel.apache.org/components/latest/langua
 
 <!-- step: {"check":"flowStatus:SplitNames:started"} -->
 
-1. Click **Add** next to *SplitXML* and choose **Route**. A new, empty route appears under it, above the Error handler.
-2. Set **Route name** to `OutboundXML` and copy this route into its **Route** field:
+1. Click **Add route** under *SplitXML*. A new route appears under it.
+2. Set **Route name** to `OutboundXML` and copy this route into its **Camel route** field:
 
 ```xml
 <route>
@@ -93,11 +93,11 @@ The `<split>` uses the [XPath](https://camel.apache.org/components/latest/langua
 </route>
 ```
 
-3. Click **Add** next to *OutboundXML*, choose **Connection** and select *Gateway broker*. Each route that uses a queue needs a Connection, so this route needs one too.
+3. Click **+ Connection** under *OutboundXML* and select *Gateway broker*. Each route that uses a queue needs a Connection, so this route needs one too.
 
 ![The split and outbound routes](03-split-outbound.png)
 
-4. Click **Save**, <!-- show: [data-tour="flow-save"] --> then **Start**. <!-- show: [data-tour="flow-start"] -->
+4. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] --> It saves the Flow, starts it and switches to **Test**.
 
 You don't need to create the queues *NamesIn* and *NamesOut*: the broker creates them the first time a route uses them.
 
@@ -144,7 +144,7 @@ The one message you sent to *NamesIn* is gone. *NamesOut* has 3 more messages: o
 
 ![The split messages](06-browse-names.png)
 
-When you're done, stop *SplitNames* with **Stop** in its editor. To remove the test messages, use **⋮** → **Clear** on *NamesOut*.
+When you're done, stop *SplitNames*: on **Flows → Manage**, click **■** in its row. To remove the test messages, use **⋮** → **Clear** on *NamesOut*.
 
 ## Summary
 

@@ -37,7 +37,7 @@ You put a queue between two Flows: the first puts files on it, the second takes 
 
 ## Step 2: Put the files on a queue
 
-1. Click the **Sink** on the canvas. <!-- show: .flow-step-sink --> Its settings open on the right. (Don't see them? Click **Show editor**.)
+1. Click the **Sink** on the canvas. <!-- show: .flow-step-sink --> Its settings open on the right. (Don't see them? Click **Show panel**.)
 2. Click **Component**, type `sjms` and choose **Simple JMS**. <!-- show: [formcontrolname="componentType"] -->
 3. Set **Destination Name** to `OrdersQueue`, the name of the queue. <!-- show: [formcontrolname="uri"] -->
 
@@ -53,12 +53,11 @@ A JMS component needs to know which broker to talk to. That's what a **Connectio
 
 <!-- step: {"check":"queueMessages:OrdersQueue"} -->
 
-1. Click **Save**, <!-- show: [data-tour="flow-save"] --> then **Start**. <!-- show: [data-tour="flow-start"] -->
-2. Click **Send test message**. <!-- show: [data-tour="flow-send-test"] -->
-3. Under **Body**, type `Order 1` and click **Send**. <!-- show: [title="Send (Ctrl+Enter)"] --> Do the same with `Order 2` and `Order 3`.
-4. Click **Back**.
+1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] --> It saves the Flow, starts it and switches to **Test**.
+2. In the *Test* panel, type `Order 1` under **Body** <!-- show: .flow-test .body-codemirror --> and click **Run**. <!-- show: [data-cy="test-run"] -->
+3. Do the same with `Order 2` and `Order 3`, with **Run again**.
 
-*FileToQueue* picks up the three files and puts them on the queue: **Completed** goes to 3. <!-- show: [data-tour="flow-completed"] --> Nobody takes them off yet, because the Flow that does isn't there yet.
+*FileToQueue* puts the three messages on the queue: the Sink on the canvas shows **3**. Nobody takes them off yet, because the Flow that does isn't there yet.
 
 ## Step 4: See the messages wait
 
@@ -91,15 +90,15 @@ The Sink of this Flow is still the File component of *TestFlow*: it writes to `@
 
 <!-- step: {"check":"flowCompleted:QueueToFile"} -->
 
-1. Click **Save**, <!-- show: [data-tour="flow-save"] --> then **Start**. <!-- show: [data-tour="flow-start"] -->
+1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] -->
 
-*QueueToFile* takes the waiting messages off the queue right away: **Completed** goes to 3. <!-- show: [data-tour="flow-completed"] --> In the `out` folder of your messages folder (`@{messages}/out`) you now find three files, one for each order.
+*QueueToFile* takes the waiting messages off the queue right away: its Steps on the canvas show **3**. In the `out` folder of your messages folder (`@{messages}/out`) you now find three files, one for each order.
 
 2. Check **Broker → Endpoints** once more. *OrdersQueue* is empty and has 1 consumer: the running *QueueToFile*.
 
 ![The queue is empty](07-queue-empty.png)
 
-With both Flows running, every new file in the `in` folder travels through the queue to the `out` folder right away. Try it with **Send test message** on *FileToQueue*! Or stop *QueueToFile*, send a few messages and watch them wait on the queue until you start it again.
+With both Flows running, every new file in the `orders` folder travels through the queue to the `out` folder right away. Try it with **Run** in the *Test* panel of *FileToQueue*! Or stop *QueueToFile*, send a few messages and watch them wait on the queue until you start it again.
 
 When you're done, stop both Flows on **Flows → Manage**.
 

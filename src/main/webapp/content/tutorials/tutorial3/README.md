@@ -32,7 +32,7 @@ You build a Flow that asks a weather service for the current weather in Amsterda
 
 ## Step 2: Use a Scheduler as Source
 
-1. Click the **Source** on the canvas. <!-- show: .flow-step-source --> Its settings open on the right. (Don't see them? Click **Show editor**.)
+1. Click the **Source** on the canvas. <!-- show: .flow-step-source --> Its settings open on the right. (Don't see them? Click **Show panel**.)
 2. Click **Component**, type `sched` and choose **Scheduler**. <!-- show: [formcontrolname="componentType"] -->
 3. Set **Name** to `weather`. It's just a name for the scheduler. <!-- show: [formcontrolname="uri"] -->
 4. Under **Options**, choose **Delay** in the list and type `30000`. <!-- show: .option-row -->
@@ -74,9 +74,9 @@ You save the Flow in the next step, right before you start it.
 
 <!-- step: {"check":"flowCompleted:Weather"} -->
 
-1. Click **Save**, <!-- show: [data-tour="flow-save"] --> then **Start**. <!-- show: [data-tour="flow-start"] -->
+1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] --> It saves the Flow, starts it and switches to **Test**.
 
-After a second the Flow makes its first call, and **Completed** goes up: <!-- show: [data-tour="flow-completed"] -->
+After a second the Flow makes its first call: each Step on the canvas shows a **1**, the number of messages it handled. Every 30 seconds the numbers go up.
 
 ![The Flow is running](04-flow-running.png)
 
@@ -100,11 +100,11 @@ After a second the Flow makes its first call, and **Completed** goes up: <!-- sh
 
 Every 30 seconds the Flow calls the API again and overwrites `weather.json` with the latest weather.
 
-> **No file?** Click the **Alert** badge in the editor header to see the error.
+> **No file?** Click the **Alerts** badge in the editor header to see the error.
 
-**Try it yourself:** get the weather of your own town. Change `latitude` and `longitude` in the **Http Uri** of the HTTPS Action and click **Save & restart**. <!-- show: [data-tour="flow-save-start"] --> It saves the Flow and restarts it, so the change takes effect right away. (**Save** alone keeps the running Flow on its previous configuration until you restart it.)
+**Try it yourself:** get the weather of your own town. Click **Design**, <!-- show: [data-cy="mode-toggle"] --> change `latitude` and `longitude` in the **Http Uri** of the HTTPS Action and click **Save & Test** again. <!-- show: [data-tour="flow-save-test"] --> It saves the Flow and restarts it, so the change takes effect right away. (**Save** alone keeps the running Flow on its previous configuration until you restart it.)
 
-When you're done, click **Stop**. <!-- show: [data-tour="flow-stop"] --> Otherwise the Flow keeps calling the API.
+When you're done, click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] --> Otherwise the Flow keeps calling the API.
 
 ## Summary
 

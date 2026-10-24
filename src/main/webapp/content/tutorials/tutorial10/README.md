@@ -108,7 +108,7 @@ Now look in the browser: **Flows → Manage** shows *TestFlow* as running, altho
 
 ![TestFlow was started through the API](04-flow-running.png)
 
-Open *TestFlow* and send it a message with **Send test message**, like in Tutorial 1. <!-- show: tr[data-flow-name="TestFlow"] td a --> It arrives in the `out` folder of your messages folder: `@{messages}/out`. Then ask the API for the numbers:
+Open *TestFlow*, click **Test** and **Run** a message, like in Tutorial 1. <!-- show: tr[data-flow-name="TestFlow"] td a --> It arrives in the `out` folder of your messages folder: `@{messages}/out`. Then ask the API for the numbers:
 
 **Windows (PowerShell)**
 
