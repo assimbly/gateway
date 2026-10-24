@@ -1,4 +1,15 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  afterRenderEffect,
+  computed,
+  inject,
+  input,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -66,6 +77,23 @@ export class FlowTestPanelComponent {
   readonly duration = shortDuration;
 
   private readonly flowService = inject(FlowService);
+  /** The Passed/Failed summary of the last run, or why it couldn't run. */
+  private readonly result = viewChild<ElementRef<HTMLElement>>('result');
+  /** Set by Run: the result it brings is scrolled into view, below the message, once it's drawn. */
+  private revealResult = false;
+
+  constructor() {
+    afterRenderEffect(() => {
+      const result = this.result()?.nativeElement;
+      // Run again draws its result in the same place: the new run and failure are what move it into view.
+      this.run();
+      this.failure();
+      if (result && this.revealResult && !this.pending()) {
+        this.revealResult = false;
+        result.scrollIntoView?.({ block: 'start', behavior: 'smooth' });
+      }
+    });
+  }
 
   /** Whether the panel tests a Route Flow: the message goes into its first Route, and there are no Steps to select. */
   readonly routes = computed(() => !this.graph() && this.entryKind() === 'route');
@@ -112,6 +140,7 @@ export class FlowTestPanelComponent {
     }
     this.pending.set(true);
     this.failure.set(null);
+    this.revealResult = true;
     this.flowService.testRun(flowId, { entryStepId, body: this.body(), headers: headersOf(this.headers()) }).subscribe({
       next: run => {
         this.pending.set(false);

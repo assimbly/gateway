@@ -95,7 +95,7 @@ There it is: `Received: Hello Camel`, written by the `<log>` line of your route.
 
 > **See it as Camel runs it.** Click the **Camel route** tab to see the route the runtime built, with `@{messages}` filled in. <!-- show: [data-cy="test-view-route"] --> It works for visual Flows too: open *TestFlow* in **Test** and click **Camel route** to see the Camel route behind the canvas, ready to copy or download.
 
-When you're done, click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] -->
+When you're done, click **Stop**. <!-- show: [data-tour="flow-status-controls"] -->
 
 ## Visual Flow or Camel route?
 

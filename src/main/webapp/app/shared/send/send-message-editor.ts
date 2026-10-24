@@ -26,6 +26,8 @@ export default class SendMessageEditor {
   readonly bodyMode = model<BodyMode>('text');
   readonly suggestions = input<string[]>([]);
   readonly templatesEnabled = input(false);
+  /** A body of a few lines that grows as you type, for a side panel; the Send pages give the body a fixed, tall editor. */
+  readonly compact = input(false);
 
   readonly activeTab = signal<'body' | 'headers'>('body');
   readonly headerCount = computed(() => filledHeaders(this.headers()).length);
@@ -36,7 +38,7 @@ export default class SendMessageEditor {
   /** CodeMirror options of the body. The same object is returned until the theme or mode changes. */
   bodyEditorOptions(): Record<string, unknown> {
     const theme = this.themeService.editorTheme();
-    const key = `${theme}|${this.bodyMode()}`;
+    const key = `${theme}|${this.bodyMode()}|${this.compact()}`;
     if (!this.optionsCache || this.optionsKey !== key) {
       this.optionsKey = key;
       this.optionsCache = {
@@ -47,6 +49,8 @@ export default class SendMessageEditor {
         dragDrop: false,
         theme,
         mode: this.bodyMode(),
+        // a compact body grows with its text (up to a maximum height, see .body-codemirror--compact), so every line is drawn
+        ...(this.compact() ? { viewportMargin: Infinity } : {}),
       };
     }
     return this.optionsCache;

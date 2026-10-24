@@ -1240,6 +1240,16 @@ ng-dropdown-panel > div {
   height: 30rem;
 }
 
+/* A compact body, as in the Test panel: about 7 lines, growing with the text up to about 16 lines, then it scrolls */
+.body-codemirror--compact .CodeMirror {
+  height: auto;
+}
+
+.body-codemirror--compact .CodeMirror-scroll {
+  min-height: 10.5em;
+  max-height: 24em;
+}
+
 // The text of an import page: --import-rows sets the height in lines
 .import-codemirror ngx-codemirror {
   display: block;

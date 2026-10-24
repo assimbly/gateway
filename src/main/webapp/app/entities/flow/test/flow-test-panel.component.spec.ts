@@ -87,6 +87,29 @@ describe('Flow test panel', () => {
     expect(ran).toEqual([FAILED_RUN]);
   });
 
+  it('keeps the body a few lines high, so Run and its result fit below it', () => {
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.body-codemirror--compact')).not.toBeNull();
+  });
+
+  it('scrolls the result of a run into view', () => {
+    const scrollIntoView = jest.fn();
+    HTMLElement.prototype.scrollIntoView = scrollIntoView;
+    fixture.detectChanges();
+    fixture.componentInstance.ran.subscribe(run => fixture.componentRef.setInput('run', run));
+
+    runButton().click();
+    fixture.detectChanges();
+    expect(scrollIntoView).not.toHaveBeenCalled();
+    http.expectOne('api/flows/7/test-runs').flush(FAILED_RUN);
+    fixture.detectChanges();
+
+    expect(scrollIntoView).toHaveBeenCalledTimes(1);
+    expect(scrollIntoView.mock.contexts[0]).toBe(fixture.nativeElement.querySelector('[data-cy="test-summary"]'));
+    delete (HTMLElement.prototype as Partial<HTMLElement>).scrollIntoView;
+  });
+
   it('says why the run failed, in plain words too, and asks to select a Step', () => {
     fixture.componentRef.setInput('run', { ...FAILED_RUN, error: 'Multiple consumers for the same endpoint is not allowed' });
     fixture.detectChanges();

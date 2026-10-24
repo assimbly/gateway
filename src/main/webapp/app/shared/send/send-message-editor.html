@@ -6,6 +6,7 @@
       <div (drop)="drop($event)" (dragover)="allowDrop($event)">
         <ngx-codemirror
           class="body-codemirror"
+          [class.body-codemirror--compact]="compact()"
           name="codemirror"
           [ngModel]="body()"
           (ngModelChange)="body.set($event)"

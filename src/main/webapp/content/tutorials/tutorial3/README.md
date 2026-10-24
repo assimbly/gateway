@@ -104,7 +104,7 @@ Every 30 seconds the Flow calls the API again and overwrites `weather.json` with
 
 **Try it yourself:** get the weather of your own town. Click **Design**, <!-- show: [data-cy="mode-toggle"] --> change `latitude` and `longitude` in the **Http Uri** of the HTTPS Action and click **Save & Test** again. <!-- show: [data-tour="flow-save-test"] --> It saves the Flow and restarts it, so the change takes effect right away. (**Save** alone keeps the running Flow on its previous configuration until you restart it.)
 
-When you're done, click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] --> Otherwise the Flow keeps calling the API.
+When you're done, click **Stop**. <!-- show: [data-tour="flow-status-controls"] --> Otherwise the Flow keeps calling the API.
 
 ## Summary
 

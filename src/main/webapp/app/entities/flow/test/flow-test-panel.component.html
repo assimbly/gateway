@@ -30,7 +30,7 @@
     </div>
   }
 
-  <jhi-send-message-editor [(body)]="body" [(headers)]="headers" [(bodyMode)]="bodyMode" />
+  <jhi-send-message-editor [(body)]="body" [(headers)]="headers" [(bodyMode)]="bodyMode" [compact]="true" />
 
   <div class="flow-test__actions">
     <button type="button" class="btn btn-fx btn-fx-primary" data-cy="test-run" [disabled]="!!blocked() || pending()" (click)="runTest()">
@@ -42,11 +42,11 @@
   </div>
 
   @if (failure(); as error) {
-    <div class="alert alert-danger py-2 mb-0 small" role="alert">{{ error }}</div>
+    <div #result class="alert alert-danger py-2 mb-0 small" role="alert">{{ error }}</div>
   }
 
   @if (run(); as result) {
-    <div class="flow-test__summary" [class.flow-test__summary--failed]="result.status === 'failed'" data-cy="test-summary">
+    <div #result class="flow-test__summary" [class.flow-test__summary--failed]="result.status === 'failed'" data-cy="test-summary">
       <fa-icon [icon]="result.status === 'failed' ? 'times' : 'check'"></fa-icon>
       <span>
         {{ result.status === 'failed' ? 'Failed' : 'Passed' }} in {{ duration(result.durationMillis) }}@if (!routes()) { ·

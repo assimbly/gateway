@@ -65,7 +65,7 @@ The alert stays until you clear it, also after you reload the page.
 
 1. Stop *TestFlow*, so *DebugFlow* can listen to the `in` folder: go to **Flows → Manage** and click **■** in its row. <!-- show: tr[data-flow-name="TestFlow"] [aria-label="Stop"] -->
 2. Click *DebugFlow* to open it. If it opens in **Design**, click **Test**. <!-- show: [data-cy="mode-toggle"] -->
-3. Click **▶** (Start). <!-- show: [data-tour="flow-status-controls"] --> This time the Flow starts, and the red badge turns into a yellow **Alerts** badge.
+3. Click **Start**. <!-- show: [data-tour="flow-status-controls"] --> This time the Flow starts, and the red badge turns into a yellow **Alerts** badge.
 4. In the *Test* panel, type `Hello Assimbly` under **Body** <!-- show: .flow-test .body-codemirror --> and click **Run**. <!-- show: [data-cy="test-run"] -->
 
 The Sink can't store the message. The *Test* panel shows **Failed**, the Sink turns red on the canvas, and below it you find the error, with what it means: *The Gateway can't write the file there*. The **Alerts** badge counts one more alert, and the **Stats** tab <!-- show: [data-cy="panel-stats"] --> counts the message under **Failed**:
@@ -82,7 +82,7 @@ The Sink can't store the message. The *Test* panel shows **Failed**, the Sink tu
 
 To fix the Flow, you would create the `out2` folder or turn **Auto Create** back on.
 
-When you're done, click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] -->
+When you're done, click **Stop**. <!-- show: [data-tour="flow-status-controls"] -->
 
 ## Summary
 
