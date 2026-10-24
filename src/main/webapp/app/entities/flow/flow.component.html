@@ -2,7 +2,7 @@
   @if (hasFlows) {
   <jhi-search-toolbar
     [(query)]="searchText"
-    placeholder="Filter by flow name"
+    placeholder="Filter by Flow name"
     inputId="searchTextId"
     hint="A Flow receives messages from a Source, processes them in Steps and delivers them to a Sink."
   >
@@ -36,13 +36,14 @@
 
   @if (showEmptyState) {
     <jhi-empty-state
-      heading="Create your first Flow"
+      heading="Add your first Flow"
       description="A Flow receives messages from a Source, processes them in Steps and delivers them to a Sink. How do you want to build it?"
       [docs]="true"
     >
       <jhi-flow-type-choices />
       <span secondary>
         Or <button type="button" class="btn btn-link empty-state__link" (click)="openImport()">import</button> a Flow, Camel XML, a script or an OpenAPI document.
+        New here? <button type="button" class="btn btn-link empty-state__link" data-cy="empty-state-tutorials" (click)="tutorialPanel.show()">Take a tutorial</button>.
       </span>
     </jhi-empty-state>
   } @else {
@@ -51,7 +52,7 @@
       [(sortState)]="sortState"
       [hasRows]="!!filteredFlows.length"
       [loading]="flowsLoading"
-      emptyMessage="No flows match this filter."
+      [emptyMessage]="flowsLoadFailed ? 'The Flows could not be loaded. Click Refresh to try again.' : 'No Flows match this filter.'"
       ariaLabel="Flows"
     >
       <tr

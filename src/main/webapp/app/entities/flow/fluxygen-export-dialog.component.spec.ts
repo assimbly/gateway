@@ -86,7 +86,7 @@ describe('Export for Fluxygen dialog', () => {
     expect(labels.map(label => label.textContent?.replace('Draft', '').replace(/\s+/g, ' ').trim())).toEqual([
       'Orders in · Visual',
       'Invoice script · Script',
-      'Camel route · Route',
+      'Camel route · Camel route',
     ]);
     expect(labels.map(label => !!label.querySelector('.fluxygen-export__draft'))).toEqual([true, false, false]);
     expect(FLOWS.every(flow => flowCheckbox(flow.id!).checked)).toBe(true);

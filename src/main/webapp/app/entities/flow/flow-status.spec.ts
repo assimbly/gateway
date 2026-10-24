@@ -112,7 +112,7 @@ describe('Flows list row status', () => {
     ['flow', 'Visual'],
     [undefined, 'Visual'],
     ['script', 'Script'],
-    ['route', 'Route'],
+    ['route', 'Camel route'],
   ])('calls a Flow of type %s a %s Flow', (type, label) => {
     expect(flowTypeLabel(type)).toBe(label);
   });

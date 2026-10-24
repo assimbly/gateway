@@ -1,6 +1,6 @@
 <form *ngIf="address" (submit)="$event.preventDefault()">
     <div class="modal-header">
-        <h4 class="modal-title">Confirm delete operation</h4>
+        <h4 class="modal-title">Delete Queue</h4>
         <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" (click)="cancel()"></button>
     </div>
 
@@ -16,7 +16,7 @@
         </button>
 
         <button id="jhi-confirm-delete-queue" type="button" class="btn btn-fx btn-fx-danger" [disabled]="disableDelete" (click)="confirmDelete(address.name!)">
-            <fa-icon icon="times"></fa-icon><span>Delete</span>
+            <fa-icon icon="trash"></fa-icon><span>Delete</span>
         </button>
     </div>
 </form>

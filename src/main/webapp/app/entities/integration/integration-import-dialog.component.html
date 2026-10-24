@@ -8,7 +8,7 @@
         chosen integration; Flows with the same name are replaced. To import a single Flow, use Import in the menu.
     </p>
     <div class="form-group mb-3">
-        <label class="form-control-label fw-bold" for="field_id">Integration</label>
+        <label class="form-control-label fw-bold" for="field_id">Gateway</label>
         <select class="form-control form-select" name="id" [(ngModel)]="integrationId" id="field_id" [disabled]="integrations().length <= 1">
             @for (integration of integrations(); track integration.id) {
                 <option [ngValue]="integration.id">{{ integration.name }}</option>

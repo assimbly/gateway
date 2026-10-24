@@ -16,7 +16,8 @@ export class TopicDeleteDialogComponent {
     address?: IAddress;
     brokerType = '';
 
-    message = 'Are you sure you want to delete this topic?';
+    /** Replaces the confirmation question once the delete is refused. */
+    message?: string;
     disableDelete = false;
 
     constructor(

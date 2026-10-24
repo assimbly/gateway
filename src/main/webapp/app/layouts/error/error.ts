@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
@@ -8,7 +8,7 @@ import { TranslateDirective } from 'app/shared/language';
 
 @Component({
   selector: 'jhi-error',
-  imports: [TranslateDirective],
+  imports: [TranslateDirective, RouterLink],
   templateUrl: './error.html',
 })
 export default class Error implements OnInit, OnDestroy {

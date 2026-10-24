@@ -1,7 +1,7 @@
 <div class="row justify-content-center">
     <div class="col-8">
         <div *ngIf="integration">
-            <h2><span>Integration</span> {{integration.id}}</h2>
+            <h2><span>Gateway</span> {{integration.name}}</h2>
             <hr>
             <jhi-alert-error></jhi-alert-error>
             <dl class="row-md jh-entity-details">
@@ -25,15 +25,15 @@
                 <dd>
                     <span>{{integration.connectorType}}</span>
                 </dd>
-                <dt><span>Default From Step Type</span></dt>
+                <dt><span>Default Source component</span></dt>
                 <dd>
                     <span>{{integration.defaultFromComponentType}}</span>
                 </dd>
-                <dt><span>Default To Step Type</span></dt>
+                <dt><span>Default Sink component</span></dt>
                 <dd>
                     <span>{{integration.defaultToComponentType}}</span>
                 </dd>
-                <dt><span>Default Error Step Type</span></dt>
+                <dt><span>Default Error component</span></dt>
                 <dd>
                     <span>{{integration.defaultErrorComponentType}}</span>
                 </dd>

@@ -76,12 +76,12 @@ export function countLabel(count: number | null | undefined, ran: boolean): stri
 }
 
 /** The Flow type as the UI names it. */
-export function flowTypeLabel(type: string | undefined): 'Visual' | 'Script' | 'Route' {
+export function flowTypeLabel(type: string | undefined): 'Visual' | 'Script' | 'Camel route' {
   switch (type) {
     case 'script':
       return 'Script';
     case 'route':
-      return 'Route';
+      return 'Camel route';
     default:
       return 'Visual';
   }

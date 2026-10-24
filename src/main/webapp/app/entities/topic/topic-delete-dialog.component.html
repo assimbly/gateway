@@ -1,13 +1,13 @@
 <form *ngIf="address" (submit)="$event.preventDefault()">
     <div class="modal-header">
-        <h4 class="modal-title">Confirm delete operation</h4>
+        <h4 class="modal-title">Delete Topic</h4>
         <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" (click)="cancel()"></button>
     </div>
 
     <div class="modal-body">
         <jhi-alert-error></jhi-alert-error>
 
-        <p id="jhi-delete-topic-heading">{{message}}</p>
+        <p id="jhi-delete-topic-heading">{{ message ?? "Delete Topic '" + address.name + "'? This cannot be undone." }}</p>
     </div>
 
     <div class="modal-footer">
@@ -16,7 +16,7 @@
         </button>
 
         <button id="jhi-confirm-delete-topic" type="button" class="btn btn-fx btn-fx-danger" [disabled]="disableDelete" (click)="confirmDelete(address.name!)">
-            <fa-icon icon="times"></fa-icon><span>Delete</span>
+            <fa-icon icon="trash"></fa-icon><span>Delete</span>
         </button>
     </div>
 </form>

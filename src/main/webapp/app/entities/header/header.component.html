@@ -73,7 +73,6 @@
           <td>
             <select
               class="form-control form-select"
-              id="field_header_type"
               name="headers-type-{{ idx }}"
               id="headers-type-{{ idx }}"
               [(ngModel)]="header.type"
@@ -85,10 +84,9 @@
           <td>
             <select
               class="form-control form-select"
-              id="field_header_language"
               name="headers-language-{{ idx }}"
               id="headers-language-{{ idx }}"
-              [(ngModel)]="header.type"
+              [(ngModel)]="header.language"
               [disabled]="header.isDisabled"
             >
               <option [ngValue]="language" *ngFor="let language of languageHeader">{{ language }}</option>

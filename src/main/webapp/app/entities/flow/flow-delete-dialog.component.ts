@@ -17,7 +17,8 @@ import { FlowService } from './flow.service';
 })
 export class FlowDeleteDialogComponent {
   flow?: IFlow;
-  message = 'Are you sure you want to delete this flow?';
+  /** Replaces the confirmation question once the delete is refused. */
+  message?: string;
   disableDelete = false;
 
   constructor(

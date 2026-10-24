@@ -535,6 +535,12 @@ ng-dropdown-panel > div {
   font-weight: 600;
 }
 
+/* A label of a field that must be filled in */
+.form-control-label.required::after {
+  content: ' *';
+  color: var(--app-danger);
+}
+
 .invalid-field-message {
   margin-top: 0.25rem;
   margin-bottom: 0;

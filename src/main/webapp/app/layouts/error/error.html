@@ -1,15 +1,11 @@
-<div>
-  <div class="row">
-    <div class="col-md-4">
-      <span class="hipster img-fluid rounded"></span>
-    </div>
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h1 jhiTranslate="error.title">Something went wrong</h1>
 
-    <div class="col-md-8">
-      <h1 jhiTranslate="error.title">Error page!</h1>
+    @if (errorMessage(); as errMessage) {
+      <div class="alert alert-danger" role="alert">{{ errMessage }}</div>
+    }
 
-      @if (errorMessage(); as errMessage) {
-        <div class="alert alert-danger">{{ errMessage }}</div>
-      }
-    </div>
+    <a class="btn btn-fx btn-fx-primary" routerLink="/">Back to Flows</a>
   </div>
 </div>

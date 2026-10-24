@@ -27,6 +27,7 @@ import { FlowRowComponent } from './flow-row.component';
 import { FlowRuntime } from './flow-status';
 import { FlowSearchByNamePipe } from './flow.searchbyname.pipe';
 import { FlowTypeChoicesComponent } from './flow-type-choices.component';
+import { TutorialPanelState } from 'app/tutorials/tutorial-panel.state';
 import { NewFlowDialogComponent } from './new-flow-dialog.component';
 import { FluxygenExportDialogComponent } from './fluxygen-export-dialog.component';
 import { ImportDialogComponent } from 'app/entities/import/import-dialog.component';
@@ -81,6 +82,7 @@ export class FlowComponent implements OnInit, OnDestroy {
   /** The runtime state of the Flows by Flow id, as their rows report it. */
   runtimes: Record<number, FlowRuntime> = {};
   private readonly apiService = inject(ApiService);
+  readonly tutorialPanel = inject(TutorialPanelState);
   private readonly searchPipe = new FlowSearchByNamePipe();
   private readonly eventSubscriptions = new Subscription();
   private readonly polls = new Subscription();
@@ -320,6 +322,10 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
     this.totalItems = headers.get('X-Total-Count');
     this.flowsLoading = false;
+    if (!this.flows.length) {
+      // A first-time user on an empty Gateway gets the Tutorials to start with.
+      this.tutorialPanel.showOnFirstVisit();
+    }
     this.changeDetector.detectChanges();
   }
 

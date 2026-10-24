@@ -1,14 +1,14 @@
 <div class="row justify-content-center">
 	<div class="col-8">
 		<form (jhiSaveShortcut)="save()" [saveShortcutDisabled]="isSaving || environmentVariablesForm.invalid" [formGroup]="environmentVariablesForm" name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm" class="needs-validation">
-		    <h2 id="myEnvironmentVariablesLabel">{{ environmentVariables.id ? 'Edit Variable' : 'Create Variable' }}</h2>
+		    <h2 id="myEnvironmentVariablesLabel">{{ environmentVariables.id ? 'Edit Variable' : 'Add Variable' }}</h2>
             <jhi-alert-error></jhi-alert-error>
             <div class="form-group" hidden>
                 <label for="id">ID</label> <input [(ngModel)]="environmentVariables.id" type="text"
                                                   class="form-control" id="id" formControlName="id" readonly/>
             </div>
             <div class="form-group">
-                <label class="form-control-label" for="key">Key</label> <input
+                <label class="form-control-label required" for="key">Key</label> <input
                 [(ngModel)]="environmentVariables.key" type="text" class="form-control" id="key"
                 formControlName="key"/>
                 <div
@@ -22,8 +22,8 @@
                 <label class="form-control-label" for="encrypted">Encrypt value</label>
                 <select class="form-control form-select" id="encrypted" [(ngModel)]="environmentVariables.encrypted"
                         formControlName="encrypted" [value]="environmentVariables.encrypted">
-                    <option [ngValue]=false [selected]="!environmentVariables.encrypted">no</option>
-                    <option [ngValue]=true [selected]="environmentVariables.encrypted">yes</option>
+                    <option [ngValue]=false [selected]="!environmentVariables.encrypted">No</option>
+                    <option [ngValue]=true [selected]="environmentVariables.encrypted">Yes</option>
                 </select>
             </div>
 

@@ -1866,7 +1866,12 @@ splitOptions4(options: string): string[] {
 	}
 
 	save(then: AfterSave = 'stay'): any {
-		// Save & manage always ends on Manage: a Flow without unsaved changes has nothing to save first.
+		// A double click or a repeated Ctrl+S can come in before Save is drawn disabled; one save at a time.
+		if (this.isSaving) {
+			return;
+		}
+
+		// Save & close always ends on Manage: a Flow without unsaved changes has nothing to save first.
 		if (then === 'return' && this.flow?.id && !this.hasUnsavedChanges) {
 			this.router.navigate(['/']);
 			return;
@@ -1891,7 +1896,12 @@ splitOptions4(options: string): string[] {
 
 		if (this.useCanvas) {
 		  this.saveDesigner();
-		} else if (this.steps.some(step => isRouteStep(step.stepType, this.activeEditor))) {
+		  return;
+		}
+
+		// Disables Save and its shortcuts until the save is done, so a second click doesn't save the Flow twice.
+		this.isSaving = true;
+		if (this.steps.some(step => isRouteStep(step.stepType, this.activeEditor))) {
 		  this.saveRoutes$()
 		    .pipe(takeUntilDestroyed(this.destroyRef))
 		    .subscribe({
@@ -1899,6 +1909,7 @@ splitOptions4(options: string): string[] {
 		      error: () => {
 		        this.savingFlowFailedMessage = 'The Routes could not be saved. Give each Route a name no other Route has.';
 		        this.savingFlowFailed = true;
+		        this.isSaving = false;
 		      },
 		    });
 		} else if (this.flow.id) {
@@ -2820,7 +2831,7 @@ splitOptions4(options: string): string[] {
 	}
 
 	/**
-	 * Save & manage goes back to Manage. Otherwise the editor stays: the URL gets the Flow's id (a new Flow only has
+	 * Save & close goes back to Manage. Otherwise the editor stays: the URL gets the Flow's id (a new Flow only has
 	 * one now). A Visual Flow keeps its Steps and undo history (they already have their saved ids); other Flows are
 	 * loaded again so every Step has its saved id. Save & start then starts it, and Save & restart restarts the running
 	 * Flow; a failed start shows as Error.

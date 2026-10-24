@@ -88,6 +88,27 @@
   }
 }
 
+.flow-editor-header__save-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+
+  &:empty {
+    display: none;
+  }
+
+  fa-icon {
+    color: var(--app-success);
+  }
+}
+
+.flow-editor-header__unsaved-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--app-warning);
+}
+
 .flow-editor-header__actions {
   display: flex;
   flex-wrap: wrap;

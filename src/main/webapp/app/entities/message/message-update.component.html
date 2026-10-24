@@ -2,7 +2,7 @@
   <div class="col-8">
     <form (jhiSaveShortcut)="save()" [saveShortcutDisabled]="editForm.form.invalid || isSaving" name="editForm" role="form" novalidate #editForm="ngForm">
       <div class="modal-header">
-        <h4 class="modal-title" id="myMessageLabel">Create or edit a Message</h4>
+        <h4 class="modal-title" id="myMessageLabel">{{ message?.id ? 'Edit Message' : 'Add Message' }}</h4>
       </div>
       <div class="modal-body">
         <jhi-alert-error></jhi-alert-error>

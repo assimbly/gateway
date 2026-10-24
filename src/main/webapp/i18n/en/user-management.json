@@ -4,13 +4,13 @@
       "title": "Users",
       "refreshListLabel": "Refresh",
       "createLabel": "Add",
-      "createOrEditLabel": "Create or edit a user"
+      "createOrEditLabel": "Add or edit a User"
     },
     "created": "A new user is created with identifier {{ param }}",
     "updated": "A user is updated with identifier {{ param }}",
     "deleted": "A user is deleted with identifier {{ param }}",
     "delete": {
-      "question": "Are you sure you want to delete user {{ login }}?"
+      "question": "Delete User '{{ login }}'? This cannot be undone."
     },
     "detail": {
       "title": "User"

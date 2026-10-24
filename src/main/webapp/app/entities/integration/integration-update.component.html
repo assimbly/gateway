@@ -13,7 +13,7 @@
 				<ng-template #defaultPopover let-message="message">
 					<div [innerHtml]="defaultPopoverMessage"></div>
 			</ng-template>
-            <h2 id="jhi-integration-heading">{{ integration.id ? 'Edit Gateway' : 'Create Gateway' }}</h2>
+            <h2 id="jhi-integration-heading">{{ integration.id ? 'Edit Gateway' : 'Add Gateway' }}</h2>
 			    <div>
 			        <jhi-alert-error></jhi-alert-error>
 			        <h4>General
@@ -71,13 +71,13 @@
 						class="fa fa-info-circle"></i>
 					</h4>
 			        <div class="form-group">
-			            <label class="form-control-label font-weight-bold" for="field_defaultFromComponentType">From</label>
+			            <label class="form-control-label font-weight-bold" for="field_defaultFromComponentType">Source</label>
 			            <select class="form-control form-select" name="type"  name="defaultFromComponentType" id="field_defaultFromComponentType" [(ngModel)]="integration.defaultFromComponentType">
 			                <option *ngFor="let fromType of consumerComponentsNames" [ngValue]="fromType">{{fromType}}</option>
 			            </select>
 			        </div>
 			        <div class="form-group">
-			            <label class="form-control-label font-weight-bold" for="field_defaultToComponentType">To</label>
+			            <label class="form-control-label font-weight-bold" for="field_defaultToComponentType">Sink</label>
 			            <select class="form-control form-select" name="type"  name="defaultToComponentType" id="field_defaultToComponentType" [(ngModel)]="integration.defaultToComponentType">
 			                <option *ngFor="let toType of producerComponentsNames" [ngValue]="toType">{{toType}}</option>
 			            </select>

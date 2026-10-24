@@ -43,6 +43,15 @@
   }
 
   <div class="flow-editor-header__status">
+    <span class="flow-editor-header__save-state" role="status" data-cy="save-state">
+      @if (saving()) {
+        Saving…
+      } @else if (unsaved()) {
+        <span class="flow-editor-header__unsaved-dot" aria-hidden="true"></span>Unsaved changes
+      } @else if (saved()) {
+        <fa-icon icon="check" aria-hidden="true" />Saved
+      }
+    </span>
     @if (state().draft) {
       <span class="badge text-bg-secondary" [ngbTooltip]="draftReason()">Draft</span>
     }
@@ -129,7 +138,7 @@
             <fa-icon icon="chevron-down" />
           </button>
           <div ngbDropdownMenu>
-            <button type="button" ngbDropdownItem (click)="saveAndReturn.emit()">Save &amp; manage</button>
+            <button type="button" ngbDropdownItem (click)="saveAndReturn.emit()">Save &amp; close</button>
           </div>
         </div>
       }
@@ -223,7 +232,7 @@
           <fa-icon icon="chevron-down" />
         </button>
         <div ngbDropdownMenu>
-          <button type="button" ngbDropdownItem (click)="saveAndReturn.emit()">Save &amp; manage</button>
+          <button type="button" ngbDropdownItem (click)="saveAndReturn.emit()">Save &amp; close</button>
         </div>
       </div>
     }

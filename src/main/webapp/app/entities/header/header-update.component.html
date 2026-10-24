@@ -1,7 +1,7 @@
 <div class="row justify-content-center">
     <div class="col-8">
         <form (jhiSaveShortcut)="save()" [saveShortcutDisabled]="editForm.form.invalid || isSaving" name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
-            <h2 id="jhi-header-heading">Create or edit a Header</h2>
+            <h2 id="jhi-header-heading">{{ header?.id ? 'Edit Header' : 'Add Header' }}</h2>
             <div>
                 <jhi-alert-error></jhi-alert-error>
                 <div class="form-group" [hidden]="!header.id">

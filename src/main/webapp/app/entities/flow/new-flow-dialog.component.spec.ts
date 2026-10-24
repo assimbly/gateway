@@ -35,8 +35,8 @@ describe('New Flow dialog', () => {
     fixture.detectChanges();
   });
 
-  it('is titled Add flow', () => {
-    expect(fixture.nativeElement.querySelector('.modal-title').textContent.trim()).toBe('Add flow');
+  it('is titled Add a Flow', () => {
+    expect(fixture.nativeElement.querySelector('.modal-title').textContent.trim()).toBe('Add a Flow');
   });
 
   it.each([

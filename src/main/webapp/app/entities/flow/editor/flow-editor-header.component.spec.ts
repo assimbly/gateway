@@ -75,12 +75,12 @@ describe('Flow editor header', () => {
     expect(fixture.nativeElement.querySelector('#field_flowName_hint').textContent).toContain('Name the Flow to save it.');
   });
 
-  it('offers Save & manage', () => {
+  it('offers Save & close', () => {
     fixture.detectChanges();
     const saveAndReturn = jest.fn();
     fixture.componentInstance.saveAndReturn.subscribe(saveAndReturn);
 
-    buttonNamed('Save & manage').click();
+    buttonNamed('Save & close').click();
 
     expect(saveAndReturn).toHaveBeenCalled();
   });

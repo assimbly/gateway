@@ -20,6 +20,23 @@ export class TutorialPanelState {
     this.set(false);
   }
 
+  show(): void {
+    this.set(true);
+  }
+
+  /** Opens the panel for a user who never opened or closed it, such as on an empty Gateway on first login. */
+  showOnFirstVisit(): void {
+    let stored: string | null = 'false';
+    try {
+      stored = localStorage.getItem(TutorialPanelState.STORAGE_KEY);
+    } catch {
+      // storage can be blocked; then the panel isn't opened unasked on every visit
+    }
+    if (stored === null) {
+      this.show();
+    }
+  }
+
   private set(open: boolean): void {
     this.openState.set(open);
     try {

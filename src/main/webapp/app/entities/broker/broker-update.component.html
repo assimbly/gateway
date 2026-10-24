@@ -4,7 +4,7 @@
     <form (jhiSaveShortcut)="save()" [saveShortcutDisabled]="editForm.form.invalid || isSaving" name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
       <div class="row">
         <div class="col-10">
-          <h2 id="jhi-broker-heading">{{ broker?.id ? 'Edit Broker' : 'Create Broker' }}</h2>
+          <h2 id="jhi-broker-heading">{{ broker?.id ? 'Edit Broker' : 'Add Broker' }}</h2>
         </div>
         <div class="col-2">
           <a role="button" class="btn btn-sm right-border-radius-0 activemq-link activemq-broker-img"
@@ -44,26 +44,32 @@
         </div>
 
         <div class="form-group">
-          <label class="form-control-label" for="field_name">Name</label>
-          <i triggers="mouseenter:mouseleave" placement="right"
-             popoverTitle="Info" [ngbPopover]="namePopover" #p="ngbPopover"><fa-icon icon="info-circle"></fa-icon></i>
+          <label class="form-control-label required" for="field_name">Name</label>
+          <button type="button" class="btn btn-link btn-sm p-0 align-baseline" triggers="mouseenter:mouseleave focus:blur" placement="right"
+             popoverTitle="Info" [ngbPopover]="namePopover" aria-label="About Name"><fa-icon icon="info-circle"></fa-icon></button>
           <input type="text" class="form-control" name="name" id="field_name" required minlength="3"
-                 [(ngModel)]="broker.name"/>
+                 [(ngModel)]="broker.name" #nameModel="ngModel" [attr.aria-describedby]="nameModel.invalid && (nameModel.dirty || nameModel.touched) ? 'field_name_error' : null"/>
+          @if (nameModel.invalid && (nameModel.dirty || nameModel.touched)) {
+            <div class="invalid-field-message" id="field_name_error">
+              @if (nameModel.errors?.['required']) { Name is required. }
+              @if (nameModel.errors?.['minlength']) { Name needs at least 3 characters. }
+            </div>
+          }
         </div>
         <div class="form-group mt-2">
           <label class="form-control-label" for="field_autoStart">Autostart</label>
-          <i triggers="mouseenter:mouseleave" placement="right"
-             popoverTitle="Info" [ngbPopover]="autostartPopover" #p="ngbPopover"><fa-icon icon="info-circle"></fa-icon></i>
-          <select type="text" class="form-control form-select" id="field_autostart" id="field_autoStart" name="autoStart"
+          <button type="button" class="btn btn-link btn-sm p-0 align-baseline" triggers="mouseenter:mouseleave focus:blur" placement="right"
+             popoverTitle="Info" [ngbPopover]="autostartPopover" aria-label="About Autostart"><fa-icon icon="info-circle"></fa-icon></button>
+          <select type="text" class="form-control form-select" id="field_autoStart" name="autoStart"
                   [(ngModel)]="broker.autoStart">
-            <option value="true">true</option>
-            <option value="false">false</option>
+            <option value="true">Yes</option>
+            <option value="false">No</option>
           </select>
         </div>
         <div class="form-group mt-2">
           <label class="form-control-label" for="field_type">Type</label>
-          <i triggers="mouseenter:mouseleave" placement="right"
-             popoverTitle="Info" [ngbPopover]="typePopover" #p="ngbPopover"><fa-icon icon="info-circle"></fa-icon></i>
+          <button type="button" class="btn btn-link btn-sm p-0 align-baseline" triggers="mouseenter:mouseleave focus:blur" placement="right"
+             popoverTitle="Info" [ngbPopover]="typePopover" aria-label="About Type"><fa-icon icon="info-circle"></fa-icon></button>
           <select type="text" class="form-control form-select" id="field_type" name="type" [(ngModel)]="broker.type"
                   (ngModelChange)="onTypeChange($event)">
             <option value="classic">ActiveMQ Classic</option>
@@ -71,9 +77,9 @@
           </select>
         </div>
         <div class="form-group mt-2">
-          <label class="form-control-label" for="field_type">Configuration Type</label>
-          <i triggers="mouseenter:mouseleave" placement="right"
-             popoverTitle="Info" [ngbPopover]="configurationTypePopover" #p="ngbPopover"><fa-icon icon="info-circle"></fa-icon></i>
+          <label class="form-control-label" for="field_configuration_type">Configuration type</label>
+          <button type="button" class="btn btn-link btn-sm p-0 align-baseline" triggers="mouseenter:mouseleave focus:blur" placement="right"
+             popoverTitle="Info" [ngbPopover]="configurationTypePopover" aria-label="About Configuration type"><fa-icon icon="info-circle"></fa-icon></button>
           <select type="text" class="form-control form-select" id="field_configuration_type" name="configurationType"
                   [(ngModel)]="broker.configurationType">
             <option value="embedded">Embedded</option>
@@ -81,10 +87,9 @@
           </select>
         </div>
         <div class="form-group mt-2" *ngIf="broker.configurationType == 'file' ">
-          <label class="form-control-label" for="field_type">Configuration</label>
-          <i triggers="mouseenter:mouseleave" placement="right"
-             popoverTitle="Info" [ngbPopover]="brokerConfigurationPopover" #p="ngbPopover"><fa-icon icon="info-circle"></fa-icon>
-          </i>
+          <label class="form-control-label">Configuration</label>
+          <button type="button" class="btn btn-link btn-sm p-0 align-baseline" triggers="mouseenter:mouseleave focus:blur" placement="right"
+             popoverTitle="Info" [ngbPopover]="brokerConfigurationPopover" aria-label="About Configuration"><fa-icon icon="info-circle"></fa-icon></button>
           <span *ngIf="brokerConfigurationFailed" style="color: Tomato;">
      					<i popoverClass="increase-popover-width" triggers="mouseenter:mouseleave"
                          placement="right" container="body"

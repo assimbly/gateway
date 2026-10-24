@@ -1,7 +1,7 @@
 <div class="row justify-content-center">
     <div class="col-8">
         <form name="editForm" role="form" novalidate #editForm="ngForm">
-            <h2 id="jhi-certificate-heading">{{ certificate?.id ? 'Edit Certificate' : 'Create Certificate' }}</h2>
+            <h2 id="jhi-certificate-heading">{{ certificate?.id ? 'Edit Certificate' : 'Add Certificate' }}</h2>
             <div>
                 <jhi-alert-error></jhi-alert-error>
                 @if (errorMessage) {
@@ -13,8 +13,14 @@
                         [(ngModel)]="certificate.id" readonly />
                 </div>
                 <div class="form-group">
-                    <label class="form-control-label" for="field_url">Url</label>
-                    <input type="url" class="form-control" name="url" id="field_url" placeholder="https://mydomain.com" [(ngModel)]="certificate.url" pattern="https://.+" required />
+                    <label class="form-control-label required" for="field_url">URL</label>
+                    <input type="url" class="form-control" name="url" id="field_url" placeholder="https://mydomain.com" [(ngModel)]="certificate.url" pattern="https://.+" required #urlModel="ngModel" [attr.aria-describedby]="urlModel.invalid && (urlModel.dirty || urlModel.touched) ? 'field_url_error' : null" />
+                    @if (urlModel.invalid && (urlModel.dirty || urlModel.touched)) {
+                        <div class="invalid-field-message" id="field_url_error">
+                            @if (urlModel.errors?.['required']) { URL is required. }
+                            @if (urlModel.errors?.['pattern']) { Enter a URL that starts with https://, such as https://mydomain.com. }
+                        </div>
+                    }
                 </div>
                 <div class="form-group">
                     <label class="form-control-label" for="field_certificateType">Certificates to store</label>

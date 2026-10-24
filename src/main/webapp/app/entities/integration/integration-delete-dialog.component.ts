@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
@@ -16,6 +16,8 @@ import { IntegrationService } from './integration.service';
 })
 export class IntegrationDeleteDialogComponent {
     integration: IIntegration;
+    /** True while the delete runs, so a second click doesn't send it again. */
+    readonly deleting = signal(false);
 
     constructor(
         protected integrationService: IntegrationService,
@@ -29,9 +31,13 @@ export class IntegrationDeleteDialogComponent {
     }
 
     confirmDelete(id: number) {
-        this.integrationService.delete(id).subscribe(response => {
-		    this.eventManager.broadcast(new EventWithContent('integrationListModification', 'Deleted a integration'));
-            this.activeModal.dismiss(true);
+        this.deleting.set(true);
+        this.integrationService.delete(id).subscribe({
+            next: () => {
+                this.eventManager.broadcast(new EventWithContent('integrationListModification', 'Deleted a integration'));
+                this.activeModal.dismiss(true);
+            },
+            error: () => this.deleting.set(false),
         });
     }
 }

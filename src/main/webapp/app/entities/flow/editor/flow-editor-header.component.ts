@@ -78,6 +78,10 @@ export class FlowEditorHeaderComponent {
   readonly designLabel = input('Design');
   readonly designIcon = input<IconProp>('pencil-alt');
   readonly saving = input(false);
+  /** The Flow has edits that are not saved yet. */
+  readonly unsaved = input(false);
+  /** The last save succeeded and nothing changed since. */
+  readonly saved = input(false);
   /** Whether the user tried to save, after which a missing name is an error rather than a hint. */
   readonly submitted = input(false);
 
@@ -85,7 +89,7 @@ export class FlowEditorHeaderComponent {
   readonly saveAndStart = output<void>();
   /** Saves the running Flow and restarts it, so the change takes effect; Save alone keeps it on its previous configuration. */
   readonly saveAndRestart = output<void>();
-  /** Saves the Flow and goes back to the Manage page. */
+  /** Save & close: saves the Flow and goes back to the Manage page. */
   readonly saveAndReturn = output<void>();
   /** Send test message was clicked in the visual editor, which opens its Test panel. */
   readonly testRequested = output<void>();

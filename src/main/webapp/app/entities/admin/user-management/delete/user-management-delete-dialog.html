@@ -1,7 +1,8 @@
 @if (userManagement) {
   <form name="deleteForm" (ngSubmit)="confirmDelete(userManagement.login)">
     <div class="modal-header">
-      <h4 class="modal-title" data-cy="userManagementDeleteDialogHeading" jhiTranslate="entity.delete.title">Confirm delete operation</h4>
+      <h4 class="modal-title" data-cy="userManagementDeleteDialogHeading">Delete User</h4>
+      <button type="button" class="btn-close" aria-label="Close" (click)="cancel()"></button>
     </div>
 
     <div class="modal-body">
@@ -9,9 +10,9 @@
       <p
         id="jhi-delete-userManagement-heading"
         jhiTranslate="userManagement.delete.question"
-        [translateValues]="{ id: userManagement.login }"
+        [translateValues]="{ login: userManagement.login }"
       >
-        Are you sure you want to delete user {{ userManagement.login }}?
+        Delete User '{{ userManagement.login }}'? This cannot be undone.
       </p>
     </div>
 
@@ -20,7 +21,7 @@
         <fa-icon icon="ban" /><span jhiTranslate="entity.action.cancel">Cancel</span>
       </button>
 
-      <button id="jhi-confirm-delete-userManagement" data-cy="entityConfirmDeleteButton" type="submit" class="btn btn-fx btn-fx-danger">
+      <button id="jhi-confirm-delete-userManagement" data-cy="entityConfirmDeleteButton" type="submit" class="btn btn-fx btn-fx-danger" [disabled]="deleting()">
         <fa-icon icon="trash" /><span jhiTranslate="entity.action.delete">Delete</span>
       </button>
     </div>

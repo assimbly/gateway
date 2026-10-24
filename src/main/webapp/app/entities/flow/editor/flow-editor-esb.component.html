@@ -105,6 +105,8 @@
         [designLabel]="useCanvas ? 'Design' : 'Code'"
         [designIcon]="useCanvas ? 'pencil-alt' : 'code'"
         [saving]="isSaving"
+        [unsaved]="hasUnsavedChanges"
+        [saved]="savingFlowSuccess"
         [submitted]="formSubmitted"
         (save)="save()"
         (saveAndStart)="save('start')"
@@ -215,16 +217,16 @@
         </div>
       </ng-template>
 
-      <!-- The errors of the last save, above the Code of the Route and Script editors. -->
+      <!-- The errors of the last save, above the Code, or the Routes or Scripts in Test, of the Route and Script editors. -->
       <ng-template #codeSaveAlerts>
         @if (savingFlowFailed || invalidUriMessage || notUniqueUriMessage) {
           <div class="code-flow-alerts">
             @if (savingFlowFailed) {
-              <div class="alert alert-danger py-2 mb-0">{{ savingFlowFailedMessage }}</div>
+              <div class="alert alert-danger py-2 mb-0" role="alert">{{ savingFlowFailedMessage }}</div>
             }
             @for (message of [invalidUriMessage, notUniqueUriMessage]; track $index) {
               @if (message) {
-                <div class="alert alert-danger py-2 mb-0">{{ message }}</div>
+                <div class="alert alert-danger py-2 mb-0" role="alert">{{ message }}</div>
               }
             }
           </div>
@@ -429,11 +431,11 @@
                   </div>
                 }
                 @if (savingFlowFailed) {
-                  <div class="alert alert-danger py-2 mb-0">{{ savingFlowFailedMessage }}</div>
+                  <div class="alert alert-danger py-2 mb-0" role="alert">{{ savingFlowFailedMessage }}</div>
                 }
                 @for (message of [invalidUriMessage, notUniqueUriMessage]; track $index) {
                   @if (message) {
-                    <div class="alert alert-danger py-2 mb-0">{{ message }}</div>
+                    <div class="alert alert-danger py-2 mb-0" role="alert">{{ message }}</div>
                   }
                 }
               </div>
@@ -630,6 +632,7 @@
               <ng-container *ngTemplateOutlet="codeTestViews"></ng-container>
               <!-- Hidden rather than removed behind the Log and Camel route, so the Test panel keeps the message typed in it. -->
               <div class="code-flow-pane" [class.d-none]="testView !== 'flow'" data-cy="test-routes">
+                <ng-container *ngTemplateOutlet="codeSaveAlerts"></ng-container>
                 @if (hasUnsavedChanges) {
                   <ng-container *ngTemplateOutlet="testUnsaved"></ng-container>
                 }
@@ -741,6 +744,7 @@
               <ng-container *ngTemplateOutlet="codeTestViews"></ng-container>
               <!-- Hidden rather than removed behind the Log and Camel route, so the Test panel keeps the message typed in it. -->
               <div class="code-flow-pane" [class.d-none]="testView !== 'flow'" data-cy="test-scripts">
+                <ng-container *ngTemplateOutlet="codeSaveAlerts"></ng-container>
                 @if (hasUnsavedChanges) {
                   <ng-container *ngTemplateOutlet="testUnsaved"></ng-container>
                 }

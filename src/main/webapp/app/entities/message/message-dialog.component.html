@@ -1,6 +1,6 @@
 <form (jhiSaveShortcut)="save(true)" [saveShortcutDisabled]="editForm.form.invalid || isSaving" name="editForm" role="form" novalidate #editForm="ngForm">
   <div class="modal-header">
-    <h4 class="modal-title" id="myMessageLabel">Create or edit a Message</h4>
+    <h4 class="modal-title" id="myMessageLabel">{{ message?.id ? 'Edit Message' : 'Add Message' }}</h4>
     <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" (click)="clear()"></button>
   </div>
   <div class="modal-body">

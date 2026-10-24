@@ -1,7 +1,7 @@
 <div class="row justify-content-center">
     <div class="col-8">
         <div *ngIf="environmentVariables">
-            <h2><span>Environment Variables</span> {{environmentVariables.id}}</h2>
+            <h2><span>Variable</span> {{environmentVariables.key}}</h2>
             <hr>
             <jhi-alert-error></jhi-alert-error>
             <dl class="row-md jh-entity-details">
@@ -13,7 +13,7 @@
                 <dd>
                     <span>{{environmentVariables.value}}</span>
                 </dd>
-                <dt><span>Integration</span></dt>
+                <dt><span>Gateway</span></dt>
                 <dd>
                     <div *ngIf="environmentVariables.integrationId">
                         <a [routerLink]="['/integration', environmentVariables.integrationId, 'view']">{{environmentVariables.integrationId}}</a>

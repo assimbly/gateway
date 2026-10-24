@@ -1,11 +1,11 @@
 <form name="deleteForm" (submit)="$event.preventDefault()">
     <div class="modal-header">
-        <h4 class="modal-title">Confirm delete operation</h4>
+        <h4 class="modal-title">Delete Certificate</h4>
         <button type="button" class="btn-close" aria-label="Close" (click)="clear()"></button>
     </div>
     <div class="modal-body">
         <jhi-alert-error></jhi-alert-error>
-        <p id="jhi-delete-certificate-heading">Are you sure you want to delete this certificate?</p>
+        <p id="jhi-delete-certificate-heading">Delete Certificate '{{ certificate.certificateName }}'? This cannot be undone.</p>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-fx btn-fx-secondary" (click)="clear()">

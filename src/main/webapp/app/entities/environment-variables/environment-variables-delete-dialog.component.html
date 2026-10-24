@@ -1,17 +1,17 @@
 <form name="deleteForm" (submit)="$event.preventDefault()">
     <div class="modal-header">
-        <h4 class="modal-title">Confirm delete operation</h4>
-        <button type="button" class="btn-close" aria-label="Close" (click)="clear()"></button>		
+        <h4 class="modal-title">Delete Variable</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="clear()"></button>
     </div>
     <div class="modal-body">
         <jhi-alert-error></jhi-alert-error>
-        <p id="jhi-delete-environmentVariables-heading">Are you sure you want to delete this Environment Variables?</p>
+        <p id="jhi-delete-environmentVariables-heading">Delete Variable '{{ environmentVariables.key }}'? This cannot be undone.</p>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-fx btn-fx-secondary" (click)="clear()">
             <fa-icon [icon]="'ban'"></fa-icon><span>Cancel</span>
         </button>
-        <button id="jhi-confirm-delete-environmentVariables" type="button" class="btn btn-fx btn-fx-danger" (click)="confirmDelete(environmentVariables.id)">
+        <button id="jhi-confirm-delete-environmentVariables" type="button" class="btn btn-fx btn-fx-danger" [disabled]="deleting()" (click)="confirmDelete(environmentVariables.id)">
             <fa-icon [icon]="'trash'"></fa-icon><span>Delete</span>
         </button>
     </div>

@@ -3,7 +3,7 @@
 		<form (jhiSaveShortcut)="save()" [saveShortcutDisabled]="editForm.form.invalid || isSaving" name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm" autocomplete="off" jhiFieldTab>
 
 		    <div class="modal-header">
-		        <h4 class="modal-title" id="myConnectionLabel">Create or edit a Connection</h4>
+		        <h4 class="modal-title" id="myConnectionLabel">{{ connection?.id ? 'Edit Connection' : 'Add Connection' }}</h4>
 		    </div>
 		    <div class="modal-body">
 		        <jhi-alert-error></jhi-alert-error>

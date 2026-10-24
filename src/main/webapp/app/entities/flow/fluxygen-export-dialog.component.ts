@@ -17,7 +17,7 @@ export const MIN_PASSPHRASE_LENGTH = 12;
 export interface ExportFlow {
   id: number;
   name: string;
-  type: 'Visual' | 'Script' | 'Route';
+  type: 'Visual' | 'Script' | 'Camel route';
   draft: boolean;
 }
 

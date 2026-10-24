@@ -35,7 +35,7 @@ export class QueueDeleteDialogComponent {
         if (count > 0) {
             return `This queue has ${count} ${count === 1 ? 'message' : 'messages'}. Deleting the queue also deletes ${count === 1 ? 'it' : 'them'}. Are you sure?`;
         }
-        return 'Are you sure you want to delete this queue?';
+        return `Delete Queue '${this.address?.name}'? This cannot be undone.`;
     }
 
     cancel(): void {
