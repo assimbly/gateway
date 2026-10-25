@@ -73,24 +73,26 @@
 
     @if (index > 0) {
       <div class="tutorial-panel__step-count">Step {{ index }} of {{ count - 1 }}</div>
-      <h3 class="tutorial-panel__step-title">{{ step.title }}</h3>
+      <h3 class="tutorial-panel__step-title" tabindex="-1">{{ step.title }}</h3>
     } @else {
       <div class="tutorial-panel__step-count">Overview</div>
-      <h3 class="tutorial-panel__step-title">What you'll learn</h3>
+      <h3 class="tutorial-panel__step-title" tabindex="-1">What you'll learn</h3>
     }
 
     @if (messagesFolder() && mentionsMessagesFolder()) {
-      <p class="tutorial-panel__folder" (click)="onBodyClick($event)">
+      <p class="tutorial-panel__folder">
         <fa-icon icon="folder-open" />
         <span
           >Your messages folder, <code>{{ '@{messages}' }}</code
-          >, is <code class="tutorial-copy" data-tour-copy title="Click to copy">{{ messagesFolder() }}</code
+          >, is
+          <button type="button" class="tutorial-panel__folder-copy" title="Click to copy" (click)="copyFolder(folderValue)">
+            <code #folderValue class="tutorial-copy">{{ messagesFolder() }}</code></button
           >. So <code>{{ '@{messages}/out' }}</code> is the <code>out</code> folder in it.</span
         >
       </p>
     }
 
-    <div class="tutorial-panel__body" [innerHTML]="html()" (click)="onBodyClick($event)"></div>
+    <div class="tutorial-panel__body" [innerHTML]="html()" (click)="onBodyClick($event)" (keydown)="onBodyKeydown($event)"></div>
 
     @if (notFound()) {
       <p class="tutorial-panel__hint" role="status">

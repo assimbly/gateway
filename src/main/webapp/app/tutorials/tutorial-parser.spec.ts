@@ -61,7 +61,11 @@ describe('parseTutorial', () => {
 
   it('makes code copyable', () => {
     const html = htmlOf(parseTutorial(`${MARKDOWN}\nSet **Path** to \`www.dneonline.com\`.\n\n\`\`\`xml\n<a/>\n\`\`\`\n`).steps[2].html);
-    expect(html.querySelector('p code')?.hasAttribute('data-tour-copy')).toBe(true);
+    const value = html.querySelector('p code');
+    expect(value?.hasAttribute('data-tour-copy')).toBe(true);
+    // the keyboard reaches a value and copies it as a button
+    expect(value?.getAttribute('tabindex')).toBe('0');
+    expect(value?.getAttribute('role')).toBe('button');
     const block = html.querySelector('.tutorial-code');
     expect(block?.querySelector('button')?.hasAttribute('data-tour-copy')).toBe(true);
     expect(block?.querySelector('pre code')?.hasAttribute('data-tour-copy')).toBe(false);
@@ -81,6 +85,20 @@ describe('parseTutorial', () => {
     expect(details?.hasAttribute('open')).toBe(false);
     expect(details?.querySelector('summary')?.textContent).toBe('Before you start');
     expect(details?.querySelector('li')?.textContent).toBe('TestFlow');
+  });
+
+  it('folds a quote with a bold title under that title, collapsed', () => {
+    const markdown = `${MARKDOWN}\n> **Why?** The \`in\` folder.\n>\n> More.\n\n> **Tip: several at once.**\n>\n> * Use commas <!-- show: #field_name -->\n\n> A plain quote.\n`;
+    const html = htmlOf(parseTutorial(markdown).steps[2].html);
+    const [why, tip] = Array.from(html.querySelectorAll('details.tutorial-more'));
+    expect(why.hasAttribute('open')).toBe(false);
+    expect(why.querySelector('summary')?.textContent).toBe('Why?');
+    expect(Array.from(why.querySelectorAll('p')).map(p => p.textContent)).toEqual(['The in folder.', 'More.']);
+    expect(why.querySelector('p code')?.hasAttribute('data-tour-copy')).toBe(true);
+    expect(tip.classList).toContain('tutorial-more--tip');
+    expect(tip.querySelector('summary')?.textContent).toBe('Tip: several at once');
+    expect(tip.querySelector('li button.tutorial-show')).not.toBeNull();
+    expect(html.querySelector('blockquote')?.textContent?.trim()).toBe('A plain quote.');
   });
 
   it("leaves the What you'll learn label to the panel", () => {

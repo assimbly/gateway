@@ -141,6 +141,33 @@ describe('Flow editor modes', () => {
   });
 });
 
+describe('Flow editor canvas', () => {
+  /** The visual editor with a Source and a Sink whose graph still has the ids `graphIds`, and whose Steps have `stepIds`. */
+  function editor(graphIds: (number | undefined)[], stepIds: (number | null)[]): FlowEditorEsbComponent {
+    const component = Object.create(FlowEditorEsbComponent.prototype) as FlowEditorEsbComponent;
+    const kinds = ['SOURCE', 'SINK'];
+    Object.assign(component, {
+      designer: { current: { steps: kinds.map((kind, i) => ({ key: `step-${i}`, kind, id: graphIds[i] })), links: [] } },
+      stepKeys: ['step-0', 'step-1'],
+      steps: stepIds.map((id, i) => new Step(id ?? undefined, kinds[i] as StepType)),
+      editFlowForm: new FormGroup({
+        stepsData: new FormArray(stepIds.map(id => new FormGroup({ id: new FormControl(id), componentType: new FormControl('file'), uri: new FormControl('') }))),
+      }),
+    });
+    return component;
+  }
+
+  const idsOnCanvas = (component: FlowEditorEsbComponent): unknown[] => (component as any).syncedGraph().steps.map((step: { id?: number }) => step.id);
+
+  it('gives the Steps on the canvas the ids a save gave them, so Test and the counts find them', () => {
+    expect(idsOnCanvas(editor([undefined, undefined], [21, 22]))).toEqual([21, 22]);
+  });
+
+  it("doesn't keep the ids of the Flow a clone copies", () => {
+    expect(idsOnCanvas(editor([11, 12], [null, null]))).toEqual([undefined, undefined]);
+  });
+});
+
 describe('Route editor', () => {
   const serializer = new DefaultUrlSerializer();
 

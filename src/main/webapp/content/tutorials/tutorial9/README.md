@@ -15,62 +15,67 @@ It takes about 10 minutes.
 
 ## How it works
 
-Sometimes a few lines of code are quicker than a Flow of Steps. A **Script** Flow runs your own script: for example in Camel's Simple language, Groovy, JavaScript, Python, JSLT or XSLT. You build a small clock: every 10 seconds one script writes a greeting with the current time, and a second script saves it to a file.
-
-A Script Flow has four parts:
-
-| Part | What it does |
-|------|--------------|
-| **Source** | Starts the Flow, like in a visual Flow. A new Script Flow starts with **Once**, which sends one message when the Flow starts. |
-| **Script** | Runs your script. The result of the script becomes the message. Add more Scripts to run them one after another: each Script gets the message the one before it made. |
-| **Sink** | Takes the result of the last script. By default it's **Log Data**, which writes each result to the log. |
-| **Error handler** | Takes care of a message when a script fails. By default it writes the error to the Gateway log. |
-
-The Flow you build looks like this:
+A **Script** Flow runs your own scripts, for when a few lines of code are quicker than a Flow of Steps. You build a small clock: every 10 seconds one script writes a greeting with the current time, and a second script saves it to a file.
 
 **Scheduler (Source)** → **Simple (Script)** → **Groovy (Script)** → **Log Data (Sink)**
+
+> **What are the parts of a Script Flow?**
+>
+> * The **Source** starts the Flow, like in a visual Flow. A new Script Flow starts with **Once**, which sends one message when the Flow starts.
+> * A **Script** runs your script. Its result becomes the message. With more Scripts, each one gets the message the one before it made.
+> * The **Sink** takes the result of the last script. By default it's **Log Data**, which writes each result to the log.
+> * The **Error handler** takes care of a message when a script fails. By default it writes the error to the Gateway log.
+
+> **Which languages?** Camel's Simple language, Groovy, JavaScript, Python, JSLT and XSLT.
 
 ## Step 1: Create a Script Flow
 
 <!-- step: {"check":"route:editor=script"} -->
 
 1. Go to **Flows → Manage** and click **Add**. <!-- show: [aria-label="Add"] -->
-2. Choose **Script** (marked *Code*). <!-- show: a.flow-type-choice[href*="editor=script"] -->
+2. Choose **Script**. <!-- show: a.flow-type-choice[href*="editor=script"] -->
+
+The script editor opens on the **Scripts** tab.
 
 ![Add a Script Flow](01-add-flow.png)
 
-The script editor opens. Like the route editor of [Tutorial 7](https://github.com/assimbly/gateway/wiki/tutorial6-simple-route), it has a form instead of a canvas, with the tabs **Scripts**, **Source & result**, **Error handler** and **Notes**. It opens on **Scripts**, which shows only the scripts. The line above them sums up the other parts: *Starts: hello, once when started · Result: Log viewer · Errors: logged*.
+> **What's on the other tabs?** **Source & result**, **Error handler** and **Notes** hold the other parts. The line above the scripts sums them up: *Starts: hello, once when started · Result: Log viewer · Errors: logged*.
 
 ## Step 2: Set the Source
 
 1. Next to **Flow name**, type `Clock`. <!-- show: #field_flowName -->
-2. Click the **Source & result** tab (or the link after **Starts:**). <!-- show: [data-cy="script-tab-source"] --> Here are the **Source**, which starts the Flow, and the **Sink**, which gets the result of the scripts.
+2. Click the **Source & result** tab. <!-- show: [data-cy="script-tab-source"] -->
 3. Under **Source**, click **Component**, type `sched` and choose **Scheduler**. <!-- show: [formcontrolname="componentType"] -->
-4. Set **Name** to `clock`. This is just a name for the scheduler. <!-- show: [formcontrolname="uri"] -->
-5. Under **Options**, choose **Delay** in the list and type `10000`. <!-- show: .option-row -->
+4. Set **Name** to `clock`. <!-- show: [formcontrolname="uri"] -->
+5. Under **Options**, choose **Delay** and type `10000`. <!-- show: .option-row -->
 
 ![The Source](02-source.png)
 
-The delay is in milliseconds, so the scripts run once every 10 seconds. You know the Scheduler from [Tutorial 3](https://github.com/assimbly/gateway/wiki/tutorial6-calling-a-rest-api).
+> **Why 10000?** The delay is in milliseconds, so the scripts run every 10 seconds. You know the Scheduler from [Tutorial 3](https://github.com/assimbly/gateway/wiki/tutorial6-calling-a-rest-api). The **Name** is just a name for it.
 
 ## Step 3: Write a script in Simple
 
-1. Click the **Scripts** tab. <!-- show: [data-cy="script-tab-scripts"] --> Under **Script**, set **Language** to **Simple**. (A new script starts in Groovy.)
-2. Replace the example in the **Script** field with: <!-- show: [data-tour="script-content"] -->
+1. Click the **Scripts** tab. <!-- show: [data-cy="script-tab-scripts"] -->
+2. Set **Language** to **Simple**.
+3. Replace the example in the **Script** field with: <!-- show: [data-tour="script-content"] -->
 
    ```
    Hello from Assimbly! The time is ${date:now:HH:mm:ss}
    ```
 
-3. Click **Try it**. <!-- show: [data-tour="script-try"] --> Under **Resulting body** you see what the script makes, without starting the Flow.
+4. Click **Try it**. <!-- show: [data-tour="script-try"] -->
 
-[Simple](https://camel.apache.org/components/latest/languages/simple-language.html) is Camel's own small expression language. The text is copied as it is, and every `${...}` is replaced: `${date:now:HH:mm:ss}` by the current time. The result, for example `Hello from Assimbly! The time is 14:05:10`, becomes the message.
+**Resulting body** shows what the script makes, such as `Hello from Assimbly! The time is 14:05:10`.
+
+> **How does Simple work?** [Simple](https://camel.apache.org/components/latest/languages/simple-language.html) is Camel's own small expression language. The text is copied as it is, and every `${...}` is replaced: `${date:now:HH:mm:ss}` by the current time.
+
+> **Does Try it start the Flow?** No. It only runs the script, so you can check it first.
 
 ## Step 4: Add a script in Groovy
 
 <!-- step: {"check":"flowExists:Clock"} -->
 
-1. Click **Add script** under the script. A second **Script** appears. Its **Language** is already **Groovy**.
+1. Click **Add script** under the script. A second **Script** appears, in **Groovy**.
 2. Type this in its **Script** field:
 
    ```groovy
@@ -78,41 +83,35 @@ The delay is in milliseconds, so the scripts run once every 10 seconds. You know
    body
    ```
 
-![The two scripts](03-scripts.png)
-
-[Groovy](https://groovy-lang.org/) is a programming language for the Java platform. In a script, `body` is the message: the greeting the Simple script made. The first line writes it to the file `clock.txt` in the `out` folder of your messages folder: the Gateway puts in the Variable `@{messages}` before the script runs. The second line, `body`, is the result of the script, so the message stays the same.
-
 3. Click **Save**. <!-- show: [data-tour="flow-save"] -->
 
-> **Which language?** Use **Simple** to build text from the message and its headers, **Groovy**, **JavaScript** or **Python** when you need real code, **JSLT** to transform JSON and **XSLT** to transform XML.
+![The two scripts](03-scripts.png)
+
+> **What does this script do?** In a script, `body` is the message: the greeting the Simple script made. The first line writes it to `clock.txt` in `@{messages}/out`. The second line, `body`, is the result of the script, so the message stays the same.
+
+> **Which language when?** **Simple** to build text from the message and its headers. **Groovy**, **JavaScript** or **Python** when you need real code. **JSLT** to transform JSON and **XSLT** to transform XML.
 
 ## Step 5: Start the Flow and read the result
 
 <!-- step: {"check":"flowCompleted:Clock"} -->
 
-1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] --> It saves the Flow, starts it and switches from **Code** to **Test**.
+1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] -->
 
-The first run starts a second after you start the Flow. After that, the scripts run every 10 seconds: the **Stats** tab <!-- show: [data-cy="panel-stats"] --> counts each run under **Completed**.
+Every 10 seconds the scripts run, and the **Stats** tab <!-- show: [data-cy="panel-stats"] --> counts a run under **Completed**.
 
 ![The Flow is running](04-flow-running.png)
 
-2. Open `clock.txt` in `@{messages}/out`, the `out` folder of your messages folder: `C:\Users\<you>\messages\out` on Windows. (The Variable `messages` under **Flows → Variables** holds the path of your messages folder.)
+2. Open `clock.txt` in `@{messages}/out`. Open it again a little later: the time has changed.
+3. Click the **Log** tab. <!-- show: [data-cy="test-view-log"] --> The Sink wrote each greeting there, after `Body:`.
+4. When you're done, click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] --> Otherwise the Flow keeps writing the file.
 
-   ```
-   Hello from Assimbly! The time is 14:05:10
-   ```
+> **Where is `@{messages}/out`?** The `out` folder in your messages folder, such as `C:\Users\<you>\messages\out` on Windows. The Variable `messages` under **Flows → Variables** holds its path.
 
-Open it again a little later: the time has changed.
-
-3. Click the **Log** tab. <!-- show: [data-cy="test-view-log"] --> The **Sink** wrote each greeting to the log of this Flow, after `Body:`.
-
-**Try it yourself:**
-
-* Add the date: click **Code**, <!-- show: [data-cy="mode-toggle"] --> change the Simple script to `Hello from Assimbly! It is ${date:now:yyyy-MM-dd HH:mm:ss}` and click **Save & Test** to run it with the new script. <!-- show: [data-tour="flow-save-test"] -->
-* Click **Run** in the *Test* panel. Each Script shows what it made of the message, under **Resulting body**.
-* Break the Groovy script on purpose, for example by writing to a folder that doesn't exist. **Failed** goes up on the **Stats** tab and an **Alerts** badge appears. See [Tutorial 2](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow) for finding the error.
-
-When you're done, click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] --> Otherwise the Flow keeps writing the file every 10 seconds.
+> **Try it yourself**
+>
+> * Add the date: click **Code**, <!-- show: [data-cy="mode-toggle"] --> change the Simple script to `Hello from Assimbly! It is ${date:now:yyyy-MM-dd HH:mm:ss}` and click **Save & Test**. <!-- show: [data-tour="flow-save-test"] -->
+> * Click **Run** in the *Test* panel. Each Script shows what it made of the message, under **Resulting body**.
+> * Break the Groovy script on purpose, for example by writing to a folder that doesn't exist. **Failed** goes up on the **Stats** tab and an **Alerts** badge appears. [Tutorial 2](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow) shows how to find the error.
 
 ## Summary
 

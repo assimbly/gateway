@@ -21,68 +21,70 @@ It takes about 8 minutes.
 
 <!-- step: {"check":"route:mode=clone"} -->
 
-You make a copy of *TestFlow* that can't deliver its files, and find out what goes wrong.
+You copy *TestFlow* and break the copy on purpose.
 
-1. Go to **Flows → Manage**. If *TestFlow* isn't running, click **▶** in its row: you need it running in step 3.
+1. Go to **Flows → Manage**. Is *TestFlow* stopped? Click **▶** in its row.
 2. In the row of *TestFlow*, click **⋮** (*More actions*) <!-- show: tr[data-flow-name="TestFlow"] [aria-label="More actions"] --> and choose **Clone**.
+
+The editor opens with a copy of *TestFlow*, without a name.
 
 ![Clone the TestFlow](01-clone-flow.png)
 
-The editor opens with a copy of *TestFlow*. Everything is copied except the name, which is empty.
+> **Why keep TestFlow running?** You need it in step 3, to see why a Flow doesn't start.
 
 ## Step 2: Make the Sink fail
 
-Change the copy so it can't deliver its files:
-
 1. Next to **Flow name**, type `DebugFlow`. <!-- show: #field_flowName -->
-2. Click the **Sink** on the canvas. <!-- show: .flow-step-sink --> Its settings open in the panel on the right. (Don't see the panel? Click **Show panel**.)
+2. Click the **Sink** on the canvas. <!-- show: .flow-step-sink -->
 3. Change **Directory Name** to `@{messages}/out2`. <!-- show: [formcontrolname="uri"] -->
-4. Under **Options**, choose **Auto Create** in the list and turn the switch **Off**. <!-- show: .option-row -->
+4. Under **Options**, choose **Auto Create** and turn it **Off**. <!-- show: .option-row -->
 
 ![Configure the Sink](02-configure-sink.png)
 
-Normally the File component creates a missing folder for you. With **Auto Create** off it can't, so every file this Flow tries to deliver fails.
+> **Why does this fail?** The `out2` folder doesn't exist. Normally the File component creates a missing folder, but with **Auto Create** off it can't. So every file this Flow tries to deliver fails.
+
+> **Tip: no settings on the right?** Click **Show panel**.
 
 ## Step 3: Find out why a Flow doesn't start
 
 <!-- step: {"check":"flowExists:DebugFlow"} -->
 
-Errors can also happen when a Flow starts. *TestFlow* is still running, so you run into one right away:
+1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] -->
 
-1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] --> It saves the Flow, switches to **Test** and tries to start it.
+*DebugFlow* doesn't start: a red **Error** badge appears in the header.
 
-*DebugFlow* doesn't start. Instead a red **Error** badge appears in the header. Click it to see why: <!-- show: [data-tour="flow-error-badge"] --> the *Alerts* panel opens with a **Failed to start** alert.
+2. Click the **Error** badge. <!-- show: [data-tour="flow-error-badge"] --> The *Alerts* panel shows a **Failed to start** alert.
 
 ![Error on start](06-start-error.png)
 
-Every alert shows the same fields: when it happened, the **Endpoint** of the Step that failed, the **Error** itself (click **Copy** to paste it somewhere else) and, for common errors, **What it means**. Here both Flows read from the same folder, `@{messages}/in`. Only one Source at a time may listen to the same file endpoint, so the second Flow can't start: `Multiple consumers for the same endpoint is not allowed`.
+> **Why doesn't it start?** *TestFlow* already reads from `@{messages}/in`, and only one Flow at a time may read from the same folder. That's what the error says: *Multiple consumers for the same endpoint is not allowed*.
 
-The alert stays until you clear it, also after you reload the page.
+> **What's in an alert?** When it happened, the **Endpoint** of the Step that failed, the **Error** itself (with **Copy**) and, for common errors, **What it means**. An alert stays until you clear it, also after you reload the page.
 
 ## Step 4: Send a message and watch it fail
 
 <!-- step: {"check":"flowFailed:DebugFlow"} -->
 
-1. Stop *TestFlow*, so *DebugFlow* can listen to the `in` folder: go to **Flows → Manage** and click **■** in its row. <!-- show: tr[data-flow-name="TestFlow"] [aria-label="Stop"] -->
-2. Click *DebugFlow* to open it. If it opens in **Design**, click **Test**. <!-- show: [data-cy="mode-toggle"] -->
-3. Click **▶** (Start). <!-- show: [data-tour="flow-status-controls"] --> This time the Flow starts, and the red badge turns into a yellow **Alerts** badge.
-4. In the *Test* panel, type `Hello Assimbly` under **Body** <!-- show: .flow-test .body-codemirror --> and click **Run**. <!-- show: [data-cy="test-run"] -->
+1. Stop *TestFlow*: on **Flows → Manage**, click **■** in its row. <!-- show: tr[data-flow-name="TestFlow"] [aria-label="Stop"] -->
+2. Open *DebugFlow*. If it opens in **Design**, click **Test**. <!-- show: [data-cy="mode-toggle"] -->
+3. Click **▶** (Start). <!-- show: [data-tour="flow-status-controls"] --> This time the Flow starts.
+4. Under **Body**, type `Hello Assimbly` <!-- show: .flow-test .body-codemirror --> and click **Run**. <!-- show: [data-cy="test-run"] -->
 
-The Sink can't store the message. The *Test* panel shows **Failed**, the Sink turns red on the canvas, and below it you find the error, with what it means: *The Gateway can't write the file there*. The **Alerts** badge counts one more alert, and the **Stats** tab <!-- show: [data-cy="panel-stats"] --> counts the message under **Failed**:
+The panel shows **Failed**. The Sink turns red on the canvas, with the error below it.
 
 ![The Flow fails](03-flow-failed.png)
 
-5. Click the **Alerts** badge. <!-- show: [data-tour="flow-alert-badge"] --> The *Alerts* panel lists the errors of this Flow, newest first: the **Failed message** on top, the **Failed to start** from Step 3 below it:
+5. Click the **Alerts** badge. <!-- show: [data-tour="flow-alert-badge"] --> The newest alert is on top: `Cannot store file: ...messages\out2\...`. The Sink can't write to the `out2` folder.
 
 ![Alert details](04-alert-details.png)
 
-`Cannot store file: ...messages\out2\...` tells you exactly what went wrong: the Sink can't write to the `out2` folder. Click **Clear** to remove the alerts, for everyone, once you've read them.
+6. When you're done, click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] -->
 
-> **Where did my message go?** The Flow's **Error handler** takes care of failed messages. By default it writes the error to the Gateway log. To do something else with failed messages, click **Design**, then **Error handler** in the editor toolbar.
+> **Where else do I see failures?** The **Stats** tab <!-- show: [data-cy="panel-stats"] --> counts the message under **Failed**. In the *Alerts* panel, **Clear** removes the alerts, for everyone.
 
-To fix the Flow, you would create the `out2` folder or turn **Auto Create** back on.
+> **Where did my message go?** The Flow's **Error handler** takes care of failed messages. By default it writes the error to the Gateway log. To change that, click **Design**, then **Error handler** in the toolbar.
 
-When you're done, click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] -->
+> **How do I fix the Flow?** Create the `out2` folder, or turn **Auto Create** back on.
 
 ## Summary
 
@@ -91,6 +93,6 @@ When you're done, click **■** (Stop). <!-- show: [data-tour="flow-status-contr
 | **Error** badge | The Flow or one of its Steps didn't start. Click it to see why. |
 | **Test** panel | Runs a message through the running Flow and shows the error of the Step that failed. |
 | **Stats** tab | How many messages went through the Flow, and how many failed. |
-| **Alerts** badge | The errors of this Flow, newest first: why it didn't start and which messages failed. They stay until you clear them. |
+| **Alerts** badge | The errors of this Flow, newest first. They stay until you clear them. |
 
 **Done!** You can find out why a Flow fails. Continue with [Tutorial 3: Calling a REST API](https://github.com/assimbly/gateway/wiki/tutorial6-calling-a-rest-api).

@@ -25,9 +25,13 @@ import { exampleFromSchema, schemaFromExampleText } from './schema-from-example'
 /** Where a schema is edited: the request, or the Declared response at this index. */
 type SchemaTarget = 'request' | number;
 
+/** The parts of the panel, one shown at a time so the form stays short. */
+type OperationTab = 'general' | 'parameters' | 'request' | 'responses' | 'try';
+
 /**
  * An Operation in the API page's side panel: its contract (method, path, parameters, media types, request schema and
- * Declared responses), Open Handler Flow, and Try it. Path parameters follow the path as it is typed.
+ * Declared responses), Open Handler Flow, and Try it, each on a tab of its own. Save stays in view on every tab of the
+ * contract. Path parameters follow the path as it is typed.
  */
 @Component({
   selector: 'jhi-operation-panel',
@@ -54,6 +58,15 @@ export class OperationPanelComponent implements OnChanges {
   readonly methods = METHODS;
   readonly parameterTypes = PARAMETER_TYPES;
   readonly mediaTypes = ['application/json', 'application/xml', 'text/plain', 'text/csv', 'application/octet-stream'];
+  readonly tabs: { id: OperationTab; label: string; icon: string }[] = [
+    { id: 'general', label: 'General', icon: 'sliders' },
+    { id: 'parameters', label: 'Parameters', icon: 'list' },
+    { id: 'request', label: 'Request', icon: 'arrow-right' },
+    { id: 'responses', label: 'Responses', icon: 'arrow-left' },
+    { id: 'try', label: 'Try it', icon: 'paper-plane' },
+  ];
+
+  activeTab: OperationTab = 'general';
 
   draft!: IApiOperation;
   saving = false;
@@ -72,6 +85,8 @@ export class OperationPanelComponent implements OnChanges {
   tryResult?: ITryResponse;
   tryError?: string;
 
+  /** The Operation shown last; another one starts on General again, a save of the same one keeps the tab. */
+  private shownId?: number;
   private optionsTheme = '';
   private optionsCache?: Record<string, unknown>;
 
@@ -80,6 +95,10 @@ export class OperationPanelComponent implements OnChanges {
   }
 
   ngOnChanges(): void {
+    if (this.operation?.id === undefined || this.operation.id !== this.shownId) {
+      this.activeTab = 'general';
+    }
+    this.shownId = this.operation?.id;
     this.draft = this.operation
       ? structuredClone(this.operation)
       : { method: 'GET', path: '/', parameters: [], declaredResponses: [], requestMediaType: DEFAULT_MEDIA_TYPE, responseMediaType: DEFAULT_MEDIA_TYPE };
@@ -188,6 +207,11 @@ export class OperationPanelComponent implements OnChanges {
   }
 
   readonly handlerFlowQueryParams = handlerFlowQueryParams;
+
+  /** Whether the contract differs from the saved Operation, which is what Try it calls. */
+  hasUnsavedChanges(): boolean {
+    return !!this.operation && JSON.stringify(this.draft) !== JSON.stringify(this.operation);
+  }
 
   parametersIn(where: IApiParameter['in']): IApiParameter[] {
     return (this.operation?.parameters ?? []).filter(p => p.in === where);

@@ -4,7 +4,6 @@ import org.apache.camel.AsyncProcessor;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Consumer;
 import org.apache.camel.Exchange;
-import org.apache.camel.ExchangePattern;
 import org.apache.camel.Route;
 import org.apache.camel.ServiceStatus;
 import org.apache.camel.support.AsyncProcessorConverterHelper;
@@ -75,8 +74,9 @@ public class FlowTestRunService {
         TestRunRecorder recorder = recorderFor(context);
         TestRunRecorder.Run run = recorder.begin(UUID.randomUUID().toString());
         try {
+            // Keeps the pattern of the step's own endpoint, as for real traffic: forcing InOut would make a JMS Sink of
+            // a file Flow wait for a reply that no one sends.
             Exchange exchange = consumer.createExchange(false);
-            exchange.setPattern(ExchangePattern.InOut);
             exchange.setProperty(TestRunRecorder.PROPERTY, run.id());
             exchange.getMessage().setBody(request.body() == null ? "" : request.body());
             Map<String, String> headers = request.headers() == null ? Map.of() : request.headers();

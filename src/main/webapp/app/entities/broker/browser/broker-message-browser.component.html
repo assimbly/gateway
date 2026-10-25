@@ -116,7 +116,7 @@
             <tr>
               <th [style.display]="'none'"><span>ID</span></th>
               <th><span>No.</span></th>
-              <th class="border-bottom-none" (click)="sortByTimestamp()"><span>Timestamp</span> <span class="fa fa-sort"></span></th>
+              <th class="border-bottom-none" tabindex="0" (click)="sortByTimestamp()" (keydown.enter)="sortByTimestamp()" (keydown.space)="$event.preventDefault(); sortByTimestamp()"><span>Timestamp</span> <span class="fa fa-sort"></span></th>
               <th><span>MessageID</span></th>
               <th class="border-bottom-none"></th>
             </tr>

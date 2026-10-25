@@ -21,46 +21,57 @@ It takes about 5 minutes.
 
 ## Step 1: Create TestFlow
 
-You build *TestFlow*: it picks up each file from an `in` folder and drops it in an `out` folder. The other tutorials start from this Flow too.
+You build *TestFlow*. It moves files from an `in` folder to an `out` folder.
 
 1. Go to **Flows → Manage** and click **Add**. <!-- show: [aria-label="Add"] -->
-2. Choose **Visual** (marked *No code · recommended*). <!-- show: a.flow-type-choice -->
-3. Next to **Flow name** at the top, type `TestFlow`. <!-- show: #field_flowName -->
+2. Choose **Visual**. <!-- show: a.flow-type-choice -->
+3. Next to **Flow name**, type `TestFlow`. <!-- show: #field_flowName -->
 
-The canvas shows a new Flow of two Steps: a Source that receives messages and a Sink that delivers them. You configure them in the next step.
+The canvas shows two Steps: a **Source** and a **Sink**.
+
+> **Why a Source and a Sink?** The Source receives messages and the Sink delivers them. Every Flow has at least these two. You configure them in the next step.
+
+> **Why TestFlow?** The other tutorials start from this Flow too, so keep it.
 
 ## Step 2: Configure the Source and the Sink
 
 <!-- step: {"check":"flowStep:TestFlow:/out"} -->
 
-1. Click the **Source** on the canvas. <!-- show: .flow-step-source --> A panel opens on the right where you configure it. (Don't see the panel? Click **Show panel**.) <!-- show: [aria-controls="flow-designer-panel"] -->
+1. Click the **Source** on the canvas. <!-- show: .flow-step-source --> Set:
    * **Component:** `File`
-   * **Directory Name:** `@{messages}/in`, the `in` folder in your messages folder <!-- show: [formcontrolname="uri"] -->
-2. Click the **Sink** on the canvas. <!-- show: .flow-step-sink --> A new Flow's Sink writes each message to the log. Change it so it writes files instead:
+   * **Directory Name:** `@{messages}/in` <!-- show: [formcontrolname="uri"] -->
+2. Click the **Sink** on the canvas. <!-- show: .flow-step-sink --> Set:
    * **Component:** `File`
    * **Directory Name:** `@{messages}/out`
 3. Click **Save**. <!-- show: [data-tour="flow-save"] -->
 
-The folders don't have to exist: the File component creates them when the Flow starts.
+> **Tip: no settings on the right?** Click **Show panel**. <!-- show: [aria-controls="flow-designer-panel"] -->
 
-> **Your messages folder.** The tutorials keep their files in the folder `messages` in your home folder: `C:\Users\<you>\messages` on Windows, `/home/<you>/messages` on Linux, `/Users/<you>/messages` on macOS and `/data/messages` in Docker. A Flow refers to it as `@{messages}`, a **Variable** the Gateway creates for you, so the same Flow works on every machine. You find it under **Flows → Variables**.
+> **What is `@{messages}`?** A **Variable** that points to the folder `messages` in your home folder, such as `C:\Users\<you>\messages` on Windows, `/home/<you>/messages` on Linux, `/Users/<you>/messages` on macOS and `/data/messages` in Docker. That way the same Flow works on every machine. You find it under **Flows → Variables**.
+
+> **Do the folders have to exist?** No. The File component creates them when the Flow starts.
+
+> **Why change the Sink?** A new Flow's Sink writes each message to the log. Now it writes files instead.
 
 ## Step 3: Start it and test it
 
 <!-- step: {"check":"flowCompleted:TestFlow"} -->
 
-1. Click **Save & Test** at the top right of the editor. <!-- show: [data-tour="flow-save-test"] --> It saves the Flow, starts it and switches the editor from **Design** to **Test**. The *Test* panel opens on the right.
-2. Under **Body**, type `Hello Assimbly`, <!-- show: .flow-test .body-codemirror --> then click **Run**. <!-- show: [data-cy="test-run"] -->
+1. Click **Save & Test** at the top right. <!-- show: [data-tour="flow-save-test"] --> The editor switches to **Test**.
+2. Under **Body**, type `Hello Assimbly`. <!-- show: .flow-test .body-codemirror -->
+3. Click **Run**. <!-- show: [data-cy="test-run"] -->
 
-**Run** hands your message to the Step after the Source, here the Sink. The panel shows **Passed**, and the Sink drops the message as a file in the `out` folder: `@{messages}/out`, for example `C:\Users\<you>\messages\out` on Windows. Open it to see your message. On the canvas, the Sink shows a **1**: it handled one message.
+The panel shows **Passed** and the Sink on the canvas shows a **1**. Your message is now a file in `@{messages}/out`. Open it to have a look.
 
-> **And the Source?** It picks up every file in the `in` folder. Drop a file there yourself and it ends up in `out` too. Camel's File component moves the files it has picked up to a hidden `.camel` subfolder of the `in` folder, so the same file is not processed twice.
+> **What does Save & Test do?** It saves the Flow, starts it and switches the editor from **Design** to **Test**. When the Flow already runs, it restarts it, so your change takes effect.
 
-**Good to know**
+> **Why does only the Sink count the message?** **Run** hands your message to the Step after the Source. The Source itself picks up every file in the `in` folder: drop a file there and it ends up in `out` too. Files it picked up move to a hidden `.camel` folder, so they're not processed twice.
 
-* Click **Design** at the top to change the Flow again, and **Test** to run it. <!-- show: [data-cy="mode-toggle"] --> While the Flow runs, **Save & Test** saves it and restarts it, so your change takes effect.
-* A Flow that isn't complete yet, for example a Source without a Sink, is saved as a **Draft**. It shows a *Draft* badge in the header and can't be started until it's finished. Hover over the badge to see what is missing.
-* Errors are handled by the Flow's **Error handler**. For a new Flow it writes the error to the Gateway log. You can change it from the toolbar of the editor.
-* Every Flow runs as an [Apache Camel](https://camel.apache.org/) route. In **Test**, the **Camel route** tab shows the route of the running Flow, ready to copy or download. <!-- show: [data-cy="test-view-route"] -->
+> **Good to know**
+>
+> * **Design** and **Test** at the top switch between building the Flow and running it. <!-- show: [data-cy="mode-toggle"] -->
+> * A Flow that isn't finished, such as a Source without a Sink, is saved as a **Draft**. Hover over its *Draft* badge to see what's missing.
+> * The **Error handler** in the toolbar decides what happens with errors. For a new Flow it writes them to the Gateway log.
+> * Every Flow runs as an [Apache Camel](https://camel.apache.org/) route. **Camel route** in **Test** shows it. <!-- show: [data-cy="test-view-route"] -->
 
-**Done!** You built your first Flow. Leave *TestFlow* running and continue with [Tutorial 2: Debugging a Flow](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow), where you break a copy of it on purpose.
+**Done!** You built your first Flow. Leave *TestFlow* running and continue with [Tutorial 2: Debugging a Flow](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow).

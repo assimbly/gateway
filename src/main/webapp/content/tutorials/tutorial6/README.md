@@ -26,38 +26,39 @@ It takes about 15 minutes.
 
 <!-- step: {"check":"route:mode=clone"} -->
 
-You put a queue between two Flows: the first puts files on it, the second takes them off and writes them to a folder.
+You put a queue between two Flows. The first puts files on it, the second takes them off.
 
 1. Go to **Flows → Manage**.
 2. In the row of *TestFlow*, click **⋮** (*More actions*) and choose **Clone**. <!-- show: tr[data-flow-name="TestFlow"] [aria-label="More actions"] -->
 3. Next to **Flow name**, type `FileToQueue`. <!-- show: #field_flowName -->
 4. Click the **Source** on the canvas <!-- show: .flow-step-source --> and change **Directory Name** to `@{messages}/orders`. <!-- show: [formcontrolname="uri"] -->
 
-*FileToQueue* gets a folder of its own, so *TestFlow* doesn't pick up its files, even when it runs.
+> **Why another folder?** So *TestFlow* doesn't pick up the files of *FileToQueue*, even when it runs.
 
 ## Step 2: Put the files on a queue
 
-1. Click the **Sink** on the canvas. <!-- show: .flow-step-sink --> Its settings open on the right. (Don't see them? Click **Show panel**.)
+1. Click the **Sink** on the canvas. <!-- show: .flow-step-sink -->
 2. Click **Component**, type `sjms` and choose **Simple JMS**. <!-- show: [formcontrolname="componentType"] -->
-3. Set **Destination Name** to `OrdersQueue`, the name of the queue. <!-- show: [formcontrolname="uri"] -->
-
+3. Set **Destination Name** to `OrdersQueue`. <!-- show: [formcontrolname="uri"] -->
 4. Check that **Connection** says *Gateway broker*. <!-- show: [formcontrolname="connection"] -->
 
-You don't have to create the queue first: the broker creates it the first time a Flow uses it.
+> **Do I create the queue first?** No. The broker creates it the first time a Flow uses it.
 
-A JMS component needs to know which broker to talk to. That's what a **Connection** is for. The Gateway comes with one to its built-in broker, *Gateway broker*, and picks it for you when it's the only one.
+> **What is the Connection for?** A JMS component needs to know which broker to talk to. The Gateway comes with a Connection to its built-in broker, *Gateway broker*, and picks it for you when it's the only one.
 
-> **No Connection selected?** Choose one, or click **+** next to **Connection** <!-- show: [data-tour="step-new-connection"] --> and fill it in: **url** `tcp://localhost:61616`, **username** and **password** `admin`, **jmsprovider** `ActiveMQ Artemis` and **pooled** `true`.
+> **Tip: no Connection selected?** Choose one, or click **+** next to **Connection** <!-- show: [data-tour="step-new-connection"] --> and fill it in: **url** `tcp://localhost:61616`, **username** and **password** `admin`, **jmsprovider** `ActiveMQ Artemis` and **pooled** `true`.
 
 ## Step 3: Start it and send files
 
 <!-- step: {"check":"queueMessages:OrdersQueue"} -->
 
-1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] --> It saves the Flow, starts it and switches to **Test**.
-2. In the *Test* panel, type `Order 1` under **Body** <!-- show: .flow-test .body-codemirror --> and click **Run**. <!-- show: [data-cy="test-run"] -->
+1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] -->
+2. Under **Body**, type `Order 1` <!-- show: .flow-test .body-codemirror --> and click **Run**. <!-- show: [data-cy="test-run"] -->
 3. Do the same with `Order 2` and `Order 3`, with **Run again**.
 
-*FileToQueue* puts the three messages on the queue: the Sink on the canvas shows **3**. Nobody takes them off yet, because the Flow that does isn't there yet.
+The Sink on the canvas shows **3**: three messages are on the queue.
+
+> **Why does nobody take them off?** The Flow that does isn't there yet. You build it in step 5.
 
 ## Step 4: See the messages wait
 
@@ -65,13 +66,13 @@ A JMS component needs to know which broker to talk to. That's what a **Connectio
 
 1. Go to **Broker → Endpoints** and type `Orders` in the filter box.
 
-![Three messages wait on the queue](05-messages-waiting.png)
-
 *OrdersQueue* has 3 messages and 0 consumers: no one reads from it.
 
-2. Click **OrdersQueue** to browse the messages, like you did in Tutorial 5. <!-- show: tr[data-endpoint-name="OrdersQueue"] td a -->
+![Three messages wait on the queue](05-messages-waiting.png)
 
-The messages stay on the queue until a Flow takes them off.
+2. Click **OrdersQueue** to browse the messages. <!-- show: tr[data-endpoint-name="OrdersQueue"] td a -->
+
+> **How long do they wait?** Until a Flow takes them off the queue.
 
 ## Step 5: Build the Flow that takes messages off the queue
 
@@ -80,11 +81,13 @@ The messages stay on the queue until a Flow takes them off.
 3. Click the **Source** on the canvas. <!-- show: .flow-step-source -->
 4. Click **Component**, type `sjms` and choose **Simple JMS**. <!-- show: [formcontrolname="componentType"] -->
 5. Set **Destination Name** to `OrdersQueue`. <!-- show: [formcontrolname="uri"] -->
-6. **Connection** says *Gateway broker* again. <!-- show: [formcontrolname="connection"] --> A Connection is set up once; after that, every Flow can use it.
+6. Check that **Connection** says *Gateway broker*. <!-- show: [formcontrolname="connection"] -->
 
 ![The Source takes messages off OrdersQueue](03-source-queue.png)
 
-The Sink of this Flow is still the File component of *TestFlow*: it writes to `@{messages}/out`.
+> **And the Sink?** It's still the File component of *TestFlow*: it writes to `@{messages}/out`.
+
+> **The same Connection again?** Yes. A Connection is set up once; after that, every Flow can use it.
 
 ## Step 6: Start it and watch the queue empty
 
@@ -92,21 +95,21 @@ The Sink of this Flow is still the File component of *TestFlow*: it writes to `@
 
 1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] -->
 
-*QueueToFile* takes the waiting messages off the queue right away: its Steps on the canvas show **3**. In the `out` folder of your messages folder (`@{messages}/out`) you now find three files, one for each order.
+The Steps on the canvas show **3**: *QueueToFile* took the waiting messages off the queue. `@{messages}/out` now has three files, one per order.
 
-2. Check **Broker → Endpoints** once more. *OrdersQueue* is empty and has 1 consumer: the running *QueueToFile*.
+2. Go to **Broker → Endpoints**. *OrdersQueue* is empty and has 1 consumer: *QueueToFile*.
 
 ![The queue is empty](07-queue-empty.png)
 
-With both Flows running, every new file in the `orders` folder travels through the queue to the `out` folder right away. Try it with **Run** in the *Test* panel of *FileToQueue*! Or stop *QueueToFile*, send a few messages and watch them wait on the queue until you start it again.
+3. When you're done, stop both Flows on **Flows → Manage**.
 
-When you're done, stop both Flows on **Flows → Manage**.
+> **Why a queue?** The two Flows don't know about each other, only the queue. In real integrations the two sides are often different systems, such as a web shop and an ERP system. A queue between them:
+>
+> * **Buffers.** When the receiver is down or slow, messages wait instead of getting lost.
+> * **Decouples.** You can stop, change or replace one Flow without touching the other.
+> * **Spreads the load.** Several Flows can take messages off the same queue.
 
-**Why a queue?** The two Flows don't know about each other, only the queue. In real integrations the two sides are often different systems, such as a web shop and an ERP system. A queue between them:
-
-* **Buffers.** When the receiver is down or slow, messages wait instead of getting lost.
-* **Decouples.** You can stop, change or replace one Flow without touching the other.
-* **Spreads the load.** Several Flows can take messages off the same queue.
+> **Try it yourself** Stop *QueueToFile*, send a few messages with **Run** in *FileToQueue*, and watch them wait on the queue until you start *QueueToFile* again.
 
 ## Summary
 

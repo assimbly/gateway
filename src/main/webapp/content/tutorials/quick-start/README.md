@@ -11,7 +11,7 @@ Run your first Flow in 5 minutes.
 
 <!-- step: {"check":"route:/flow/editor"} -->
 
-Go to **Flows → Manage** and click *ExampleFlow*. <!-- show: tr[data-flow-name="ExampleFlow"] td a -->
+1. Go to **Flows → Manage** and click *ExampleFlow*. <!-- show: tr[data-flow-name="ExampleFlow"] td a -->
 
 It has two Steps:
 
@@ -25,17 +25,18 @@ It has two Steps:
 
 <!-- step: {"check":"flowStatus:ExampleFlow:started"} -->
 
-Click **Test** at the top. <!-- show: [data-cy="mode-toggle"] --> In **Test** you run the Flow and see what it does.
-
-Click **▶** (Start). <!-- show: [data-tour="flow-status-controls"] -->
+1. Click **Test** at the top. <!-- show: [data-cy="mode-toggle"] -->
+2. Click **▶** (Start). <!-- show: [data-tour="flow-status-controls"] -->
 
 A **1** appears on both Steps: the message went through.
+
+> **What is Test?** The mode where you run the Flow and see what it does. **Design** is where you build it.
 
 ## See the message
 
 <!-- step: {"check":"flowLog:ExampleFlow:Example flow running"} -->
 
-Click the **Log** tab. <!-- show: [data-cy="test-view-log"] -->
+1. Click the **Log** tab. <!-- show: [data-cy="test-view-log"] -->
 
 You see `Example flow running`.
 
@@ -43,6 +44,6 @@ You see `Example flow running`.
 
 <!-- step: {"check":"flowStatus:ExampleFlow:stopped"} -->
 
-Click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] -->
+1. Click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] -->
 
 **Done!** Next, build your own Flow in [Tutorial 1](https://github.com/assimbly/gateway/wiki/tutorial6-your-first-flow).

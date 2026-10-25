@@ -21,35 +21,36 @@ It takes about 10 minutes.
 
 <!-- step: {"check":"route:/broker"} -->
 
-A **broker** is a message server. Instead of sending a message straight to another system, you put it on the broker, and the broker keeps it until someone picks it up. The sender and the receiver don't need to be online at the same time.
+1. Go to **Broker → Manage**.
 
-* A **queue** is a named place on the broker where messages wait. Each message is picked up by one receiver.
-* A **topic** is like a queue, but every subscriber gets its own copy of each message.
-* The Gateway calls queues and topics **Endpoints**.
-
-Go to **Broker → Manage**. The Gateway created the broker *default* when it first started: an [ActiveMQ Artemis](https://activemq.apache.org/components/artemis/) broker that starts with the Gateway.
+You see the broker *default*. The green buttons under **Status** show that it runs. <!-- show: [aria-label="Stop"] -->
 
 ![The default broker](01-broker-manage.png)
 
-* The green buttons under **Status** show that it runs. <!-- show: [aria-label="Stop"] -->
-* **Consumers** is the number of receivers connected, such as running Flows that read from a queue. **Messages** is the number of messages waiting, over all queues.
-* Click **Stats** for details such as the version, the uptime and the connections. <!-- show: [aria-label="Stats"] -->
+2. Click **Stats** for its version, uptime and connections. <!-- show: [aria-label="Stats"] -->
 
-![The broker stats](02-broker-stats.png)
+> **What is a broker?** A message server. Instead of sending a message straight to another system, you put it on the broker, and the broker keeps it until someone picks it up. The sender and the receiver don't need to be online at the same time.
+>
+> * A **queue** is a named place where messages wait. Each message is picked up by one receiver.
+> * A **topic** is like a queue, but every subscriber gets its own copy of each message.
+> * The Gateway calls queues and topics **Endpoints**.
+
+> **Where does *default* come from?** The Gateway created it when it first started: an [ActiveMQ Artemis](https://activemq.apache.org/components/artemis/) broker that starts with the Gateway.
+
+> **What do Consumers and Messages count?** **Consumers** is the number of receivers connected, such as running Flows that read from a queue. **Messages** is the number of messages waiting, over all queues.
 
 ## Step 2: Stop and start the broker
 
 <!-- step: {"check":"brokerStatus:stopped"} -->
 
 1. Click **Stop** (the square). <!-- show: [aria-label="Stop"] -->
-
-   While the broker is stopped, no one can put messages on it or take them off: Flows that use a queue fail until it's back.
-
 2. Click **Start** (the triangle). <!-- show: [aria-label="Start"] -->
 
-After a few seconds the green buttons are back. Messages that were waiting are still there: the broker keeps them on disk.
+After a few seconds the green buttons are back.
 
-> **Restart** (the circular arrows) stops and starts the broker in one go. You need it after you change the broker's configuration.
+> **What happens while it's stopped?** No one can put messages on it or take them off: Flows that use a queue fail until it's back. Messages that were waiting aren't lost: the broker keeps them on disk.
+
+> **And Restart?** **Restart** (the circular arrows) stops and starts the broker in one go. You need it after you change the broker's configuration.
 
 ## Step 3: Look at the broker file
 
@@ -57,46 +58,43 @@ After a few seconds the green buttons are back. Messages that were waiting are s
 
 ![The broker file](03-broker-file.png)
 
-* **Autostart** `true`: the broker starts with the Gateway.
-* **Type** `ActiveMQ Artemis`. The other option is `ActiveMQ Classic`.
-* **Configuration Type** `File`: the broker uses the file below, `broker.xml`. <!-- show: #field_configuration_type --> It's in `~/.assimbly/broker/`.
+2. Look around, then click **Cancel**. <!-- show: #cancel-save -->
 
-In the file, `<acceptors>` sets the ports clients connect to, such as `61616` for JMS, and `<addresses>` the queues that always exist, such as `DLQ` (the dead letter queue).
+> **What's in it?**
+>
+> * **Autostart** `true`: the broker starts with the Gateway.
+> * **Type** `ActiveMQ Artemis`. The other option is `ActiveMQ Classic`.
+> * **Configuration Type** `File`: the broker uses the file below, `broker.xml`, from `~/.assimbly/broker/`. <!-- show: #field_configuration_type -->
+> * In the file, `<acceptors>` sets the ports clients connect to, such as `61616` for JMS, and `<addresses>` the queues that always exist, such as `DLQ` (the dead letter queue).
 
-To change the broker, you would edit the file, click **Save**, then **Restart** on **Broker → Manage**.
-
-2. For now, click **Cancel**. <!-- show: #cancel-save -->
+> **How do I change the broker?** Edit the file, click **Save**, then **Restart** on **Broker → Manage**.
 
 ## Step 4: Create a queue
 
 <!-- step: {"check":"queueExists:HelloQueue"} -->
 
-1. Go to **Broker → Endpoints**. The **Queues** tab lists the queues on the broker.
+1. Go to **Broker → Endpoints**.
 2. Click **Add**. <!-- show: [aria-label="Add"] -->
 3. Set **Name** to `HelloQueue`. <!-- show: #field_name -->
-
-   > **Tip:** to create several queues at once, type their names as a comma-separated list, for example `HelloQueue,OrdersQueue,InvoicesQueue`.
-
-![Create a queue](04-create-queue.png)
-
 4. Click **Save**. <!-- show: #save-entity -->
 
-*HelloQueue* appears in the list, with 0 messages:
+*HelloQueue* appears in the list, with 0 messages.
 
 ![The queues on the broker](05-endpoints.png)
+
+> **Tip: several queues at once** Type their names separated by commas, such as `HelloQueue,OrdersQueue,InvoicesQueue`.
 
 ## Step 5: Send a message
 
 <!-- step: {"check":"queueMessages:HelloQueue"} -->
 
-1. Click **Send** in the row of *HelloQueue*. <!-- show: tr[data-endpoint-name="HelloQueue"] [aria-label="Send"] --> The **Send** page opens with *HelloQueue* as destination.
+1. Click **Send** in the row of *HelloQueue*. <!-- show: tr[data-endpoint-name="HelloQueue"] [aria-label="Send"] -->
 2. Under **Body**, type `Hello broker!`. <!-- show: .body-codemirror -->
-
-![Send a message](06-send-message.png)
-
 3. Click **Send** at the top right. <!-- show: [title="Send (Ctrl+Enter)"] -->
 
 A notification confirms: *Message sent to queue HelloQueue*.
+
+![Send a message](06-send-message.png)
 
 ## Step 6: Browse the message
 
@@ -105,11 +103,11 @@ A notification confirms: *Message sent to queue HelloQueue*.
 1. Go to **Broker → Endpoints**. *HelloQueue* now has 1 message.
 2. Click **HelloQueue**. <!-- show: tr[data-endpoint-name="HelloQueue"] td a -->
 
-**Browse Messages** lists the messages on the queue. On the right you see the body and the headers of the selected one:
+You see your message, with its body and headers on the right.
 
 ![Browse the message](07-browse-message.png)
 
-Browsing only *looks*: the messages stay on the queue until a receiver picks them up. In [Tutorial 6](https://github.com/assimbly/gateway/wiki/tutorial6-message-queueing) a Flow does that.
+> **Is the message gone from the queue now?** No. Browsing only looks: messages stay on the queue until a receiver picks them up. In [Tutorial 6](https://github.com/assimbly/gateway/wiki/tutorial6-message-queueing) a Flow does that.
 
 > **Clean up?** On **Broker → Endpoints**, click **⋮** in the row of *HelloQueue* and choose **Delete**. **Clear** keeps the queue but removes its messages.
 

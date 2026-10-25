@@ -68,6 +68,14 @@ class FlowTestRunServiceTest {
                             .setBody(constant("caught"))
                         .end()
                     .end();
+
+                // Flow 5 reports the exchange pattern its Sink gets, from a one-way and from a request-reply Source.
+                from("direct:5-50").routeId("5-50").group("5")
+                    .step("step-50").to("direct:5-52").end();
+                from("direct:5-51?exchangePattern=InOut").routeId("5-51").group("5")
+                    .step("step-51").to("direct:5-52").end();
+                from("direct:5-52").routeId("5-52").group("5")
+                    .step("step-52").process(exchange -> exchange.getMessage().setBody(exchange.getPattern().name())).end();
             }
         });
         context.start();
@@ -148,6 +156,13 @@ class FlowTestRunServiceTest {
         assertThat(result.error()).isNull();
         assertThat(result.steps()).extracting(TestRunResult.Step::status).containsOnly("completed");
         assertThat(result.response().body()).isEqualTo("caught");
+    }
+
+    @Test
+    void keepsTheExchangePatternOfTheEntryStepsEndpoint() {
+        // A JMS Sink would wait for a reply on InOut, so a one-way Source must stay one-way.
+        assertThat(service.run("5", "50", new TestRunRequest("50", "Hi", Map.of())).response().body()).isEqualTo("InOnly");
+        assertThat(service.run("5", "51", new TestRunRequest("51", "Hi", Map.of())).response().body()).isEqualTo("InOut");
     }
 
     @Test

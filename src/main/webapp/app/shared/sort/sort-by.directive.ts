@@ -9,6 +9,9 @@ import { SortDirective } from './sort.directive';
   selector: '[jhiSortBy]',
   host: {
     '(click)': 'onClick()',
+    '(keydown.enter)': 'onKey($event)',
+    '(keydown.space)': 'onKey($event)',
+    '[attr.tabindex]': 'iconComponent() ? 0 : null',
     '[attr.aria-sort]': 'ariaSort()',
     '[class.table-fx-th-sortable]': 'true',
     '[class.table-fx-th-sorted]': 'isSorted()',
@@ -54,5 +57,11 @@ export class SortByDirective {
     if (this.iconComponent()) {
       this.sort.sort(this.jhiSortBy());
     }
+  }
+
+  /** Enter and Space sort too, like on a button; Space would otherwise scroll the page. */
+  onKey(event: Event): void {
+    event.preventDefault();
+    this.onClick();
   }
 }

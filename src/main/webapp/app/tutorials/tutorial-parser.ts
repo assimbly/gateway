@@ -14,6 +14,8 @@ const SECTION = /^## /m;
 /** The label the written tutorial puts above what you'll learn; the panel has a heading of its own for it. */
 const LEARN_LABEL = /^\*\*What you'll learn:?\*\*[ \t]*$/m;
 const PREREQUISITES = /^Before you start$/i;
+/** A quote that opens with a bold title, such as `> **Why?** ...` or `> **Tip: ...**`, as marked renders it. */
+const ASIDE = /<blockquote>\s*<p><strong>([\s\S]+?)<\/strong>[ \t]*([\s\S]*?)<\/blockquote>/g;
 
 interface StepMeta {
   check?: string;
@@ -65,8 +67,10 @@ function render(markdown: string, id: string): string {
   const html = marked.parse(withButtons, { async: false, gfm: true });
   return (
     html
-      // values such as a path or a URL are copied with a click, a code block with its Copy button
-      .replace(/(?<!<pre>)<code>/g, '<code class="tutorial-copy" data-tour-copy title="Click to copy">')
+      // a tip or an explanation stays folded under its title, so the step itself is just what to do
+      .replace(ASIDE, (_, title: string, rest: string) => fold(title, rest))
+      // values such as a path or a URL are copied with a click or Enter, a code block with its Copy button
+      .replace(/(?<!<pre>)<code>/g, '<code class="tutorial-copy" data-tour-copy tabindex="0" role="button" title="Click to copy">')
       .replace(/<pre>/g, '<div class="tutorial-code"><button type="button" class="tutorial-code__copy" data-tour-copy>Copy</button><pre>')
       .replace(/<\/pre>/g, '</pre></div>')
       // images sit next to the tutorial
@@ -74,6 +78,15 @@ function render(markdown: string, id: string): string {
       // other pages open next to the Gateway, not in its place
       .replace(/<a href="(https?:[^"]+)"/g, '<a href="$1" target="_blank" rel="noopener"')
   );
+}
+
+/** The quote as a section that opens on a click, under its title without the period or colon it ends with. */
+function fold(title: string, rest: string): string {
+  const label = title.trim().replace(/[.:]$/, '');
+  const kind = /^tip\b/i.test(label) ? ' tutorial-more--tip' : '';
+  // the title can have a paragraph of its own, as in "> **Good to know**" above a list
+  const body = rest.startsWith('</p>') ? rest.slice('</p>'.length) : `<p>${rest}`;
+  return `<details class="tutorial-more${kind}"><summary>${label}</summary>${body.trim()}</details>`;
 }
 
 function escapeAttribute(value: string): string {

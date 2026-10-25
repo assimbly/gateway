@@ -23,6 +23,7 @@ import { IntegrationService } from 'app/entities/integration/integration.service
 import { EmptyState } from 'app/shared/empty-state';
 import { SearchToolbar } from 'app/shared/filter';
 import { DataTable, DataTableColumn } from 'app/shared/table';
+import { isPlainKey, isTypingTarget } from 'app/shared/keyboard';
 import { FlowRowComponent } from './flow-row.component';
 import { FlowRuntime } from './flow-status';
 import { FlowSearchByNamePipe } from './flow.searchbyname.pipe';
@@ -38,6 +39,9 @@ import { IApiHandler } from 'app/entities/api/api.model';
   selector: 'jhi-flow',
   templateUrl: './flow.component.html',
   imports: [CommonModule, RouterModule, FontAwesomeModule, EmptyState, SearchToolbar, DataTable, FlowRowComponent, FlowTypeChoicesComponent],
+  host: {
+    '(document:keydown)': 'onKeydown($event)',
+  },
 })
 export class FlowComponent implements OnInit, OnDestroy {
   integrations: IIntegration[];
@@ -266,6 +270,14 @@ export class FlowComponent implements OnInit, OnDestroy {
 
   openNewFlow(): void {
     this.modalService.open(NewFlowDialogComponent, { size: 'lg', ariaLabelledBy: 'new-flow-title' });
+  }
+
+  /** N adds a Flow, unless the key is typed into a field or a dialog is open. */
+  onKeydown(event: KeyboardEvent): void {
+    if ((isPlainKey(event, 'n') || isPlainKey(event, 'N')) && !isTypingTarget(event.target) && !this.modalService.hasOpenModals()) {
+      event.preventDefault();
+      this.openNewFlow();
+    }
   }
 
   openImport(): void {

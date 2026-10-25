@@ -9,6 +9,7 @@
   type="button"
   class="btn btn-fx btn-fx-sm btn-fx-icon btn-fx-ghost"
   (mouseenter)="load.emit()"
+  (focus)="load.emit()"
   [ngbPopover]="statsTemplate"
   popoverTitle="Flow stats"
   popoverClass="flow-stats-popover"

@@ -2383,7 +2383,11 @@ splitOptions4(options: string): string[] {
 		}
 	}
 
-	/** The Flow graph with each Step's component and settings taken from its form. */
+	/**
+	 * The Flow graph with each Step's component and settings taken from its form, and its id from the saved Step: a save
+	 * gives new Steps their id, and a clone drops the ids of the Flow it copies. Test and the counts on the canvas find
+	 * the Steps by that id.
+	 */
 	private syncedGraph(): FlowGraph {
 		const graph = this.designer!.current;
 		const stepsData = this.editFlowForm.controls.stepsData as FormArray;
@@ -2395,6 +2399,7 @@ splitOptions4(options: string): string[] {
 				return form
 					? {
 							...step,
+							id: this.steps[index]?.id ?? undefined,
 							componentType: form.componentType || undefined,
 							uri: form.uri || undefined,
 							options: this.steps[index]?.options,

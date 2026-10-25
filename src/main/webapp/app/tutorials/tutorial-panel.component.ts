@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, computed, effect, inject, signal } from '@angular/core';
+import { Component, ElementRef, Injector, OnDestroy, OnInit, afterNextRender, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DomSanitizer } from '@angular/platform-browser';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -6,7 +6,7 @@ import { map } from 'rxjs';
 
 import { VariableKeysService } from 'app/entities/environment-variables/variable-keys.service';
 
-import { clearHighlight, highlight } from './tutorial-highlight';
+import { clearHighlight, highlight, isHighlighting } from './tutorial-highlight';
 import { TutorialPanelState } from './tutorial-panel.state';
 import { TutorialService } from './tutorial.service';
 import { groupByTrack } from './tutorial-tracks';
@@ -24,6 +24,7 @@ import { groupByTrack } from './tutorial-tracks';
   host: {
     role: 'complementary',
     'aria-labelledby': 'tutorial-panel-title',
+    '(keydown)': 'onKeydown($event)',
   },
 })
 export class TutorialPanelComponent implements OnInit, OnDestroy {
@@ -31,6 +32,8 @@ export class TutorialPanelComponent implements OnInit, OnDestroy {
   readonly panel = inject(TutorialPanelState);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly variables = inject(VariableKeysService);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly injector = inject(Injector);
 
   // the tutorials are first-party Markdown bundled with the Gateway; their Show me buttons need their data attribute
   /** The tutorials by track, such as Get started and Messaging. */
@@ -58,6 +61,63 @@ export class TutorialPanelComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.tutorials.stopWatching();
     clearHighlight();
+  }
+
+  /**
+   * While focus is in the panel, but not in a field: Left and Right go to the previous and next step, as Back and Next
+   * do, and Escape stops a Show me pointing, or else closes the panel.
+   */
+  onKeydown(event: KeyboardEvent): void {
+    if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || isEditable(event.target)) {
+      return;
+    }
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      if (isHighlighting()) {
+        clearHighlight();
+      } else {
+        this.panel.close();
+        // back to the button that opened the panel, so the keyboard isn't left at the top of the page
+        document.querySelector<HTMLElement>('[data-cy="tutorials"]')?.focus();
+      }
+      return;
+    }
+    if (!this.tutorials.step() || (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight')) {
+      return;
+    }
+    event.preventDefault();
+    if (event.key === 'ArrowLeft') {
+      if (this.tutorials.stepIndex() === 0) {
+        return;
+      }
+      this.tutorials.previous();
+    } else {
+      this.tutorials.next();
+    }
+    // a value in the old step, or Back on the first, can't keep focus; the step's title takes it so the keys keep working
+    afterNextRender(
+      () => {
+        const host = this.host.nativeElement;
+        if (!host.contains(document.activeElement) || (document.activeElement as HTMLButtonElement | null)?.disabled) {
+          (host.querySelector<HTMLElement>('.tutorial-panel__step-title') ?? host).focus();
+        }
+      },
+      { injector: this.injector },
+    );
+  }
+
+  /** Enter or Space on a value in the step copies it, as a click does; buttons already click on these keys. */
+  onBodyKeydown(event: KeyboardEvent): void {
+    const copyable = event.target as Element | null;
+    if ((event.key === 'Enter' || event.key === ' ') && copyable?.matches('[data-tour-copy]:not(button)')) {
+      event.preventDefault();
+      copy(copyable as HTMLElement);
+    }
+  }
+
+  /** The messages folder is copied with its button. */
+  copyFolder(value: HTMLElement): void {
+    copy(value);
   }
 
   /**
@@ -131,6 +191,12 @@ function endBeforeTrailingWhitespace(range: Range, source: HTMLElement): void {
   if (last) {
     range.setEnd(last, last.data.trimEnd().length);
   }
+}
+
+/** Whether keys typed into the element are its own, such as in a field or a code editor. */
+function isEditable(target: EventTarget | null): boolean {
+  const element = target as HTMLElement | null;
+  return !!element?.closest?.('input, textarea, select, [contenteditable]:not([contenteditable="false"]), .cm-editor');
 }
 
 /** The text of the list item or paragraph a Show me button is in, without the buttons. */

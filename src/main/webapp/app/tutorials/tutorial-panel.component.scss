@@ -131,6 +131,17 @@
   }
 }
 
+// the folder's value is a button, so the keyboard can copy it too, but looks like the other values
+.tutorial-panel__folder-copy {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  vertical-align: baseline;
+}
+
 .tutorial-panel__hint {
   margin: 1rem 0 0;
   padding: 0.5rem 0.75rem;
@@ -195,6 +206,19 @@
 
     li + li {
       margin-top: 0.25rem;
+    }
+
+    // what to do, one action at a time, with room to find your place again after looking at the page
+    > ol > li {
+      padding-left: 0.25rem;
+
+      + li {
+        margin-top: 0.625rem;
+      }
+
+      > ul {
+        margin: 0.375rem 0 0;
+      }
     }
 
     img {
@@ -297,6 +321,51 @@
       ul:last-child {
         margin-bottom: 0;
       }
+    }
+
+    // a tip or a why, folded under its title: the step reads as what to do, and the rest is a click away
+    .tutorial-more {
+      margin-bottom: 0.5rem;
+      border-radius: 0.25rem;
+      background: var(--app-code-bg);
+      font-size: 0.875rem;
+
+      summary {
+        padding: 0.375rem 0.75rem;
+        color: var(--app-primary-accessible);
+        cursor: pointer;
+        font-weight: 600;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      &[open] {
+        padding-bottom: 0.5rem;
+
+        summary {
+          margin-bottom: 0.25rem;
+        }
+      }
+
+      > :not(summary) {
+        margin-right: 0.75rem;
+        margin-left: 0.75rem;
+      }
+
+      > :last-child {
+        margin-bottom: 0;
+      }
+
+      code {
+        background: var(--app-surface);
+      }
+    }
+
+    // the folds after a step's actions start a little apart from them
+    :not(.tutorial-more) + .tutorial-more {
+      margin-top: 1rem;
     }
 
     blockquote {

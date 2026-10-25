@@ -24,87 +24,81 @@ It takes about 10 minutes.
 
 <!-- step: {"check":"route:mode=clone"} -->
 
-You build a Flow that asks a weather service for the current weather in Amsterdam every 30 seconds, and saves the answer as a JSON file.
+You build *Weather*: every 30 seconds it gets the weather in Amsterdam and saves it as a file.
 
 1. Go to **Flows → Manage**.
-2. In the row of *TestFlow*, click **⋮** (*More actions*) and choose **Clone**. <!-- show: tr[data-flow-name="TestFlow"] [aria-label="More actions"] -->
+2. In the row of *TestFlow*, click **⋮** (*More actions*) <!-- show: tr[data-flow-name="TestFlow"] [aria-label="More actions"] --> and choose **Clone**.
 3. Next to **Flow name**, type `Weather`. <!-- show: #field_flowName -->
 
 ## Step 2: Use a Scheduler as Source
 
-1. Click the **Source** on the canvas. <!-- show: .flow-step-source --> Its settings open on the right. (Don't see them? Click **Show panel**.)
+1. Click the **Source** on the canvas. <!-- show: .flow-step-source -->
 2. Click **Component**, type `sched` and choose **Scheduler**. <!-- show: [formcontrolname="componentType"] -->
-3. Set **Name** to `weather`. It's just a name for the scheduler. <!-- show: [formcontrolname="uri"] -->
-4. Under **Options**, choose **Delay** in the list and type `30000`. <!-- show: .option-row -->
+3. Set **Name** to `weather`. <!-- show: [formcontrolname="uri"] -->
+4. Under **Options**, choose **Delay** and type `30000`. <!-- show: .option-row -->
 
 ![Configure the Scheduler](01-scheduler-source.png)
 
-The delay is in milliseconds, so the Flow runs every 30 seconds. The first run starts a second after you start the Flow.
+> **Why 30000?** The delay is in milliseconds, so the Flow runs every 30 seconds. The first run starts a second after the Flow starts.
+
+> **What is the Name for?** It's just a name for the scheduler.
 
 ## Step 3: Call the REST API
 
 1. Click the **+** on the line between the Source and the Sink. <!-- show: [aria-label="Insert a Step here"] -->
 2. Type `http` in the search box and choose **HTTP**.
-3. Set **Http Uri** to the address of the API: <!-- show: [formcontrolname="uri"] -->
+3. Set **Http Uri** to: <!-- show: [formcontrolname="uri"] -->
 
    ```
    https://api.open-meteo.com/v1/forecast?latitude=52.37&longitude=4.89&current=temperature_2m,wind_speed_10m
    ```
 
-   It asks for the current temperature and wind speed in the center of Amsterdam.
-
-4. Under **Options**, choose **Http Method** in the list and select **GET**. <!-- show: .option-row -->
+4. Under **Options**, choose **Http Method** and select **GET**. <!-- show: .option-row -->
 
 ![Configure the HTTPS Action](02-https-action.png)
 
-> **HTTP or HTTPS?** You don't have to choose. When you click elsewhere, the Step takes `https://` off the address and switches to **HTTPS (Secure)**, the Component that matches it. Paste an address that starts with `http://` and it uses **HTTP**.
+> **What does this address ask for?** The current temperature and wind speed in the center of Amsterdam.
+
+> **Why does the Step say HTTPS now?** When you click elsewhere, the Step takes `https://` off the address and switches to **HTTPS (Secure)**, the Component that matches it. An address that starts with `http://` keeps **HTTP**.
 
 ## Step 4: Give the saved file a fixed name
 
-The Sink saves each answer as a new file with a generated name. Give it a fixed name, so you always know where to look:
-
 1. Click the **Sink** on the canvas. <!-- show: .flow-step-sink -->
-2. Under **Options**, choose **File Name** in the list and type `weather.json`. <!-- show: .option-row -->
+2. Under **Options**, choose **File Name** and type `weather.json`. <!-- show: .option-row -->
 
 ![Configure the Sink](03-sink-file-name.png)
 
-You save the Flow in the next step, right before you start it.
+> **Why a fixed name?** Otherwise the Sink saves each answer as a new file with a generated name. Now you always know where to look.
 
-## Step 5: Save and start the Flow, and read the weather
+## Step 5: Start the Flow and read the weather
 
 <!-- step: {"check":"flowCompleted:Weather"} -->
 
-1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] --> It saves the Flow, starts it and switches to **Test**.
+1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] -->
 
-After a second the Flow makes its first call: each Step on the canvas shows a **1**, the number of messages it handled. Every 30 seconds the numbers go up.
+After a second each Step on the canvas shows a **1**. Every 30 seconds the numbers go up.
 
 ![The Flow is running](04-flow-running.png)
 
-2. Open `weather.json` in `@{messages}/out`, the `out` folder of your messages folder: `C:\Users\<you>\messages\out` on Windows. (The Variable `messages` under **Flows → Variables** holds the path of your messages folder.) It holds the answer of the API, for example (shortened):
+2. Open `weather.json` in `@{messages}/out`. It holds the current weather, for example:
 
-```json
-{
-  "latitude": 52.366,
-  "longitude": 4.901,
-  "current_units": {
-    "temperature_2m": "°C",
-    "wind_speed_10m": "km/h"
-  },
-  "current": {
-    "time": "2026-10-15T13:00",
-    "temperature_2m": 18.5,
-    "wind_speed_10m": 18.7
-  }
-}
-```
+   ```json
+   {
+     "current": {
+       "time": "2026-10-15T13:00",
+       "temperature_2m": 18.5,
+       "wind_speed_10m": 18.7
+     }
+   }
+   ```
 
-Every 30 seconds the Flow calls the API again and overwrites `weather.json` with the latest weather.
+3. When you're done, click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] --> Otherwise the Flow keeps calling the API.
 
 > **No file?** Click the **Alerts** badge in the editor header to see the error.
 
-**Try it yourself:** get the weather of your own town. Click **Design**, <!-- show: [data-cy="mode-toggle"] --> change `latitude` and `longitude` in the **Http Uri** of the HTTPS Action and click **Save & Test** again. <!-- show: [data-tour="flow-save-test"] --> It saves the Flow and restarts it, so the change takes effect right away. (**Save** alone keeps the running Flow on its previous configuration until you restart it.)
+> **Where is `@{messages}/out`?** The `out` folder in your messages folder, such as `C:\Users\<you>\messages\out` on Windows. The Variable `messages` under **Flows → Variables** holds its path.
 
-When you're done, click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] --> Otherwise the Flow keeps calling the API.
+> **Try it yourself: the weather in your town** Click **Design**, <!-- show: [data-cy="mode-toggle"] --> change `latitude` and `longitude` in the **Http Uri**, and click **Save & Test** again. <!-- show: [data-tour="flow-save-test"] --> It restarts the Flow, so the change takes effect right away. **Save** alone keeps the running Flow on its old configuration.
 
 ## Summary
 

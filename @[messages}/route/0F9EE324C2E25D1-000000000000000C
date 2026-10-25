@@ -1,0 +1,14 @@
+<names>
+    <name>
+       <firstname>John</firstname>
+       <lastname>Doe</lastname>
+    </name>
+    <name>
+       <firstname>Michael</firstname>
+       <lastname>Kay</lastname>
+    </name>
+    <name>
+       <firstname>Jane</firstname>
+       <lastname>Smith</lastname>
+    </name>
+</names>
