@@ -1,0 +1,353 @@
+import org.gradle.internal.os.OperatingSystem
+
+ext {
+    jlinkModulesCommon = [
+        'java.se',
+        'jdk.unsupported',
+        'jdk.crypto.ec',
+        'jdk.crypto.cryptoki',
+        'jdk.zipfs',
+        'jdk.charsets',
+        'jdk.localedata',
+        'jdk.management',
+        'jdk.management.agent',
+        'jdk.jfr',
+        'jdk.management.jfr',
+        'jdk.naming.dns',
+        'jdk.naming.rmi',
+        'jdk.httpserver',
+        'jdk.xml.dom',
+        'jdk.net',
+        'jdk.nio.mapmode',
+        'jdk.security.auth',
+        'jdk.security.jgss',
+        'jdk.compiler',
+        'jdk.dynalink'
+    ]
+    jlinkModulesWin = jlinkModulesCommon + ['jdk.crypto.mscapi']
+    jlinkModulesMac = jlinkModulesCommon
+}
+
+def hostJavaHome = javaToolchains.launcherFor(java.toolchain).get().metadata.installationPath.asFile
+def isWindowsHost = OperatingSystem.current().isWindows()
+def isMacHost = OperatingSystem.current().isMacOsX()
+def jlinkExecutable = new File(hostJavaHome, isWindowsHost ? 'bin/jlink.exe' : 'bin/jlink').absolutePath
+def jpackageExecutable = new File(hostJavaHome, isWindowsHost ? 'bin/jpackage.exe' : 'bin/jpackage').absolutePath
+
+def windowsLauncherBatContent = { String jarFileName ->
+    """@echo off
+setlocal
+title Assimbly Gateway
+cd /d "%~dp0"
+
+echo ==========================================================
+echo   Assimbly Gateway ${project.version}
+echo ==========================================================
+echo.
+
+netstat -ano | findstr /R /C:":8080 .*LISTENING" >nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+    echo Assimbly Gateway is already running on port 8080!
+    echo Opening http://localhost:8080 in your browser...
+    rundll32 url.dll,FileProtocolHandler http://localhost:8080
+    timeout /t 3 >nul
+    exit /b 0
+)
+
+echo Starting Assimbly Gateway...
+echo Your browser will open automatically at http://localhost:8080 once ready.
+echo Keep this window open while using Assimbly. Press Ctrl+C to stop.
+echo.
+
+"%~dp0runtime\\bin\\java.exe" -Xmx2g -jar "%~dp0app\\${jarFileName}" %*
+if %ERRORLEVEL% NEQ 0 (
+    echo.
+    echo Assimbly Gateway stopped with an error (exit code %ERRORLEVEL%).
+    pause
+)
+""".replace('\n', '\r\n')
+}
+
+def macLauncherCommandContent = { String jarFileName ->
+    """#!/bin/bash
+DIR="\$( cd "\$( dirname "\${BASH_SOURCE[0]}" )" && pwd )"
+cd "\$DIR"
+
+# Remove macOS Gatekeeper quarantine attribute from bundled runtime if present
+xattr -cr "\$DIR/runtime" 2>/dev/null || true
+
+echo "=========================================================="
+echo "  Assimbly Gateway ${project.version}"
+echo "=========================================================="
+echo ""
+
+if lsof -iTCP:8080 -sTCP:LISTEN -t >/dev/null 2>&1; then
+    echo "Assimbly Gateway is already running on port 8080!"
+    echo "Opening http://localhost:8080 in your browser..."
+    open "http://localhost:8080"
+    sleep 2
+    exit 0
+fi
+
+chmod +x "\$DIR/runtime/bin/java" "\$DIR/runtime/lib/jspawnhelper" 2>/dev/null || true
+
+echo "Starting Assimbly Gateway..."
+echo "Your browser will open automatically at http://localhost:8080 once ready."
+echo "Keep this terminal window open while using Assimbly. Press Ctrl+C to stop."
+echo ""
+
+"\$DIR/runtime/bin/java" -Xmx2g -jar "\$DIR/app/${jarFileName}" "\$@"
+EXIT_CODE=\$?
+if [ \$EXIT_CODE -ne 0 ] && [ \$EXIT_CODE -ne 130 ]; then
+    echo ""
+    echo "Assimbly Gateway stopped with exit code \$EXIT_CODE."
+    read -r -p "Press Enter to close this window..."
+fi
+"""
+}
+
+def bundleReadmeContent = {
+    """Assimbly Gateway ${project.version} - Quick Start
+==================================================
+
+1. Start Assimbly:
+   - Windows: Double-click "Assimbly.exe" or "Start Assimbly.bat"
+   - Mac:     Double-click "Start Assimbly.command"
+              (If macOS says the file is from an unidentified developer,
+               right-click "Start Assimbly.command" and click "Open".)
+
+2. Wait ~10 seconds while Assimbly starts in the terminal window.
+   Your browser will open automatically to:
+   http://localhost:8080
+
+3. Sign in with:
+   Username: admin
+   Password: admin
+   (You will be asked to choose your own password on first sign-in.)
+
+4. Click "Tutorials" in the top bar and choose "Quick start" to run
+   your first Flow in 5 minutes!
+
+Stopping Assimbly:
+   Keep the terminal window open while using Assimbly.
+   To stop Assimbly, press Ctrl+C in the terminal window or close it.
+
+Documentation:
+   https://github.com/assimbly/gateway/wiki/quick-start
+"""
+}
+
+// ---------------------------------------------------------------------------
+// Target Runtime Downloads (for cross-building when not on target OS)
+// ---------------------------------------------------------------------------
+
+def jdksDir = layout.buildDirectory.dir("jdks")
+
+tasks.register('downloadRuntimeWinX64', Download) {
+    description = 'Downloads Adoptium JRE 25 for Windows x64 (used when cross-building on non-Windows).'
+    group = 'distribution'
+    src 'https://api.adoptium.net/v3/binary/latest/25/ga/windows/x64/jre/hotspot/normal/eclipse'
+    dest jdksDir.map { it.file('jre25-win-x64.zip') }
+    overwrite false
+    onlyIf { !isWindowsHost && !dest.exists() }
+}
+
+tasks.register('extractRuntimeWinX64', Copy) {
+    dependsOn 'downloadRuntimeWinX64'
+    from({ zipTree(jdksDir.get().file('jre25-win-x64.zip')) })
+    into jdksDir.map { it.dir('win-x64') }
+    onlyIf { !isWindowsHost && !jdksDir.get().dir('win-x64').asFile.exists() }
+}
+
+tasks.register('downloadRuntimeMacArm64', Download) {
+    description = 'Downloads Adoptium JRE 25 for macOS Apple Silicon (aarch64).'
+    group = 'distribution'
+    src 'https://api.adoptium.net/v3/binary/latest/25/ga/mac/aarch64/jre/hotspot/normal/eclipse'
+    dest jdksDir.map { it.file('jre25-mac-aarch64.tar.gz') }
+    overwrite false
+    onlyIf { !isMacHost && !dest.exists() }
+}
+
+tasks.register('extractRuntimeMacArm64', Copy) {
+    dependsOn 'downloadRuntimeMacArm64'
+    from({ tarTree(resources.gzip(jdksDir.get().file('jre25-mac-aarch64.tar.gz'))) })
+    into jdksDir.map { it.dir('mac-aarch64') }
+    onlyIf { !isMacHost && !jdksDir.get().dir('mac-aarch64').asFile.exists() }
+}
+
+def findJavaRuntimeHome = { File searchRoot ->
+    File found = null
+    searchRoot.eachDirRecurse { dir ->
+        if (dir.name == 'bin' && (new File(dir, 'java').exists() || new File(dir, 'java.exe').exists())) {
+            found = dir.parentFile
+        }
+    }
+    if (found == null) {
+        throw new GradleException("Could not find Java runtime home directory under ${searchRoot}")
+    }
+    return found
+}
+
+// ---------------------------------------------------------------------------
+// Windows Packaging (jpackage + Start Assimbly.bat + portable ZIP)
+// ---------------------------------------------------------------------------
+
+tasks.register('preparePackageWin') {
+    description = 'Builds the self-contained Windows application image with embedded Java 25 runtime.'
+    group = 'distribution'
+    dependsOn tasks.named('bootJar'), tasks.named('extractRuntimeWinX64')
+
+    doLast {
+        def bootJarFile = tasks.named('bootJar').get().archiveFile.get().asFile
+        def workDir = layout.buildDirectory.dir('package/win').get().asFile
+        def appImageDir = new File(workDir, 'Assimbly')
+        delete(workDir)
+        workDir.mkdirs()
+
+        if (isWindowsHost) {
+            def inputDir = new File(workDir, 'input')
+            inputDir.mkdirs()
+            copy {
+                from bootJarFile
+                into inputDir
+                rename { 'gateway.jar' }
+            }
+
+            def iconFile = file('src/main/webapp/content/images/favicon.ico')
+            def jpackageCmd = [
+                jpackageExecutable,
+                '--type', 'app-image',
+                '--name', 'Assimbly',
+                '--input', inputDir.absolutePath,
+                '--main-jar', 'gateway.jar',
+                '--main-class', 'org.springframework.boot.loader.launch.JarLauncher',
+                '--dest', workDir.absolutePath,
+                '--app-version', project.version.toString().replaceAll('-.*', ''),
+                '--vendor', 'Assimbly',
+                '--description', 'Assimbly Gateway',
+                '--win-console',
+                '--java-options', '-Xmx2g',
+                '--add-modules', jlinkModulesWin.join(','),
+                '--jlink-options', '--strip-debug --no-man-pages --no-header-files --compress=zip-6'
+            ]
+            if (iconFile.exists() && iconFile.length() > 0) {
+                jpackageCmd.addAll(['--icon', iconFile.absolutePath])
+            }
+
+            def proc = new ProcessBuilder(jpackageCmd).inheritIO().start()
+            int exitCode = proc.waitFor()
+            if (exitCode != 0) {
+                throw new GradleException("jpackage failed with exit code ${exitCode}")
+            }
+            delete(inputDir)
+        } else {
+            appImageDir.mkdirs()
+            def appDir = new File(appImageDir, 'app')
+            appDir.mkdirs()
+            copy {
+                from bootJarFile
+                into appDir
+                rename { 'gateway.jar' }
+            }
+            def winRuntimeHome = findJavaRuntimeHome(jdksDir.get().dir('win-x64').asFile)
+            copy {
+                from winRuntimeHome
+                into new File(appImageDir, 'runtime')
+            }
+        }
+
+        new File(appImageDir, 'Start Assimbly.bat').setText(windowsLauncherBatContent('gateway.jar'), 'UTF-8')
+        new File(appImageDir, 'README.txt').setText(bundleReadmeContent().replace('\n', '\r\n'), 'UTF-8')
+    }
+}
+
+tasks.register('packageWin', Zip) {
+    description = 'Packages the self-contained Windows bundle (with embedded Java 25) into a ZIP archive.'
+    group = 'distribution'
+    dependsOn 'preparePackageWin'
+    archiveFileName = "assimbly-gateway-${project.version}-windows-x64.zip"
+    destinationDirectory = layout.buildDirectory.dir('distributions')
+    from(layout.buildDirectory.dir('package/win'))
+}
+
+// ---------------------------------------------------------------------------
+// macOS Packaging (jlink / embedded Java 25 + Start Assimbly.command + .tar.gz)
+// ---------------------------------------------------------------------------
+
+tasks.register('preparePackageMac') {
+    description = 'Builds the self-contained macOS (Apple Silicon) bundle with embedded Java 25 runtime.'
+    group = 'distribution'
+    dependsOn tasks.named('bootJar'), tasks.named('extractRuntimeMacArm64')
+
+    doLast {
+        def bootJarFile = tasks.named('bootJar').get().archiveFile.get().asFile
+        def workDir = layout.buildDirectory.dir('package/mac').get().asFile
+        def appImageDir = new File(workDir, 'Assimbly')
+        delete(workDir)
+        def appDir = new File(appImageDir, 'app')
+        appDir.mkdirs()
+
+        copy {
+            from bootJarFile
+            into appDir
+            rename { 'gateway.jar' }
+        }
+
+        def runtimeDir = new File(appImageDir, 'runtime')
+        if (isMacHost) {
+            def jlinkCmd = [
+                jlinkExecutable,
+                '--add-modules', jlinkModulesMac.join(','),
+                '--strip-debug',
+                '--no-man-pages',
+                '--no-header-files',
+                '--compress=zip-6',
+                '--output', runtimeDir.absolutePath
+            ]
+            def proc = new ProcessBuilder(jlinkCmd).inheritIO().start()
+            int exitCode = proc.waitFor()
+            if (exitCode != 0) {
+                throw new GradleException("jlink for macOS failed with exit code ${exitCode}")
+            }
+        } else {
+            def macRuntimeHome = findJavaRuntimeHome(jdksDir.get().dir('mac-aarch64').asFile)
+            copy {
+                from macRuntimeHome
+                into runtimeDir
+                exclude 'man/**', 'legal/**'
+            }
+        }
+
+        new File(appImageDir, 'Start Assimbly.command').setText(macLauncherCommandContent('gateway.jar'), 'UTF-8')
+        new File(appImageDir, 'README.txt').setText(bundleReadmeContent(), 'UTF-8')
+    }
+}
+
+tasks.register('packageMac', Tar) {
+    description = 'Packages the self-contained macOS bundle (with embedded Java 25) into a .tar.gz archive.'
+    group = 'distribution'
+    dependsOn 'preparePackageMac'
+    archiveFileName = "assimbly-gateway-${project.version}-mac-aarch64.tar.gz"
+    destinationDirectory = layout.buildDirectory.dir('distributions')
+    compression = Compression.GZIP
+
+    from(layout.buildDirectory.dir('package/mac')) {
+        exclude '**/Start Assimbly.command'
+        exclude '**/runtime/bin/**'
+        exclude '**/runtime/lib/jspawnhelper'
+    }
+    from(layout.buildDirectory.dir('package/mac')) {
+        include '**/Start Assimbly.command'
+        include '**/runtime/bin/**'
+        include '**/runtime/lib/jspawnhelper'
+        filePermissions {
+            unix(0755)
+        }
+    }
+}
+
+tasks.register('packageAll') {
+    description = 'Packages both Windows and macOS self-contained bundles in build/distributions.'
+    group = 'distribution'
+    dependsOn 'packageWin', 'packageMac'
+}

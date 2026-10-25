@@ -41,7 +41,7 @@ You create an API that says hello to whoever calls it.
 
 <!-- step: {"check":"flowExists:sayHello"} -->
 
-1. Click **New Operation**. <!-- show: [data-tour="api-new-operation"] --> A panel opens on the right, on its **General** tab.
+1. Click **New Operation**. <!-- show: [data-tour="api-new-operation"] --> A panel opens on the right.
 2. Keep **Method** on `GET`.
 3. In **Path**, type `{name}` after the `/`, so it reads `/{name}`. <!-- show: #operation-path -->
 4. Set **operationId** to `sayHello` <!-- show: #operation-id --> and **Summary** to `Say hello`.
@@ -51,9 +51,7 @@ The Operation appears in the list, with its Handler Flow *sayHello*.
 
 ![The API with its Operation](03-api-operation.png)
 
-> **What is `{name}`?** A *path parameter*: whatever the caller puts in that part of the path. It appears on the **Parameters** tab by itself.
-
-> **What are the other tabs?** **Parameters** lists the values a caller passes, **Request** describes the body a caller sends and **Responses** what the Operation answers. You don't need them for this API; **Add Operation** stays at the bottom of every tab.
+> **What is `{name}`?** A *path parameter*: whatever the caller puts in that part of the path. It appears under **Parameters** by itself.
 
 ## Step 3: Build the Handler Flow
 
@@ -83,8 +81,7 @@ The Flow is already there: the **Operation** receives the request and the **Resp
 
 1. Click **APIs**, <!-- show: .app-sidebar__link[href="/rest-apis"] --> then **Greetings**. It says **1 of 1 Operation running**.
 2. Click **GET** in the row of the Operation. <!-- show: [data-tour="operation-edit"] -->
-3. Click the **Try it** tab. <!-- show: [data-cy="operation-tab-try"] -->
-4. Type `World` next to **name** and click **Send**. <!-- show: [data-tour="api-try-send"] -->
+3. Under **Try it**, type `World` next to **name** and click **Send**. <!-- show: [data-tour="api-try-send"] -->
 
 The answer comes back with status `200`:
 

@@ -22,10 +22,12 @@ import tech.jhipster.config.JHipsterConstants;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
 // @SpringBootApplication
 @SpringBootApplication(scanBasePackages = { "org.assimbly.gateway", "org.assimbly.cookies", "org.assimbly.gateway.web.rest.integration", "org.assimbly.brokerrest", "org.assimbly.integrationrest" })
@@ -165,5 +167,33 @@ public class GatewayApp {
             contextPath,
             applicationStartupTime
            );
+
+        openBrowserIfEnabled(env, protocol + "://localhost:" + serverPort + contextPath);
+    }
+
+    static void openBrowserIfEnabled(Environment env, String url) {
+        if (!env.getProperty("application.gateway.open-browser", Boolean.class, true)) {
+            return;
+        }
+        if (Arrays.asList(env.getActiveProfiles()).contains("headless")
+            || "true".equalsIgnoreCase(System.getenv("CI"))
+            || System.getenv("CONTAINER") != null
+            || Files.exists(Path.of("/.dockerenv"))) {
+            return;
+        }
+        try {
+            String os = System.getProperty("os.name", "").toLowerCase(Locale.ROOT);
+            ProcessBuilder command;
+            if (os.contains("win")) {
+                command = new ProcessBuilder("rundll32", "url.dll,FileProtocolHandler", url);
+            } else if (os.contains("mac")) {
+                command = new ProcessBuilder("open", url);
+            } else {
+                command = new ProcessBuilder("xdg-open", url);
+            }
+            command.start();
+        } catch (Exception e) {
+            log.debug("Could not open browser for {}: {}", url, e.getMessage());
+        }
     }
 }

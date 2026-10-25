@@ -66,6 +66,7 @@ apply from: "$rootDir/scripts/upgrade/upgrade.gradle"
 apply from: "$rootDir/scripts/resources/resources.gradle"
 apply from: "$rootDir/scripts/version/version.gradle"
 apply from: "gradle/docker.gradle"
+apply from: "gradle/package.gradle"
 apply plugin: 'maven-publish'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'

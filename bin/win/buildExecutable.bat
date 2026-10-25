@@ -1,0 +1,66 @@
+@echo off
+setlocal enabledelayedexpansion
+
+set "propertyFile=..\..\gradle.properties"
+set "tempFile=temp.properties"
+set "propertyName=type"
+set "newValue=FULL"
+set "targetTask=packageWin"
+
+if /I "%~1" == "win" (
+    set "targetTask=packageWin"
+    shift
+) else if /I "%~1" == "mac" (
+    set "targetTask=packageMac"
+    shift
+) else if /I "%~1" == "all" (
+    set "targetTask=packageAll"
+    shift
+)
+
+if "%~1"=="" (
+    goto UPDATE
+) else if "%~1" == "integration" (
+    set "newValue=INTEGRATION"
+) else if "%~1" == "broker" (
+    set "newValue=BROKER"
+) else if "%~1" == "headless" (
+    set "newValue=HEADLESS"
+)
+
+if "%~2"=="" (
+    goto UPDATE
+) else if "%~2" == "integration" (
+    set "newValue=INTEGRATION"
+) else if "%~2" == "broker" (
+    set "newValue=BROKER"
+) else if "%~2" == "headless" (
+    set "newValue=HEADLESS"
+)
+
+:UPDATE
+
+if exist "%tempFile%" del "%tempFile%"
+
+for /f "tokens=1* delims==" %%a in ('type "%propertyFile%"') do (
+    set "line=%%a"
+    if "!line!" == "%propertyName%" (
+        echo %propertyName%=%newValue%>> "%tempFile%"
+    ) else (
+        echo %%a=%%b>> "%tempFile%"
+    )
+)
+
+move /y "%tempFile%" "%propertyFile%"
+
+if [%1]==[] (
+    cls & ..\..\gradlew clean %targetTask% "-Dorg.gradle.jvmargs=-Xmx4g" --project-dir ./../../ -Pprod -Papi-docs
+) else (
+    if [%2]==[] (
+        cls & ..\..\gradlew clean %targetTask% "-Dorg.gradle.jvmargs=-Xmx4g" --project-dir ./../../ -Pprod -Papi-docs -P%1
+    ) else (
+        cls & ..\..\gradlew clean %targetTask% "-Dorg.gradle.jvmargs=-Xmx4g" --project-dir ./../../ -Pprod -Papi-docs -P%1 -P%2
+    )
+)
+
+echo "Executable bundle(s) are located at gateway/build/distributions"

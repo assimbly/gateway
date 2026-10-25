@@ -114,6 +114,8 @@ public class ApplicationProperties {
         private String restListenerUrl = "https://localhost:9001";
         /** Whether a new Gateway gets an example Flow and a default broker on its first start. */
         private boolean firstStartSetup = true;
+        /** Whether the Gateway opens its Local URL in the default browser once started (ignored when headless or in a container). */
+        private boolean openBrowser = true;
 
         public boolean getFirstStartSetup() {
             return firstStartSetup;
@@ -121,6 +123,14 @@ public class ApplicationProperties {
 
         public void setFirstStartSetup(boolean firstStartSetup) {
             this.firstStartSetup = firstStartSetup;
+        }
+
+        public boolean getOpenBrowser() {
+            return openBrowser;
+        }
+
+        public void setOpenBrowser(boolean openBrowser) {
+            this.openBrowser = openBrowser;
         }
 
         public String getTenant() {

@@ -1,64 +1,81 @@
 # Install
 
-Get the Gateway running and sign in. Then follow the [Quick start](https://github.com/assimbly/gateway/wiki/quick-start).
+Get Assimbly Gateway running on your computer in three steps — **no Java installation and no terminal commands required**. Then follow the [Quick start](https://github.com/assimbly/gateway/wiki/quick-start) to run your first Flow.
 
-## Prerequisites
+---
 
-You need **Java 25** (or newer) and a [release of the Assimbly Gateway](https://github.com/assimbly/gateway/releases). Prefer containers? See [Run with Docker](#run-with-docker) instead.
+## 1. Download and unpack
 
-Check your Java version:
+Go to the [latest Assimbly Gateway release](https://github.com/assimbly/gateway/releases/latest) and download the file for your computer:
 
-```
-java -version
-```
+* **Windows**: `assimbly-gateway-[version]-windows-x64.zip`
+  Right-click the downloaded `.zip` file and click **Extract All…**, then open the extracted `Assimbly` folder.
+* **Mac**: `assimbly-gateway-[version]-mac-aarch64.tar.gz`
+  Double-click the downloaded `.tar.gz` file in Finder to unpack it, then open the `Assimbly` folder.
 
-The first line should say version `25` or higher, for example:
+---
 
-```
-openjdk version "25" 2025-09-16 LTS
-```
+## 2. Click to start
 
-If it doesn't, install Java 25 from [Adoptium](https://adoptium.net/).
+* **On Windows**: Double-click **`Assimbly`** (or **`Start Assimbly.bat`**).
+  > *If Windows shows "Windows protected your PC"*: click **More info**, then click **Run anyway**.
+* **On Mac**: Double-click **`Start Assimbly.command`**.
+  > *If Mac says the file is from an unidentified developer*: **right-click** (or Control-click) **`Start Assimbly.command`** and click **Open**, then click **Open** again.
 
-## Start the Gateway
+What happens next:
+1. A terminal window opens and starts Assimbly.
+2. After about 10 seconds, your web browser opens automatically to **[http://localhost:8080](http://localhost:8080)**.
 
-Open a terminal, go to the folder that contains the downloaded jar and start it:
+> **Important:** Keep the terminal window open while you use Assimbly (you can minimize it). When you are done and want to stop Assimbly, simply close that terminal window or press `Ctrl+C`.
 
-```
-java -jar gateway-[version].jar
-```
+---
 
-Wait until the log says the application is running. Then open the Gateway in your browser:
+## 3. Sign in
 
-**[http://localhost:8080](http://localhost:8080)**
+1. Sign in with:
+   * **Username**: `admin`
+   * **Password**: `admin`
+2. Because everyone knows the default password, Assimbly immediately asks you to choose your own password:
+   * Type `admin` as the **Current password**
+   * Type your **New password** twice and click **Save**
 
-Keep the terminal open: the Gateway stops when you close it (press `Ctrl+C` to stop it yourself).
+You now land on **Flows → Manage**! Click **Tutorials** at the top of the screen and select **Quick start** to run your first Flow right inside Assimbly.
 
-> **Port already in use?** Pick another one: `java -Dserver.port=8888 -jar gateway-[version].jar`
+---
+
+## For developers and servers (Docker or Java JAR)
+
+Prefer running Assimbly in a container or with your own Java installation?
 
 ### Run with Docker
 
-```
+```bash
 docker run -p 8080:8088 -p 9001:9001 -v assimbly-data:/data assimbly/gateway-full
 ```
 
-The Gateway is then at **[http://localhost:8080](http://localhost:8080)**, like the jar. Port `9001` serves the REST APIs you create. The volume keeps your Flows when the container is replaced. The Gateway in the container only sees folders you mount into it, for example `-v <your folder>/messages:/messages`.
+Open **[http://localhost:8080](http://localhost:8080)**. Port `9001` serves the REST APIs you create, and the `assimbly-data` volume keeps your Flows when the container is replaced. The Gateway in the container only sees folders you mount into it, for example `-v <your folder>/messages:/messages`.
 
 > Other systems that send messages to the built-in broker need its port too: add `-p 61616:61616`, on a network you trust.
 
-## Sign in
+### Run the JAR with Java 25
 
-Sign in with username `admin` and password `admin`.
+If you already have **Java 25** (or newer) installed (for example from [Adoptium](https://adoptium.net/)), download `gateway-[version].jar` from the [releases page](https://github.com/assimbly/gateway/releases/latest) and run:
 
-Because everyone knows that password, the Gateway first asks you to choose your own: type `admin` as the current password, then your new one twice. Until you do, nothing else works.
+```bash
+java -jar gateway-[version].jar
+```
 
-After that you land on **Flows → Manage**.
+Your browser opens **[http://localhost:8080](http://localhost:8080)** automatically once the Gateway is ready.
 
-> **Secure by default.** On its first start the Gateway generates its own keys for login tokens and for encrypting secrets, and keeps them in `.assimbly/security/secrets.properties` in your home folder (in `/data` with Docker). Keep that file with your database: without it, the stored secrets can't be read. Registration is off: an administrator adds users under **Administration → Users**.
+> **Secure by default.** On its first start the Gateway generates its own keys for login tokens and for encrypting secrets, and keeps them in `.assimbly/security/secrets.properties` in your home folder (in `/data` with Docker). Keep that file with your database: without it, stored secrets can't be read. Registration is off: an administrator adds users under **Administration → Users**.
+
+---
 
 ## Troubleshooting
 
-| Problem | What to check |
-|---------|---------------|
-| `java -version` shows an older version | Install Java 25 and make sure it is the first Java on your `PATH`. |
-| The page doesn't load | Check that the terminal is still running and that you use the right port: `8080`, or the one you chose. |
+| Problem | What to do |
+|---------|------------|
+| **Windows says "Windows protected your PC"** | Click **More info**, then click **Run anyway**. |
+| **Mac says "cannot be opened because it is from an unidentified developer"** | Right-click (or Control-click) **`Start Assimbly.command`** and click **Open**, then confirm **Open**. |
+| **The browser page doesn't load** | Wait 10–15 seconds for the terminal window to say `Assimbly is running!`, then refresh **[http://localhost:8080](http://localhost:8080)**. Make sure you didn't close the terminal window. |
+| **Port 8080 is already in use by another program** | Pick another port when starting: `Start Assimbly.bat --server.port=8888` (Windows) or `./Start\ Assimbly.command --server.port=8888` (Mac). |

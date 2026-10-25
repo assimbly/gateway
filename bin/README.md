@@ -61,6 +61,33 @@ build integration
 
 ---
 
+## buildExecutable
+
+Builds self-contained executable bundles (with an embedded Java 25 runtime via `jlink` / `jpackage`) for Windows and/or Mac so users can run Assimbly without installing Java.
+
+### Usage:
+
+To build the executable bundle:
+
+```buildExecutable [target] [module] [kind]```
+
+* Target: valid values are `win`, `mac`, or `all` (default is `win` on Windows, `mac` on Mac)
+* Module: valid values are `full`, `integration`, `broker` or `headless` (default is `full`)
+* Kind: kind of dependencies: `default` or `full` (default is `default`)
+
+### Examples:
+
+```
+buildExecutable
+buildExecutable all
+buildExecutable win full
+buildExecutable mac integration
+```
+
+The generated archives (`assimbly-gateway-<version>-windows-x64.zip` and `assimbly-gateway-<version>-mac-aarch64.tar.gz`) are placed in `build/distributions/`.
+
+---
+
 ##  BuildDocker
 
 Build a local Docker image to Docker Desktop. (Docker Desktop needs to be installed).

@@ -153,3 +153,4 @@ jhipster:
 application:
   gateway:
     cache: true
+    open-browser: false

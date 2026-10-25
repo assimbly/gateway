@@ -250,6 +250,8 @@ application:
     base-directory: default
     # A new Gateway gets an example Flow and a default Artemis broker that starts with it
     first-start-setup: true
+    # Open the Gateway in the default browser once started (ignored in Docker or headless)
+    open-browser: true
   deploy-directory:
     deploy-on-start: true
     deploy-on-change: true

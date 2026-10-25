@@ -108,6 +108,7 @@ application:
     gateway:
         # Tests set up their own data, and must not start a broker
         first-start-setup: false
+        open-browser: false
 
 encryption:
     jasypt:

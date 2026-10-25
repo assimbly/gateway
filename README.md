@@ -22,23 +22,22 @@ on a canvas, without writing code. Powered by [Apache Camel](https://camel.apach
 
 ## Quick start
 
-You need **Java 25** or newer. Download the latest [release](https://github.com/assimbly/gateway/releases/latest) and run:
+1. **Download and click (Windows & Mac — no Java install needed)**:
+   Download the **Windows** (`.zip`) or **Mac** (`.tar.gz`) bundle from the [latest release](https://github.com/assimbly/gateway/releases/latest), unpack it, and double-click **`Assimbly`** (`Start Assimbly.bat` on Windows, `Start Assimbly.command` on Mac). A terminal window opens, and after a few seconds your browser opens **[http://localhost:8080](http://localhost:8080)** automatically.
 
-```bash
-java -jar gateway-6.0.0.jar
-```
+2. **Or run with Docker** (`amd64` and `arm64`):
+   ```bash
+   docker run -p 8080:8088 -p 9001:9001 -v assimbly-data:/data assimbly/gateway-full
+   ```
 
-Or run it with Docker (amd64 and arm64):
+3. **Or run the JAR** (requires **Java 25** or newer):
+   ```bash
+   java -jar gateway-6.0.0.jar
+   ```
 
-```bash
-docker run -p 8080:8088 -p 9001:9001 -v assimbly-data:/data assimbly/gateway-full
-```
+Sign in at **[http://localhost:8080](http://localhost:8080)** with `admin` / `admin` and choose your own password. Then click **Tutorials** in the top menu and run your first Flow in five minutes.
 
-Open [http://localhost:8080](http://localhost:8080), sign
-in with `admin` / `admin` and choose your own password. Then click **Tutorials** and run your first Flow in five
-minutes.
-
-Stuck? The [Quick start](https://github.com/assimbly/gateway/wiki/quick-start) has more detail and troubleshooting.
+Need help? See the [Install guide](docs/install.md) and the [Quick start](https://github.com/assimbly/gateway/wiki/quick-start).
 
 ## What's new in 6.0
 
