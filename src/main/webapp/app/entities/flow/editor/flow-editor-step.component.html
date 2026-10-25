@@ -279,7 +279,7 @@
           </div>
           @for (option of stepOptions; track option; let idx = $index) {
           <div class="option-row" [formGroupName]="idx">
-            <ng-select [items]="optionChoices" bindLabel="displayName" groupBy="heading"
+            <ng-select [items]="optionChoices" bindLabel="displayName" groupBy="heading" panelClass="option-key-panel"
                        bindValue="name" [addTag]="addOptionTag" addTagText="Use the Option" formControlName="key" [clearable]="false"
                        labelForId="field_options-key-{{index}}-{{idx}}" aria-label="Option"
                        (change)="changeOptionSelection($event, idx)"
@@ -292,7 +292,7 @@
                 <div (mouseenter)="onOptionHover(item)">
                   <div>{{item.displayName}}@if (item.required) { <span class="badge text-bg-secondary">required</span>}</div>
                   @if (item.description) {
-                    <div class="small text-muted text-truncate" [title]="item.description">{{item.description}}</div>
+                    <div class="small text-muted option-key-panel__description" [title]="item.description">{{item.description}}</div>
                   }
                 </div>
               </ng-template>

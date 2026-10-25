@@ -84,6 +84,21 @@
   }
 }
 
+// The keys of a Step's Options open as wide as the Option's row (see .option-row in the Step editor), over its value, so
+// long keys and their descriptions can be read. The panel is sized to the key column, the first 2 of the row's 5 fr, so
+// the row is 2.5 times that plus its two gaps of 0.5rem and its menu column.
+.ng-dropdown-panel.option-key-panel {
+  min-width: calc(250% + 1rem + var(--app-btn-height-sm));
+}
+
+.option-key-panel__description {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: normal;
+}
+
 .option-desc-footer {
   border-top-color: var(--app-border);
   background: var(--app-hover);
