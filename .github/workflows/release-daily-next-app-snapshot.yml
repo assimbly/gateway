@@ -1,0 +1,29 @@
+name: Release Daily Next App Snapshot
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write          # the caller must grant this, or the called workflow can't push
+
+jobs:
+  runtime-image:
+    uses: ./.github/workflows/release-github-images.yml
+    secrets: inherit
+    with:
+      image: assimbly-runtime
+      module: headless
+      branch: next-app
+      tag: next-app
+      jdk: '25'
+
+  broker-image:
+    uses: ./.github/workflows/release-github-images.yml
+    secrets: inherit
+    with:
+      image: assimbly-broker
+      module: broker
+      branch: next-app
+      tag: next-app
+      jdk: '25'

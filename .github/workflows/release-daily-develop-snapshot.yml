@@ -3,9 +3,6 @@ name: Release Daily Development Snapshot
 on:
   workflow_dispatch:
 
-  schedule:
-    - cron: '40 1 * * *'
-
 jobs:
   getversion:
     runs-on: ubuntu-latest
