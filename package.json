@@ -77,6 +77,8 @@
   "overrides": {
     "browser-sync": "3.0.4",
     "webpack": "5.109.2",
+    "@angular-devkit/build-angular": "22.1.8",
+    "@angular/build": "22.1.8",
     "@babel/core": "^7.29.7",
     "eslint-webpack-plugin": {
       "eslint": "$eslint"
