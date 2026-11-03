@@ -421,6 +421,7 @@ if (project.hasProperty("integration")){
                 exclude 'org/assimbly/gateway/camel/**'
                 exclude 'org/assimbly/gateway/config/importing/Import.java'
                 exclude 'org/assimbly/gateway/service/importing/**'
+                exclude 'org/assimbly/gateway/service/testrun/FlowTestRunService.java'
                 exclude 'org/assimbly/gateway/config/memory/**'
                 exclude 'org/assimbly/gateway/web/rest/headless/**'
                 exclude 'org/assimbly/gateway/web/rest/integration/**'
