@@ -178,3 +178,6 @@ activemq-data/**
 /bin/test/
 /bin/generated-sources/
 /bin/default/
+
+# Local secrets loaded by bin/win/run.bat
+/local-env-variables.txt

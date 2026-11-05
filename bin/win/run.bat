@@ -1,10 +1,19 @@
 @echo off
+setlocal
+
+rem Load local secrets (gitignored) before delayed expansion, so a "!" in a value is kept
+set "envFile=%~dp0..\..\local-env-variables.txt"
+if exist "%envFile%" (
+    for /f "usebackq eol=# tokens=1* delims==" %%a in ("%envFile%") do set "%%a=%%b"
+)
+
 setlocal enabledelayedexpansion
 
 set "propertyFile=..\..\gradle.properties"
 set "tempFile=temp.properties"
 set "propertyName=type"
 set "newValue=FULL"
+
 
 if "%~1"=="" (
     goto UPDATE
