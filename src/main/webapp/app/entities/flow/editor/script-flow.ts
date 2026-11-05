@@ -158,7 +158,7 @@ export function scriptTrialError(error: { status: number; statusText?: string; e
     return { ok: false, error: "The runtime can't be reached." };
   }
   if (error.status === 401 || error.status === 403) {
-    return { ok: false, error: 'Sign in again to try the script.' };
+    return { ok: false, error: 'Log in again to try the script.' };
   }
   return { ok: false, error: `The runtime couldn't run the script (${error.status}${error.statusText ? ' ' + error.statusText : ''}).` };
 }

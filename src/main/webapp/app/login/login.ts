@@ -16,6 +16,7 @@ import { TranslateDirective } from 'app/shared/language';
   standalone: true,
   imports: [TranslateDirective, TranslatePipe, ReactiveFormsModule, RouterLink],
   templateUrl: './login.html',
+  styleUrl: './login.scss',
 })
 export default class Login implements OnInit, AfterViewInit {
   readonly username = viewChild.required<ElementRef>('username');

@@ -169,7 +169,7 @@ describe('Script Flow', () => {
 
     it('tells a runtime that cannot be reached from a broken script', () => {
       expect(scriptTrialError({ status: 0 })).toEqual({ ok: false, error: "The runtime can't be reached." });
-      expect(scriptTrialError({ status: 401 })).toEqual({ ok: false, error: 'Sign in again to try the script.' });
+      expect(scriptTrialError({ status: 401 })).toEqual({ ok: false, error: 'Log in again to try the script.' });
       expect(scriptTrialError({ status: 500, statusText: 'Server Error' })).toEqual({
         ok: false,
         error: "The runtime couldn't run the script (500 Server Error).",
