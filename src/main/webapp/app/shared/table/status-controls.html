@@ -2,7 +2,7 @@
   @if (showStart()) {
     <button
       type="button"
-      class="btn btn-fx btn-fx-sm btn-fx-icon"
+      class="btn btn-fx btn-fx-icon" [class.btn-fx-sm]="small()"
       [ngClass]="statusClass()"
       (click)="start.emit()"
       [disabled]="busy() || startDisabled()"
@@ -15,7 +15,7 @@
   @if (showPause()) {
     <button
       type="button"
-      class="btn btn-fx btn-fx-sm btn-fx-icon"
+      class="btn btn-fx btn-fx-icon" [class.btn-fx-sm]="small()"
       [ngClass]="statusClass()"
       (click)="pause.emit()"
       [disabled]="busy() || pauseDisabled()"
@@ -28,7 +28,7 @@
   @if (showResume()) {
     <button
       type="button"
-      class="btn btn-fx btn-fx-sm btn-fx-icon"
+      class="btn btn-fx btn-fx-icon" [class.btn-fx-sm]="small()"
       [ngClass]="statusClass()"
       (click)="resume.emit()"
       [disabled]="busy() || resumeDisabled()"
@@ -41,7 +41,7 @@
   @if (showStop()) {
     <button
       type="button"
-      class="btn btn-fx btn-fx-sm btn-fx-icon"
+      class="btn btn-fx btn-fx-icon" [class.btn-fx-sm]="small()"
       [ngClass]="statusClass()"
       (click)="stop.emit()"
       [disabled]="busy() || stopDisabled()"
@@ -54,7 +54,7 @@
   @if (showRestart()) {
     <button
       type="button"
-      class="btn btn-fx btn-fx-sm btn-fx-icon"
+      class="btn btn-fx btn-fx-icon" [class.btn-fx-sm]="small()"
       [ngClass]="statusClass()"
       (click)="restart.emit()"
       [disabled]="busy() || restartDisabled()"

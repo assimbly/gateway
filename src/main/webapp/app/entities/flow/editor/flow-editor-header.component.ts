@@ -3,7 +3,7 @@ import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { NgClass } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
@@ -64,7 +64,7 @@ const TONE_CLASS: Record<StatusControlsTone, string> = {
   selector: 'jhi-flow-editor-header',
   templateUrl: './flow-editor-header.component.html',
   styleUrl: './flow-editor-header.component.scss',
-  imports: [NgClass, ReactiveFormsModule, FontAwesomeModule, NgbDropdownModule, NgbTooltip, FlowRowAlerts, StatusControls],
+  imports: [NgClass, ReactiveFormsModule, RouterLink, FontAwesomeModule, NgbDropdownModule, NgbTooltip, FlowRowAlerts, StatusControls],
   host: {
     '(document:keydown)': 'onKeydown($event)',
   },

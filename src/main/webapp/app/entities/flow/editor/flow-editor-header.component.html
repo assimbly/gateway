@@ -1,26 +1,87 @@
-<header class="flow-editor-header">
-  <div class="flow-editor-header__title">
-    <label class="flow-editor-header__label" for="field_flowName">Flow name</label>
-    <div class="flow-editor-header__name-field" [class.is-invalid]="nameInvalid()">
-      <fa-icon icon="pencil-alt" class="flow-editor-header__name-icon" aria-hidden="true" />
-      <input
-        #nameInput
-        id="field_flowName"
-        type="text"
-        class="flow-editor-header__name"
-        [formControl]="nameControl()"
-        [attr.aria-invalid]="nameInvalid()"
-        [attr.aria-describedby]="nameInvalid() ? 'field_flowName_hint' : null"
-        placeholder="e.g. Orders"
-        autocomplete="off"
-        required
-      />
+<header class="flow-editor-header" [class.flow-editor-header--modes]="modes()">
+  <!-- Left: which Flow this is and how it stands. -->
+  <div class="flow-editor-header__left">
+    <div class="flow-editor-header__title">
+      <a class="btn btn-fx btn-fx-ghost btn-fx-icon" routerLink="/" data-cy="back-to-flows" aria-label="Back to Flows" ngbTooltip="Back to Flows">
+        <fa-icon icon="arrow-left" />
+      </a>
+      <div class="flow-editor-header__name-field" [class.is-invalid]="nameInvalid()">
+        <fa-icon icon="pencil-alt" class="flow-editor-header__name-icon" aria-hidden="true" />
+        <input
+          #nameInput
+          id="field_flowName"
+          type="text"
+          class="flow-editor-header__name"
+          aria-label="Flow name"
+          [formControl]="nameControl()"
+          [attr.aria-invalid]="nameInvalid()"
+          [attr.aria-describedby]="nameInvalid() ? 'field_flowName_hint' : null"
+          placeholder="Flow name, e.g. Orders"
+          autocomplete="off"
+          required
+        />
+      </div>
+      @if (nameInvalid()) {
+        <small id="field_flowName_hint" class="flow-editor-header__hint text-danger">Name the Flow to save it.</small>
+      }
     </div>
-    @if (nameInvalid()) {
-      <small id="field_flowName_hint" class="flow-editor-header__hint text-danger">Name the Flow to save it.</small>
-    }
+
+    <div class="flow-editor-header__status">
+      @if (modes() && flowId()) {
+        <span class="flow-editor-header__state" data-cy="flow-state">
+          <span class="flow-editor-header__state-dot" [attr.data-tone]="state().tone" aria-hidden="true"></span>{{ state().label }}
+        </span>
+      }
+      <span class="flow-editor-header__save-state" role="status" data-cy="save-state">
+        @if (saving()) {
+          Saving…
+        } @else if (unsaved()) {
+          <span class="flow-editor-header__unsaved-dot" aria-hidden="true"></span>Unsaved changes
+        } @else if (saved()) {
+          <fa-icon icon="check" aria-hidden="true" />{{ draftReason() !== null ? 'Saved as Draft' : 'Saved' }}
+        }
+      </span>
+      @if (state().draft) {
+        @if (draftProblems().length) {
+          <!-- The Draft badge lists what keeps the Flow from running; each one selects its Step or Branch on the canvas. -->
+          <div ngbDropdown class="d-inline-block" placement="bottom-start" container="body">
+            <button type="button" class="badge text-bg-warning flow-editor-header__draft" ngbDropdownToggle data-cy="draft-issues" [attr.aria-label]="draftLabel()">
+              <fa-icon icon="exclamation-triangle" aria-hidden="true" /><span>Draft · {{ issueCount() }}</span>
+            </button>
+            <div ngbDropdownMenu style="max-width: 28rem">
+              <h6 class="dropdown-header">Finish these to start or test the Flow</h6>
+              @for (problem of draftProblems(); track $index) {
+                <button type="button" ngbDropdownItem class="d-flex gap-2 align-items-baseline text-wrap" data-cy="draft-issue" (click)="problemSelected.emit(problem)">
+                  <fa-icon icon="exclamation-triangle" class="text-danger" aria-hidden="true" /><span><strong>{{ problem.where }}</strong> {{ problem.message }}</span>
+                </button>
+              }
+              @if (draftWarnings().length) {
+                <h6 class="dropdown-header">Doesn't block running</h6>
+                @for (warning of draftWarnings(); track $index) {
+                  <button type="button" ngbDropdownItem class="d-flex gap-2 align-items-baseline text-wrap" data-cy="draft-warning" (click)="problemSelected.emit(warning)">
+                    <fa-icon icon="exclamation-circle" class="text-warning" aria-hidden="true" /><span><strong>{{ warning.where }}</strong> {{ warning.message }}</span>
+                  </button>
+                }
+              }
+            </div>
+          </div>
+        } @else {
+          <span class="badge text-bg-secondary" [ngbTooltip]="draftReason()">Draft</span>
+        }
+      }
+      @if (flowId() && !modes()) {
+        <span class="flow-editor-header__counter" data-tour="flow-completed"
+          >Completed <strong>{{ completedLabel() }}</strong></span
+        >
+        <span class="flow-editor-header__counter" data-tour="flow-failed"
+          >Failed <strong>{{ failedLabel() }}</strong></span
+        >
+      }
+      <jhi-flow-row-alerts [failed]="!!failure()" [numberOfAlerts]="alerts()" (alertsOpen)="openAlerts()" />
+    </div>
   </div>
 
+  <!-- Centre: where the user is, always in the same place. -->
   @if (modes()) {
     <span class="flow-editor-header__mode" [ngbTooltip]="toggleBlocked() ?? 'Switch between ' + designLabel() + ' and Test (T)'">
       <button
@@ -40,136 +101,70 @@
         <span class="flow-mode-toggle__option" [class.is-active]="mode() === 'test'"><fa-icon icon="flask" /><span>Test</span></span>
       </button>
     </span>
-
-    <!-- The controls of the Flows list, in Design as well as in Test: their colour shows whether the Flow runs. -->
-    @if (flowId()) {
-      <span class="visually-hidden">{{ state().label }}</span>
-      <jhi-status-controls
-        data-tour="flow-status-controls"
-        [busy]="busy()"
-        [tone]="state().tone"
-        [showStart]="shows('start')"
-        [startDisabled]="disabled('start') || startBlocked() !== null"
-        [showPause]="shows('pause')"
-        [pauseDisabled]="disabled('pause')"
-        [showResume]="shows('resume')"
-        [showStop]="shows('stop')"
-        [stopDisabled]="disabled('stop')"
-        [showRestart]="shows('restart')"
-        (start)="start()"
-        (pause)="pause()"
-        (resume)="resume()"
-        (stop)="stop()"
-        (restart)="restart()"
-      />
-    }
   }
 
-  <div class="flow-editor-header__status">
-    <span class="flow-editor-header__save-state" role="status" data-cy="save-state">
-      @if (saving()) {
-        Saving…
-      } @else if (unsaved()) {
-        <span class="flow-editor-header__unsaved-dot" aria-hidden="true"></span>Unsaved changes
-      } @else if (saved()) {
-        <fa-icon icon="check" aria-hidden="true" />{{ draftReason() !== null ? 'Saved as Draft' : 'Saved' }}
-      }
-    </span>
-    @if (state().draft) {
-      @if (draftProblems().length) {
-        <!-- The Draft badge lists what keeps the Flow from running; each one selects its Step or Branch on the canvas. -->
-        <div ngbDropdown class="d-inline-block" placement="bottom-start" container="body">
-          <button type="button" class="badge text-bg-warning flow-editor-header__draft" ngbDropdownToggle data-cy="draft-issues" [attr.aria-label]="draftLabel()">
-            <fa-icon icon="exclamation-triangle" aria-hidden="true" /><span>Draft · {{ issueCount() }}</span>
-          </button>
-          <div ngbDropdownMenu style="max-width: 28rem">
-            <h6 class="dropdown-header">Finish these to start or test the Flow</h6>
-            @for (problem of draftProblems(); track $index) {
-              <button type="button" ngbDropdownItem class="d-flex gap-2 align-items-baseline text-wrap" data-cy="draft-issue" (click)="problemSelected.emit(problem)">
-                <fa-icon icon="exclamation-triangle" class="text-danger" aria-hidden="true" /><span><strong>{{ problem.where }}</strong> {{ problem.message }}</span>
-              </button>
-            }
-            @if (draftWarnings().length) {
-              <h6 class="dropdown-header">Doesn't block running</h6>
-              @for (warning of draftWarnings(); track $index) {
-                <button type="button" ngbDropdownItem class="d-flex gap-2 align-items-baseline text-wrap" data-cy="draft-warning" (click)="problemSelected.emit(warning)">
-                  <fa-icon icon="exclamation-circle" class="text-warning" aria-hidden="true" /><span><strong>{{ warning.where }}</strong> {{ warning.message }}</span>
-                </button>
-              }
-            }
-          </div>
-        </div>
-      } @else {
-        <span class="badge text-bg-secondary" [ngbTooltip]="draftReason()">Draft</span>
-      }
-    }
-    @if (flowId() && !modes()) {
-      <span class="flow-editor-header__counter" data-tour="flow-completed"
-        >Completed <strong>{{ completedLabel() }}</strong></span
-      >
-      <span class="flow-editor-header__counter" data-tour="flow-failed"
-        >Failed <strong>{{ failedLabel() }}</strong></span
-      >
-    }
-    <jhi-flow-row-alerts [failed]="!!failure()" [numberOfAlerts]="alerts()" (alertsOpen)="openAlerts()" />
-  </div>
-
+  <!-- Right: what the current mode does. -->
   <div class="flow-editor-header__actions">
     @if (modes()) {
-      <!-- Test has the status controls next to the mode switch only; Design saves as well. -->
       @if (mode() === 'design') {
+        <button
+          type="button"
+          class="btn btn-fx btn-fx-secondary"
+          data-tour="flow-save"
+          [disabled]="saving()"
+          (click)="save.emit()"
+          aria-keyshortcuts="Control+S"
+          [ngbTooltip]="running() ? 'Save (Ctrl+S). The running Flow keeps its previous configuration until it is restarted' : 'Save (Ctrl+S)'"
+        >
+          <fa-icon icon="save" /><span>Save</span>
+        </button>
         @if (running()) {
           <button
             type="button"
-            class="btn btn-fx btn-fx-secondary"
+            class="btn btn-fx btn-fx-primary"
             data-tour="flow-save-test"
             [disabled]="saving() || busy()"
             (click)="saveAndRestart.emit()"
             ngbTooltip="Save the Flow, restart it so the change takes effect, and test it (Ctrl+Enter)"
             aria-keyshortcuts="Control+Enter"
           >
-            <fa-icon icon="flask" /><span>Save &amp; Test</span>
+            <fa-icon icon="play" /><span>Save &amp; Test</span>
           </button>
         } @else {
           <span [ngbTooltip]="draftReason() ? 'This Flow is a Draft: ' + draftReason() : 'Save the Flow, start it and test it (Ctrl+Enter)'">
             <button
               type="button"
-              class="btn btn-fx btn-fx-secondary"
+              class="btn btn-fx btn-fx-primary"
               data-tour="flow-save-test"
               [disabled]="saving() || busy() || draftReason() !== null"
               (click)="saveAndStart.emit()"
               aria-keyshortcuts="Control+Enter"
             >
-              <fa-icon icon="flask" /><span>Save &amp; Test</span>
+              <fa-icon icon="play" /><span>Save &amp; Test</span>
             </button>
           </span>
         }
-        <div class="btn-group" ngbDropdown placement="bottom-end" container="body">
-          <button
-            type="button"
-            class="btn btn-fx btn-fx-primary"
-            data-tour="flow-save"
-            [disabled]="saving()"
-            (click)="save.emit()"
-            [attr.title]="running() ? null : 'Save (Ctrl+S)'"
-            aria-keyshortcuts="Control+S"
-            [ngbTooltip]="running() ? 'The running Flow keeps its previous configuration until it is restarted' : ''"
-          >
-            <fa-icon icon="save" /><span>Save</span>
-          </button>
-          <button
-            type="button"
-            class="btn btn-fx btn-fx-primary btn-fx-icon flow-editor-header__save-menu"
-            ngbDropdownToggle
-            [disabled]="saving()"
-            aria-label="More save options"
-          >
-            <fa-icon icon="chevron-down" />
-          </button>
-          <div ngbDropdownMenu>
-            <button type="button" ngbDropdownItem (click)="saveAndReturn.emit()">Save &amp; close</button>
-          </div>
-        </div>
+      } @else if (flowId()) {
+        <!-- The controls of the Flows list: their colour shows whether the Flow runs. -->
+        <jhi-status-controls
+          data-tour="flow-status-controls"
+          [small]="false"
+          [busy]="busy()"
+          [tone]="state().tone"
+          [showStart]="shows('start')"
+          [startDisabled]="disabled('start') || startBlocked() !== null"
+          [showPause]="shows('pause')"
+          [pauseDisabled]="disabled('pause')"
+          [showResume]="shows('resume')"
+          [showStop]="shows('stop')"
+          [stopDisabled]="disabled('stop')"
+          [showRestart]="shows('restart')"
+          (start)="start()"
+          (pause)="pause()"
+          (resume)="resume()"
+          (stop)="stop()"
+          (restart)="restart()"
+        />
       }
     } @else {
       @if (flowId()) {

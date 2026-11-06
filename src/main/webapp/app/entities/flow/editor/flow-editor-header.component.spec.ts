@@ -92,8 +92,7 @@ describe('Flow editor header', () => {
 
   it('renames the Flow from its labelled name field', () => {
     fixture.detectChanges();
-    const input: HTMLInputElement = fixture.nativeElement.querySelector('#field_flowName');
-    expect(fixture.nativeElement.querySelector('label[for="field_flowName"]').textContent).toContain('Flow name');
+    const input: HTMLInputElement = fixture.nativeElement.querySelector('input[aria-label="Flow name"]');
 
     input.value = 'Orders to SFTP';
     input.dispatchEvent(new Event('input'));
@@ -116,6 +115,12 @@ describe('Flow editor header', () => {
     fixture.detectChanges();
 
     expect(fixture.nativeElement.querySelector('#field_flowName_hint').textContent).toContain('Name the Flow to save it.');
+  });
+
+  it('goes back to the Flows', () => {
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('[data-cy="back-to-flows"]').getAttribute('href')).toBe('/');
   });
 
   it('offers Save & close', () => {
@@ -272,10 +277,12 @@ describe('Flow editor header', () => {
       buttonNamed('Save & Test').click();
 
       expect(saveAndStart).toHaveBeenCalled();
-      expect(buttonNamed('Save')).toBeTruthy();
-      for (const label of ['Log', 'Camel route', 'Send test message', 'Save & start']) {
+      expect(buttonNamed('Save & Test').classList).toContain('btn-fx-primary');
+      expect(buttonNamed('Save').classList).toContain('btn-fx-secondary');
+      for (const label of ['Log', 'Camel route', 'Send test message', 'Save & start', 'Save & close']) {
         expect(() => buttonNamed(label)).toThrow();
       }
+      expect(fixture.nativeElement.querySelector('[aria-label="More save options"]')).toBeNull();
       expect(fixture.nativeElement.querySelector('[data-tour="flow-completed"]')).toBeNull();
     });
 
@@ -332,17 +339,12 @@ describe('Flow editor header', () => {
       expect(modeChange).toHaveBeenCalledWith('design');
     });
 
-    it('starts and stops with the controls of the Flows list in Design as well', () => {
-      fixture.detectChanges();
-      expect(controlNamed('Start').disabled).toBe(false);
-
+    it('shows in Design whether the Flow runs, and leaves starting and stopping to Test', () => {
       fixture.componentInstance.status.set('active');
       fixture.detectChanges();
-      const stop = jest.spyOn(TestBed.inject(FlowService), 'stop').mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
-      expect(fixture.nativeElement.querySelector('.visually-hidden').textContent).toBe('Running');
-      controlNamed('Stop').click();
 
-      expect(stop).toHaveBeenCalledWith(7);
+      expect(fixture.nativeElement.querySelector('[data-cy="flow-state"]').textContent.trim()).toBe('Running');
+      expect(fixture.nativeElement.querySelector('jhi-status-controls')).toBeNull();
       expect(buttonNamed('Save')).toBeTruthy();
     });
 
@@ -377,6 +379,8 @@ describe('Flow editor header', () => {
       expect(fixture.nativeElement.querySelector('[role="switch"]').getAttribute('aria-checked')).toBe('true');
       expect(controlNamed('Stop')).toBeTruthy();
       expect(controlNamed('Restart')).toBeTruthy();
+      // As tall as the other buttons of the header, unlike the small ones of the Flows list.
+      expect(controlNamed('Stop').classList).not.toContain('btn-fx-sm');
       expect(() => buttonNamed('Save')).toThrow();
       controlNamed('Pause').click();
 

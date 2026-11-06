@@ -1,3 +1,9 @@
+// The header's own width decides its layout, not the window's: the sidebar and panels take a varying share.
+:host {
+  display: block;
+  container-type: inline-size;
+}
+
 .flow-editor-header {
   display: flex;
   flex-wrap: wrap;
@@ -8,31 +14,65 @@
   border-bottom: 1px solid var(--app-border);
 }
 
-.flow-editor-header__title {
+// The visual editor's header when it is wide enough: who and what on the left, the mode switch in the centre, the mode's
+// actions on the right, on one row, so it keeps its height when "Unsaved changes" or the Draft badge appears: the name
+// gives way first. The switch is centred whenever the left side leaves room for it. Narrower headers wrap.
+@container (min-width: 64rem) {
+  .flow-editor-header--modes {
+    display: grid;
+    grid-template-columns: minmax(min-content, 1fr) auto minmax(min-content, 1fr);
+
+    .flow-editor-header__actions {
+      justify-self: end;
+    }
+
+    .flow-editor-header__left,
+    .flow-editor-header__status,
+    .flow-editor-header__actions {
+      flex-wrap: nowrap;
+      white-space: nowrap;
+    }
+
+    .flow-editor-header__name-field {
+      min-width: 10rem;
+    }
+
+    // Without a width an input keeps its default width of about 20 characters and never gives way.
+    .flow-editor-header__name {
+      width: 0;
+    }
+  }
+}
+
+.flow-editor-header__left {
   display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.flow-editor-header__title {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
   flex: 1 1 18rem;
   min-width: 0;
   max-width: 32rem;
 }
 
-.flow-editor-header__label {
-  margin: 0;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--app-text-muted);
-}
-
 .flow-editor-header__name-field {
   display: flex;
+  flex: 1 1 auto;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.25rem 0.625rem;
+  min-width: 0;
+  height: var(--app-btn-height, 2.25rem);
+  padding: 0 0.625rem;
   border: 1px solid var(--app-border);
-  border-radius: 6px;
+  border-radius: var(--app-btn-radius);
   background: var(--app-surface);
 
   &:hover {
@@ -71,8 +111,39 @@
   }
 }
 
+// Under the name field, without pushing the row down.
 .flow-editor-header__hint {
-  color: var(--app-text-muted);
+  position: absolute;
+  top: 100%;
+  left: calc(var(--app-btn-height, 2.25rem) + 0.375rem);
+  z-index: 1;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.flow-editor-header__state {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.flow-editor-header__state-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--app-text-muted);
+
+  &[data-tone='started'] {
+    background: var(--app-success);
+  }
+
+  &[data-tone='paused'] {
+    background: var(--app-warning);
+  }
+
+  &[data-tone='failed'] {
+    background: var(--app-danger);
+  }
 }
 
 .flow-editor-header__status {
@@ -130,7 +201,7 @@
   margin-left: auto;
 }
 
-// The Design/Test toggle of the visual editor: a pill whose thumb slides under the active mode.
+// The Design/Test toggle of the visual editor: a segmented control whose thumb slides under the active mode.
 .flow-mode-toggle {
   position: relative;
   display: inline-grid;
@@ -138,7 +209,7 @@
   height: var(--app-btn-height, 2.25rem);
   padding: 3px;
   border: 1px solid var(--app-border);
-  border-radius: 999px;
+  border-radius: var(--app-btn-radius);
   background: var(--app-hover);
   color: var(--app-text-muted);
   font-size: var(--app-btn-font-size, 0.875rem);
@@ -162,7 +233,7 @@
   bottom: 3px;
   left: 3px;
   width: calc(50% - 3px);
-  border-radius: 999px;
+  border-radius: var(--app-btn-radius);
   background: var(--app-surface);
   box-shadow: 0 1px 2px rgb(16 24 40 / 15%);
   transition: transform 0.2s ease;
