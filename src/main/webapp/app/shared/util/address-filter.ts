@@ -32,3 +32,19 @@ export function filterAddresses(
   }
   return result;
 }
+
+export interface AddressTotals {
+  consumers: number;
+  messages: number;
+}
+
+/** Adds up the Consumers and Messages of the Queues or Topics, counting a missing number as 0. */
+export function totalAddresses(addresses: IAddress[] | null | undefined): AddressTotals {
+  return (addresses ?? []).reduce(
+    (totals, address) => ({
+      consumers: totals.consumers + (address.numberOfConsumers ?? 0),
+      messages: totals.messages + (address.numberOfMessages ?? 0),
+    }),
+    { consumers: 0, messages: 0 },
+  );
+}

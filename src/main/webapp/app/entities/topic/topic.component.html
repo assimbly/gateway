@@ -41,6 +41,13 @@
       [brokerType]="brokerType"
       endpointType="topic"
     ></tr>
+    <tr
+      jhiTableFooter
+      jhi-address-totals-row
+      [shown]="filteredAddresses"
+      [count]="addresses.length"
+      noun="topics"
+    ></tr>
   </jhi-data-table>
   }
 </div>

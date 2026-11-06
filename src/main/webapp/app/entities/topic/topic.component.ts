@@ -21,12 +21,13 @@ import { SearchToolbar } from 'app/shared/filter';
 import { EndpointTypeSwitch, EndpointsEmptyState } from 'app/shared/endpoint-switch';
 import { DataTable, DataTableColumn } from 'app/shared/table';
 import { AddressRowComponent } from 'app/entities/broker/address-row.component';
+import { AddressTotalsRowComponent } from 'app/entities/broker/address-totals-row.component';
 import { filterAddresses } from 'app/shared/util/address-filter';
 
 @Component({
   selector: 'jhi-topic',
   templateUrl: './topic.component.html',
-  imports: [CommonModule, RouterModule, FontAwesomeModule, SearchToolbar, EndpointTypeSwitch, EndpointsEmptyState, DataTable, AddressRowComponent],
+  imports: [CommonModule, RouterModule, FontAwesomeModule, SearchToolbar, EndpointTypeSwitch, EndpointsEmptyState, DataTable, AddressRowComponent, AddressTotalsRowComponent],
 })
 export class TopicComponent implements OnInit, OnDestroy {
 

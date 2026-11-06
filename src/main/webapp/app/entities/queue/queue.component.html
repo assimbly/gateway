@@ -42,6 +42,13 @@
       [attr.data-endpoint-name]="address.name"
       endpointType="queue"
     ></tr>
+    <tr
+      jhiTableFooter
+      jhi-address-totals-row
+      [shown]="filteredAddresses"
+      [count]="addresses.length"
+      noun="queues"
+    ></tr>
   </jhi-data-table>
   }
 </div>
