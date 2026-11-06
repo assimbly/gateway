@@ -15,11 +15,12 @@ import {
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
-import { EFMarkerType, FCanvasComponent, FFlowModule, FMinimapComponent, FMoveNodesEvent, FSelectionChangeEvent, FZoomDirective } from '@foblex/flow';
+import { EFMarkerType, FCanvasComponent, FFlowComponent, FFlowModule, FMinimapComponent, FMoveNodesEvent, FSelectionChangeEvent, FZoomDirective } from '@foblex/flow';
 
 import { Components } from 'app/shared/camel/component-type';
 
 import {
+  canDeleteStep,
   defaultBranch,
   DesignLink,
   DesignStep,
@@ -33,6 +34,7 @@ import {
   routerOf,
   routerShape,
   routerTitle,
+  shownName,
   StepKind,
   StepMove,
 } from './flow-graph';
@@ -42,8 +44,8 @@ import { compactCount } from '../flow-stats';
 import { StepRun, StepRunMark, shortDuration } from '../test/flow-test-run';
 import { PickedKind, StepComponents, StepPickerComponent } from './step-picker.component';
 
-/** What the right-hand panel shows: a Step, the Link leading to a Step, or the Flow settings. */
-export type DesignerSelection = { type: 'step'; key: string } | { type: 'link'; to: string } | { type: 'flow' };
+/** What the right-hand panel shows: a Step, several Steps, the Link leading to a Step, or the Flow settings. */
+export type DesignerSelection = { type: 'step'; key: string } | { type: 'steps'; keys: string[] } | { type: 'link'; to: string } | { type: 'flow' };
 
 /**
  * The visual designer's canvas: draws a Flow graph and reports what the user does with it.
@@ -78,7 +80,12 @@ export class FlowCanvasComponent {
   @Output() appendStep = new EventEmitter<{ after: string; kind: PickedKind; componentType: string }>();
   @Output() addBranch = new EventEmitter<string>();
   @Output() moveSteps = new EventEmitter<StepMove[]>();
+  /** The × on a Step was clicked. */
+  @Output() deleteStep = new EventEmitter<string>();
+  /** A Step got a new name; an empty one takes its name away. */
+  @Output() renameStep = new EventEmitter<{ key: string; name: string }>();
 
+  @ViewChild(FFlowComponent) private flow?: FFlowComponent;
   @ViewChild(FCanvasComponent) canvas?: FCanvasComponent;
   @ViewChild(FMinimapComponent) private minimapComponent?: FMinimapComponent;
   @ViewChild(FZoomDirective) private zoom?: FZoomDirective;
@@ -193,6 +200,43 @@ export class FlowCanvasComponent {
     return text ? text + returns : undefined;
   }
 
+  readonly shownName = shownName;
+
+  /** The Step whose name is being typed under it, if any. */
+  editingName?: string;
+
+  @ViewChild('nameInput') private nameInput?: ElementRef<HTMLInputElement>;
+
+  /** Turns the line under the Step into a field for its name, as double-clicking that line or F2 does. */
+  editName(key: string): void {
+    if (this.readOnly || !this.graph.steps.some(s => s.key === key)) {
+      return;
+    }
+    this.editingName = key;
+    this.cdr.markForCheck();
+    setTimeout(() => this.nameInput?.nativeElement.select());
+  }
+
+  commitName(step: DesignStep, name: string): void {
+    if (this.editingName !== step.key) {
+      return;
+    }
+    this.editingName = undefined;
+    if (name.trim() !== (shownName(step) ?? '')) {
+      this.renameStep.emit({ key: step.key, name });
+    }
+  }
+
+  cancelNameEdit(): void {
+    this.editingName = undefined;
+    this.cdr.markForCheck();
+  }
+
+  /** Whether the Step gets a ×: not the Source, nor a Step its Branch can't do without. */
+  canDelete(step: DesignStep): boolean {
+    return canDeleteStep(this.graph, step.key);
+  }
+
   canAddBranch(step: DesignStep): boolean {
     return step.kind === 'ROUTER' && routerShape(step).slots === 'list';
   }
@@ -215,21 +259,33 @@ export class FlowCanvasComponent {
   }
 
   isSelected(step: DesignStep): boolean {
-    return this.selection.type === 'step' && this.selection.key === step.key;
+    const selection = this.selection;
+    return (selection.type === 'step' && selection.key === step.key) || (selection.type === 'steps' && selection.keys.includes(step.key));
   }
 
   isLinkSelected(link: DesignLink): boolean {
     return this.selection.type === 'link' && this.selection.to === link.to;
   }
 
+  /** Several Steps are selected by Shift+dragging a box around them or Ctrl+clicking them; read-only views show one. */
   onSelectionChange(event: FSelectionChangeEvent): void {
-    if (event.nodeIds.length) {
+    if (event.nodeIds.length > 1 && !this.readOnly) {
+      this.selectionChange.emit({ type: 'steps', keys: event.nodeIds });
+    } else if (event.nodeIds.length) {
       this.selectionChange.emit({ type: 'step', key: event.nodeIds[0] });
     } else if (event.connectionIds.length) {
       this.selectionChange.emit({ type: 'link', to: event.connectionIds[0].replace(/^link-/, '') });
     } else {
       this.selectionChange.emit({ type: 'flow' });
     }
+  }
+
+  /** Selects every Step, as Ctrl+A does; with a single Step that is just that one. */
+  selectAllSteps(): void {
+    const keys = this.graph.steps.map(s => s.key);
+    // Marked as changed, so Foblex reports the next click (such as one on the background) as a new selection.
+    this.flow?.select(keys, []);
+    this.selectionChange.emit(keys.length === 1 ? { type: 'step', key: keys[0] } : { type: 'steps', keys });
   }
 
   onMoveNodes(event: FMoveNodesEvent): void {
@@ -302,6 +358,9 @@ export class FlowCanvasComponent {
     }
     if (selection.type === 'link') {
       return `link:${selection.to}`;
+    }
+    if (selection.type === 'steps') {
+      return undefined;
     }
     const ends = openEnds(this.graph);
     if (selection.type === 'flow') {

@@ -1,5 +1,6 @@
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { DefaultUrlSerializer, UrlTree } from '@angular/router';
+import { Subject } from 'rxjs';
 
 import { Step, StepType } from 'app/shared/model/step.model';
 
@@ -117,6 +118,78 @@ describe('Flow editor modes', () => {
     component.onDesignerKeydown(new KeyboardEvent('keydown', { key: 'Delete' }));
 
     expect(deleteStep).not.toHaveBeenCalled();
+  });
+
+  describe('with several Steps', () => {
+    function designing(): FlowEditorEsbComponent {
+      const { component } = editor();
+      Object.assign(component, {
+        designer: {},
+        modalService: { hasOpenModals: () => false },
+        offcanvas: { hasOpenOffcanvas: () => false },
+      });
+      return component;
+    }
+
+    it('selects every Step with Ctrl+A, without selecting the page text', () => {
+      const component = designing();
+      const selectAllSteps = jest.fn();
+      Object.assign(component, { flowCanvas: { selectAllSteps } });
+      const event = new KeyboardEvent('keydown', { key: 'a', ctrlKey: true, cancelable: true });
+
+      component.onDesignerKeydown(event);
+
+      expect(selectAllSteps).toHaveBeenCalled();
+      expect(event.defaultPrevented).toBe(true);
+    });
+
+    it('deletes all selected Steps with the Delete key', () => {
+      const component = designing();
+      component.selection = { type: 'steps', keys: ['s1', 's2'] };
+      const deleteSteps = jest.spyOn(component, 'onDeleteSteps').mockImplementation(() => undefined);
+
+      component.onDesignerKeydown(new KeyboardEvent('keydown', { key: 'Delete' }));
+
+      expect(deleteSteps).toHaveBeenCalledWith(['s1', 's2']);
+    });
+  });
+
+  describe('saving before leaving', () => {
+    function saving(): FlowEditorEsbComponent {
+      const { component } = editor();
+      Object.assign(component, { saving: false, saveFinished: new Subject<boolean>(), savingFlowSuccess: false });
+      return component;
+    }
+
+    it('tells that the Flow was saved once the save is over', async () => {
+      const component = saving();
+      jest.spyOn(component, 'save').mockImplementation(() => {
+        component.isSaving = true;
+        setTimeout(() => {
+          component.savingFlowSuccess = true;
+          component.isSaving = false;
+        });
+      });
+
+      expect(await component.saveBeforeLeaving()).toBe(true);
+    });
+
+    it('tells that it was not saved when the save failed', async () => {
+      const component = saving();
+      jest.spyOn(component, 'save').mockImplementation(() => {
+        component.isSaving = true;
+        setTimeout(() => (component.isSaving = false));
+      });
+
+      expect(await component.saveBeforeLeaving()).toBe(false);
+    });
+
+    it('tells that it was not saved when the Flow could not be saved, such as with an empty field', async () => {
+      const component = saving();
+      jest.spyOn(component, 'save').mockImplementation(() => undefined);
+
+      expect(await component.saveBeforeLeaving()).toBe(false);
+    });
   });
 
   it('goes back to Design to edit a Step from Test', () => {

@@ -83,6 +83,11 @@
     background: var(--flow-kind-color);
     border: none;
   }
+
+  // The theme circles the end of a Link to drag it elsewhere; Links can't be reassigned here.
+  .f-connection-drag-handle {
+    display: none;
+  }
 }
 
 .flow-designer-canvas {

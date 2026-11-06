@@ -383,6 +383,9 @@ public class ExportXML {
         Element step = setElement("step", null, steps);
 
         setElement("id", confId, step);
+        if (stepDB.getName() != null && !stepDB.getName().isBlank()) {
+            setElement("name", stepDB.getName(), step);
+        }
         setElement("type", confStepType, step);
 
         ResponseSettings response = isResponse(stepDB) ? ResponseSettings.of(stepDB.getUri(), stepDB.getOptions()) : null;

@@ -25,7 +25,7 @@ import { IMessage } from 'app/shared/model/message.model';
 import { IRoute, Route } from "app/shared/model/route.model";
 import { Connection } from 'app/shared/model/connection.model';
 import dayjs from "dayjs/esm";
-import { from, forkJoin, Observable, of, Subscription } from "rxjs";
+import { firstValueFrom, from, forkJoin, Observable, of, Subject, Subscription } from "rxjs";
 import { map, switchMap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LinkService } from "../../link/link.service";
@@ -71,6 +71,7 @@ import { variableWarnings } from "app/shared/camel/variables";
 import { LinkEditorComponent } from "../designer/link-editor.component";
 import { ResponseEditorComponent } from "./response-editor.component";
 import { CallFlowEditorComponent, callableFlows } from "./call-flow-editor.component";
+import { confirmChoice } from "./confirm-dialog.component";
 import { ApiService } from "app/entities/api/api.service";
 import { operationUrl } from "app/entities/api/operation-url";
 import { IApiHandler } from "app/entities/api/api.model";
@@ -84,6 +85,9 @@ import {
   conditionBranch,
   deleteBranch,
   deleteStep,
+  deleteSteps,
+  renameStep,
+  shownName,
   DesignLink,
   DesignStep,
   EditResult,
@@ -192,7 +196,23 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	activeStep: any;
 	activeEditor: string;
 
-	isSaving: boolean;
+	private saving = false;
+	/** Tells, when a save is over, whether it saved the Flow. */
+	private readonly saveFinished = new Subject<boolean>();
+
+	get isSaving(): boolean {
+		return this.saving;
+	}
+
+	// Every save ends here, whichever way it went; a save that worked has set savingFlowSuccess by then.
+	set isSaving(saving: boolean) {
+		const finished = this.saving && !saving;
+		this.saving = saving;
+		if (finished) {
+			this.saveFinished.next(this.savingFlowSuccess);
+		}
+	}
+
 	savingFlowFailed = false;
 	savingFlowFailedMessage = "Saving failed (check logs)";
 	savingFlowSuccess = false;
@@ -2792,21 +2812,60 @@ splitOptions4(options: string): string[] {
 		this.edit(addBranch(this.designer!.current, routerKey));
 	}
 
-	onDeleteStep(key: string): void {
-		const graph = this.designer!.current;
-		const step = graph.steps.find(s => s.key === key);
-		const branches = graph.links.filter(l => l.from === key).length;
+	async onDeleteStep(key: string): Promise<void> {
+		const step = this.designer!.current.steps.find(s => s.key === key);
 		if (
 			step?.kind === 'ROUTER' &&
-			branches > 1 &&
-			!window.confirm(`Delete this ${routerTitle(step)} Router? Its Default branch takes its place and its other Branches are deleted.`)
+			this.hasBranches([key]) &&
+			!(await this.confirmDelete(`Delete this ${routerTitle(step)} Router? Its Default branch takes its place and its other Branches are deleted.`))
 		) {
 			return;
 		}
-		this.edit(deleteStep(graph, key));
+		this.edit(deleteStep(this.designer!.current, key));
 		if (!this.designer!.current.steps.some(s => s.key === key)) {
 			this.selection = { type: 'flow' };
 		}
+		this.cdr.markForCheck();
+	}
+
+	/** Deletes the selected Steps as one edit, so one undo brings them all back. */
+	async onDeleteSteps(keys: string[]): Promise<void> {
+		if (
+			this.hasBranches(keys) &&
+			!(await this.confirmDelete('Delete the selected Steps? Each Router among them is replaced by its Default branch, and its other Branches are deleted.'))
+		) {
+			return;
+		}
+		this.edit(deleteSteps(this.designer!.current, keys));
+		const left = keys.filter(key => this.designer!.current.steps.some(s => s.key === key));
+		this.selection = left.length === 1 ? { type: 'step', key: left[0] } : left.length ? { type: 'steps', keys: left } : { type: 'flow' };
+		this.cdr.markForCheck();
+	}
+
+	/** The name of the selected Step, for the Name field of the side panel. */
+	get selectedStepName(): string {
+		const selection = this.selection;
+		const step = selection.type === 'step' ? this.canvasGraph?.steps.find(s => s.key === selection.key) : undefined;
+		return (step && shownName(step)) ?? '';
+	}
+
+	onRenameStep(key: string, name: string): void {
+		this.edit(renameStep(this.designer!.current, key, name));
+		this.cdr.markForCheck();
+	}
+
+	/** Whether any of these Steps is a Router with more than one Branch, which a delete takes with it. */
+	private hasBranches(keys: string[]): boolean {
+		const graph = this.designer!.current;
+		return graph.steps.some(s => keys.includes(s.key) && s.kind === 'ROUTER' && graph.links.filter(l => l.from === s.key).length > 1);
+	}
+
+	private async confirmDelete(message: string): Promise<boolean> {
+		const choice = await confirmChoice(this.modalService, 'Delete Router', message, [
+			{ value: 'cancel', label: 'Cancel', style: 'secondary', icon: 'ban' },
+			{ value: 'delete', label: 'Delete', style: 'danger', icon: 'trash' },
+		]);
+		return choice === 'delete';
 	}
 
 	onDeleteBranch(linkTo: string): void {
@@ -2867,6 +2926,11 @@ splitOptions4(options: string): string[] {
 		if (covered) {
 			return;
 		}
+		if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'a' && this.flowCanvas && !this.canvasGraph?.readOnlyReason) {
+			event.preventDefault();
+			this.flowCanvas.selectAllSteps();
+			return;
+		}
 		// Space adds a Step, like the + that fits the selection. On a focused button or link, Space keeps its usual meaning.
 		if (event.key === ' ' && !event.ctrlKey && !event.metaKey && !event.altKey && !target.closest('button, a')) {
 			if (this.flowCanvas?.openStepPicker(this.selection)) {
@@ -2874,15 +2938,32 @@ splitOptions4(options: string): string[] {
 			}
 			return;
 		}
+		if (event.key === 'F2' && this.selection.type === 'step' && !this.canvasGraph?.readOnlyReason) {
+			event.preventDefault();
+			this.flowCanvas?.editName(this.selection.key);
+			return;
+		}
 		// Backspace too: a Mac keyboard's delete key sends it.
 		if ((event.key === 'Delete' || event.key === 'Backspace') && !event.ctrlKey && !event.metaKey) {
 			const selection = this.selection;
 			if (selection.type === 'step') {
 				this.onDeleteStep(selection.key);
+			} else if (selection.type === 'steps') {
+				this.onDeleteSteps(selection.keys);
 			} else if (selection.type === 'link') {
 				this.onDeleteBranch(selection.to);
 			}
 		}
+	}
+
+	/**
+	 * Saves the Flow before the editor is left, and tells whether it was saved. A Flow that can't be saved, such as one
+	 * with a field left empty, shows why and keeps the user in the editor.
+	 */
+	saveBeforeLeaving(): Promise<boolean> {
+		const finished = firstValueFrom(this.saveFinished);
+		this.save('stay');
+		return this.isSaving ? finished : Promise.resolve(false);
 	}
 
 	/** True while the Flow has edits that are not saved; used to warn before leaving the designer. */
@@ -2997,6 +3078,7 @@ splitOptions4(options: string): string[] {
 
 		stepsToSave(graph, this.flow.id ?? 0).forEach(({ key, step }) => {
 			const target = this.steps[this.stepKeys.indexOf(key)];
+			target.name = step.name;
 			target.options = step.options;
 			target.coordinateX = step.coordinateX;
 			target.coordinateY = step.coordinateY;

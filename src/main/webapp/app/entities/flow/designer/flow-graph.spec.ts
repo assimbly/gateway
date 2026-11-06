@@ -10,6 +10,7 @@ import {
   canDeleteStep,
   changeComponent,
   deleteStep,
+  deleteSteps,
   EditResult,
   endsRequest,
   FlowGraph,
@@ -30,6 +31,8 @@ import {
   routerShape,
   routerTitle,
   stepsToSave,
+  renameStep,
+  shownName,
   takesCondition,
   updateLink,
   updateStep,
@@ -545,6 +548,58 @@ describe('Flow graph', () => {
 
     it('refuses to delete the Source', () => {
       expect(deleteStep(sourceToSink(), 'step-10')).toEqual({ outcome: 'rejected', reason: expect.stringContaining('Source') });
+    });
+  });
+
+  describe('deleting several Steps', () => {
+    it('deletes a chain of Actions at once, reconnecting the Steps around them', () => {
+      const one = edited(insertStep(sourceToSink(), 'step-11', 'ACTION', 'setbody'));
+      const two = edited(insertStep(one, 'step-11', 'ACTION', 'log'));
+      const actions = two.steps.filter(s => s.kind === 'ACTION').map(s => s.key);
+
+      const graph = edited(deleteSteps(two, actions));
+
+      expect(graph.steps.map(s => s.key)).toEqual(['step-10', 'step-11']);
+      expect(linkKeys(graph)).toEqual(['step-10 → step-11']);
+    });
+
+    it('keeps the Source, and skips Steps that already went with their Router', () => {
+      const graph = edited(deleteSteps(contentRouterFlow(), ['step-10', 'step-11', 'step-12', 'step-13']));
+
+      expect(graph.steps.map(s => s.key)).toEqual(['step-10']);
+      expect(graph.links).toEqual([]);
+    });
+
+    it('refuses when none of the Steps can be deleted', () => {
+      expect(deleteSteps(contentRouterFlow(), ['step-10', 'step-12']).outcome).toBe('rejected');
+    });
+  });
+
+  describe('naming a Step', () => {
+    it('names a Step and saves the name with it', () => {
+      const graph = edited(renameStep(sourceToSink(), 'step-11', '  Write orders  '));
+
+      expect(graph.steps.find(s => s.key === 'step-11')!.name).toBe('Write orders');
+      expect(stepsToSave(graph, 1).find(s => s.key === 'step-11')!.step.name).toBe('Write orders');
+    });
+
+    it('takes the name away when it is emptied', () => {
+      const named = edited(renameStep(sourceToSink(), 'step-11', 'Write orders'));
+
+      expect(edited(renameStep(named, 'step-11', ' ')).steps.find(s => s.key === 'step-11')!.name).toBeUndefined();
+    });
+
+    it('loads the saved name of a Step', () => {
+      const graph = loadFlowGraph(flow([{ id: 10, name: 'Poll orders', stepType: 'SOURCE', componentType: 'timer' } as IStep]));
+
+      expect(graph.steps[0].name).toBe('Poll orders');
+    });
+
+    it('shows no name that an import gave a Step from its id', () => {
+      expect(shownName({ name: 'Poll orders' })).toBe('Poll orders');
+      expect(shownName({ name: '12' })).toBeUndefined();
+      expect(shownName({ name: '0b6a3c0e-1f0d-4a8e-9a55-2f4e0c1d9b7a' })).toBeUndefined();
+      expect(shownName({})).toBeUndefined();
     });
   });
 

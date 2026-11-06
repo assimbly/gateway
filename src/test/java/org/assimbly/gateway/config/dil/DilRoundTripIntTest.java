@@ -101,6 +101,16 @@ class DilRoundTripIntTest {
         assertThat(xPath.evaluate("coordinates", stepByUri(exported, "log:check"), XPathConstants.NODE)).isNull();
     }
 
+    @Test
+    void aNamedStepKeepsItsNameAndAnUnnamedStepGetsNone() throws Exception {
+
+        Document exported = roundTrip("content-router.xml", "ContentRouterFlow");
+
+        assertThat(xPath.evaluate("name", step(exported, "router"))).isEqualTo("Route orders");
+        // Imported without a name, the source is no longer named after its DIL id.
+        assertThat(xPath.evaluate("name", step(exported, "source"), XPathConstants.NODE)).isNull();
+    }
+
     @ParameterizedTest
     @CsvSource(delimiter = '|', value = {
         "if-router.xml        | IfRouterFlow        | if      | log:sink-if   | simple | ${body} contains 'Test'",

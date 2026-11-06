@@ -152,6 +152,99 @@ describe('Flow canvas', () => {
     expect(selections).toEqual([{ type: 'step', key: 'step-11' }]);
   });
 
+  it('reports several selected Steps as one selection, and marks each of them', () => {
+    const selections: DesignerSelection[] = [];
+    fixture.componentInstance.selectionChange.subscribe(selection => selections.push(selection));
+
+    fixture.componentInstance.onSelectionChange({ nodeIds: ['step-11', 'step-12'], connectionIds: [] } as any);
+    fixture.componentRef.setInput('selection', selections[0]);
+    fixture.detectChanges();
+
+    expect(selections).toEqual([{ type: 'steps', keys: ['step-11', 'step-12'] }]);
+    const steps: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('.flow-step'));
+    expect(steps.map(s => s.classList.contains('flow-step-selected'))).toEqual([false, true, true, false]);
+  });
+
+  it('selects every Step at once', () => {
+    const selections: DesignerSelection[] = [];
+    fixture.componentInstance.selectionChange.subscribe(selection => selections.push(selection));
+
+    fixture.componentInstance.selectAllSteps();
+
+    expect(selections).toEqual([{ type: 'steps', keys: ['step-10', 'step-11', 'step-12', 'step-13'] }]);
+  });
+
+  it('offers a × only on Steps that can be deleted, and reports which one was clicked', () => {
+    const deleted: string[] = [];
+    const selections: DesignerSelection[] = [];
+    fixture.componentInstance.deleteStep.subscribe(key => deleted.push(key));
+    fixture.componentInstance.selectionChange.subscribe(selection => selections.push(selection));
+    const steps: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('.flow-step'));
+
+    // The Source starts every Flow, and the Default branch can't go.
+    expect(steps.map(s => !!s.querySelector('.flow-step-delete'))).toEqual([false, true, false, true]);
+
+    steps[1].querySelector<HTMLElement>('.flow-step-delete')!.click();
+
+    expect(deleted).toEqual(['step-11']);
+    expect(selections).toEqual([]);
+  });
+
+  describe('naming a Step', () => {
+    function names(): string[] {
+      return Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('.flow-step-name')).map(n => n.textContent!.trim());
+    }
+
+    function typeName(key: string, name: string, key2: 'Enter' | 'Escape'): { key: string; name: string }[] {
+      const renamed: { key: string; name: string }[] = [];
+      fixture.componentInstance.renameStep.subscribe(event => renamed.push(event));
+      fixture.componentInstance.editName(key);
+      fixture.detectChanges();
+      const input = fixture.nativeElement.querySelector('.flow-step-name-input') as HTMLInputElement;
+      input.value = name;
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: key2 }));
+      if (key2 === 'Enter') {
+        // Enter blurs the field, which jsdom doesn't do on its own.
+        input.dispatchEvent(new Event('blur'));
+      }
+      fixture.detectChanges();
+      return renamed;
+    }
+
+    it('shows the name under the Step instead of its path', () => {
+      const graph = loadFlowGraph(contentRouterFlow);
+      fixture.componentRef.setInput('graph', { ...graph, steps: graph.steps.map(s => (s.key === 'step-12' ? { ...s, name: 'Log orders' } : s)) });
+      fixture.detectChanges();
+
+      expect(names()).toEqual(['Log orders']);
+    });
+
+    it('reports the name typed under a Step on Enter', () => {
+      expect(typeName('step-12', 'Log orders', 'Enter')).toEqual([{ key: 'step-12', name: 'Log orders' }]);
+      expect(fixture.nativeElement.querySelector('.flow-step-name-input')).toBeNull();
+    });
+
+    it('keeps the name as it was on Escape', () => {
+      expect(typeName('step-12', 'Log orders', 'Escape')).toEqual([]);
+      expect(fixture.nativeElement.querySelector('.flow-step-name-input')).toBeNull();
+    });
+
+    it('offers no name field when read-only', () => {
+      fixture.componentRef.setInput('readOnly', true);
+      fixture.componentInstance.editName('step-12');
+      fixture.detectChanges();
+
+      expect(fixture.nativeElement.querySelector('.flow-step-name-input')).toBeNull();
+    });
+  });
+
+  it('offers no × when read-only', () => {
+    fixture.componentRef.setInput('readOnly', true);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelectorAll('.flow-step-delete')).toHaveLength(0);
+  });
+
   it('marks what each Step did in a test run: the Source gave the input, a Step failed, a Step was never reached', () => {
     const message = { body: 'x', headers: {}, truncated: false };
     fixture.componentRef.setInput(

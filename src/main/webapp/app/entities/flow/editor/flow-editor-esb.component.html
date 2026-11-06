@@ -421,6 +421,8 @@
                   (appendStep)="onAppendStep($event)"
                   (addBranch)="onAddBranch($event)"
                   (moveSteps)="onMoveSteps($event)"
+                  (deleteStep)="onDeleteStep($event)"
+                  (renameStep)="onRenameStep($event.key, $event.name)"
                 ></jhi-flow-canvas>
               <div class="flow-designer-alerts">
                 @if (viewMode === 'test' && hasUnsavedChanges) {
@@ -484,6 +486,12 @@
                   (countsChange)="onRunCountsChange($event)"
                 />
               } @else if (selection.type === 'step' && selectedStepIndex >= 0) {
+                <div class="flow-step-name-field mb-2">
+                  <label class="form-label small text-muted mb-1" for="field_stepName">Name</label>
+                  <input type="text" class="form-control form-control-sm" id="field_stepName" maxlength="255" placeholder="Shown under the Step on the canvas (F2)"
+                         [value]="selectedStepName" [readOnly]="!!canvasGraph?.readOnlyReason"
+                         (change)="onRenameStep(selection.key, $any($event.target).value)" (keydown.enter)="$any($event.target).blur()" />
+                </div>
                 @switch (panelFor(selectedStepIndex)) {
                   @case ('operation') {
                     <ng-container *ngTemplateOutlet="operationSource"></ng-container>
@@ -516,6 +524,18 @@
                     <ng-container *ngTemplateOutlet="stepEditor; context: { $implicit: selectedStepIndex }"></ng-container>
                   }
                 }
+              } @else if (selection.type === 'steps') {
+                <div class="card bg-light text-start flow-settings" data-cy="selected-steps">
+                  <div class="card-body">
+                    <h5 class="border-bottom">{{ selection.keys.length }} STEPS SELECTED</h5>
+                    <p class="text-muted small">Drag one of them to move them together. Shift+drag on the canvas selects the Steps in a box; Ctrl+click adds or removes one.</p>
+                    @if (!canvasGraph?.readOnlyReason) {
+                      <button type="button" class="btn btn-fx btn-fx-danger" (click)="onDeleteSteps(selection.keys)">
+                        <fa-icon icon="trash"></fa-icon><span>Delete</span>
+                      </button>
+                    }
+                  </div>
+                </div>
               } @else if (selectedLink; as link) {
                 <jhi-link-editor
                   [graph]="canvasGraph!"

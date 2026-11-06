@@ -47,8 +47,17 @@
           } @else {
             <div class="flow-step-label" [title]="label(step)">{{ label(step) }}</div>
           }
-          @if (caption(step); as path) {
-            <div class="flow-step-caption" [title]="step.uri">{{ path }}</div>
+          @if (editingName === step.key) {
+            <input #nameInput fDragBlocker class="flow-step-caption flow-step-name-input" aria-label="Step name" placeholder="Name this Step"
+                   [value]="shownName(step) ?? ''" maxlength="255"
+                   (keydown.enter)="nameInput.blur()" (keydown.escape)="cancelNameEdit()" (blur)="commitName(step, nameInput.value)"
+                   (click)="$event.stopPropagation()" (dblclick)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" />
+          } @else if (shownName(step); as name) {
+            <div class="flow-step-caption flow-step-name" [title]="step.uri ? name + ' — ' + step.uri : name"
+                 (dblclick)="!readOnly && editName(step.key); $event.stopPropagation()">{{ name }}</div>
+          } @else if (caption(step); as path) {
+            <div class="flow-step-caption" [title]="step.uri"
+                 (dblclick)="!readOnly && editName(step.key); $event.stopPropagation()">{{ path }}</div>
           }
           @if (problemOf(step); as problem) {
             <span class="flow-step-warning" [title]="problem"><fa-icon icon="exclamation-triangle"></fa-icon></span>
@@ -72,6 +81,12 @@
               <fa-icon [icon]="run.status === 'failed' ? 'times' : 'check'"></fa-icon>{{ shortDuration(run.ownMillis) }}
             </div>
           }
+          @if (!readOnly && canDelete(step)) {
+            <button type="button" fDragBlocker class="flow-step-delete" title="Delete this Step (Delete)" aria-label="Delete this Step"
+                    (click)="$event.stopPropagation(); deleteStep.emit(step.key)" (dblclick)="$event.stopPropagation()">
+              <fa-icon icon="times"></fa-icon>
+            </button>
+          }
           @if (canAddBranch(step) && !readOnly) {
             <button type="button" fDragBlocker class="flow-plus flow-add-branch" title="Add a Branch" aria-label="Add a Branch"
                     (click)="$event.stopPropagation(); addBranch.emit(step.key)" (dblclick)="$event.stopPropagation()">
@@ -93,6 +108,11 @@
       }
     </ng-container>
   </f-canvas>
+
+  <!-- Shift+drag on the background draws a box that selects the Steps in it. Alone in its @if, so Foblex gets it. -->
+  @if (!readOnly) {
+    <f-selection-area></f-selection-area>
+  }
 
   <!-- Declared here, inside the flow, so the minimap can reach it; the editor shows it in its side panel. -->
   <ng-template #minimap>

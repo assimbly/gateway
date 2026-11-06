@@ -163,6 +163,8 @@ public class ImportXMLFlows {
 
             flow = setLinks(doc, flowId, flow);
 
+            forgetNamesTakenFromIds(doc, flowId, flow);
+
             flow = flowRepository.save(flow);
 
             log.info("Importing flow finished: " + flowId);
@@ -464,6 +466,22 @@ public class ImportXMLFlows {
 
         return flow;
 
+    }
+
+    /**
+     * A Step without a name in the DIL is imported under its DIL id, which finds it again while its Links are set.
+     * Once they are set, that id is no name the user gave it, so the Step keeps no name.
+     */
+    private void forgetNamesTakenFromIds(Document doc, String flowId, Flow flow) throws XPathExpressionException {
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        String stepsXPath = "/dil/integrations/integration/flows/flow[id='" + flowId + "']/steps/";
+        for (Step step : flow.getSteps()) {
+            String name = step.getName();
+            boolean named = name != null && Integer.parseInt(xPath.evaluate("count(" + stepsXPath + "step[name='" + name + "'])", doc)) > 0;
+            if (!named) {
+                step.setName(null);
+            }
+        }
     }
 
     /** Whether a message is one the export generated for a Response, named response{stepId}. */

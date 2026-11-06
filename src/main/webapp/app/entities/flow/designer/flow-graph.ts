@@ -10,6 +10,8 @@ export type StepKind = 'SOURCE' | 'ACTION' | 'ROUTER' | 'SINK';
 export interface DesignStep {
   key: string;
   id?: number;
+  /** What the user named the Step; unnamed Steps are known by their component. */
+  name?: string;
   kind: StepKind;
   componentType?: string;
   uri?: string;
@@ -296,6 +298,7 @@ function toDesignStep(step: IStep): DesignStep {
   return {
     key: `step-${step.id}`,
     id: step.id,
+    name: step.name || undefined,
     kind: step.stepType as StepKind,
     componentType: step.componentType,
     uri: step.uri,
@@ -486,6 +489,42 @@ export function deleteStep(graph: FlowGraph, key: string): EditResult {
 
   return rejected('This Step cannot be deleted.');
 }
+
+/**
+ * Deletes several Steps as one edit. Each goes as `deleteStep` would delete it on its own; a Step that can't go (such
+ * as the Source), or that already went with a Router before it, is left out.
+ */
+export function deleteSteps(graph: FlowGraph, keys: string[]): EditResult {
+  let result = graph;
+  for (const key of keys) {
+    const deleted = deleteStep(result, key);
+    if (deleted.outcome === 'accepted') {
+      result = deleted.graph;
+    }
+  }
+  return result === graph ? rejected('None of these Steps can be deleted.') : accepted(result);
+}
+
+/** Names a Step; an empty name takes its name away, so it is known by its component again. */
+export function renameStep(graph: FlowGraph, key: string, name: string): EditResult {
+  const step = graph.steps.find(s => s.key === key);
+  if (!step) {
+    return rejected('There is no such Step.');
+  }
+  const trimmed = name.trim() || undefined;
+  return accepted({ ...graph, steps: graph.steps.map(s => (s === step ? { ...s, name: trimmed } : s)) });
+}
+
+/**
+ * The name to show for a Step. An import used to give a Step without a name its id in the imported file, such as `12`
+ * or a UUID; that is no name the user gave it.
+ */
+export function shownName(step: Pick<DesignStep, 'name'>): string | undefined {
+  const name = step.name?.trim();
+  return name && !/^\d+$/.test(name) && !UUID.test(name) ? name : undefined;
+}
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** Whether the Step can be deleted, so the editor only offers to delete it then. */
 export function canDeleteStep(graph: FlowGraph, key: string): boolean {
@@ -816,6 +855,7 @@ export function stepsToSave(graph: FlowGraph, flowId: number): { key: string; st
     key: s.key,
     step: {
       id: s.id,
+      name: s.name,
       stepType: s.kind as IStep['stepType'],
       componentType: s.componentType,
       uri: s.uri,
