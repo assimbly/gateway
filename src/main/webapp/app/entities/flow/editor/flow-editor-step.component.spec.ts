@@ -235,6 +235,116 @@ describe('Flow editor Component Step', () => {
   }
 });
 
+describe('Flow editor Router Step', () => {
+  let fixture: ComponentFixture<FlowEditorStepComponent>;
+
+  const language = { name: 'language', displayName: 'Language', type: 'string' };
+  const expression = { name: 'expression', displayName: 'Expression', type: 'string', required: true };
+  const streaming = { name: 'streaming', displayName: 'Streaming', type: 'boolean', defaultValue: false };
+
+  /** A split Router on the canvas, as an imported one that still holds a Condition in its own Options. */
+  function render(options: Array<{ key: string; value: string }>, step: object = { options: 'saved' }): FlowEditorStepComponent {
+    TestBed.configureTestingModule({
+      imports: [FlowEditorStepComponent],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting(), StepEditorRegistry],
+    });
+    TestBed.inject(FaIconLibrary).addIcons(...fontAwesomeIcons);
+
+    fixture = TestBed.createComponent(FlowEditorStepComponent);
+    fixture.componentRef.setInput('step', { stepType: StepType.ROUTER, componentType: 'split', ...step });
+    fixture.componentRef.setInput('index', 1);
+    fixture.componentRef.setInput(
+      'stepForm',
+      new FormGroup({
+        id: new FormControl(null),
+        stepType: new FormControl('ROUTER'),
+        message: new FormControl(null),
+        connection: new FormControl(null),
+        componentType: new FormControl('split'),
+        uri: new FormControl(''),
+        options: new FormArray(
+          options.map(option => new FormGroup({ key: new FormControl(option.key), value: new FormControl(option.value), defaultValue: new FormControl('') })),
+        ),
+      }),
+    );
+    fixture.componentRef.setInput('onCanvas', true);
+    fixture.componentRef.setInput('routerTitle', 'Split');
+    fixture.componentRef.setInput('conditionBranch', 'split');
+    fixture.componentRef.setInput('stepOptions', options.map(option => ({ ...option })));
+    fixture.componentRef.setInput('componentOptions', [language, expression, streaming]);
+    fixture.detectChanges();
+    return fixture.componentInstance;
+  }
+
+  function editBranchButton(): HTMLButtonElement | null {
+    return fixture.nativeElement.querySelector('[data-cy="edit-condition-branch"]');
+  }
+
+  it('keeps the Path of a Router in place, read-only', () => {
+    render([]);
+    const path: HTMLInputElement = fixture.nativeElement.querySelector('#field_uri_1');
+
+    expect(path.readOnly).toBe(true);
+    expect(path.classList).toContain('step-field__unused');
+    expect(path.placeholder).toBe('Split has no path');
+  });
+
+  it("doesn't offer the language and expression of a Condition held by a Branch", () => {
+    const step = render([]);
+
+    expect(step.optionChoices.map(option => option.name)).toEqual(['streaming']);
+    expect(step.missingRequiredOptions).toEqual([]);
+  });
+
+  it("doesn't suggest them for a new Router either", () => {
+    render([], { options: undefined });
+
+    const keys = (fixture.componentInstance.stepForm.get('options') as FormArray).controls.map(option => option.get('key')?.value);
+    expect(keys).not.toContain('language');
+    expect(keys).not.toContain('expression');
+  });
+
+  it('shows a Condition left in the Options as unused, and can remove it', () => {
+    const step = render([
+      { key: 'expression', value: '/persons/person' },
+      { key: 'streaming', value: 'true' },
+    ]);
+    const value: HTMLInputElement = fixture.nativeElement.querySelector('#field_options-value-1-0');
+
+    expect(value.readOnly).toBe(true);
+    expect(value.classList).toContain('step-field__unused');
+    expect(value.value).toBe('/persons/person');
+
+    (fixture.nativeElement.querySelector('.option-row [aria-label="Remove option"]') as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    expect(step.stepOptions.map(option => option.key)).toEqual(['streaming']);
+  });
+
+  it('points to the Branch that holds the Condition, and opens it', () => {
+    const step = render([]);
+    const opened = jest.fn();
+    step.editBranch.subscribe(opened);
+
+    expect(fixture.nativeElement.querySelector('[data-cy="condition-branch-hint"]').textContent).toContain(
+      'The Condition (language and expression) is set on the split Branch: select its arrow on the canvas.',
+    );
+    expect(editBranchButton()!.textContent?.trim()).toBe('Edit the split Branch');
+
+    editBranchButton()!.click();
+    expect(opened).toHaveBeenCalled();
+  });
+
+  it('leaves the Condition Options alone for a Router without such a Branch', () => {
+    const step = render([]);
+    fixture.componentRef.setInput('conditionBranch', undefined);
+    fixture.detectChanges();
+
+    expect(step.optionChoices.map(option => option.name)).toEqual(expect.arrayContaining(['language', 'expression']));
+    expect(editBranchButton()).toBeNull();
+  });
+});
+
 describe('Flow editor Route Step', () => {
   const broker = { id: 1, name: 'Gateway broker', type: 'ActiveMQ' };
   const database = { id: 2, name: 'Orders database', type: 'SQL' };

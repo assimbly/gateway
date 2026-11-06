@@ -867,6 +867,22 @@ describe('Flow graph', () => {
 
       expect(stepsToSave(graph, 1).find(s => s.key === router.key)!.step.options).toBe('streaming=false');
     });
+
+    it.each(['if', 'loop', 'dowhile'])("drops the copy of an '%s' Router's Condition from its options too", kind => {
+      const inserted = edited(insertStep(sourceToSink(), 'step-11', 'ROUTER', kind));
+      const router = inserted.steps.find(s => s.kind === 'ROUTER')!;
+      const graph = edited(updateStep(inserted, router.key, { options: 'language=simple&expression=${body}&copy=true' }));
+
+      expect(stepsToSave(graph, 1).find(s => s.key === router.key)!.step.options).toBe('copy=true');
+    });
+
+    it('keeps the options of a Router whose Branches take no Condition', () => {
+      const inserted = edited(insertStep(sourceToSink(), 'step-11', 'ROUTER', 'enrich'));
+      const router = inserted.steps.find(s => s.kind === 'ROUTER')!;
+      const graph = edited(updateStep(inserted, router.key, { options: 'language=simple&expression=${body}' }));
+
+      expect(stepsToSave(graph, 1).find(s => s.key === router.key)!.step.options).toBe('language=simple&expression=${body}');
+    });
   });
 
   describe('arranging', () => {

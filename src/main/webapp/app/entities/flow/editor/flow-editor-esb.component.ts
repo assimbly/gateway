@@ -81,9 +81,11 @@ import {
   autoArrange,
   canDeleteStep,
   COMPONENTS_WITH_CONNECTION,
+  conditionBranch,
   deleteBranch,
   deleteStep,
   DesignLink,
+  DesignStep,
   EditResult,
   FlowGraph,
   insertStep,
@@ -2265,11 +2267,32 @@ splitOptions4(options: string): string[] {
 		return hasModes(this.activeEditor);
 	}
 
+	private get selectedRouter(): DesignStep | undefined {
+		const selection = this.selection;
+		return selection.type === 'step' ? this.canvasGraph?.steps.find(s => s.key === selection.key && s.kind === 'ROUTER') : undefined;
+	}
+
 	/** What the selected Router is called, shown read-only as its component. */
 	get selectedRouterTitle(): string | undefined {
-		const selection = this.selection;
-		const router = selection.type === 'step' ? this.canvasGraph?.steps.find(s => s.key === selection.key && s.kind === 'ROUTER') : undefined;
+		const router = this.selectedRouter;
 		return router ? routerTitle(router) : undefined;
+	}
+
+	/** The Branch of the selected Router that holds its Condition, such as `split`; the Router's panel points there. */
+	get selectedConditionBranch(): string | undefined {
+		const router = this.selectedRouter;
+		return router ? conditionBranch(router) : undefined;
+	}
+
+	/** Selects the Branch that holds the selected Router's Condition, which opens its editor in the panel. */
+	editConditionBranch(): void {
+		const router = this.selectedRouter;
+		const branch = router ? conditionBranch(router) : undefined;
+		const link = branch ? this.canvasGraph?.links.find(l => l.from === router!.key && l.rule === branch) : undefined;
+		if (link) {
+			this.onSelectionChange({ type: 'link', to: link.to });
+			this.flowCanvas?.reveal(link.to);
+		}
 	}
 
 	get selectedStepDeletable(): boolean {

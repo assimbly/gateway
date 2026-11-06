@@ -255,7 +255,7 @@
               Type a logger name to use your own.
             </small>
           }
-          @if (uriPlaceholder) {
+          @if (uriPlaceholder && !pathUnused) {
             <small class="step-field__hint font-monospace" id="field_uri_syntax_{{index}}">{{uriPlaceholder}}</small>
           }
           @if (formSubmitted && uriErrors?.required) {
@@ -278,6 +278,19 @@
             </div>
           </div>
           @for (option of stepOptions; track option; let idx = $index) {
+          @if (isConditionOption(idx)) {
+            <!-- Left by mistake or by an import: shown as unused, as the Router reads its Condition from its Branch. -->
+            <div class="option-row">
+              <input type="text" class="form-control step-field__unused" readonly [value]="optionTitle(idx)" aria-label="Option"
+                     [title]="'Not used: the Condition is set on the ' + conditionBranch + ' Branch'" />
+              <input type="text" class="form-control step-field__unused" readonly id="field_options-value-{{index}}-{{idx}}"
+                     [value]="optionValue(idx)" aria-label="Value" [title]="'Not used: the Condition is set on the ' + conditionBranch + ' Branch'" />
+              <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm" title="Remove option" aria-label="Remove option"
+                      (click)="removeOption(option)">
+                <fa-icon icon="times"></fa-icon>
+              </button>
+            </div>
+          } @else {
           <div class="option-row" [formGroupName]="idx">
             <ng-select [items]="optionChoices" bindLabel="displayName" groupBy="heading" panelClass="option-key-panel"
                        bindValue="name" [addTag]="addOptionTag" addTagText="Use the Option" formControlName="key" [clearable]="false"
@@ -367,8 +380,19 @@
               </div>
             </div>
           </div>
+          }
           } @empty {
             <div class="step-field__hint">No options yet.</div>
+          }
+          @if (conditionBranch) {
+            <div class="step-field__hint" data-cy="condition-branch-hint">
+              The Condition (language and expression) is set on the {{ conditionBranch }} Branch: select its arrow on the canvas.
+              <div>
+                <button type="button" class="btn btn-link btn-sm p-0" data-cy="edit-condition-branch" (click)="onEditBranch()">
+                  Edit the {{ conditionBranch }} Branch
+                </button>
+              </div>
+            </div>
           }
         </div>
 

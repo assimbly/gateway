@@ -163,19 +163,40 @@ export class StepPickerComponent implements OnChanges {
   }
 
   /**
-   * Components the search finds that this kind of Step can't use, with the reason, so nothing Camel offers is hidden.
-   * Only shown while searching.
+   * Routers the search finds while another tab is chosen. Users look for something like Split among the Actions, so
+   * it is offered there too, rather than as a catalogue component that can't be used. Only shown while searching.
    */
-  hiddenMatches(kind: PickedKind): { name: string; reason: string }[] {
+  routerMatches(kind: PickedKind): string[] {
     if (!this.filter.trim() || kind === 'ROUTER') {
       return [];
     }
-    const usable = new Set(this.componentsOf(kind));
+    return searchCatalogue(ROUTER_KINDS.map(name => this.entry(name, 'ROUTER')), this.filter).map(entry => entry.name);
+  }
+
+  /**
+   * Components the search finds that this kind of Step can't use, with the reason, so nothing Camel offers is hidden.
+   * Routers are left to routerMatches, unless this + can't take one. Only shown while searching.
+   */
+  hiddenMatches(kind: PickedKind): { name: string; kind?: PickedKind; reason: string }[] {
+    if (!this.filter.trim() || kind === 'ROUTER') {
+      return [];
+    }
+    const routers = this.kinds.includes('ROUTER')
+      ? []
+      : this.routerMatches(kind).map(name => ({
+          name,
+          kind: 'ROUTER' as const,
+          reason: `${routerKindTitle(name)} is a Router; a Router can't go here.`,
+        }));
+    const usable = new Set([...this.componentsOf(kind), ...ROUTER_KINDS]);
     const others = [...this.catalogue.values()].filter(entry => !usable.has(entry.name));
-    return searchCatalogue(others, this.filter).map(entry => ({
+    return [
+      ...routers,
+      ...searchCatalogue(others, this.filter).map(entry => ({
         name: entry.name,
         reason: roleMismatch(entry, 'producer') ?? `${entry.title ?? entry.name} isn't available for this Step.`,
-      }));
+      })),
+    ];
   }
 
   /** Opens the menu without a click, for the keyboard. */

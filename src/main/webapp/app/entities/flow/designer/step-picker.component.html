@@ -58,10 +58,27 @@
       } @empty {
         <div class="step-picker-empty">No {{ labels[kind] | lowercase }} matches "{{ filter }}".</div>
       }
+      @if (kinds.includes('ROUTER')) {
+        @for (name of routerMatches(kind); track name) {
+          @let item = entry(name, 'ROUTER');
+          <button type="button" role="option" class="step-picker-item" [title]="item.description ?? ''" (click)="pick('ROUTER', name)">
+            <span class="step-picker-item-title">{{ item.title ?? name }} <span class="step-picker-item-tag">{{ labels.ROUTER }}</span></span>
+            <span class="step-picker-item-id">{{ name }}</span>
+            @if (item.description) {
+              <span class="step-picker-item-description">{{ item.description }}</span>
+            }
+          </button>
+        }
+      }
       @for (hidden of hiddenMatches(kind); track hidden.name) {
-        @let item = entry(hidden.name);
+        @let item = entry(hidden.name, hidden.kind);
         <div class="step-picker-item step-picker-item-unavailable" role="option" aria-disabled="true">
-          <span class="step-picker-item-title">{{ item.title ?? hidden.name }}</span>
+          <span class="step-picker-item-title">
+            {{ item.title ?? hidden.name }}
+            @if (hidden.kind) {
+              <span class="step-picker-item-tag">{{ labels[hidden.kind] }}</span>
+            }
+          </span>
           <span class="step-picker-item-id">{{ hidden.name }}</span>
           <span class="step-picker-item-description">{{ hidden.reason }}</span>
         </div>

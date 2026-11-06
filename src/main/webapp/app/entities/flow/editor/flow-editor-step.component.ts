@@ -45,6 +45,9 @@ import 'codemirror/mode/xml/xml';
 import 'codemirror/addon/display/placeholder';
 import 'codemirror/addon/edit/closetag';
 
+/** The Options that make up a Condition. */
+const CONDITION_OPTIONS: readonly string[] = [LANGUAGE_OPTION, 'expression'];
+
 @Injectable()
 export class StepEditorRegistry {
   readonly editors: FlowEditorStepComponent[] = [];
@@ -69,6 +72,11 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   @Input() onCanvas = false;
   /** On the canvas, the kind of the Router being edited; it is shown as its component and can't be changed here. */
   @Input() routerTitle?: string;
+  /**
+   * On the canvas, the named Branch of the Router being edited that holds its Condition, such as `split`. The Router's
+   * own `language` and `expression` Options then do nothing, so they aren't offered and point to that Branch.
+   */
+  @Input() conditionBranch?: string;
   /**
    * On the canvas, whether the Flow keeps a valid shape without this Step; the canvas decides which Steps can go. In the
    * Route and Script editors, whether the Flow has another Route or Script.
@@ -116,6 +124,8 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   @Output() createOrEditRoute = new EventEmitter<{ step: IStep; form: FormGroup }>();
   @Output() createOrEditMessage = new EventEmitter<{ step: IStep; control: AbstractControl }>();
   @Output() createOrEditConnection = new EventEmitter<{ step: IStep; connectionType: string; control: AbstractControl }>();
+  /** Opens the Router's `conditionBranch`, where its Condition is set. */
+  @Output() editBranch = new EventEmitter<void>();
 
   readonly themeService = inject(ThemeService);
   private readonly flowService = inject(FlowService);
@@ -221,7 +231,7 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
     return unknown.length ? unknownVariablesMessage(unknown) : undefined;
   }
 
-  private choicesCache?: { options: unknown[]; length: number; role: EndpointRole; choices: OptionSchema[] };
+  private choicesCache?: { options: unknown[]; length: number; role: EndpointRole; branch?: string; choices: OptionSchema[] };
   private pathPartsCache?: { syntax: string; options: unknown[]; parts: PathPart[] };
   private componentChoicesCache?: { names: unknown[]; role: EndpointRole; search: string; choices: ComponentChoice[] };
 
@@ -242,9 +252,11 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   /** The Options this Step can set, under Common, Advanced and Security. Cached so the key list keeps its items. */
   get optionChoices(): OptionSchema[] {
     const options = this.componentOptions ?? [];
+    const branch = this.conditionBranch;
     const cache = this.choicesCache;
-    if (!cache || cache.options !== options || cache.length !== options.length || cache.role !== this.role) {
-      this.choicesCache = { options, length: options.length, role: this.role, choices: groupOptions(options, this.role) };
+    if (!cache || cache.options !== options || cache.length !== options.length || cache.role !== this.role || cache.branch !== branch) {
+      const settable = branch ? options.filter(option => !this.isConditionKey(option.name)) : options;
+      this.choicesCache = { options, length: options.length, role: this.role, branch, choices: groupOptions(settable, this.role) };
     }
     return this.choicesCache!.choices;
   }
@@ -376,7 +388,7 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
     const formOptions = (this.stepForm.get('options') as FormArray)?.controls ?? [];
     const filled = new Set(formOptions.filter(option => `${option.get('value')?.value ?? ''}`.trim()).map(option => option.get('key')?.value));
     return requiredOptions(this.componentOptions ?? [], this.role)
-      .filter(name => !filled.has(name))
+      .filter(name => !filled.has(name) && !this.isConditionKey(name))
       .map(name => this.componentOptions.find(option => option.name === name)?.displayName ?? name);
   }
 
@@ -396,7 +408,7 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
     }
     const present = new Set(formOptions.controls.map(option => option.get('key')?.value));
     suggestedOptions(this.componentOptions, this.role)
-      .filter(name => !present.has(name))
+      .filter(name => !present.has(name) && !this.isConditionKey(name))
       .forEach(name => {
         const emptyRow = formOptions.controls.findIndex(option => !option.get('key')?.value && !option.get('value')?.value);
         if (emptyRow < 0) {
@@ -741,13 +753,31 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
    * then stays in place, read-only, so every Step has the same fields; while it holds a value it stays editable.
    */
   get pathUnused(): boolean {
-    return this.uriPlaceholder === '' && !this.stepForm.get('uri')?.value && !this.autoPath;
+    // A Router's kind is its whole setup, so it reads no path either.
+    const noPath = this.uriPlaceholder === '' || this.stepType === 'ROUTER';
+    return noPath && !this.stepForm.get('uri')?.value && !this.autoPath;
   }
 
-  /** The Component's name as the component list shows it. */
+  /** The Component's name as the component list shows it; a Router is called by its kind. */
   get componentLabel(): string {
+    if (this.stepType === 'ROUTER' && this.routerTitle) {
+      return this.routerTitle;
+    }
     const type = this.componentType ?? '';
     return this.catalogueEntry(type).title ?? type;
+  }
+
+  /** Whether an Option row is part of the Condition, which a Router with a `conditionBranch` reads from that Branch instead. */
+  isConditionOption(idx: number): boolean {
+    return this.isConditionKey(this.optionKey(idx));
+  }
+
+  private isConditionKey(name: string | undefined): boolean {
+    return !!this.conditionBranch && CONDITION_OPTIONS.includes(name ?? '');
+  }
+
+  onEditBranch(): void {
+    this.editBranch.emit();
   }
 
   /** The row of the Option whose value is open in the larger editor. */

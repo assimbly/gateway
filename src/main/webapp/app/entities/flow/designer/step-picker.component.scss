@@ -103,6 +103,17 @@
   font-weight: 600;
 }
 
+// Marks a Router offered on another kind's tab.
+.step-picker-item-tag {
+  margin-left: 0.25rem;
+  padding: 0 0.35rem;
+  border: 1px solid var(--app-border, #d0d5dd);
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: var(--app-text-muted, #667085);
+}
+
 .step-picker-item-id {
   font-size: 0.75rem;
   color: var(--app-text-muted, #667085);

@@ -1,15 +1,20 @@
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 import { ESSENTIALS } from 'app/shared/camel/catalogue';
 
 import { PickedKind, StepPickerComponent } from './step-picker.component';
 
 describe('Step picker', () => {
+  let fixture: ComponentFixture<StepPickerComponent>;
   let picker: StepPickerComponent;
 
   beforeEach(() => {
     TestBed.configureTestingModule({ imports: [StepPickerComponent] });
-    picker = TestBed.createComponent(StepPickerComponent).componentInstance;
+    TestBed.inject(FaIconLibrary).addIcons(faPlus);
+    fixture = TestBed.createComponent(StepPickerComponent);
+    picker = fixture.componentInstance;
     picker.kinds = ['ACTION', 'ROUTER', 'SINK'];
     picker.components = { actions: ['azure-files', 'file', 'log', 'setbody'], sinks: ['azure-files', 'file', 'ftp'] };
   });
@@ -70,5 +75,51 @@ describe('Step picker', () => {
 
   it('lists the most used Routers first', () => {
     expect(picker.matches('ROUTER').slice(0, 3)).toEqual(['content', 'if', 'split']);
+  });
+
+  describe('searching for a Router from the Action tab', () => {
+    /** Opens the menu with a search; the menu is rendered in the body. */
+    function searchFor(filter: string): HTMLElement[] {
+      fixture.componentRef.setInput('kinds', picker.kinds);
+      fixture.componentRef.setInput('components', picker.components);
+      fixture.detectChanges();
+      picker.open();
+      picker.filter = filter;
+      fixture.componentRef.changeDetectorRef.markForCheck();
+      fixture.detectChanges();
+      return [...document.body.querySelectorAll<HTMLElement>('.step-picker-item')];
+    }
+
+    afterEach(() => fixture.destroy());
+
+    it("offers Split as a Router, not as a catalogue component that can't be used", () => {
+      picker.filter = 'split';
+
+      expect(picker.routerMatches('ACTION')[0]).toBe('split');
+      expect(picker.hiddenMatches('ACTION').map(hidden => hidden.name)).not.toContain('split');
+      expect(picker.routerMatches('ROUTER')).toEqual([]);
+    });
+
+    it('adds a Split Router when it is clicked', () => {
+      const picked: { kind: PickedKind; componentType: string }[] = [];
+      picker.picked.subscribe(p => picked.push(p));
+
+      const split = searchFor('split').find(item => item.querySelector('.step-picker-item-id')?.textContent === 'split');
+
+      expect(split?.tagName).toBe('BUTTON');
+      expect(split?.querySelector('.step-picker-item-tag')?.textContent).toBe('Router');
+      split!.click();
+      expect(picked).toEqual([{ kind: 'ROUTER', componentType: 'split' }]);
+    });
+
+    it("shows Split as unavailable where a Router can't go", () => {
+      picker.kinds = ['ACTION', 'SINK'];
+
+      const split = searchFor('split').filter(item => item.querySelector('.step-picker-item-id')?.textContent === 'split');
+
+      expect(split).toHaveLength(1);
+      expect(split[0].getAttribute('aria-disabled')).toBe('true');
+      expect(split[0].textContent).toContain("Split is a Router; a Router can't go here.");
+    });
   });
 });

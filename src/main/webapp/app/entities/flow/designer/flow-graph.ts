@@ -819,7 +819,7 @@ export function stepsToSave(graph: FlowGraph, flowId: number): { key: string; st
       stepType: s.kind as IStep['stepType'],
       componentType: s.componentType,
       uri: s.uri,
-      options: s.kind === 'ROUTER' && isSplitRouter(s) ? withoutCondition(s.options) : s.options,
+      options: s.kind === 'ROUTER' && conditionBranch(s) ? withoutCondition(s.options) : s.options,
       connectionId: s.connectionId,
       messageId: s.messageId,
       routeId: s.routeId,
@@ -831,12 +831,16 @@ export function stepsToSave(graph: FlowGraph, flowId: number): { key: string; st
   }));
 }
 
-function isSplitRouter(step: DesignStep): boolean {
+/**
+ * The named Branch that holds a Fixed-slot Router's Condition, such as `split` or `if`; nothing for a Router whose
+ * Branches take no Condition, or whose Branches each hold their own.
+ */
+export function conditionBranch(step: Pick<DesignStep, 'componentType' | 'uri'>): string | undefined {
   const shape = routerShape(step);
-  return shape.slots === 'fixed' && shape.branch === 'split';
+  return shape.slots === 'fixed' && shape.takesCondition ? shape.branch : undefined;
 }
 
-/** A split Router's Condition lives on its split Branch, not in its options. */
+/** Such a Router's Condition lives on its named Branch; a copy in its options would give the runtime a second `language`. */
 function withoutCondition(options: string | undefined): string | undefined {
   return options
     ?.split('&')
