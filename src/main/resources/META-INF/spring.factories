@@ -1,3 +1,4 @@
 org.springframework.boot.EnvironmentPostProcessor=\
 org.assimbly.gateway.config.BaseDirectorySetting,\
+org.assimbly.gateway.config.PortFallback,\
 org.assimbly.gateway.config.security.GeneratedSecrets
