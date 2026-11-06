@@ -180,6 +180,7 @@
 }
 
 .flow-designer-minimap {
+  position: relative;
   flex: 0 0 14rem;
   overflow: hidden;
   border: 1px solid var(--app-border, #d0d5dd);
@@ -220,6 +221,33 @@
     fill-opacity: 0.08;
     stroke: var(--app-primary, #2e90fa);
     stroke-width: 1;
+  }
+}
+
+// The + and − in the top-right corner of the minimap.
+.flow-minimap-zoom {
+  position: absolute;
+  top: 0.375rem;
+  right: 0.375rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--app-border, #d0d5dd);
+  border-radius: 6px;
+  background: var(--app-surface, #fff);
+  cursor: default;
+
+  .btn {
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0;
+    border-radius: 0;
+    font-size: 0.75rem;
+    line-height: 1;
+  }
+
+  .btn + .btn {
+    border-top: 1px solid var(--app-border, #d0d5dd);
   }
 }
 

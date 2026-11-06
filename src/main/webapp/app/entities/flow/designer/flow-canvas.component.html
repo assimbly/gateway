@@ -97,5 +97,14 @@
   <!-- Declared here, inside the flow, so the minimap can reach it; the editor shows it in its side panel. -->
   <ng-template #minimap>
     <f-minimap [fMinSize]="400"></f-minimap>
+    <!-- Stops the presses here, so a click on a button doesn't also move the view to the point under it. -->
+    <div class="flow-minimap-zoom" (pointerdown)="$event.stopPropagation()" (pointermove)="$event.stopPropagation()">
+      <button type="button" class="btn btn-fx btn-fx-ghost" title="Zoom in" aria-label="Zoom in" (click)="zoomIn()">
+        <fa-icon icon="plus"></fa-icon>
+      </button>
+      <button type="button" class="btn btn-fx btn-fx-ghost" title="Zoom out" aria-label="Zoom out" (click)="zoomOut()">
+        <fa-icon icon="minus"></fa-icon>
+      </button>
+    </div>
   </ng-template>
 </f-flow>

@@ -581,7 +581,7 @@
                 </div>
               }
               </div>
-              @if (selection.type !== 'flow' && !testOpen) {
+              @if (!testOpen) {
                 <div class="flow-designer-minimap" title="Click or drag to move the view"
                      (pointerdown)="flowCanvasRef.onMinimapPointer($event)" (pointermove)="flowCanvasRef.onMinimapPointer($event)">
                   <ng-container *ngTemplateOutlet="flowCanvasRef.minimap"></ng-container>

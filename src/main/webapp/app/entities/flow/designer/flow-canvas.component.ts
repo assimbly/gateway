@@ -15,7 +15,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
-import { EFMarkerType, FCanvasComponent, FFlowModule, FMinimapComponent, FMoveNodesEvent, FSelectionChangeEvent } from '@foblex/flow';
+import { EFMarkerType, FCanvasComponent, FFlowModule, FMinimapComponent, FMoveNodesEvent, FSelectionChangeEvent, FZoomDirective } from '@foblex/flow';
 
 import { Components } from 'app/shared/camel/component-type';
 
@@ -81,6 +81,7 @@ export class FlowCanvasComponent {
 
   @ViewChild(FCanvasComponent) canvas?: FCanvasComponent;
   @ViewChild(FMinimapComponent) private minimapComponent?: FMinimapComponent;
+  @ViewChild(FZoomDirective) private zoom?: FZoomDirective;
   @ViewChildren(StepPickerComponent) private pickers?: QueryList<StepPickerComponent>;
 
   /** The minimap of this canvas, for the editor to show elsewhere on the page. */
@@ -380,6 +381,15 @@ export class FlowCanvasComponent {
       y: position.y + scaledPosition.y - (y - flow.height / 2),
     };
     this.cdr.markForCheck();
+  }
+
+  /** Zooms in on the middle of the view by one step, as one turn of the mouse wheel does. */
+  zoomIn(): void {
+    this.zoom?.zoomIn();
+  }
+
+  zoomOut(): void {
+    this.zoom?.zoomOut();
   }
 }
 

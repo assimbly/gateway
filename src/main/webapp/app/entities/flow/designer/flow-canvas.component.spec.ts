@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import { FZoomDirective } from '@foblex/flow';
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
 import { faCheck, faCodeBranch, faCogs, faExclamationTriangle, faPlus, faSignInAlt, faSignOutAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
 
@@ -171,5 +173,17 @@ describe('Flow canvas', () => {
     expect(steps[2].classList).toContain('flow-step-run-failed');
     expect(steps[2].querySelector<HTMLElement>('.flow-step-run')!.title).toBe('Failed: Disk full. 1.2 s in this Step, 1.2 s with the Steps after it.');
     expect(steps[3].classList).toContain('flow-step-run-unreached');
+  });
+
+  it('zooms the canvas in and out around the middle of the view, as the mouse wheel does', () => {
+    const zoom = fixture.debugElement.query(By.directive(FZoomDirective)).injector.get(FZoomDirective);
+    const zoomIn = jest.spyOn(zoom, 'zoomIn').mockImplementation(() => undefined);
+    const zoomOut = jest.spyOn(zoom, 'zoomOut').mockImplementation(() => undefined);
+
+    fixture.componentInstance.zoomIn();
+    fixture.componentInstance.zoomOut();
+
+    expect(zoomIn).toHaveBeenCalledWith();
+    expect(zoomOut).toHaveBeenCalledWith();
   });
 });
