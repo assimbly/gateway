@@ -98,6 +98,8 @@
         [nameControl]="nameControl"
         [flowId]="flow?.id"
         [draftReason]="draftReason"
+        [draftProblems]="draftProblems"
+        [draftWarnings]="draftWarnings"
         [sourceComponent]="sourceComponent"
         [testInEditor]="hasModes"
         [modes]="hasModes"
@@ -114,6 +116,7 @@
         (saveAndReturn)="save('return')"
         (testRequested)="openTest()"
         (modeChange)="setMode($event)"
+        (problemSelected)="onProblemSelected($event)"
       />
 
       <ng-template #stepEditor let-index>

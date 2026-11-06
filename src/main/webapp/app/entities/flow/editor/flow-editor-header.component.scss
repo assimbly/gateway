@@ -102,6 +102,19 @@
   }
 }
 
+.flow-editor-header__draft {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border: 0;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--app-focus);
+    outline-offset: 2px;
+  }
+}
+
 .flow-editor-header__unsaved-dot {
   width: 0.5rem;
   height: 0.5rem;

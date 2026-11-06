@@ -40,7 +40,7 @@ import { SaveShortcutDirective, isTypingTarget } from "app/shared/keyboard";
 import { CodemirrorModule } from "@ctrl/ngx-codemirror";
 import { ThemeService } from "app/core/theme";
 import { FlowCanvasComponent, DesignerSelection } from "../designer/flow-canvas.component";
-import { EditorMode, FlowEditorHeaderComponent } from "./flow-editor-header.component";
+import { DraftProblem, EditorMode, FlowEditorHeaderComponent } from "./flow-editor-header.component";
 import { FlowFailure, failureProblems, firstRouteStepOf, routeSourceOf, sourceStepOf } from "../flow-status";
 import { FlowTestPanelComponent } from "../test/flow-test-panel.component";
 import { FlowRunStatsComponent } from "../stats/flow-run-stats.component";
@@ -95,6 +95,7 @@ import {
   moveSteps,
   opensOnCanvas,
   Problem,
+  problemPlace,
   problems,
   routerTitle,
   StepMove,
@@ -2167,6 +2168,8 @@ splitOptions4(options: string): string[] {
 	designerMessage?: string;
 
 	canvasWarnings: Problem[] = [];
+	draftProblems: DraftProblem[] = [];
+	draftWarnings: DraftProblem[] = [];
 
 	@ViewChild(FlowCanvasComponent) flowCanvas?: FlowCanvasComponent;
 
@@ -2430,7 +2433,36 @@ splitOptions4(options: string): string[] {
 		if (this.canvasGraph) {
 			this.canvasProblems = problems(this.canvasGraph, this.schemas.pathRule);
 			this.canvasWarnings = [...warnings(this.canvasGraph), ...variableWarnings(this.canvasGraph.steps, this.knownVariables)];
+			this.draftProblems = this.draftListOf(this.canvasProblems);
+			this.draftWarnings = this.draftListOf(this.canvasWarnings);
+			// A Draft can't be tested, also not when it was opened in Test: show the first thing to finish instead.
+			if (this.viewMode === 'test' && this.draftProblems.length) {
+				this.onProblemSelected(this.draftProblems[0]);
+			}
 			this.cdr.markForCheck();
+		}
+	}
+
+	/** The problems or warnings as the Draft badge lists them: where each is, and what to select to fix it. */
+	private draftListOf(list: Problem[]): DraftProblem[] {
+		const graph = this.canvasGraph!;
+		return list.map(problem => ({
+			where: problemPlace(graph, problem),
+			message: problem.message,
+			selection: problem.linkTo ? { type: 'link', to: problem.linkTo } : problem.stepKey ? { type: 'step', key: problem.stepKey } : { type: 'flow' },
+		}));
+	}
+
+	/** A problem in the Draft list selects its Step or Branch, in Design, with the side panel showing how to fix it. */
+	onProblemSelected(problem: DraftProblem): void {
+		const selection = problem.selection;
+		this.setMode('design');
+		this.onSelectionChange(selection);
+		this.setPanelCollapsed(false);
+		// A Branch is shown by the Step it leads to.
+		const key = selection.type === 'step' ? selection.key : selection.type === 'link' ? selection.to : undefined;
+		if (key) {
+			this.flowCanvas?.reveal(key);
 		}
 	}
 
@@ -2559,9 +2591,9 @@ splitOptions4(options: string): string[] {
 		this.cdr.markForCheck();
 	}
 
-	/** Switches the mode; a new Flow has nothing to test until it is saved. */
+	/** Switches the mode; a new Flow has nothing to test until it is saved, and a Draft until it is complete. */
 	setMode(mode: EditorMode): void {
-		if (mode === this.viewMode || (mode === 'test' && !this.flow?.id)) {
+		if (mode === this.viewMode || (mode === 'test' && (!this.flow?.id || this.draftReason !== null))) {
 			return;
 		}
 		this.applyMode(mode);

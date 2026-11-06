@@ -22,7 +22,7 @@
   </div>
 
   @if (modes()) {
-    <span class="flow-editor-header__mode" [ngbTooltip]="flowId() ? 'Switch between ' + designLabel() + ' and Test (T)' : 'Save the Flow first.'">
+    <span class="flow-editor-header__mode" [ngbTooltip]="toggleBlocked() ?? 'Switch between ' + designLabel() + ' and Test (T)'">
       <button
         type="button"
         role="switch"
@@ -32,7 +32,7 @@
         [attr.aria-checked]="mode() === 'test'"
         aria-label="Test mode"
         aria-keyshortcuts="T"
-        [disabled]="!flowId()"
+        [disabled]="toggleBlocked() !== null"
         (click)="toggleMode()"
       >
         <span class="flow-mode-toggle__thumb" aria-hidden="true"></span>
@@ -72,11 +72,36 @@
       } @else if (unsaved()) {
         <span class="flow-editor-header__unsaved-dot" aria-hidden="true"></span>Unsaved changes
       } @else if (saved()) {
-        <fa-icon icon="check" aria-hidden="true" />Saved
+        <fa-icon icon="check" aria-hidden="true" />{{ draftReason() !== null ? 'Saved as Draft' : 'Saved' }}
       }
     </span>
     @if (state().draft) {
-      <span class="badge text-bg-secondary" [ngbTooltip]="draftReason()">Draft</span>
+      @if (draftProblems().length) {
+        <!-- The Draft badge lists what keeps the Flow from running; each one selects its Step or Branch on the canvas. -->
+        <div ngbDropdown class="d-inline-block" placement="bottom-start" container="body">
+          <button type="button" class="badge text-bg-warning flow-editor-header__draft" ngbDropdownToggle data-cy="draft-issues" [attr.aria-label]="draftLabel()">
+            <fa-icon icon="exclamation-triangle" aria-hidden="true" /><span>Draft · {{ issueCount() }}</span>
+          </button>
+          <div ngbDropdownMenu style="max-width: 28rem">
+            <h6 class="dropdown-header">Finish these to start or test the Flow</h6>
+            @for (problem of draftProblems(); track $index) {
+              <button type="button" ngbDropdownItem class="d-flex gap-2 align-items-baseline text-wrap" data-cy="draft-issue" (click)="problemSelected.emit(problem)">
+                <fa-icon icon="exclamation-triangle" class="text-danger" aria-hidden="true" /><span><strong>{{ problem.where }}</strong> {{ problem.message }}</span>
+              </button>
+            }
+            @if (draftWarnings().length) {
+              <h6 class="dropdown-header">Doesn't block running</h6>
+              @for (warning of draftWarnings(); track $index) {
+                <button type="button" ngbDropdownItem class="d-flex gap-2 align-items-baseline text-wrap" data-cy="draft-warning" (click)="problemSelected.emit(warning)">
+                  <fa-icon icon="exclamation-circle" class="text-warning" aria-hidden="true" /><span><strong>{{ warning.where }}</strong> {{ warning.message }}</span>
+                </button>
+              }
+            }
+          </div>
+        </div>
+      } @else {
+        <span class="badge text-bg-secondary" [ngbTooltip]="draftReason()">Draft</span>
+      }
     }
     @if (flowId() && !modes()) {
       <span class="flow-editor-header__counter" data-tour="flow-completed"

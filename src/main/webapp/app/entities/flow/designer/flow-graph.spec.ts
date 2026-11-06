@@ -23,6 +23,7 @@ import {
   moveStep,
   moveSteps,
   openEnds,
+  problemPlace,
   problems,
   RESPONSE_COMPONENT,
   ROUTER_KINDS,
@@ -696,6 +697,15 @@ describe('Flow graph', () => {
 
       expect(problems(withSjmsSink())).toEqual([{ stepKey: 'step-11', message: 'Choose a Connection for this Step.' }]);
       expect(isDraft(withSjmsSink(3))).toBe(false);
+    });
+
+    it('names where a problem is: the Step by its kind and Component, a Branch by its name', () => {
+      const graph = edited(addBranch(contentRouterFlow(), 'step-11'));
+      const newBranch = graph.links.find(l => l.rule === 'branch2')!;
+
+      expect(problemPlace(graph, { stepKey: 'step-12', message: '' })).toBe('Sink · log');
+      expect(problemPlace(graph, { stepKey: 'step-11', message: '' })).toBe('Router');
+      expect(problemPlace(graph, { linkTo: newBranch.to, message: '' })).toBe('Branch branch2');
     });
   });
 

@@ -14,6 +14,7 @@ import { Components } from 'app/shared/camel/component-type';
 import { isPlainKey, isRunShortcut, isStopShortcut, isTypingTarget } from 'app/shared/keyboard';
 import { StatusControls, StatusControlsTone } from 'app/shared/table';
 
+import { DesignerSelection } from '../designer/flow-canvas.component';
 import { FlowService } from '../flow.service';
 import {
   FlowAction,
@@ -37,6 +38,13 @@ const POLL_INTERVAL = 10000;
 
 /** The visual editor designs a Flow, or runs and tests the saved Flow. */
 export type EditorMode = 'design' | 'test';
+
+/** Something in the Draft list: which Step or Branch it is on, what to do, and what to select to do it. */
+export interface DraftProblem {
+  where: string;
+  message: string;
+  selection: DesignerSelection;
+}
 
 const TONE_CLASS: Record<StatusControlsTone, string> = {
   default: 'btn-fx-secondary',
@@ -67,6 +75,10 @@ export class FlowEditorHeaderComponent {
   readonly flowId = input<number | null | undefined>();
   /** Why the Flow is a Draft, or null when it is complete enough to run. */
   readonly draftReason = input<string | null>(null);
+  /** Everything that keeps a visual Flow a Draft, listed behind the Draft badge. */
+  readonly draftProblems = input<DraftProblem[]>([]);
+  /** What may not be meant but doesn't keep the Flow from running, listed below the problems. */
+  readonly draftWarnings = input<DraftProblem[]>([]);
   /** The Component of the Flow's Source, which a test message is sent to. */
   readonly sourceComponent = input<string | undefined>();
   /** The visual editor tests the Flow in its own Test panel instead of on the Send page. */
@@ -95,6 +107,8 @@ export class FlowEditorHeaderComponent {
   readonly testRequested = output<void>();
   /** The toggle, or its T key, asks for the other mode. */
   readonly modeChange = output<EditorMode>();
+  /** A problem in the Draft list was clicked: the editor selects its Step or Branch. */
+  readonly problemSelected = output<DraftProblem>();
 
   readonly status = signal<RuntimeStatus>('inactive');
   readonly ran = signal(false);
@@ -110,6 +124,11 @@ export class FlowEditorHeaderComponent {
   readonly running = computed(() => this.status() === 'active' || this.status() === 'paused');
   readonly completedLabel = computed(() => countLabel(this.completed(), this.ran()));
   readonly failedLabel = computed(() => countLabel(this.failed(), this.ran()));
+  readonly issueCount = computed(() => {
+    const count = this.draftProblems().length;
+    return `${count} ${count === 1 ? 'issue' : 'issues'}`;
+  });
+  readonly draftLabel = computed(() => `Draft: ${this.issueCount()} ${this.draftProblems().length === 1 ? 'keeps' : 'keep'} this Flow from running. Show them`);
 
   /** Why the Flow can't be started now, or null when it can. */
   readonly startBlocked = computed(() => {
@@ -137,9 +156,23 @@ export class FlowEditorHeaderComponent {
     return this.state().disabled.includes(action);
   }
 
-  /** A saved Flow switches between Design and Test; a new one has nothing to test yet. */
+  /**
+   * Why the toggle can't switch now, or null when it can: a new Flow has nothing to test yet, and a Draft can't run,
+   * so it can't be tested until it is complete. Back to Design is always possible.
+   */
+  readonly toggleBlocked = computed(() => {
+    if (!this.flowId()) {
+      return 'Save the Flow first.';
+    }
+    if (this.mode() === 'design' && this.draftReason() !== null) {
+      return this.draftProblems().length ? `Finish the Draft to test it: ${this.issueCount()}. Click Draft to see them.` : `This Flow is a Draft: ${this.draftReason()}`;
+    }
+    return null;
+  });
+
+  /** A saved Flow switches between Design and Test, unless it is a Draft. */
   toggleMode(): void {
-    if (this.flowId()) {
+    if (this.toggleBlocked() === null) {
       this.modeChange.emit(this.mode() === 'design' ? 'test' : 'design');
     }
   }

@@ -11,7 +11,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { fontAwesomeIcons } from 'app/config/font-awesome-icons';
 
 import { FlowService } from '../flow.service';
-import { FlowEditorHeaderComponent } from './flow-editor-header.component';
+import { DraftProblem, FlowEditorHeaderComponent } from './flow-editor-header.component';
 
 describe('Flow editor header', () => {
   let fixture: ComponentFixture<FlowEditorHeaderComponent>;
@@ -26,6 +26,49 @@ describe('Flow editor header', () => {
     fixture = TestBed.createComponent(FlowEditorHeaderComponent);
     name = new FormControl('Orders', { nonNullable: true });
     fixture.componentRef.setInput('nameControl', name);
+  });
+
+  describe('the Draft badge', () => {
+    const missingDirectory: DraftProblem = { where: 'Sink · file', message: 'Fill in the Directory Name in the path.', selection: { type: 'step', key: 'step-3' } };
+    const undeclared: DraftProblem = { where: 'Response', message: "404 isn't a Declared response.", selection: { type: 'step', key: 'step-4' } };
+
+    beforeEach(() => {
+      fixture.componentRef.setInput('draftReason', missingDirectory.message);
+      fixture.componentRef.setInput('draftProblems', [missingDirectory]);
+    });
+
+    it('warns how many issues keep the Flow from running', () => {
+      fixture.detectChanges();
+      const badge: HTMLButtonElement = fixture.nativeElement.querySelector('[data-cy="draft-issues"]');
+
+      expect(badge.textContent?.trim()).toBe('Draft · 1 issue');
+      expect(badge.querySelector('fa-icon')).not.toBeNull();
+      expect(badge.getAttribute('aria-label')).toBe('Draft: 1 issue keeps this Flow from running. Show them');
+    });
+
+    it('lists each issue with where it is, and selects it when clicked', () => {
+      fixture.componentRef.setInput('draftWarnings', [undeclared]);
+      fixture.detectChanges();
+      const selected = jest.fn();
+      fixture.componentInstance.problemSelected.subscribe(selected);
+
+      fixture.nativeElement.querySelector('[data-cy="draft-issues"]').click();
+      fixture.detectChanges();
+      const issue: HTMLButtonElement = document.querySelector('[data-cy="draft-issue"]')!;
+      const warning: HTMLButtonElement = document.querySelector('[data-cy="draft-warning"]')!;
+
+      expect(issue.textContent).toContain('Sink · file Fill in the Directory Name in the path.');
+      expect(warning.textContent).toContain("Response 404 isn't a Declared response.");
+      issue.click();
+      expect(selected).toHaveBeenCalledWith(missingDirectory);
+    });
+
+    it('says a Draft was saved as a Draft', () => {
+      fixture.componentRef.setInput('saved', true);
+      fixture.detectChanges();
+
+      expect(fixture.nativeElement.querySelector('[data-cy="save-state"]').textContent.trim()).toBe('Saved as Draft');
+    });
   });
 
   it('disables Save & start while the Flow is a Draft', () => {
@@ -259,6 +302,34 @@ describe('Flow editor header', () => {
       fixture.nativeElement.querySelector('#field_flowName').dispatchEvent(new KeyboardEvent('keydown', { key: 't', bubbles: true, cancelable: true }));
 
       expect(modeChange.mock.calls).toEqual([['test'], ['test']]);
+    });
+
+    it('cannot switch a Draft to Test, with the toggle or with T, and says why', () => {
+      fixture.componentRef.setInput('draftReason', 'Fill in the Directory Name in the path.');
+      fixture.componentRef.setInput('draftProblems', [
+        { where: 'Sink · file', message: 'Fill in the Directory Name in the path.', selection: { type: 'step', key: 'step-3' } },
+      ]);
+      fixture.detectChanges();
+      const modeChange = jest.fn();
+      fixture.componentInstance.modeChange.subscribe(modeChange);
+      const toggle: HTMLButtonElement = fixture.nativeElement.querySelector('[role="switch"]');
+
+      expect(toggle.disabled).toBe(true);
+      expect(fixture.componentInstance.toggleBlocked()).toBe('Finish the Draft to test it: 1 issue. Click Draft to see them.');
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 't', bubbles: true, cancelable: true }));
+      expect(modeChange).not.toHaveBeenCalled();
+    });
+
+    it('can always go back from Test to Design', () => {
+      fixture.componentRef.setInput('mode', 'test');
+      fixture.componentRef.setInput('draftReason', 'Fill in the Directory Name in the path.');
+      fixture.detectChanges();
+      const modeChange = jest.fn();
+      fixture.componentInstance.modeChange.subscribe(modeChange);
+
+      fixture.nativeElement.querySelector('[role="switch"]').click();
+
+      expect(modeChange).toHaveBeenCalledWith('design');
     });
 
     it('starts and stops with the controls of the Flows list in Design as well', () => {

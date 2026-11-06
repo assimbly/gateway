@@ -784,6 +784,27 @@ export function warnings(graph: FlowGraph): Problem[] {
     }));
 }
 
+const KIND_NAMES: Record<StepKind, string> = { SOURCE: 'Source', ACTION: 'Action', ROUTER: 'Router', SINK: 'Sink' };
+
+/** Where a Problem is, as a list of them names it: the Step's kind and Component, such as "Sink · file", or its Branch. */
+export function problemPlace(graph: FlowGraph, problem: Problem): string {
+  if (problem.linkTo) {
+    const rule = graph.links.find(l => l.to === problem.linkTo)?.rule;
+    return rule ? `Branch ${rule}` : 'Branch';
+  }
+  const step = graph.steps.find(s => s.key === problem.stepKey);
+  if (!step) {
+    return 'Flow';
+  }
+  if (isLockedSource(graph, step.key)) {
+    return 'Operation';
+  }
+  if (isResponse(graph, step)) {
+    return 'Response';
+  }
+  return step.componentType ? `${KIND_NAMES[step.kind]} · ${step.componentType}` : KIND_NAMES[step.kind];
+}
+
 /** A Flow is a Draft while anything in it is incomplete. A Draft can be saved but not started. */
 export function isDraft(graph: FlowGraph, pathRules?: PathRules): boolean {
   return problems(graph, pathRules).length > 0;

@@ -64,6 +64,7 @@ describe('Flow editor modes', () => {
       testPanelTab: 'test',
       sidePanelCollapsed: true,
       selection: { type: 'flow' },
+      canvasProblems: [],
       flow: { id: flowId },
       activeEditor: 'flow',
       editFlowForm: new FormGroup({}),
@@ -126,6 +127,53 @@ describe('Flow editor modes', () => {
 
     expect(component.viewMode).toBe('design');
     expect(component.selection).toEqual({ type: 'step', key: 's1' });
+  });
+
+  it('selects a problem of the Draft list in Design, with the panel open and its Step in view', () => {
+    const { component } = editor();
+    const reveal = jest.fn();
+    Object.assign(component, { flowCanvas: { reveal, keepInView: jest.fn() } });
+    component.setMode('test');
+
+    component.onProblemSelected({ where: 'Sink · file', message: 'Fill in the Directory Name in the path.', selection: { type: 'step', key: 's3' } });
+
+    expect(component.viewMode).toBe('design');
+    expect(component.selection).toEqual({ type: 'step', key: 's3' });
+    expect(component.sidePanelCollapsed).toBe(false);
+    expect(reveal).toHaveBeenCalledWith('s3');
+  });
+
+  it('does not test a Draft', () => {
+    const { component, url } = editor();
+    component.canvasProblems = [{ stepKey: 's2', message: 'Choose a component for this Step.' }];
+
+    component.setMode('test');
+
+    expect(component.viewMode).toBe('design');
+    expect(url()).not.toContain('view=test');
+  });
+
+  it('opens a Draft opened in Test in Design instead, with the first thing to finish selected', () => {
+    const { component, url } = editor();
+    component.setMode('test');
+    Object.assign(component, {
+      flowCanvas: { reveal: jest.fn(), keepInView: jest.fn() },
+      schemas: { pathRule: () => undefined },
+      canvasGraph: {
+        steps: [
+          { key: 's1', kind: 'SOURCE', componentType: 'file', uri: 'in' },
+          { key: 's2', kind: 'SINK' },
+        ],
+        links: [{ from: 's1', to: 's2', transport: 'sync' }],
+      },
+    });
+
+    (component as any).checkCanvas();
+
+    expect(component.viewMode).toBe('design');
+    expect(url()).not.toContain('view=test');
+    expect(component.selection).toEqual({ type: 'step', key: 's2' });
+    expect(component.draftProblems).toEqual([{ where: 'Sink', message: 'Choose a component for this Step.', selection: { type: 'step', key: 's2' } }]);
   });
 
   it('switches to Test once Save & Test saved the Flow', () => {
