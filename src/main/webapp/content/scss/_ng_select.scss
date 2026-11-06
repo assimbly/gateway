@@ -67,15 +67,21 @@
     background-color: var(--app-surface-elevated);
     color: var(--app-text);
 
+    // --app-hover and --app-active are only a shade off the panel (in dark mode even darker than it), so the selected
+    // option could not be told apart. It gets the primary colour as a tint and a bar; the hovered one a clearer gray.
     &.ng-option-marked {
-      background-color: var(--app-hover);
+      background-color: color-mix(in srgb, var(--app-text) 10%, var(--app-surface-elevated));
       color: var(--app-text);
     }
 
-    &.ng-option-selected,
-    &.ng-option-selected.ng-option-marked {
-      background-color: var(--app-active);
+    &.ng-option-selected {
+      background-color: color-mix(in srgb, var(--app-primary) 22%, var(--app-surface-elevated));
+      box-shadow: inset 3px 0 0 var(--app-primary);
       color: var(--app-text);
+    }
+
+    &.ng-option-selected.ng-option-marked {
+      background-color: color-mix(in srgb, var(--app-primary) 32%, var(--app-surface-elevated));
     }
 
     &.ng-option-disabled {
