@@ -20,12 +20,12 @@ It takes about 10 minutes.
 You create an API that says hello to whoever calls it.
 
 1. Click **APIs** in the menu on the left. <!-- show: .app-sidebar__link[href="/rest-apis"] -->
-2. Click **Add**. <!-- show: a[href="/rest-apis/new"] -->
+2. Click **Add**. <!-- show: a[href="/rest-apis/new"] @ /rest-apis -->
 3. Fill in the form:
-   * **Name:** `Greetings` <!-- show: #api-name -->
-   * **Base path:** `/greetings` <!-- show: #api-base-path -->
+   * **Name:** `Greetings` <!-- show: #api-name @ /rest-apis/new -->
+   * **Base path:** `/greetings` <!-- show: #api-base-path @ /rest-apis/new -->
    * **Description:** `Says hello to whoever asks.`
-4. Click **Create API**. <!-- show: [data-tour="api-save"] -->
+4. Click **Create API**. <!-- show: [data-tour="api-save"] @ /rest-apis/new -->
 
 ![Create the API](01-new-api.png)
 
@@ -41,7 +41,7 @@ You create an API that says hello to whoever calls it.
 
 <!-- step: {"check":"flowExists:sayHello"} -->
 
-1. Click **New Operation**. <!-- show: [data-tour="api-new-operation"] --> A panel opens on the right.
+1. Click **New Operation**. <!-- show: [data-tour="api-new-operation"] @ api:Greetings --> A panel opens on the right.
 2. Keep **Method** on `GET`.
 3. In **Path**, type `{name}` after the `/`, so it reads `/{name}`. <!-- show: #operation-path -->
 4. Set **operationId** to `sayHello` <!-- show: #operation-id --> and **Summary** to `Say hello`.
@@ -57,11 +57,11 @@ The Operation appears in the list, with its Handler Flow *sayHello*.
 
 <!-- step: {"check":"flowStatus:sayHello:started"} -->
 
-1. Click **sayHello** in the **Handler Flow** column. <!-- show: [data-tour="operation-handler-flow"] -->
+1. Click **sayHello** in the **Handler Flow** column. <!-- show: [data-tour="operation-handler-flow"] @ api:Greetings -->
 
 The Flow is already there: the **Operation** receives the request and the **Response** sends the answer. You add the answer in between.
 
-2. Click the **+** on the line between the Operation and the Response. <!-- show: [aria-label="Insert a Step here"] -->
+2. Click the **+** on the line between the Operation and the Response. <!-- show: [aria-label="Insert a Step here"] @ flow:sayHello -->
 3. Type `body` in the search box and choose **Set body**.
 4. Under **Options**, next to **Expression**, type: <!-- show: .option-row -->
 
@@ -69,7 +69,7 @@ The Flow is already there: the **Operation** receives the request and the **Resp
    {"message": "Hello ${header.name}!"}
    ```
 
-5. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] -->
+5. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] @ flow:sayHello -->
 
 ![Configure the Set body Action](05-set-body.png)
 
@@ -80,8 +80,8 @@ The Flow is already there: the **Operation** receives the request and the **Resp
 <!-- step: {"check":"flowCompleted:sayHello"} -->
 
 1. Click **APIs**, <!-- show: .app-sidebar__link[href="/rest-apis"] --> then **Greetings**. It says **1 of 1 Operation running**.
-2. Click **GET** in the row of the Operation. <!-- show: [data-tour="operation-edit"] -->
-3. Under **Try it**, type `World` next to **name** and click **Send**. <!-- show: [data-tour="api-try-send"] -->
+2. Click **GET** in the row of the Operation. <!-- show: [data-tour="operation-edit"] @ api:Greetings -->
+3. Click the **Try it** tab, <!-- show: [data-cy="operation-tab-try"] --> type `World` next to **name** and click **Send**. <!-- show: [data-tour="api-try-send"] -->
 
 The answer comes back with status `200`:
 
@@ -91,11 +91,11 @@ The answer comes back with status `200`:
 
 ![The API is running](06-api-running.png)
 
-> **Tip: call it from your browser** Click the path `/greetings/{name}` in the row of the Operation. <!-- show: [data-tour="operation-url"] --> Your API opens in a new tab. Replace `{name}` in the address bar with a name. The browser warns that the connection isn't private, because the Gateway on your own machine uses its own certificate: click **Advanced** and continue to `localhost`. With Docker, the `docker run` command needs `-p 9001:9001`.
+> **Tip: call it from your browser** Click the path `/greetings/{name}` in the row of the Operation. <!-- show: [data-tour="operation-url"] @ api:Greetings --> Your API opens in a new tab. Replace `{name}` in the address bar with a name. The browser warns that the connection isn't private, because the Gateway on your own machine uses its own certificate: click **Advanced** and continue to `localhost`. With Docker, the `docker run` command needs `-p 9001:9001`.
 
 ## Step 5: Export the API as an OpenAPI file
 
-1. Click **Export OpenAPI** on the API page. <!-- show: #export-openapi -->
+1. Click **Export OpenAPI** on the API page. <!-- show: #export-openapi @ api:Greetings -->
 2. Choose **Export as YAML**.
 
 You get `Greetings-openapi.yaml`: the contract to give to the people who call your API.

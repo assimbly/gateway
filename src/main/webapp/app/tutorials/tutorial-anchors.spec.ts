@@ -1,6 +1,8 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
+import { splitShow } from './tutorial-parser';
+
 /**
  * The Show me buttons of the tutorials point at elements by selector. When a template loses the attribute or id a
  * tutorial relies on, its Show me finds nothing, so this fails first: fix the template or the tutorial (in the
@@ -13,10 +15,12 @@ describe('tutorial anchors', () => {
     .map(file => readFileSync(file, 'utf8'))
     .join('\n');
 
-  const selectors = readdirSync(tutorials, { withFileTypes: true })
+  const shows = readdirSync(tutorials, { withFileTypes: true })
     .filter(entry => entry.isDirectory())
     .flatMap(entry => [...readFileSync(join(tutorials, entry.name, 'README.md'), 'utf8').matchAll(/<!--\s*show:\s*([\s\S]*?)\s*-->/g)])
-    .map(match => match[1]);
+    .map(match => splitShow(match[1]));
+  const selectors = shows.map(([selector]) => selector);
+  const pages = [...new Set(shows.map(([, page]) => page).filter((page): page is string => page !== undefined))];
 
   it('finds the Show me selectors of the tutorials', () => {
     expect(selectors.length).toBeGreaterThan(10);
@@ -46,6 +50,18 @@ describe('tutorial anchors', () => {
       expect(templates).toMatch(new RegExp(`(id|inputId|labelForId)="${id}"`));
     },
   );
+
+  it('finds the pages of the Show me buttons', () => {
+    expect(pages.length).toBeGreaterThan(10);
+  });
+
+  it.each(pages)('the page %s is a route, a Flow or an API', page => {
+    expect(page).toMatch(/^(\/[\w/-]*|flow:\w+(:test)?|api:\w+)$/);
+  });
+
+  it.each(pages.filter(page => page.startsWith('/')))('a link goes to the page %s', page => {
+    expect(templates).toMatch(new RegExp(`(routerLink|href)="${page}"`));
+  });
 
   it('a Flows list row carries the name of its Flow', () => {
     expect(templates).toContain('[attr.data-flow-name]="flow.name"');

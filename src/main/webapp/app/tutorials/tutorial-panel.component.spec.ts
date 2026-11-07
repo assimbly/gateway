@@ -1,5 +1,6 @@
 import { computed, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Router, UrlTree, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
@@ -7,16 +8,26 @@ import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
 import { fontAwesomeIcons } from 'app/config/font-awesome-icons';
 import { VariableKeysService } from 'app/entities/environment-variables/variable-keys.service';
 
+import { highlight } from './tutorial-highlight';
+import { TutorialPages } from './tutorial-pages';
 import { TutorialPanelComponent } from './tutorial-panel.component';
 import { TutorialPanelState } from './tutorial-panel.state';
 import { TutorialService } from './tutorial.service';
 import { Tutorial } from './tutorial.model';
+
+// pointing finds the element when it's there; the wait for one that's still being rendered is the highlight's own
+jest.mock('./tutorial-highlight', () => {
+  const actual = jest.requireActual('./tutorial-highlight');
+  return { ...actual, highlight: jest.fn((selector: string) => Promise.resolve(actual.isVisible(selector))) };
+});
 
 describe('Tutorial panel', () => {
   let fixture: ComponentFixture<TutorialPanelComponent>;
   const stepIndex = signal(1);
   let service: { previous: jest.Mock; next: jest.Mock };
   let panel: { close: jest.Mock };
+  let router: Router;
+  const pages = { url: jest.fn(), isCurrent: jest.fn() };
 
   function open(stepHtml: string, variables: Record<string, string> | null = { messages: 'C:/Users/me/messages' }): void {
     stepIndex.set(1);
@@ -55,9 +66,12 @@ describe('Tutorial panel', () => {
         { provide: TutorialService, useValue: tutorials },
         { provide: TutorialPanelState, useValue: (panel = { close: jest.fn() }) },
         { provide: VariableKeysService, useValue: { values: () => of(variables) } },
+        { provide: TutorialPages, useValue: pages },
+        provideRouter([]),
       ],
     });
     TestBed.inject(FaIconLibrary).addIcons(...fontAwesomeIcons);
+    router = TestBed.inject(Router);
     fixture = TestBed.createComponent(TutorialPanelComponent);
     fixture.detectChanges();
   }
@@ -184,6 +198,111 @@ describe('Tutorial panel', () => {
     element('.tutorial-panel__body').dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', altKey: true, bubbles: true }));
 
     expect(service.previous).not.toHaveBeenCalled();
+  });
+
+  describe('Show me', () => {
+    beforeEach(() => {
+      pages.url.mockReset();
+      pages.isCurrent.mockReset();
+      document.body.querySelectorAll('.show-me-target').forEach(target => target.remove());
+    });
+
+    function url(path: string): UrlTree {
+      return router.parseUrl(path);
+    }
+
+    /** jsdom lays nothing out, so an element counts as visible when it says so. */
+    function addTarget(): void {
+      const target = document.createElement('button');
+      target.className = 'show-me-target';
+      target.getClientRects = () => [{}] as unknown as DOMRectList;
+      document.body.appendChild(target);
+    }
+
+    async function showMissing(page: string): Promise<void> {
+      await fixture.componentInstance.show('.show-me-target', page, 'Click it.');
+      fixture.detectChanges();
+    }
+
+    it('opens the page of the step first when the element is on another page', async () => {
+      open('<p>Click <strong>Add</strong>.</p>');
+      const queues = url('/queue');
+      pages.url.mockReturnValue(of(queues));
+      pages.isCurrent.mockReturnValue(false);
+      const navigate = jest.spyOn(router, 'navigateByUrl').mockImplementation(() => {
+        addTarget();
+        return Promise.resolve(true);
+      });
+
+      await fixture.componentInstance.show('.show-me-target', '/queue', 'Click Add.');
+      fixture.detectChanges();
+
+      expect(pages.url).toHaveBeenCalledWith('/queue');
+      expect(navigate).toHaveBeenCalledWith(queues);
+      expect(highlight).toHaveBeenLastCalledWith('.show-me-target', 'Click Add.');
+      expect(fixture.nativeElement.querySelector('.tutorial-panel__hint')).toBeNull();
+    });
+
+    it('stays on this page when the element is already on it', async () => {
+      open('<p>Click <strong>Add</strong>.</p>');
+      addTarget();
+      const navigate = jest.spyOn(router, 'navigateByUrl');
+
+      await fixture.componentInstance.show('.show-me-target', '/queue', 'Click Add.');
+
+      expect(pages.url).not.toHaveBeenCalled();
+      expect(navigate).not.toHaveBeenCalled();
+    });
+
+    it('asks to switch to Test when the element is in the Test view of this editor', async () => {
+      open('<p>Click the <strong>Log</strong> tab.</p>');
+      pages.url.mockReturnValue(of(url('/flow/editor/1?view=test')));
+      pages.isCurrent.mockReturnValue(true);
+      const navigate = jest.spyOn(router, 'navigateByUrl');
+
+      await showMissing('flow:ExampleFlow:test');
+
+      expect(navigate).not.toHaveBeenCalled();
+      expect(element('.tutorial-panel__hint').textContent).toContain("That's in Test");
+    });
+
+    it('says to follow the steps when the page is not there yet', async () => {
+      open('<p>Click the <strong>Sink</strong>.</p>');
+      pages.url.mockReturnValue(of(undefined));
+
+      await showMissing('flow:DebugFlow');
+
+      expect(element('.tutorial-panel__hint').textContent).toContain("That isn't on this page");
+    });
+  });
+
+  it('enlarges a screenshot that is clicked, until a click closes it', () => {
+    open('<p><img src="content/tutorials/tutorial2/01-clone-flow.png" alt="Clone the TestFlow" tabindex="0"></p>');
+    const dialog = element<HTMLDialogElement>('dialog.tutorial-lightbox');
+    dialog.showModal = jest.fn();
+    dialog.close = jest.fn(() => dialog.dispatchEvent(new Event('close')));
+
+    element('.tutorial-panel__body img').click();
+    fixture.detectChanges();
+
+    expect(dialog.showModal).toHaveBeenCalled();
+    expect(element<HTMLImageElement>('.tutorial-lightbox__image').src).toContain('01-clone-flow.png');
+    expect(element('.tutorial-lightbox__caption').textContent).toBe('Clone the TestFlow');
+
+    dialog.click();
+    fixture.detectChanges();
+
+    expect(dialog.close).toHaveBeenCalled();
+    expect(fixture.nativeElement.querySelector('.tutorial-lightbox__image')).toBeNull();
+  });
+
+  it('enlarges a screenshot with Enter', () => {
+    open('<p><img src="content/tutorials/tutorial2/01-clone-flow.png" alt="Clone the TestFlow" tabindex="0"></p>');
+    const dialog = element<HTMLDialogElement>('dialog.tutorial-lightbox');
+    dialog.showModal = jest.fn();
+
+    expect(press(element('.tutorial-panel__body img'), 'Enter').defaultPrevented).toBe(true);
+    expect(dialog.showModal).toHaveBeenCalled();
   });
 
   it('closes with Escape', () => {

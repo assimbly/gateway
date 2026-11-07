@@ -32,7 +32,7 @@ A **Script** Flow runs your own scripts, for when a few lines of code are quicke
 
 <!-- step: {"check":"route:editor=script"} -->
 
-1. Go to **Flows → Manage** and click **Add**. <!-- show: [aria-label="Add"] -->
+1. Go to **Flows → Manage** and click **Add**. <!-- show: [aria-label="Add"] @ / -->
 2. Choose **Script**. <!-- show: a.flow-type-choice[href*="editor=script"] -->
 
 The script editor opens on the **Scripts** tab.
@@ -43,7 +43,7 @@ The script editor opens on the **Scripts** tab.
 
 ## Step 2: Set the Source
 
-1. Next to **Flow name**, type `Clock`. <!-- show: #field_flowName -->
+1. At the top left, where it says *Flow name*, type `Clock`. <!-- show: #field_flowName -->
 2. Click the **Source & result** tab. <!-- show: [data-cy="script-tab-source"] -->
 3. Under **Source**, click **Component**, type `sched` and choose **Scheduler**. <!-- show: [formcontrolname="componentType"] -->
 4. Set **Name** to `clock`. <!-- show: [formcontrolname="uri"] -->
@@ -95,21 +95,21 @@ The script editor opens on the **Scripts** tab.
 
 <!-- step: {"check":"flowCompleted:Clock"} -->
 
-1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] -->
+1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] @ flow:Clock -->
 
-Every 10 seconds the scripts run, and the **Stats** tab <!-- show: [data-cy="panel-stats"] --> counts a run under **Completed**.
+Every 10 seconds the scripts run, and the **Stats** tab <!-- show: [data-cy="panel-stats"] @ flow:Clock:test --> counts a run under **Completed**.
 
 ![The Flow is running](04-flow-running.png)
 
 2. Open `clock.txt` in `@{messages}/out`. Open it again a little later: the time has changed.
-3. Click the **Log** tab. <!-- show: [data-cy="test-view-log"] --> The Sink wrote each greeting there, after `Body:`.
-4. When you're done, click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] --> Otherwise the Flow keeps writing the file.
+3. Click the **Log** tab. <!-- show: [data-cy="test-view-log"] @ flow:Clock:test --> The Sink wrote each greeting there, after `Body:`.
+4. When you're done, click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] @ flow:Clock:test --> Otherwise the Flow keeps writing the file.
 
 > **Where is `@{messages}/out`?** The `out` folder in your messages folder, such as `C:\Users\<you>\messages\out` on Windows. The Variable `messages` under **Flows → Variables** holds its path.
 
 > **Try it yourself**
 >
-> * Add the date: click **Code**, <!-- show: [data-cy="mode-toggle"] --> change the Simple script to `Hello from Assimbly! It is ${date:now:yyyy-MM-dd HH:mm:ss}` and click **Save & Test**. <!-- show: [data-tour="flow-save-test"] -->
+> * Add the date: click **Code**, <!-- show: [data-cy="mode-toggle"] @ flow:Clock --> change the Simple script to `Hello from Assimbly! It is ${date:now:yyyy-MM-dd HH:mm:ss}` and click **Save & Test**. <!-- show: [data-tour="flow-save-test"] @ flow:Clock -->
 > * Click **Run** in the *Test* panel. Each Script shows what it made of the message, under **Resulting body**.
 > * Break the Groovy script on purpose, for example by writing to a folder that doesn't exist. **Failed** goes up on the **Stats** tab and an **Alerts** badge appears. [Tutorial 2](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow) shows how to find the error.
 

@@ -41,7 +41,7 @@ The Gateway runs every Flow as an [Apache Camel](https://camel.apache.org/) rout
 
 <!-- step: {"check":"route:editor=route"} -->
 
-1. Go to **Flows → Manage** and click **Add**. <!-- show: [aria-label="Add"] -->
+1. Go to **Flows → Manage** and click **Add**. <!-- show: [aria-label="Add"] @ / -->
 2. Choose **Camel route**. <!-- show: a.flow-type-choice[href*="editor=route"] -->
 
 The route editor opens, with a field to write the route in instead of a canvas.
@@ -54,7 +54,7 @@ The route editor opens, with a field to write the route in instead of a canvas.
 
 <!-- step: {"check":"flowExists:SimpleRoute"} -->
 
-1. Next to **Flow name**, type `SimpleRoute`. <!-- show: #field_flowName -->
+1. At the top left, where it says *Flow name*, type `SimpleRoute`. <!-- show: #field_flowName -->
 2. Set **Route name** to `MoveFiles`. <!-- show: [formcontrolname="routeName"] -->
 3. Replace the example in the **Camel route** field with: <!-- show: [data-tour="route-content"] -->
 
@@ -72,7 +72,7 @@ The route editor opens, with a field to write the route in instead of a canvas.
 
 > **Tips**
 >
-> * Click the **Edit** icon above the field to write the route in a larger editor.
+> * Click the expand icon at the top right of the field to write the route in a larger editor.
 > * With **Add route** you add more routes to the same Flow, for example routes that call each other. You do that in Tutorial 8.
 > * On the **Error handler** tab you can write a route that handles errors. Leave it empty to use the default error handling.
 
@@ -80,8 +80,8 @@ The route editor opens, with a field to write the route in instead of a canvas.
 
 <!-- step: {"check":"flowCompleted:SimpleRoute"} -->
 
-1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] --> The editor switches from **Code** to **Test**.
-2. Under **Body**, type `Hello Camel` <!-- show: .flow-test .body-codemirror --> and click **Run**. <!-- show: [data-cy="test-run"] -->
+1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] @ flow:SimpleRoute --> The editor switches from **Code** to **Test**.
+2. Under **Body**, type `Hello Camel` <!-- show: .flow-test .body-codemirror @ flow:SimpleRoute:test --> and click **Run**. <!-- show: [data-cy="test-run"] @ flow:SimpleRoute:test -->
 
 The panel shows **Passed**. Your message is now a file in `@{messages}/out`.
 
@@ -95,14 +95,14 @@ The panel shows **Passed**. Your message is now a file in `@{messages}/out`.
 
 <!-- step: {"check":"flowLog:SimpleRoute:Received"} -->
 
-1. Click the **Log** tab. <!-- show: [data-cy="test-view-log"] -->
+1. Click the **Log** tab. <!-- show: [data-cy="test-view-log"] @ flow:SimpleRoute:test -->
 2. Type `Received` in the filter box. <!-- show: #flowLogSearchText -->
 
 There it is: `Received: Hello Camel`, written by the `<log>` line of your route.
 
-3. When you're done, click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] -->
+3. When you're done, click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] @ flow:SimpleRoute:test -->
 
-> **Tip: see the route as Camel runs it** Click the **Camel route** tab <!-- show: [data-cy="test-view-route"] --> to see the route the runtime built, with `@{messages}` filled in. It works for visual Flows too: open *TestFlow* in **Test** and click **Camel route** to see the route behind the canvas, ready to copy or download.
+> **Tip: see the route as Camel runs it** Click the **Camel route** tab <!-- show: [data-cy="test-view-route"] @ flow:SimpleRoute:test --> to see the route the runtime built, with `@{messages}` filled in. It works for visual Flows too: open *TestFlow* in **Test** and click **Camel route** to see the route behind the canvas, ready to copy or download.
 
 > **Visual Flow or Camel route?**
 >

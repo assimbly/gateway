@@ -20,7 +20,7 @@ It takes about 5 minutes.
 
 <!-- step: {"check":"route:/flow/editor"} -->
 
-1. On **Flows → Manage**, click *TestFlow* <!-- show: tr[data-flow-name="TestFlow"] td a --> to open it in the editor.
+1. On **Flows → Manage**, click *TestFlow* <!-- show: tr[data-flow-name="TestFlow"] td a @ / --> to open it in the editor.
 2. Look at the address bar: `/flow/editor/1052?...` means id `1052`.
 
 Wherever this tutorial says `1052`, use your own id.
@@ -64,8 +64,9 @@ Open the endpoint, fill in its parameters and click **Execute**. Try a few more 
 
 * `resume`: resumes a paused Flow.
 * `status`: `started`, or `unconfigured` when the Flow doesn't run.
-* `stats`: the counters of the messages, the same numbers as in the Flow editor.
 * `lasterror`: the last error of the Flow.
+
+The counters of the messages, the same numbers as in the Flow editor, are under **API Explorer → Observability**, in **Statistics**: `GET /api/integration/flow/{flowId}/stats`.
 
 The other entries of **API Explorer**, such as **Broker**, **Configuration** and **Observability**, hold the rest of the API. **All endpoints** shows them all.
 

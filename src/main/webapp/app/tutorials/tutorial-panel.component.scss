@@ -221,12 +221,19 @@
       }
     }
 
+    // a screenshot is too small to read here; a click shows it at full size
     img {
       max-width: 100%;
       height: auto;
       margin: 0.25rem 0;
       border: 1px solid var(--app-border);
       border-radius: 0.25rem;
+      cursor: zoom-in;
+
+      &:hover,
+      &:focus-visible {
+        border-color: var(--app-primary);
+      }
     }
 
     code {
@@ -411,4 +418,39 @@
       }
     }
   }
+}
+
+.tutorial-lightbox {
+  max-width: 95vw;
+  max-height: 95vh;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  cursor: zoom-out;
+
+  &::backdrop {
+    background: rgb(0 0 0 / 75%);
+  }
+}
+
+.tutorial-lightbox__image {
+  display: block;
+  max-width: 95vw;
+  max-height: calc(95vh - 2.5rem);
+  border-radius: 0.25rem;
+  box-shadow: 0 0.5rem 2rem rgb(0 0 0 / 50%);
+}
+
+.tutorial-lightbox__close {
+  position: absolute;
+  top: -2rem;
+  right: 0;
+  opacity: 0.9;
+}
+
+.tutorial-lightbox__caption {
+  margin: 0.5rem 0 0;
+  color: #fff;
+  text-align: center;
 }

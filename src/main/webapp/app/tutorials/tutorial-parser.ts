@@ -8,6 +8,8 @@ export const TUTORIALS_URL = 'content/tutorials/';
 const TUTORIAL_HEADER = /<!--\s*tutorial:\s*(\{[\s\S]*?\})\s*-->/;
 const STEP_META = /<!--\s*step:\s*(\{[\s\S]*?\})\s*-->/;
 const SHOW = /<!--\s*show:\s*([\s\S]*?)\s*-->/g;
+/** What separates the selector of a Show me from the page it's on, as in `<!-- show: [aria-label="Add"] @ /queue -->`. */
+const PAGE = ' @ ';
 /** A block only the written tutorial needs, such as the hint to follow it in the Gateway: the comment and the lines up to the next blank one. */
 const WEB_ONLY = /<!--\s*web-only\s*-->\n(?:[^\n]+\n?)*/g;
 const SECTION = /^## /m;
@@ -60,10 +62,7 @@ function stepMeta(body: string): StepMeta {
 }
 
 function render(markdown: string, id: string): string {
-  const withButtons = markdown.replace(
-    SHOW,
-    (_, selector: string) => `<button type="button" class="tutorial-show" data-tour-show="${escapeAttribute(selector)}">Show me</button>`,
-  );
+  const withButtons = markdown.replace(SHOW, (_, show: string) => showButton(show));
   const html = marked.parse(withButtons, { async: false, gfm: true });
   return (
     html
@@ -73,11 +72,25 @@ function render(markdown: string, id: string): string {
       .replace(/(?<!<pre>)<code>/g, '<code class="tutorial-copy" data-tour-copy tabindex="0" role="button" title="Click to copy">')
       .replace(/<pre>/g, '<div class="tutorial-code"><button type="button" class="tutorial-code__copy" data-tour-copy>Copy</button><pre>')
       .replace(/<\/pre>/g, '</pre></div>')
-      // images sit next to the tutorial
+      // images sit next to the tutorial, and open at full size with a click or Enter
       .replace(/(<img\s[^>]*?src=")(?![a-z]+:|\/|#)([^"]+)"/gi, `$1${TUTORIALS_URL}${id}/$2"`)
+      .replace(/<img\s/g, '<img tabindex="0" role="button" title="Click to enlarge" ')
       // other pages open next to the Gateway, not in its place
       .replace(/<a href="(https?:[^"]+)"/g, '<a href="$1" target="_blank" rel="noopener"')
   );
+}
+
+/** A Show me button for `selector` or `selector @ page`: the panel opens the page first when the element isn't on this one. */
+function showButton(show: string): string {
+  const [selector, page] = splitShow(show);
+  const pageAttribute = page ? ` data-tour-page="${escapeAttribute(page)}"` : '';
+  return `<button type="button" class="tutorial-show" data-tour-show="${escapeAttribute(selector)}"${pageAttribute}>Show me</button>`;
+}
+
+/** The selector of a show comment and the page it names, if any. */
+export function splitShow(show: string): [selector: string, page: string | undefined] {
+  const at = show.lastIndexOf(PAGE);
+  return at < 0 ? [show, undefined] : [show.slice(0, at).trim(), show.slice(at + PAGE.length).trim()];
 }
 
 /** The quote as a section that opens on a click, under its title without the period or colon it ends with. */

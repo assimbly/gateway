@@ -31,6 +31,11 @@ export async function highlight(selector: string, text: string): Promise<boolean
   return true;
 }
 
+/** Whether the selector matches a visible element on this page right now, without waiting for one. */
+export function isVisible(selector: string): boolean {
+  return findVisible(selector) !== undefined;
+}
+
 /** Whether a Show me is pointing at an element right now. */
 export function isHighlighting(): boolean {
   return active !== undefined;

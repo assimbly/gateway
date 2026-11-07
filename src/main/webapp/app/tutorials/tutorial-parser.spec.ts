@@ -27,7 +27,7 @@ See the [user guide](https://github.com/assimbly/gateway/wiki/user-guide).
 
 ## Step 4: Open it
 
-Click it.
+Click it. <!-- show: [data-cy="mode-toggle"] @ flow:ExampleFlow:test -->
 `;
 
 describe('parseTutorial', () => {
@@ -59,6 +59,14 @@ describe('parseTutorial', () => {
     expect(button?.dataset['tourShow']).toBe('tr[data-flow-name="ExampleFlow"]');
   });
 
+  it('names the page a Show me is on, after its selector', () => {
+    const [plain] = Array.from(htmlOf(tutorial.steps[1].html).querySelectorAll<HTMLButtonElement>('button.tutorial-show'));
+    const [paged] = Array.from(htmlOf(tutorial.steps[2].html).querySelectorAll<HTMLButtonElement>('button.tutorial-show'));
+    expect(plain.dataset['tourPage']).toBeUndefined();
+    expect(paged.dataset['tourShow']).toBe('[data-cy="mode-toggle"]');
+    expect(paged.dataset['tourPage']).toBe('flow:ExampleFlow:test');
+  });
+
   it('makes code copyable', () => {
     const html = htmlOf(parseTutorial(`${MARKDOWN}\nSet **Path** to \`www.dneonline.com\`.\n\n\`\`\`xml\n<a/>\n\`\`\`\n`).steps[2].html);
     const value = html.querySelector('p code');
@@ -74,6 +82,9 @@ describe('parseTutorial', () => {
   it('serves images from next to the tutorial and opens other pages in a new tab', () => {
     const html = htmlOf(tutorial.steps[1].html);
     expect(html.querySelector('img')?.getAttribute('src')).toBe('content/tutorials/quick-start/01-list.png');
+    // a screenshot is enlarged with a click, or Enter from the keyboard
+    expect(html.querySelector('img')?.getAttribute('tabindex')).toBe('0');
+    expect(html.querySelector('img')?.getAttribute('title')).toBe('Click to enlarge');
     expect(html.querySelector('a')?.getAttribute('target')).toBe('_blank');
   });
 

@@ -23,11 +23,11 @@ It takes about 10 minutes.
 
 1. Go to **Broker → Manage**.
 
-You see the broker *default*. The green buttons under **Status** show that it runs. <!-- show: [aria-label="Stop"] -->
+You see the broker *default*. The green buttons under **Status** show that it runs. <!-- show: [aria-label="Stop"] @ /broker -->
 
 ![The default broker](01-broker-manage.png)
 
-2. Click **Stats** for its version, uptime and connections. <!-- show: [aria-label="Stats"] -->
+2. Click **Stats** for its version, uptime and connections. <!-- show: [aria-label="Stats"] @ /broker -->
 
 > **What is a broker?** A message server. Instead of sending a message straight to another system, you put it on the broker, and the broker keeps it until someone picks it up. The sender and the receiver don't need to be online at the same time.
 >
@@ -43,8 +43,8 @@ You see the broker *default*. The green buttons under **Status** show that it ru
 
 <!-- step: {"check":"brokerStatus:stopped"} -->
 
-1. Click **Stop** (the square). <!-- show: [aria-label="Stop"] -->
-2. Click **Start** (the triangle). <!-- show: [aria-label="Start"] -->
+1. Click **Stop** (the square). <!-- show: [aria-label="Stop"] @ /broker -->
+2. Click **Start** (the triangle). <!-- show: [aria-label="Start"] @ /broker -->
 
 After a few seconds the green buttons are back.
 
@@ -54,7 +54,7 @@ After a few seconds the green buttons are back.
 
 ## Step 3: Look at the broker file
 
-1. Click **Edit** in the row of *default*. <!-- show: [aria-label="Edit"] -->
+1. Click **Edit** in the row of *default*. <!-- show: [aria-label="Edit"] @ /broker -->
 
 ![The broker file](03-broker-file.png)
 
@@ -62,9 +62,9 @@ After a few seconds the green buttons are back.
 
 > **What's in it?**
 >
-> * **Autostart** `true`: the broker starts with the Gateway.
+> * **Autostart** *Yes*: the broker starts with the Gateway.
 > * **Type** `ActiveMQ Artemis`. The other option is `ActiveMQ Classic`.
-> * **Configuration Type** `File`: the broker uses the file below, `broker.xml`, from `~/.assimbly/broker/`. <!-- show: #field_configuration_type -->
+> * **Configuration type** *File*: the broker uses the file below, `broker.xml`, from `~/.assimbly/broker/`. <!-- show: #field_configuration_type -->
 > * In the file, `<acceptors>` sets the ports clients connect to, such as `61616` for JMS, and `<addresses>` the queues that always exist, such as `DLQ` (the dead letter queue).
 
 > **How do I change the broker?** Edit the file, click **Save**, then **Restart** on **Broker → Manage**.
@@ -74,7 +74,7 @@ After a few seconds the green buttons are back.
 <!-- step: {"check":"queueExists:HelloQueue"} -->
 
 1. Go to **Broker → Endpoints**.
-2. Click **Add**. <!-- show: [aria-label="Add"] -->
+2. Click **Add**. <!-- show: [aria-label="Add"] @ /queue -->
 3. Set **Name** to `HelloQueue`. <!-- show: #field_name -->
 4. Click **Save**. <!-- show: #save-entity -->
 
@@ -88,7 +88,7 @@ After a few seconds the green buttons are back.
 
 <!-- step: {"check":"queueMessages:HelloQueue"} -->
 
-1. Click **Send** in the row of *HelloQueue*. <!-- show: tr[data-endpoint-name="HelloQueue"] [aria-label="Send"] -->
+1. Click **Send** in the row of *HelloQueue*. <!-- show: tr[data-endpoint-name="HelloQueue"] [aria-label="Send"] @ /queue -->
 2. Under **Body**, type `Hello broker!`. <!-- show: .body-codemirror -->
 3. Click **Send** at the top right. <!-- show: [title="Send (Ctrl+Enter)"] -->
 
@@ -101,7 +101,7 @@ A notification confirms: *Message sent to queue HelloQueue*.
 <!-- step: {"check":"route:endpointName=HelloQueue"} -->
 
 1. Go to **Broker → Endpoints**. *HelloQueue* now has 1 message.
-2. Click **HelloQueue**. <!-- show: tr[data-endpoint-name="HelloQueue"] td a -->
+2. Click **HelloQueue**. <!-- show: tr[data-endpoint-name="HelloQueue"] td a @ /queue -->
 
 You see your message, with its body and headers on the right.
 

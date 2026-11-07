@@ -23,9 +23,9 @@ It takes about 5 minutes.
 
 You build *TestFlow*. It moves files from an `in` folder to an `out` folder.
 
-1. Go to **Flows → Manage** and click **Add**. <!-- show: [aria-label="Add"] -->
+1. Go to **Flows → Manage** and click **Add**. <!-- show: [aria-label="Add"] @ / -->
 2. Choose **Visual**. <!-- show: a.flow-type-choice -->
-3. Next to **Flow name**, type `TestFlow`. <!-- show: #field_flowName -->
+3. At the top left, where it says *Flow name*, type `TestFlow`. <!-- show: #field_flowName -->
 
 The canvas shows two Steps: a **Source** and a **Sink**.
 
@@ -57,9 +57,9 @@ The canvas shows two Steps: a **Source** and a **Sink**.
 
 <!-- step: {"check":"flowCompleted:TestFlow"} -->
 
-1. Click **Save & Test** at the top right. <!-- show: [data-tour="flow-save-test"] --> The editor switches to **Test**.
-2. Under **Body**, type `Hello Assimbly`. <!-- show: .flow-test .body-codemirror -->
-3. Click **Run**. <!-- show: [data-cy="test-run"] -->
+1. Click **Save & Test** at the top right. <!-- show: [data-tour="flow-save-test"] @ flow:TestFlow --> The editor switches to **Test**.
+2. Under **Body**, type `Hello Assimbly`. <!-- show: .flow-test .body-codemirror @ flow:TestFlow:test -->
+3. Click **Run**. <!-- show: [data-cy="test-run"] @ flow:TestFlow:test -->
 
 The panel shows **Passed** and the Sink on the canvas shows a **1**. Your message is now a file in `@{messages}/out`. Open it to have a look.
 
@@ -69,9 +69,9 @@ The panel shows **Passed** and the Sink on the canvas shows a **1**. Your messag
 
 > **Good to know**
 >
-> * **Design** and **Test** at the top switch between building the Flow and running it. <!-- show: [data-cy="mode-toggle"] -->
-> * A Flow that isn't finished, such as a Source without a Sink, is saved as a **Draft**. Hover over its *Draft* badge to see what's missing.
+> * **Design** and **Test** at the top switch between building the Flow and running it. <!-- show: [data-cy="mode-toggle"] @ flow:TestFlow -->
+> * A Flow that isn't finished, such as a Source without a Sink, is saved as a **Draft**. Click its **Draft** badge to see what's missing, and click a problem to go to its Step. A Draft can't be tested until it's finished.
 > * The **Error handler** in the toolbar decides what happens with errors. For a new Flow it writes them to the Gateway log.
-> * Every Flow runs as an [Apache Camel](https://camel.apache.org/) route. **Camel route** in **Test** shows it. <!-- show: [data-cy="test-view-route"] -->
+> * Every Flow runs as an [Apache Camel](https://camel.apache.org/) route. **Camel route** in **Test** shows it. <!-- show: [data-cy="test-view-route"] @ flow:TestFlow:test -->
 
 **Done!** You built your first Flow. Leave *TestFlow* running and continue with [Tutorial 2: Debugging a Flow](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow).

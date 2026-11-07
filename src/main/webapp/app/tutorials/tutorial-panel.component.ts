@@ -1,12 +1,14 @@
-import { Component, ElementRef, Injector, OnDestroy, OnInit, afterNextRender, computed, effect, inject, signal } from '@angular/core';
+import { Component, ElementRef, Injector, OnDestroy, OnInit, afterNextRender, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DomSanitizer } from '@angular/platform-browser';
+import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { map } from 'rxjs';
+import { firstValueFrom, map } from 'rxjs';
 
 import { VariableKeysService } from 'app/entities/environment-variables/variable-keys.service';
 
-import { clearHighlight, highlight, isHighlighting } from './tutorial-highlight';
+import { clearHighlight, highlight, isHighlighting, isVisible } from './tutorial-highlight';
+import { TutorialPages } from './tutorial-pages';
 import { TutorialPanelState } from './tutorial-panel.state';
 import { TutorialService } from './tutorial.service';
 import { groupByTrack } from './tutorial-tracks';
@@ -34,13 +36,21 @@ export class TutorialPanelComponent implements OnInit, OnDestroy {
   private readonly variables = inject(VariableKeysService);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly injector = inject(Injector);
+  private readonly pages = inject(TutorialPages);
+  private readonly router = inject(Router);
+  private readonly lightbox = viewChild.required<ElementRef<HTMLDialogElement>>('lightbox');
 
   // the tutorials are first-party Markdown bundled with the Gateway; their Show me buttons need their data attribute
   /** The tutorials by track, such as Get started and Messaging. */
   readonly tracks = computed(() => groupByTrack(this.tutorials.summaries()));
   readonly html = computed(() => this.sanitizer.bypassSecurityTrustHtml(this.tutorials.step()?.html ?? ''));
-  /** Whether the last Show me found nothing on this page. */
-  readonly notFound = signal(false);
+  /**
+   * Why the last Show me found nothing: the element is on a page the panel couldn't open, or it's in the Test view of
+   * the editor the user is in.
+   */
+  readonly hint = signal<'elsewhere' | 'test' | undefined>(undefined);
+  /** The screenshot the user clicked, shown at full size. */
+  readonly enlarged = signal<{ src: string; alt: string } | undefined>(undefined);
   /** Where the Variable `messages` points: the folder the tutorials keep their files in, or undefined when unknown. */
   readonly messagesFolder = toSignal(this.variables.values().pipe(map(values => values?.['messages'] || undefined)));
   /** Whether the open step is about files in the messages folder, so the panel says where that folder is. */
@@ -49,7 +59,7 @@ export class TutorialPanelComponent implements OnInit, OnDestroy {
   constructor() {
     effect(() => {
       this.tutorials.stepIndex();
-      this.notFound.set(false);
+      this.hint.set(undefined);
       clearHighlight();
     });
   }
@@ -68,6 +78,10 @@ export class TutorialPanelComponent implements OnInit, OnDestroy {
    * do, and Escape stops a Show me pointing, or else closes the panel.
    */
   onKeydown(event: KeyboardEvent): void {
+    // the enlarged screenshot closes on Escape by itself, and keeps the panel open
+    if ((event.target as Element | null)?.closest?.('dialog')) {
+      return;
+    }
     if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || isEditable(event.target)) {
       return;
     }
@@ -106,12 +120,21 @@ export class TutorialPanelComponent implements OnInit, OnDestroy {
     );
   }
 
-  /** Enter or Space on a value in the step copies it, as a click does; buttons already click on these keys. */
+  /**
+   * Enter or Space on a value in the step copies it, and on a screenshot enlarges it, as a click does; buttons already
+   * click on these keys.
+   */
   onBodyKeydown(event: KeyboardEvent): void {
-    const copyable = event.target as Element | null;
-    if ((event.key === 'Enter' || event.key === ' ') && copyable?.matches('[data-tour-copy]:not(button)')) {
+    const target = event.target as Element | null;
+    if (event.key !== 'Enter' && event.key !== ' ') {
+      return;
+    }
+    if (target?.matches('[data-tour-copy]:not(button)')) {
       event.preventDefault();
-      copy(copyable as HTMLElement);
+      copy(target as HTMLElement);
+    } else if (target instanceof HTMLImageElement) {
+      event.preventDefault();
+      this.enlarge(target);
     }
   }
 
@@ -122,7 +145,7 @@ export class TutorialPanelComponent implements OnInit, OnDestroy {
 
   /**
    * A Show me button in the step points at its element, with the line it stands in; a value or code block is copied;
-   * a link to another tutorial opens it in the panel.
+   * a screenshot is enlarged; a link to another tutorial opens it in the panel.
    */
   onBodyClick(event: MouseEvent): void {
     const link = (event.target as Element | null)?.closest<HTMLAnchorElement>('a[href]');
@@ -135,13 +158,45 @@ export class TutorialPanelComponent implements OnInit, OnDestroy {
       copy(copyable);
       return;
     }
-    const button = (event.target as Element | null)?.closest<HTMLElement>('[data-tour-show]');
-    const selector = button?.dataset['tourShow'];
-    if (!button || !selector) {
+    if (event.target instanceof HTMLImageElement) {
+      this.enlarge(event.target);
       return;
     }
-    this.notFound.set(false);
-    void highlight(selector, describe(button)).then(found => this.notFound.set(!found));
+    const button = (event.target as Element | null)?.closest<HTMLElement>('[data-tour-show]');
+    const selector = button?.dataset['tourShow'];
+    if (button && selector) {
+      void this.show(selector, button.dataset['tourPage'], describe(button));
+    }
+  }
+
+  /**
+   * Points at the element. When it isn't on this page but the tutorial says which page it's on, that page opens first;
+   * the editor still asks before it drops unsaved changes.
+   */
+  async show(selector: string, page: string | undefined, text: string): Promise<void> {
+    this.hint.set(undefined);
+    const url = page && !isVisible(selector) ? await firstValueFrom(this.pages.url(page)) : undefined;
+    const elsewhere = url !== undefined && !this.pages.isCurrent(url);
+    if (elsewhere && !(await this.router.navigateByUrl(url))) {
+      // the user chose to stay, for example to keep unsaved changes
+      return;
+    }
+    if (await highlight(selector, text)) {
+      return;
+    }
+    // in the editor of the right Flow, but in Design: the user switches to Test themselves, as reopening would reload it
+    const inDesign = url !== undefined && !elsewhere && url.queryParams['view'] === 'test';
+    this.hint.set(inDesign ? 'test' : 'elsewhere');
+  }
+
+  closeEnlarged(): void {
+    this.lightbox().nativeElement.close();
+  }
+
+  private enlarge(image: HTMLImageElement): void {
+    clearHighlight();
+    this.enlarged.set({ src: image.src, alt: image.alt });
+    this.lightbox().nativeElement.showModal();
   }
 }
 

@@ -36,8 +36,8 @@ You build the Flow *SplitNames*. It takes a list of names from a queue, splits i
 
 <!-- step: {"check":"route:editor=route"} -->
 
-1. Go to **Flows → Manage**, click **Add** <!-- show: [aria-label="Add"] --> and choose **Camel route**. <!-- show: a.flow-type-choice[href*="editor=route"] -->
-2. Next to **Flow name**, type `SplitNames`. <!-- show: #field_flowName -->
+1. Go to **Flows → Manage**, click **Add** <!-- show: [aria-label="Add"] @ / --> and choose **Camel route**. <!-- show: a.flow-type-choice[href*="editor=route"] -->
+2. At the top left, where it says *Flow name*, type `SplitNames`. <!-- show: #field_flowName -->
 3. Set **Route name** to `InboundXML`. <!-- show: [formcontrolname="routeName"] -->
 
 > **And the Error handler tab?** It holds a route for failed messages. Leave it empty: it's not one of the three routes.
@@ -111,7 +111,7 @@ You build the Flow *SplitNames*. It takes a list of names from a queue, splits i
 <!-- step: {"check":"queueMessages:NamesOut"} -->
 
 1. Go to **Broker → Endpoints**. *NamesIn* has 1 consumer: your *InboundXML* route.
-2. Click **Send** in the row of *NamesIn*. <!-- show: tr[data-endpoint-name="NamesIn"] [aria-label="Send"] -->
+2. Click **Send** in the row of *NamesIn*. <!-- show: tr[data-endpoint-name="NamesIn"] [aria-label="Send"] @ /queue -->
 3. Paste this XML into the **Body**: <!-- show: .body-codemirror -->
 
    ```xml
@@ -147,7 +147,7 @@ Your message to *NamesIn* is gone, and *NamesOut* has 3 more messages: one per n
 
 ![One message in, three messages out](05-queues.png)
 
-2. Click **NamesOut** to browse them. <!-- show: tr[data-endpoint-name="NamesOut"] td a --> Each message holds one `<name>`.
+2. Click **NamesOut** to browse them. <!-- show: tr[data-endpoint-name="NamesOut"] td a @ /queue --> Each message holds one `<name>`.
 
 ![The split messages](06-browse-names.png)
 

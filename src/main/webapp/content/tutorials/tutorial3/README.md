@@ -27,8 +27,8 @@ It takes about 10 minutes.
 You build *Weather*: every 30 seconds it gets the weather in Amsterdam and saves it as a file.
 
 1. Go to **Flows → Manage**.
-2. In the row of *TestFlow*, click **⋮** (*More actions*) <!-- show: tr[data-flow-name="TestFlow"] [aria-label="More actions"] --> and choose **Clone**.
-3. Next to **Flow name**, type `Weather`. <!-- show: #field_flowName -->
+2. In the row of *TestFlow*, click **⋮** (*More actions*) <!-- show: tr[data-flow-name="TestFlow"] [aria-label="More actions"] @ / --> and choose **Clone**.
+3. At the top left, where it says *Flow name*, type `Weather`. <!-- show: #field_flowName -->
 
 ## Step 2: Use a Scheduler as Source
 
@@ -92,13 +92,13 @@ After a second each Step on the canvas shows a **1**. Every 30 seconds the numbe
    }
    ```
 
-3. When you're done, click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] --> Otherwise the Flow keeps calling the API.
+3. When you're done, click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] @ flow:Weather:test --> Otherwise the Flow keeps calling the API.
 
 > **No file?** Click the **Alerts** badge in the editor header to see the error.
 
 > **Where is `@{messages}/out`?** The `out` folder in your messages folder, such as `C:\Users\<you>\messages\out` on Windows. The Variable `messages` under **Flows → Variables** holds its path.
 
-> **Try it yourself: the weather in your town** Click **Design**, <!-- show: [data-cy="mode-toggle"] --> change `latitude` and `longitude` in the **Http Uri**, and click **Save & Test** again. <!-- show: [data-tour="flow-save-test"] --> It restarts the Flow, so the change takes effect right away. **Save** alone keeps the running Flow on its old configuration.
+> **Try it yourself: the weather in your town** Click **Design**, <!-- show: [data-cy="mode-toggle"] @ flow:Weather --> change `latitude` and `longitude` in the **Http Uri**, and click **Save & Test** again. <!-- show: [data-tour="flow-save-test"] @ flow:Weather --> It restarts the Flow, so the change takes effect right away. **Save** alone keeps the running Flow on its old configuration.
 
 ## Summary
 

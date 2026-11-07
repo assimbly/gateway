@@ -29,8 +29,8 @@ It takes about 15 minutes.
 You put a queue between two Flows. The first puts files on it, the second takes them off.
 
 1. Go to **Flows → Manage**.
-2. In the row of *TestFlow*, click **⋮** (*More actions*) and choose **Clone**. <!-- show: tr[data-flow-name="TestFlow"] [aria-label="More actions"] -->
-3. Next to **Flow name**, type `FileToQueue`. <!-- show: #field_flowName -->
+2. In the row of *TestFlow*, click **⋮** (*More actions*) and choose **Clone**. <!-- show: tr[data-flow-name="TestFlow"] [aria-label="More actions"] @ / -->
+3. At the top left, where it says *Flow name*, type `FileToQueue`. <!-- show: #field_flowName -->
 4. Click the **Source** on the canvas <!-- show: .flow-step-source --> and change **Directory Name** to `@{messages}/orders`. <!-- show: [formcontrolname="uri"] -->
 
 > **Why another folder?** So *TestFlow* doesn't pick up the files of *FileToQueue*, even when it runs.
@@ -53,7 +53,7 @@ You put a queue between two Flows. The first puts files on it, the second takes 
 <!-- step: {"check":"queueMessages:OrdersQueue"} -->
 
 1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] -->
-2. Under **Body**, type `Order 1` <!-- show: .flow-test .body-codemirror --> and click **Run**. <!-- show: [data-cy="test-run"] -->
+2. Under **Body**, type `Order 1` <!-- show: .flow-test .body-codemirror @ flow:FileToQueue:test --> and click **Run**. <!-- show: [data-cy="test-run"] @ flow:FileToQueue:test -->
 3. Do the same with `Order 2` and `Order 3`, with **Run again**.
 
 The Sink on the canvas shows **3**: three messages are on the queue.
@@ -70,14 +70,14 @@ The Sink on the canvas shows **3**: three messages are on the queue.
 
 ![Three messages wait on the queue](05-messages-waiting.png)
 
-2. Click **OrdersQueue** to browse the messages. <!-- show: tr[data-endpoint-name="OrdersQueue"] td a -->
+2. Click **OrdersQueue** to browse the messages. <!-- show: tr[data-endpoint-name="OrdersQueue"] td a @ /queue -->
 
 > **How long do they wait?** Until a Flow takes them off the queue.
 
 ## Step 5: Build the Flow that takes messages off the queue
 
-1. Go to **Flows → Manage** and clone *TestFlow* once more. <!-- show: tr[data-flow-name="TestFlow"] [aria-label="More actions"] -->
-2. Next to **Flow name**, type `QueueToFile`. <!-- show: #field_flowName -->
+1. Go to **Flows → Manage** and clone *TestFlow* once more. <!-- show: tr[data-flow-name="TestFlow"] [aria-label="More actions"] @ / -->
+2. At the top left, where it says *Flow name*, type `QueueToFile`. <!-- show: #field_flowName -->
 3. Click the **Source** on the canvas. <!-- show: .flow-step-source -->
 4. Click **Component**, type `sjms` and choose **Simple JMS**. <!-- show: [formcontrolname="componentType"] -->
 5. Set **Destination Name** to `OrdersQueue`. <!-- show: [formcontrolname="uri"] -->

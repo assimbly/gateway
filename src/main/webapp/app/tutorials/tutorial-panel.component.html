@@ -94,9 +94,14 @@
 
     <div class="tutorial-panel__body" [innerHTML]="html()" (click)="onBodyClick($event)" (keydown)="onBodyKeydown($event)"></div>
 
-    @if (notFound()) {
+    @if (hint() === 'test') {
       <p class="tutorial-panel__hint" role="status">
-        <fa-icon icon="info-circle" /> That isn't on this page. Follow the step to get there first, then click
+        <fa-icon icon="info-circle" /> That's in <strong>Test</strong>. Click <strong>Test</strong> at the top of the editor, then click
+        <strong>Show me</strong> again.
+      </p>
+    } @else if (hint() === 'elsewhere') {
+      <p class="tutorial-panel__hint" role="status">
+        <fa-icon icon="info-circle" /> That isn't on this page. Follow the steps before this one to get there, then click
         <strong>Show me</strong> again.
       </p>
     }
@@ -126,3 +131,14 @@
     </div>
   </footer>
 }
+
+<!-- a click anywhere closes the enlarged screenshot, as does Escape -->
+<dialog #lightbox class="tutorial-lightbox" aria-label="Screenshot" (click)="closeEnlarged()" (close)="enlarged.set(undefined)">
+  @if (enlarged(); as image) {
+    <button type="button" class="btn-close btn-close-white tutorial-lightbox__close" aria-label="Close"></button>
+    <img class="tutorial-lightbox__image" [src]="image.src" [alt]="image.alt" />
+    @if (image.alt) {
+      <p class="tutorial-lightbox__caption">{{ image.alt }}</p>
+    }
+  }
+</dialog>
