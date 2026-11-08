@@ -26,12 +26,18 @@ import {
   valueChoicesOf,
   valueFieldOf,
 } from 'app/shared/camel/endpoint';
-import { insertVariable, unknownVariables, unknownVariablesMessage } from 'app/shared/camel/variables';
+import {
+  describeVariables,
+  flowAndGlobalVariables,
+  insertVariable,
+  unknownVariables,
+  unknownVariablesMessage,
+} from 'app/shared/camel/variables';
 import { IStep, StepType } from 'app/shared/model/step.model';
 import { IMessage } from 'app/shared/model/message.model';
 import { Connection } from 'app/shared/model/connection.model';
 import { ThemeService } from 'app/core/theme';
-import { VariableKeysService } from 'app/entities/environment-variables/variable-keys.service';
+import { KnownVariable, VariableKeysService } from 'app/entities/environment-variables/variable-keys.service';
 import { isRouteStep, missingRouteFields } from './route-step';
 import { Subscription } from 'rxjs';
 import { FlowService } from '../flow.service';
@@ -174,22 +180,49 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   ) {
     this.stepEditorRegistry.editors.push(this);
     inject(VariableKeysService)
-      .keys()
+      .known()
       .pipe(takeUntilDestroyed())
-      .subscribe(keys => {
-        this.variableKeys = keys;
+      .subscribe(variables => {
+        this.variables = variables;
+        this.variableKeys = variables ? variables.map(variable => variable.key) : null;
         this.cdr.markForCheck();
       });
   }
 
-  /** The keys of the Variables a Path or Option can refer to; null while unknown, so nothing is reported as missing. */
+  /** The global Variables a Path or Option can refer to, to pick from; null while unknown. */
+  variables: KnownVariable[] | null = null;
+  /** The keys of the global Variables; null while unknown, so nothing is reported as missing. */
   variableKeys: string[] | null = null;
+  /** The Flow's own Variables by key, which win over a global Variable with the same key. */
+  @Input() flowVariables: Record<string, string> = {};
   /** What is typed in the Insert Variable menu to narrow its keys. */
   variableFilter = '';
 
-  get filteredVariableKeys(): string[] {
+  /** The Variables a Path or Option can refer to: the Flow's own, then the global ones; null while unknown. */
+  get allVariables(): KnownVariable[] | null {
+    return flowAndGlobalVariables(this.flowVariables, this.variables);
+  }
+
+  get hasFlowVariables(): boolean {
+    return Object.keys(this.flowVariables).length > 0;
+  }
+
+  get filteredFlowVariables(): KnownVariable[] {
+    return this.matchingFilter(Object.entries(this.flowVariables).map(([key, value]) => ({ key, value, encrypted: false })));
+  }
+
+  get filteredVariables(): KnownVariable[] {
+    return this.matchingFilter(this.variables ?? []);
+  }
+
+  private matchingFilter(variables: KnownVariable[]): KnownVariable[] {
     const filter = this.variableFilter.trim().toLowerCase();
-    return (this.variableKeys ?? []).filter(key => key.toLowerCase().includes(filter));
+    return variables.filter(variable => variable.key.toLowerCase().includes(filter));
+  }
+
+  /** What the Variables a Path or Option value refers to stand for, shown when hovering it; null when it refers to none. */
+  variablesTitle(text: unknown): string | null {
+    return describeVariables(text == null ? '' : `${text}`, this.allVariables) ?? null;
   }
 
   /** Puts a reference to the Variable in a Path or Option value at the cursor, and leaves the cursor after it. */
@@ -223,11 +256,15 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
 
   /** What the Step says about the Variables its Path and Options refer to that don't exist, or nothing. */
   get unknownVariablesWarning(): string | undefined {
-    if (!this.variableKeys) {
+    const known = this.allVariables;
+    if (!known) {
       return undefined;
     }
     const values = ((this.stepForm.get('options') as FormArray)?.controls ?? []).map(option => `${option.get('value')?.value ?? ''}`);
-    const unknown = unknownVariables([`${this.stepForm.get('uri')?.value ?? ''}`, ...values], this.variableKeys);
+    const unknown = unknownVariables(
+      [`${this.stepForm.get('uri')?.value ?? ''}`, ...values],
+      known.map(variable => variable.key),
+    );
     return unknown.length ? unknownVariablesMessage(unknown) : undefined;
   }
 

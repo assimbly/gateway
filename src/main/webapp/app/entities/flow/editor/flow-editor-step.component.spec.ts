@@ -3,11 +3,12 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { provideRouter } from '@angular/router';
-import { Subject } from 'rxjs';
+import { Subject, of } from 'rxjs';
 
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
 
 import { fontAwesomeIcons } from 'app/config/font-awesome-icons';
+import { KnownVariable, VariableKeysService } from 'app/entities/environment-variables/variable-keys.service';
 import { StepType } from 'app/shared/model/step.model';
 
 import { FlowService } from '../flow.service';
@@ -126,10 +127,22 @@ describe('Flow editor Component Step', () => {
   const bridgeErrorHandler = { name: 'bridgeErrorHandler', displayName: 'Bridge error handler', type: 'boolean', defaultValue: false };
   const expression = { name: 'expression', displayName: 'Expression', type: 'string' };
 
-  function render(componentType: string, uriPlaceholder: string, options: Array<{ key: string; value: string }>): void {
+  function render(
+    componentType: string,
+    uriPlaceholder: string,
+    options: Array<{ key: string; value: string }>,
+    variables: KnownVariable[] | null = null,
+  ): void {
+    const known = { known: () => of(variables) };
     TestBed.configureTestingModule({
       imports: [FlowEditorStepComponent],
-      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting(), StepEditorRegistry],
+      providers: [
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        StepEditorRegistry,
+        ...(variables ? [{ provide: VariableKeysService, useValue: known }] : []),
+      ],
     });
     TestBed.inject(FaIconLibrary).addIcons(...fontAwesomeIcons);
 
@@ -224,6 +237,60 @@ describe('Flow editor Component Step', () => {
     fixture.componentInstance.changeOptionSelection('language', 0);
 
     expect(fixture.componentInstance.optionValue(0)).toBe('simple');
+  });
+
+  it('shows each Variable with its value, hides an encrypted value, and sets Manage Variables apart', () => {
+    render('file', 'file:directoryName', [], [
+      { key: 'messages', value: 'C:/Users/me/messages', encrypted: false },
+      { key: 'password', value: 'ENC(abc)', encrypted: true },
+    ]);
+
+    (fixture.nativeElement.querySelector('[aria-label="Insert a Variable"]') as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    const menu: HTMLElement = document.body.querySelector('.dropdown-menu.show')!;
+    expect(menu.querySelector('.dropdown-header')?.textContent).toBe('Insert a Variable');
+    const rows = Array.from(menu.querySelectorAll('.variable-menu__item'));
+    expect(rows.map(row => row.querySelector('.variable-menu__key')?.textContent)).toEqual(['messages', 'password']);
+    expect(rows[0].querySelector('.variable-menu__value')?.textContent).toBe('C:/Users/me/messages');
+    expect(rows[1].textContent).toContain('encrypted');
+    expect(rows[1].textContent).not.toContain('ENC(abc)');
+    const manage = menu.querySelector('.variable-menu__manage')!;
+    expect(manage.textContent?.trim()).toBe('Manage Variables');
+    expect(manage.previousElementSibling?.classList).toContain('dropdown-divider');
+  });
+
+  it('shows the values of the Variables a Path or Option refers to when hovering it', () => {
+    render('file', 'file:directoryName', [{ key: 'expression', value: 'x=@{password}' }], [
+      { key: 'messages', value: 'C:/Users/me/messages', encrypted: false },
+      { key: 'password', value: 'ENC(abc)', encrypted: true },
+    ]);
+
+    pathField().value = '@{messages}/in';
+    pathField().dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    expect(pathField().title).toBe('@{messages} = C:/Users/me/messages');
+    expect((fixture.nativeElement.querySelector('#field_options-value-1-0') as HTMLInputElement).title).toBe('@{password}: encrypted');
+  });
+
+  it("lists the Flow's own Variables apart from the global ones, and uses the Flow's value", () => {
+    render('file', 'file:directoryName', [], [{ key: 'messages', value: 'C:/Users/me/messages', encrypted: false }]);
+    fixture.componentRef.setInput('flowVariables', { messages: '/flow/messages', inbox: '/flow/in' });
+    fixture.detectChanges();
+
+    (fixture.nativeElement.querySelector('[aria-label="Insert a Variable"]') as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    const menu: HTMLElement = document.body.querySelector('.dropdown-menu.show')!;
+    expect(Array.from(menu.querySelectorAll('.variable-menu__group')).map(header => header.textContent)).toEqual(['This Flow', 'Global']);
+    expect(Array.from(menu.querySelectorAll('.variable-menu__key')).map(key => key.textContent)).toEqual(['messages', 'inbox', 'messages']);
+
+    pathField().value = '@{messages}/@{inbox}';
+    pathField().dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    expect(pathField().title).toBe('@{messages} = /flow/messages\n@{inbox} = /flow/in');
+    expect(fixture.componentInstance.unknownVariablesWarning).toBeUndefined();
   });
 
   function menuItem(row: number, text: string): HTMLButtonElement {

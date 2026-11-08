@@ -128,3 +128,27 @@
   max-height: 16rem;
   overflow-y: auto;
 }
+
+.variable-menu__item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  max-width: 24rem;
+}
+
+.variable-menu__key {
+  flex-shrink: 0;
+}
+
+.variable-menu__value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.8125rem;
+  color: var(--bs-secondary-color);
+}
+
+.variable-menu__manage {
+  font-size: 0.875rem;
+}

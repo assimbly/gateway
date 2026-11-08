@@ -64,21 +64,45 @@
 
 <!-- The Variables to pick from; a row's index puts the pick in that Option's value, otherwise in the input given. -->
 <ng-template #variableList let-control="control" let-input="input" let-row="row">
-  @if ((variableKeys?.length ?? 0) > 6) {
+  @if ((allVariables?.length ?? 0) > 6) {
     <div class="px-2 pb-1">
       <input type="search" class="form-control form-control-sm" placeholder="Filter Variables" aria-label="Filter Variables"
              [value]="variableFilter" (input)="variableFilter = $any($event.target).value" />
     </div>
   }
+  <!-- Key and value side by side, so each row reads as a Variable; an encrypted value is never shown. -->
+  <ng-template #variableItem let-variable>
+    <button type="button" ngbDropdownItem class="variable-menu__item"
+            [title]="variable.encrypted ? variable.key + ' (encrypted)' : variable.key + ' = ' + variable.value"
+            (click)="row === undefined ? insertVariableInto(control, input, variable.key) : insertVariableIntoOption(row, variable.key)">
+      <span class="variable-menu__key font-monospace">{{ variable.key }}</span>
+      @if (variable.encrypted) {
+        <span class="variable-menu__value"><fa-icon icon="lock"></fa-icon> encrypted</span>
+      } @else {
+        <span class="variable-menu__value">{{ variable.value }}</span>
+      }
+    </button>
+  </ng-template>
   <div class="variable-menu__keys">
-    @for (key of filteredVariableKeys; track key) {
-      <button type="button" ngbDropdownItem class="font-monospace"
-              (click)="row === undefined ? insertVariableInto(control, input, key) : insertVariableIntoOption(row, key)">{{ key }}</button>
+    @if (hasFlowVariables) {
+      <h6 class="dropdown-header variable-menu__group">This Flow</h6>
+      @for (variable of filteredFlowVariables; track variable.key) {
+        <ng-container *ngTemplateOutlet="variableItem; context: { $implicit: variable }"></ng-container>
+      } @empty {
+        <span class="dropdown-item-text small text-muted">No Flow variable matches.</span>
+      }
+      <h6 class="dropdown-header variable-menu__group">Global</h6>
+    }
+    @for (variable of filteredVariables; track variable.key) {
+      <ng-container *ngTemplateOutlet="variableItem; context: { $implicit: variable }"></ng-container>
     } @empty {
       <span class="dropdown-item-text small text-muted">{{ variableKeys?.length ? 'No Variable matches.' : 'No Variables yet.' }}</span>
     }
   </div>
-  <a ngbDropdownItem routerLink="/environment-variables" target="_blank" rel="noopener">Manage Variables</a>
+  <div class="dropdown-divider"></div>
+  <a ngbDropdownItem class="variable-menu__manage" routerLink="/environment-variables" target="_blank" rel="noopener">
+    <fa-icon icon="arrow-up-right-from-square"></fa-icon> Manage Variables
+  </a>
 </ng-template>
 
 <ng-template #variableMenu let-control="control" let-input="input">
@@ -86,6 +110,7 @@
     <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm font-monospace" ngbDropdownToggle
             title="Insert a Variable, a named value kept under Flows → Variables" aria-label="Insert a Variable">&#64;&#123;&#125;</button>
     <div ngbDropdownMenu class="variable-menu">
+      <h6 class="dropdown-header">Insert a Variable</h6>
       <ng-container *ngTemplateOutlet="variableList; context: { control: control, input: input }"></ng-container>
     </div>
   </div>
@@ -239,7 +264,7 @@
           </div>
           <input #uriInput type="text" class="form-control" id="field_uri_{{index}}" [attr.list]="'urilist_' + index"
                  formControlName="uri" [value]="uriValue" (blur)="normalizeHttpUrl()"
-                 [readonly]="pathUnused" [class.step-field__unused]="pathUnused"
+                 [readonly]="pathUnused" [class.step-field__unused]="pathUnused" [attr.title]="variablesTitle(stepForm.get('uri')?.value)"
                  [attr.placeholder]="pathUnused ? componentLabel + ' has no path' : (autoPath ?? null)"
                  [attr.aria-describedby]="autoPath ? 'field_uri_auto_' + index + ' field_uri_syntax_' + index : 'field_uri_syntax_' + index" />
           <datalist id="urilist_{{index}}">
@@ -357,7 +382,7 @@
               @default {
                 <input type="text" class="form-control" id="field_options-value-{{index}}-{{idx}}" formControlName="value"
                        [placeholder]="optionDefaultValue(idx)" aria-label="Value"
-                       [title]="optionValue(idx) || 'Value of the option. The book button by Component opens its documentation.'"/>
+                       [title]="variablesTitle(optionValue(idx)) ?? (optionValue(idx) || 'Value of the option. The book button by Component opens its documentation.')"/>
               }
             }
 

@@ -47,6 +47,45 @@ export function variableWarnings(steps: { key: string; uri?: string; options?: s
     .map(({ stepKey, unknown }) => ({ stepKey, message: unknownVariablesMessage(unknown) }));
 }
 
+/**
+ * What each Variable a text refers to stands for, one line each, to show when hovering the field; nothing when the
+ * text refers to none. An encrypted value is never shown. Without the Variables, nothing is said about the references.
+ */
+export function describeVariables(
+  text: string | null | undefined,
+  variables: { key: string; value: string; encrypted: boolean }[] | null,
+): string | undefined {
+  const keys = referencedVariables(text);
+  if (!keys.length || !variables) {
+    return undefined;
+  }
+  const byKey = new Map(variables.map(variable => [variable.key, variable]));
+  return keys
+    .map(key => {
+      const variable = byKey.get(key);
+      if (!variable) {
+        return `${variableRef(key)}: not defined`;
+      }
+      return variable.encrypted ? `${variableRef(key)}: encrypted` : `${variableRef(key)} = ${variable.value}`;
+    })
+    .join('\n');
+}
+
+/**
+ * The Variables a Flow's Steps can refer to: its own first, then the global ones it doesn't have, as the Gateway puts
+ * them in when it exports the Flow. Null while the global Variables are unknown.
+ */
+export function flowAndGlobalVariables(
+  flow: Record<string, string>,
+  global: { key: string; value: string; encrypted: boolean }[] | null,
+): { key: string; value: string; encrypted: boolean }[] | null {
+  if (!global) {
+    return null;
+  }
+  const own = Object.entries(flow).map(([key, value]) => ({ key, value, encrypted: false }));
+  return [...own, ...global.filter(variable => !(variable.key in flow))];
+}
+
 /** The text with a reference to the Variable put in at the cursor, and where the cursor ends up after it. */
 export function insertVariable(text: string, key: string, cursor = text.length): { text: string; cursor: number } {
   const at = Math.max(0, Math.min(cursor, text.length));
