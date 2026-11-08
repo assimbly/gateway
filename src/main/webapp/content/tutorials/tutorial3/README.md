@@ -53,8 +53,6 @@ You build *Weather*: every 30 seconds it gets the weather in Amsterdam and saves
    https://api.open-meteo.com/v1/forecast?latitude=52.37&longitude=4.89&current=temperature_2m,wind_speed_10m
    ```
 
-4. Under **Options**, choose **Http Method** and select **GET**. <!-- show: .option-row -->
-
 ![Configure the HTTPS Action](02-https-action.png)
 
 > **What does this address ask for?** The current temperature and wind speed in the center of Amsterdam.
