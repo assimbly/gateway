@@ -3,7 +3,6 @@ package org.assimbly.gateway.config;
 import org.apache.commons.logging.Log;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.context.config.ConfigDataEnvironmentPostProcessor;
 import org.springframework.boot.context.properties.source.ConfigurationPropertySources;
 import org.springframework.boot.env.OriginTrackedMapPropertySource;
 import org.springframework.boot.logging.DeferredLogFactory;
@@ -25,7 +24,8 @@ import java.util.Map;
  * or a system property, stays, so a clash there still stops the start; Docker maps the port it sets that way.
  * <p>
  * Runs right after the configuration files are read, so the startup log, the H2 port and the REST resources that read
- * {@code server.port} all see the port the Gateway really uses.
+ * {@code server.port} all see the port the Gateway really uses. Runs after {@link SingleInstance}, so a second start of
+ * the bundle stops instead of moving to the next port.
  */
 public class PortFallback implements EnvironmentPostProcessor, Ordered {
 
@@ -41,7 +41,7 @@ public class PortFallback implements EnvironmentPostProcessor, Ordered {
 
     @Override
     public int getOrder() {
-        return ConfigDataEnvironmentPostProcessor.ORDER + 1;
+        return SingleInstance.ORDER + 1;
     }
 
     @Override

@@ -116,6 +116,8 @@ public class ApplicationProperties {
         private boolean firstStartSetup = true;
         /** Whether the Gateway opens its Local URL in the default browser once started (ignored when headless or in a container). */
         private boolean openBrowser = true;
+        /** Set by the Windows and Mac bundles: one Gateway per base directory, started from a tray / menu-bar icon. */
+        private boolean desktop;
 
         public boolean getFirstStartSetup() {
             return firstStartSetup;
@@ -131,6 +133,14 @@ public class ApplicationProperties {
 
         public void setOpenBrowser(boolean openBrowser) {
             this.openBrowser = openBrowser;
+        }
+
+        public boolean getDesktop() {
+            return desktop;
+        }
+
+        public void setDesktop(boolean desktop) {
+            this.desktop = desktop;
         }
 
         public String getTenant() {

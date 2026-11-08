@@ -5,7 +5,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.CommandsUtil;
 import org.assimbly.gateway.config.DefaultProfileUtil;
+import org.assimbly.gateway.config.DesktopTray;
 import org.assimbly.gateway.config.EncryptionProperties;
+import org.assimbly.gateway.config.SingleInstance;
 import org.assimbly.gateway.config.security.SecuritySummary;
 import org.assimbly.util.BaseDirectory;
 import org.assimbly.util.EncryptionUtil;
@@ -19,6 +21,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.core.env.Environment;
 import tech.jhipster.config.JHipsterConstants;
 
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -85,14 +88,31 @@ public class GatewayApp {
             app.setLogStartupInfo(false);
 
             DefaultProfileUtil.addDefaultProfile(app);
-            Environment env = app
-                .run(args).getEnvironment();
 
-            logApplicationStartup(env);
+            // The bundles start without a console window, so a tray icon shows the start and offers Stop
+            boolean desktop = Boolean.getBoolean("application.gateway.desktop");
+            DesktopTray tray = desktop ? DesktopTray.showWhenStarting(app) : null;
+
+            Environment env;
+            try {
+                env = app.run(args).getEnvironment();
+            } catch (RuntimeException e) {
+                if (desktop) {
+                    DesktopTray.startFailed();
+                    System.exit(1);
+                }
+                throw e;
+            }
+
+            String localUrl = logApplicationStartup(env);
+            if (tray != null) {
+                tray.running(localUrl);
+            }
+            openBrowserIfEnabled(env, localUrl);
         }
     }
 
-    private static void logApplicationStartup(Environment env) {
+    private static String logApplicationStartup(Environment env) {
 
         String protocol = "http";
         if (env.getProperty("server.ssl.key-store") != null) {
@@ -168,7 +188,13 @@ public class GatewayApp {
             applicationStartupTime
            );
 
-        openBrowserIfEnabled(env, protocol + "://localhost:" + serverPort + contextPath);
+        String localUrl = protocol + "://localhost:" + serverPort + contextPath;
+        try {
+            SingleInstance.publishUrl(localUrl);
+        } catch (IOException e) {
+            log.warn("Could not note the Local URL for a next start: {}", e.getMessage());
+        }
+        return localUrl;
     }
 
     static void openBrowserIfEnabled(Environment env, String url) {
@@ -181,6 +207,10 @@ public class GatewayApp {
             || Files.exists(Path.of("/.dockerenv"))) {
             return;
         }
+        openBrowser(url);
+    }
+
+    public static void openBrowser(String url) {
         try {
             String os = System.getProperty("os.name", "").toLowerCase(Locale.ROOT);
             ProcessBuilder command;

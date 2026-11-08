@@ -17,16 +17,18 @@ Go to the [latest Assimbly Gateway release](https://github.com/assimbly/gateway/
 
 ## 2. Click to start
 
-* **On Windows**: Double-click **`Assimbly`** (or **`Start Assimbly.bat`**).
+* **On Windows**: Double-click **`Assimbly`** (`Assimbly.exe`). That is the only file you need to start.
   > *If Windows shows "Windows protected your PC"*: click **More info**, then click **Run anyway**.
 * **On Mac**: Double-click **`Start Assimbly.command`**.
   > *If Mac says the file is from an unidentified developer*: **right-click** (or Control-click) **`Start Assimbly.command`** and click **Open**, then click **Open** again.
 
 What happens next:
-1. A terminal window opens and starts Assimbly.
-2. After about 10 seconds, your web browser opens automatically to **[http://localhost:8080](http://localhost:8080)**.
+1. A message **Assimbly is starting** appears in the corner of your screen, and the Assimbly icon appears in the taskbar tray (Windows, bottom right; it may be behind the **^** arrow) or in the menu bar (Mac, top right). On Mac you can close the Terminal window that opens.
+2. Starting takes about 10 seconds. Then the message **Assimbly is running** appears and your web browser opens **[http://localhost:8080](http://localhost:8080)**.
 
-> **Important:** Keep the terminal window open while you use Assimbly (you can minimize it). When you are done and want to stop Assimbly, simply close that terminal window or press `Ctrl+C`.
+If Assimbly cannot start, a window **Assimbly could not start** names the log file that tells why. Click **Open log file** and look for `ERROR` near the end.
+
+> **Closed the browser?** Double-click **`Assimbly`** again, or click the Assimbly icon and choose **Open Assimbly**. Assimbly keeps running until you click the icon and choose **Stop Assimbly**.
 
 ---
 
@@ -77,5 +79,6 @@ Your browser opens **[http://localhost:8080](http://localhost:8080)** automatica
 |---------|------------|
 | **Windows says "Windows protected your PC"** | Click **More info**, then click **Run anyway**. |
 | **Mac says "cannot be opened because it is from an unidentified developer"** | Right-click (or Control-click) **`Start Assimbly.command`** and click **Open**, then confirm **Open**. |
-| **The browser page doesn't load** | Wait 10–15 seconds for the terminal window to say `Assimbly is running!`, then refresh **[http://localhost:8080](http://localhost:8080)**. Make sure you didn't close the terminal window. |
-| **Port 8080 is already in use by another program** | Pick another port when starting: `Start Assimbly.bat --server.port=8888` (Windows) or `./Start\ Assimbly.command --server.port=8888` (Mac). |
+| **The browser page doesn't load** | Wait 10–15 seconds, until the Assimbly icon says *Assimbly is running*, then click the icon and choose **Open Assimbly**. |
+| **Port 8080 is already in use by another program** | Nothing to do: Assimbly takes the next free port (8081, 8082, …) and opens the browser there. |
+| **Assimbly doesn't start** | Click the Assimbly icon and choose **Open logs folder**, or open the `.assimbly/logs` folder in your home folder, and look at the latest log. |

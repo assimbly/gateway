@@ -7,7 +7,7 @@ Run your first Flow in 5 minutes — no coding required.
 <!-- web-only -->
 > **Haven't started Assimbly yet?**
 > 1. Download the bundle for **Windows** (`.zip`) or **Mac** (`.tar.gz`) from the [latest release](https://github.com/assimbly/gateway/releases/latest) and unpack it.
-> 2. Double-click **`Assimbly`** (`Start Assimbly.bat` on Windows, `Start Assimbly.command` on Mac). A terminal window opens, and after ~10 seconds your browser opens **[http://localhost:8080](http://localhost:8080)** automatically.
+> 2. Double-click **`Assimbly`** (`Assimbly.exe` on Windows, `Start Assimbly.command` on Mac). A message tells you Assimbly is starting; after ~10 seconds it says Assimbly is running and your browser opens **[http://localhost:8080](http://localhost:8080)**.
 > 3. Sign in with `admin` / `admin` and choose your own password.
 > 4. Click **Tutorials → Quick start** in the top menu to follow these steps interactively right inside Assimbly!
 >

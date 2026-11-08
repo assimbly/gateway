@@ -71,7 +71,7 @@ To build the executable bundle:
 
 ```buildExecutable [target] [module] [kind]```
 
-* Target: valid values are `win`, `mac`, or `all` (default is `win` on Windows, `mac` on Mac)
+* Target: valid values are `win`, `mac`, or `all` (default is `win` on Windows, `mac` on Mac). The Windows bundle (`Assimbly.exe`) can only be built on Windows, so `win` and `all` need a Windows machine; the Mac bundle builds on both.
 * Module: valid values are `full`, `integration`, `broker` or `headless` (default is `full`)
 * Kind: kind of dependencies: `default` or `full` (default is `default`)
 

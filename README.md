@@ -23,7 +23,7 @@ on a canvas, without writing code. Powered by [Apache Camel](https://camel.apach
 ## Quick start
 
 1. **Download and click (Windows & Mac — no Java install needed)**:
-   Download the **Windows** (`.zip`) or **Mac** (`.tar.gz`) bundle from the [latest release](https://github.com/assimbly/gateway/releases/latest), unpack it, and double-click **`Assimbly`** (`Start Assimbly.bat` on Windows, `Start Assimbly.command` on Mac). A terminal window opens, and after a few seconds your browser opens **[http://localhost:8080](http://localhost:8080)** automatically.
+   Download the **Windows** (`.zip`) or **Mac** (`.tar.gz`) bundle from the [latest release](https://github.com/assimbly/gateway/releases/latest), unpack it, and double-click **`Assimbly`** (`Assimbly.exe` on Windows, `Start Assimbly.command` on Mac). A message tells you Assimbly is starting; after about 10 seconds it says Assimbly is running and your browser opens **[http://localhost:8080](http://localhost:8080)**.
 
 2. **Or run with Docker** (`amd64` and `arm64`):
    ```bash
