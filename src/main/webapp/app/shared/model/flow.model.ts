@@ -18,9 +18,13 @@ export interface IFlow {
     logLevel?: LogLevelType;
     integrationId?: number;
     steps?: IStep[];
+    /** The Flow's own Variables by key; its Steps refer to them as @{key}, before a global Variable with that key. */
+    variables?: Record<string, string>;
 }
 
 export class Flow implements IFlow {
+    variables?: Record<string, string>;
+
     constructor(
         public id?: number,
         public name?: string,

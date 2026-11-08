@@ -316,6 +316,8 @@ public class ExportXML {
         setElement("logLevel", flowDB.getLogLevel().toString(), options);
         setElement("failureProcessor", "true", options);
 
+        setFlowVariables(flowDB);
+
         flowNameAsString = flowDB.getName();
         flowTypeAsString = flowDB.getType();
         logLevelAsString = flowDB.getLogLevel().toString();
@@ -334,6 +336,23 @@ public class ExportXML {
         // set steps
         setSteps(stepsDB);
 
+    }
+
+    /**
+     * The Flow's own Variables, sorted by key, as {@code <variables><variable><key/><value/></variable></variables>}.
+     * {@link Export} puts them in and removes the element before a configuration goes to the runtime.
+     */
+    private void setFlowVariables(Flow flowDB) {
+        Map<String, String> variables = flowDB.getVariables();
+        if (variables == null || variables.isEmpty()) {
+            return;
+        }
+        Element variablesElement = setElement("variables", null, flow);
+        new TreeMap<>(variables).forEach((key, value) -> {
+            Element variable = setElement("variable", null, variablesElement);
+            setElement("key", key, variable);
+            setElement("value", Objects.toString(value, ""), variable);
+        });
     }
 
     public void setDependencies(Set<Step> stepsDB) {

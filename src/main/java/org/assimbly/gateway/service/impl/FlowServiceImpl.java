@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -59,8 +60,11 @@ public class FlowServiceImpl implements FlowService {
         log.debug("Request to save Flow : {}", flowDTO);
 
         Flow flow = flowMapper.toEntity(flowDTO);
-        flow = flowRepository.save(flow);
-        return flowMapper.toDto(flow);
+        if (flowDTO.getVariables() == null && flow.getId() != null) {
+            // A client that doesn't send the Flow's Variables leaves them as they are, rather than removing them
+            flowRepository.findById(flow.getId()).ifPresent(saved -> flow.setVariables(new HashMap<>(saved.getVariables())));
+        }
+        return flowMapper.toDto(flowRepository.save(flow));
     }
 
     /**

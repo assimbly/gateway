@@ -67,7 +67,7 @@ import { ComponentSchemas } from "../component-schemas.service";
 import { FlowTemplate, flowTemplate, templateFlow } from "../templates/flow-templates";
 import { STARTER_FLOW, STARTER_ROUTE } from "../templates/starter-flow";
 import { VariableKeysService } from "app/entities/environment-variables/variable-keys.service";
-import { variableWarnings } from "app/shared/camel/variables";
+import { duplicateVariableKeys, flowVariablesFrom, variableWarnings } from "app/shared/camel/variables";
 import { LinkEditorComponent } from "../designer/link-editor.component";
 import { ResponseEditorComponent } from "./response-editor.component";
 import { CallFlowEditorComponent, callableFlows } from "./call-flow-editor.component";
@@ -163,6 +163,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	private readonly variableKeys = inject(VariableKeysService);
 	/** The keys of the Variables, to warn about Steps that refer to one that doesn't exist; null until loaded. */
 	private knownVariables: string[] | null = null;
+	/** The Flow's own Variables by key, as edited in Settings; the Step editors offer them before the global ones. */
+	flowVariables: Record<string, string> = {};
 	/** The Example Flow a new Flow starts from, from the `template` query parameter. */
 	private template?: FlowTemplate;
 	private readonly apiService = inject(ApiService);
@@ -968,7 +970,41 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 				logLevel: new FormControl(flow.logLevel),
 				integration: new FormControl(flow.integrationId),
 				stepsData: new FormArray([]),
+				variables: new FormArray(
+					Object.entries(flow.variables ?? {})
+						.sort(([a], [b]) => a.localeCompare(b))
+						.map(([key, value]) => this.flowVariableRow(key, value)),
+				),
 			});
+		this.flowVariables = flowVariablesFrom(this.flowVariableRows.value);
+		this.flowVariableRows.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(rows => {
+			this.flowVariables = flowVariablesFrom(rows);
+			this.checkCanvas();
+		});
+	}
+
+	get flowVariableRows(): FormArray<FormGroup> {
+		return this.editFlowForm.get('variables') as FormArray<FormGroup>;
+	}
+
+	/** The keys more than one Flow variable has; only the last of each is kept. */
+	get duplicateFlowVariableKeys(): string[] {
+		return duplicateVariableKeys(this.flowVariableRows?.value ?? []);
+	}
+
+	private flowVariableRow(key = '', value = ''): FormGroup {
+		return new FormGroup({ key: new FormControl(key), value: new FormControl(value) });
+	}
+
+	addFlowVariable(): void {
+		this.flowVariableRows.push(this.flowVariableRow());
+		this.flowVariableRows.markAsDirty();
+		setTimeout(() => document.getElementById(`field_flowVariable_key_${this.flowVariableRows.length - 1}`)?.focus());
+	}
+
+	removeFlowVariable(index: number): void {
+		this.flowVariableRows.removeAt(index);
+		this.flowVariableRows.markAsDirty();
 	}
 
 	stepFormAt(index: number): FormGroup {
@@ -2068,6 +2104,7 @@ splitOptions4(options: string): string[] {
 		this.flow.notes = flowControls.notes.value;
 		this.flow.autoStart = flowControls.autoStart.value;
 		this.flow.integrationId = flowControls.integration.value;
+		this.flow.variables = flowVariablesFrom(this.flowVariableRows.value);
 
 		(<FormArray>flowControls.stepsData).controls.forEach(
 			(step, index) => {
@@ -2480,7 +2517,7 @@ splitOptions4(options: string): string[] {
 	private checkCanvas(): void {
 		if (this.canvasGraph) {
 			this.canvasProblems = problems(this.canvasGraph, this.schemas.pathRule);
-			this.canvasWarnings = [...warnings(this.canvasGraph), ...variableWarnings(this.canvasGraph.steps, this.knownVariables)];
+			this.canvasWarnings = [...warnings(this.canvasGraph), ...variableWarnings(this.canvasGraph.steps, this.knownVariables && [...this.knownVariables, ...Object.keys(this.flowVariables)])];
 			this.draftProblems = this.draftListOf(this.canvasProblems);
 			this.draftWarnings = this.draftListOf(this.canvasWarnings);
 			// A Draft can't be tested, also not when it was opened in Test: show the first thing to finish instead.

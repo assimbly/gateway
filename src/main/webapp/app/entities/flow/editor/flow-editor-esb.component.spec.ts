@@ -2,6 +2,7 @@ import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { DefaultUrlSerializer, UrlTree } from '@angular/router';
 import { Subject } from 'rxjs';
 
+import { Flow } from 'app/shared/model/flow.model';
 import { Step, StepType } from 'app/shared/model/step.model';
 
 import { FlowEditorEsbComponent } from './flow-editor-esb.component';
@@ -49,6 +50,49 @@ describe('Flow editor Connection of a Step', () => {
 
     expect(component.enableConnection[0]).toBe(false);
     expect(component.editFlowForm.dirty).toBe(true);
+  });
+});
+
+describe('Flow editor Flow variables', () => {
+  /** The editor of a Flow with these Variables, without rendering it. */
+  function editor(variables?: Record<string, string>): FlowEditorEsbComponent {
+    const component = Object.create(FlowEditorEsbComponent.prototype) as FlowEditorEsbComponent;
+    Object.assign(component, { destroyRef: { onDestroy: () => () => undefined }, flow: new Flow(7, 'Orders') });
+    component.initializeForm(Object.assign(new Flow(7, 'Orders'), { variables }));
+    return component;
+  }
+
+  it('edits them in rows sorted by key and saves them by key', () => {
+    const component = editor({ outbox: '/out', inbox: '/in' });
+
+    expect(component.flowVariableRows.value).toEqual([
+      { key: 'inbox', value: '/in' },
+      { key: 'outbox', value: '/out' },
+    ]);
+    expect(component.flowVariables).toEqual({ inbox: '/in', outbox: '/out' });
+
+    component.addFlowVariable();
+    component.flowVariableRows.at(2).patchValue({ key: 'name', value: 'x' });
+    component.removeFlowVariable(0);
+
+    expect(component.flowVariables).toEqual({ outbox: '/out', name: 'x' });
+    expect(component.editFlowForm.dirty).toBe(true);
+
+    component.setDataFromForm();
+    expect(component.flow.variables).toEqual({ outbox: '/out', name: 'x' });
+  });
+
+  it('starts without rows for a Flow without Variables, and tells about a key used twice', () => {
+    const component = editor();
+    expect(component.flowVariableRows.length).toBe(0);
+
+    component.addFlowVariable();
+    component.addFlowVariable();
+    component.flowVariableRows.at(0).patchValue({ key: 'inbox', value: '/a' });
+    component.flowVariableRows.at(1).patchValue({ key: 'inbox', value: '/b' });
+
+    expect(component.duplicateFlowVariableKeys).toEqual(['inbox']);
+    expect(component.flowVariables).toEqual({ inbox: '/b' });
   });
 });
 

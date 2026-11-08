@@ -71,6 +71,24 @@ export function describeVariables(
     .join('\n');
 }
 
+/** A Flow's Variables by key from the rows they are edited in: a row without a key is left out, and the last row with a key wins. */
+export function flowVariablesFrom(rows: { key?: string | null; value?: string | null }[]): Record<string, string> {
+  const variables: Record<string, string> = {};
+  rows.forEach(row => {
+    const key = (row.key ?? '').trim();
+    if (key) {
+      variables[key] = row.value ?? '';
+    }
+  });
+  return variables;
+}
+
+/** The keys more than one row has, each once, so the user can be told only the last one is kept. */
+export function duplicateVariableKeys(rows: { key?: string | null }[]): string[] {
+  const keys = rows.map(row => (row.key ?? '').trim()).filter(key => key);
+  return [...new Set(keys.filter((key, i) => keys.indexOf(key) !== i))];
+}
+
 /**
  * The Variables a Flow's Steps can refer to: its own first, then the global ones it doesn't have, as the Gateway puts
  * them in when it exports the Flow. Null while the global Variables are unknown.

@@ -135,6 +135,7 @@
           [actionComponentsNames]="actionComponentsNames"
           [languageComponentsNames]="languageComponentsNames"
           [messages]="messages"
+          [flowVariables]="flowVariables"
           [connections]="connections"
           [messageCreated]="messageCreated"
           [connectionCreated]="connectionCreated"
@@ -181,6 +182,7 @@
           [actionComponentsNames]="actionComponentsNames"
           [languageComponentsNames]="languageComponentsNames"
           [messages]="messages"
+          [flowVariables]="flowVariables"
           [connections]="connections"
           [messageCreated]="messageCreated"
           [connectionCreated]="connectionCreated"
@@ -436,6 +438,40 @@
                 <input class="form-check-input" type="checkbox" role="switch" id="field_autoStart" aria-describedby="field_autoStart_help"
                        formControlName="autoStart" />
               </div>
+            </div>
+
+            <!-- The Flow's own Variables, in rows like a Step's Options. -->
+            <div class="flow-variables" formArrayName="variables" data-cy="flow-variables">
+              <div class="flow-setting__text mb-2">
+                <span class="form-check-label">Variables</span>
+                <small class="text-muted" id="field_flowVariables_help">
+                  This Flow's Steps refer to them as &#64;&#123;key&#125;. A Flow variable wins over a global Variable with the same key.
+                  For a secret, use an encrypted global Variable under Flows → Variables.
+                </small>
+              </div>
+              @for (row of flowVariableRows.controls; track row; let i = $index) {
+                <div class="flow-variable-row" [formGroupName]="i">
+                  <input type="text" class="form-control font-monospace" id="field_flowVariable_key_{{ i }}" formControlName="key"
+                         placeholder="Key" aria-label="Key" aria-describedby="field_flowVariables_help" autocomplete="off" />
+                  <input type="text" class="form-control" id="field_flowVariable_value_{{ i }}" formControlName="value"
+                         placeholder="Value" aria-label="Value" autocomplete="off" />
+                  <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm" title="Remove variable" aria-label="Remove variable"
+                          (click)="removeFlowVariable(i)">
+                    <fa-icon icon="times"></fa-icon>
+                  </button>
+                </div>
+              } @empty {
+                <div class="small text-muted">No Flow variables yet.</div>
+              }
+              @if (duplicateFlowVariableKeys.length; as count) {
+                <div class="alert alert-warning py-1 px-2 small mt-2 mb-0" role="status">
+                  {{ count === 1 ? 'The key' : 'The keys' }} {{ duplicateFlowVariableKeys.join(', ') }} {{ count === 1 ? 'is' : 'are' }}
+                  used more than once; only the last one is kept.
+                </div>
+              }
+              <button type="button" class="btn btn-link btn-sm p-0 mt-2" data-cy="add-flow-variable" (click)="addFlowVariable()">
+                <fa-icon icon="plus"></fa-icon> Variable
+              </button>
             </div>
           </div>
         </div>

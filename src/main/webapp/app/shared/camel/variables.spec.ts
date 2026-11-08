@@ -1,6 +1,8 @@
 import {
   describeVariables,
+  duplicateVariableKeys,
   flowAndGlobalVariables,
+  flowVariablesFrom,
   insertVariable,
   referencedVariables,
   resolveVariables,
@@ -57,6 +59,13 @@ describe('Variables', () => {
     );
     expect(describeVariables('/plain/path', variables)).toBeUndefined();
     expect(describeVariables('@{messages}', null)).toBeUndefined();
+  });
+
+  it("takes a Flow's Variables from its rows, leaving out rows without a key and keeping the last of a key", () => {
+    const rows = [{ key: ' inbox ', value: '/a' }, { key: '', value: 'lost' }, { key: 'inbox', value: '/b' }, { key: 'name', value: null }];
+
+    expect(flowVariablesFrom(rows)).toEqual({ inbox: '/b', name: '' });
+    expect(duplicateVariableKeys(rows)).toEqual(['inbox']);
   });
 
   it("puts a Flow's own Variables before the global ones with the same key", () => {

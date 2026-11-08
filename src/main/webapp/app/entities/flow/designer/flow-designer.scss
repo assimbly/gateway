@@ -200,6 +200,23 @@
   min-width: 0;
 }
 
+.flow-variables .form-check-label {
+  display: block;
+  font-weight: 600;
+}
+
+// A Flow variable: its key, its value and a remove button, like a Step's Option row.
+.flow-variable-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr) var(--app-btn-height-sm);
+  gap: 0.5rem;
+  align-items: center;
+
+  + .flow-variable-row {
+    margin-top: 0.25rem;
+  }
+}
+
 // Over the bottom-right corner of the canvas, so it is there whether the side panel is shown or not.
 .flow-designer-minimap {
   position: absolute;

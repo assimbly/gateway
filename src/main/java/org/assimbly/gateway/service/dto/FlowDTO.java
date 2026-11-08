@@ -4,6 +4,7 @@ import org.assimbly.gateway.domain.enumeration.LogLevelType;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -43,6 +44,9 @@ public class FlowDTO implements Serializable {
     private Long integrationId;
 
     private Set<StepDTO> steps;
+
+    /** The Flow's own Variables by key; null when a client leaves them as they are. */
+    private Map<String, String> variables;
 
     public Long getId() {
         return id;
@@ -166,6 +170,14 @@ public class FlowDTO implements Serializable {
 
     public void setSteps(Set<StepDTO> steps) {
         this.steps = steps;
+    }
+
+    public Map<String, String> getVariables() {
+        return variables;
+    }
+
+    public void setVariables(Map<String, String> variables) {
+        this.variables = variables;
     }
 
     @Override

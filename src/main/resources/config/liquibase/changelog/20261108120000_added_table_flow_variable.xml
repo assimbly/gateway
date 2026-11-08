@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <!-- The Variables of one Flow: its Steps refer to them as @{key}, and they win over a global Variable with that key -->
+    <changeSet id="20261108120000-1" author="gateway">
+        <createTable tableName="flow_variable">
+            <column name="flow_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="jhi_key" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="jhi_value" type="${clobType}"/>
+        </createTable>
+        <addPrimaryKey tableName="flow_variable" columnNames="flow_id, jhi_key" constraintName="pk_flow_variable"/>
+        <addForeignKeyConstraint baseTableName="flow_variable" baseColumnNames="flow_id" constraintName="fk_flow_variable_flow_id"
+                                 referencedTableName="flow" referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>

@@ -65,6 +65,19 @@ public class ImportXMLFlows {
 
 	}
 
+    /** The Flow's own Variables by key, from {@code <variables><variable><key/><value/></variable></variables>}. */
+    private Map<String, String> getVariablesFromXML(Document doc, String flowId, XPath xPath) throws XPathExpressionException {
+        NodeList variables = (NodeList) xPath.evaluate("//flows/flow[id='" + flowId + "']/variables/variable", doc, XPathConstants.NODESET);
+        Map<String, String> result = new HashMap<>();
+        for (int i = 0; i < variables.getLength(); i++) {
+            String key = xPath.evaluate("key", variables.item(i)).trim();
+            if (!key.isEmpty()) {
+                result.put(key, xPath.evaluate("value", variables.item(i)));
+            }
+        }
+        return result;
+    }
+
     /** Imports the Flow with this DIL id; returns the saved Flow, or null when the Flow or the Integration isn't found. */
 	public Flow setFlowFromXML(Document doc, Long integrationId, String flowId) throws Exception {
 
@@ -113,6 +126,9 @@ public class ImportXMLFlows {
 			flow.setType(ImportXMLUtil.setStringValue(flowType,"connector"));
 
 			flow.setNotes(ImportXMLUtil.setStringValue(flowNotes,""));
+
+            flow.getVariables().clear();
+            flow.getVariables().putAll(getVariablesFromXML(doc, flowId, xPath));
 
 			flow.setAutoStart(ImportXMLUtil.setBooleanValue(flowAutostart));
 

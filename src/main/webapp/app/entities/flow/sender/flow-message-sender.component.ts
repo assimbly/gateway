@@ -131,6 +131,8 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     private optionsRequest = 0;
     private destroyed = false;
     private readonly uploaded = new UploadedMessages(this.body, this.bodyMode, this.headers);
+    /** The Variables of the Flow the page was opened from, which win over the global ones. */
+    private flowVariables: Record<string, string> = {};
 
     get isSending(): boolean {
         return this.state.sending();
@@ -210,6 +212,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
      */
     private prefillFromFlowSource(flowId: number): void {
         this.flowService.find(flowId).subscribe(response => {
+            this.flowVariables = response.body?.variables ?? {};
             const steps = response.body?.steps;
             const source = sourceStepOf(steps);
             const route = firstRouteStepOf(steps);
@@ -536,9 +539,10 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         const keys$: Observable<string> = connectionId
             ? this.connectionService.getConnectionKeys(parseInt(connectionId, 10)).pipe(map(res => JSON.stringify(res.body)))
             : of('');
-        // the runtime doesn't know Variables, so a Source such as file://@{messages}/in gets their values here
+        // the runtime doesn't know Variables, so a Source such as file://@{messages}/in gets their values here:
+        // the Flow's own first, which may refer to global ones, as the Gateway does when it exports the Flow
         const uri$: Observable<string> = referencedVariables(uri).length
-            ? this.variables.values().pipe(take(1), map(values => resolveVariables(uri, values ?? {})))
+            ? this.variables.values().pipe(take(1), map(values => resolveVariables(resolveVariables(uri, this.flowVariables), values ?? {})))
             : of(uri);
 
         forkJoin([keys$, uri$])
