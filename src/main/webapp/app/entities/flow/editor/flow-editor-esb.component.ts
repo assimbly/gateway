@@ -344,6 +344,10 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 					this.activeStep = params["stepid"];
 					this.activeEditor = nextEditor;
+					// Every Flow the editor opens starts on its first tab, with the other tabs full page.
+					this.designTab = 'flow';
+					this.testView = 'flow';
+					this.tabLayout = 'full';
 					this.applyMode(params["id"] && hasModes(nextEditor) && params["view"] === "test" ? "test" : "design");
 					this.template = nextTemplate;
 
@@ -1142,6 +1146,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 	showScriptTab(tab: ScriptTab): void {
 		this.scriptTab = tab;
+		this.openTabLayout(tab);
 		this.scrollCodeToTop();
 		this.cdr.markForCheck();
 	}
@@ -2500,8 +2505,8 @@ splitOptions4(options: string): string[] {
 	onProblemSelected(problem: DraftProblem): void {
 		const selection = problem.selection;
 		this.setMode('design');
+		this.designTab = 'flow';
 		this.onSelectionChange(selection);
-		this.setPanelCollapsed(false);
 		// A Branch is shown by the Step it leads to.
 		const key = selection.type === 'step' ? selection.key : selection.type === 'link' ? selection.to : undefined;
 		if (key) {
@@ -2532,40 +2537,150 @@ splitOptions4(options: string): string[] {
 			});
 	}
 
-	/** Whether the side panel is hidden, to give the canvas the whole width. Hidden by default; remembered in this browser. */
-	sidePanelCollapsed = readPanelCollapsed();
+	/** Whether the side panel is hidden, to give the canvas the whole width. Hidden until a Step or Branch is clicked. */
+	sidePanelCollapsed = true;
 
-	togglePanel(): void {
-		this.setPanelCollapsed(!this.sidePanelCollapsed);
+	closePanel(): void {
+		this.setPanelCollapsed(true);
+		this.cdr.markForCheck();
 	}
 
-	/**
-	 * A double-click on a Step shows it in the side panel when the panel is hidden, and hides the panel when it is shown.
-	 * In Test it goes back to Design to edit the Step.
-	 */
-	toggleStepEditor(key: string): void {
+	/** < beside the Step clicked on the Visual flow: the same Step on the Editor tab, full page. */
+	showSelectionFullPage(): void {
+		this.tabLayout = 'full';
+		this.showDesignTab('editor');
+	}
+
+	/** Whether the side panel shows beside the Visual flow; in Design only while a Step, Steps or a Branch is selected. */
+	get sidePanelShown(): boolean {
+		if (this.sidePanelCollapsed) {
+			return false;
+		}
+		return this.viewMode === 'test' ? this.testView === 'flow' : this.designTab === 'flow' && this.selection.type !== 'flow';
+	}
+
+	// Tab layout
+	//
+	// Every tab but the first (the Visual flow, or the Routes or Scripts) shows full page, in a side panel beside the
+	// first tab's canvas or list, or not at all, leaving just the canvas. < and > move it between these; the layout is
+	// the same for every tab, in Design and in Test.
+
+	tabLayout: TabLayout = 'full';
+
+	/** The tab whose canvas, or list of Routes or Scripts, the other tabs show beside. */
+	get firstTab(): string {
+		if (this.viewMode === 'test' || this.useCanvas) {
+			return 'flow';
+		}
+		return this.activeEditor === 'script' ? 'scripts' : 'routes';
+	}
+
+	/** Whether the canvas (or the Routes or Scripts) shows. Behind a full-page tab it is hidden, not removed. */
+	get canvasShown(): boolean {
+		return this.activeTab === this.firstTab || this.tabLayout !== 'full';
+	}
+
+	/** Whether the open tab shows, full page or in the side panel. */
+	get tabShown(): boolean {
+		return this.activeTab !== this.firstTab && this.tabLayout !== 'closed';
+	}
+
+	/** <: the closed panel opens; the panel becomes full page. */
+	tabToLeft(): void {
+		this.setTabLayout(this.tabLayout === 'closed' ? 'panel' : 'full');
+	}
+
+	/** >: the full-page tab moves to the panel beside the canvas; the panel closes. */
+	tabToRight(): void {
+		this.setTabLayout(this.tabLayout === 'full' ? 'panel' : 'closed');
+	}
+
+	private setTabLayout(layout: TabLayout): void {
+		if (layout !== 'full') {
+			// The canvas shows again, or gets narrower or wider: keep its Steps in view.
+			this.flowCanvas?.keepInView();
+		}
+		this.tabLayout = layout;
+		this.cdr.markForCheck();
+	}
+
+	/** Opening a tab while the panel is closed shows it in the panel. */
+	private openTabLayout(tab: string): void {
+		if (this.tabLayout === 'closed' && tab !== this.firstTab) {
+			this.setTabLayout('panel');
+		}
+	}
+
+	/** A double-click on a Step opens it on the Editor tab. In Test it goes back to Design, with the Step in the side panel. */
+	openStepEditor(key: string): void {
 		const fromTest = this.viewMode === 'test';
 		this.setMode('design');
 		this.onSelectionChange({ type: 'step', key });
-		this.setPanelCollapsed(fromTest ? false : !this.sidePanelCollapsed);
+		this.designTab = fromTest ? 'flow' : 'editor';
+		this.openTabLayout(this.designTab);
+	}
+
+	// Design tabs
+	//
+	// Design shows the Visual flow, the selected Step on the Editor tab, the Error handler, the Flow's Settings and its
+	// Notes, each on a tab, as Test shows its own tabs.
+
+	designTab: DesignTab = 'flow';
+
+	showDesignTab(tab: DesignTab): void {
+		this.designTab = tab;
+		this.openTabLayout(tab);
+		this.scrollCodeToTop();
+		this.cdr.markForCheck();
+	}
+
+	/** The tabs above the editor: what Design (or Code) shows, or what Test shows. */
+	get toolbarTabs(): readonly EditorTab[] {
+		if (this.viewMode === 'test') {
+			return this.testTabs;
+		}
+		if (this.useCanvas) {
+			return CANVAS_DESIGN_TABS;
+		}
+		return this.activeEditor === 'script' ? this.scriptTabs : this.routeTabs;
+	}
+
+	get activeTab(): string {
+		if (this.viewMode === 'test') {
+			return this.testView;
+		}
+		if (this.useCanvas) {
+			return this.designTab;
+		}
+		return this.activeEditor === 'script' ? this.scriptTab : this.routeTab;
+	}
+
+	showTab(id: string): void {
+		if (this.viewMode === 'test') {
+			this.showTestView(id as TestView);
+		} else if (this.useCanvas) {
+			this.showDesignTab(id as DesignTab);
+		} else if (this.activeEditor === 'script') {
+			this.showScriptTab(id as ScriptTab);
+		} else {
+			this.showRouteTab(id as 'routes' | 'errorHandler' | 'notes');
+		}
 	}
 
 	// Modes
 	//
 	// Design edits the Flow on the canvas. Test runs the saved Flow: the canvas is read-only and shows the messages each
-	// Step completed and failed, the toolbar has the Flow's Log and Camel route, and the side panel the Test panel and
-	// the stats. The mode is in the URL (view=test), so a reload keeps it.
+	// Step completed and failed, and the side panel what a clicked Step did in the last test run. The Tester, the stats,
+	// the Flow's Log and its Camel route each have a tab. The mode is in the URL (view=test), so a reload keeps it.
 
 	viewMode: EditorMode = 'design';
 	/** What Test shows in place of the canvas. */
-	testView: 'flow' | 'log' | 'route' = 'flow';
-	/** What the side panel shows in Test. */
-	testPanelTab: 'test' | 'stats' = 'test';
+	testView: TestView = 'flow';
 	/** The completed and failed messages of each Step, while the Flow runs. */
 	runCounts?: Map<string, IFlowCounts>;
 
-	/** What Test shows: the Flow (on the canvas, or its Routes or Scripts), its Log and the Camel route the runtime built. */
-	get testTabs(): readonly { id: 'flow' | 'log' | 'route'; label: string; icon: string }[] {
+	/** What Test shows: the Flow (on the canvas, or its Routes or Scripts), the Tester, the stats, its Log and the Camel route. */
+	get testTabs(): readonly EditorTab[] {
 		if (this.useCanvas) {
 			return CANVAS_TEST_TABS;
 		}
@@ -2574,8 +2689,8 @@ splitOptions4(options: string): string[] {
 
 	// Route editor
 	//
-	// Code edits the Routes, the Error handler and the Notes, each on a tab. Test shows the Routes read-only beside the
-	// Test panel and the stats, like the visual editor shows its canvas.
+	// Code edits the Routes, the Error handler and the Notes, each on a tab. Test shows the Routes read-only where the
+	// visual editor shows its canvas, with the same Tester, Stats, Log and Camel route tabs.
 
 	routeTab: 'routes' | 'errorHandler' | 'notes' = 'routes';
 
@@ -2587,13 +2702,14 @@ splitOptions4(options: string): string[] {
 
 	showRouteTab(tab: 'routes' | 'errorHandler' | 'notes'): void {
 		this.routeTab = tab;
+		this.openTabLayout(tab);
 		this.scrollCodeToTop();
 		this.cdr.markForCheck();
 	}
 
-	/** A tab of the Route or Script editor opens at its top, not where the last tab was scrolled to. */
+	/** A tab opens at its top, not where the last tab was scrolled to; the canvas, Routes or Scripts beside it stay put. */
 	private scrollCodeToTop(): void {
-		document.querySelector('.code-flow-pane')?.scrollTo({ top: 0 });
+		document.querySelector('.flow-designer-tab .code-flow-pane')?.scrollTo?.({ top: 0 });
 	}
 
 	/** The saved id of the Route a test message goes into: the first one that is a route, not a routeConfiguration. */
@@ -2626,11 +2742,13 @@ splitOptions4(options: string): string[] {
 		} else {
 			this.routeTab = stepType === StepType.ERROR ? 'errorHandler' : 'routes';
 		}
+		this.openTabLayout(this.activeTab);
 		this.cdr.detectChanges();
 	}
 
-	showTestView(view: 'flow' | 'log' | 'route'): void {
+	showTestView(view: TestView): void {
 		this.testView = view;
+		this.openTabLayout(view);
 		this.cdr.markForCheck();
 	}
 
@@ -2654,15 +2772,9 @@ splitOptions4(options: string): string[] {
 
 	private applyMode(mode: EditorMode): void {
 		this.viewMode = mode;
-		this.testOpen = mode === 'test';
-		if (mode === 'test') {
-			// Test always opens with its panel; Design keeps the choice this browser remembered.
-			if (this.sidePanelCollapsed) {
-				this.flowCanvas?.keepInView();
-			}
-			this.sidePanelCollapsed = false;
-		} else {
-			this.sidePanelCollapsed = readPanelCollapsed();
+		// Both modes open without the side panel, until a Step or Branch is clicked.
+		this.sidePanelCollapsed = true;
+		if (mode === 'design') {
 			this.testView = 'flow';
 			this.runCounts = undefined;
 		}
@@ -2680,25 +2792,21 @@ splitOptions4(options: string): string[] {
 
 	// Test panel
 	//
-	// Test mode shows it in the side panel, whatever is selected: selecting a Step shows what that Step did in the last
-	// test run. The run is kept here, so the canvas can mark each Step, until the Flow changes.
+	// The Tester tab sends the message; clicking a Step on the Visual flow shows in the side panel what that Step did in
+	// the last test run. The run is kept here, so the canvas can mark each Step, until the Flow changes.
 
-	testOpen = false;
 	testRun?: FlowTestRun;
 	testMarks?: Map<string, StepRunMark>;
 	/** What each Step did in the last test run, by its saved id, in an editor without a canvas. */
 	private stepRuns?: Map<string, StepRun>;
 	private testedShape?: string;
 
-	isTestOpen(): boolean {
-		return !this.sidePanelCollapsed && this.testOpen;
-	}
-
+	/** The Test button of the header opens Test on the Tester tab. */
 	openTest(): void {
 		this.setMode('test');
-		this.testPanelTab = 'test';
-		this.setPanelCollapsed(false);
-		this.cdr.markForCheck();
+		if (this.viewMode === 'test') {
+			this.showTestView('tester');
+		}
 	}
 
 	onTestRan(run: FlowTestRun): void {
@@ -2714,9 +2822,10 @@ splitOptions4(options: string): string[] {
 		this.cdr.markForCheck();
 	}
 
-	/** Edit Step in the Test panel goes back to Design with the Step's settings. */
+	/** Edit Step in the Test panel goes back to Design with the Step's settings, beside the Visual flow. */
 	editStepFromTest(key: string): void {
 		this.setMode('design');
+		this.designTab = 'flow';
 		this.onSelectionChange({ type: 'step', key });
 	}
 
@@ -2743,48 +2852,18 @@ splitOptions4(options: string): string[] {
 		return this.failedStart.problems;
 	}
 
-	/** What the side panel shows while no Step or Link is selected: the Flow settings or its Error handler. */
-	flowPanel: 'settings' | 'errorHandler' = 'settings';
-
-	/** Whether the side panel shows this part of the Flow settings. */
-	isFlowPanelOpen(panel: 'settings' | 'errorHandler'): boolean {
-		return !this.sidePanelCollapsed && !this.testOpen && this.selection.type === 'flow' && this.flowPanel === panel;
-	}
-
-	openFlowSettings(): void {
-		this.openFlowPanel('settings');
-	}
-
-	openErrorHandler(): void {
-		this.openFlowPanel('errorHandler');
-	}
-
-	private openFlowPanel(panel: 'settings' | 'errorHandler'): void {
-		this.testOpen = false;
-		this.onSelectionChange({ type: 'flow' });
-		this.flowPanel = panel;
-		this.setPanelCollapsed(false);
-	}
-
 	private setPanelCollapsed(collapsed: boolean): void {
 		if (this.sidePanelCollapsed && !collapsed) {
 			// The panel takes room from the canvas, so Steps may end up under it.
 			this.flowCanvas?.keepInView();
 		}
 		this.sidePanelCollapsed = collapsed;
-		if (this.viewMode !== 'design') {
-			return;
-		}
-		try {
-			localStorage.setItem(PANEL_COLLAPSED_KEY, String(collapsed));
-		} catch {
-			// Without storage the panel is simply hidden again next time.
-		}
 	}
 
+	/** Selecting a Step, Steps or a Branch shows them in the side panel; a click on the empty canvas hides it. */
 	onSelectionChange(selection: DesignerSelection): void {
 		this.selection = selection;
-		this.flowPanel = 'settings';
+		this.setPanelCollapsed(selection.type === 'flow');
 		this.cdr.markForCheck();
 	}
 
@@ -2993,7 +3072,7 @@ splitOptions4(options: string): string[] {
 		this.location.replaceState(this.router.serializeUrl(url));
 		// Save & Test: the editors go on to test the Flow they start.
 		if (this.hasModes && (then === 'start' || then === 'restart')) {
-			this.setMode('test');
+			this.openTest();
 		}
 		if (this.activeEditor === 'script') {
 			// What each Script made of the last test message was made by the Scripts as they were.
@@ -3171,18 +3250,32 @@ type AfterSave = 'stay' | 'start' | 'restart' | 'return';
 /** The graph key of a Flow's Error Step, which has its own Error handler panel rather than a place on the canvas. */
 const ERROR_STEP_KEY = 'error';
 
-const PANEL_COLLAPSED_KEY = 'flow-designer.panel-collapsed';
-
-function readPanelCollapsed(): boolean {
-	try {
-		return localStorage.getItem(PANEL_COLLAPSED_KEY) !== 'false';
-	} catch {
-		return true;
-	}
+/** A tab above the editor, in Design (or Code) or in Test. */
+interface EditorTab {
+	readonly id: string;
+	readonly label: string;
+	readonly icon: string;
 }
+
+type DesignTab = 'flow' | 'editor' | 'errorHandler' | 'settings' | 'notes';
+
+/** How a tab other than the first shows: full page, in a side panel beside the canvas, or not at all. */
+type TabLayout = 'full' | 'panel' | 'closed';
+
+type TestView = 'flow' | 'tester' | 'stats' | 'log' | 'route';
+
+const CANVAS_DESIGN_TABS: readonly EditorTab[] = [
+	{ id: 'flow', label: 'Visual flow', icon: 'sitemap' },
+	{ id: 'editor', label: 'Editor', icon: 'edit' },
+	{ id: 'errorHandler', label: 'Error handler', icon: 'exclamation-triangle' },
+	{ id: 'settings', label: 'Settings', icon: 'cogs' },
+	{ id: 'notes', label: 'Notes', icon: 'file-alt' },
+];
 
 const CANVAS_TEST_TABS = [
 	{ id: 'flow', label: 'Visual flow', icon: 'sitemap' },
+	{ id: 'tester', label: 'Tester', icon: 'flask' },
+	{ id: 'stats', label: 'Stats', icon: 'chart-bar' },
 	{ id: 'log', label: 'Log', icon: 'file-alt' },
 	{ id: 'route', label: 'Camel route', icon: 'code' },
 ] as const;

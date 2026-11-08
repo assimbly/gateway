@@ -114,7 +114,7 @@
     <f-selection-area></f-selection-area>
   }
 
-  <!-- Declared here, inside the flow, so the minimap can reach it; the editor shows it in its side panel. -->
+  <!-- Declared here, inside the flow, so the minimap can reach it; the editor shows it in a corner of the canvas. -->
   <ng-template #minimap>
     <f-minimap [fMinSize]="400"></f-minimap>
     <!-- Stops the presses here, so a click on a button doesn't also move the view to the point under it. -->
@@ -125,6 +125,12 @@
       <button type="button" class="btn btn-fx btn-fx-ghost" title="Zoom out" aria-label="Zoom out" (click)="zoomOut()">
         <fa-icon icon="minus"></fa-icon>
       </button>
+      @if (!readOnly) {
+        <button type="button" class="btn btn-fx btn-fx-ghost" title="Auto-arrange: lay the Flow out from left to right" aria-label="Auto-arrange"
+                data-cy="auto-arrange" (click)="autoArrange.emit()">
+          <fa-icon icon="sitemap"></fa-icon>
+        </button>
+      }
     </div>
   </ng-template>
 </f-flow>

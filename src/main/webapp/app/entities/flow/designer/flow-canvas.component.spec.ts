@@ -2,7 +2,18 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { FZoomDirective } from '@foblex/flow';
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
-import { faCheck, faCodeBranch, faCogs, faExclamationTriangle, faPlus, faSignInAlt, faSignOutAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCheck,
+  faCodeBranch,
+  faCogs,
+  faExclamationTriangle,
+  faMinus,
+  faPlus,
+  faSignInAlt,
+  faSignOutAlt,
+  faSitemap,
+  faTimes,
+} from '@fortawesome/free-solid-svg-icons';
 
 import { IFlow } from 'app/shared/model/flow.model';
 import { IStep } from 'app/shared/model/step.model';
@@ -43,7 +54,7 @@ describe('Flow canvas', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({ imports: [FlowCanvasComponent] });
-    TestBed.inject(FaIconLibrary).addIcons(faPlus, faExclamationTriangle, faSignInAlt, faCogs, faCodeBranch, faSignOutAlt, faCheck, faTimes);
+    TestBed.inject(FaIconLibrary).addIcons(faPlus, faMinus, faSitemap, faExclamationTriangle, faSignInAlt, faCogs, faCodeBranch, faSignOutAlt, faCheck, faTimes);
     fixture = TestBed.createComponent(FlowCanvasComponent);
     const graph = loadFlowGraph(contentRouterFlow);
     fixture.componentRef.setInput('graph', graph);
@@ -278,5 +289,55 @@ describe('Flow canvas', () => {
 
     expect(zoomIn).toHaveBeenCalledWith();
     expect(zoomOut).toHaveBeenCalledWith();
+  });
+
+  it('offers Auto-arrange on the minimap, but not when read-only', () => {
+    const canvas = fixture.componentInstance;
+    const arranged = jest.fn();
+    canvas.autoArrange.subscribe(arranged);
+    const view = canvas.minimap.createEmbeddedView(undefined);
+    const button = () =>
+      view.rootNodes.map(node => (node as HTMLElement).querySelector?.<HTMLButtonElement>('[data-cy="auto-arrange"]')).find(found => found) ?? null;
+    view.detectChanges();
+
+    button()!.click();
+    expect(arranged).toHaveBeenCalledTimes(1);
+
+    fixture.componentRef.setInput('readOnly', true);
+    view.detectChanges();
+    expect(button()).toBeNull();
+    view.destroy();
+  });
+
+  describe('bringing the Flow into view', () => {
+    const fitToScreen = jest.fn();
+
+    // jsdom lays nothing out: the canvas is 1000 by 400px from (100, 0), and the 120 by 100px Steps are in a row at y=150.
+    function fit(stepSpacing: number): FlowCanvasComponent {
+      const canvas = fixture.componentInstance;
+      fitToScreen.mockReset();
+      canvas.canvas = { fitToScreen, getScale: () => 1, transform: { position: { x: 300, y: 50 }, scaledPosition: { x: 10, y: 5 } } } as any;
+      const rect = (left: number, top: number, width: number, height: number) => () =>
+        ({ left, top, width, height, right: left + width, bottom: top + height }) as DOMRect;
+      fixture.nativeElement.querySelector('f-flow').getBoundingClientRect = rect(100, 0, 1000, 400);
+      fixture.nativeElement
+        .querySelectorAll('[data-step-key]')
+        .forEach((node: HTMLElement, i: number) => (node.getBoundingClientRect = rect(500 + i * stepSpacing, 150, 120, 100)));
+      jest.useFakeTimers();
+      canvas.fitToScreen();
+      jest.runOnlyPendingTimers();
+      jest.useRealTimers();
+      return canvas;
+    }
+
+    it('starts a Flow that fits at the left of the canvas, where its Source is, and in the middle from top to bottom', () => {
+      expect(fit(150).canvasPosition).toEqual({ x: 310 - (500 - 100 - 48), y: 55 - 150 + (400 - 100) / 2 });
+      expect(fitToScreen).not.toHaveBeenCalled();
+    });
+
+    it('shrinks a Flow that is too wide for the canvas', () => {
+      expect(fit(300).canvasPosition).toBeUndefined();
+      expect(fitToScreen).toHaveBeenCalledWith({ x: 80, y: 80 }, false, false, 1);
+    });
   });
 });

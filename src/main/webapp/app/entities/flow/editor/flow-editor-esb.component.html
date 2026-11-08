@@ -238,7 +238,7 @@
         }
       </ng-template>
 
-      <!-- The Notes tab of the Route and Script editors. -->
+      <!-- The Notes tab of every editor. -->
       <ng-template #codeNotes>
         <div class="code-flow-notes">
           <ngx-codemirror
@@ -252,65 +252,72 @@
         </div>
       </ng-template>
 
-      <!-- The Test panel and the stats beside the Routes or Scripts in Test. -->
-      <ng-template #codeTestPanel let-entryStepId="entryStepId" let-entryKind="entryKind">
-        <aside class="flow-designer-panel" id="flow-designer-panel" [class.d-none]="sidePanelCollapsed || testView !== 'flow'">
-          <div class="flow-designer-panel-tabs" role="tablist" aria-label="What the panel shows">
-            <button type="button" role="tab" class="btn btn-fx btn-fx-ghost" data-cy="panel-test"
-                    [class.active]="testPanelTab === 'test'" [attr.aria-selected]="testPanelTab === 'test'" (click)="testPanelTab = 'test'">
-              <fa-icon icon="flask"></fa-icon><span>Test</span>
-            </button>
-            <button type="button" role="tab" class="btn btn-fx btn-fx-ghost" data-cy="panel-stats"
-                    [class.active]="testPanelTab === 'stats'" [attr.aria-selected]="testPanelTab === 'stats'" (click)="testPanelTab = 'stats'">
-              <fa-icon icon="chart-bar"></fa-icon><span>Stats</span>
-            </button>
-          </div>
-          <div class="flow-designer-panel-editor">
-            <jhi-flow-test-panel
-              [class.d-none]="testPanelTab !== 'test'"
-              [flowId]="flow?.id"
-              [entryStepId]="entryStepId"
-              [entryKind]="entryKind"
-              [running]="editorHeader.running()"
-              [draftReason]="draftReason"
-              [unsaved]="false"
-              [run]="testRun"
-              (ran)="onTestRan($event)"
-              (start)="editorHeader.start()"
-              (saveAndRun)="saveAndTest()"
-              (closed)="setMode('design')"
-            />
-            <jhi-flow-run-stats [class.d-none]="testPanelTab !== 'stats'" [flowId]="flow?.id" />
-          </div>
-        </aside>
+      <!--
+        The Tester and Stats tabs of every editor in Test. Hidden rather than removed behind the other tabs, and never moved
+        between full page and the side panel: the Tester keeps the message typed in it, and the stats keep the counts on the
+        canvas current.
+      -->
+      <ng-template #testerAndStats let-entryStepId="entryStepId" let-entryKind="entryKind">
+        <div class="code-flow-pane" [class.d-none]="testView !== 'tester'" data-cy="test-tester">
+          <jhi-flow-test-panel
+            [flowId]="flow?.id"
+            [graph]="canvasGraph"
+            [entryStepId]="entryStepId"
+            [entryKind]="entryKind ?? 'route'"
+            [selectedKey]="selectedStepKey"
+            [running]="editorHeader.running()"
+            [draftReason]="draftReason"
+            [unsaved]="hasUnsavedChanges"
+            [run]="testRun"
+            (ran)="onTestRan($event)"
+            (start)="editorHeader.start()"
+            (saveAndRun)="saveAndTest()"
+            (editStep)="editStepFromTest($event)"
+          />
+        </div>
+        <div class="code-flow-pane" [class.d-none]="testView !== 'stats'" data-cy="test-stats">
+          <jhi-flow-run-stats [flowId]="flow?.id" [graph]="canvasGraph" [selection]="selection" (countsChange)="onRunCountsChange($event)" />
+        </div>
       </ng-template>
 
-      <!-- The toolbar of the Route and Script editors: the tabs of Code, or of Test, and in Test the panel switch. -->
-      <ng-template #codeToolbar let-tabs="tabs" let-active="active" let-cy="cy">
+      <!-- The tabs above every editor: what Design (or Code) shows, or what Test shows. -->
+      <ng-template #editorToolbar>
         <div class="flow-designer-toolbar">
           <div class="flow-designer-tabs" role="tablist" [attr.aria-label]="viewMode === 'test' ? 'What Test shows' : 'What the editor shows'">
-            @if (viewMode === 'design') {
-              @for (tab of tabs; track tab.id) {
-                <button type="button" role="tab" class="btn btn-fx btn-fx-ghost" [attr.data-cy]="cy + tab.id"
-                        [class.active]="active === tab.id" [attr.aria-selected]="active === tab.id" (click)="activeEditor === 'script' ? showScriptTab(tab.id) : showRouteTab(tab.id)">
-                  <fa-icon [icon]="tab.icon"></fa-icon><span>{{ tab.label }}</span>
-                </button>
-              }
-            } @else {
-              @for (tab of testTabs; track tab.id) {
-                <button type="button" role="tab" class="btn btn-fx btn-fx-ghost" [attr.data-cy]="'test-view-' + tab.id"
-                        [class.active]="testView === tab.id" [attr.aria-selected]="testView === tab.id" (click)="showTestView(tab.id)">
-                  <fa-icon [icon]="$any(tab.icon)"></fa-icon><span>{{ tab.label }}</span>
-                </button>
-              }
+            @for (tab of toolbarTabs; track tab.id) {
+              <button type="button" role="tab" class="btn btn-fx btn-fx-ghost"
+                      [attr.data-cy]="(viewMode === 'test' ? 'test-view-' : useCanvas ? 'design-tab-' : activeEditor === 'script' ? 'script-tab-' : 'route-tab-') + tab.id"
+                      [class.active]="activeTab === tab.id" [attr.aria-selected]="activeTab === tab.id" (click)="showTab(tab.id)">
+                <fa-icon [icon]="$any(tab.icon)"></fa-icon><span>{{ tab.label }}</span>
+              </button>
             }
           </div>
-          @if (viewMode === 'test' && testView === 'flow') {
-            <div class="flow-designer-toolbar-end">
-              <button type="button" class="btn btn-fx btn-fx-ghost" (click)="togglePanel()" aria-controls="flow-designer-panel"
-                      [attr.aria-expanded]="!sidePanelCollapsed">
-                <fa-icon [icon]="sidePanelCollapsed ? 'chevron-left' : 'chevron-right'"></fa-icon>
-                <span>{{ sidePanelCollapsed ? 'Show panel' : 'Hide panel' }}</span>
+          <!-- < and >: the open tab full page, in the side panel beside the canvas, or closed. -->
+          @if (activeTab !== firstTab) {
+            <div class="flow-designer-toolbar-end flow-designer-layout">
+              @if (tabLayout !== 'full') {
+                @let left = tabLayout === 'closed' ? 'Show the panel' : 'Show full page';
+                <button type="button" class="btn btn-fx btn-fx-ghost" data-cy="tab-left" [title]="left" [attr.aria-label]="left" (click)="tabToLeft()">
+                  <fa-icon icon="chevron-left"></fa-icon>
+                </button>
+              }
+              @if (tabLayout !== 'closed') {
+                @let right = tabLayout === 'full' ? 'Show it in a side panel' : 'Hide the panel';
+                <button type="button" class="btn btn-fx btn-fx-ghost" data-cy="tab-right" [title]="right" [attr.aria-label]="right" (click)="tabToRight()">
+                  <fa-icon icon="chevron-right"></fa-icon>
+                </button>
+              }
+            </div>
+          } @else if (viewMode === 'design' && sidePanelShown) {
+            <!-- The same < and > for the Step clicked on the Visual flow: on the Editor tab full page, or the panel hidden. -->
+            <div class="flow-designer-toolbar-end flow-designer-layout">
+              <button type="button" class="btn btn-fx btn-fx-ghost" data-cy="panel-full-page" title="Show full page" aria-label="Show full page"
+                      (click)="showSelectionFullPage()">
+                <fa-icon icon="chevron-left"></fa-icon>
+              </button>
+              <button type="button" class="btn btn-fx btn-fx-ghost" data-cy="panel-close" title="Hide the panel" aria-label="Hide the panel"
+                      aria-controls="flow-designer-panel" (click)="closePanel()">
+                <fa-icon icon="chevron-right"></fa-icon>
               </button>
             </div>
           }
@@ -328,6 +335,110 @@
             <jhi-camel-route-drawer [flowId]="flow?.id" [flowName]="flow?.name" />
           </div>
         }
+      </ng-template>
+
+      <!-- The selected Step, Steps or Branch: in the side panel beside the Visual flow, and on the Editor tab. -->
+      <ng-template #selectionEditor>
+        @if (selection.type === 'step' && selectedStepIndex >= 0) {
+          <div class="flow-step-name-field mb-2">
+            <label class="form-label small text-muted mb-1" for="field_stepName">Name</label>
+            <input type="text" class="form-control form-control-sm" id="field_stepName" maxlength="255" placeholder="Shown under the Step on the canvas (F2)"
+                   [value]="selectedStepName" [readOnly]="!!canvasGraph?.readOnlyReason"
+                   (change)="onRenameStep(selection.key, $any($event.target).value)" (keydown.enter)="$any($event.target).blur()" />
+          </div>
+          @switch (panelFor(selectedStepIndex)) {
+            @case ('operation') {
+              <ng-container *ngTemplateOutlet="operationSource"></ng-container>
+            }
+            @case ('response') {
+              <jhi-response-editor
+                [uri]="stepFormAt(selectedStepIndex).value.uri"
+                [options]="steps[selectedStepIndex].options"
+                [declaredStatuses]="handler?.declaredStatuses ?? []"
+                [responseMediaType]="handler?.responseMediaType"
+                [warning]="selectedWarning"
+                [problem]="selectedProblem"
+                [deletable]="selectedStepDeletable"
+                (settingsChange)="onResponseChange(selectedStepIndex, $event)"
+                (remove)="onDeleteStep(stepKeys[selectedStepIndex])"
+              />
+            }
+            @case ('callFlow') {
+              <jhi-call-flow-editor
+                [options]="steps[selectedStepIndex].options"
+                [kind]="$any(steps[selectedStepIndex].stepType)"
+                [flows]="callableFlows"
+                [problem]="selectedProblem"
+                [deletable]="selectedStepDeletable"
+                (optionsChange)="onCallFlowChange(selectedStepIndex, $event)"
+                (remove)="onDeleteStep(stepKeys[selectedStepIndex])"
+              />
+            }
+            @default {
+              <ng-container *ngTemplateOutlet="stepEditor; context: { $implicit: selectedStepIndex }"></ng-container>
+            }
+          }
+        } @else if (selection.type === 'steps') {
+          <div class="card bg-light text-start flow-settings" data-cy="selected-steps">
+            <div class="card-body">
+              <h5 class="border-bottom">{{ selection.keys.length }} STEPS SELECTED</h5>
+              <p class="text-muted small">Drag one of them to move them together. Shift+drag on the canvas selects the Steps in a box; Ctrl+click adds or removes one.</p>
+              @if (!canvasGraph?.readOnlyReason) {
+                <button type="button" class="btn btn-fx btn-fx-danger" (click)="onDeleteSteps(selection.keys)">
+                  <fa-icon icon="trash"></fa-icon><span>Delete</span>
+                </button>
+              }
+            </div>
+          </div>
+        } @else if (selectedLink; as link) {
+          <jhi-link-editor
+            [graph]="canvasGraph!"
+            [link]="link"
+            [readOnly]="!!canvasGraph?.readOnlyReason"
+            [problem]="selectedLinkProblem"
+            (linkChange)="onLinkChange($event)"
+            (deleteBranch)="onDeleteBranch(link.to)"
+          ></jhi-link-editor>
+        } @else {
+          <p class="text-muted small mb-0" data-cy="editor-nothing-selected">Select a Step on the Visual flow to edit it here.</p>
+        }
+      </ng-template>
+
+      <!-- The Settings tab of the visual editor. -->
+      <ng-template #flowSettings>
+        <div class="card bg-light text-start" data-cy="flow-settings">
+          <div class="card-body">
+            <h5 class="border-bottom">SETTINGS</h5>
+            <div class="flow-setting">
+              <div class="flow-setting__text">
+                <label class="form-check-label" for="field_trace">Trace</label>
+                <small class="text-muted" id="field_trace_help">
+                  Writes the messages at each Step to the Log viewer (Administration → Log viewer). Applies when the Flow is started.
+                </small>
+              </div>
+              <div class="form-check form-switch mb-0">
+                <input class="form-check-input" type="checkbox" role="switch" id="field_trace" aria-describedby="field_trace_help"
+                       [checked]="traceOn" (change)="setTrace($any($event.target).checked)" />
+              </div>
+            </div>
+            <div class="flow-setting">
+              <div class="flow-setting__text">
+                <label class="form-check-label" for="field_autoStart">Auto start</label>
+                <small class="text-muted" id="field_autoStart_help">
+                  @if (flowIsDraft) {
+                    This Flow is a Draft, so it is saved with auto start off until it is complete.
+                  } @else {
+                    Starts the Flow when the Gateway starts.
+                  }
+                </small>
+              </div>
+              <div class="form-check form-switch mb-0">
+                <input class="form-check-input" type="checkbox" role="switch" id="field_autoStart" aria-describedby="field_autoStart_help"
+                       formControlName="autoStart" />
+              </div>
+            </div>
+          </div>
+        </div>
       </ng-template>
 
       <ng-template #operationSource>
@@ -356,54 +467,11 @@
 
       @if (useCanvas) {
         <div class="flow-designer" [class.flow-designer--test]="viewMode === 'test'">
-          <div class="flow-designer-toolbar">
-            @if (viewMode === 'design') {
-              <button type="button" class="btn btn-fx btn-fx-ghost" (click)="autoArrangeCanvas()" [disabled]="!!canvasGraph?.readOnlyReason"
-                      title="Lay the Flow out from left to right">
-                <fa-icon icon="sitemap"></fa-icon><span>Auto-arrange</span>
-              </button>
-              <button type="button" class="btn btn-fx btn-fx-ghost" (click)="openFlowSettings()"
-                      [class.active]="isFlowPanelOpen('settings')" [attr.aria-pressed]="isFlowPanelOpen('settings')">
-                <fa-icon icon="cogs"></fa-icon><span>Flow settings</span>
-              </button>
-              <button type="button" class="btn btn-fx btn-fx-ghost" (click)="openErrorHandler()"
-                      [class.active]="isFlowPanelOpen('errorHandler')" [attr.aria-pressed]="isFlowPanelOpen('errorHandler')"
-                      title="What happens to a message that fails in this Flow">
-                <fa-icon icon="exclamation-triangle"></fa-icon><span>Error handler</span>
-              </button>
-            } @else {
-              <div class="flow-designer-tabs" role="tablist" aria-label="What Test shows">
-                @for (tab of testTabs; track tab.id) {
-                  <button type="button" role="tab" class="btn btn-fx btn-fx-ghost" [attr.data-cy]="'test-view-' + tab.id"
-                          [class.active]="testView === tab.id" [attr.aria-selected]="testView === tab.id" (click)="showTestView(tab.id)">
-                    <fa-icon [icon]="tab.icon"></fa-icon><span>{{ tab.label }}</span>
-                  </button>
-                }
-              </div>
-            }
-            @if (viewMode === 'design' || testView === 'flow') {
-              <div class="flow-designer-toolbar-end">
-                <button type="button" class="btn btn-fx btn-fx-ghost" (click)="togglePanel()" aria-controls="flow-designer-panel"
-                        [attr.aria-expanded]="!sidePanelCollapsed">
-                  <fa-icon [icon]="sidePanelCollapsed ? 'chevron-left' : 'chevron-right'"></fa-icon>
-                  <span>{{ sidePanelCollapsed ? 'Show panel' : 'Hide panel' }}</span>
-                </button>
-              </div>
-            }
-          </div>
+          <ng-container *ngTemplateOutlet="editorToolbar"></ng-container>
           <div class="flow-designer-body" #designerBody>
-            @if (viewMode === 'test' && testView === 'log') {
-              <div class="flow-designer-view" data-cy="test-log">
-                <jhi-flow-log-drawer [flowId]="flow?.id" [flowName]="flow?.name" />
-              </div>
-            } @else if (viewMode === 'test' && testView === 'route') {
-              <div class="flow-designer-view" data-cy="test-camel-route">
-                <jhi-camel-route-drawer [flowId]="flow?.id" [flowName]="flow?.name" />
-              </div>
-            }
             @if (canvasGraph) {
-            <!-- Hidden rather than removed behind the Log and Camel route, so the canvas keeps its view and the stats keep coming. -->
-            <div class="flow-designer-canvas" [class.d-none]="viewMode === 'test' && testView !== 'flow'">
+            <!-- Hidden rather than removed behind a full-page tab, so the canvas keeps its view. -->
+            <div class="flow-designer-canvas" [class.d-none]="!canvasShown">
                 <jhi-flow-canvas
                   #flowCanvasRef
                   [graph]="canvasGraph!"
@@ -416,14 +484,19 @@
                   [readOnly]="viewMode === 'test' || !!canvasGraph.readOnlyReason"
                   [components]="{ actions: actionComponentsNames, sinks: sinkComponentsNames }"
                   (selectionChange)="onSelectionChange($event)"
-                  (openStep)="toggleStepEditor($event)"
+                  (openStep)="openStepEditor($event)"
                   (insertStep)="onInsertStep($event)"
                   (appendStep)="onAppendStep($event)"
                   (addBranch)="onAddBranch($event)"
                   (moveSteps)="onMoveSteps($event)"
                   (deleteStep)="onDeleteStep($event)"
                   (renameStep)="onRenameStep($event.key, $event.name)"
+                  (autoArrange)="autoArrangeCanvas()"
                 ></jhi-flow-canvas>
+              <div class="flow-designer-minimap" title="Click or drag to move the view"
+                   (pointerdown)="flowCanvasRef.onMinimapPointer($event)" (pointermove)="flowCanvasRef.onMinimapPointer($event)">
+                <ng-container *ngTemplateOutlet="flowCanvasRef.minimap"></ng-container>
+              </div>
               <div class="flow-designer-alerts">
                 @if (viewMode === 'test' && hasUnsavedChanges) {
                   <ng-container *ngTemplateOutlet="testUnsaved"></ng-container>
@@ -447,216 +520,112 @@
                 }
               </div>
             </div>
-            <aside class="flow-designer-panel" id="flow-designer-panel" [class.d-none]="sidePanelCollapsed || (viewMode === 'test' && testView !== 'flow')">
-              @if (viewMode === 'test') {
-                <div class="flow-designer-panel-tabs" role="tablist" aria-label="What the panel shows">
-                  <button type="button" role="tab" class="btn btn-fx btn-fx-ghost" data-cy="panel-test"
-                          [class.active]="testPanelTab === 'test'" [attr.aria-selected]="testPanelTab === 'test'" (click)="testPanelTab = 'test'">
-                    <fa-icon icon="flask"></fa-icon><span>Test</span>
-                  </button>
-                  <button type="button" role="tab" class="btn btn-fx btn-fx-ghost" data-cy="panel-stats"
-                          [class.active]="testPanelTab === 'stats'" [attr.aria-selected]="testPanelTab === 'stats'" (click)="testPanelTab = 'stats'">
-                    <fa-icon icon="chart-bar"></fa-icon><span>Stats</span>
-                  </button>
-                </div>
-              }
+            <aside class="flow-designer-panel" id="flow-designer-panel" [class.d-none]="!sidePanelShown">
               <div class="flow-designer-panel-editor">
               @if (viewMode === 'test') {
-                <!-- Both stay in the panel: the Test panel keeps the message typed in it, and the stats keep the counts on the canvas current. -->
+                <!-- Only what the clicked Step did in the last run; the message is sent from the Tester tab. -->
                 <jhi-flow-test-panel
-                  [class.d-none]="testPanelTab !== 'test'"
+                  [stepOnly]="true"
                   [flowId]="flow?.id"
                   [graph]="canvasGraph!"
                   [selectedKey]="selectedStepKey"
-                  [running]="editorHeader.running()"
-                  [draftReason]="draftReason"
-                  [unsaved]="false"
                   [run]="testRun"
-                  (ran)="onTestRan($event)"
-                  (start)="editorHeader.start()"
-                  (saveAndRun)="saveAndTest()"
                   (editStep)="editStepFromTest($event)"
-                  (closed)="setMode('design')"
+                  (closed)="closePanel()"
+                  (openTester)="showTestView('tester')"
                 />
-                <jhi-flow-run-stats
-                  [class.d-none]="testPanelTab !== 'stats'"
-                  [flowId]="flow?.id"
-                  [graph]="canvasGraph"
-                  [selection]="selection"
-                  (countsChange)="onRunCountsChange($event)"
-                />
-              } @else if (selection.type === 'step' && selectedStepIndex >= 0) {
-                <div class="flow-step-name-field mb-2">
-                  <label class="form-label small text-muted mb-1" for="field_stepName">Name</label>
-                  <input type="text" class="form-control form-control-sm" id="field_stepName" maxlength="255" placeholder="Shown under the Step on the canvas (F2)"
-                         [value]="selectedStepName" [readOnly]="!!canvasGraph?.readOnlyReason"
-                         (change)="onRenameStep(selection.key, $any($event.target).value)" (keydown.enter)="$any($event.target).blur()" />
-                </div>
-                @switch (panelFor(selectedStepIndex)) {
-                  @case ('operation') {
-                    <ng-container *ngTemplateOutlet="operationSource"></ng-container>
-                  }
-                  @case ('response') {
-                    <jhi-response-editor
-                      [uri]="stepFormAt(selectedStepIndex).value.uri"
-                      [options]="steps[selectedStepIndex].options"
-                      [declaredStatuses]="handler?.declaredStatuses ?? []"
-                      [responseMediaType]="handler?.responseMediaType"
-                      [warning]="selectedWarning"
-                      [problem]="selectedProblem"
-                      [deletable]="selectedStepDeletable"
-                      (settingsChange)="onResponseChange(selectedStepIndex, $event)"
-                      (remove)="onDeleteStep(stepKeys[selectedStepIndex])"
-                    />
-                  }
-                  @case ('callFlow') {
-                    <jhi-call-flow-editor
-                      [options]="steps[selectedStepIndex].options"
-                      [kind]="$any(steps[selectedStepIndex].stepType)"
-                      [flows]="callableFlows"
-                      [problem]="selectedProblem"
-                      [deletable]="selectedStepDeletable"
-                      (optionsChange)="onCallFlowChange(selectedStepIndex, $event)"
-                      (remove)="onDeleteStep(stepKeys[selectedStepIndex])"
-                    />
-                  }
-                  @default {
-                    <ng-container *ngTemplateOutlet="stepEditor; context: { $implicit: selectedStepIndex }"></ng-container>
-                  }
-                }
-              } @else if (selection.type === 'steps') {
-                <div class="card bg-light text-start flow-settings" data-cy="selected-steps">
-                  <div class="card-body">
-                    <h5 class="border-bottom">{{ selection.keys.length }} STEPS SELECTED</h5>
-                    <p class="text-muted small">Drag one of them to move them together. Shift+drag on the canvas selects the Steps in a box; Ctrl+click adds or removes one.</p>
-                    @if (!canvasGraph?.readOnlyReason) {
-                      <button type="button" class="btn btn-fx btn-fx-danger" (click)="onDeleteSteps(selection.keys)">
-                        <fa-icon icon="trash"></fa-icon><span>Delete</span>
-                      </button>
-                    }
-                  </div>
-                </div>
-              } @else if (selectedLink; as link) {
-                <jhi-link-editor
-                  [graph]="canvasGraph!"
-                  [link]="link"
-                  [readOnly]="!!canvasGraph?.readOnlyReason"
-                  [problem]="selectedLinkProblem"
-                  (linkChange)="onLinkChange($event)"
-                  (deleteBranch)="onDeleteBranch(link.to)"
-                ></jhi-link-editor>
-              } @else if (flowPanel === 'errorHandler') {
-                <p class="text-muted small mb-2">
-                  A message that fails in this Flow goes to its Error handler. By default it logs the error, with all its details.
-                </p>
-                @if (errorStepIndex >= 0) {
-                  <ng-container *ngTemplateOutlet="stepEditor; context: { $implicit: errorStepIndex }"></ng-container>
-                }
-              } @else {
-                <div class="card bg-light text-start flow-settings">
-                  <div class="card-body">
-                    <h5 class="border-bottom">FLOW</h5>
-                    <div class="flow-setting">
-                      <div class="flow-setting__text">
-                        <label class="form-check-label" for="field_trace">Trace</label>
-                        <small class="text-muted" id="field_trace_help">
-                          @if (activeEditor === 'route') {
-                            Writes the messages at each Step to the Log viewer (Administration → Log viewer). A Route has no Steps, so nothing is written for this Flow.
-                          } @else {
-                            Writes the messages at each Step to the Log viewer (Administration → Log viewer). Applies when the Flow is started.
-                          }
-                        </small>
-                      </div>
-                      <div class="form-check form-switch mb-0">
-                        <input class="form-check-input" type="checkbox" role="switch" id="field_trace" aria-describedby="field_trace_help"
-                               [checked]="traceOn" (change)="setTrace($any($event.target).checked)" />
-                      </div>
-                    </div>
-                    <div class="flow-setting">
-                      <div class="flow-setting__text">
-                        <label class="form-check-label" for="field_autoStart">Auto start</label>
-                        <small class="text-muted" id="field_autoStart_help">
-                          @if (flowIsDraft) {
-                            This Flow is a Draft, so it is saved with auto start off until it is complete.
-                          } @else {
-                            Starts the Flow when the Gateway starts.
-                          }
-                        </small>
-                      </div>
-                      <div class="form-check form-switch mb-0">
-                        <input class="form-check-input" type="checkbox" role="switch" id="field_autoStart" aria-describedby="field_autoStart_help"
-                               formControlName="autoStart" />
-                      </div>
-                    </div>
-                    <label class="form-control-label" for="field_notes">Notes</label>
-                    <ngx-codemirror
-                      *ngIf="flow"
-                      class="notes-codemirror"
-                      id="field_notes"
-                      formControlName="notes"
-                      [options]="notesEditorOptions()"
-                      (codeMirrorLoaded)="refreshCodeMirror($event)">
-                    </ngx-codemirror>
-                  </div>
-                </div>
+              } @else if (designTab === 'flow') {
+                <ng-container *ngTemplateOutlet="selectionEditor"></ng-container>
               }
               </div>
-              @if (!testOpen) {
-                <div class="flow-designer-minimap" title="Click or drag to move the view"
-                     (pointerdown)="flowCanvasRef.onMinimapPointer($event)" (pointermove)="flowCanvasRef.onMinimapPointer($event)">
-                  <ng-container *ngTemplateOutlet="flowCanvasRef.minimap"></ng-container>
-                </div>
-              }
             </aside>
             }
+            <div class="flow-designer-tab" [class.flow-designer-tab--panel]="tabLayout === 'panel'" [class.d-none]="!tabShown">
+              @if (viewMode === 'design' && designTab !== 'flow') {
+                <div class="code-flow-pane" [attr.data-cy]="'design-' + designTab">
+                  @if (!canvasShown) {
+                    <ng-container *ngTemplateOutlet="codeSaveAlerts"></ng-container>
+                  }
+                  @switch (designTab) {
+                    @case ('editor') {
+                      <ng-container *ngTemplateOutlet="selectionEditor"></ng-container>
+                    }
+                    @case ('errorHandler') {
+                      <p class="text-muted small code-flow-intro">
+                        A message that fails in this Flow goes to its Error handler. By default it logs the error, with all its details.
+                      </p>
+                      @if (errorStepIndex >= 0) {
+                        <ng-container *ngTemplateOutlet="stepEditor; context: { $implicit: errorStepIndex }"></ng-container>
+                      }
+                    }
+                    @case ('settings') {
+                      <ng-container *ngTemplateOutlet="flowSettings"></ng-container>
+                    }
+                    @case ('notes') {
+                      <ng-container *ngTemplateOutlet="codeNotes"></ng-container>
+                    }
+                  }
+                </div>
+              }
+              @if (viewMode === 'test') {
+                <ng-container *ngTemplateOutlet="codeTestViews"></ng-container>
+                @if (canvasGraph) {
+                  <ng-container *ngTemplateOutlet="testerAndStats"></ng-container>
+                }
+              }
+            </div>
           </div>
         </div>
       } @else if (activeEditor === 'route') {
 
         <div class="flow-designer code-flow" [class.flow-designer--test]="viewMode === 'test'">
-          <ng-container *ngTemplateOutlet="codeToolbar; context: { tabs: routeTabs, active: routeTab, cy: 'route-tab-' }"></ng-container>
+          <ng-container *ngTemplateOutlet="editorToolbar"></ng-container>
 
           <div class="flow-designer-body" #designerBody>
             @if (viewMode === 'design') {
-              <div class="code-flow-pane">
+              <div class="code-flow-pane" [class.d-none]="!canvasShown" data-cy="route-list">
                 <ng-container *ngTemplateOutlet="codeSaveAlerts"></ng-container>
-                @switch (routeTab) {
-                  @case ('routes') {
-                    <div class="code-flow-list" cdkDropList cdkDropListLockAxis="y" [cdkDropListDisabled]="routeCount < 2"
-                         (cdkDropListDropped)="moveRoute($event.previousIndex, $event.currentIndex)">
-                      @for (index of routeIndices; track steps[index]) {
-                        <div class="code-flow-item" cdkDrag>
-                          <div class="code-flow-item__placeholder" *cdkDragPlaceholder></div>
-                          <ng-container *ngTemplateOutlet="listStepEditor; context: { $implicit: index }"></ng-container>
-                        </div>
-                      }
-                    </div>
-                    <div class="code-flow-add">
-                      <button type="button" class="btn btn-fx btn-fx-secondary" data-cy="route-add" data-tour="step-add" (click)="addRoute()">
-                        <fa-icon icon="plus"></fa-icon><span>Add route</span>
-                      </button>
+                <div class="code-flow-list" cdkDropList cdkDropListLockAxis="y" [cdkDropListDisabled]="routeCount < 2"
+                     (cdkDropListDropped)="moveRoute($event.previousIndex, $event.currentIndex)">
+                  @for (index of routeIndices; track steps[index]) {
+                    <div class="code-flow-item" cdkDrag>
+                      <div class="code-flow-item__placeholder" *cdkDragPlaceholder></div>
+                      <ng-container *ngTemplateOutlet="listStepEditor; context: { $implicit: index }"></ng-container>
                     </div>
                   }
-                  @case ('errorHandler') {
-                    <p class="text-muted small code-flow-intro">
-                      A message that fails in this Flow goes to its Error handler: a Camel route that gets the failed message. Leave it
-                      empty to use the default, which logs the error with all its details.
-                    </p>
-                    @for (step of steps; track step; let index = $index) {
-                      @if (step.stepType === 'ERROR') {
-                        <ng-container *ngTemplateOutlet="listStepEditor; context: { $implicit: index }"></ng-container>
+                </div>
+                <div class="code-flow-add">
+                  <button type="button" class="btn btn-fx btn-fx-secondary" data-cy="route-add" data-tour="step-add" (click)="addRoute()">
+                    <fa-icon icon="plus"></fa-icon><span>Add route</span>
+                  </button>
+                </div>
+              </div>
+              <div class="flow-designer-tab" [class.flow-designer-tab--panel]="tabLayout === 'panel'" [class.d-none]="!tabShown">
+                <div class="code-flow-pane">
+                  @if (!canvasShown) {
+                    <ng-container *ngTemplateOutlet="codeSaveAlerts"></ng-container>
+                  }
+                  @switch (routeTab) {
+                    @case ('errorHandler') {
+                      <p class="text-muted small code-flow-intro">
+                        A message that fails in this Flow goes to its Error handler: a Camel route that gets the failed message. Leave it
+                        empty to use the default, which logs the error with all its details.
+                      </p>
+                      @for (step of steps; track step; let index = $index) {
+                        @if (step.stepType === 'ERROR') {
+                          <ng-container *ngTemplateOutlet="listStepEditor; context: { $implicit: index }"></ng-container>
+                        }
                       }
                     }
+                    @case ('notes') {
+                      <ng-container *ngTemplateOutlet="codeNotes"></ng-container>
+                    }
                   }
-                  @case ('notes') {
-                    <ng-container *ngTemplateOutlet="codeNotes"></ng-container>
-                  }
-                }
+                </div>
               </div>
             } @else {
-              <ng-container *ngTemplateOutlet="codeTestViews"></ng-container>
-              <!-- Hidden rather than removed behind the Log and Camel route, so the Test panel keeps the message typed in it. -->
-              <div class="code-flow-pane" [class.d-none]="testView !== 'flow'" data-cy="test-routes">
+              <!-- Hidden rather than removed behind a full-page tab. -->
+              <div class="code-flow-pane" [class.d-none]="!canvasShown" data-cy="test-routes">
                 <ng-container *ngTemplateOutlet="codeSaveAlerts"></ng-container>
                 @if (hasUnsavedChanges) {
                   <ng-container *ngTemplateOutlet="testUnsaved"></ng-container>
@@ -680,95 +649,102 @@
                   </section>
                 }
               </div>
-              <ng-container *ngTemplateOutlet="codeTestPanel; context: { entryStepId: routeEntryStepId, entryKind: 'route' }"></ng-container>
+              <div class="flow-designer-tab" [class.flow-designer-tab--panel]="tabLayout === 'panel'" [class.d-none]="!tabShown">
+                <ng-container *ngTemplateOutlet="codeTestViews"></ng-container>
+                <ng-container *ngTemplateOutlet="testerAndStats; context: { entryStepId: routeEntryStepId, entryKind: 'route' }"></ng-container>
+              </div>
             }
           </div>
         </div>
       } @else if (activeEditor === 'script') {
         <div class="flow-designer code-flow" [class.flow-designer--test]="viewMode === 'test'">
-          <ng-container *ngTemplateOutlet="codeToolbar; context: { tabs: scriptTabs, active: scriptTab, cy: 'script-tab-' }"></ng-container>
+          <ng-container *ngTemplateOutlet="editorToolbar"></ng-container>
 
           <div class="flow-designer-body" #designerBody>
             @if (viewMode === 'design') {
-              <div class="code-flow-pane">
+              <div class="code-flow-pane" [class.d-none]="!canvasShown" data-cy="script-list">
                 <ng-container *ngTemplateOutlet="codeSaveAlerts"></ng-container>
-                @switch (scriptTab) {
-                  @case ('scripts') {
-                    @let summary = scriptSummary;
-                    <p class="script-flow-summary small text-muted mb-0" data-cy="script-summary">
-                      @if (summary.source; as source) {
-                        <span>Starts:
-                          <button type="button" class="btn btn-link btn-sm p-0 align-baseline" [class.text-danger]="summaryItemInvalid(source.index)"
-                                  (click)="showSummaryStep(source.index)" title="Show this Step on its tab">{{ source.text }}</button>
-                        </span>
-                      }
-                      @if (summary.result; as result) {
-                        <span>Result:
-                          <button type="button" class="btn btn-link btn-sm p-0 align-baseline" [class.text-danger]="summaryItemInvalid(result.index)"
-                                  (click)="showSummaryStep(result.index)" title="Show this Step on its tab">{{ result.text }}</button>
-                        </span>
-                      } @else {
-                        <span>Result: not logged —
-                          <button type="button" class="btn btn-link btn-sm p-0 align-baseline" (click)="addResultLog()">Log it</button>
-                        </span>
-                      }
-                      @if (summary.errors; as errors) {
-                        <span>Errors:
-                          <button type="button" class="btn btn-link btn-sm p-0 align-baseline" [class.text-danger]="summaryItemInvalid(errors.index)"
-                                  (click)="showSummaryStep(errors.index)" title="Show this Step on its tab">{{ errors.text }}</button>
-                        </span>
-                      }
-                    </p>
-                    <div class="code-flow-list" cdkDropList cdkDropListLockAxis="y" [cdkDropListDisabled]="scriptCount < 2"
-                         (cdkDropListDropped)="moveScript($event.previousIndex, $event.currentIndex)">
-                      @for (index of scriptIndices; track steps[index]) {
-                        <div class="code-flow-item" cdkDrag>
-                          <div class="code-flow-item__placeholder" *cdkDragPlaceholder></div>
-                          <ng-container *ngTemplateOutlet="listStepEditor; context: { $implicit: index }"></ng-container>
-                        </div>
-                      }
-                    </div>
-                    <div class="code-flow-add">
-                      <button type="button" class="btn btn-fx btn-fx-secondary" data-cy="script-add" data-tour="step-add" (click)="addScript()">
-                        <fa-icon icon="plus"></fa-icon><span>Add script</span>
-                      </button>
-                    </div>
+                @let summary = scriptSummary;
+                <p class="script-flow-summary small text-muted mb-0" data-cy="script-summary">
+                  @if (summary.source; as source) {
+                    <span>Starts:
+                      <button type="button" class="btn btn-link btn-sm p-0 align-baseline" [class.text-danger]="summaryItemInvalid(source.index)"
+                              (click)="showSummaryStep(source.index)" title="Show this Step on its tab">{{ source.text }}</button>
+                    </span>
                   }
-                  @case ('source') {
-                    <p class="text-muted small code-flow-intro">
-                      The Source starts the Flow. Its message goes through the Scripts, one after the other, and the Sink gets the result of the
-                      last one.
-                    </p>
-                    @for (index of scriptEndIndices; track steps[index]) {
+                  @if (summary.result; as result) {
+                    <span>Result:
+                      <button type="button" class="btn btn-link btn-sm p-0 align-baseline" [class.text-danger]="summaryItemInvalid(result.index)"
+                              (click)="showSummaryStep(result.index)" title="Show this Step on its tab">{{ result.text }}</button>
+                    </span>
+                  } @else {
+                    <span>Result: not logged —
+                      <button type="button" class="btn btn-link btn-sm p-0 align-baseline" (click)="addResultLog()">Log it</button>
+                    </span>
+                  }
+                  @if (summary.errors; as errors) {
+                    <span>Errors:
+                      <button type="button" class="btn btn-link btn-sm p-0 align-baseline" [class.text-danger]="summaryItemInvalid(errors.index)"
+                              (click)="showSummaryStep(errors.index)" title="Show this Step on its tab">{{ errors.text }}</button>
+                    </span>
+                  }
+                </p>
+                <div class="code-flow-list" cdkDropList cdkDropListLockAxis="y" [cdkDropListDisabled]="scriptCount < 2"
+                     (cdkDropListDropped)="moveScript($event.previousIndex, $event.currentIndex)">
+                  @for (index of scriptIndices; track steps[index]) {
+                    <div class="code-flow-item" cdkDrag>
+                      <div class="code-flow-item__placeholder" *cdkDragPlaceholder></div>
                       <ng-container *ngTemplateOutlet="listStepEditor; context: { $implicit: index }"></ng-container>
-                    }
-                    @if (!hasResultStep) {
-                      <div class="code-flow-add">
-                        <button type="button" class="btn btn-fx btn-fx-secondary" data-cy="script-add-log" (click)="addResultLog()">
-                          <fa-icon icon="plus"></fa-icon><span>Log the result</span>
-                        </button>
-                      </div>
-                    }
+                    </div>
                   }
-                  @case ('errorHandler') {
-                    <p class="text-muted small code-flow-intro">
-                      A message that fails in this Flow goes to its Error handler. By default it logs the error, with all its details.
-                    </p>
-                    @for (step of steps; track step; let index = $index) {
-                      @if (step.stepType === 'ERROR') {
+                </div>
+                <div class="code-flow-add">
+                  <button type="button" class="btn btn-fx btn-fx-secondary" data-cy="script-add" data-tour="step-add" (click)="addScript()">
+                    <fa-icon icon="plus"></fa-icon><span>Add script</span>
+                  </button>
+                </div>
+              </div>
+              <div class="flow-designer-tab" [class.flow-designer-tab--panel]="tabLayout === 'panel'" [class.d-none]="!tabShown">
+                <div class="code-flow-pane">
+                  @if (!canvasShown) {
+                    <ng-container *ngTemplateOutlet="codeSaveAlerts"></ng-container>
+                  }
+                  @switch (scriptTab) {
+                    @case ('source') {
+                      <p class="text-muted small code-flow-intro">
+                        The Source starts the Flow. Its message goes through the Scripts, one after the other, and the Sink gets the result of the
+                        last one.
+                      </p>
+                      @for (index of scriptEndIndices; track steps[index]) {
                         <ng-container *ngTemplateOutlet="listStepEditor; context: { $implicit: index }"></ng-container>
                       }
+                      @if (!hasResultStep) {
+                        <div class="code-flow-add">
+                          <button type="button" class="btn btn-fx btn-fx-secondary" data-cy="script-add-log" (click)="addResultLog()">
+                            <fa-icon icon="plus"></fa-icon><span>Log the result</span>
+                          </button>
+                        </div>
+                      }
+                    }
+                    @case ('errorHandler') {
+                      <p class="text-muted small code-flow-intro">
+                        A message that fails in this Flow goes to its Error handler. By default it logs the error, with all its details.
+                      </p>
+                      @for (step of steps; track step; let index = $index) {
+                        @if (step.stepType === 'ERROR') {
+                          <ng-container *ngTemplateOutlet="listStepEditor; context: { $implicit: index }"></ng-container>
+                        }
+                      }
+                    }
+                    @case ('notes') {
+                      <ng-container *ngTemplateOutlet="codeNotes"></ng-container>
                     }
                   }
-                  @case ('notes') {
-                    <ng-container *ngTemplateOutlet="codeNotes"></ng-container>
-                  }
-                }
+                </div>
               </div>
             } @else {
-              <ng-container *ngTemplateOutlet="codeTestViews"></ng-container>
-              <!-- Hidden rather than removed behind the Log and Camel route, so the Test panel keeps the message typed in it. -->
-              <div class="code-flow-pane" [class.d-none]="testView !== 'flow'" data-cy="test-scripts">
+              <!-- Hidden rather than removed behind a full-page tab. -->
+              <div class="code-flow-pane" [class.d-none]="!canvasShown" data-cy="test-scripts">
                 <ng-container *ngTemplateOutlet="codeSaveAlerts"></ng-container>
                 @if (hasUnsavedChanges) {
                   <ng-container *ngTemplateOutlet="testUnsaved"></ng-container>
@@ -818,7 +794,10 @@
                   <p class="text-muted small mb-0">This Flow has no Scripts yet.</p>
                 }
               </div>
-              <ng-container *ngTemplateOutlet="codeTestPanel; context: { entryStepId: scriptEntryStepId, entryKind: 'script' }"></ng-container>
+              <div class="flow-designer-tab" [class.flow-designer-tab--panel]="tabLayout === 'panel'" [class.d-none]="!tabShown">
+                <ng-container *ngTemplateOutlet="codeTestViews"></ng-container>
+                <ng-container *ngTemplateOutlet="testerAndStats; context: { entryStepId: scriptEntryStepId, entryKind: 'script' }"></ng-container>
+              </div>
             }
           </div>
         </div>

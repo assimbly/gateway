@@ -44,7 +44,7 @@ import { compactCount } from '../flow-stats';
 import { StepRun, StepRunMark, shortDuration } from '../test/flow-test-run';
 import { PickedKind, StepComponents, StepPickerComponent } from './step-picker.component';
 
-/** What the right-hand panel shows: a Step, several Steps, the Link leading to a Step, or the Flow settings. */
+/** What is selected on the canvas: a Step, several Steps, the Link leading to a Step, or nothing (the Flow). */
 export type DesignerSelection = { type: 'step'; key: string } | { type: 'steps'; keys: string[] } | { type: 'link'; to: string } | { type: 'flow' };
 
 /**
@@ -84,6 +84,8 @@ export class FlowCanvasComponent {
   @Output() deleteStep = new EventEmitter<string>();
   /** A Step got a new name; an empty one takes its name away. */
   @Output() renameStep = new EventEmitter<{ key: string; name: string }>();
+  /** Auto-arrange on the minimap was clicked, to lay the Flow out from left to right. */
+  @Output() autoArrange = new EventEmitter<void>();
 
   @ViewChild(FFlowComponent) private flow?: FFlowComponent;
   @ViewChild(FCanvasComponent) canvas?: FCanvasComponent;
@@ -310,7 +312,6 @@ export class FlowCanvasComponent {
 
   /**
    * Fits the Flow into view once, when it first appears; after that the view stays where the user put it.
-   * A Flow of just its Source starts at the left, leaving the room on the right for the Steps still to come.
    * The fit waits a moment, because the Steps are not measured yet when Foblex reports them rendered. Until the
    * fit has been drawn the canvas stays invisible (but measured).
    */
@@ -318,23 +319,39 @@ export class FlowCanvasComponent {
     if (!this.fitted) {
       this.fitted = true;
       setTimeout(() => {
-        if (this.graph.steps.length === 1) {
-          this.showAtStart(this.graph.steps[0]);
-        } else {
-          this.canvas?.fitToScreen({ x: 80, y: 80 }, false, false, 1);
-        }
+        this.fit();
         requestAnimationFrame(() => this.show());
       });
     }
   }
 
-  private showAtStart(step: DesignStep): void {
+  /**
+   * Brings the whole Flow into view without magnifying it. A Flow that fits as it is starts at the left, where its
+   * Source is, rather than in the middle, so the room on the right is left for the Steps still to come; a larger
+   * one is shrunk to fit. Foblex's own fit centers the Flow and only moves it later, so it is used just to shrink.
+   */
+  private fit(): void {
+    const canvas = this.canvas;
     const flow = this.host.nativeElement.querySelector('f-flow')?.getBoundingClientRect();
-    const node = this.host.nativeElement.querySelector(`[data-step-key="${step.key}"]`)?.getBoundingClientRect();
-    if (flow && node) {
-      this.canvasPosition = { x: START_MARGIN - (step.x ?? 0), y: (flow.height - node.height) / 2 - (step.y ?? 0) };
-      this.cdr.markForCheck();
+    const nodes = Array.from(this.host.nativeElement.querySelectorAll<HTMLElement>('[data-step-key]'), node => node.getBoundingClientRect());
+    if (!canvas || !flow?.width || !nodes.length) {
+      return;
     }
+    const left = Math.min(...nodes.map(node => node.left));
+    const top = Math.min(...nodes.map(node => node.top));
+    const width = Math.max(...nodes.map(node => node.right)) - left;
+    const height = Math.max(...nodes.map(node => node.bottom)) - top;
+    if (canvas.getScale() > 1 || width > flow.width - START_MARGIN - FIT_PADDING || height > flow.height - 2 * FIT_PADDING) {
+      canvas.fitToScreen({ x: FIT_PADDING, y: FIT_PADDING }, false, false, 1);
+      return;
+    }
+    // Foblex keeps the position in two parts; together they are where the canvas is drawn.
+    const { position, scaledPosition } = canvas.transform;
+    this.canvasPosition = {
+      x: position.x + scaledPosition.x - (left - flow.left - START_MARGIN),
+      y: position.y + scaledPosition.y - (top - flow.top) + (flow.height - height) / 2,
+    };
+    this.cdr.markForCheck();
   }
 
   /**
@@ -405,14 +422,14 @@ export class FlowCanvasComponent {
         return node.left < flow.left || node.right > flow.right || node.top < flow.top || node.bottom > flow.bottom;
       });
       if (hidden) {
-        this.canvas?.fitToScreen({ x: 80, y: 80 }, false, false, 1);
+        this.fit();
       }
     });
   }
 
   /**
    * Pressing or dragging on the minimap centers the view on the point under the pointer. Foblex only does this
-   * itself for a minimap inside the canvas; this one is shown in the editor's side panel.
+   * itself for a minimap inside its flow; the editor shows this one over a corner of the canvas instead.
    */
   onMinimapPointer(event: PointerEvent): void {
     if (event.type === 'pointerdown') {
@@ -452,8 +469,11 @@ export class FlowCanvasComponent {
   }
 }
 
-/** Space in pixels between the left edge of the canvas and the Source of a new Flow. */
+/** Space in pixels between the left edge of the canvas and the Source of a Flow brought into view. */
 const START_MARGIN = 48;
+
+/** Space in pixels kept around a Flow brought into view at the other edges; on the right it leaves room for a +. */
+const FIT_PADDING = 80;
 
 /** How many characters of a Step's path fit on one line under it. */
 const CAPTION_LENGTH = 28;

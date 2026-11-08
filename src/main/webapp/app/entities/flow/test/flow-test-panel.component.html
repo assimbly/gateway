@@ -1,48 +1,59 @@
 <section class="flow-test" aria-labelledby="flow-test-title">
   <div class="flow-test__header">
-    <h5 id="flow-test-title" class="mb-0"><fa-icon icon="flask"></fa-icon> Test</h5>
-    <button type="button" class="btn-close" aria-label="Close the Test panel" (click)="closed.emit()"></button>
-  </div>
-  <p class="text-muted small mb-0">
-    @if (routes()) {
-      Runs one message through the running Flow, into the first Route, past its <code>from</code> endpoint. The Routes do what they always
-      do: they write files, call APIs and put messages on queues.
-    } @else if (scripts()) {
-      Runs one message through the running Flow, into the first Script, past the Source. The Steps do what they always do: they write files,
-      call APIs and put messages on queues.
-    } @else {
-      Runs one message through the running Flow, from the Step after the Source. The Steps do what they always do: they write files, call
-      APIs and put messages on queues.
+    <h5 id="flow-test-title" class="mb-0"><fa-icon icon="flask"></fa-icon> {{ stepOnly() ? 'Last test run' : 'Test' }}</h5>
+    @if (stepOnly()) {
+      <button type="button" class="btn-close" aria-label="Close the panel" (click)="closed.emit()"></button>
     }
-  </p>
+  </div>
+  @if (stepOnly()) {
+    @if (!run()) {
+      <p class="small text-muted mb-0" data-cy="test-no-run">Run a test on the Tester tab to see what each Step did.</p>
+      <button type="button" class="btn btn-fx btn-fx-sm btn-fx-secondary align-self-start" (click)="openTester.emit()">
+        <fa-icon icon="flask"></fa-icon><span>Open Tester</span>
+      </button>
+    }
+  } @else {
+    <p class="text-muted small mb-0">
+      @if (routes()) {
+        Runs one message through the running Flow, into the first Route, past its <code>from</code> endpoint. The Routes do what they always
+        do: they write files, call APIs and put messages on queues.
+      } @else if (scripts()) {
+        Runs one message through the running Flow, into the first Script, past the Source. The Steps do what they always do: they write files,
+        call APIs and put messages on queues.
+      } @else {
+        Runs one message through the running Flow, from the Step after the Source. The Steps do what they always do: they write files, call
+        APIs and put messages on queues.
+      }
+    </p>
 
-  @if (blocked(); as reason) {
-    <div class="alert alert-secondary py-2 mb-0 small flow-test__notice" data-cy="test-blocked">
-      <span>{{ reason.text }}</span>
-      @if (reason.action === 'start') {
-        <button type="button" class="btn btn-fx btn-fx-sm btn-fx-success" (click)="start.emit()"><fa-icon icon="play"></fa-icon><span>Start</span></button>
+    @if (blocked(); as reason) {
+      <div class="alert alert-secondary py-2 mb-0 small flow-test__notice" data-cy="test-blocked">
+        <span>{{ reason.text }}</span>
+        @if (reason.action === 'start') {
+          <button type="button" class="btn btn-fx btn-fx-sm btn-fx-success" (click)="start.emit()"><fa-icon icon="play"></fa-icon><span>Start</span></button>
+        }
+      </div>
+    } @else if (unsaved()) {
+      <div class="alert alert-warning py-2 mb-0 small flow-test__notice" data-cy="test-unsaved">
+        <span>A test runs the saved Flow, without your unsaved changes.</span>
+        <button type="button" class="btn btn-fx btn-fx-sm btn-fx-secondary" (click)="saveAndRun.emit()">Save &amp; restart</button>
+      </div>
+    }
+
+    <jhi-send-message-editor [(body)]="body" [(headers)]="headers" [(bodyMode)]="bodyMode" [compact]="true" />
+
+    <div class="flow-test__actions">
+      <button type="button" class="btn btn-fx btn-fx-primary" data-cy="test-run" [disabled]="!!blocked() || pending()" (click)="runTest()">
+        <fa-icon [icon]="pending() ? 'sync' : run() ? 'redo' : 'play'" [animation]="pending() ? 'spin' : undefined"></fa-icon><span>{{ pending() ? 'Running…' : run() ? 'Run again' : 'Run' }}</span>
+      </button>
+      @if (flowId() && !routes()) {
+        <a class="small" routerLink="/flow/message-sender" [queryParams]="{ flowId: flowId() }">Send to the Source's endpoint instead</a>
       }
     </div>
-  } @else if (unsaved()) {
-    <div class="alert alert-warning py-2 mb-0 small flow-test__notice" data-cy="test-unsaved">
-      <span>A test runs the saved Flow, without your unsaved changes.</span>
-      <button type="button" class="btn btn-fx btn-fx-sm btn-fx-secondary" (click)="saveAndRun.emit()">Save &amp; restart</button>
-    </div>
-  }
 
-  <jhi-send-message-editor [(body)]="body" [(headers)]="headers" [(bodyMode)]="bodyMode" [compact]="true" />
-
-  <div class="flow-test__actions">
-    <button type="button" class="btn btn-fx btn-fx-primary" data-cy="test-run" [disabled]="!!blocked() || pending()" (click)="runTest()">
-      <fa-icon [icon]="pending() ? 'sync' : run() ? 'redo' : 'play'" [animation]="pending() ? 'spin' : undefined"></fa-icon><span>{{ pending() ? 'Running…' : run() ? 'Run again' : 'Run' }}</span>
-    </button>
-    @if (flowId() && !routes()) {
-      <a class="small" routerLink="/flow/message-sender" [queryParams]="{ flowId: flowId() }">Send to the Source's endpoint instead</a>
+    @if (failure(); as error) {
+      <div #result class="alert alert-danger py-2 mb-0 small" role="alert">{{ error }}</div>
     }
-  </div>
-
-  @if (failure(); as error) {
-    <div #result class="alert alert-danger py-2 mb-0 small" role="alert">{{ error }}</div>
   }
 
   @if (run(); as result) {
@@ -73,7 +84,7 @@
         @if (scripts()) {
           <p class="text-muted small mb-0">Each Script shows what it made of the message.</p>
         } @else if (!routes()) {
-          <p class="text-muted small mb-0">Select a Step on the canvas to see the message it got and passed on.</p>
+          <p class="text-muted small mb-0">Select a Step on the Visual flow to see the message it got and passed on.</p>
         }
       }
       @default {

@@ -59,12 +59,17 @@ export class FlowTestPanelComponent {
   readonly unsaved = input(false);
   /** The last run; the editor keeps it, and drops it once the Flow changes. */
   readonly run = input<FlowTestRun | undefined>();
+  /** Beside the Visual flow, only what the selected Step did in the last run; the message is sent from the Tester tab. */
+  readonly stepOnly = input(false);
 
   readonly ran = output<FlowTestRun>();
   readonly start = output<void>();
   readonly saveAndRun = output<void>();
   readonly editStep = output<string>();
+  /** The close button of the side panel, shown with `stepOnly`. */
   readonly closed = output<void>();
+  /** Open Tester, shown with `stepOnly` before the first run. */
+  readonly openTester = output<void>();
 
   readonly body = signal('');
   readonly headers = signal<SendHeader[]>([]);

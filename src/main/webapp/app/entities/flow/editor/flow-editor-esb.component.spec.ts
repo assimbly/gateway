@@ -61,9 +61,10 @@ describe('Flow editor modes', () => {
     let url = '/flow/editor/7?mode=edit&editor=flow&id=7';
     Object.assign(component, {
       viewMode: 'design',
+      designTab: 'flow',
       testView: 'flow',
-      testPanelTab: 'test',
       sidePanelCollapsed: true,
+      tabLayout: 'full',
       selection: { type: 'flow' },
       canvasProblems: [],
       flow: { id: flowId },
@@ -82,21 +83,179 @@ describe('Flow editor modes', () => {
     return { component, url: () => url };
   }
 
-  it('tests the saved Flow with its panel open, and keeps the mode in the URL without loading the Flow again', () => {
+  it('tests the saved Flow on the Visual flow without the side panel, and keeps the mode in the URL without loading the Flow again', () => {
     const { component, url } = editor();
 
     component.setMode('test');
 
     expect(component.viewMode).toBe('test');
-    expect(component.testOpen).toBe(true);
-    expect(component.sidePanelCollapsed).toBe(false);
+    expect(component.testView).toBe('flow');
+    expect(component.sidePanelShown).toBe(false);
     expect(url()).toBe('/flow/editor/7?mode=edit&editor=flow&id=7&view=test');
     expect((component as any).router.navigate).not.toHaveBeenCalled();
 
     component.setMode('design');
 
-    expect(component.testOpen).toBe(false);
+    expect(component.viewMode).toBe('design');
     expect(url()).toBe('/flow/editor/7?mode=edit&editor=flow&id=7');
+  });
+
+  it('opens Test on the Tester tab with the Test button, and shows a clicked Step beside the Visual flow', () => {
+    const { component } = editor();
+
+    component.openTest();
+
+    expect(component.viewMode).toBe('test');
+    expect(component.activeTab).toBe('tester');
+    expect(component.canvasShown).toBe(false);
+    expect(component.toolbarTabs.map(tab => tab.label)).toEqual(['Visual flow', 'Tester', 'Stats', 'Log', 'Camel route']);
+
+    component.showTab('flow');
+    component.onSelectionChange({ type: 'step', key: 's1' });
+
+    expect(component.sidePanelShown).toBe(true);
+  });
+
+  describe('tab layout', () => {
+    const shows = (component: FlowEditorEsbComponent) => ({ canvas: component.canvasShown, tab: component.tabShown });
+
+    it('shows a tab full page, beside the canvas, or not at all, with < and >', () => {
+      const { component } = editor();
+      component.showTab('settings');
+      expect(shows(component)).toEqual({ canvas: false, tab: true });
+
+      component.tabToRight();
+      expect(component.tabLayout).toBe('panel');
+      expect(shows(component)).toEqual({ canvas: true, tab: true });
+
+      component.tabToRight();
+      expect(component.tabLayout).toBe('closed');
+      expect(shows(component)).toEqual({ canvas: true, tab: false });
+
+      component.tabToLeft();
+      expect(component.tabLayout).toBe('panel');
+
+      component.tabToLeft();
+      expect(component.tabLayout).toBe('full');
+      expect(shows(component)).toEqual({ canvas: false, tab: true });
+    });
+
+    it('keeps the layout for every tab, also in Test, and shows only the canvas on the Visual flow', () => {
+      const { component } = editor();
+      component.showTab('notes');
+      component.tabToRight();
+
+      component.showTab('editor');
+      expect(shows(component)).toEqual({ canvas: true, tab: true });
+
+      component.setMode('test');
+      component.showTab('stats');
+      expect(component.tabLayout).toBe('panel');
+      expect(shows(component)).toEqual({ canvas: true, tab: true });
+
+      component.showTab('flow');
+      expect(shows(component)).toEqual({ canvas: true, tab: false });
+    });
+
+    it('opens another tab in the panel while the panel is closed', () => {
+      const { component } = editor();
+      component.showTab('settings');
+      component.tabToRight();
+      component.tabToRight();
+
+      component.showTab('notes');
+
+      expect(component.tabLayout).toBe('panel');
+      expect(shows(component)).toEqual({ canvas: true, tab: true });
+    });
+
+    it('opens the Tester in the panel with the Test button while the panel is closed', () => {
+      const { component } = editor();
+      component.showTab('notes');
+      component.tabToRight();
+      component.tabToRight();
+
+      component.openTest();
+
+      expect(component.activeTab).toBe('tester');
+      expect(component.tabLayout).toBe('panel');
+    });
+  });
+
+  describe('Design tabs', () => {
+    it('shows the side panel while a Step, Steps or a Branch is selected, and hides it on a click on the empty canvas', () => {
+      const { component } = editor();
+
+      expect(component.sidePanelShown).toBe(false);
+
+      component.onSelectionChange({ type: 'step', key: 's1' });
+      expect(component.sidePanelShown).toBe(true);
+
+      component.onSelectionChange({ type: 'link', to: 's2' });
+      expect(component.sidePanelShown).toBe(true);
+
+      component.onSelectionChange({ type: 'flow' });
+      expect(component.sidePanelShown).toBe(false);
+    });
+
+    it('closes the side panel with its close button, and keeps the Step selected', () => {
+      const { component } = editor();
+      component.onSelectionChange({ type: 'step', key: 's1' });
+
+      component.closePanel();
+
+      expect(component.sidePanelShown).toBe(false);
+      expect(component.selection).toEqual({ type: 'step', key: 's1' });
+    });
+
+    it('shows no side panel on the other tabs, and hides the canvas behind them', () => {
+      const { component } = editor();
+      component.onSelectionChange({ type: 'step', key: 's1' });
+
+      component.showTab('settings');
+
+      expect(component.designTab).toBe('settings');
+      expect(component.activeTab).toBe('settings');
+      expect(component.sidePanelShown).toBe(false);
+      expect(component.canvasShown).toBe(false);
+      expect(component.toolbarTabs.map(tab => tab.label)).toEqual(['Visual flow', 'Editor', 'Error handler', 'Settings', 'Notes']);
+    });
+
+    it('shows the Step clicked on the Visual flow full page on the Editor tab with <', () => {
+      const { component } = editor();
+      component.showTab('notes');
+      component.tabToRight();
+      component.showTab('flow');
+      component.onSelectionChange({ type: 'step', key: 's1' });
+
+      component.showSelectionFullPage();
+
+      expect(component.activeTab).toBe('editor');
+      expect(component.tabLayout).toBe('full');
+      expect({ canvas: component.canvasShown, tab: component.tabShown }).toEqual({ canvas: false, tab: true });
+      expect(component.selection).toEqual({ type: 'step', key: 's1' });
+    });
+
+    it('opens a double-clicked Step on the Editor tab', () => {
+      const { component } = editor();
+
+      component.openStepEditor('s1');
+
+      expect(component.designTab).toBe('editor');
+      expect(component.selection).toEqual({ type: 'step', key: 's1' });
+    });
+
+    it('opens a Step double-clicked in Test beside the Visual flow in Design', () => {
+      const { component } = editor();
+      component.showDesignTab('notes');
+      component.setMode('test');
+
+      component.openStepEditor('s1');
+
+      expect(component.viewMode).toBe('design');
+      expect(component.designTab).toBe('flow');
+      expect(component.sidePanelShown).toBe(true);
+    });
   });
 
   it('has nothing to test before the Flow is saved', () => {
@@ -258,6 +417,7 @@ describe('Flow editor modes', () => {
 
     expect(start).toHaveBeenCalledWith(7);
     expect(component.viewMode).toBe('test');
+    expect(component.testView).toBe('tester');
     expect(url()).toContain('view=test');
   });
 });
@@ -308,8 +468,8 @@ describe('Route editor', () => {
     Object.assign(component, {
       viewMode: 'design',
       testView: 'flow',
-      testPanelTab: 'test',
       sidePanelCollapsed: true,
+      tabLayout: 'full',
       selection: { type: 'flow' },
       flow: { id: 7 },
       activeEditor: 'route',
@@ -396,8 +556,22 @@ describe('Route editor', () => {
 
     expect(component.hasModes).toBe(true);
     expect(component.viewMode).toBe('test');
-    expect(component.testTabs.map(tab => tab.label)).toEqual(['Routes', 'Log', 'Camel route']);
+    expect(component.testTabs.map(tab => tab.label)).toEqual(['Routes', 'Tester', 'Stats', 'Log', 'Camel route']);
     expect(url()).toBe('/flow/editor/7?mode=edit&editor=route&id=7&view=test');
+  });
+
+  it('shows the Error handler and the Tester beside the Routes, as the visual editor does beside its canvas', () => {
+    const { component } = editor();
+    expect(component.firstTab).toBe('routes');
+
+    component.showTab('errorHandler');
+    component.tabToRight();
+    expect({ routes: component.canvasShown, tab: component.tabShown }).toEqual({ routes: true, tab: true });
+
+    component.setMode('test');
+    component.showTab('tester');
+    expect(component.firstTab).toBe('flow');
+    expect({ routes: component.canvasShown, tab: component.tabShown }).toEqual({ routes: true, tab: true });
   });
 });
 
@@ -427,9 +601,9 @@ describe('Script editor', () => {
     Object.assign(component, {
       viewMode: 'design',
       testView: 'flow',
-      testPanelTab: 'test',
       scriptTab: 'scripts',
       sidePanelCollapsed: true,
+      tabLayout: 'full',
       selection: { type: 'flow' },
       flow: { id: 7 },
       activeEditor: 'script',
@@ -526,7 +700,7 @@ describe('Script editor', () => {
     component.setMode('test');
 
     expect(component.viewMode).toBe('test');
-    expect(component.testTabs.map(tab => tab.label)).toEqual(['Scripts', 'Log', 'Camel route']);
+    expect(component.testTabs.map(tab => tab.label)).toEqual(['Scripts', 'Tester', 'Stats', 'Log', 'Camel route']);
     expect(url()).toBe('/flow/editor/7?mode=edit&editor=script&id=7&view=test');
 
     component.onTestRan({ runId: 'r', status: 'completed', durationMillis: 4, response: null, steps: [stepRun('2', 'completed')] });

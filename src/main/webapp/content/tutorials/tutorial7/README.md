@@ -80,10 +80,10 @@ The route editor opens, with a field to write the route in instead of a canvas.
 
 <!-- step: {"check":"flowCompleted:SimpleRoute"} -->
 
-1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] @ flow:SimpleRoute --> The editor switches from **Code** to **Test**.
-2. Under **Body**, type `Hello Camel` <!-- show: .flow-test .body-codemirror @ flow:SimpleRoute:test --> and click **Run**. <!-- show: [data-cy="test-run"] @ flow:SimpleRoute:test -->
+1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] @ flow:SimpleRoute --> The editor switches from **Code** to the **Tester** tab of **Test**. <!-- show: [data-cy="test-view-tester"] @ flow:SimpleRoute:test -->
+2. Under **Body**, type `Hello Camel` and click **Run**. <!-- show: [data-cy="test-run"] @ flow:SimpleRoute:test -->
 
-The panel shows **Passed**. Your message is now a file in `@{messages}/out`.
+The Tester shows **Passed**. Your message is now a file in `@{messages}/out`.
 
 ![The route is running](03-route-running.png)
 

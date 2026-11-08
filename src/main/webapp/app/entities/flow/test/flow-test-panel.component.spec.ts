@@ -116,7 +116,7 @@ describe('Flow test panel', () => {
 
     expect(text('[data-cy="test-summary"]')).toContain('Failed in 42 ms');
     expect(text('[data-cy="test-error"]')).toContain('Multiple consumers for the same endpoint is not allowed');
-    expect(fixture.nativeElement.textContent).toContain('Select a Step on the canvas');
+    expect(fixture.nativeElement.textContent).toContain('Select a Step on the Visual flow');
     expect(runButton().textContent).toContain('Run again');
   });
 
@@ -132,6 +132,41 @@ describe('Flow test panel', () => {
     fixture.detectChanges();
 
     expect(text('[data-cy="test-body"]')).toBe('Hello world');
+  });
+
+  describe('beside the Visual flow', () => {
+    beforeEach(() => fixture.componentRef.setInput('stepOnly', true));
+
+    it('shows only what the selected Step did, without the message to send', () => {
+      fixture.componentRef.setInput('run', FAILED_RUN);
+      fixture.componentRef.setInput('selectedKey', 'step-11');
+      fixture.detectChanges();
+
+      expect(text('[data-cy="test-body"]')).toBe('Hello');
+      expect(fixture.nativeElement.querySelector('[data-cy="test-run"]')).toBeNull();
+      expect(fixture.nativeElement.querySelector('jhi-send-message-editor')).toBeNull();
+    });
+
+    it('points to the Tester tab before the first run, and closes', () => {
+      const opened = jest.fn();
+      const closed = jest.fn();
+      fixture.componentInstance.openTester.subscribe(opened);
+      fixture.componentInstance.closed.subscribe(closed);
+      fixture.detectChanges();
+
+      expect(text('[data-cy="test-no-run"]')).toContain('Run a test on the Tester tab');
+      buttonNamed('Open Tester').click();
+      fixture.nativeElement.querySelector('.btn-close').click();
+
+      expect(opened).toHaveBeenCalledTimes(1);
+      expect(closed).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('has no close button on the Tester tab', () => {
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.btn-close')).toBeNull();
   });
 
   it('tells which Steps the message never reached', () => {
@@ -204,7 +239,7 @@ describe('Flow test panel', () => {
       const content = fixture.nativeElement.textContent;
       expect(content).toContain('into the first Route');
       expect(text('[data-cy="test-summary"]')).toBe('Failed in 42 ms');
-      expect(content).not.toContain('Select a Step on the canvas');
+      expect(content).not.toContain('Select a Step on the Visual flow');
       expect(content).not.toContain("Send to the Source's endpoint instead");
     });
 
@@ -239,7 +274,7 @@ describe('Flow test panel', () => {
       expect(content).toContain('into the first Script');
       expect(text('[data-cy="test-summary"]')).toContain('Step runs completed');
       expect(content).toContain('Each Script shows what it made of the message.');
-      expect(content).not.toContain('Select a Step on the canvas');
+      expect(content).not.toContain('Select a Step on the Visual flow');
       expect(content).toContain("Send to the Source's endpoint instead");
     });
 

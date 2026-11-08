@@ -5,7 +5,7 @@
 **What you'll learn**
 
 * Find out why a Flow doesn't start
-* Spot failed messages: the Test panel, stats and alerts
+* Spot failed messages: the Tester, stats and alerts
 
 It takes about 8 minutes.
 
@@ -43,7 +43,7 @@ The editor opens with a copy of *TestFlow*, without a name.
 
 > **Why does this fail?** The `out2` folder doesn't exist. Normally the File component creates a missing folder, but with **Auto Create** off it can't. So every file this Flow tries to deliver fails.
 
-> **Tip: no settings on the right?** Click **Show panel**.
+> **Tip: where are the settings?** Clicking a Step opens its settings on the right, and **>** at the right of the tabs hides them.
 
 ## Step 3: Find out why a Flow doesn't start
 
@@ -68,21 +68,24 @@ The editor opens with a copy of *TestFlow*, without a name.
 1. Stop *TestFlow*: on **Flows → Manage**, click **■** in its row. <!-- show: tr[data-flow-name="TestFlow"] [aria-label="Stop"] @ / -->
 2. Open *DebugFlow*. If it opens in **Design**, click **Test**. <!-- show: [data-cy="mode-toggle"] @ flow:DebugFlow -->
 3. Click **▶** (Start). <!-- show: [data-tour="flow-status-controls"] @ flow:DebugFlow:test --> This time the Flow starts.
-4. Under **Body**, type `Hello Assimbly` <!-- show: .flow-test .body-codemirror @ flow:DebugFlow:test --> and click **Run**. <!-- show: [data-cy="test-run"] @ flow:DebugFlow:test -->
+4. Click the **Tester** tab. <!-- show: [data-cy="test-view-tester"] @ flow:DebugFlow:test -->
+5. Under **Body**, type `Hello Assimbly` and click **Run**. <!-- show: [data-cy="test-run"] @ flow:DebugFlow:test -->
 
-The panel shows **Failed**, with the error. The Sink turns red on the canvas.
+The Tester shows **Failed**, with the error. On the **Visual flow** tab the Sink is red; click it to see the error of that Step.
+
+> **Tip: test beside the canvas** Click **>** at the right of the tabs <!-- show: [data-cy="tab-right"] @ flow:DebugFlow:test --> to keep the Tester in a panel beside the canvas, so you see the Sink turn red as you run.
 
 ![The Flow fails](03-flow-failed.png)
 
-5. Click the **Alerts** badge. <!-- show: [data-tour="flow-alert-badge"] @ flow:DebugFlow --> The newest alert is on top: `Cannot store file: ...messages\out2\...`. The Sink can't write to the `out2` folder.
+6. Click the **Alerts** badge. <!-- show: [data-tour="flow-alert-badge"] @ flow:DebugFlow --> The newest alert is on top: `Cannot store file: ...messages\out2\...`. The Sink can't write to the `out2` folder.
 
 ![Alert details](04-alert-details.png)
 
-6. When you're done, click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] @ flow:DebugFlow:test -->
+7. When you're done, click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] @ flow:DebugFlow:test -->
 
-> **Where else do I see failures?** The **Stats** tab <!-- show: [data-cy="panel-stats"] @ flow:DebugFlow:test --> counts the message under **Failed**. In the *Alerts* panel, **Clear** removes the alerts, for everyone.
+> **Where else do I see failures?** The **Stats** tab <!-- show: [data-cy="test-view-stats"] @ flow:DebugFlow:test --> counts the message under **Failed**. In the *Alerts* panel, **Clear** removes the alerts, for everyone.
 
-> **Where did my message go?** The Flow's **Error handler** takes care of failed messages. By default it writes the error to the Gateway log. To change that, click **Design**, then **Error handler** in the toolbar.
+> **Where did my message go?** The Flow's **Error handler** takes care of failed messages. By default it writes the error to the Gateway log. To change that, click **Design**, then the **Error handler** tab.
 
 > **How do I fix the Flow?** Create the `out2` folder, or turn **Auto Create** back on.
 
@@ -91,7 +94,7 @@ The panel shows **Failed**, with the error. The Sink turns red on the canvas.
 | Where | What it tells you |
 |-------|-------------------|
 | **Error** badge | The Flow or one of its Steps didn't start. Click it to see why. |
-| **Test** panel | Runs a message through the running Flow and shows the error of the Step that failed. |
+| **Tester** tab | Runs a message through the running Flow and shows the error of the Step that failed. |
 | **Stats** tab | How many messages went through the Flow, and how many failed. |
 | **Alerts** badge | The errors of this Flow, newest first. They stay until you clear them. |
 

@@ -37,9 +37,13 @@ describe('tutorial anchors', () => {
   it.each([...new Set(selectors.flatMap(selector => [...selector.matchAll(/\[data-cy="([^"]+)"\]/g)].map(match => match[1])))])(
     'a template has data-cy="%s"',
     name => {
-      // Also as a bound name that starts with a fixed prefix, as in [attr.data-cy]="'test-view-' + tab.id", or with a
-      // prefix handed to a template, as in context: { cy: 'script-tab-' }.
-      const prefixes = [...templates.matchAll(/\[attr\.data-cy\]="'([\w-]+)' \+|\bcy: '([\w-]+)'/g)].map(match => match[1] ?? match[2]);
+      // Also as a bound name that starts with a fixed prefix, as in [attr.data-cy]="'test-view-' + tab.id" or
+      // [attr.data-cy]="(test ? 'test-view-' : 'route-tab-') + tab.id", or with a prefix handed to a template, as in
+      // context: { cy: 'script-tab-' }.
+      const prefixes = [
+        ...[...templates.matchAll(/\[attr\.data-cy\]="([^"]*)"/g)].flatMap(binding => [...binding[1].matchAll(/'([\w-]+-)'/g)].map(match => match[1])),
+        ...[...templates.matchAll(/\bcy: '([\w-]+)'/g)].map(match => match[1]),
+      ];
       expect(templates.includes(`data-cy="${name}"`) || prefixes.some(prefix => name.startsWith(prefix))).toBe(true);
     },
   );

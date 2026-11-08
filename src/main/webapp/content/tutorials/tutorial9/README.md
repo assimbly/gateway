@@ -97,7 +97,7 @@ The script editor opens on the **Scripts** tab.
 
 1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] @ flow:Clock -->
 
-Every 10 seconds the scripts run, and the **Stats** tab <!-- show: [data-cy="panel-stats"] @ flow:Clock:test --> counts a run under **Completed**.
+Every 10 seconds the scripts run, and the **Stats** tab <!-- show: [data-cy="test-view-stats"] @ flow:Clock:test --> counts a run under **Completed**.
 
 ![The Flow is running](04-flow-running.png)
 
@@ -110,7 +110,7 @@ Every 10 seconds the scripts run, and the **Stats** tab <!-- show: [data-cy="pan
 > **Try it yourself**
 >
 > * Add the date: click **Code**, <!-- show: [data-cy="mode-toggle"] @ flow:Clock --> change the Simple script to `Hello from Assimbly! It is ${date:now:yyyy-MM-dd HH:mm:ss}` and click **Save & Test**. <!-- show: [data-tour="flow-save-test"] @ flow:Clock -->
-> * Click **Run** in the *Test* panel. Each Script shows what it made of the message, under **Resulting body**.
+> * Click **Run** on the **Tester** tab, then open the **Scripts** tab. Each Script shows what it made of the message, under **Resulting body**.
 > * Break the Groovy script on purpose, for example by writing to a folder that doesn't exist. **Failed** goes up on the **Stats** tab and an **Alerts** badge appears. [Tutorial 2](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow) shows how to find the error.
 
 ## Summary
