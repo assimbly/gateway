@@ -53,6 +53,51 @@ describe('Flow editor Connection of a Step', () => {
   });
 });
 
+describe('Flow editor integer Options', () => {
+  /** The editor of one Action Step with a Timeout Option of this value, without rendering it. */
+  function editor(timeout: string, onCanvas = true): FlowEditorEsbComponent {
+    const component = Object.create(FlowEditorEsbComponent.prototype) as FlowEditorEsbComponent;
+    // On the canvas, unless deleted there: then it is only kept to undo the delete.
+    Object.assign(component, { activeEditor: 'canvas', designer: { current: { steps: onCanvas ? [{ key: 'step-7' }] : [] } } });
+    component.stepKeys = ['step-7'];
+    component.steps = [new Step(7, StepType.ACTION)];
+    component.componentOptions = [[{ name: 'timeout', displayName: 'Timeout', type: 'integer' }]];
+    component.editFlowForm = new FormGroup({
+      stepsData: new FormArray([
+        new FormGroup({ options: new FormArray([new FormGroup({ key: new FormControl('timeout'), value: new FormControl(timeout) })]) }),
+      ]),
+    });
+    return component;
+  }
+
+  it("doesn't save, so doesn't start, a Flow whose integer Option holds something else", () => {
+    const component = editor('10s');
+
+    component.checkForm();
+
+    expect(component.savingFlowFailed).toBe(true);
+    expect(component.savingFlowFailedMessage).toBe('Timeout must be an integer.');
+    expect(component.editFlowForm.valid).toBe(false);
+  });
+
+  it('takes a whole number', () => {
+    const component = editor('1000');
+
+    component.checkForm();
+
+    expect(component.savingFlowFailed).toBeFalsy();
+    expect(component.editFlowForm.valid).toBe(true);
+  });
+
+  it("doesn't check a Step deleted from the canvas", () => {
+    const component = editor('10s', false);
+
+    component.checkForm();
+
+    expect(component.savingFlowFailed).toBeFalsy();
+  });
+});
+
 describe('Flow editor Flow variables', () => {
   /** The editor of a Flow with these Variables, without rendering it. */
   function editor(variables?: Record<string, string>): FlowEditorEsbComponent {

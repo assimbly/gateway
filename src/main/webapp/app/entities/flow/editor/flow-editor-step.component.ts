@@ -18,6 +18,7 @@ import {
   PathPart,
   ValueField,
   groupOptions,
+  notAnInteger,
   pathLabel,
   pathRule,
   requiredOptions,
@@ -385,6 +386,11 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
     const field = valueFieldOf(this.optionSchema(idx) ?? { name: this.optionKey(idx) });
     const value = this.optionValue(idx);
     return field === 'switch' && value !== '' && value !== 'true' && value !== 'false' ? 'text' : field;
+  }
+
+  /** Whether the value of an integer Option isn't one; such a Flow isn't saved or started. */
+  notAnInteger(idx: number): boolean {
+    return notAnInteger(this.optionSchema(idx), this.optionValue(idx));
   }
 
   hasValue(idx: number): boolean {

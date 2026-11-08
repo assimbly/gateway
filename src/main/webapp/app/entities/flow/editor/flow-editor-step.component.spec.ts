@@ -126,6 +126,7 @@ describe('Flow editor Component Step', () => {
 
   const bridgeErrorHandler = { name: 'bridgeErrorHandler', displayName: 'Bridge error handler', type: 'boolean', defaultValue: false };
   const expression = { name: 'expression', displayName: 'Expression', type: 'string' };
+  const timeout = { name: 'timeout', displayName: 'Timeout', type: 'integer' };
 
   function render(
     componentType: string,
@@ -165,7 +166,7 @@ describe('Flow editor Component Step', () => {
       }),
     );
     fixture.componentRef.setInput('stepOptions', options.map(option => ({ ...option })));
-    fixture.componentRef.setInput('componentOptions', [bridgeErrorHandler, expression]);
+    fixture.componentRef.setInput('componentOptions', [bridgeErrorHandler, expression, timeout]);
     fixture.componentRef.setInput('uriPlaceholder', uriPlaceholder);
     fixture.detectChanges();
   }
@@ -191,6 +192,21 @@ describe('Flow editor Component Step', () => {
     const actions: HTMLElement = pathField().closest('.step-field')!.querySelector('.step-field__head .step-field__actions')!;
     expect(actions.querySelector('[aria-label="Insert a Variable"]')).not.toBeNull();
     expect(actions.querySelector('[aria-label="Edit the path in a larger editor"]')).not.toBeNull();
+  });
+
+  it('says when an integer Option holds something else', () => {
+    render('file', 'file:directoryName', [{ key: 'timeout', value: '10s' }]);
+
+    expect(fixture.nativeElement.querySelector('.invalid-field-message')?.textContent).toContain('Timeout must be an integer.');
+  });
+
+  it('takes a whole number or a Variable for an integer Option', () => {
+    render('file', 'file:directoryName', [
+      { key: 'timeout', value: '1000' },
+      { key: 'timeout', value: '@{timeout}' },
+    ]);
+
+    expect(fixture.nativeElement.querySelector('.invalid-field-message')).toBeNull();
   });
 
   it('shows an unset switch Option as off by default', () => {

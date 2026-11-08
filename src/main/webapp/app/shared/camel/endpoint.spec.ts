@@ -1,4 +1,4 @@
-import { OptionSchema, groupOptions, missingPathParts, pathLabel, pathRule, requiredOptions, splitHttpUrl, suggestedOptions, valueFieldOf } from './endpoint';
+import { OptionSchema, groupOptions, missingPathParts, pathLabel, pathRule, requiredOptions, splitHttpUrl, suggestedOptions, valueFieldOf, notAnInteger } from './endpoint';
 
 const sftp: Record<string, Omit<OptionSchema, 'name'>> = {
   host: { kind: 'path', displayName: 'Host', group: 'common', type: 'string', required: true, description: 'Hostname of the FTP server' },
@@ -65,6 +65,22 @@ describe('Endpoint editing', () => {
       [undefined, 'text'],
     ] as const)('gives an Option of %o a %s field', (option, field) => {
       expect(valueFieldOf(option)).toBe(field);
+    });
+  });
+
+  describe('integer values', () => {
+    it.each(['1000', ' 5 ', '-1', '+3', '', '@{timeout}', '{{timeout}}', '${header.size}'])('takes %p for an integer Option', value => {
+      expect(notAnInteger({ type: 'integer' }, value)).toBe(false);
+    });
+
+    it.each(['1.5', '10s', 'abc', '1 000', '1e3'])('refuses %p for an integer Option', value => {
+      expect(notAnInteger({ type: 'integer' }, value)).toBe(true);
+    });
+
+    it('leaves the values of other Options alone', () => {
+      expect(notAnInteger({ type: 'number' }, '1.5')).toBe(false);
+      expect(notAnInteger({ type: 'string' }, 'abc')).toBe(false);
+      expect(notAnInteger(undefined, 'abc')).toBe(false);
     });
   });
 

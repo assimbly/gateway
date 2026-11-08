@@ -109,10 +109,9 @@
     </ng-container>
   </f-canvas>
 
-  <!-- Shift+drag on the background draws a box that selects the Steps in it. Alone in its @if, so Foblex gets it. -->
-  @if (!readOnly) {
-    <f-selection-area></f-selection-area>
-  }
+  <!-- Shift+drag on the background draws a box that selects the Steps in it. Alone in its @if, without even whitespace
+       around it (Foblex preserves whitespace), so it's projected into Foblex's selection-area slot. -->
+  @if (!readOnly) {<f-selection-area></f-selection-area>}
 
   <!-- Declared here, inside the flow, so the minimap can reach it; the editor shows it in a corner of the canvas. -->
   <ng-template #minimap>

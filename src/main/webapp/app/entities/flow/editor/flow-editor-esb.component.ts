@@ -17,6 +17,7 @@ import { ConnectionDialogComponent } from 'app/entities/connection/connection-di
 import { ConnectionPopupService } from 'app/entities/connection/connection-popup.service';
 import { Components } from "app/shared/camel/component-type";
 import { Connections } from "app/shared/camel/connections";
+import { notAnInteger } from "app/shared/camel/endpoint";
 import { Link, ILink } from "app/shared/model/link.model";
 import { Step, StepType, IStep } from "app/shared/model/step.model";
 import { Flow, IFlow, LogLevelType } from "app/shared/model/flow.model";
@@ -920,8 +921,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		this.notesPopoverMessage = `Notes to document the flow.`;
 
     this.componentPopoverMessage = `The component to use (scheme). Click on the docs icon for online documentation.`;
-    this.optionsPopoverMessage = `Options for the selected component. Hover the option for more information.`;
-    this.optionsPopoverMessage = ``;
+    this.optionsPopoverMessage = `Endpoint options are optional settings that configure how an endpoint behaves.`;
     this.messagePopoverMessage = `A group of key/value pairs to add to the message header.<br/><br/> Use the button on the right to create or edit a header.`;
     this.routePopoverMessage = `A Camel route defined in XML.<br/><br/>`;
     this.connectionPopoverMessage = `If available then a connection can be selected. For example a database connection that sets up a connection.<br/><br/>
@@ -2163,7 +2163,29 @@ splitOptions4(options: string): string[] {
       					}
       				},
       );
+      this.checkIntegerOptions();
   }
+
+	/** Marks each integer Option whose value isn't one, so the Flow isn't saved or started. Deleted canvas Steps are skipped. */
+	private checkIntegerOptions(): void {
+		const stepsData = this.editFlowForm.controls.stepsData as FormArray;
+		const onCanvas = this.useCanvas ? new Set([...(this.designer?.current.steps ?? []).map(s => s.key), ERROR_STEP_KEY]) : undefined;
+		stepsData.controls.forEach((stepForm, index) => {
+			if (onCanvas && !onCanvas.has(this.stepKeys[index])) {
+				return;
+			}
+			((stepForm.get('options') as FormArray)?.controls ?? []).forEach(row => {
+				const schema = this.componentOptions[index]?.find(option => option.name === row.get('key')?.value);
+				const value = row.get('value')!;
+				if (notAnInteger(schema, value.value)) {
+					value.setErrors({ integer: true });
+					value.markAsTouched();
+					this.savingFlowFailedMessage = `${schema.displayName ?? schema.name} must be an integer.`;
+					this.savingFlowFailed = true;
+				}
+			});
+		});
+	}
 
 	private subscribeToSaveResponse(result: Observable<Flow>): void {
 		result.subscribe(

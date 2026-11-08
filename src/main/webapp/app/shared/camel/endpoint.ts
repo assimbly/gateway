@@ -95,6 +95,18 @@ export function valueFieldOf(option: (Pick<OptionSchema, 'type' | 'enum' | 'secr
   }
 }
 
+/**
+ * Whether a value can't be used for this Option: an `integer` Option takes a whole number, or a placeholder such as
+ * `@{key}` or `{{key}}` that gets its number later. An empty value leaves the default.
+ */
+export function notAnInteger(option: Pick<OptionSchema, 'type'> | undefined, value: string | null | undefined): boolean {
+  const text = `${value ?? ''}`.trim();
+  if (option?.type !== 'integer' || !text || text.includes('@{') || text.includes('{{') || text.includes('${')) {
+    return false;
+  }
+  return !/^[+-]?\d+$/.test(text);
+}
+
 /** The required Options a Step of this role needs; they are pre-added and warned about, but don't make a Draft. */
 export function requiredOptions(properties: OptionSchema[], role: EndpointRole): string[] {
   return properties.filter(option => option.kind !== 'path' && option.required && fitsRole(option, role)).map(option => option.name);

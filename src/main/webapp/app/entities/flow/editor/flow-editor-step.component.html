@@ -405,6 +405,9 @@
               </div>
             </div>
           </div>
+          @if (notAnInteger(idx)) {
+            <div class="invalid-field-message">*{{ optionTitle(idx) }} must be an integer.</div>
+          }
           }
           } @empty {
             <div class="step-field__hint">No options yet.</div>
