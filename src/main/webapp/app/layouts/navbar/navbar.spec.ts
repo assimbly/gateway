@@ -135,6 +135,12 @@ describe('Navbar Component', () => {
     expect(comp.sidebarInert()).toBe(false);
   });
 
+  it('should hide the sidebar while the user still has to replace a default password', () => {
+    accountService.authenticate({ ...account, passwordChangeRequired: true });
+
+    expect(comp.sidebarVisible()).toBe(false);
+  });
+
   it('should treat flows and admin child routes as active', () => {
     expect(comp.isFlowsActive()).toBe(true);
     expect(comp.isFlowListActive()).toBe(true);

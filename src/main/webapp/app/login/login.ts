@@ -29,6 +29,8 @@ export default class Login implements OnInit, AfterViewInit {
       .pipe(map(info => info.registration === true)),
     { initialValue: false },
   );
+  /** A first-time user on this computer is told how to sign in the first time. */
+  readonly firstSignIn = toSignal(inject(LoginService).firstSignIn(), { initialValue: false });
 
   loginForm = new FormGroup({
     username: new FormControl('', { nonNullable: true, validators: [Validators.required] }),

@@ -24,6 +24,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -80,7 +81,7 @@ class SecureDefaultsIntTest {
         mockMvc.perform(get("/api/account").header(HttpHeaders.AUTHORIZATION, bearer(token)))
             .andExpect(result -> assertThat(result.getResponse().getStatus()).isNotEqualTo(403));
         mockMvc.perform(post("/api/account/change-password").header(HttpHeaders.AUTHORIZATION, bearer(token))
-                .contentType(MediaType.APPLICATION_JSON).content("{\"currentPassword\":\"operator\",\"newPassword\":\"a-new-one\"}"))
+                .contentType(MediaType.APPLICATION_JSON).content("{\"currentPassword\":\"operator\",\"newPassword\":\"a-new-password\"}"))
             .andExpect(result -> assertThat(result.getResponse().getStatus()).isNotEqualTo(403));
 
         gate.clear("operator");
@@ -105,6 +106,34 @@ class SecureDefaultsIntTest {
         }
         mockMvc.perform(get("/management/env").header(HttpHeaders.AUTHORIZATION, bearer(token("operator", "ROLE_USER", "ROLE_ADMIN"))))
             .andExpect(status().isOk());
+    }
+
+    @Test
+    void aNewPasswordNeedsTwelveCharactersOfAnyKind() throws Exception {
+        String token = token("operator", "ROLE_USER");
+
+        mockMvc.perform(post("/api/account/change-password").header(HttpHeaders.AUTHORIZATION, bearer(token))
+                .contentType(MediaType.APPLICATION_JSON).content("{\"currentPassword\":\"operator\",\"newPassword\":\"elevenchars\"}"))
+            .andExpect(status().isBadRequest());
+        mockMvc.perform(post("/api/account/change-password").header(HttpHeaders.AUTHORIZATION, bearer(token))
+                .contentType(MediaType.APPLICATION_JSON).content("{\"currentPassword\":\"operator\",\"newPassword\":\"twelve chars\"}"))
+            .andExpect(result -> assertThat(result.getResponse().getStatus()).isNotEqualTo(400));
+    }
+
+    @Test
+    void theSignInPageTellsOnlyAFirstTimeUserOnThisComputerHowToSignIn() throws Exception {
+        mockMvc.perform(get("/api/account/first-sign-in")).andExpect(status().isOk()).andExpect(content().string("true"));
+        mockMvc.perform(get("/api/account/first-sign-in").with(request -> {
+            request.setRemoteAddr("192.168.1.20");
+            return request;
+        })).andExpect(content().string("false"));
+
+        gate.clear("admin");
+        try {
+            mockMvc.perform(get("/api/account/first-sign-in")).andExpect(content().string("false"));
+        } finally {
+            gate.require("admin");
+        }
     }
 
     @Test

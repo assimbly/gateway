@@ -58,7 +58,8 @@ export default class Navbar implements OnInit {
   readonly tutorialPanel = inject(TutorialPanelState);
   private readonly theme = inject(ThemeService);
   readonly brandIcon = computed(() => (this.theme.appearance() === 'dark' ? 'logo_darkmode.svg' : 'logo_lightmode.svg'));
-  readonly sidebarVisible = computed(() => this.account() !== null);
+  /** No menu while the user still has to replace a default password. */
+  readonly sidebarVisible = computed(() => this.account() !== null && !this.account()?.passwordChangeRequired);
   readonly sidebarInert = computed(() => !this.sidebarVisible() || (!this.layout.isDesktop() && !this.layout.mobileOpen()));
 
   private readonly loginService = inject(LoginService);

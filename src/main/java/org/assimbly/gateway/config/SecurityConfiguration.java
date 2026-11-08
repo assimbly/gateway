@@ -102,6 +102,7 @@ public class SecurityConfiguration {
 
                     // API authentication and password reset
                     .requestMatchers(HttpMethod.POST, "/api/authenticate").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/account/first-sign-in").permitAll()
                     .requestMatchers("/api/account/reset-password/init").permitAll()
                     .requestMatchers("/api/account/reset-password/finish").permitAll();
 

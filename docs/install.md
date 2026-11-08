@@ -37,9 +37,11 @@ If Assimbly cannot start, a window **Assimbly could not start** names the log fi
 1. Sign in with:
    * **Username**: `admin`
    * **Password**: `admin`
-2. Because everyone knows the default password, Assimbly immediately asks you to choose your own password:
+
+   The sign-in page reminds you of this on your own computer, until you have chosen your own password.
+2. Because everyone knows the default password, Assimbly asks you to choose your own password before anything else (the menu appears only after that):
    * Type `admin` as the **Current password**
-   * Type your **New password** twice and click **Save**
+   * Type your **New password** twice and click **Save**. It needs at least 12 characters; any characters count, no capitals, digits or symbols needed. A few words in a row make a good one.
 
 You now land on **Flows → Manage**! Click **Tutorials** at the top of the screen and select **Quick start** to run your first Flow right inside Assimbly.
 

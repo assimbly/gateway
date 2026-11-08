@@ -25,7 +25,7 @@
       <img class="app-topbar__brand-icon" [src]="brandIcon()" alt="" aria-hidden="true" />
       <span jhiTranslate="global.title">Gateway</span>
     </a>
-    @if (!sidebarVisible()) {
+    @if (!signedIn()) {
       <div class="app-topbar__actions">
         <a class="app-topbar__link" routerLink="/login" id="login" data-cy="login">
           <span jhiTranslate="global.menu.account.login">Log in</span>

@@ -36,7 +36,9 @@ const PASSWORD_PAGE = '/account/password';
 export default class Main implements OnInit {
   readonly layout = inject(LayoutService);
   readonly tutorialPanel = inject(TutorialPanelState);
-  readonly sidebarVisible = computed(() => this.accountService.isAuthenticated());
+  readonly signedIn = computed(() => this.accountService.isAuthenticated());
+  /** No menu while a user still has to replace a default password: the Password page is all they can use. */
+  readonly sidebarVisible = computed(() => this.signedIn() && !this.accountService.account()?.passwordChangeRequired);
   /** Whether the Gateway lets anyone create an account; otherwise an administrator adds users. */
   readonly registration = toSignal(
     inject(ProfileService)

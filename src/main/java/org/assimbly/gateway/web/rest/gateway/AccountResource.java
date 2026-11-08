@@ -4,7 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.assimbly.gateway.config.ApplicationProperties;
+import org.assimbly.gateway.config.security.PasswordChangeGate;
 import org.assimbly.gateway.domain.User;
 import org.assimbly.gateway.repository.UserRepository;
 import org.assimbly.gateway.security.SecurityUtils;
@@ -26,6 +28,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import tech.jhipster.config.JHipsterConstants;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Optional;
 
 /**
@@ -51,14 +55,17 @@ public class AccountResource {
 
     private final MailService mailService;
 
+    private final PasswordChangeGate passwordChangeGate;
+
     /** Anyone may create an account: on dev, or when application.security.registration is on. */
     private final boolean registrationOpen;
 
     public AccountResource(UserRepository userRepository, UserService userService, MailService mailService,
-                           ApplicationProperties applicationProperties, Environment env) {
+                           PasswordChangeGate passwordChangeGate, ApplicationProperties applicationProperties, Environment env) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.mailService = mailService;
+        this.passwordChangeGate = passwordChangeGate;
         this.registrationOpen = applicationProperties.getSecurity().isRegistration() ||
             env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT));
     }
@@ -83,6 +90,27 @@ public class AccountResource {
         }
         User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
         mailService.sendActivationEmail(user);
+    }
+
+    /**
+     * {@code GET  /account/first-sign-in} : whether the sign-in page may tell a first-time user to sign in with the
+     * default account {@code admin}. Only while it still has its default password, and only to a browser on the
+     * Gateway's own computer: someone elsewhere on the network is not told. Behind a proxy on the same computer, set
+     * {@code server.forward-headers-strategy} so the visitor's own address is the one checked.
+     */
+    @Operation(summary = "Whether the sign-in page shows how to sign in the first time")
+    @GetMapping("/account/first-sign-in")
+    public boolean isFirstSignIn(HttpServletRequest request) {
+        return passwordChangeGate.isRequired("admin") && isLocal(request.getRemoteAddr());
+    }
+
+    static boolean isLocal(String address) {
+        try {
+            // An IP address as the servlet container gives it: no name lookup happens
+            return address != null && InetAddress.getByName(address).isLoopbackAddress();
+        } catch (UnknownHostException _) {
+            return false;
+        }
     }
 
     /**

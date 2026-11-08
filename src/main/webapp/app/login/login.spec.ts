@@ -19,6 +19,7 @@ describe('Login', () => {
   let mockAccountService: AccountService;
   let mockLoginService: LoginService;
   let registration = false;
+  let firstSignIn = false;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -38,6 +39,7 @@ describe('Login', () => {
           provide: LoginService,
           useValue: {
             login: vi.fn(() => of({})),
+            firstSignIn: vi.fn(() => of(firstSignIn)),
           },
         },
         {
@@ -106,6 +108,23 @@ describe('Login', () => {
       registration = false;
 
       expect(open.registration()).toBe(true);
+    });
+  });
+
+  describe('first sign-in', () => {
+    it('says nothing about the default account once it has its own password', () => {
+      expect(comp.firstSignIn()).toBe(false);
+    });
+
+    it('tells a first-time user how to log in and that a new password follows', () => {
+      firstSignIn = true;
+      const first = TestBed.createComponent(Login);
+      firstSignIn = false;
+      first.detectChanges();
+
+      const note = first.nativeElement.querySelector('[data-cy="firstSignIn"]') as HTMLElement;
+      expect(note.textContent).toContain('admin');
+      expect(note.textContent).toContain('at least 12 characters');
     });
   });
 

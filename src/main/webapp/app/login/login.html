@@ -1,6 +1,13 @@
 <div class="login">
   <h1 class="login__title" data-cy="loginTitle" jhiTranslate="login.title">Log in to Gateway</h1>
 
+  @if (firstSignIn()) {
+    <div class="alert alert-info login__first" role="note" data-cy="firstSignIn">
+      <strong>First time here?</strong> Log in with username <strong>admin</strong> and password <strong>admin</strong>. Right after,
+      you choose your own password of at least 12 characters.
+    </div>
+  }
+
   @if (authenticationError()) {
     <div class="alert alert-danger login__error" role="alert" data-cy="loginError" jhiTranslate="login.messages.error.authentication">
       <strong>Failed to log in!</strong> Please check your credentials and try again.
