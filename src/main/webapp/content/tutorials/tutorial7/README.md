@@ -78,8 +78,8 @@ You save the Flow in the next step, when you run it.
 
 <!-- step: {"check":"flowCompleted:SimpleRoute"} -->
 
-1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] @ flow:SimpleRoute --> The editor switches from **Code** to the **Tester** tab of **Test**. <!-- show: [data-cy="test-view-tester"] @ flow:SimpleRoute:test -->
-2. Under **In**, type `Hello, Assimbly!` in **Body** and click **Run**. <!-- show: [data-cy="test-run"] @ flow:SimpleRoute:test -->
+1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] @ flow:SimpleRoute --> The editor switches from **Code** to **Test**, with the **Tester** beside the Routes. <!-- show: [data-cy="test-tester"] @ flow:SimpleRoute:test -->
+2. Under **In**, type `Hello, Assimbly!` in **Body** and click **Test**. <!-- show: [data-cy="test-run"] @ flow:SimpleRoute:test -->
 
 The Tester shows **Passed** under **Out**. Your message is now a file in `@{messages}/out`.
 

@@ -47,6 +47,39 @@ describe('Test message', () => {
     expect(fixture.componentInstance.bodyOptions().mode).toBe('json');
   });
 
+  it('draws the body again when it shows again, as after a test run while it was hidden behind another tab', () => {
+    let resized: (() => void) | undefined;
+    const observed: Element[] = [];
+    const original = (globalThis as { ResizeObserver?: unknown }).ResizeObserver;
+    (globalThis as { ResizeObserver?: unknown }).ResizeObserver = class {
+      constructor(callback: () => void) {
+        resized = callback;
+      }
+      observe(target: Element): void {
+        observed.push(target);
+      }
+      disconnect(): void {}
+    };
+    jest.spyOn(window, 'requestAnimationFrame').mockImplementation(callback => {
+      callback(0);
+      return 0;
+    });
+    try {
+      const wrapper = document.createElement('div');
+      const codeMirror = { refresh: jest.fn(), getWrapperElement: () => wrapper };
+      fixture.componentInstance.refreshCodeMirror({ codeMirror });
+      codeMirror.refresh.mockClear();
+
+      resized!();
+
+      expect(observed).toEqual([wrapper]);
+      expect(codeMirror.refresh).toHaveBeenCalledTimes(1);
+    } finally {
+      (globalThis as { ResizeObserver?: unknown }).ResizeObserver = original;
+      jest.restoreAllMocks();
+    }
+  });
+
   it('shows the placeholder when there is no message', () => {
     fixture.componentRef.setInput('message', null);
     fixture.componentRef.setInput('placeholder', 'Run the test to see what the Flow sends back.');

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { CodemirrorModule } from '@ctrl/ngx-codemirror';
@@ -44,7 +44,7 @@ export class TestMessageComponent {
   private readonly bodyMode = computed(() => detectResponseMode(this.message()?.body));
 
   /** CodeMirror does not draw itself correctly (no line numbers) until it is refreshed once it is visible. */
-  refreshCodeMirror(editor: { codeMirror?: { refresh: () => void } }): void {
+  refreshCodeMirror(editor: { codeMirror?: TestBodyEditor }): void {
     const codeMirror = editor?.codeMirror;
     if (!codeMirror) {
       return;
@@ -54,5 +54,32 @@ export class TestMessageComponent {
       refresh();
       setTimeout(refresh);
     });
+    this.refreshWhenShown(codeMirror);
   }
+
+  private resizeObserver?: ResizeObserver;
+
+  /**
+   * A body set while the Tester is hidden, such as behind the Stats tab, is not drawn until the editor is refreshed: it
+   * kept showing the last body until clicked. So it refreshes each time it shows again or changes size.
+   */
+  private refreshWhenShown(codeMirror: TestBodyEditor): void {
+    if (typeof ResizeObserver === 'undefined') {
+      return;
+    }
+    this.resizeObserver?.disconnect();
+    // In the next frame: a refresh in the callback can resize the editor, which the observer reports as a loop.
+    this.resizeObserver = new ResizeObserver(() => requestAnimationFrame(() => codeMirror.refresh()));
+    this.resizeObserver.observe(codeMirror.getWrapperElement());
+  }
+
+  constructor() {
+    inject(DestroyRef).onDestroy(() => this.resizeObserver?.disconnect());
+  }
+}
+
+/** The CodeMirror editor of the body, as far as it is used here. */
+interface TestBodyEditor {
+  refresh(): void;
+  getWrapperElement(): HTMLElement;
 }

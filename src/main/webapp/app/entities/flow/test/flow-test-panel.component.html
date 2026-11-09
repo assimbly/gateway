@@ -1,34 +1,29 @@
 <section class="flow-test" aria-labelledby="flow-test-title">
   <div class="flow-test__header">
     <h5 id="flow-test-title" class="mb-0"><fa-icon icon="flask"></fa-icon> Test</h5>
-    @if (stepOnly()) {
-      <button type="button" class="btn-close" aria-label="Close the panel" (click)="closed.emit()"></button>
-    }
   </div>
 
-  @if (!stepOnly()) {
-    @if (blocked(); as reason) {
-      <div class="alert alert-secondary py-2 mb-0 small flow-test__notice" data-cy="test-blocked">
-        <span>{{ reason.text }}</span>
-        @if (reason.action === 'start') {
-          <button type="button" class="btn btn-fx btn-fx-sm btn-fx-success" (click)="start.emit()"><fa-icon icon="play"></fa-icon><span>Start</span></button>
-        }
-      </div>
-    } @else if (unsaved()) {
-      <div class="alert alert-warning py-2 mb-0 small flow-test__notice" data-cy="test-unsaved">
-        <span>A test runs the saved Flow, without your unsaved changes.</span>
-        <button type="button" class="btn btn-fx btn-fx-sm btn-fx-secondary" (click)="saveAndRun.emit()">Save &amp; restart</button>
-      </div>
-    }
+  @if (blocked(); as reason) {
+    <div class="alert alert-secondary py-2 mb-0 small flow-test__notice" data-cy="test-blocked">
+      <span>{{ reason.text }}</span>
+      @if (reason.action === 'start') {
+        <button type="button" class="btn btn-fx btn-fx-sm btn-fx-success" (click)="start.emit()"><fa-icon icon="play"></fa-icon><span>Start</span></button>
+      }
+    </div>
+  } @else if (unsaved()) {
+    <div class="alert alert-warning py-2 mb-0 small flow-test__notice" data-cy="test-unsaved">
+      <span>A test runs the saved Flow, without your unsaved changes.</span>
+      <button type="button" class="btn btn-fx btn-fx-sm btn-fx-secondary" (click)="saveAndRun.emit()">Save &amp; restart</button>
+    </div>
+  }
 
-    @if (graph()) {
-      <div class="btn-group btn-group-sm align-self-start" role="group" aria-label="What the Tester shows">
-        <button type="button" class="btn btn-outline-secondary" data-cy="test-level-flow" title="The message into and out of the whole Flow"
-                [class.active]="level() === 'flow'" [attr.aria-pressed]="level() === 'flow'" (click)="level.set('flow')">Flow</button>
-        <button type="button" class="btn btn-outline-secondary" data-cy="test-level-step" title="The message into and out of the Step selected on the Visual flow"
-                [class.active]="level() === 'step'" [attr.aria-pressed]="level() === 'step'" (click)="level.set('step')">Step</button>
-      </div>
-    }
+  @if (graph()) {
+    <div class="btn-group btn-group-sm align-self-start" role="group" aria-label="What the Tester shows">
+      <button type="button" class="btn btn-outline-secondary" data-cy="test-level-flow" title="The message into and out of the whole Flow"
+              [class.active]="level() === 'flow'" [attr.aria-pressed]="level() === 'flow'" (click)="level.set('flow')">Flow</button>
+      <button type="button" class="btn btn-outline-secondary" data-cy="test-level-step" title="The message into and out of the Step selected on the Visual flow"
+              [class.active]="level() === 'step'" [attr.aria-pressed]="level() === 'step'" (click)="level.set('step')">Step</button>
+    </div>
   }
 
   @if (shownLevel() === 'flow') {
@@ -75,12 +70,7 @@
       </section>
     </div>
   } @else {
-    @if (stepOnly() && !run()) {
-      <p class="small text-muted mb-0" data-cy="test-no-run">Run a test on the Tester tab to see each Step's In and Out.</p>
-      <button type="button" class="btn btn-fx btn-fx-sm btn-fx-secondary align-self-start" (click)="openTester.emit()">
-        <fa-icon icon="flask"></fa-icon><span>Open Tester</span>
-      </button>
-    } @else if (selectedStep(); as step) {
+    @if (selectedStep(); as step) {
       <ng-container *ngTemplateOutlet="subject; context: { kind: 'Step', name: step.label, detail: step.name, edit: selectedKey() }"></ng-container>
       @switch (selectedMark()) {
         @case ('input') {
@@ -92,9 +82,7 @@
         @case (undefined) {
           <div class="flow-test__status">
             <span class="small text-muted">Run the test to see this Step's In and Out.</span>
-            @if (!stepOnly()) {
-              <ng-container *ngTemplateOutlet="runButton; context: { small: true }"></ng-container>
-            }
+            <ng-container *ngTemplateOutlet="runButton; context: { small: true }"></ng-container>
           </div>
         }
         @default {
@@ -103,9 +91,7 @@
               <span class="badge" [class.text-bg-success]="stepResult.status === 'completed'" [class.text-bg-danger]="stepResult.status === 'failed'"
                     [class.text-bg-secondary]="stepResult.status === 'running'">{{ stepStatus(stepResult) }}</span>
               <span class="small text-muted">{{ duration(stepResult.ownMillis) }} in this Step · {{ duration(stepResult.totalMillis) }} with the Steps after it</span>
-              @if (!stepOnly()) {
-                <ng-container *ngTemplateOutlet="runButton; context: { small: true }"></ng-container>
-              }
+              <ng-container *ngTemplateOutlet="runButton; context: { small: true }"></ng-container>
             </div>
             @if (stepResult.error; as error) {
               <ng-container *ngTemplateOutlet="errorDetail; context: { $implicit: error }"></ng-container>
@@ -165,7 +151,7 @@
 <!-- Run, under the message to send; beside a Step's result to run again. -->
 <ng-template #runButton let-small="small">
   <button type="button" class="btn btn-fx btn-fx-primary" [class.btn-fx-sm]="small" data-cy="test-run" [disabled]="!!blocked() || pending()" (click)="runTest()">
-    <fa-icon [icon]="pending() ? 'sync' : run() ? 'redo' : 'play'" [animation]="pending() ? 'spin' : undefined"></fa-icon><span>{{ pending() ? 'Running…' : run() ? 'Run again' : 'Run' }}</span>
+    <fa-icon [icon]="pending() ? 'sync' : run() ? 'redo' : 'play'" [animation]="pending() ? 'spin' : undefined"></fa-icon><span>{{ pending() ? 'Testing…' : run() ? 'Test again' : 'Test' }}</span>
   </button>
 </ng-template>
 

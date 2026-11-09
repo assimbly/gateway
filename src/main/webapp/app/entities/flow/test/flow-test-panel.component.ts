@@ -68,8 +68,6 @@ export class FlowTestPanelComponent {
   readonly unsaved = input(false);
   /** The last run; the editor keeps it, and drops it once the Flow changes. */
   readonly run = input<FlowTestRun | undefined>();
-  /** Beside the Visual flow, only what the selected Step did in the last run; the message is sent from the Tester tab. */
-  readonly stepOnly = input(false);
   /** Whether the Tester is full page, hiding the canvas the Steps are selected on. */
   readonly canvasHidden = input(false);
 
@@ -77,10 +75,6 @@ export class FlowTestPanelComponent {
   readonly start = output<void>();
   readonly saveAndRun = output<void>();
   readonly editStep = output<string>();
-  /** The close button of the side panel, shown with `stepOnly`. */
-  readonly closed = output<void>();
-  /** Open Tester, shown with `stepOnly` before the first run. */
-  readonly openTester = output<void>();
   /** Visual flow, full page: show the canvas beside the Tester, so a Step can be selected. */
   readonly showCanvas = output<void>();
 
@@ -106,7 +100,7 @@ export class FlowTestPanelComponent {
   constructor() {
     afterRenderEffect(() => {
       const result = this.result()?.nativeElement;
-      // Run again draws its result in the same place: the new run and failure are what move it into view.
+      // Test again draws its result in the same place: the new run and failure are what move it into view.
       this.run();
       this.failure();
       if (result && this.revealResult && !this.pending()) {
@@ -165,8 +159,8 @@ export class FlowTestPanelComponent {
     return key ? this.marks().get(key) : undefined;
   });
 
-  /** What is shown: only Step beside the Visual flow, and only Flow without a canvas to select Steps on. */
-  readonly shownLevel = computed<TestLevel>(() => (this.stepOnly() ? 'step' : this.graph() ? this.level() : 'flow'));
+  /** What is shown: only Flow without a canvas to select Steps on. */
+  readonly shownLevel = computed<TestLevel>(() => (this.graph() ? this.level() : 'flow'));
 
   /** The selected Step, named as on the canvas: what it is, and the name the user gave it or else what it works on, such as a folder. */
   readonly selectedStep = computed(() => {

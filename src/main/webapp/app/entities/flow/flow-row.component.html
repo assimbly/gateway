@@ -74,6 +74,18 @@
       type="button"
       ngbDropdownItem
       class="btn-fx-dropdown-item"
+      [disabled]="state.draft"
+      [title]="state.draft ? 'This Flow is a Draft. Finish its design to test it.' : ''"
+      (click)="navigateToFlowEditor('test')"
+    >
+      <fa-icon icon="flask"></fa-icon>
+      <span>Test</span>
+    </button>
+    <button
+      jhiOverflowAction
+      type="button"
+      ngbDropdownItem
+      class="btn-fx-dropdown-item"
       [disabled]="testMessageBlocked !== null"
       [title]="testMessageBlocked ?? ''"
       (click)="sendTestMessage()"

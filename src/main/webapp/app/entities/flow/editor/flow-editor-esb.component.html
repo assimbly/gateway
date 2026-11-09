@@ -255,12 +255,12 @@
       </ng-template>
 
       <!--
-        The Tester and Stats tabs of every editor in Test. Hidden rather than removed behind the other tabs, and never moved
-        between full page and the side panel: the Tester keeps the message typed in it, and the stats keep the counts on the
-        canvas current.
+        The Tester beside the Visual flow (or the Routes or Scripts), and the Stats tab, of every editor in Test. Hidden rather
+        than removed behind the other tabs, and never moved between full page and the side panel: the Tester keeps the message
+        typed in it, and the stats keep the counts on the canvas current.
       -->
       <ng-template #testerAndStats let-entryStepId="entryStepId" let-entryKind="entryKind">
-        <div class="code-flow-pane" [class.d-none]="testView !== 'tester'" data-cy="test-tester">
+        <div class="code-flow-pane" [class.d-none]="testView !== 'flow'" data-cy="test-tester">
           <jhi-flow-test-panel
             [flowId]="flow?.id"
             [flowName]="flow?.name"
@@ -277,7 +277,7 @@
             (saveAndRun)="saveAndTest()"
             (editStep)="editStepFromTest($event)"
             [canvasHidden]="tabLayout === 'full'"
-            (showCanvas)="tabToRight()"
+            (showCanvas)="setTabLayout('panel')"
           />
         </div>
         <div class="code-flow-pane" [class.d-none]="testView !== 'stats'" data-cy="test-stats">
@@ -297,32 +297,23 @@
               </button>
             }
           </div>
-          <!-- < and >: the open tab full page, in the side panel beside the canvas, or closed. -->
-          @if (activeTab !== firstTab) {
+          <!-- The open tab's panel: enlarged to full page, back beside the canvas, or hidden until a tab is clicked. -->
+          @if (tabShown) {
             <div class="flow-designer-toolbar-end flow-designer-layout">
-              @if (tabLayout !== 'full') {
-                @let left = tabLayout === 'closed' ? 'Show the panel' : 'Show full page';
-                <button type="button" class="btn btn-fx btn-fx-ghost" data-cy="tab-left" [title]="left" [attr.aria-label]="left" (click)="tabToLeft()">
-                  <fa-icon icon="chevron-left"></fa-icon>
+              @if (tabLayout === 'panel') {
+                <button type="button" class="btn btn-fx btn-fx-ghost" data-cy="panel-enlarge" title="Show full page" aria-label="Show full page"
+                        (click)="setTabLayout('full')">
+                  <fa-icon icon="up-right-and-down-left-from-center"></fa-icon>
+                </button>
+              } @else {
+                <button type="button" class="btn btn-fx btn-fx-ghost" data-cy="panel-shrink" title="Show in a side panel" aria-label="Show in a side panel"
+                        (click)="setTabLayout('panel')">
+                  <fa-icon icon="down-left-and-up-right-to-center"></fa-icon>
                 </button>
               }
-              @if (tabLayout !== 'closed') {
-                @let right = tabLayout === 'full' ? 'Show it in a side panel' : 'Hide the panel';
-                <button type="button" class="btn btn-fx btn-fx-ghost" data-cy="tab-right" [title]="right" [attr.aria-label]="right" (click)="tabToRight()">
-                  <fa-icon icon="chevron-right"></fa-icon>
-                </button>
-              }
-            </div>
-          } @else if (viewMode === 'design' && sidePanelShown) {
-            <!-- The same < and > for the Step clicked on the Visual flow: on the Editor tab full page, or the panel hidden. -->
-            <div class="flow-designer-toolbar-end flow-designer-layout">
-              <button type="button" class="btn btn-fx btn-fx-ghost" data-cy="panel-full-page" title="Show full page" aria-label="Show full page"
-                      (click)="showSelectionFullPage()">
-                <fa-icon icon="chevron-left"></fa-icon>
-              </button>
-              <button type="button" class="btn btn-fx btn-fx-ghost" data-cy="panel-close" title="Hide the panel" aria-label="Hide the panel"
-                      aria-controls="flow-designer-panel" (click)="closePanel()">
-                <fa-icon icon="chevron-right"></fa-icon>
+              <button type="button" class="btn btn-fx btn-fx-ghost" data-cy="panel-hide" title="Hide the panel; click a tab to show it again"
+                      aria-label="Hide the panel" (click)="setTabLayout('closed')">
+                <fa-icon icon="times"></fa-icon>
               </button>
             </div>
           }
@@ -342,7 +333,7 @@
         }
       </ng-template>
 
-      <!-- The selected Step, Steps or Branch: in the side panel beside the Visual flow, and on the Editor tab. -->
+      <!-- The Editor: the selected Step, Steps or Branch, beside the Visual flow or full page. -->
       <ng-template #selectionEditor>
         @if (selection.type === 'step' && selectedStepIndex >= 0) {
           <div class="flow-step-name-field mb-2">
@@ -559,35 +550,15 @@
                 }
               </div>
             </div>
-            <aside class="flow-designer-panel" id="flow-designer-panel" [class.d-none]="!sidePanelShown">
-              <div class="flow-designer-panel-editor">
-              @if (viewMode === 'test') {
-                <!-- Only what the clicked Step did in the last run; the message is sent from the Tester tab. -->
-                <jhi-flow-test-panel
-                  [stepOnly]="true"
-                  [flowId]="flow?.id"
-                  [flowName]="flow?.name"
-                  [graph]="canvasGraph!"
-                  [selectedKey]="selectedStepKey"
-                  [run]="testRun"
-                  (editStep)="editStepFromTest($event)"
-                  (closed)="closePanel()"
-                  (openTester)="showTestView('tester')"
-                />
-              } @else if (designTab === 'flow') {
-                <ng-container *ngTemplateOutlet="selectionEditor"></ng-container>
-              }
-              </div>
-            </aside>
             }
             <div class="flow-designer-tab" [class.flow-designer-tab--panel]="tabLayout === 'panel'" [class.d-none]="!tabShown">
-              @if (viewMode === 'design' && designTab !== 'flow') {
+              @if (viewMode === 'design') {
                 <div class="code-flow-pane" [attr.data-cy]="'design-' + designTab">
                   @if (!canvasShown) {
                     <ng-container *ngTemplateOutlet="codeSaveAlerts"></ng-container>
                   }
                   @switch (designTab) {
-                    @case ('editor') {
+                    @case ('flow') {
                       <ng-container *ngTemplateOutlet="selectionEditor"></ng-container>
                     }
                     @case ('errorHandler') {

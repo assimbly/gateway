@@ -43,7 +43,7 @@ The editor opens with a copy of *TestFlow*, without a name.
 
 > **Why does this fail?** The `out2` folder doesn't exist. Normally the File component creates a missing folder, but with **Auto Create** off it can't. So every file this Flow tries to deliver fails.
 
-> **Tip: where are the settings?** Clicking a Step opens its settings on the right, and **>** at the right of the tabs hides them.
+> **Tip: where are the settings?** Clicking a Step opens its settings on the right, and **✕** at the right of the tabs hides them.
 
 ## Step 3: Find out why a Flow doesn't start
 
@@ -68,12 +68,12 @@ The editor opens with a copy of *TestFlow*, without a name.
 1. Stop *TestFlow*: on **Flows → Manage**, click **■** in its row. <!-- show: tr[data-flow-name="TestFlow"] [aria-label="Stop"] @ / -->
 2. Open *DebugFlow*. If it opens in **Design**, click **Test**. <!-- show: [data-cy="mode-toggle"] @ flow:DebugFlow -->
 3. Click **▶** (Start). <!-- show: [data-tour="flow-status-controls"] @ flow:DebugFlow:test --> This time the Flow starts.
-4. Click the **Tester** tab. <!-- show: [data-cy="test-view-tester"] @ flow:DebugFlow:test -->
-5. Under **In**, type `Hello, Assimbly!` in **Body** and click **Run**. <!-- show: [data-cy="test-run"] @ flow:DebugFlow:test -->
+4. The **Tester** is beside the canvas. <!-- show: [data-cy="test-tester"] @ flow:DebugFlow:test -->
+5. Under **In**, type `Hello, Assimbly!` in **Body** and click **Test**. <!-- show: [data-cy="test-run"] @ flow:DebugFlow:test -->
 
-The Tester shows **Failed**, with the error under **Out**. On the **Visual flow** tab the Sink is red; click it to see what it received under **In**, and its error under **Out**.
+The Tester shows **Failed**, with the error under **Out**. On the canvas the Sink is red; click it to see what it received under **In**, and its error under **Out**.
 
-> **Tip: test beside the canvas** Click **>** at the right of the tabs <!-- show: [data-cy="tab-right"] @ flow:DebugFlow:test --> to keep the Tester in a panel beside the canvas, so you see the Sink turn red as you run.
+> **Tip: more room for the Tester** The enlarge button at the right of the tabs <!-- show: [data-cy="panel-enlarge"] @ flow:DebugFlow:test --> shows the Tester full page. Put it back beside the canvas to see the Sink turn red as you run.
 
 ![The Flow fails](03-flow-failed.png)
 
@@ -94,7 +94,7 @@ The Tester shows **Failed**, with the error under **Out**. On the **Visual flow*
 | Where | What it tells you |
 |-------|-------------------|
 | **Error** badge | The Flow or one of its Steps didn't start. Click it to see why. |
-| **Tester** tab | Runs a message through the running Flow and shows the error of the Step that failed. |
+| **Tester** | Beside the Visual flow in Test. Runs a message through the running Flow and shows the error of the Step that failed. |
 | **Stats** tab | How many messages went through the Flow, and how many failed. |
 | **Alerts** badge | The errors of this Flow, newest first. They stay until you clear them. |
 

@@ -52,9 +52,9 @@ You put a queue between two Flows. The first puts files on it, the second takes 
 
 <!-- step: {"check":"queueMessages:OrdersQueue"} -->
 
-1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] --> The editor switches to the **Tester** tab of **Test**. <!-- show: [data-cy="test-view-tester"] @ flow:FileToQueue:test -->
-2. Under **In**, type `Order 1` in **Body** and click **Run**. <!-- show: [data-cy="test-run"] @ flow:FileToQueue:test -->
-3. Do the same with `Order 2` and `Order 3`, with **Run again**.
+1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] --> The editor switches to **Test**, with the **Tester** beside the Visual flow. <!-- show: [data-cy="test-tester"] @ flow:FileToQueue:test -->
+2. Under **In**, type `Order 1` in **Body** and click **Test**. <!-- show: [data-cy="test-run"] @ flow:FileToQueue:test -->
+3. Do the same with `Order 2` and `Order 3`, with **Test again**.
 
 Click the **Visual flow** tab: <!-- show: [data-cy="test-view-flow"] @ flow:FileToQueue:test --> the Sink shows **3**: three messages are on the queue.
 
@@ -109,7 +109,7 @@ The Steps on the canvas show **3**: *QueueToFile* took the waiting messages off 
 > * **Decouples.** You can stop, change or replace one Flow without touching the other.
 > * **Spreads the load.** Several Flows can take messages off the same queue.
 
-> **Try it yourself** Stop *QueueToFile*, send a few messages with **Run** in *FileToQueue*, and watch them wait on the queue until you start *QueueToFile* again.
+> **Try it yourself** Stop *QueueToFile*, send a few messages with **Test** in *FileToQueue*, and watch them wait on the queue until you start *QueueToFile* again.
 
 ## Summary
 

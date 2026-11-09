@@ -132,7 +132,7 @@ describe('Flow test panel', () => {
     expect(text('[data-cy="test-error"]')).toContain('Multiple consumers for the same endpoint is not allowed');
     expect(fixture.nativeElement.querySelector('.flow-test__io [data-cy="test-error"]')).toBeNull();
     expect(fixture.nativeElement.textContent.replace(/\s+/g, ' ')).toContain('Click a Step on the Visual flow to see its In and Out.');
-    expect(runButton().textContent).toContain('Run again');
+    expect(runButton().textContent).toContain('Test again');
   });
 
   it('puts Run under the message to send', () => {
@@ -259,42 +259,6 @@ describe('Flow test panel', () => {
     buttonNamed('Edit Step').click();
 
     expect(edited).toEqual(['step-11']);
-  });
-
-  describe('beside the Visual flow', () => {
-    beforeEach(() => fixture.componentRef.setInput('stepOnly', true));
-
-    it('shows only the In and Out of the selected Step, without Flow, Step and Run', () => {
-      fixture.componentRef.setInput('run', FAILED_RUN);
-      fixture.componentRef.setInput('selectedKey', 'step-11');
-      fixture.detectChanges();
-
-      expect(shownMessage('test-in')).toEqual(FAILED_RUN.steps[0].in);
-      expect(fixture.nativeElement.querySelector('[data-cy="test-run"]')).toBeNull();
-      expect(fixture.nativeElement.querySelector('[data-cy="test-level-flow"]')).toBeNull();
-      expect(fixture.nativeElement.querySelector('jhi-send-message-editor')).toBeNull();
-    });
-
-    it('points to the Tester tab before the first run, and closes', () => {
-      const opened = jest.fn();
-      const closed = jest.fn();
-      fixture.componentInstance.openTester.subscribe(opened);
-      fixture.componentInstance.closed.subscribe(closed);
-      fixture.detectChanges();
-
-      expect(text('[data-cy="test-no-run"]')).toContain('Run a test on the Tester tab');
-      buttonNamed('Open Tester').click();
-      fixture.nativeElement.querySelector('.btn-close').click();
-
-      expect(opened).toHaveBeenCalledTimes(1);
-      expect(closed).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  it('has no close button on the Tester tab', () => {
-    fixture.detectChanges();
-
-    expect(fixture.nativeElement.querySelector('.btn-close')).toBeNull();
   });
 
   it('tells which Steps the message never reached', () => {

@@ -457,6 +457,10 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
         case 'clone':
           this.router.navigate(['../../flow/editor', this.flow.id], {queryParams: { mode: mode, editor: this.flow.type, id: this.flow.id }});
           break;
+        case 'test':
+          // The editor opens in Test, on the Visual flow with the Tester beside it.
+          this.router.navigate(['../../flow/editor', this.flow.id], {queryParams: { mode: 'edit', editor: this.flow.type, id: this.flow.id, view: 'test' }});
+          break;
         case 'delete': {
           const modalRef = this.modalService.open(FlowDeleteDialogComponent);
           modalRef.componentInstance.flow = this.flow;
