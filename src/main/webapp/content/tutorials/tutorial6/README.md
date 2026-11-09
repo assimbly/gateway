@@ -52,11 +52,11 @@ You put a queue between two Flows. The first puts files on it, the second takes 
 
 <!-- step: {"check":"queueMessages:OrdersQueue"} -->
 
-1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] -->
-2. Under **In**, type `Order 1` in **Body** <!-- show: .flow-test .body-codemirror @ flow:FileToQueue:test --> and click **Run**. <!-- show: [data-cy="test-run"] @ flow:FileToQueue:test -->
+1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] --> The editor switches to the **Tester** tab of **Test**. <!-- show: [data-cy="test-view-tester"] @ flow:FileToQueue:test -->
+2. Under **In**, type `Order 1` in **Body** and click **Run**. <!-- show: [data-cy="test-run"] @ flow:FileToQueue:test -->
 3. Do the same with `Order 2` and `Order 3`, with **Run again**.
 
-The Sink on the canvas shows **3**: three messages are on the queue.
+Click the **Visual flow** tab: <!-- show: [data-cy="test-view-flow"] @ flow:FileToQueue:test --> the Sink shows **3**: three messages are on the queue.
 
 > **Why does nobody take them off?** The Flow that does isn't there yet. You build it in step 5.
 

@@ -44,7 +44,7 @@ Within a second, a **1** appears on both Steps — your message was created and 
 
 <!-- step: {"check":"flowLog:ExampleFlow:Example flow running"} -->
 
-1. Click the **Log** tab at the bottom. <!-- show: [data-cy="test-view-log"] @ flow:ExampleFlow:test -->
+1. Click the **Log** tab above the canvas. <!-- show: [data-cy="test-view-log"] @ flow:ExampleFlow:test -->
 
 You see the log entry with your message: `Example flow running`.
 

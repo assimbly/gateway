@@ -1,10 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { HttpResponse } from '@angular/common/http';
+import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { of, throwError } from 'rxjs';
 
 import { AccountService } from 'app/core/auth';
+import { TutorialPanelState } from 'app/tutorials/tutorial-panel.state';
 
 import Password from './password';
 import { PasswordService } from './password.service';
@@ -101,5 +103,39 @@ describe('Password', () => {
     expect(comp.doNotMatch()).toBe(false);
     expect(comp.success()).toBe(false);
     expect(comp.error()).toBe(true);
+  });
+});
+
+describe('Password on first login', () => {
+  const showOnFirstVisit = vi.fn();
+
+  function create(passwordChangeRequired: boolean): Password {
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: AccountService,
+          useValue: { account: signal({ passwordChangeRequired }), identity: vi.fn(() => of(null)), isAuthenticated: vi.fn() },
+        },
+        { provide: TutorialPanelState, useValue: { showOnFirstVisit } },
+      ],
+    });
+    const comp = TestBed.createComponent(Password).componentInstance;
+    vi.spyOn(TestBed.inject(PasswordService), 'save').mockReturnValue(of(new HttpResponse({ body: true })));
+    comp.passwordForm.patchValue({ currentPassword: 'oldPassword', newPassword: 'myNewPassword', confirmPassword: 'myNewPassword' });
+    return comp;
+  }
+
+  beforeEach(() => showOnFirstVisit.mockClear());
+
+  it('opens the Tutorials after the password they had to change', () => {
+    create(true).changePassword();
+
+    expect(showOnFirstVisit).toHaveBeenCalledOnce();
+  });
+
+  it('leaves the Tutorials alone when the password was changed by choice', () => {
+    create(false).changePassword();
+
+    expect(showOnFirstVisit).not.toHaveBeenCalled();
   });
 });

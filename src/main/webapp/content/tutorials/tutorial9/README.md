@@ -60,20 +60,18 @@ The script editor opens on the **Scripts** tab.
 3. Replace the example in the **Script** field with: <!-- show: [data-tour="script-content"] -->
 
    ```
-   Hello from Assimbly! The time is ${date:now:HH:mm:ss}
+   Hello, Assimbly! The time is ${date:now:HH:mm:ss}
    ```
 
 4. Click **Try it**. <!-- show: [data-tour="script-try"] -->
 
-**Resulting body** shows what the script makes, such as `Hello from Assimbly! The time is 14:05:10`.
+**Resulting body** shows what the script makes, such as `Hello, Assimbly! The time is 14:05:10`.
 
 > **How does Simple work?** [Simple](https://camel.apache.org/components/latest/languages/simple-language.html) is Camel's own small expression language. The text is copied as it is, and every `${...}` is replaced: `${date:now:HH:mm:ss}` by the current time.
 
 > **Does Try it start the Flow?** No. It only runs the script, so you can check it first.
 
 ## Step 4: Add a script in Groovy
-
-<!-- step: {"check":"flowExists:Clock"} -->
 
 1. Click **Add script** under the script. A second **Script** appears, in **Groovy**.
 2. Type this in its **Script** field:
@@ -83,7 +81,7 @@ The script editor opens on the **Scripts** tab.
    body
    ```
 
-3. Click **Save**. <!-- show: [data-tour="flow-save"] -->
+You save the Flow in the next step, when you start it.
 
 ![The two scripts](03-scripts.png)
 
@@ -109,7 +107,7 @@ Every 10 seconds the scripts run, and the **Stats** tab <!-- show: [data-cy="tes
 
 > **Try it yourself**
 >
-> * Add the date: click **Code**, <!-- show: [data-cy="mode-toggle"] @ flow:Clock --> change the Simple script to `Hello from Assimbly! It is ${date:now:yyyy-MM-dd HH:mm:ss}` and click **Save & Test**. <!-- show: [data-tour="flow-save-test"] @ flow:Clock -->
+> * Add the date: click **Code**, <!-- show: [data-cy="mode-toggle"] @ flow:Clock --> change the Simple script to `Hello, Assimbly! It is ${date:now:yyyy-MM-dd HH:mm:ss}` and click **Save & Test**. <!-- show: [data-tour="flow-save-test"] @ flow:Clock -->
 > * Click **Run** on the **Tester** tab, then open the **Scripts** tab. Each Script shows what it made of the message, under **Out**.
 > * Break the Groovy script on purpose, for example by writing to a folder that doesn't exist. **Failed** goes up on the **Stats** tab and an **Alerts** badge appears. [Tutorial 2](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow) shows how to find the error.
 

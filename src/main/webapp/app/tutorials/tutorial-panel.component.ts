@@ -171,11 +171,12 @@ export class TutorialPanelComponent implements OnInit, OnDestroy {
 
   /**
    * Points at the element. When it isn't on this page but the tutorial says which page it's on, that page opens first;
-   * the editor still asks before it drops unsaved changes.
+   * the editor still asks before it drops unsaved changes. A route is always checked: a button such as Stop or Add is
+   * on several pages, so seeing one doesn't mean this is the page the step is about.
    */
   async show(selector: string, page: string | undefined, text: string): Promise<void> {
     this.hint.set(undefined);
-    const url = page && !isVisible(selector) ? await firstValueFrom(this.pages.url(page)) : undefined;
+    const url = page && (page.startsWith('/') || !isVisible(selector)) ? await firstValueFrom(this.pages.url(page)) : undefined;
     const elsewhere = url !== undefined && !this.pages.isCurrent(url);
     if (elsewhere && !(await this.router.navigateByUrl(url))) {
       // the user chose to stay, for example to keep unsaved changes

@@ -243,12 +243,38 @@ describe('Tutorial panel', () => {
       expect(fixture.nativeElement.querySelector('.tutorial-panel__hint')).toBeNull();
     });
 
-    it('stays on this page when the element is already on it', async () => {
+    it('stays on this page when the element is on the page of the step', async () => {
       open('<p>Click <strong>Add</strong>.</p>');
       addTarget();
+      pages.url.mockReturnValue(of(url('/queue')));
+      pages.isCurrent.mockReturnValue(true);
       const navigate = jest.spyOn(router, 'navigateByUrl');
 
       await fixture.componentInstance.show('.show-me-target', '/queue', 'Click Add.');
+
+      expect(navigate).not.toHaveBeenCalled();
+      expect(highlight).toHaveBeenLastCalledWith('.show-me-target', 'Click Add.');
+    });
+
+    it('opens the route of the step when a look-alike element is on another page', async () => {
+      open('<p>Click <strong>Stop</strong>.</p>');
+      addTarget();
+      const broker = url('/broker');
+      pages.url.mockReturnValue(of(broker));
+      pages.isCurrent.mockReturnValue(false);
+      const navigate = jest.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
+
+      await fixture.componentInstance.show('.show-me-target', '/broker', 'Click Stop.');
+
+      expect(navigate).toHaveBeenCalledWith(broker);
+    });
+
+    it('stays on this page for a Flow page when the element is already on it', async () => {
+      open('<p>Click <strong>Save</strong>.</p>');
+      addTarget();
+      const navigate = jest.spyOn(router, 'navigateByUrl');
+
+      await fixture.componentInstance.show('.show-me-target', 'flow:TestFlow', 'Click Save.');
 
       expect(pages.url).not.toHaveBeenCalled();
       expect(navigate).not.toHaveBeenCalled();

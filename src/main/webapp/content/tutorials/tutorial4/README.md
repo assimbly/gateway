@@ -66,7 +66,7 @@ The Flow is already there: the **Operation** receives the request and the **Resp
 4. Under **Options**, next to **Expression**, type: <!-- show: .option-row -->
 
    ```
-   {"message": "Hello ${header.name}!"}
+   {"message": "Hello, ${header.name}!"}
    ```
 
 5. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] @ flow:sayHello -->
@@ -81,12 +81,12 @@ The Flow is already there: the **Operation** receives the request and the **Resp
 
 1. Click **APIs**, <!-- show: .app-sidebar__link[href="/rest-apis"] --> then **Greetings**. It says **1 of 1 Operation running**.
 2. Click **GET** in the row of the Operation. <!-- show: [data-tour="operation-edit"] @ api:Greetings -->
-3. Click the **Try it** tab, <!-- show: [data-cy="operation-tab-try"] --> type `World` next to **name** and click **Send**. <!-- show: [data-tour="api-try-send"] -->
+3. Click the **Try it** tab, <!-- show: [data-cy="operation-tab-try"] --> type `Assimbly` next to **name** and click **Send**. <!-- show: [data-tour="api-try-send"] -->
 
 The answer comes back with status `200`:
 
 ```json
-{"message": "Hello World!"}
+{"message": "Hello, Assimbly!"}
 ```
 
 ![The API is running](06-api-running.png)

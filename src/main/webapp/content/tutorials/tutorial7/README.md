@@ -52,8 +52,6 @@ The route editor opens, with a field to write the route in instead of a canvas.
 
 ## Step 2: Write the route
 
-<!-- step: {"check":"flowExists:SimpleRoute"} -->
-
 1. At the top left, where it says *Flow name*, type `SimpleRoute`. <!-- show: #field_flowName -->
 2. Set **Route name** to `MoveFiles`. <!-- show: [formcontrolname="routeName"] -->
 3. Replace the example in the **Camel route** field with: <!-- show: [data-tour="route-content"] -->
@@ -66,7 +64,7 @@ The route editor opens, with a field to write the route in instead of a canvas.
    </route>
    ```
 
-4. Click **Save**. <!-- show: [data-tour="flow-save"] -->
+You save the Flow in the next step, when you run it.
 
 ![The route](02-route.png)
 
@@ -81,7 +79,7 @@ The route editor opens, with a field to write the route in instead of a canvas.
 <!-- step: {"check":"flowCompleted:SimpleRoute"} -->
 
 1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] @ flow:SimpleRoute --> The editor switches from **Code** to the **Tester** tab of **Test**. <!-- show: [data-cy="test-view-tester"] @ flow:SimpleRoute:test -->
-2. Under **In**, type `Hello Camel` in **Body** and click **Run**. <!-- show: [data-cy="test-run"] @ flow:SimpleRoute:test -->
+2. Under **In**, type `Hello, Assimbly!` in **Body** and click **Run**. <!-- show: [data-cy="test-run"] @ flow:SimpleRoute:test -->
 
 The Tester shows **Passed** under **Out**. Your message is now a file in `@{messages}/out`.
 
@@ -98,7 +96,7 @@ The Tester shows **Passed** under **Out**. Your message is now a file in `@{mess
 1. Click the **Log** tab. <!-- show: [data-cy="test-view-log"] @ flow:SimpleRoute:test -->
 2. Type `Received` in the filter box. <!-- show: #flowLogSearchText -->
 
-There it is: `Received: Hello Camel`, written by the `<log>` line of your route.
+There it is: `Received: Hello, Assimbly!`, written by the `<log>` line of your route.
 
 3. When you're done, click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] @ flow:SimpleRoute:test -->
 

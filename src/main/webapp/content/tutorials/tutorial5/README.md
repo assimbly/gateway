@@ -89,7 +89,7 @@ After a few seconds the green buttons are back.
 <!-- step: {"check":"queueMessages:HelloQueue"} -->
 
 1. Click **Send** in the row of *HelloQueue*. <!-- show: tr[data-endpoint-name="HelloQueue"] [aria-label="Send"] @ /queue -->
-2. Under **Body**, type `Hello broker!`. <!-- show: .body-codemirror -->
+2. Under **Body**, type `Hello, Assimbly!`. <!-- show: .body-codemirror -->
 3. Click **Send** at the top right. <!-- show: [title="Send (Ctrl+Enter)"] -->
 
 A notification confirms: *Message sent to queue HelloQueue*.

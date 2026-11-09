@@ -35,15 +35,14 @@ The canvas shows two Steps: a **Source** and a **Sink**.
 
 ## Step 2: Configure the Source and the Sink
 
-<!-- step: {"check":"flowStep:TestFlow:/out"} -->
-
 1. Click the **Source** on the canvas. <!-- show: .flow-step-source --> Set:
    * **Component:** `File`
    * **Directory Name:** `@{messages}/in` <!-- show: [formcontrolname="uri"] -->
 2. Click the **Sink** on the canvas. <!-- show: .flow-step-sink --> Set:
    * **Component:** `File`
    * **Directory Name:** `@{messages}/out`
-3. Click **Save**. <!-- show: [data-tour="flow-save"] -->
+
+You save the Flow in the next step, when you start it.
 
 > **Tip: where are the settings?** Clicking a Step opens its settings on the right. **>** at the right of the tabs hides them, and **<** shows the Step full page on the **Editor** tab, for more room. <!-- show: [data-cy="design-tab-editor"] -->
 
@@ -58,7 +57,7 @@ The canvas shows two Steps: a **Source** and a **Sink**.
 <!-- step: {"check":"flowCompleted:TestFlow"} -->
 
 1. Click **Save & Test** at the top right. <!-- show: [data-tour="flow-save-test"] @ flow:TestFlow --> The editor switches to **Test** and opens its **Tester** tab. <!-- show: [data-cy="test-view-tester"] @ flow:TestFlow:test -->
-2. Under **In**, type `Hello Assimbly` in **Body**. <!-- show: [data-cy="test-in"] @ flow:TestFlow:test -->
+2. Under **In**, type `Hello, Assimbly!` in **Body**. <!-- show: [data-cy="test-in"] @ flow:TestFlow:test -->
 3. Click **Run**. <!-- show: [data-cy="test-run"] @ flow:TestFlow:test -->
 
 The Tester shows **Passed** under **Out**. Click the **Visual flow** tab: <!-- show: [data-cy="test-view-flow"] @ flow:TestFlow:test --> the Sink shows a **1**. Click the Sink to see its **In** and **Out**: the message it received and the message it passed on. Your message is now a file in `@{messages}/out`. Open it to have a look.

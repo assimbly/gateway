@@ -6,6 +6,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 
 import { AccountService } from 'app/core/auth';
 import { TranslateDirective } from 'app/shared/language';
+import { TutorialPanelState } from 'app/tutorials/tutorial-panel.state';
 
 import PasswordStrengthBar from './password-strength-bar/password-strength-bar';
 import { PasswordService } from './password.service';
@@ -21,6 +22,7 @@ export default class Password {
   readonly success = signal(false);
   private readonly accountService = inject(AccountService);
   private readonly router = inject(Router);
+  private readonly tutorialPanel = inject(TutorialPanelState);
   readonly account = this.accountService.account;
   /** The user still has a default password: they can't do anything else until they choose a new one. */
   readonly changeRequired = computed(() => this.account()?.passwordChangeRequired === true);
@@ -50,7 +52,8 @@ export default class Password {
         next: () => {
           this.success.set(true);
           if (wasRequired) {
-            // Read the account again, so the Gateway opens up, and carry on where a new user starts
+            // Read the account again, so the Gateway opens up, and carry on where a new user starts, with the Tutorials
+            this.tutorialPanel.showOnFirstVisit();
             this.accountService.identity(true).subscribe(() => this.router.navigate(['']));
           }
         },
