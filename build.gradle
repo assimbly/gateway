@@ -356,8 +356,7 @@ dependencies {
     implementation "tech.jhipster:jhipster-framework:${jhipster_version}"
     implementation 'org.slf4j:jcl-over-slf4j:2.0.20'
 
-    //force version 12.9 (same as mapforce)
-    implementation 'net.sf.saxon:Saxon-HE:12.9'
+    implementation 'net.sf.saxon:Saxon-HE:13.1'
 
     implementation("io.github.assimbly:docconverter:3.0.2")
 
@@ -479,6 +478,8 @@ tasks.named('bootJar') {
 }
 
 tasks.named("bootRun") {
+    // Ehcache 3 still calls sun.misc.Unsafe (already reported upstream); allow it so JDK 24+ prints no deprecation warning.
+    jvmArgs "--sun-misc-unsafe-memory-access=allow"
     environment "ASSIMBLY_ENCRYPTION_SECRET", System.getenv("ASSIMBLY_ENCRYPTION_SECRET") ?: "Pl34s3_Ch4ng3!_Th1s_1s_N0t_V3ry_S3c4r3!"
 }
 

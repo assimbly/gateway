@@ -36,7 +36,9 @@ def jpackageExecutable = new File(hostJavaHome, isWindowsHost ? 'bin/jpackage.ex
 
 // The bundles run without a console window: the Gateway shows a tray / menu-bar icon to open or stop it, and a second
 // start opens the running Gateway (application.gateway.desktop).
-def desktopJavaOptions = ['-Xmx2g', '-Dapplication.gateway.desktop=true']
+// Ehcache 3 still calls sun.misc.Unsafe (already reported upstream); allow it so JDK 24+ prints no deprecation warning.
+def unsafeMemoryAccessOption = '--sun-misc-unsafe-memory-access=allow'
+def desktopJavaOptions = ['-Xmx2g', '-Dapplication.gateway.desktop=true', unsafeMemoryAccessOption]
 
 def macLauncherCommandContent = { String jarFileName ->
     """#!/bin/bash
@@ -169,8 +171,7 @@ tasks.register('preparePackageWin') {
             '--app-version', project.version.toString().replaceAll('-.*', ''),
             '--vendor', 'Assimbly',
             '--description', 'Assimbly Gateway',
-            '--java-options', desktopJavaOptions[0],
-            '--java-options', desktopJavaOptions[1],
+            *desktopJavaOptions.collectMany { ['--java-options', it] },
             '--add-modules', jlinkModulesWin.join(','),
             '--jlink-options', '--strip-debug --no-man-pages --no-header-files --compress=zip-6'
         ]
