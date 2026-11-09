@@ -205,15 +205,8 @@ export class QueueComponent implements OnInit, OnDestroy {
         data => {
           if (data && data.body.queues) {
             this.isBroker = true;
-            if (data.body.queues.queue) {
-              for (let i = 0; i < data.body.queues.queue.length; i++) {
-                // exclude temporary queues
-                if (data.body.queues.queue[i].temporary.toString() === 'false') {
-                  this.addresses.splice(i, 1, data.body.queues.queue[i]);
-                }
-              }
-              this.addresses = [...this.addresses];
-            }
+            // Replace the whole list, so Queues deleted on the Broker drop out of the table.
+            this.addresses = (data.body.queues.queue ?? []).filter(queue => queue.temporary.toString() === 'false');
           } else {
             this.isBroker = false;
           }

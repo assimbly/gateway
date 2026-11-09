@@ -209,14 +209,8 @@ export class TopicComponent implements OnInit, OnDestroy {
         data => {
           if (data && data.body.topics) {
             this.isBroker = true;
-            if (data.body.topics.topic) {
-              for (let i = 0; i < data.body.topics.topic.length; i++) {
-                if (data.body.topics.topic[i].temporary.toString() === 'false') {
-                  this.addresses.splice(i, 1, data.body.topics.topic[i]);
-                }
-              }
-              this.addresses = [...this.addresses];
-            }
+            // Replace the whole list, so Topics deleted on the Broker drop out of the table.
+            this.addresses = (data.body.topics.topic ?? []).filter(topic => topic.temporary.toString() === 'false');
           }
           this.changeDetector.detectChanges();
         },
