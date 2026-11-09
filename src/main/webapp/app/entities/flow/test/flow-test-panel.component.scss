@@ -1,5 +1,7 @@
 :host {
   display: block;
+  // In and Out sit side by side when the panel is wide enough, as on the Tester tab full page
+  container-type: inline-size;
 }
 
 .flow-test {
@@ -9,70 +11,116 @@
 }
 
 .flow-test__header,
-.flow-test__actions,
 .flow-test__notice,
-.flow-test__step-status {
+.flow-test__subject,
+.flow-test__status,
+.flow-test__actions {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
 }
 
-.flow-test__actions,
-.flow-test__step-status {
+.flow-test__status,
+.flow-test__actions {
   justify-content: flex-start;
   flex-wrap: wrap;
 }
 
-.flow-test__summary {
+.flow-test__subject-text {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: 6px;
-  font-size: 0.875rem;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.flow-test__kind {
+  font-size: 0.75rem;
   font-weight: 600;
-  color: var(--app-success, #079455);
-  background: color-mix(in srgb, var(--app-success, #079455) 10%, transparent);
-}
-
-.flow-test__summary--failed {
-  color: var(--app-danger, #d92d20);
-  background: color-mix(in srgb, var(--app-danger, #d92d20) 10%, transparent);
-}
-
-.flow-test__title {
-  margin: 0;
-  font-size: 0.8rem;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--app-text-muted, #667085);
 }
 
-.flow-test__step {
+.flow-test__name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.flow-test__detail {
+  font-weight: 400;
+  color: var(--app-text-muted, #667085);
+}
+
+.flow-test__info {
+  margin-left: 0.25rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 0.875rem;
+  line-height: 1;
+  vertical-align: baseline;
+  color: var(--app-text-muted, #667085);
+  cursor: help;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--app-primary, #0d6efd);
+  }
+}
+
+/* In and Out, set apart by a line: above Out when stacked, between them when side by side. */
+.flow-test__io {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--app-border, #e4e7ec);
+}
+
+.flow-test__part {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  min-width: 0;
 }
 
-.flow-test__body {
-  max-height: 16rem;
+.flow-test__part + .flow-test__part {
+  padding-top: 1rem;
+  border-top: 1px solid var(--app-border, #e4e7ec);
+}
+
+@container (min-width: 48rem) {
+  .flow-test__io {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0;
+    align-items: stretch;
+  }
+
+  .flow-test__part:first-child {
+    padding-right: 1.25rem;
+  }
+
+  .flow-test__part + .flow-test__part {
+    padding-top: 0;
+    padding-left: 1.25rem;
+    border-top: 0;
+    border-left: 1px solid var(--app-border, #e4e7ec);
+  }
+}
+
+.flow-test__part-header {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.flow-test__part-title {
   margin: 0;
-  padding: 0.5rem;
-  overflow: auto;
-  border: 1px solid var(--app-border, #e4e7ec);
-  border-radius: 6px;
-  font-size: 0.75rem;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-.flow-test__headers th {
-  width: 40%;
+  font-size: 1.125rem;
   font-weight: 600;
-  word-break: break-all;
 }
 
-.flow-test__headers td,
 .flow-test__error {
   word-break: break-word;
 }

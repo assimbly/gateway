@@ -6,6 +6,7 @@ import {
   computed,
   inject,
   input,
+  linkedSignal,
   output,
   signal,
   viewChild,
@@ -13,16 +14,19 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 
+import { Components } from 'app/shared/camel/component-type';
 import SendMessageEditor from 'app/shared/send/send-message-editor';
 import { SendHeader } from 'app/shared/send/send-headers';
 import { sendErrorText } from 'app/shared/send/send-state';
 import { BodyMode } from 'app/shared/send/send-upload';
 
-import { FlowGraph } from '../designer/flow-graph';
+import { FlowGraph, shownName, stepLabel, stepPath } from '../designer/flow-graph';
 import { explainError } from '../flow-errors';
 import { FlowService } from '../flow.service';
-import { FlowTestRun, StepRun, StepRunMark, TestMessage, entryStepOf, headersOf, runResultsByStepKey, shortDuration } from './flow-test-run';
+import { FlowTestRun, StepRun, StepRunMark, entryStepOf, headersOf, runResultsByStepKey, shortDuration } from './flow-test-run';
+import { TestMessageComponent } from './test-message.component';
 
 /** Why a test can't run now, and the button that helps, if any. */
 interface Blocked {
@@ -30,22 +34,27 @@ interface Blocked {
   action?: 'start';
 }
 
+/** What the panel shows: the message in and out of the whole Flow, or of the Step selected on the canvas. */
+export type TestLevel = 'flow' | 'step';
+
 /**
  * The Test panel of the visual editor: sends one message through the running Flow, from the Step after the Source,
- * and shows what came back. The editor marks each Step on the canvas with what it did; selecting a Step shows here
- * the message it got and passed on. The Route and Script editors use it too, without a graph. In a Route Flow the
- * message goes into its first Route, and only the response comes back, as a Route has no Steps inside. In a Script
- * Flow it goes into its first Script, and the editor shows what each Script made of it.
+ * and shows what came back. Flow shows the In (the message to send) and Out (what came back) of the whole Flow; Step
+ * shows the In and Out of the Step selected on the canvas, in the same layout. Selecting a Step switches to Step.
+ * The Route and Script editors use it too, without a graph and so without Step. In a Route Flow the message goes into
+ * its first Route, as a Route has no Steps inside. In a Script Flow it goes into its first Script, and the editor shows
+ * what each Script made of it.
  */
 @Component({
   selector: 'jhi-flow-test-panel',
   templateUrl: './flow-test-panel.component.html',
   styleUrl: './flow-test-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FontAwesomeModule, NgTemplateOutlet, RouterLink, SendMessageEditor],
+  imports: [FontAwesomeModule, NgbTooltip, NgTemplateOutlet, RouterLink, SendMessageEditor, TestMessageComponent],
 })
 export class FlowTestPanelComponent {
   readonly flowId = input<number | null | undefined>();
+  readonly flowName = input<string | null | undefined>();
   /** The visual Flow; a Route Flow has none and names its entry instead. */
   readonly graph = input<FlowGraph | undefined>();
   /** The Step the message goes into, when there is no graph: the first Route of a Route Flow, or the first Script of a Script Flow. */
@@ -61,6 +70,8 @@ export class FlowTestPanelComponent {
   readonly run = input<FlowTestRun | undefined>();
   /** Beside the Visual flow, only what the selected Step did in the last run; the message is sent from the Tester tab. */
   readonly stepOnly = input(false);
+  /** Whether the Tester is full page, hiding the canvas the Steps are selected on. */
+  readonly canvasHidden = input(false);
 
   readonly ran = output<FlowTestRun>();
   readonly start = output<void>();
@@ -70,18 +81,23 @@ export class FlowTestPanelComponent {
   readonly closed = output<void>();
   /** Open Tester, shown with `stepOnly` before the first run. */
   readonly openTester = output<void>();
+  /** Visual flow, full page: show the canvas beside the Tester, so a Step can be selected. */
+  readonly showCanvas = output<void>();
 
   readonly body = signal('');
   readonly headers = signal<SendHeader[]>([]);
   readonly bodyMode = signal<BodyMode>('text');
   readonly pending = signal(false);
   readonly failure = signal<string | null>(null);
-  readonly messageTab = signal<'in' | 'out'>('in');
+  /** Flow or Step: a Step selected on the canvas switches to Step, a click on the empty canvas back to Flow. */
+  readonly level = linkedSignal<TestLevel>(() => (this.selectedKey() ? 'step' : 'flow'));
 
   readonly explain = explainError;
   readonly duration = shortDuration;
 
   private readonly flowService = inject(FlowService);
+  /** Each component's title from the catalogue, such as 'File' for `file`, as the canvas names the Steps. */
+  private readonly titles = new Map<string, string>(inject(Components).types.map(type => [type.name, type.title ?? type.name]));
   /** The Passed/Failed summary of the last run, or why it couldn't run. */
   private readonly result = viewChild<ElementRef<HTMLElement>>('result');
   /** Set by Run: the result it brings is scrolled into view, below the message, once it's drawn. */
@@ -105,6 +121,20 @@ export class FlowTestPanelComponent {
 
   /** Whether the panel tests a Script Flow: the message goes into its first Script, and the editor shows each Script's result. */
   readonly scripts = computed(() => !this.graph() && this.entryKind() === 'script');
+
+  /** What a test does, behind the info icon of the Flow. */
+  readonly flowInfo = computed(() => {
+    const into = this.routes() ? 'into the first Route, past its from endpoint' : this.scripts() ? 'into the first Script, past the Source' : 'from the Step after the Source';
+    const what = this.routes() ? 'The Routes' : 'The Steps';
+    return `Runs one message through the running Flow, ${into}. ${what} do what they always do: they write files, call APIs and put messages on queues.`;
+  });
+
+  readonly inInfo = computed(() => {
+    const where = this.routes() ? 'the first Route' : this.scripts() ? 'the first Script' : 'the Step after the Source';
+    return `What goes into the Flow: the message that goes into ${where}. Type its body and, if needed, its headers, then click Run.`;
+  });
+
+  readonly outInfo = 'What goes out of the Flow: the message as it is at the end of the run.';
 
   readonly entryStep = computed(() => {
     const graph = this.graph();
@@ -135,6 +165,17 @@ export class FlowTestPanelComponent {
     return key ? this.marks().get(key) : undefined;
   });
 
+  /** What is shown: only Step beside the Visual flow, and only Flow without a canvas to select Steps on. */
+  readonly shownLevel = computed<TestLevel>(() => (this.stepOnly() ? 'step' : this.graph() ? this.level() : 'flow'));
+
+  /** The selected Step, named as on the canvas: what it is, and the name the user gave it or else what it works on, such as a folder. */
+  readonly selectedStep = computed(() => {
+    const graph = this.graph();
+    const key = this.selectedKey();
+    const step = graph && key ? graph.steps.find(s => s.key === key) : undefined;
+    return graph && step ? { label: stepLabel(graph, step, this.titles), name: shownName(step) ?? (stepPath(graph, step) || undefined) } : undefined;
+  });
+
   readonly passedSteps = computed(() => this.run()?.steps.filter(step => step.status === 'completed').length ?? 0);
 
   runTest(): void {
@@ -163,12 +204,15 @@ export class FlowTestPanelComponent {
     return typeof mark === 'object' ? mark : undefined;
   }
 
-  /** The message of the open tab; a Step that failed or still ran passed nothing on. */
-  shownMessage(step: StepRun): TestMessage | null {
-    return this.messageTab() === 'in' ? step.in : step.out;
+  stepStatus(step: StepRun): string {
+    return step.status === 'completed' ? 'Completed' : step.status === 'failed' ? 'Failed' : 'Still running';
   }
 
-  headerEntries(message: TestMessage | null | undefined): [string, string][] {
-    return Object.entries(message?.headers ?? {});
+  /** Why a Step has no Out. */
+  noOut(step: StepRun): string {
+    if (step.status === 'failed') {
+      return 'This Step failed, so it passed nothing on.';
+    }
+    return step.status === 'running' ? 'This Step was still running when the test ended.' : 'This Step passed nothing on.';
   }
 }

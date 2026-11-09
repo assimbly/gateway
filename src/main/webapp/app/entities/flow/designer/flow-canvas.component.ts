@@ -33,12 +33,12 @@ import {
   RESPONSE_COMPONENT,
   routerOf,
   routerShape,
-  routerTitle,
+  stepLabel,
+  stepPath,
   shownName,
   StepKind,
   StepMove,
 } from './flow-graph';
-import { responseSettings } from './response';
 import { IFlowCounts } from '../flow.service';
 import { compactCount } from '../flow-stats';
 import { StepRun, StepRunMark, shortDuration } from '../test/flow-test-run';
@@ -116,20 +116,7 @@ export class FlowCanvasComponent {
   }
 
   label(step: DesignStep): string {
-    const handler = this.graph.handler;
-    if (handler && isLockedSource(this.graph, step.key)) {
-      return `${handler.method} ${handler.fullPath}`;
-    }
-    if (isResponse(this.graph, step)) {
-      return `Response ${responseSettings(step).status}`;
-    }
-    if (step.componentType?.toLowerCase() === 'flowlink') {
-      return 'Call Flow';
-    }
-    if (step.kind === 'ROUTER') {
-      return routerTitle(step);
-    }
-    return step.componentType ? (this.titles.get(step.componentType) ?? step.componentType) : step.uri || 'choose a component';
+    return stepLabel(this.graph, step, this.titles);
   }
 
   /**
@@ -137,10 +124,7 @@ export class FlowCanvasComponent {
    * Routers, Responses, Call Flows and the Operation have none.
    */
   caption(step: DesignStep): string {
-    if (!step.componentType || !step.uri || step.kind === 'ROUTER' || isResponse(this.graph, step) || isLockedSource(this.graph, step.key)) {
-      return '';
-    }
-    return step.componentType.toLowerCase() === 'flowlink' ? '' : shortened(step.uri, CAPTION_LENGTH);
+    return shortened(stepPath(this.graph, step), CAPTION_LENGTH);
   }
 
   /** What the step kind shows: a Handler Flow's Source is its Operation, and a Response is named as such. */

@@ -663,6 +663,35 @@ export function isResponse(graph: FlowGraph, step: DesignStep): boolean {
   );
 }
 
+/**
+ * What a Step is, as the canvas shows it on the Step: its component's title (from `titles`, such as 'File' for `file`),
+ * what kind of Router it is, the Operation of a Handler Flow, or a Response.
+ */
+export function stepLabel(graph: FlowGraph, step: DesignStep, titles: ReadonlyMap<string, string>): string {
+  const handler = graph.handler;
+  if (handler && isLockedSource(graph, step.key)) {
+    return `${handler.method} ${handler.fullPath}`;
+  }
+  if (isResponse(graph, step)) {
+    return `Response ${responseSettings(step).status}`;
+  }
+  if (step.componentType?.toLowerCase() === 'flowlink') {
+    return 'Call Flow';
+  }
+  if (step.kind === 'ROUTER') {
+    return routerTitle(step);
+  }
+  return step.componentType ? (titles.get(step.componentType) ?? step.componentType) : step.uri || 'choose a component';
+}
+
+/** What a Step works on, such as a folder or a queue, as the canvas shows it under the Step. Routers, Responses, Call Flows and the Operation have none. */
+export function stepPath(graph: FlowGraph, step: DesignStep): string {
+  if (!step.componentType || !step.uri || step.kind === 'ROUTER' || isResponse(graph, step) || isLockedSource(graph, step.key)) {
+    return '';
+  }
+  return step.componentType.toLowerCase() === 'flowlink' ? '' : step.uri;
+}
+
 export function moveStep(graph: FlowGraph, key: string, x: number, y: number): EditResult {
   const target = graph.steps.find(s => s.key === key);
   return target ? accepted(replaceStep(graph, { ...target, x, y })) : rejected('There is no such Step.');

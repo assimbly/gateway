@@ -58,10 +58,10 @@ The canvas shows two Steps: a **Source** and a **Sink**.
 <!-- step: {"check":"flowCompleted:TestFlow"} -->
 
 1. Click **Save & Test** at the top right. <!-- show: [data-tour="flow-save-test"] @ flow:TestFlow --> The editor switches to **Test** and opens its **Tester** tab. <!-- show: [data-cy="test-view-tester"] @ flow:TestFlow:test -->
-2. Under **Body**, type `Hello Assimbly`.
+2. Under **In**, type `Hello Assimbly` in **Body**. <!-- show: [data-cy="test-in"] @ flow:TestFlow:test -->
 3. Click **Run**. <!-- show: [data-cy="test-run"] @ flow:TestFlow:test -->
 
-The Tester shows **Passed**. Click the **Visual flow** tab: <!-- show: [data-cy="test-view-flow"] @ flow:TestFlow:test --> the Sink shows a **1**. Click the Sink to see the message it got. Your message is now a file in `@{messages}/out`. Open it to have a look.
+The Tester shows **Passed** under **Out**. Click the **Visual flow** tab: <!-- show: [data-cy="test-view-flow"] @ flow:TestFlow:test --> the Sink shows a **1**. Click the Sink to see its **In** and **Out**: the message it received and the message it passed on. Your message is now a file in `@{messages}/out`. Open it to have a look.
 
 > **What does Save & Test do?** It saves the Flow, starts it and switches the editor from **Design** to the **Tester** tab of **Test**. When the Flow already runs, it restarts it, so your change takes effect.
 
@@ -72,7 +72,7 @@ The Tester shows **Passed**. Click the **Visual flow** tab: <!-- show: [data-cy=
 > * **Design** and **Test** at the top switch between building the Flow and running it. <!-- show: [data-cy="mode-toggle"] @ flow:TestFlow -->
 > * A Flow that isn't finished, such as a Source without a Sink, is saved as a **Draft**. Click its **Draft** badge to see what's missing, and click a problem to go to its Step. A Draft can't be tested until it's finished.
 > * Design has the same tabs for every Flow: **Visual flow**, **Editor**, **Error handler**, **Settings** and **Notes**. Test has **Visual flow**, **Tester**, **Stats**, **Log** and **Camel route**.
-> * **<** and **>** at the right of the tabs show a tab full page, in a panel beside the canvas, or not at all. Keep the **Tester** beside the canvas to watch the Steps while you test. <!-- show: [data-cy="tab-right"] @ flow:TestFlow:test -->
+> * **<** and **>** at the right of the tabs show a tab full page, in a panel beside the canvas, or not at all. Keep the **Tester** beside the canvas to watch the Steps while you test: click a Step to see its **In** and **Out**, and **Flow** to go back to the whole Flow. <!-- show: [data-cy="tab-right"] @ flow:TestFlow:test -->
 > * The **Error handler** tab decides what happens with errors. For a new Flow it writes them to the Gateway log.
 > * **Auto-arrange** on the minimap, in the corner of the canvas, lays the Flow out from left to right.
 > * Every Flow runs as an [Apache Camel](https://camel.apache.org/) route. **Camel route** in **Test** shows it. <!-- show: [data-cy="test-view-route"] @ flow:TestFlow:test -->

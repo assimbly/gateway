@@ -263,6 +263,7 @@
         <div class="code-flow-pane" [class.d-none]="testView !== 'tester'" data-cy="test-tester">
           <jhi-flow-test-panel
             [flowId]="flow?.id"
+            [flowName]="flow?.name"
             [graph]="canvasGraph"
             [entryStepId]="entryStepId"
             [entryKind]="entryKind ?? 'route'"
@@ -275,6 +276,8 @@
             (start)="editorHeader.start()"
             (saveAndRun)="saveAndTest()"
             (editStep)="editStepFromTest($event)"
+            [canvasHidden]="tabLayout === 'full'"
+            (showCanvas)="tabToRight()"
           />
         </div>
         <div class="code-flow-pane" [class.d-none]="testView !== 'stats'" data-cy="test-stats">
@@ -563,6 +566,7 @@
                 <jhi-flow-test-panel
                   [stepOnly]="true"
                   [flowId]="flow?.id"
+                  [flowName]="flow?.name"
                   [graph]="canvasGraph!"
                   [selectedKey]="selectedStepKey"
                   [run]="testRun"
@@ -812,7 +816,7 @@
                             <div class="small text-danger">The script failed</div>
                             <pre class="border border-danger rounded p-2 mb-0 text-danger text-wrap">{{ error }}</pre>
                           } @else if (run.out?.body) {
-                            <div class="small text-muted">Resulting body</div>
+                            <div class="small text-muted">Out</div>
                             <pre class="border rounded p-2 mb-0 text-wrap">{{ run.out?.body }}</pre>
                             @if (run.out?.truncated) {
                               <div class="small text-muted">The body is cut short.</div>

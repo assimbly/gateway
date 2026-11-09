@@ -69,9 +69,9 @@ The editor opens with a copy of *TestFlow*, without a name.
 2. Open *DebugFlow*. If it opens in **Design**, click **Test**. <!-- show: [data-cy="mode-toggle"] @ flow:DebugFlow -->
 3. Click **▶** (Start). <!-- show: [data-tour="flow-status-controls"] @ flow:DebugFlow:test --> This time the Flow starts.
 4. Click the **Tester** tab. <!-- show: [data-cy="test-view-tester"] @ flow:DebugFlow:test -->
-5. Under **Body**, type `Hello Assimbly` and click **Run**. <!-- show: [data-cy="test-run"] @ flow:DebugFlow:test -->
+5. Under **In**, type `Hello Assimbly` in **Body** and click **Run**. <!-- show: [data-cy="test-run"] @ flow:DebugFlow:test -->
 
-The Tester shows **Failed**, with the error. On the **Visual flow** tab the Sink is red; click it to see the error of that Step.
+The Tester shows **Failed**, with the error under **Out**. On the **Visual flow** tab the Sink is red; click it to see what it received under **In**, and its error under **Out**.
 
 > **Tip: test beside the canvas** Click **>** at the right of the tabs <!-- show: [data-cy="tab-right"] @ flow:DebugFlow:test --> to keep the Tester in a panel beside the canvas, so you see the Sink turn red as you run.
 
