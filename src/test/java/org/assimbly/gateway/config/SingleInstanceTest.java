@@ -1,5 +1,6 @@
 package org.assimbly.gateway.config;
 
+import org.apache.commons.logging.Log;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -19,7 +20,7 @@ class SingleInstanceTest {
 
     private static final DeferredLogFactory LOGS = Supplier::get;
 
-    private final SingleInstance singleInstance = new SingleInstance(LOGS);
+    private static final Log LOG = LOGS.getLog(SingleInstance.class);
 
     @TempDir
     Path folder;
@@ -33,24 +34,24 @@ class SingleInstanceTest {
     void theFirstStartTakesTheLockAndForgetsAnOldUrl() throws IOException {
         Files.writeString(folder.resolve("gateway.url"), "http://localhost:8080/");
 
-        assertThat(singleInstance.acquire(folder)).isTrue();
+        assertThat(SingleInstance.acquire(folder, LOG)).isTrue();
         assertThat(SingleInstance.runningUrl(folder)).isEmpty();
     }
 
     @Test
     void aSecondStartFindsTheLockTakenAndTheRunningUrl() throws IOException {
-        singleInstance.acquire(folder);
+        SingleInstance.acquire(folder, LOG);
         Files.writeString(folder.resolve("gateway.url"), "http://localhost:8081/");
 
-        assertThat(new SingleInstance(LOGS).acquire(folder)).isFalse();
+        assertThat(SingleInstance.acquire(folder, LOG)).isFalse();
         assertThat(SingleInstance.runningUrl(folder)).contains("http://localhost:8081/");
     }
 
     @Test
     void aSecondStartWhileTheFirstStillStartsHasNoUrl() {
-        singleInstance.acquire(folder);
+        SingleInstance.acquire(folder, LOG);
 
-        assertThat(new SingleInstance(LOGS).acquire(folder)).isFalse();
+        assertThat(SingleInstance.acquire(folder, LOG)).isFalse();
         assertThat(SingleInstance.runningUrl(folder)).isEmpty();
     }
 
@@ -59,7 +60,7 @@ class SingleInstanceTest {
         String home = System.getProperty("user.home");
         System.setProperty("user.home", folder.toString());
         try {
-            singleInstance.postProcessEnvironment(new StandardEnvironment(), new SpringApplication());
+            new SingleInstance(LOGS).postProcessEnvironment(new StandardEnvironment(), new SpringApplication());
         } finally {
             System.setProperty("user.home", home);
         }

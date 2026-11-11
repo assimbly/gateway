@@ -22,7 +22,8 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
-@Transactional
+// Spring only rolls back on unchecked exceptions by default, and the import methods throw checked ones
+@Transactional(rollbackFor = Exception.class)
 public class ImportXMLRoutes {
 
     private final Logger log = LoggerFactory.getLogger(ImportXMLRoutes.class);

@@ -97,11 +97,11 @@ public class ExportXML {
 
         setGeneralProperties(integrationId);
 
-        List<Flow> flows = flowRepository.findAllByIntegrationId(integrationId);
+        List<Flow> flowsList = flowRepository.findAllByIntegrationId(integrationId);
 
-        for (Flow flow : flows) {
-            if (flow != null) {
-                getXMLFlowConfiguration(flow);
+        for (Flow currentFlow : flowsList) {
+            if (currentFlow != null) {
+                getXMLFlowConfiguration(currentFlow);
             }
         }
 
@@ -168,15 +168,15 @@ public class ExportXML {
 
         List<String> idsList = Arrays.asList(ids.split(","));
 
-        List<Flow> flows = flowRepository.findAllByIntegrationId(integrationId);
+        List<Flow> flowsList = flowRepository.findAllByIntegrationId(integrationId);
 
-        for (Flow flow : flows) {
-            if (flow != null) {
+        for (Flow currentFlow : flowsList) {
+            if (currentFlow != null) {
 
-                String confId = Long.toString(flow.getId());
+                String confId = Long.toString(currentFlow.getId());
 
                 if(idsList.contains(confId)) {
-                    getXMLFlowConfiguration(flow);
+                    getXMLFlowConfiguration(currentFlow);
                 }
             }
         }
@@ -210,21 +210,21 @@ public class ExportXML {
 
         if (flowOptional.isPresent()) {
 
-            Flow flow = flowOptional.get();
+            Flow foundFlow = flowOptional.get();
 
-            if (flow.getIntegration() == null) {
-                throw new IllegalStateException("Flow " + flow.getId() + " has no integration assigned");
+            if (foundFlow.getIntegration() == null) {
+                throw new IllegalStateException("Flow " + foundFlow.getId() + " has no integration assigned");
             }
 
-            setGeneralProperties(flow.getIntegration().getId());
+            setGeneralProperties(foundFlow.getIntegration().getId());
 
             // check if steps are configured
-            stepsDB = flow.getSteps();
+            stepsDB = foundFlow.getSteps();
 
             if (stepsDB == null) {
                 throw new Exception("Set of configuration failed. Step cannot be null");
             } else {
-                setFlows(flow);
+                setFlows(foundFlow);
             }
 
         }

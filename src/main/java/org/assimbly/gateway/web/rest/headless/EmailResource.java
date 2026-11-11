@@ -112,11 +112,7 @@ public class EmailResource {
             context.removeRoute(routeId);
 
             if (beanId != null) {
-                try {
-                    context.getRegistry().unbind(beanId);
-                } catch (Exception e) {
-                    log.warn("Could not unbind temporary mail authenticator bean: {}", beanId, e);
-                }
+                unbindAuthenticator(context, beanId);
             }
 
             return Response.status(Response.Status.OK).entity("OK").build();
@@ -124,6 +120,14 @@ public class EmailResource {
         } catch (Exception e) {
             log.error("Error to send email", e);
             return Response.status(Response.Status.BAD_REQUEST).entity("Failed to send email - " + e.getMessage()).build();
+        }
+    }
+
+    private void unbindAuthenticator(CamelContext context, String beanId) {
+        try {
+            context.getRegistry().unbind(beanId);
+        } catch (Exception e) {
+            log.warn("Could not unbind temporary mail authenticator bean: {}", beanId, e);
         }
     }
 

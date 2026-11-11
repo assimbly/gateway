@@ -26,9 +26,6 @@ public final class SecuritySummary {
         if (PUBLIC_JWT_SECRET.equals(env.getProperty(GeneratedSecrets.JWT_SECRET))) {
             risks.add("Login tokens are signed with a published key (" + GeneratedSecrets.JWT_SECRET + "): anyone can make one. Remove it to get a key of this Gateway's own.");
         }
-        if (GeneratedSecrets.LEGACY_ENCRYPTION_SECRET.equals(env.getProperty(GeneratedSecrets.ENCRYPTION_SECRET))) {
-            risks.add("Connection keys and Variables are encrypted with a published key (" + GeneratedSecrets.ENCRYPTION_SECRET + " or ASSIMBLY_ENCRYPTION_SECRET). Remove it to get a key of this Gateway's own.");
-        }
         String runtimeSecret = env.getProperty(GeneratedSecrets.RUNTIME_ENCRYPTION_SECRET);
         if (runtimeSecret != null && !runtimeSecret.isBlank() && !runtimeSecret.equals(env.getProperty(GeneratedSecrets.ENCRYPTION_SECRET))) {
             risks.add("ASSIMBLY_ENCRYPTION_SECRET differs from " + GeneratedSecrets.ENCRYPTION_SECRET + ": encrypted Variables used in a Flow can't be read. Set only one of them.");

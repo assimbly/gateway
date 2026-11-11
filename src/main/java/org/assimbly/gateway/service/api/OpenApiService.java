@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -100,11 +101,15 @@ public class OpenApiService {
     /** The API as an OpenAPI 3.0.3 document, YAML or (with format {@code json}) JSON. */
     @Transactional(readOnly = true)
     public String exportDocument(Long apiId, String format, String listenerUrl) {
-        return exportDocument(apiId, format, listenerUrl, applicationProperties.getGateway().getTenant());
+        return writeDocument(apiId, format, listenerUrl, applicationProperties.getGateway().getTenant());
     }
 
     @Transactional(readOnly = true)
     public String exportDocument(Long apiId, String format, String listenerUrl, String tenant) {
+        return writeDocument(apiId, format, listenerUrl, tenant);
+    }
+
+    private String writeDocument(Long apiId, String format, String listenerUrl, String tenant) {
         ApiDTO api = apiService.findOne(apiId).orElseThrow(() -> new ApiRuleException("There is no API " + apiId + "."));
         ObjectNode root = JSON.createObjectNode();
         root.put("openapi", "3.0.3");
@@ -141,24 +146,31 @@ public class OpenApiService {
         putIfPresent(node, "description", operation.description());
 
         if (!operation.parameters().isEmpty()) {
-            ArrayNode parameters = node.putArray("parameters");
-            for (ApiParameterDTO parameter : operation.parameters()) {
-                ObjectNode p = parameters.addObject();
-                p.put("name", parameter.name());
-                p.put("in", parameter.in());
-                if (parameter.required()) {
-                    p.put("required", true);
-                }
-                putIfPresent(p, "description", parameter.description());
-                p.putObject("schema").put("type", parameter.type());
-            }
+            exportParameters(node.putArray("parameters"), operation.parameters());
         }
 
         if (operation.requestSchema() != null) {
             node.putObject("requestBody").putObject("content").putObject(operation.requestMediaType()).set("schema", schema(operation.requestSchema()));
         }
 
-        ObjectNode responses = node.putObject("responses");
+        exportResponses(node.putObject("responses"), operation);
+        return node;
+    }
+
+    private static void exportParameters(ArrayNode parameters, List<ApiParameterDTO> given) {
+        for (ApiParameterDTO parameter : given) {
+            ObjectNode p = parameters.addObject();
+            p.put("name", parameter.name());
+            p.put("in", parameter.in());
+            if (parameter.required()) {
+                p.put("required", true);
+            }
+            putIfPresent(p, "description", parameter.description());
+            p.putObject("schema").put("type", parameter.type());
+        }
+    }
+
+    private static void exportResponses(ObjectNode responses, ApiOperationDTO operation) {
         for (ApiDeclaredResponseDTO declared : operation.declaredResponses()) {
             ObjectNode response = responses.putObject(declared.status());
             response.put("description", declared.description());
@@ -180,7 +192,6 @@ public class OpenApiService {
             problem.put("description", "The request failed. The body names the Operation and gives a correlation id to look the failure up with.");
             problem.putObject("content").putObject(PROBLEM_MEDIA_TYPE).putObject("schema").put("$ref", "#/components/schemas/Problem");
         }
-        return node;
     }
 
     private static ObjectNode problemSchema() {
@@ -247,7 +258,6 @@ public class OpenApiService {
 
         private final JsonNode root;
         private final List<String> dropped;
-        private String basePath;
         private String stripFromPaths = "";
 
         Document(JsonNode root, List<String> dropped) {
@@ -267,7 +277,7 @@ public class OpenApiService {
                     dropped.add(component + " of components");
                 }
             });
-            basePath = basePath();
+            String basePath = basePath();
             return new ApiDTO(null, title.isEmpty() ? "Imported API" : title, basePath, textOrNull(info.path("version")),
                 textOrNull(info.path("description")), integrationId, 0, null);
         }
@@ -352,31 +362,38 @@ public class OpenApiService {
             }
 
             List<ApiDeclaredResponseDTO> responses = new ArrayList<>();
-            String responseMediaType = null;
             Iterator<Map.Entry<String, JsonNode>> statuses = operation.path("responses").fields();
             while (statuses.hasNext()) {
                 Map.Entry<String, JsonNode> entry = statuses.next();
                 String status = entry.getKey().toLowerCase(Locale.ROOT);
-                if (!ApiService.isStatus(status)) {
+                if (ApiService.isStatus(status)) {
+                    responses.add(declaredResponse(status, entry.getValue(), where));
+                } else {
                     dropped.add("the " + entry.getKey() + " response of " + where);
-                    continue;
-                }
-                String whereResponse = "the " + status + " response of " + where;
-                JsonNode response = resolved(entry.getValue());
-                dropUnknown(response, RESPONSE_KEYS, "", " of " + whereResponse);
-                response.path("headers").fieldNames().forEachRemaining(header -> dropped.add("the header " + header + " of " + whereResponse));
-                Map.Entry<String, JsonNode> content = firstContent(response, whereResponse);
-                String description = response.path("description").asText("").isBlank() ? "Response " + status : response.path("description").asText();
-                responses.add(new ApiDeclaredResponseDTO(status, description, content == null ? null : content.getKey(),
-                    content == null ? null : schemaText(content.getValue())));
-                if (responseMediaType == null && content != null && status.startsWith("2")) {
-                    responseMediaType = content.getKey();
                 }
             }
+            String responseMediaType = responses.stream()
+                .filter(response -> response.status().startsWith("2") && response.mediaType() != null)
+                .map(ApiDeclaredResponseDTO::mediaType)
+                .findFirst()
+                .orElse(null);
 
             return new ApiOperationDTO(null, null, method, path, null, textOrNull(operation.path("operationId")),
                 textOrNull(operation.path("summary")), textOrNull(operation.path("description")), requestMediaType, responseMediaType,
                 requestSchema, parameters, responses, null, null, "flow");
+        }
+
+        private ApiDeclaredResponseDTO declaredResponse(String status, JsonNode node, String where) {
+            String whereResponse = "the " + status + " response of " + where;
+            JsonNode response = resolved(node);
+            dropUnknown(response, RESPONSE_KEYS, "", " of " + whereResponse);
+            response.path("headers").fieldNames().forEachRemaining(header -> dropped.add("the header " + header + " of " + whereResponse));
+            Map.Entry<String, JsonNode> content = firstContent(response, whereResponse);
+            String description = response.path("description").asText("").isBlank() ? "Response " + status : response.path("description").asText();
+            if (content == null) {
+                return new ApiDeclaredResponseDTO(status, description, null, null);
+            }
+            return new ApiDeclaredResponseDTO(status, description, content.getKey(), schemaText(content.getValue()));
         }
 
         /** Path-level parameters, overridden by the Operation's own with the same name and place. */
@@ -384,34 +401,38 @@ public class OpenApiService {
             Map<String, ApiParameterDTO> byKey = new LinkedHashMap<>();
             for (JsonNode list : List.of(pathLevel, operationLevel)) {
                 for (JsonNode node : list) {
-                    JsonNode parameter = resolved(node);
-                    String name = parameter.path("name").asText("");
-                    String in = parameter.path("in").asText("");
-                    if (in.equals("cookie")) {
-                        dropped.add("the cookie parameter " + name + " of " + where);
-                        continue;
-                    }
-                    String whereParameter = " of the " + in + " parameter " + name + " of " + where;
-                    if (parameter.has("example") || parameter.has("examples")) {
-                        dropped.add("the example" + whereParameter);
-                    }
-                    dropUnknown(parameter, PARAMETER_KEYS, "", whereParameter);
-                    // A parameter keeps only its type; the rest of its schema, such as a format or enum, is listed.
-                    parameter.path("schema").fieldNames().forEachRemaining(key -> {
-                        if (!key.equals("type")) {
-                            dropped.add(describeKey(key) + " of the schema" + whereParameter);
-                        }
-                    });
-                    String type = parameterType(parameter.path("schema").path("type"));
-                    if (type == null) {
-                        dropped.add("the schema" + whereParameter + " (kept as a string)");
-                        type = "string";
-                    }
-                    byKey.put(in + ":" + name, new ApiParameterDTO(name, in, type, parameter.path("required").asBoolean(false),
-                        textOrNull(parameter.path("description"))));
+                    parameter(where, resolved(node)).ifPresent(parameter -> byKey.put(parameter.in() + ":" + parameter.name(), parameter));
                 }
             }
             return new ArrayList<>(byKey.values());
+        }
+
+        /** The parameter as the model holds it; empty for a cookie parameter, which the model doesn't have. */
+        private Optional<ApiParameterDTO> parameter(String where, JsonNode parameter) {
+            String name = parameter.path("name").asText("");
+            String in = parameter.path("in").asText("");
+            if (in.equals("cookie")) {
+                dropped.add("the cookie parameter " + name + " of " + where);
+                return Optional.empty();
+            }
+            String whereParameter = " of the " + in + " parameter " + name + " of " + where;
+            if (parameter.has("example") || parameter.has("examples")) {
+                dropped.add("the example" + whereParameter);
+            }
+            dropUnknown(parameter, PARAMETER_KEYS, "", whereParameter);
+            // A parameter keeps only its type; the rest of its schema, such as a format or enum, is listed.
+            parameter.path("schema").fieldNames().forEachRemaining(key -> {
+                if (!key.equals("type")) {
+                    dropped.add(describeKey(key) + " of the schema" + whereParameter);
+                }
+            });
+            String type = parameterType(parameter.path("schema").path("type"));
+            if (type == null) {
+                dropped.add("the schema" + whereParameter + " (kept as a string)");
+                type = "string";
+            }
+            return Optional.of(new ApiParameterDTO(name, in, type, parameter.path("required").asBoolean(false),
+                textOrNull(parameter.path("description"))));
         }
 
         /** A parameter's type when the model has it; an array type of 3.1 counts by its one non-null type. */
@@ -426,7 +447,10 @@ public class OpenApiService {
                 });
                 name = types.size() == 1 ? types.getFirst() : null;
             }
-            return name != null && ApiService.PARAMETER_TYPES.contains(name) ? name : name == null && type.isMissingNode() ? "string" : null;
+            if (name == null) {
+                return type.isMissingNode() ? "string" : null;
+            }
+            return ApiService.PARAMETER_TYPES.contains(name) ? name : null;
         }
 
         /** The first media type of a request body or response; any others, and examples, are dropped. */

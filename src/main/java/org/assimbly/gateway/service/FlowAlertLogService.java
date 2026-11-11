@@ -59,7 +59,7 @@ public class FlowAlertLogService {
 
     public FlowAlertsPageDTO page(long flowId, int offset, int limit) {
         int safeOffset = Math.max(offset, 0);
-        int safeLimit = Math.min(Math.max(limit, 0), PAGE_SIZE);
+        int safeLimit = Math.clamp(limit, 0, PAGE_SIZE);
         List<String> lines = readNewestFirst(flowId);
 
         FlowAlertsPageDTO page = new FlowAlertsPageDTO();
@@ -113,23 +113,30 @@ public class FlowAlertLogService {
         try {
             Files.createDirectories(clearedDir);
             for (Path file : files) {
-                Path target = unusedName(clearedDir, file.getFileName().toString());
-                try {
-                    Files.move(file, target);
-                } catch (IOException moveFailed) {
-                    // The runtime may hold the log open (Windows refuses to move it). Copy it aside and empty it;
-                    // alerts written in between are lost. If it can't be emptied, drop the copy so it isn't kept twice.
-                    Files.copy(file, target);
-                    try {
-                        Files.newOutputStream(file, StandardOpenOption.TRUNCATE_EXISTING).close();
-                    } catch (IOException truncateFailed) {
-                        Files.deleteIfExists(target);
-                        throw truncateFailed;
-                    }
-                }
+                moveAside(file, unusedName(clearedDir, file.getFileName().toString()));
             }
         } catch (IOException e) {
             throw new UncheckedIOException("Could not clear the alerts of flow " + flowId, e);
+        }
+    }
+
+    private static void moveAside(Path file, Path target) throws IOException {
+        try {
+            Files.move(file, target);
+        } catch (IOException _) {
+            // The runtime may hold the log open (Windows refuses to move it)
+            copyAndEmpty(file, target);
+        }
+    }
+
+    /** Alerts written in between are lost. If the log can't be emptied, the copy is dropped so it isn't kept twice. */
+    private static void copyAndEmpty(Path file, Path target) throws IOException {
+        Files.copy(file, target);
+        try {
+            Files.newOutputStream(file, StandardOpenOption.TRUNCATE_EXISTING).close();
+        } catch (IOException truncateFailed) {
+            Files.deleteIfExists(target);
+            throw truncateFailed;
         }
     }
 

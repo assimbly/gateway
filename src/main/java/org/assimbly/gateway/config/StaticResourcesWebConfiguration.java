@@ -15,12 +15,12 @@ import java.util.concurrent.TimeUnit;
 @Profile({ JHipsterConstants.SPRING_PROFILE_PRODUCTION })
 public class StaticResourcesWebConfiguration implements WebMvcConfigurer {
 
-    protected static final String[] RESOURCE_LOCATIONS = new String[] {
+    protected static final String[] RESOURCE_LOCATIONS = {
         "classpath:/static/",
         "classpath:/static/content/",
         "classpath:/static/i18n/",
     };
-    protected static final String[] RESOURCE_PATHS = new String[] {
+    protected static final String[] RESOURCE_PATHS = {
         "/*.js",
         "/*.css",
         "/*.svg",

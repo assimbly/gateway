@@ -84,7 +84,7 @@ public class TokenProvider {
             .setSubject(authentication.getName())
             .claim(AUTHORITIES_KEY, authorities)
             .signWith(key, SignatureAlgorithm.HS512)
-            .setExpiration(Date.from(validity))
+            .setExpiration(Date.from(validity)) // NOSONAR jjwt's setExpiration only accepts java.util.Date
             .compact();
     }
 

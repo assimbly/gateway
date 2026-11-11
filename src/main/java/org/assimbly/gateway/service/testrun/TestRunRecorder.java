@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
@@ -90,6 +91,7 @@ public class TestRunRecorder extends EventNotifierSupport {
             case CamelEvent.StepCompletedEvent _ -> run.finished(step.getExchange(), false);
             case CamelEvent.StepFailedEvent _ -> run.finished(step.getExchange(), true);
             default -> {
+                // Other step events tell the Test panel nothing new
             }
         }
     }
@@ -130,7 +132,7 @@ public class TestRunRecorder extends EventNotifierSupport {
 
         Map<String, String> headers = new LinkedHashMap<>();
         message.getHeaders().forEach((name, value) ->
-            headers.put(name, SECRET_HEADER.matcher(name).find() ? MASK : value == null ? "" : String.valueOf(value)));
+            headers.put(name, SECRET_HEADER.matcher(name).find() ? MASK : Objects.toString(value, "")));
         return new TestRunResult.Message(text, headers, truncated);
     }
 
@@ -146,7 +148,7 @@ public class TestRunRecorder extends EventNotifierSupport {
                 .onUnmappableCharacter(CodingErrorAction.REPORT)
                 .decode(ByteBuffer.wrap(bytes));
             return true;
-        } catch (CharacterCodingException e) {
+        } catch (CharacterCodingException _) {
             return false;
         }
     }

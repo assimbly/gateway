@@ -214,12 +214,14 @@ public class GatewayApp {
         try {
             String os = System.getProperty("os.name", "").toLowerCase(Locale.ROOT);
             ProcessBuilder command;
+            // Absolute paths, so a writable directory on the PATH cannot put another program in their place
             if (os.contains("win")) {
-                command = new ProcessBuilder("rundll32", "url.dll,FileProtocolHandler", url);
+                String systemRoot = System.getenv().getOrDefault("SystemRoot", "C:\\Windows");
+                command = new ProcessBuilder(systemRoot + "\\System32\\rundll32.exe", "url.dll,FileProtocolHandler", url);
             } else if (os.contains("mac")) {
-                command = new ProcessBuilder("open", url);
+                command = new ProcessBuilder("/usr/bin/open", url);
             } else {
-                command = new ProcessBuilder("xdg-open", url);
+                command = new ProcessBuilder("/usr/bin/xdg-open", url);
             }
             command.start();
         } catch (Exception e) {

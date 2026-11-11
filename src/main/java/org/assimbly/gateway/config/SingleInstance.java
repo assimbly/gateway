@@ -57,7 +57,7 @@ public class SingleInstance implements EnvironmentPostProcessor, Ordered {
             return;
         }
         Path folder = folder();
-        if (acquire(folder)) {
+        if (acquire(folder, log)) {
             return;
         }
         // Logging is not set up yet and the start ends here, so the browser opening is the answer the user sees.
@@ -66,7 +66,7 @@ public class SingleInstance implements EnvironmentPostProcessor, Ordered {
     }
 
     /** True when this Gateway is the only one on the folder; false when another one holds the lock. */
-    boolean acquire(Path folder) {
+    static boolean acquire(Path folder, Log log) {
         try {
             Files.createDirectories(folder);
             FileChannel channel = FileChannel.open(folder.resolve(LOCK_FILE), StandardOpenOption.CREATE, StandardOpenOption.WRITE);

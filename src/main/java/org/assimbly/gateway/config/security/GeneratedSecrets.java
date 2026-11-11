@@ -36,9 +36,6 @@ public class GeneratedSecrets implements EnvironmentPostProcessor, Ordered {
     public static final String ENCRYPTION_SECRET = "encryption.jasypt.password";
     public static final String RUNTIME_ENCRYPTION_SECRET = "ASSIMBLY_ENCRYPTION_SECRET";
 
-    /** The encryption key every Gateway used up to 6.0. Only kept to read values made with it, and to warn about it. */
-    public static final String LEGACY_ENCRYPTION_SECRET = "Pl34s3_Ch4ng3!_Th1s_1s_N0t_V3ry_S3c4r3!";
-
     static final String PROPERTY_SOURCE_NAME = "generatedSecrets";
 
     private static final SecureRandom RANDOM = new SecureRandom();
@@ -75,21 +72,7 @@ public class GeneratedSecrets implements EnvironmentPostProcessor, Ordered {
         }
 
         if (needsJwtSecret || needsEncryptionSecret) {
-            Path file = secretsFile();
-            Properties stored = read(file);
-            boolean generated = false;
-            if (!stored.containsKey(JWT_SECRET)) {
-                stored.setProperty(JWT_SECRET, randomBase64(64));
-                generated = true;
-            }
-            if (!stored.containsKey(ENCRYPTION_SECRET)) {
-                stored.setProperty(ENCRYPTION_SECRET, randomBase64(32));
-                generated = true;
-            }
-            if (generated) {
-                write(file, stored);
-                log.info("Generated the Gateway's secrets in " + file);
-            }
+            Properties stored = storedSecrets();
             if (needsJwtSecret) {
                 secrets.setProperty(JWT_SECRET, stored.getProperty(JWT_SECRET));
             }
@@ -100,6 +83,26 @@ public class GeneratedSecrets implements EnvironmentPostProcessor, Ordered {
 
         // Last, so environment variables and an application.yml next to the jar still win
         environment.getPropertySources().addLast(new PropertiesPropertySource(PROPERTY_SOURCE_NAME, secrets));
+    }
+
+    /** The secrets kept in the secrets file. A missing one is generated and stored there, once. */
+    private Properties storedSecrets() {
+        Path file = secretsFile();
+        Properties stored = read(file);
+        boolean generated = false;
+        if (!stored.containsKey(JWT_SECRET)) {
+            stored.setProperty(JWT_SECRET, randomBase64(64));
+            generated = true;
+        }
+        if (!stored.containsKey(ENCRYPTION_SECRET)) {
+            stored.setProperty(ENCRYPTION_SECRET, randomBase64(32));
+            generated = true;
+        }
+        if (generated) {
+            write(file, stored);
+            log.info("Generated the Gateway's secrets in " + file);
+        }
+        return stored;
     }
 
     /** Where the generated secrets are kept: next to the database, in the Gateway's base directory. */

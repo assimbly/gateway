@@ -12,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -60,6 +62,32 @@ public class FlowTestRunService {
         if (context == null) {
             throw new FlowTestRunException("Start the Flow first.");
         }
+        Consumer consumer = startedConsumer(context, flowId, entryStepId);
+
+        TestRunRecorder runRecorder = recorderFor(context);
+        TestRunRecorder.Run run = runRecorder.begin(UUID.randomUUID().toString());
+        try {
+            Exchange exchange = exchange(consumer, run.id(), request);
+
+            long started = System.nanoTime();
+            boolean timedOut = !process(consumer, exchange, run.id());
+            long durationMillis = (System.nanoTime() - started) / 1_000_000;
+            if (!timedOut) {
+                settle(run);
+            }
+
+            List<TestRunResult.Step> steps = run.steps();
+            // A failure the Flow's Error handler took leaves the exchange without an exception, but it failed all the same.
+            boolean failed = timedOut || exchange.isFailed() || exchange.getExchangeExtension().isFailureHandled() || run.hasFailedStep();
+            return new TestRunResult(run.id(), failed ? "failed" : "completed", durationMillis,
+                timedOut ? null : TestRunRecorder.snapshot(exchange.getMessage()), error(exchange, timedOut, failed, steps), steps);
+        } finally {
+            runRecorder.end(run.id());
+        }
+    }
+
+    /** The consumer of the entry step's route, which must belong to the Flow and be started. */
+    private static Consumer startedConsumer(CamelContext context, String flowId, String entryStepId) {
         Route route = context.getRoute(flowId + "-" + entryStepId);
         if (route == null) {
             boolean flowHasRoutes = context.getRoutes().stream().anyMatch(candidate -> flowId.equals(candidate.getGroup()));
@@ -70,43 +98,38 @@ public class FlowTestRunService {
         if (consumer == null || status == null || !status.isStarted()) {
             throw new FlowTestRunException("Start the Flow first.");
         }
+        return consumer;
+    }
 
-        TestRunRecorder recorder = recorderFor(context);
-        TestRunRecorder.Run run = recorder.begin(UUID.randomUUID().toString());
-        try {
-            // Keeps the pattern of the step's own endpoint, as for real traffic: forcing InOut would make a JMS Sink of
-            // a file Flow wait for a reply that no one sends.
-            Exchange exchange = consumer.createExchange(false);
-            exchange.setProperty(TestRunRecorder.PROPERTY, run.id());
-            exchange.getMessage().setBody(request.body() == null ? "" : request.body());
-            Map<String, String> headers = request.headers() == null ? Map.of() : request.headers();
-            headers.forEach((name, value) -> {
-                if (name != null && !name.isBlank()) {
-                    exchange.getMessage().setHeader(name, value);
-                }
-            });
-
-            long started = System.nanoTime();
-            boolean timedOut = !process(consumer, exchange, run.id());
-            long durationMillis = (System.nanoTime() - started) / 1_000_000;
-            if (!timedOut) {
-                settle(run);
+    /** The user's message as an exchange of the entry step, marked as part of this run. */
+    private static Exchange exchange(Consumer consumer, String runId, TestRunRequest request) {
+        // Keeps the pattern of the step's own endpoint, as for real traffic: forcing InOut would make a JMS Sink of
+        // a file Flow wait for a reply that no one sends.
+        Exchange exchange = consumer.createExchange(false);
+        exchange.setProperty(TestRunRecorder.PROPERTY, runId);
+        exchange.getMessage().setBody(request.body() == null ? "" : request.body());
+        Map<String, String> headers = request.headers() == null ? Map.of() : request.headers();
+        headers.forEach((name, value) -> {
+            if (name != null && !name.isBlank()) {
+                exchange.getMessage().setHeader(name, value);
             }
+        });
+        return exchange;
+    }
 
-            var steps = run.steps();
-            // A failure the Flow's Error handler took leaves the exchange without an exception, but it failed all the same.
-            boolean failed = timedOut || exchange.isFailed() || exchange.getExchangeExtension().isFailureHandled() || run.hasFailedStep();
-            String error = timedOut
-                ? "The Flow didn't answer within " + RESPONSE_TIMEOUT.toSeconds() + " seconds."
-                : failed ? TestRunRecorder.errorOf(exchange) : null;
-            if (error == null && failed) {
-                error = steps.stream().map(TestRunResult.Step::error).filter(stepError -> stepError != null).findFirst().orElse(null);
-            }
-            return new TestRunResult(run.id(), failed ? "failed" : "completed", durationMillis,
-                timedOut ? null : TestRunRecorder.snapshot(exchange.getMessage()), error, steps);
-        } finally {
-            recorder.end(run.id());
+    /** Why the run failed: the timeout, else the exchange's error, else the first step's; null when it didn't fail. */
+    private static String error(Exchange exchange, boolean timedOut, boolean failed, List<TestRunResult.Step> steps) {
+        if (timedOut) {
+            return "The Flow didn't answer within " + RESPONSE_TIMEOUT.toSeconds() + " seconds.";
         }
+        if (!failed) {
+            return null;
+        }
+        String error = TestRunRecorder.errorOf(exchange);
+        if (error != null) {
+            return error;
+        }
+        return steps.stream().map(TestRunResult.Step::error).filter(Objects::nonNull).findFirst().orElse(null);
     }
 
     /**
@@ -127,12 +150,12 @@ public class FlowTestRunService {
         try {
             done.get(RESPONSE_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS);
             return true;
-        } catch (TimeoutException e) {
+        } catch (TimeoutException _) {
             return false;
         } catch (ExecutionException e) {
             exchange.setException(e.getCause());
             return true;
-        } catch (InterruptedException e) {
+        } catch (InterruptedException _) {
             Thread.currentThread().interrupt();
             throw new FlowTestRunException("The test run was interrupted.");
         }
@@ -144,7 +167,7 @@ public class FlowTestRunService {
         while (!run.isSettled(QUIET) && System.nanoTime() < deadline) {
             try {
                 Thread.sleep(25);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException _) {
                 Thread.currentThread().interrupt();
                 return;
             }

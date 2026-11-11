@@ -49,8 +49,8 @@ public class AccountResource {
 
     private static class UserVM {
 
-        private String login;
-        private Set<String> authorities;
+        private final String login;
+        private final Set<String> authorities;
 
         @JsonCreator
         UserVM(String login, Set<String> authorities) {

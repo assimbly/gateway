@@ -5,6 +5,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * What a Response Sink answers, as kept in its Step: the status, the body's language and the headers in its options
@@ -20,21 +21,23 @@ public record ResponseSettings(String status, String body, String language, Map<
         String status = DEFAULT_STATUS;
         String language = null;
         Map<String, String> headers = new LinkedHashMap<>();
-        if (options != null && !options.isBlank()) {
-            for (String option : options.split("&")) {
-                String[] pair = option.split("=", 2);
-                String value = pair.length > 1 ? pair[1] : "";
-                if (pair[0].equals("status") && !value.isBlank()) {
-                    status = value.strip();
-                } else if (pair[0].equals("language") && !value.isBlank()) {
-                    language = value.strip();
-                } else if (pair[0].startsWith(HEADER_PREFIX) && pair[0].length() > HEADER_PREFIX.length()) {
-                    headers.put(pair[0].substring(HEADER_PREFIX.length()), URLDecoder.decode(value, StandardCharsets.UTF_8));
-                }
+        for (String option : split(options)) {
+            String[] pair = option.split("=", 2);
+            String value = pair.length > 1 ? pair[1] : "";
+            if (pair[0].equals("status") && !value.isBlank()) {
+                status = value.strip();
+            } else if (pair[0].equals("language") && !value.isBlank()) {
+                language = value.strip();
+            } else if (pair[0].startsWith(HEADER_PREFIX) && pair[0].length() > HEADER_PREFIX.length()) {
+                headers.put(pair[0].substring(HEADER_PREFIX.length()), URLDecoder.decode(value, StandardCharsets.UTF_8));
             }
         }
         String body = uri == null || uri.isEmpty() ? null : uri;
-        return new ResponseSettings(status, body, body == null ? null : language == null ? "constant" : language, headers);
+        return new ResponseSettings(status, body, body == null ? null : Objects.requireNonNullElse(language, "constant"), headers);
+    }
+
+    private static String[] split(String options) {
+        return options == null || options.isBlank() ? new String[0] : options.split("&");
     }
 
     public boolean keepsBody() {

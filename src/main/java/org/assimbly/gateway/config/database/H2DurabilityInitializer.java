@@ -10,7 +10,9 @@ import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
@@ -43,43 +45,25 @@ public class H2DurabilityInitializer implements ApplicationRunner {
             s.execute("SET DB_CLOSE_DELAY 0");
             s.execute("SET WRITE_DELAY 0");
             s.execute("CHECKPOINT SYNC");
-            String closeDelay = readSetting(s, "DB_CLOSE_DELAY");
-            String writeDelay = readSetting(s, "WRITE_DELAY");
+            String closeDelay = readSetting(c, "DB_CLOSE_DELAY");
+            String writeDelay = readSetting(c, "WRITE_DELAY");
             log.info("H2 durability settings applied: DB_CLOSE_DELAY={}, WRITE_DELAY={}", closeDelay, writeDelay);
         } catch (Exception e) {
             log.warn("Could not apply H2 durability settings: {}", e.toString());
         }
     }
 
-    private static String readSetting(Statement s, String name) {
-        try (ResultSet rs = s.executeQuery(
-            "SELECT SETTING_VALUE FROM INFORMATION_SCHEMA.SETTINGS WHERE SETTING_NAME='" + name + "'"
+    private String readSetting(Connection c, String name) {
+        try (PreparedStatement ps = c.prepareStatement(
+            "SELECT SETTING_VALUE FROM INFORMATION_SCHEMA.SETTINGS WHERE SETTING_NAME = ?"
         )) {
-            if (rs.next()) {
-                return rs.getString(1);
+            ps.setString(1, name);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getString(1) : "unknown";
             }
-        } catch (Exception ignored) {
-            // older H2 column names
-        }
-        try (ResultSet rs = s.executeQuery("SELECT * FROM INFORMATION_SCHEMA.SETTINGS")) {
-            while (rs.next()) {
-                String n;
-                try {
-                    n = rs.getString("SETTING_NAME");
-                } catch (Exception e) {
-                    n = rs.getString("NAME");
-                }
-                if (name.equalsIgnoreCase(n)) {
-                    try {
-                        return rs.getString("SETTING_VALUE");
-                    } catch (Exception e) {
-                        return rs.getString("VALUE");
-                    }
-                }
-            }
-        } catch (Exception e) {
+        } catch (SQLException e) {
+            log.warn("Could not read H2 setting {}: {}", name, e.toString());
             return "error";
         }
-        return "unknown";
     }
 }

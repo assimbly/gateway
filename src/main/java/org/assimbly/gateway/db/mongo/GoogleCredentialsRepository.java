@@ -7,7 +7,7 @@ import java.util.List;
 
 public class GoogleCredentialsRepository implements ICredentialRepository {
 
-    private MongoDao mongoDao;
+    private final MongoDao mongoDao;
 
     public GoogleCredentialsRepository(String databaseName) {
         mongoDao = new MongoDao(databaseName);

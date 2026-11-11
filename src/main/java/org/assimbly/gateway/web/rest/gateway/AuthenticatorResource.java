@@ -30,8 +30,8 @@ public class AuthenticatorResource {
 
     private static final GoogleAuthenticator authenticator = new GoogleAuthenticator();
 
-    private MongoDao mongoDao;
-    private String database = ConfigHelper.get("baseDatabaseName");
+    private final MongoDao mongoDao;
+    private final String database = ConfigHelper.get("baseDatabaseName");
 
     private final Logger log = LoggerFactory.getLogger(AuthenticatorResource.class);
 

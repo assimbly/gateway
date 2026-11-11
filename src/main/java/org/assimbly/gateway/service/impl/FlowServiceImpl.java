@@ -113,12 +113,16 @@ public class FlowServiceImpl implements FlowService {
     @Override
     @Transactional(readOnly = true)
     public Optional<FlowDTO> findByName(String name) {
-        return findByName(name, false);
+        return findFlowByName(name, false);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<FlowDTO> findByName(String name, boolean ignoreCase) {
+        return findFlowByName(name, ignoreCase);
+    }
+
+    private Optional<FlowDTO> findFlowByName(String name, boolean ignoreCase) {
         log.debug("Request to get Flow by name : {}", name);
         Optional<Flow> flow = flowRepository.findFirstByNameOrderByIdAsc(name);
         if (flow.isEmpty() && ignoreCase) {

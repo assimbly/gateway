@@ -20,7 +20,10 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Resource to return information about the currently running Spring profiles.
@@ -203,7 +206,26 @@ public class EnvironmentResource {
     }
 
     /** What to export for Fluxygen: the Flows (all when empty) and the passphrase that protects their secrets. */
-    public record FluxygenExportRequest(List<Long> flowIds, char[] passphrase) {}
+    public record FluxygenExportRequest(List<Long> flowIds, char[] passphrase) {
+
+        @Override
+        public boolean equals(Object o) {
+            return o instanceof FluxygenExportRequest(var otherFlowIds, var otherPassphrase)
+                && Objects.equals(flowIds, otherFlowIds)
+                && Arrays.equals(passphrase, otherPassphrase);
+        }
+
+        @Override
+        public int hashCode() {
+            return 31 * Objects.hashCode(flowIds) + Arrays.hashCode(passphrase);
+        }
+
+        // The passphrase is a secret, so it is masked rather than printed.
+        @Override
+        public String toString() {
+            return "FluxygenExportRequest[flowIds=" + flowIds + ", passphrase=" + (passphrase == null ? "null" : "****") + "]";
+        }
+    }
 
     /**
      * POST  /environment/{integrationid}/fluxygen-export : the Flows as a zip for Fluxygen, one DIL per Flow in the
@@ -225,7 +247,7 @@ public class EnvironmentResource {
     ) {
         try {
             byte[] zip = fluxygenExport.zip(integrationid, request.flowIds(), request.passphrase());
-            String fileName = fluxygenExport.fileName(LocalDate.now().toString());
+            String fileName = fluxygenExport.fileName(LocalDate.now(ZoneId.systemDefault()).toString());
             return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("application/zip"))
                 .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment().filename(fileName).build().toString())

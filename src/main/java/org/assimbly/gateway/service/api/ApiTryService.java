@@ -2,22 +2,31 @@ package org.assimbly.gateway.service.api;
 
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.service.dto.ApiHandlerDTO;
+import org.assimbly.util.BaseDirectory;
+import org.assimbly.util.CertificatesUtil;
 import org.springframework.stereotype.Service;
 
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
-import javax.net.ssl.X509ExtendedTrustManager;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
-import java.net.Socket;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -28,7 +37,7 @@ import java.util.stream.Collectors;
 
 /**
  * Try it: sends a request to an Operation through its real path on the runtime's REST listener, from the Gateway,
- * so the browser needn't trust the runtime's certificate or deal with CORS. It only ever calls the Operation's own
+ * so the browser needn't trust the runtime's certificate or deal with CORS. The Gateway does validate it. It only ever calls the Operation's own
  * path on the configured listener, never a URL from the request.
  */
 @Service
@@ -71,7 +80,7 @@ public class ApiTryService {
         builder.method(operation.method(), body == null || body.isEmpty() ? HttpRequest.BodyPublishers.noBody() : HttpRequest.BodyPublishers.ofString(body));
 
         long started = System.nanoTime();
-        try (HttpClient client = HttpClient.newBuilder().sslContext(trustingContext()).connectTimeout(Duration.ofSeconds(5)).build()) {
+        try (HttpClient client = HttpClient.newBuilder().sslContext(listenerContext()).connectTimeout(Duration.ofSeconds(5)).build()) {
             HttpResponse<String> response = client.send(builder.build(), HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
             Map<String, String> headers = new LinkedHashMap<>();
             response.headers().map().forEach((name, values) -> headers.put(name, String.join(", ", values)));
@@ -79,7 +88,7 @@ public class ApiTryService {
         } catch (IOException e) {
             throw new ApiRuleException("The runtime didn't answer on " + target + ": " + e.getMessage()
                 + ". Is the Handler Flow running?");
-        } catch (InterruptedException e) {
+        } catch (InterruptedException _) {
             Thread.currentThread().interrupt();
             throw new ApiRuleException("The request to " + target + " was interrupted.");
         }
@@ -124,47 +133,57 @@ public class ApiTryService {
     }
 
     /**
-     * The runtime's listener uses its own certificate, which the Gateway may not trust. This context is only used to
-     * call that listener, at the address the Gateway is configured with.
+     * The runtime's listener serves one of the runtime's own server identities, by default a self-signed one the JDK
+     * doesn't trust. Built per request, so an identity added or replaced under Certificates is trusted right away.
      */
-    private static SSLContext trustingContext() {
+    private static SSLContext listenerContext() {
+        Path identityStore = Path.of(BaseDirectory.getInstance().getBaseDirectory(), "security", CertificatesUtil.IDENTITY_STORE_FILE);
         try {
             SSLContext context = SSLContext.getInstance("TLS");
-            context.init(null, new X509ExtendedTrustManager[] {new TrustingManager()}, null);
+            context.init(null, listenerTrustManagers(identityStore, CertificatesUtil.runtimeKeystorePassword()), null);
             return context;
         } catch (GeneralSecurityException e) {
-            throw new IllegalStateException(e);
+            throw new IllegalStateException("Can't set up TLS to the runtime's REST listener", e);
         }
     }
 
-    private static final class TrustingManager extends X509ExtendedTrustManager {
-        @Override
-        public void checkClientTrusted(X509Certificate[] chain, String authType, Socket socket) {
+    /** Trusts the JDK's CAs and the certificates of the runtime's server identities. */
+    static TrustManager[] listenerTrustManagers(Path identityStore, String password) throws GeneralSecurityException {
+        KeyStore trusted = KeyStore.getInstance("PKCS12");
+        try {
+            trusted.load(null, null);
+            X509Certificate[] jdkCas = jdkTrustManager().getAcceptedIssuers();
+            for (int i = 0; i < jdkCas.length; i++) {
+                trusted.setCertificateEntry("jdk-" + i, jdkCas[i]);
+            }
+            // Only read, never created: the runtime gives itself a default identity only when it creates the file
+            if (Files.isRegularFile(identityStore)) {
+                KeyStore identities = KeyStore.getInstance("PKCS12");
+                try (InputStream in = Files.newInputStream(identityStore)) {
+                    identities.load(in, password.toCharArray());
+                }
+                for (String alias : Collections.list(identities.aliases())) {
+                    Certificate certificate = identities.getCertificate(alias);
+                    if (certificate != null) {
+                        trusted.setCertificateEntry("identity-" + alias, certificate);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException("Can't read the runtime's server identities in " + identityStore, e);
         }
+        TrustManagerFactory factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        factory.init(trusted);
+        return factory.getTrustManagers();
+    }
 
-        @Override
-        public void checkServerTrusted(X509Certificate[] chain, String authType, Socket socket) {
-        }
-
-        @Override
-        public void checkClientTrusted(X509Certificate[] chain, String authType, SSLEngine engine) {
-        }
-
-        @Override
-        public void checkServerTrusted(X509Certificate[] chain, String authType, SSLEngine engine) {
-        }
-
-        @Override
-        public void checkClientTrusted(X509Certificate[] chain, String authType) {
-        }
-
-        @Override
-        public void checkServerTrusted(X509Certificate[] chain, String authType) {
-        }
-
-        @Override
-        public X509Certificate[] getAcceptedIssuers() {
-            return new X509Certificate[0];
-        }
+    private static X509TrustManager jdkTrustManager() throws GeneralSecurityException {
+        TrustManagerFactory factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        factory.init((KeyStore) null);
+        return Arrays.stream(factory.getTrustManagers())
+            .filter(X509TrustManager.class::isInstance)
+            .map(X509TrustManager.class::cast)
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("The JDK has no X.509 trust manager"));
     }
 }

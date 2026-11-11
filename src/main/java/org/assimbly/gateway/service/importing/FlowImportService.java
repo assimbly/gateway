@@ -246,7 +246,14 @@ public class FlowImportService {
 
     /** The asked-for name, else the fallback id or name, made unique because a Flow is found by name. */
     private String flowName(String name, String fallbackId, String fallback) {
-        String base = name != null && !name.isBlank() ? name.strip() : fallbackId != null && !fallbackId.isBlank() ? fallbackId : fallback;
+        String base;
+        if (name != null && !name.isBlank()) {
+            base = name.strip();
+        } else if (fallbackId != null && !fallbackId.isBlank()) {
+            base = fallbackId;
+        } else {
+            base = fallback;
+        }
         String candidate = base;
         for (int n = 2; flowRepository.findFirstByNameOrderByIdAsc(candidate).isPresent(); n++) {
             candidate = base + "-" + n;

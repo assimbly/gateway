@@ -7,8 +7,6 @@ import org.assimbly.gateway.authenticate.util.helper.ConfigHelper;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Date;
 
 public final class JwtBuilder {
@@ -46,14 +44,10 @@ public final class JwtBuilder {
      * Create a date used as an expiration date. Date is currentDate + given seconds.
      *
      * @param seconds the time to add to the current date in seconds.
-     * @return a date represented as a Date object.
+     * @return a date represented as a Date object, because the JWT library only accepts a Date.
      */
     private static Date creatExpiration(int seconds) {
-        LocalDateTime date = LocalDateTime.now(ZoneId.systemDefault());
-        date = date.plusSeconds(seconds);
-
-        Instant instant = date.atZone(ZoneId.systemDefault()).toInstant();
-        return Date.from(instant);
+        return Date.from(Instant.now().plusSeconds(seconds));
     }
 
     /**

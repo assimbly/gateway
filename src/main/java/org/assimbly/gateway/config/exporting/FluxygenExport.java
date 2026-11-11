@@ -69,14 +69,13 @@ public class FluxygenExport {
      * characters or a Flow isn't one of the Integration's
      */
     public synchronized byte[] zip(Long integrationId, List<Long> flowIds, char[] passphrase) throws Exception {
-        try {
+        try(ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
             if (passphrase == null || passphrase.length < MIN_PASSPHRASE_LENGTH) {
                 throw new IllegalArgumentException("The passphrase must be at least " + MIN_PASSPHRASE_LENGTH + " characters.");
             }
             List<Flow> flows = flowsToExport(integrationId, flowIds);
             UnaryOperator<String> secretMapper = secretMapper(passphrase);
 
-            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
             List<Map<String, Object>> manifestFlows = new ArrayList<>();
             Set<String> files = new HashSet<>();
             try (ZipOutputStream zip = new ZipOutputStream(bytes, StandardCharsets.UTF_8)) {
@@ -131,7 +130,7 @@ public class FluxygenExport {
             String plain;
             try {
                 plain = isEncrypted(value) ? gateway.decrypt(value) : value;
-            } catch (RuntimeException e) {
+            } catch (RuntimeException _) {
                 // Not the cause: its message could hold the value.
                 throw new IllegalStateException("A secret could not be decrypted with this Gateway's key.");
             }

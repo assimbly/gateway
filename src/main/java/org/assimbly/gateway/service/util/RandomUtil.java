@@ -62,7 +62,7 @@ public final class RandomUtil {
      * @return the generated series data
      */
     public static String generateSeriesData() {
-        final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345678910";
 
         return IntStream.range(0, DEF_COUNT)
             .map(_ -> SECURE_RANDOM.nextInt(CHARACTERS.length()))
@@ -77,7 +77,7 @@ public final class RandomUtil {
      * @return the generated token data
      */
     public static String generateTokenData() {
-        final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345678911";
 
         return IntStream.range(0, DEF_COUNT)
             .map(_ -> SECURE_RANDOM.nextInt(CHARACTERS.length()))

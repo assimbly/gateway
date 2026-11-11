@@ -144,14 +144,17 @@ public class OpenApiDocsConfiguration {
             }
             for (MethodParameter parameter : handlerMethod.getMethodParameters()) {
                 if (!parameter.hasParameterAnnotation(RequestBody.class)) continue;
-                Doc doc = bodyDoc(handlerMethod.getMethod().getName(), parameter);
-                if (doc != null) {
-                    if (doc.description() != null) requestBody.setDescription(doc.description());
-                    if (doc.example() != null) requestBody.getContent().values().forEach(media -> media.setExample(doc.example()));
-                }
+                applyBodyDoc(requestBody, bodyDoc(handlerMethod.getMethod().getName(), parameter));
             }
             return operation;
         };
+    }
+
+    // The Swagger RequestBody is spelled out because the Spring annotation of the same name is imported
+    private static void applyBodyDoc(io.swagger.v3.oas.models.parameters.RequestBody requestBody, Doc doc) {
+        if (doc == null) return;
+        if (doc.description() != null) requestBody.setDescription(doc.description());
+        if (doc.example() != null) requestBody.getContent().values().forEach(media -> media.setExample(doc.example()));
     }
 
     private static boolean isGatewayResource(Class<?> type) {
@@ -190,7 +193,7 @@ public class OpenApiDocsConfiguration {
                 node = array;
             }
             return new Doc(null, node);
-        } catch (JsonProcessingException e) {
+        } catch (JsonProcessingException _) {
             return null;
         }
     }

@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
-import org.springframework.context.ApplicationListener;
 
 import javax.imageio.ImageIO;
 import javax.swing.JDialog;
@@ -21,6 +20,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 /**
@@ -31,7 +31,7 @@ public final class DesktopTray {
 
     private static final Logger log = LoggerFactory.getLogger(DesktopTray.class);
 
-    private volatile TrayIcon icon;
+    private final AtomicReference<TrayIcon> icon = new AtomicReference<>();
 
     private volatile String url;
 
@@ -45,9 +45,9 @@ public final class DesktopTray {
     public static DesktopTray showWhenStarting(SpringApplication application) {
         application.setHeadless(false);
         DesktopTray tray = new DesktopTray();
-        application.addListeners(new ApplicationListener<ApplicationEnvironmentPreparedEvent>() {
-            @Override
-            public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
+        // A lambda hides its event type from Spring, which then offers it every event; the check picks the one we want
+        application.addListeners(event -> {
+            if (event instanceof ApplicationEnvironmentPreparedEvent) {
                 tray.show();
             }
         });
@@ -67,7 +67,7 @@ public final class DesktopTray {
             SystemTray.getSystemTray().add(trayIcon);
             trayIcon.displayMessage("Assimbly is starting",
                 "This takes about 10 seconds. Your browser opens Assimbly when it is ready.", TrayIcon.MessageType.INFO);
-            icon = trayIcon;
+            icon.set(trayIcon);
         } catch (IOException | AWTException | RuntimeException e) {
             log.warn("Could not show the Assimbly tray icon: {}", e.getMessage());
         }
@@ -92,7 +92,7 @@ public final class DesktopTray {
     /** Says that Assimbly runs; the browser opens right after. */
     public void running(String url) {
         this.url = url;
-        TrayIcon trayIcon = icon;
+        TrayIcon trayIcon = icon.get();
         if (trayIcon != null) {
             trayIcon.setToolTip("Assimbly is running at " + url);
             trayIcon.displayMessage("Assimbly is running",
