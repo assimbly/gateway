@@ -21,7 +21,7 @@ export class AuthServerProvider {
       })
       .pipe(
         map(response => {
-          this.setToken(response.id_token);
+          this.setToken(response.id_token, credentials.rememberMe);
           return response;
         }),
       );
@@ -36,14 +36,17 @@ export class AuthServerProvider {
   }
 
   getToken(): string | null {
-    return localStorage.getItem(this.tokenKey);
+    return sessionStorage.getItem(this.tokenKey) ?? localStorage.getItem(this.tokenKey);
   }
 
-  setToken(token: string): void {
-    localStorage.setItem(this.tokenKey, token);
+  /** Keeps the token for this browser tab only, unless the user asked to be remembered. */
+  setToken(token: string, rememberMe = false): void {
+    this.clearToken();
+    (rememberMe ? localStorage : sessionStorage).setItem(this.tokenKey, token);
   }
 
   clearToken(): void {
+    sessionStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.tokenKey);
   }
 
