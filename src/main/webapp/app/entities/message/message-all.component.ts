@@ -22,7 +22,7 @@ import { AccountService } from 'app/core/auth/account.service';
 export class MessageAllComponent implements OnInit, OnDestroy {
   public messages: IMessage[] = [];
   public page: any;
-  private eventSubscriber: Subscription;
+  private eventSubscriber!: Subscription;
   private currentAccount: any;
   sortState: SortState = { predicate: 'name', order: 'asc' };
 
@@ -66,7 +66,7 @@ export class MessageAllComponent implements OnInit, OnDestroy {
       })
       .subscribe(
         res => {
-          this.messages = res.body;
+          this.messages = res.body!;
         },
         res => this.onError(res.body)
       );

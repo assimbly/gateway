@@ -22,7 +22,7 @@ export class ConnectionResolve implements Resolve<IConnection> {
     if (id) {
       return this.connection.find(id).pipe(
         filter((response: HttpResponse<Connection>) => response.ok),
-        map((connection: HttpResponse<Connection>) => connection.body)
+        map((connection: HttpResponse<Connection>) => connection.body!)
       );
     }
     return of(new Connection());

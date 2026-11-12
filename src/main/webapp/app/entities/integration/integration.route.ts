@@ -20,7 +20,7 @@ export class IntegrationResolve implements Resolve<IIntegration> {
     if (id) {
       return this.service.find(id).pipe(
         filter((response: HttpResponse<Integration>) => response.ok),
-        map((integration: HttpResponse<Integration>) => integration.body)
+        map((integration: HttpResponse<Integration>) => integration.body!)
       );
     }
     return of(new Integration());

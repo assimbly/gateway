@@ -12,7 +12,7 @@
         <button type="button" class="btn btn-fx btn-fx-secondary" data-dismiss="modal" (click)="clear()">
             <fa-icon [icon]="'ban'"></fa-icon><span>Cancel</span>
         </button>
-        <button id="jhi-confirm-delete-connection" type="button" (click)="confirmDelete(connection.id)" class="btn btn-fx btn-fx-danger" [disabled]="!deleteMode">
+        <button id="jhi-confirm-delete-connection" type="button" (click)="confirmDelete(connection.id!)" class="btn btn-fx btn-fx-danger" [disabled]="!deleteMode">
             <fa-icon [icon]="'trash'"></fa-icon><span>Delete</span>
         </button>
     </div>

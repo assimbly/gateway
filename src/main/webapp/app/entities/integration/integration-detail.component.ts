@@ -13,7 +13,7 @@ import { IIntegration } from 'app/shared/model/integration.model';
     imports: [CommonModule, RouterModule, FontAwesomeModule, AlertError],
 })
 export class IntegrationDetailComponent implements OnInit {
-    integration: IIntegration;
+    integration!: IIntegration;
 
     constructor(protected activatedRoute: ActivatedRoute) {}
 

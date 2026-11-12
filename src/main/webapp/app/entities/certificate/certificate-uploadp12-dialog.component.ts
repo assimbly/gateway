@@ -16,13 +16,13 @@ export class CertificateUploadP12DialogComponent {
   readonly identityStore = IDENTITY_STORE;
   readonly namePattern = CERTIFICATE_NAME_PATTERN;
   name = '';
-  certificateFile: string;
+  certificateFile!: string;
   password = '';
   fileName = 'Choose file';
-  fileNameWithoutExtension: string;
+  fileNameWithoutExtension!: string;
   isSaving = false;
   uploadError = false;
-  uploadErrorMessage: String;
+  uploadErrorMessage!: String;
 
   constructor(private eventManager: EventManager, private certificateService: CertificateService, public activeModal: NgbActiveModal) {}
 
@@ -35,9 +35,9 @@ export class CertificateUploadP12DialogComponent {
     reader.onload = () => {
       this.certificateFile = reader.result as string;
     };
-    reader.readAsDataURL((event.target as HTMLInputElement).files[0]);
+    reader.readAsDataURL((event.target as HTMLInputElement).files![0]);
 
-    this.fileName = (event.target as HTMLInputElement).files[0].name;
+    this.fileName = (event.target as HTMLInputElement).files![0].name;
     this.fileNameWithoutExtension = this.fileName.split('.').slice(0, -1).join('.');
     if (!this.name) {
       this.name = toCertificateName(this.fileNameWithoutExtension);
@@ -49,7 +49,7 @@ export class CertificateUploadP12DialogComponent {
     // the record stores the certificate the runtime returns, never the uploaded file with its private key
     this.certificateService
       .importIdentity(this.name, this.certificateFile, this.password)
-      .pipe(switchMap(res => this.certificateService.createFromRuntimeResponse(res.body, 'Identity (' + this.fileNameWithoutExtension + ')')))
+      .pipe(switchMap(res => this.certificateService.createFromRuntimeResponse(res.body!, 'Identity (' + this.fileNameWithoutExtension + ')')))
       .subscribe(
         () => {
           this.uploadError = false;

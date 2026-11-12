@@ -20,8 +20,8 @@ import { Router } from '@angular/router';
     imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, PopoverModule, SaveShortcutDirective],
 })
 export class IntegrationUpdateComponent implements OnInit {
-    integration: IIntegration;
-    isSaving: boolean;
+    integration!: IIntegration;
+    isSaving!: boolean;
 
     public integrationListType = [GatewayType.FULL, GatewayType.BROKER, GatewayType.CONNECTOR];
     public integrationListStage = [EnvironmentType.DEVELOPMENT, EnvironmentType.TEST, EnvironmentType.ACCEPTANCE, EnvironmentType.PRODUCTION];
@@ -29,10 +29,10 @@ export class IntegrationUpdateComponent implements OnInit {
     consumerComponentsNames: Array<any> = [];
     producerComponentsNames: Array<any> = [];
 
-    generalPopoverMessage: string;
-    typePopoverMessage: string;
-    environmentPopoverMessage: string;
-    defaultPopoverMessage: string;
+    generalPopoverMessage!: string;
+    typePopoverMessage!: string;
+    environmentPopoverMessage!: string;
+    defaultPopoverMessage!: string;
 
     constructor(
 		protected alertService: AlertService,
@@ -61,7 +61,7 @@ export class IntegrationUpdateComponent implements OnInit {
         }
 
         if (this.activatedRoute.snapshot.fragment === 'clone') {
-            this.integration.id = null;
+            this.integration.id = null!;
         }
     }
 
@@ -102,11 +102,11 @@ export class IntegrationUpdateComponent implements OnInit {
     }
 
     setTypeIntegration() {
-        if (this.integration.type.toString() === 'BROKER') {
+        if (this.integration.type!.toString() === 'BROKER') {
             this.integration.defaultFromComponentType = 'activemq';
             this.integration.defaultToComponentType = 'activemq';
             this.integration.defaultErrorComponentType = 'activemq';
-        } else if (this.integration.type.toString() === 'ARTEMIS') {
+        } else if (this.integration.type!.toString() === 'ARTEMIS') {
             this.integration.defaultFromComponentType = 'amqp';
             this.integration.defaultToComponentType = 'amqp';
             this.integration.defaultErrorComponentType = 'amqp';

@@ -9,7 +9,7 @@ export class ConnectionPopupService {
     private ngbModalRef: NgbModalRef;
 
     constructor(private modalService: NgbModal, private router: Router, private connectionService: ConnectionService) {
-        this.ngbModalRef = null;
+        this.ngbModalRef = null!;
     }
 
     open(component: Component, id?: number | any, type?: string): Promise<NgbModalRef> {
@@ -17,12 +17,12 @@ export class ConnectionPopupService {
         return new Promise<NgbModalRef>((resolve, reject) => {
             const isOpen = this.ngbModalRef !== null;
             if (isOpen) {
-                this.ngbModalRef = null;
+                this.ngbModalRef = null!;
             }
 
             if (id) {
                 this.connectionService.find(id).subscribe(connection => {
-                    this.ngbModalRef = this.connectionModalRef(component, connection.body);
+                    this.ngbModalRef = this.connectionModalRef(component, connection.body!);
                     resolve(this.ngbModalRef);
                 });
             } else {

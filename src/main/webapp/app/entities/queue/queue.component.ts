@@ -39,7 +39,7 @@ export class QueueComponent implements OnInit, OnDestroy {
   links: any;
   page: number;
   sortState: SortState = { predicate: 'name', order: 'asc' };
-  timeInterval: Subscription;
+  timeInterval!: Subscription;
   isBroker: boolean | undefined;
   /** Whether the Queues of the Broker have been asked for, so an empty list is known to be empty. */
   addressesLoaded = false;
@@ -146,14 +146,14 @@ export class QueueComponent implements OnInit, OnDestroy {
     this.queueService.getBrokers().subscribe(
       data => {
         if (data) {
-          for (let i = 0; i < data.body.length; i++) {
-            this.brokers.push(data.body[i]);
+          for (let i = 0; i < data.body!.length; i++) {
+            this.brokers.push(data.body![i]);
           }
 
           if (this.brokers[0]) {
             this.isBroker = true;
 
-            this.brokerType = this.brokers[0].type;
+            this.brokerType = this.brokers[0].type!;
             if (this.brokerType != null) {
               this.getAllQueues();
             }
@@ -175,12 +175,12 @@ export class QueueComponent implements OnInit, OnDestroy {
       this.queueService.getAllQueues(this.brokerType).subscribe(
         data => {
           this.addressesLoaded = true;
-          if (data && data.body.queues) {
+          if (data && data.body!.queues) {
             this.isBroker = true;
-            if (data.body.queues.queue) {
-              for (let i = 0; i < data.body.queues.queue.length; i++) {
-                if (data.body.queues.queue[i].temporary.toString() === 'false') {
-                  this.addresses.push(data.body.queues.queue[i]);
+            if (data.body!.queues.queue) {
+              for (let i = 0; i < data.body!.queues.queue.length; i++) {
+                if (data.body!.queues.queue[i].temporary!.toString() === 'false') {
+                  this.addresses.push(data.body!.queues.queue[i]);
                 }
               }
             }
@@ -203,10 +203,10 @@ export class QueueComponent implements OnInit, OnDestroy {
     if (this.isBroker) {
       this.queueService.getAllQueues(this.brokerType).subscribe(
         data => {
-          if (data && data.body.queues) {
+          if (data && data.body!.queues) {
             this.isBroker = true;
             // Replace the whole list, so Queues deleted on the Broker drop out of the table.
-            this.addresses = (data.body.queues.queue ?? []).filter(queue => queue.temporary.toString() === 'false');
+            this.addresses = (data.body!.queues.queue ?? []).filter(queue => queue.temporary!.toString() === 'false');
           } else {
             this.isBroker = false;
           }

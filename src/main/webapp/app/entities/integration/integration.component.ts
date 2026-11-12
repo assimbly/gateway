@@ -43,9 +43,9 @@ export class IntegrationComponent implements OnInit, OnDestroy {
     /** Whether the Gateways have been asked for, so an empty list is known to be empty. */
     readonly loaded = signal(false);
     currentAccount: any;
-    eventSubscriber: Subscription;
-    restartIntegrationMessage: string;
-    modalRef: NgbModalRef | null;
+    eventSubscriber!: Subscription;
+    restartIntegrationMessage!: string;
+    modalRef!: NgbModalRef | null;
     searchText = '';
     infoIntegration: IIntegration | null = null;
     sortState: SortState = { predicate: 'name', order: 'asc' };

@@ -22,11 +22,11 @@ import { PopoverModule } from 'ngx-bootstrap/popover';
 })
 export class TopicUpdateComponent implements OnInit {
     isSaving = false;
-    isClose: boolean;
+    isClose!: boolean;
 
-    editForm: FormGroup;
+    editForm!: FormGroup;
 
-    namePopoverMessage: string;
+    namePopoverMessage!: string;
     brokerType = '';
     brokers: IBroker[];
 
@@ -81,7 +81,7 @@ export class TopicUpdateComponent implements OnInit {
         this.isSaving = true;
         const address = this.createFromForm();
 
-        const topicNames = address.name.split(',');
+        const topicNames = address.name!.split(',');
 
         if (topicNames) {
             for (let i = 0; i < topicNames.length; i++) {
@@ -97,7 +97,7 @@ export class TopicUpdateComponent implements OnInit {
             }
         } else {
             this.isClose = true;
-            this.subscribeToSaveResponse(this.topicService.createTopic(address.name, this.brokerType));
+            this.subscribeToSaveResponse(this.topicService.createTopic(address.name!, this.brokerType));
         }
     }
 
@@ -135,9 +135,9 @@ export class TopicUpdateComponent implements OnInit {
         this.topicService.getBrokers().subscribe(
             data => {
                 if (data) {
-                    for (const broker of data.body) {
+                    for (const broker of data.body!) {
                         this.brokers.push(broker);
-                        this.brokerType = broker.type;
+                        this.brokerType = broker.type!;
                     }
                 }
             },

@@ -47,12 +47,12 @@ import { saveAs } from 'file-saver/FileSaver';
 export class CertificateComponent implements OnInit, OnDestroy {
   securities: ICertificate[] = [];
   currentAccount: any;
-  eventSubscriber: Subscription;
+  eventSubscriber!: Subscription;
   itemsPerPage: number;
   links: any;
   page: any;
   sortState: SortState = { predicate: 'certificateName', order: 'asc' };
-  totalItems: number;
+  totalItems!: number;
   searchText = '';
   loading = true;
   loadFailed = false;
@@ -92,7 +92,7 @@ export class CertificateComponent implements OnInit, OnDestroy {
         sort: this.sort(),
       })
       .subscribe(
-        (res: HttpResponse<ICertificate[]>) => this.paginateSecurities(res.body, res.headers),
+        (res: HttpResponse<ICertificate[]>) => this.paginateSecurities(res.body!, res.headers),
         (res: HttpErrorResponse) => this.onError(res.message)
       );
   }
@@ -178,23 +178,23 @@ export class CertificateComponent implements OnInit, OnDestroy {
       const certificate = data.body;
       let exportFileName = 'certificate';
 
-      if (certificate.certificateName.startsWith('Generic') || certificate.certificateName.startsWith('Self-Signed')) {
-        exportFileName = certificate.certificateName.substring(
-          certificate.certificateName.indexOf('(') + 1,
-          certificate.certificateName.lastIndexOf(')')
+      if (certificate!.certificateName!.startsWith('Generic') || certificate!.certificateName!.startsWith('Self-Signed')) {
+        exportFileName = certificate!.certificateName!.substring(
+          certificate!.certificateName!.indexOf('(') + 1,
+          certificate!.certificateName!.lastIndexOf(')')
         );
       } else {
-        exportFileName = certificate.certificateName;
+        exportFileName = certificate!.certificateName!;
       }
 
-      const blob = new Blob([certificate.certificateFile], { type: 'plain/text' });
+      const blob = new Blob([certificate!.certificateFile!], { type: 'plain/text' });
       saveAs(blob, `${exportFileName}.cer`);
     });
   }
 
   protected paginateSecurities(data: ICertificate[], headers: HttpHeaders) {
-    this.links = this.parseLinks.parse(headers.get('link'));
-    this.totalItems = parseInt(headers.get('X-Total-Count'), 10);
+    this.links = this.parseLinks.parse(headers.get('link')!);
+    this.totalItems = parseInt(headers.get('X-Total-Count')!, 10);
     const body = data ?? [];
     if (this.page > 0) {
       this.securities = [...this.securities, ...body];

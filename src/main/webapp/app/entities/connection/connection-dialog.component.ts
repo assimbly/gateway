@@ -32,18 +32,18 @@ import { SaveShortcutDirective } from 'app/shared/keyboard';
 export class ConnectionDialogComponent implements OnInit {
 
     public connectionKeys: Array<ConnectionKeys> = [];
-    public connection: Connection;
+    public connection!: Connection;
     public connectionNames: Array<string> = [];
-    public isSaving: boolean;
+    public isSaving!: boolean;
     public connectionKeysKeys: Array<string> = [];
     public driversList: Array<String> = this.connections.driversList;
     jmsProvidersList: Array<String> = ['ActiveMQ Artemis', 'ActiveMQ Classic', 'AMQ'];
     pooledList: Array<String> = ['true', 'false'];
 
-    public disableType: boolean;
-    public connectionType: string;
+    public disableType!: boolean;
+    public connectionType!: string;
     private requiredConnectionKey: Array<RequiredConnectionKey> = [];
-    private requiredType: RequiredConnectionKey;
+    private requiredType!: RequiredConnectionKey;
     private connectionKeysRemoveList: Array<ConnectionKeys> = [];
 
     constructor(
@@ -66,7 +66,7 @@ export class ConnectionDialogComponent implements OnInit {
         this.addRequiredConnectionKeys();
         this.connectionService.query().subscribe(
             res => {
-                this.connectionNames = res.body.filter(s => s.id !== this.connection.id).map(s => s.name);
+                this.connectionNames = res.body!.filter(s => s.id !== this.connection.id).map(s => s.name!);
                 this.cdr.markForCheck();
             },
             res => this.onError(res.body)
@@ -88,11 +88,11 @@ export class ConnectionDialogComponent implements OnInit {
             // Drop the keys only the previous type needed; saved ones are deleted on save
             const keep = (newType?.connectionKeys ?? []).map(rsk => rsk.connectionKeyName);
             const drop = this.requiredType.connectionKeys.map(rsk => rsk.connectionKeyName).filter(key => !keep.includes(key));
-            this.connectionKeysRemoveList = this.connectionKeys.filter(sk => drop.includes(sk.key) && sk.id);
-            this.connectionKeys = this.connectionKeys.filter(sk => !drop.includes(sk.key));
+            this.connectionKeysRemoveList = this.connectionKeys.filter(sk => drop.includes(sk.key!) && sk.id);
+            this.connectionKeys = this.connectionKeys.filter(sk => !drop.includes(sk.key!));
         }
 
-        this.requiredType = newType;
+        this.requiredType = newType!;
         if (typeof this.requiredType === 'undefined') {
             return;
         }
@@ -105,7 +105,7 @@ export class ConnectionDialogComponent implements OnInit {
                 rsk = ersk;
                 this.connectionKeys.splice(this.connectionKeys.indexOf(ersk), 1);
             }
-            rsk.id = cloneHeader ? null : rsk.id;
+            rsk.id = cloneHeader ? null! : rsk.id;
             rsk.key = sk.connectionKeyName;
             rsk.valueType = sk.valueType;
             rsk.placeholder = sk.placeholder;
@@ -145,7 +145,7 @@ export class ConnectionDialogComponent implements OnInit {
     }
 
     deleteConnectionKeys(connectionKey: ConnectionKeys) {
-        this.connectionKeysService.delete(connectionKey.id).subscribe(() => {
+        this.connectionKeysService.delete(connectionKey.id!).subscribe(() => {
             this.removeConnectionKeys(this.connectionKeys.indexOf(connectionKey));
             this.cdr.markForCheck();
         });
@@ -173,20 +173,20 @@ export class ConnectionDialogComponent implements OnInit {
     private loadConnectionKeys(cloneHeader: boolean) {
         if (this.connection.id) {
             this.connectionKeysService.query().subscribe(res => {
-                this.connectionKeys = res.body.filter(sk => sk.connectionId === this.connection.id);
+                this.connectionKeys = res.body!.filter(sk => sk.connectionId === this.connection.id);
                 this.changeType(cloneHeader);
-                this.connection.id = cloneHeader ? null : this.connection.id;
+                this.connection.id = cloneHeader ? null! : this.connection.id;
                 this.cdr.markForCheck();
             });
         } else if (this.connection.type) {
             this.changeType(cloneHeader);
-            this.connection.id = cloneHeader ? null : this.connection.id;
+            this.connection.id = cloneHeader ? null! : this.connection.id;
         }
     }
 
     private mapConnectionKeysKeys() {
         if (typeof this.connectionKeys !== 'undefined') {
-            this.connectionKeysKeys = this.connectionKeys.map(sk => sk.key);
+            this.connectionKeysKeys = this.connectionKeys.map(sk => sk.key!);
             this.connectionKeysKeys = this.connectionKeysKeys.filter(k => k !== undefined);
         }
     }
@@ -194,7 +194,7 @@ export class ConnectionDialogComponent implements OnInit {
     private subscribeToSaveResponse(result: Observable<HttpResponse<IConnection>>) {
         result.subscribe(data => {
             if (data.ok) {
-                this.onSaveSuccess(data.body, true);
+                this.onSaveSuccess(data.body!, true);
             } else {
                 this.onSaveError();
             }
@@ -209,18 +209,18 @@ export class ConnectionDialogComponent implements OnInit {
         this.activeModal.dismiss(result);
 
         this.connectionKeysRemoveList.forEach(skrl => {
-            this.connectionKeysService.delete(skrl.id).subscribe();
+            this.connectionKeysService.delete(skrl.id!).subscribe();
         });
 
         this.connectionKeys.forEach(connectionKey => {
             connectionKey.connectionId = result.id;
             if (connectionKey.id) {
                 this.connectionKeysService.update(connectionKey).subscribe(sk => {
-                    connectionKey = sk.body;
+                    connectionKey = sk.body!;
                 });
             } else {
                 this.connectionKeysService.create(connectionKey).subscribe(sk => {
-                    connectionKey = sk.body;
+                    connectionKey = sk.body!;
                 });
             }
         });

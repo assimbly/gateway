@@ -191,7 +191,7 @@ export class FlowService {
   /** Sends the Flow's saved configuration to the runtime, to start it next; a failure is kept as an Alert. */
   configure(flowId: number): Observable<unknown> {
     return this.getConfiguration(flowId).pipe(
-      switchMap(configuration => this.setConfiguration(flowId, configuration.body, 'true')),
+      switchMap(configuration => this.setConfiguration(flowId, configuration.body!, 'true')),
       catchError(error => this.recordFailure(flowId, 'configure', errorFailure(error)).pipe(switchMap(() => throwError(() => error)))),
     );
   }
@@ -449,7 +449,7 @@ export class FlowService {
       })
       .subscribe(
         data => {
-          const blob = new Blob([data.body], { type: 'application/xml' });
+          const blob = new Blob([data.body!], { type: 'application/xml' });
           saveAs(blob, `export_integration_${integration.name}_${exportDate}.xml`);
         },
         error => console.log(error)
@@ -476,7 +476,7 @@ export class FlowService {
       .pipe(
         map(response => {
           const fileName = attachmentName(response.headers.get('Content-Disposition')) ?? `assimbly-to-fluxygen-${this.getDate()}.zip`;
-          saveAs(new Blob([response.body], { type: 'application/zip' }), fileName);
+          saveAs(new Blob([response.body!], { type: 'application/zip' }), fileName);
           return fileName;
         }),
         catchError(error => from(failureText(error)).pipe(switchMap(message => throwError(() => new Error(message))))),
@@ -499,7 +499,7 @@ export class FlowService {
       })
       .subscribe(
         data => {
-          const blob = new Blob([data.body], { type: 'application/xml' });
+          const blob = new Blob([data.body!], { type: 'application/xml' });
           saveAs(blob, `export_flow_${flow.name}_${exportDate}.xml`);
         },
         error => console.log(error)

@@ -11,8 +11,8 @@
             <input type="text" class="form-control" name="name" id="field_name" required maxlength="255" [jhiExistingConnectionNames]='connectionNames'
                 [(ngModel)]="connection.name" #name="ngModel"  />
             <div *ngIf="name.invalid && (name.dirty || name.touched)" class="invalid-field-message">
-                <span *ngIf="name.errors.required">Name is required.</span>
-                <span *ngIf="name.errors.existingConnectionName">Name already exists.</span>
+                <span *ngIf="name.errors?.required">Name is required.</span>
+                <span *ngIf="name.errors?.existingConnectionName">Name already exists.</span>
             </div>
         </div>
       <div class="form-group" [hidden]="!connection.id">
@@ -25,7 +25,7 @@
                 <option [ngValue]="type" *ngFor="let type of connections.connectionsList">{{type}}</option>
             </select>
             <div *ngIf="type.invalid && (type.dirty || type.touched)" class="invalid-field-message">
-                <span *ngIf="type.errors.required">Type is required.</span>
+                <span *ngIf="type.errors?.required">Type is required.</span>
             </div>
         </div>
 
@@ -49,17 +49,17 @@
                                     required maxlength="255" id="connectionKey-key-{{idx}}" [disabled]="connectionKey.isRequired"
                                     #requiredKey="ngModel" />
                                 <div *ngIf="requiredKey.invalid && (requiredKey.dirty || requiredKey.touched)" class="invalid-field-message">
-                                    <span *ngIf="requiredKey.errors.required">Key is required.</span>
+                                    <span *ngIf="requiredKey.errors?.required">Key is required.</span>
                                 </div>
                             </td>
                             <ng-template #notRequired>
                                 <td>
                                     <input type="text" class="form-control" [(ngModel)]="connectionKey.key" value="connectionKey.key" name="connectionKey-key-{{idx}}"
-                                        required maxlength="255" [jhiExistingConnectionKeys]="connectionKeysKeys" [disabled]="connectionKey.isRequired"
+                                        required maxlength="255" [jhiExistingConnectionKeys]="connectionKeysKeys" [disabled]="!!connectionKey.isRequired"
                                         id="connectionKey-key-{{idx}}" #key="ngModel" />
                                     <div *ngIf="key.invalid && (key.dirty || key.touched)" class="invalid-field-message">
-                                        <span *ngIf="key.errors.required">Key is required.</span>
-                                        <span *ngIf="key.errors.existingConnectionKey">Key already exists.</span>
+                                        <span *ngIf="key.errors?.required">Key is required.</span>
+                                        <span *ngIf="key.errors?.existingConnectionKey">Key already exists.</span>
                                     </div>
                                 </td>
                             </ng-template>
@@ -68,7 +68,7 @@
                                     id="connectionKey-value-{{idx}}" required maxlength="1000" value="connectionKey.value" #value="ngModel"
                                     [attr.autocomplete]="connectionKey.valueType === 'password' ? 'new-password' : 'nope'"/>
                                 <div *ngIf="value.invalid && (value.dirty || value.touched)" class="invalid-field-message">
-                                    <span *ngIf="value.errors.required">Value is required.</span>
+                                    <span *ngIf="value.errors?.required">Value is required.</span>
                                 </div>
                             </td>
                             <ng-template #isList>
@@ -85,7 +85,7 @@
                                         </ng-container>
                                     </select>
                                     <div *ngIf="listValue.invalid && (listValue.dirty || listValue.touched)" class="invalid-field-message">
-                                        <span *ngIf="listValue.errors.required">Value is required.</span>
+                                        <span *ngIf="listValue.errors?.required">Value is required.</span>
                                     </div>
                                 </td>
                             </ng-template>

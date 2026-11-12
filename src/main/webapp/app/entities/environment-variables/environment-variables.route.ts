@@ -20,7 +20,7 @@ export class EnvironmentVariablesResolve implements Resolve<IEnvironmentVariable
     if (id) {
       return this.service.find(id).pipe(
         filter((response: HttpResponse<EnvironmentVariables>) => response.ok),
-        map((environmentVariables: HttpResponse<EnvironmentVariables>) => environmentVariables.body)
+        map((environmentVariables: HttpResponse<EnvironmentVariables>) => environmentVariables.body!)
       );
     }
     return of(new EnvironmentVariables());

@@ -28,12 +28,12 @@ import { MessagePopupService } from 'app/entities/message/message-popup.service'
   imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, ForbiddenHeaderValidatorDirective, ForbiddenMessageNamesValidatorDirective, SaveShortcutDirective],
 })
 export class MessageDialogComponent implements OnInit {
-  message: IMessage;
-  messages: IMessage[];
+  message!: IMessage;
+  messages!: IMessage[];
   messageNames: Array<string> = [];
   headers: Array<Header> = [];
   headerArray: Array<string> = [];
-  isSaving: boolean;
+  isSaving!: boolean;
   public typeHeader: string[] = ['header', 'property'];
   public languageHeader: string[] = ['constant', 'simple', 'groovy', 'jsonpath', 'xpath'];
 
@@ -51,8 +51,8 @@ export class MessageDialogComponent implements OnInit {
     this.isSaving = false;
     this.messageService.query().subscribe(
       res => {
-        this.messages = res.body;
-        this.messageNames = this.messages.map(h => h.name);
+        this.messages = res.body!;
+        this.messageNames = this.messages.map(h => h.name!);
       },
       res => this.onError(res.body)
     );
@@ -63,14 +63,14 @@ export class MessageDialogComponent implements OnInit {
   private loadHeader(cloneHeader: boolean) {
     if (this.message.id) {
       this.headerService.query().subscribe(res => {
-        this.headers = res.body.filter(hk => hk.messageId === this.message.id);
+        this.headers = res.body!.filter(hk => hk.messageId === this.message.id);
       });
     } else {
       const hk = new Header();
       hk.type = this.typeHeader[0];
       hk.language = this.languageHeader[0];
       this.headers.push(hk);
-      this.message.id = cloneHeader ? null : this.message.id;
+      this.message.id = cloneHeader ? null! : this.message.id;
     }
   }
 
@@ -88,7 +88,7 @@ export class MessageDialogComponent implements OnInit {
   }
 
   deleteHeader(header: IHeader) {
-    this.headerService.delete(header.id).subscribe(res => {
+    this.headerService.delete(header.id!).subscribe(res => {
       this.removeHeader(this.headers.indexOf(header));
     });
   }
@@ -126,7 +126,7 @@ export class MessageDialogComponent implements OnInit {
 
   private mapHeaders() {
     if (typeof this.headers !== 'undefined') {
-      this.headerArray = this.headers.map(hk => hk.key);
+      this.headerArray = this.headers.map(hk => hk.key!);
       this.headerArray = this.headerArray.filter(k => k !== undefined);
     }
   }
@@ -134,7 +134,7 @@ export class MessageDialogComponent implements OnInit {
   private subscribeToSaveResponse(result: Observable<HttpResponse<IMessage>>, closePopup: boolean) {
     result.subscribe(data => {
       if (data.ok) {
-        this.onSaveSuccess(data.body, closePopup);
+        this.onSaveSuccess(data.body!, closePopup);
       } else {
         this.onSaveError();
       }
@@ -152,11 +152,11 @@ export class MessageDialogComponent implements OnInit {
       header.messageId = result.id;
       if (header.id) {
         this.headerService.update(header).subscribe(hk => {
-          header = hk.body;
+          header = hk.body!;
         });
       } else {
         this.headerService.create(header).subscribe(hk => {
-          header = hk.body;
+          header = hk.body!;
         });
       }
     });

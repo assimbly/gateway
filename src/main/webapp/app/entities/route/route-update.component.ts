@@ -29,9 +29,9 @@ export class RouteUpdateComponent implements OnInit {
     private routeOptionsCache: Record<string, unknown> | null = null;
 
     editForm = this.fb.group({
-        id: [],
-        name: [],
-        type: [],
+        id: [null as IRoute['id'] | null],
+        name: [null as IRoute['name'] | null],
+        type: [null as IRoute['type'] | null],
         content: []
     });
 

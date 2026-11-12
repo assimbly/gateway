@@ -47,11 +47,11 @@ export class BrokerMessageSenderComponent implements OnInit, OnDestroy {
     readonly bodyMode = signal<BodyMode>('text');
     readonly headers = signal<SendHeader[]>([]);
 
-    brokerType: string;
+    brokerType!: string;
     brokers: IBroker[] = [];
 
-    endpointName: string;
-    endpointType: string;
+    endpointName!: string;
+    endpointType!: string;
 
     // names of the existing queues or topics, offered as suggestions for the destination
     suggestions: string[] = [];
@@ -62,7 +62,7 @@ export class BrokerMessageSenderComponent implements OnInit, OnDestroy {
     // true when the page was opened from an endpoint row (query params), false when opened from the sidebar
     openedFromEndpoint = false;
 
-    messageSenderForm: FormGroup;
+    messageSenderForm!: FormGroup;
     finished = false;
 
     private readonly uploaded = new UploadedMessages(this.body, this.bodyMode, this.headers);
@@ -145,7 +145,7 @@ export class BrokerMessageSenderComponent implements OnInit, OnDestroy {
                 this.loadingSuggestions = false;
                 this.suggestions = addresses
                     .filter(address => address.temporary?.toString() !== 'true' && !!address.name)
-                    .map(address => address.name)
+                    .map(address => address.name!)
                     .sort();
                 this.updateEndpointOptions();
             },
@@ -210,7 +210,7 @@ export class BrokerMessageSenderComponent implements OnInit, OnDestroy {
             data => {
                 if (data) {
                     this.brokers = data.body ?? [];
-                    this.brokerType = this.brokers[0]?.type;
+                    this.brokerType = this.brokers[0]?.type!;
                     if (this.brokerType == null) {
                         this.brokerType = 'artemis';
                     }

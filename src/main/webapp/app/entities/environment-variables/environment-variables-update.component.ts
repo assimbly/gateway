@@ -23,10 +23,10 @@ import { forbiddenEnvironmentKeysValidator } from './environment-variables-valid
 })
 export class EnvironmentVariablesUpdateComponent implements OnInit {
     environmentVariables: IEnvironmentVariables = new EnvironmentVariables();
-    isSaving: boolean;
+    isSaving!: boolean;
 
     integrations: IIntegration[] = [];
-    environmentVariablesForm: FormGroup;
+    environmentVariablesForm!: FormGroup;
     private knownVariables: IEnvironmentVariables[] = [];
 
     constructor(
@@ -47,7 +47,7 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
                 this.environmentVariables.encrypted = false;
             }
             if (this.activatedRoute.snapshot.fragment === 'clone') {
-                this.environmentVariables.id = null;
+                this.environmentVariables.id = null!;
             }
             this.environmentVariablesForm.patchValue({
                 id: this.environmentVariables.id,
@@ -61,7 +61,7 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
 
         this.integrationService.query().subscribe(
             (res: HttpResponse<IIntegration[]>) => {
-                this.integrations = res.body;
+                this.integrations = res.body!;
                 this.environmentVariables.integrationId = this.integrations[0].id;
                 if (!this.environmentVariablesForm.controls.integrationId.value) {
                     this.environmentVariablesForm.patchValue({

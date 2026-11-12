@@ -26,15 +26,15 @@ import { ForbiddenConnectionKeysValidatorDirective } from './connection-keys-val
 })
 export class ConnectionKeysComponent implements OnInit, OnChanges {
     @Input() connectionKeys: Array<IConnectionKeys> = [];
-    @Input() connection: Connection;
+    @Input() connection!: Connection;
 
     connectionKeysKeys: Array<string> = [];
-    isSaving: boolean;
-    connectionKey: IConnectionKeys;
+    isSaving!: boolean;
+    connectionKey!: IConnectionKeys;
     currentAccount: any;
-    eventSubscriber: Subscription;
+    eventSubscriber!: Subscription;
     requiredConnectionKey: Array<RequiredConnectionKey> = [];
-    private requiredType: RequiredConnectionKey;
+    private requiredType!: RequiredConnectionKey;
     driversList: Array<String> = this.connections.driversList;
     jmsProvidersList: Array<String> = ['ActiveMQ Artemis', 'ActiveMQ Classic', 'AMQ'];
     pooledList: Array<String> = ['true', 'false'];
@@ -51,7 +51,7 @@ export class ConnectionKeysComponent implements OnInit, OnChanges {
     loadAll() {
         this.connectionKeysService.query().subscribe(
             (res: HttpResponse<IConnectionKeys[]>) => {
-                this.connectionKeys = res.body;
+                this.connectionKeys = res.body!;
             },
             (res: HttpErrorResponse) => this.onError(res.message)
         );
@@ -102,7 +102,7 @@ export class ConnectionKeysComponent implements OnInit, OnChanges {
             }
             const requiredType = this.requiredConnectionKey.find(x => x.name === this.connection.type);
             const requiredConnectionKeys = new Array<ConnectionKeys>();
-            requiredType.connectionKeys.forEach(sk => {
+            requiredType!.connectionKeys.forEach(sk => {
                 const ersk = this.connectionKeys.find(s => s.key === sk.connectionKeyName);
                 let rsk = new ConnectionKeys();
                 if (ersk instanceof ConnectionKeys) {
@@ -151,7 +151,7 @@ export class ConnectionKeysComponent implements OnInit, OnChanges {
 
     mapConnectionKeysKeys() {
         if (typeof this.connectionKeys !== 'undefined') {
-            this.connectionKeysKeys = this.connectionKeys.map(sk => sk.key);
+            this.connectionKeysKeys = this.connectionKeys.map(sk => sk.key!);
             this.connectionKeysKeys = this.connectionKeysKeys.filter(k => k !== undefined);
         }
     }
@@ -159,21 +159,21 @@ export class ConnectionKeysComponent implements OnInit, OnChanges {
     private subscribeToSaveResponse(result: Observable<HttpResponse<IConnectionKeys>>, isCreate: boolean, i: number) {
         result.subscribe(data => {
             if (data.ok) {
-                this.onSaveSuccess(data.body, isCreate, i);
+                this.onSaveSuccess(data.body!, isCreate, i);
             }
         });
     }
 
     cloneConnectionKey(connectionKey: ConnectionKeys) {
         const connectionKeyForClone = new ConnectionKeys(
-            null,
+            null!,
             connectionKey.key,
             connectionKey.value,
-            null,
+            null!,
             false,
             true,
-            null,
-            null,
+            null!,
+            null!,
             connectionKey.connectionId
         );
         this.connectionKeys.push(connectionKeyForClone);
@@ -181,7 +181,7 @@ export class ConnectionKeysComponent implements OnInit, OnChanges {
 
     private onSaveSuccess(result: IConnectionKeys, isCreate: boolean, i: number) {
         result.isRequired = this.requiredConnectionKey
-            .find(rsk => rsk.name === this.connection.type)
+            .find(rsk => rsk.name === this.connection.type)!
             .connectionKeys.some(sk => sk.connectionKeyName === result.key);
 
         if (isCreate) {

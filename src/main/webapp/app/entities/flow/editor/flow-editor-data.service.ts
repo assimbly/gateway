@@ -73,14 +73,14 @@ export class FlowEditorDataService {
       integrationName: this.flowService.getIntegrationName(),
     }).pipe(
       map(responses => ({
-        wikiDocUrl: responses.wikiDocUrl.body,
-        camelDocUrl: responses.camelDocUrl.body,
-        messages: responses.messages.body,
-        routes: responses.routes.body,
-        connections: responses.connections.body,
-        integrations: responses.integrations.body,
-        allsteps: responses.allsteps.body,
-        integrationName: responses.integrationName.body,
+        wikiDocUrl: responses.wikiDocUrl.body!,
+        camelDocUrl: responses.camelDocUrl.body!,
+        messages: responses.messages.body!,
+        routes: responses.routes.body!,
+        connections: responses.connections.body!,
+        integrations: responses.integrations.body!,
+        allsteps: responses.allsteps.body!,
+        integrationName: responses.integrationName.body!,
       })),
     );
   }
@@ -90,6 +90,6 @@ export class FlowEditorDataService {
       flow: this.flowService.find(id),
       handler: this.apiService.handlerOf(id),
       flows: this.flowService.query({ page: 0, size: 1000 }),
-    }).pipe(map(({ flow, handler, flows }) => ({ flow: flow.body, handler, flows: flows.body ?? [] })));
+    }).pipe(map(({ flow, handler, flows }) => ({ flow: flow.body!, handler, flows: flows.body ?? [] })));
   }
 }

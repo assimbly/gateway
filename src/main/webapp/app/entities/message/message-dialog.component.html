@@ -23,8 +23,8 @@
         #name="ngModel"
       />
       <div *ngIf="name.invalid && (name.dirty || name.touched)" class="invalid-field-message">
-        <span *ngIf="name.errors.required">Name is required.</span>
-        <span *ngIf="name.errors.existingMessageName">Name already exists.</span>
+        <span *ngIf="name.errors?.required">Name is required.</span>
+        <span *ngIf="name.errors?.existingMessageName">Name already exists.</span>
       </div>
     </div>
 
@@ -59,8 +59,8 @@
                   #key="ngModel"
                 />
                 <div *ngIf="key.invalid && (key.dirty || key.touched)" class="invalid-field-message">
-                  <span *ngIf="key.errors.required">Key is required.</span>
-                  <span *ngIf="key.errors.existingHeaders">Key already exists.</span>
+                  <span *ngIf="key.errors?.required">Key is required.</span>
+                  <span *ngIf="key.errors?.existingHeaders">Key already exists.</span>
                 </div>
               </td>
               <td>
@@ -76,7 +76,7 @@
                   #value="ngModel"
                 />
                 <div *ngIf="value.invalid && (value.dirty || value.touched)" class="invalid-field-message">
-                  <span *ngIf="value.errors.required">Value is required.</span>
+                  <span *ngIf="value.errors?.required">Value is required.</span>
                 </div>
               </td>
               <td>

@@ -9,7 +9,7 @@ export class CertificatePopupService {
     private ngbModalRef: NgbModalRef;
 
     constructor(private modalService: NgbModal, private router: Router, private certificateService: CertificateService) {
-        this.ngbModalRef = null;
+        this.ngbModalRef = null!;
     }
 
     open(component: Component, id?: number | any): Promise<NgbModalRef> {
@@ -21,7 +21,7 @@ export class CertificatePopupService {
 
             if (id) {
                 this.certificateService.find(id).subscribe(integration => {
-                    this.ngbModalRef = this.gatewayModalRef(component, integration.body);
+                    this.ngbModalRef = this.gatewayModalRef(component, integration.body!);
                     resolve(this.ngbModalRef);
                 });
             } else {
@@ -40,11 +40,11 @@ export class CertificatePopupService {
         modalRef.result.then(
             result => {
                 this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
-                this.ngbModalRef = null;
+                this.ngbModalRef = null!;
             },
             reason => {
                 this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
-                this.ngbModalRef = null;
+                this.ngbModalRef = null!;
             }
         );
         return modalRef;

@@ -16,8 +16,8 @@ import { OverflowActionDirective, PrimaryActionDirective, RowActions, Truncate }
   imports: [RouterModule, FontAwesomeModule, NgbDropdownModule, RowActions, PrimaryActionDirective, OverflowActionDirective, Truncate],
 })
 export class AddressRowComponent {
-  @Input() address: Address;
-  @Input() brokerType: string;
+  @Input() address!: Address;
+  @Input() brokerType!: string;
   @Input() endpointType: 'queue' | 'topic' = 'queue';
 
   constructor(

@@ -22,10 +22,10 @@ import { PopoverModule } from 'ngx-bootstrap/popover';
 })
 export class QueueUpdateComponent implements OnInit {
     isSaving = false;
-    isClose: boolean;
-    namePopoverMessage: string;
+    isClose!: boolean;
+    namePopoverMessage!: string;
 
-    editForm: FormGroup;
+    editForm!: FormGroup;
 
     brokerType = '';
     brokers: IBroker[];
@@ -82,7 +82,7 @@ export class QueueUpdateComponent implements OnInit {
 
         const address = this.createFromForm();
 
-        const queueNames = address.name.split(',');
+        const queueNames = address.name!.split(',');
 
         if (queueNames) {
             for (let i = 0; i < queueNames.length; i++) {
@@ -98,7 +98,7 @@ export class QueueUpdateComponent implements OnInit {
             }
         } else {
             this.isClose = true;
-            this.subscribeToSaveResponse(this.queueService.createQueue(address.name, this.brokerType));
+            this.subscribeToSaveResponse(this.queueService.createQueue(address.name!, this.brokerType));
         }
     }
 
@@ -136,9 +136,9 @@ export class QueueUpdateComponent implements OnInit {
         this.queueService.getBrokers().subscribe(
             data => {
                 if (data) {
-                    for (const broker of data.body) {
+                    for (const broker of data.body!) {
                         this.brokers.push(broker);
-                        this.brokerType = broker.type;
+                        this.brokerType = broker.type!;
                     }
                 }
             },

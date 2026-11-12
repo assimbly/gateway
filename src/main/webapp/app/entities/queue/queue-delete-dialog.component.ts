@@ -43,7 +43,7 @@ export class QueueDeleteDialogComponent {
     }
 
     confirmDelete(name: string): void {
-        if (this.address?.numberOfConsumers > 0) {
+        if (this.address?.numberOfConsumers! > 0) {
             this.message = 'Cannot delete queue because there is at least one active consumer';
             this.disableDelete = true;
             return;

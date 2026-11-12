@@ -21,7 +21,7 @@ export class FlowResolve implements Resolve<IFlow> {
     if (id) {
       return this.service.find(id).pipe(
         filter((response: HttpResponse<Flow>) => response.ok),
-        map((flow: HttpResponse<Flow>) => flow.body)
+        map((flow: HttpResponse<Flow>) => flow.body!)
       );
     }
     return of(new Flow());

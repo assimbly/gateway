@@ -16,7 +16,7 @@ export class CertificateSelfSignDialogComponent {
   readonly identityStore = IDENTITY_STORE;
   cn = '';
   error = false;
-  errorMessage: String;
+  errorMessage!: String;
   isSaving = false;
 
   constructor(private eventManager: EventManager, private certificateService: CertificateService, public activeModal: NgbActiveModal) {}
@@ -29,7 +29,7 @@ export class CertificateSelfSignDialogComponent {
     this.isSaving = true;
     this.certificateService
       .generateIdentity(this.cn)
-      .pipe(switchMap(res => this.certificateService.createFromRuntimeResponse(res.body, 'Self-Signed (' + this.cn + ')')))
+      .pipe(switchMap(res => this.certificateService.createFromRuntimeResponse(res.body!, 'Self-Signed (' + this.cn + ')')))
       .subscribe(
         () => {
           this.error = false;

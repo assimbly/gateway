@@ -31,15 +31,15 @@ export class RouteDialogComponent implements OnInit {
     readonly themeService = inject(ThemeService);
     private routeOptionsTheme = '';
     private routeOptionsCache: Record<string, unknown> | null = null;
-    route: IRoute;
-    routes: IRoute[];
+    route!: IRoute;
+    routes!: IRoute[];
     routeNames: Array<string> = [];
     isSaving = false;
     show = true;
-    type: string;
+    type!: string;
 
     editForm = this.fb.group({
-        id: [null],
+        id: [null as IRoute['id'] | null],
         name: ['', Validators.required],
         type: ['xml'],
         content: [
@@ -96,8 +96,8 @@ export class RouteDialogComponent implements OnInit {
 
         this.routeService.query().subscribe(
             res => {
-                this.routes = res.body;
-                this.routeNames = this.routes.filter(h => h.id !== this.route.id).map(h => h.name);
+                this.routes = res.body!;
+                this.routeNames = this.routes.filter(h => h.id !== this.route.id).map(h => h.name!);
                 // The validator reads the names once they are bound; then a name already taken shows at once.
                 setTimeout(() => {
                     this.editForm.controls.name.updateValueAndValidity();
@@ -150,7 +150,7 @@ export class RouteDialogComponent implements OnInit {
     private subscribeToSaveResponse(result: Observable<HttpResponse<IRoute>>, closePopup: boolean) {
         result.subscribe(data => {
             if (data.ok) {
-                this.onSaveSuccess(data.body, closePopup);
+                this.onSaveSuccess(data.body!, closePopup);
             } else {
                 this.onSaveError();
             }

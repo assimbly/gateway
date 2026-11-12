@@ -7,7 +7,7 @@ import { NG_VALIDATORS, Validator, AbstractControl } from '@angular/forms';
 })
 export class ForbiddenHeaderValidatorDirective implements Validator {
     // tslint:disable-next-line:no-input-rename
-    @Input('jhiExistingHeader') existingHeaders: Array<string>;
+    @Input('jhiExistingHeader') existingHeaders!: Array<string>;
 
     validate(control: AbstractControl): { [key: string]: any } | null {
         console.log('validating headers');

@@ -204,7 +204,7 @@ export class CertificateService {
 
   protected convertDateFromServer(res: EntityResponseType): EntityResponseType {
     if (res.body) {
-      res.body.certificateExpiry = res.body.certificateExpiry != null ? dayjs(res.body.certificateExpiry) : null;
+      res.body.certificateExpiry = res.body.certificateExpiry != null ? dayjs(res.body.certificateExpiry) : null!;
     }
     return res;
   }
@@ -212,7 +212,7 @@ export class CertificateService {
   protected convertDateArrayFromServer(res: EntityArrayResponseType): EntityArrayResponseType {
     if (res.body) {
       res.body.forEach((certificate: ICertificate) => {
-        certificate.certificateExpiry = certificate.certificateExpiry != null ? dayjs(certificate.certificateExpiry) : null;
+        certificate.certificateExpiry = certificate.certificateExpiry != null ? dayjs(certificate.certificateExpiry) : null!;
       });
     }
     return res;

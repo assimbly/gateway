@@ -23,7 +23,7 @@ export class ConnectionAllComponent implements OnInit, OnDestroy {
   public connections: Array<Connection> = [];
   public page: any;
   private currentAccount: any;
-  private eventSubscriber: Subscription;
+  private eventSubscriber!: Subscription;
   sortState: SortState = { predicate: 'name', order: 'asc' };
 
   constructor(
@@ -60,7 +60,7 @@ export class ConnectionAllComponent implements OnInit, OnDestroy {
       })
       .subscribe(
         res => {
-          this.connections = res.body;
+          this.connections = res.body!;
         },
         res => this.onError(res)
       );

@@ -44,10 +44,10 @@ import { IApiHandler } from 'app/entities/api/api.model';
   },
 })
 export class FlowComponent implements OnInit, OnDestroy {
-  integrations: IIntegration[];
-  integration: IIntegration;
+  integrations!: IIntegration[];
+  integration!: IIntegration;
   flows: IFlow[] = [];
-  flow: IFlow;
+  flow!: IFlow;
   currentAccount: any;
   itemsPerPage: number;
   links: any;
@@ -55,19 +55,19 @@ export class FlowComponent implements OnInit, OnDestroy {
   sortState: SortState = { predicate: 'name', order: 'asc' };
   queryCount: any;
   totalItems = -1;
-  integrationExists: boolean;
+  integrationExists!: boolean;
   multipleIntegrations = false;
   finished = false;
 
-  singleIntegrationName: string;
-  singleIntegrationId: number;
-  singleIntegrationStage: string;
+  singleIntegrationName!: string;
+  singleIntegrationId!: number;
+  singleIntegrationStage!: string;
 
-  configuredIntegration: IIntegration;
-  indexIntegration: number;
+  configuredIntegration!: IIntegration;
+  indexIntegration!: number;
 
   flowActions = ['start', 'stop', 'pause', 'restart', 'resume'];
-  selectedAction: string;
+  selectedAction!: string;
   test: any;
   searchText = '';
   flowsLoading = true;
@@ -91,7 +91,7 @@ export class FlowComponent implements OnInit, OnDestroy {
   private readonly eventSubscriptions = new Subscription();
   private readonly polls = new Subscription();
 
-  @ViewChildren(FlowRowComponent) private flowRows: QueryList<FlowRowComponent>;
+  @ViewChildren(FlowRowComponent) private flowRows!: QueryList<FlowRowComponent>;
 
   constructor(
     protected flowService: FlowService,
@@ -113,7 +113,7 @@ export class FlowComponent implements OnInit, OnDestroy {
 
   loadFlows() {
     if (this.integrations.length > 1) {
-      this.getFlowsForSelectedIntegration(this.integrations[this.indexIntegration].id);
+      this.getFlowsForSelectedIntegration(this.integrations[this.indexIntegration].id!);
     } else {
       this.flowService
         .query({
@@ -122,7 +122,7 @@ export class FlowComponent implements OnInit, OnDestroy {
           sort: this.sort(),
         })
         .subscribe(
-          (res: HttpResponse<IFlow[]>) => this.onSuccess(res.body, res.headers),
+          (res: HttpResponse<IFlow[]>) => this.onSuccess(res.body!, res.headers),
           (res: HttpErrorResponse) => this.onError(res.message)
         );
     }
@@ -136,7 +136,7 @@ export class FlowComponent implements OnInit, OnDestroy {
         sort: this.sort(),
       })
       .subscribe(
-        (res: HttpResponse<IFlow[]>) => this.onSuccess(res.body, res.headers),
+        (res: HttpResponse<IFlow[]>) => this.onSuccess(res.body!, res.headers),
         (res: HttpErrorResponse) => this.onError(res.message)
       );
   }
@@ -184,13 +184,13 @@ export class FlowComponent implements OnInit, OnDestroy {
 
   getIntegrations(): void {
     forkJoin(this.flowService.getIntegrationName(), this.integrationService.query()).subscribe(([integrationName, integrations]) => {
-      this.integrations = integrations.body;
-      this.checkIntegrationType(this.integrations, integrationName.body);
+      this.integrations = integrations.body!;
+      this.checkIntegrationType(this.integrations, integrationName.body!);
 
       if (!this.integrationExists) {
         console.log('Creating integration');
         this.integration = new Object();
-        this.integration.name = integrationName.body;
+        this.integration.name = integrationName.body!;
         this.integration.type = GatewayType.FULL;
         this.integration.environmentName = 'Dev1';
         this.integration.stage = EnvironmentType.DEVELOPMENT;
@@ -200,22 +200,22 @@ export class FlowComponent implements OnInit, OnDestroy {
 
         this.integrationService.create(this.integration).subscribe(integration => {
           console.log('integration created');
-          this.integration = integration.body;
+          this.integration = integration.body!;
           this.integrations.push(this.integration);
           this.integrationExists = true;
-          this.singleIntegrationName = integration.body.name;
-          this.singleIntegrationId = integration.body.id;
-          this.singleIntegrationStage = integration.body.stage ? integration.body.stage.toString().toLowerCase() : '';
+          this.singleIntegrationName = integration.body!.name!;
+          this.singleIntegrationId = integration.body!.id!;
+          this.singleIntegrationStage = integration.body!.stage ? integration.body!.stage.toString().toLowerCase() : '';
           this.flowsLoading = false;
           this.changeDetector.detectChanges();
         });
       } else {
         this.loadFlows();
         if (!this.multipleIntegrations) {
-          this.singleIntegrationName = this.integrations[this.indexIntegration].name;
-          this.singleIntegrationId = this.integrations[this.indexIntegration].id;
+          this.singleIntegrationName = this.integrations[this.indexIntegration].name!;
+          this.singleIntegrationId = this.integrations[this.indexIntegration].id!;
           this.singleIntegrationStage = this.integrations[this.indexIntegration].stage
-            ? this.integrations[this.indexIntegration].stage.toString().toLowerCase()
+            ? this.integrations[this.indexIntegration].stage!.toString().toLowerCase()
             : '';
         }
       }
@@ -229,7 +229,7 @@ export class FlowComponent implements OnInit, OnDestroy {
       this.multipleIntegrations = integrations.length > 1;
     } else {
       this.multipleIntegrations = false;
-      this.configuredIntegration = integrations.find(integration => integration.name === integrationName);
+      this.configuredIntegration = integrations.find(integration => integration.name === integrationName)!;
       this.indexIntegration = integrations.findIndex(integration => integration.name == integrationName);
       this.integrationExists = this.indexIntegration >= 0;
       if (!this.integrationExists) {
@@ -325,7 +325,7 @@ export class FlowComponent implements OnInit, OnDestroy {
 
   private onSuccess(data: IFlow[], headers: HttpHeaders) {
     if (this.integrations.length === 1) {
-      this.links = this.parseLinks.parse(headers.get('link'));
+      this.links = this.parseLinks.parse(headers.get('link')!);
     }
     this.flows = new Array<IFlow>();
     for (let i = 0; i < data.length; i++) {

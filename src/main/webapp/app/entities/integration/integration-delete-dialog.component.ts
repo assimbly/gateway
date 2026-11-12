@@ -15,7 +15,7 @@ import { IntegrationService } from './integration.service';
     imports: [FontAwesomeModule, AlertError],
 })
 export class IntegrationDeleteDialogComponent {
-    integration: IIntegration;
+    integration!: IIntegration;
     /** True while the delete runs, so a second click doesn't send it again. */
     readonly deleting = signal(false);
 

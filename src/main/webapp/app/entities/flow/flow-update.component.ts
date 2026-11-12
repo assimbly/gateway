@@ -21,8 +21,8 @@ import { IntegrationService } from 'app/entities/integration/integration.service
   imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, SaveShortcutDirective],
 })
 export class FlowUpdateComponent implements OnInit {
-  flow: IFlow;
-  isSaving: boolean;
+  flow!: IFlow;
+  isSaving!: boolean;
 
   public logLevelListType = [
     LogLevelType.OFF,
@@ -33,7 +33,7 @@ export class FlowUpdateComponent implements OnInit {
     LogLevelType.DEBUG
   ];
 
-  integrations: IIntegration[];
+  integrations!: IIntegration[];
 
   constructor(
     protected alertService: AlertService,
@@ -49,7 +49,7 @@ export class FlowUpdateComponent implements OnInit {
     });
     this.integrationService.query().subscribe(
       (res: HttpResponse<IIntegration[]>) => {
-        this.integrations = res.body;
+        this.integrations = res.body!;
       },
       (res: HttpErrorResponse) => this.onError(res.message)
     );

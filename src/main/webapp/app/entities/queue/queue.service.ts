@@ -23,7 +23,7 @@ export class QueueService {
   public queuesResourceUrl = `${serverApiUrl}api/queues`;
   public brokersResourceUrl = `${serverApiUrl}api/brokers`;
 
-  brokerType: string;
+  brokerType!: string;
 
   constructor(protected http: HttpClient, protected router: Router, protected $window: WindowRef, protected brokerService: BrokerService) {   
   }
@@ -57,7 +57,7 @@ export class QueueService {
         context,
       });
     } else {
-      return null;
+      return null!;
     }
   }
 

@@ -76,7 +76,7 @@
           <button
             type="button"
             class="btn btn-fx btn-fx-sm btn-fx-icon btn-fx-ghost"
-            (click)="getBrokerInfo(rowBroker.id)"
+            (click)="getBrokerInfo(rowBroker.id!)"
             [ngbPopover]="statsTemplate"
             popoverTitle="Stats"
             placement="left"

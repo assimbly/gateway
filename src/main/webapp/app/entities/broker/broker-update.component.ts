@@ -29,18 +29,18 @@ export class BrokerUpdateComponent implements OnInit {
     @ViewChild('codeEditor') private codeEditor?: CodemirrorComponent;
     readonly themeService = inject(ThemeService);
 
-    broker: IBroker;
-    brokerConfiguration: string;
-    artemisConfiguration: string;
-    activemqConfiguration: string;
-    brokerConfigurationFailed: string;
-    isSaving: boolean;
+    broker!: IBroker;
+    brokerConfiguration!: string;
+    artemisConfiguration!: string;
+    activemqConfiguration!: string;
+    brokerConfigurationFailed!: string;
+    isSaving!: boolean;
 
-    namePopoverMessage: string;
-    autostartPopoverMessage: string;
-    typePopoverMessage: string;
-    configurationTypePopoverMessage: string;
-    brokerConfigurationPopoverMessage: string;
+    namePopoverMessage!: string;
+    autostartPopoverMessage!: string;
+    typePopoverMessage!: string;
+    configurationTypePopoverMessage!: string;
+    brokerConfigurationPopoverMessage!: string;
 
 
     constructor(protected brokerService: BrokerService, protected activatedRoute: ActivatedRoute) {
@@ -53,7 +53,7 @@ export class BrokerUpdateComponent implements OnInit {
         this.activatedRoute.data.subscribe(({ broker }) => {
             this.broker = broker;
             if (this.broker.id !== undefined) {
-                this.brokerService.getBrokerConfiguration(this.broker.id, this.broker.type).subscribe(brokerConfiguration => {
+                this.brokerService.getBrokerConfiguration(this.broker.id, this.broker.type!).subscribe(brokerConfiguration => {
                     const body = brokerConfiguration.body ?? '';
                     if (this.broker.type === 'artemis') {
                         this.artemisConfiguration = body;
@@ -98,7 +98,7 @@ export class BrokerUpdateComponent implements OnInit {
             this.brokerService.update(this.broker).subscribe(
                 response => {
                     this.brokerService
-                        .setBrokerConfiguration(this.broker.id, this.broker.type, this.broker.configurationType, this.brokerConfiguration)
+                        .setBrokerConfiguration(this.broker.id!, this.broker.type!, this.broker.configurationType!, this.brokerConfiguration)
                         .subscribe(
                             response => {
                                 this.isSaving = false;
@@ -164,14 +164,14 @@ export class BrokerUpdateComponent implements OnInit {
 
     protected subscribeToCreateResponse(result: Observable<HttpResponse<IBroker>>) {
         result.subscribe(
-            (res: HttpResponse<IBroker>) => this.onCreateSuccess(res.body),
+            (res: HttpResponse<IBroker>) => this.onCreateSuccess(res.body!),
             (res: HttpErrorResponse) => this.onCreateError()
         );
     }
 
     protected onCreateSuccess(createdBroker: IBroker) {
         this.brokerService
-            .setBrokerConfiguration(createdBroker.id, createdBroker.type, createdBroker.configurationType, this.brokerConfiguration)
+            .setBrokerConfiguration(createdBroker.id!, createdBroker.type!, createdBroker.configurationType!, this.brokerConfiguration)
             .subscribe(
                 response => {
                     this.isSaving = false;

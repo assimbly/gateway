@@ -13,7 +13,7 @@
             type="button"
             ngbDropdownItem
             class="btn-fx-dropdown-item"
-            (click)="navigateToMessageBrowser(address.name)"
+            (click)="navigateToMessageBrowser(address.name!)"
         >
             <fa-icon icon="eye"></fa-icon>
             <span>Browse</span>
@@ -23,7 +23,7 @@
             jhiPrimaryAction
             type="button"
             class="btn btn-fx btn-fx-sm btn-fx-ghost"
-            (click)="navigateToMessageSender(address.name)"
+            (click)="navigateToMessageSender(address.name!)"
             aria-label="Send"
         >
             <fa-icon icon="envelope"></fa-icon>

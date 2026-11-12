@@ -13,7 +13,7 @@ import { IEnvironmentVariables } from 'app/shared/model/environment-variables.mo
     imports: [CommonModule, RouterModule, FontAwesomeModule, AlertError],
 })
 export class EnvironmentVariablesDetailComponent implements OnInit {
-    environmentVariables: IEnvironmentVariables;
+    environmentVariables!: IEnvironmentVariables;
 
     constructor(protected activatedRoute: ActivatedRoute) {}
 

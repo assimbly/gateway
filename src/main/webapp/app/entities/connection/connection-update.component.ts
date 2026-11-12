@@ -28,8 +28,8 @@ import { SaveShortcutDirective } from 'app/shared/keyboard';
   imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, ForbiddenConnectionNamesValidatorDirective, ForbiddenConnectionKeysValidatorDirective, FieldTabDirective, SaveShortcutDirective],
 })
 export class ConnectionUpdateComponent implements OnInit {
-  connection: IConnection;
-  isSaving: boolean;
+  connection!: IConnection;
+  isSaving!: boolean;
   connectionKeys: Array<ConnectionKeys> = [];
   connectionNames: Array<string> = [];
   connectionKeysKeys: Array<string> = [];
@@ -38,10 +38,10 @@ export class ConnectionUpdateComponent implements OnInit {
   jmsProvidersList: Array<string> = ['ActiveMQ Artemis', 'ActiveMQ Classic', 'AMQ'];
   pooledList: Array<String> = ['true', 'false'];
 
-  public disableType: boolean;
+  public disableType!: boolean;
 
   requiredConnectionKey: Array<RequiredConnectionKey> = [];
-  requiredType: RequiredConnectionKey;
+  requiredType!: RequiredConnectionKey;
   connectionKeysRemoveList: Array<ConnectionKeys> = [];
 
   constructor(
@@ -62,7 +62,7 @@ export class ConnectionUpdateComponent implements OnInit {
     });
     this.connectionService.query().subscribe(
       res => {
-        this.connectionNames = res.body.map(s => s.name);
+        this.connectionNames = res.body!.map(s => s.name!);
       },
       res => this.onError(res.body)
     );
@@ -85,14 +85,14 @@ export class ConnectionUpdateComponent implements OnInit {
       this.requiredType.connectionKeys.forEach(rsk => {
         this.connectionKeysRemoveList.push(
           this.connectionKeys.splice(
-            this.connectionKeys.indexOf(this.connectionKeys.find(sk => rsk.connectionKeyName === sk.key && sk.id !== undefined)),
+            this.connectionKeys.indexOf(this.connectionKeys.find(sk => rsk.connectionKeyName === sk.key && sk.id !== undefined)!),
             1
           )[0]
         );
       });
     }
 
-    this.requiredType = this.requiredConnectionKey.find(x => x.name === this.connection.type);
+    this.requiredType = this.requiredConnectionKey.find(x => x.name === this.connection.type)!;
 
     const requiredConnectionKeys = new Array<ConnectionKeys>();
     this.requiredType.connectionKeys.forEach(sk => {
@@ -104,7 +104,7 @@ export class ConnectionUpdateComponent implements OnInit {
           this.connectionKeys.splice(this.connectionKeys.indexOf(ersk), 1);
         }
       }
-      rsk.id = cloneHeader ? null : rsk.id;
+      rsk.id = cloneHeader ? null! : rsk.id;
       rsk.key = sk.connectionKeyName;
       rsk.valueType = sk.valueType;
       rsk.placeholder = sk.placeholder;
@@ -144,7 +144,7 @@ export class ConnectionUpdateComponent implements OnInit {
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IConnection>>) {
     result.subscribe(
-      (res: HttpResponse<IConnection>) => this.onSaveSuccess(res.body),
+      (res: HttpResponse<IConnection>) => this.onSaveSuccess(res.body!),
       (res: HttpErrorResponse) => this.onSaveError()
     );
   }
@@ -155,18 +155,18 @@ export class ConnectionUpdateComponent implements OnInit {
     this.isSaving = false;
 
     this.connectionKeysRemoveList.forEach(skrl => {
-      this.connectionKeysService.delete(skrl.id).subscribe();
+      this.connectionKeysService.delete(skrl.id!).subscribe();
     });
 
     this.connectionKeys.forEach(connectionKey => {
       connectionKey.connectionId = result.id;
       if (connectionKey.id) {
         this.connectionKeysService.update(connectionKey).subscribe(sk => {
-          connectionKey = sk.body;
+          connectionKey = sk.body!;
         });
       } else {
         this.connectionKeysService.create(connectionKey).subscribe(sk => {
-          connectionKey = sk.body;
+          connectionKey = sk.body!;
         });
       }
     });
@@ -187,7 +187,7 @@ export class ConnectionUpdateComponent implements OnInit {
   }
 
   deleteConnectionKeys(connectionKey: ConnectionKeys) {
-    this.connectionKeysService.delete(connectionKey.id).subscribe(() => {
+    this.connectionKeysService.delete(connectionKey.id!).subscribe(() => {
       this.removeConnectionKeys(this.connectionKeys.indexOf(connectionKey));
     });
   }
@@ -206,19 +206,19 @@ export class ConnectionUpdateComponent implements OnInit {
   private loadConnectionKeys(cloneHeader: boolean) {
     if (this.connection.id) {
       this.connectionKeysService.query().subscribe(res => {
-        this.connectionKeys = res.body.filter(sk => sk.connectionId === this.connection.id);
+        this.connectionKeys = res.body!.filter(sk => sk.connectionId === this.connection.id);
         this.changeType(cloneHeader);
-        this.connection.id = cloneHeader ? null : this.connection.id;
+        this.connection.id = cloneHeader ? null! : this.connection.id;
       });
     } else if (this.connection.type) {
       this.changeType(cloneHeader);
-      this.connection.id = cloneHeader ? null : this.connection.id;
+      this.connection.id = cloneHeader ? null! : this.connection.id;
     }
   }
 
   private mapConnectionKeysKeys() {
     if (typeof this.connectionKeys !== 'undefined') {
-      this.connectionKeysKeys = this.connectionKeys.map(sk => sk.key);
+      this.connectionKeysKeys = this.connectionKeys.map(sk => sk.key!);
       this.connectionKeysKeys = this.connectionKeysKeys.filter(k => k !== undefined);
     }
   }

@@ -15,7 +15,7 @@ import { ConnectionService } from './connection.service';
     imports: [CommonModule, FontAwesomeModule, AlertError],
 })
 export class ConnectionDeleteDialogComponent {
-    connection: IConnection;
+    connection!: IConnection;
     errorMessage = false;
     deleteMode = true;
 

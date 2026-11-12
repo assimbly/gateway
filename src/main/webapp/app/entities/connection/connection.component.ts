@@ -25,14 +25,14 @@ import { Observable } from 'rxjs';
 })
 export class ConnectionComponent implements OnInit, OnDestroy, OnChanges {
     [x: string]: any;
-    connections: IConnection[];
+    connections!: IConnection[];
     currentAccount: any;
-    eventSubscriber: Subscription;
-    connectionKey: ConnectionKeys;
-    connectionKeys: Array<ConnectionKeys>;
-    connection: Connection;
+    eventSubscriber!: Subscription;
+    connectionKey!: ConnectionKeys;
+    connectionKeys!: Array<ConnectionKeys>;
+    connection!: Connection;
     type: any;
-    isSaving: boolean;
+    isSaving!: boolean;
     disabledConnectionType = true;
     selectedConnection: Connection = new Connection();
 
@@ -47,7 +47,7 @@ export class ConnectionComponent implements OnInit, OnDestroy, OnChanges {
     loadAll() {
         this.connectionService.query().subscribe(
             (res: HttpResponse<IConnection[]>) => {
-                this.connections = res.body;
+                this.connections = res.body!;
             },
             (res: HttpErrorResponse) => this.onError(res.message)
         );
@@ -93,7 +93,7 @@ export class ConnectionComponent implements OnInit, OnDestroy, OnChanges {
         } else {
             this.connectionKeysService.query().subscribe(
                 (res: HttpResponse<ConnectionKeys[]>) => {
-                    this.connectionKeys = res.body;
+                    this.connectionKeys = res.body!;
                     this.connectionKeys = this.connectionKeys.filter(k => k.connectionId === this.selectedConnection.id);
                     if (this.connectionKeys.length === 0) {
                         const newConnectionKeys = new ConnectionKeys();
@@ -115,7 +115,7 @@ export class ConnectionComponent implements OnInit, OnDestroy, OnChanges {
     private subscribeToSaveResponse(result: Observable<HttpResponse<IConnection>>) {
         result.subscribe(data => {
             if (data.ok) {
-                this.onSaveSuccess(data.body);
+                this.onSaveSuccess(data.body!);
             } else {
                 this.onSaveError();
             }

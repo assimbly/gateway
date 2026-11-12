@@ -24,12 +24,12 @@ import { filter } from 'rxjs/operators';
   imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, ForbiddenHeaderValidatorDirective, ForbiddenMessageNamesValidatorDirective, SaveShortcutDirective],
 })
 export class MessageUpdateComponent implements OnInit {
-  message: IMessage;
-  messages: IMessage[];
+  message!: IMessage;
+  messages!: IMessage[];
   messageNames: Array<string> = [];
   headers: Array<Header> = [];
   headerArray: Array<string> = [];
-  isSaving: boolean;
+  isSaving!: boolean;
   public typeHeader: string[] = ['header', 'property'];
   public languageHeader: string[] = ['constant', 'simple', 'groovy', 'jsonpath', 'xpath'];
 
@@ -68,7 +68,7 @@ export class MessageUpdateComponent implements OnInit {
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IMessage>>) {
     result.subscribe(
-      (res: HttpResponse<IMessage>) => this.onSaveSuccess(res.body),
+      (res: HttpResponse<IMessage>) => this.onSaveSuccess(res.body!),
       (res: HttpErrorResponse) => this.onSaveError()
     );
   }
@@ -83,11 +83,11 @@ export class MessageUpdateComponent implements OnInit {
       header.messageId = result.id;
       if (header.id) {
         this.headerService.update(header).subscribe(hk => {
-          header = hk.body;
+          header = hk.body!;
         });
       } else {
         this.headerService.create(header).subscribe(hk => {
-          header = hk.body;
+          header = hk.body!;
         });
       }
     });
@@ -100,7 +100,7 @@ export class MessageUpdateComponent implements OnInit {
   }
 
   deleteHeader(header: IHeader) {
-    this.headerService.delete(header.id).subscribe(res => {
+    this.headerService.delete(header.id!).subscribe(res => {
       this.removeHeader(this.headers.indexOf(header));
     });
   }
@@ -124,8 +124,8 @@ export class MessageUpdateComponent implements OnInit {
 
   clearHeaderIds() {
     this.headers.forEach((element, index) => {
-      this.headers[index].messageId = null;
-      this.headers[index].id = null;
+      this.headers[index].messageId = null!;
+      this.headers[index].id = null!;
     });
   }
 
@@ -139,7 +139,7 @@ export class MessageUpdateComponent implements OnInit {
 
   private mapHeader() {
     if (typeof this.headers !== 'undefined') {
-      this.headerArray = this.headers.map(hk => hk.key);
+      this.headerArray = this.headers.map(hk => hk.key!);
       this.headerArray = this.headerArray.filter(k => k !== undefined);
     }
   }
@@ -151,10 +151,10 @@ export class MessageUpdateComponent implements OnInit {
 
     if (this.message.id) {
       this.headerService.query({ filter: 'messageId.equals=1' }).subscribe(res => {
-        this.headers = res.body.filter(header => header.messageId === this.message.id);
+        this.headers = res.body!.filter(header => header.messageId === this.message.id);
         if (cloneMessage) {
-          this.message.id = null;
-          this.message.name = null;
+          this.message.id = null!;
+          this.message.name = null!;
           this.clearHeaderIds();
         }
       });
@@ -163,7 +163,7 @@ export class MessageUpdateComponent implements OnInit {
       hk.type = this.typeHeader[0];
       hk.language = this.languageHeader[0];
       this.headers.push(hk);
-      this.message.id = cloneMessage ? null : this.message.id;
+      this.message.id = cloneMessage ? null! : this.message.id;
     }
   }
 }

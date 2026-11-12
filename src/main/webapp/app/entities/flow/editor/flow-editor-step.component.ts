@@ -71,10 +71,10 @@ export class StepEditorRegistry {
   imports: [CommonModule, ReactiveFormsModule, RouterLink, NgbModule, FontAwesomeModule, NgSelectModule, PopoverModule, CodemirrorModule, CdkDragHandle],
 })
 export class FlowEditorStepComponent implements OnChanges, OnDestroy {
-  @Input({ required: true }) step: IStep;
-  @Input({ required: true }) index: number;
-  @Input({ required: true }) stepForm: FormGroup;
-  @Input() activeEditor: string;
+  @Input({ required: true }) step!: IStep;
+  @Input({ required: true }) index!: number;
+  @Input({ required: true }) stepForm!: FormGroup;
+  @Input() activeEditor!: string;
   /** On the visual designer's canvas, Steps are added there instead of through this form. */
   @Input() onCanvas = false;
   /** On the canvas, the kind of the Router being edited; it is shown as its component and can't be changed here. */
@@ -103,21 +103,21 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   @Input() messageCreated = false;
   @Input() connectionCreated = false;
 
-  @Input() uriPlaceholder: string;
+  @Input() uriPlaceholder!: string;
   /** The path an Error Handler gets automatically while the user leaves it to the Flow, shown as a hint. */
   @Input() autoPath?: string;
-  @Input() uriPopoverMessage: string;
+  @Input() uriPopoverMessage!: string;
   @Input() uriList: IStep[] = [];
   @Input() componentOptions: Array<any> = [];
   @Input() stepOptions: Array<{ key?: string; value?: string }> = [];
   @Input() selectedOptions: Array<any> = [];
-  @Input() componentTypeCamelLink: string;
+  @Input() componentTypeCamelLink!: string;
   @Input() enableMessage = false;
   @Input() enableConnection = false;
   @Input() filterConnection: Connection[] = [];
-  @Input() connectionType: string;
-  @Input() errorHandlerPopoverMessage: string;
-  @Input() optionsPopoverMessage: string;
+  @Input() connectionType!: string;
+  @Input() errorHandlerPopoverMessage!: string;
+  @Input() optionsPopoverMessage!: string;
   @Input() customOptions: Array<any> = [];
 
   @Output() removeStep = new EventEmitter<{ step: IStep; index: number }>();
@@ -169,7 +169,7 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   }
 
   hoveredOption: any;
-  modalRef: NgbModalRef | null;
+  modalRef!: NgbModalRef | null;
 
   private readonly injector = inject(Injector);
 
@@ -507,11 +507,11 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   }
 
   get messageControl(): AbstractControl {
-    return this.stepForm.get('message');
+    return this.stepForm.get('message')!;
   }
 
   get connectionControl(): AbstractControl {
-    return this.stepForm.get('connection');
+    return this.stepForm.get('connection')!;
   }
 
   get componentTypeErrors(): any {

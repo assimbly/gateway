@@ -15,7 +15,7 @@ import { CertificateService } from './certificate.service';
     imports: [FontAwesomeModule, AlertError],
 })
 export class CertificateDeleteDialogComponent {
-    certificate: ICertificate;
+    certificate!: ICertificate;
     isDeleting = false;
 
     constructor(protected certificateService: CertificateService, public activeModal: NgbActiveModal, protected eventManager: EventManager) {}
@@ -27,7 +27,7 @@ export class CertificateDeleteDialogComponent {
     confirmDelete(id: number) {
         this.isDeleting = true;
         this.certificateService
-            .deleteCertificate(this.certificate.certificateName, this.certificate.certificateStore)
+            .deleteCertificate(this.certificate.certificateName!, this.certificate.certificateStore)
             .pipe(switchMap(() => this.certificateService.delete(id)))
             .subscribe({
                 next: () => {

@@ -9,19 +9,19 @@ export class MessagePopupService {
     private ngbModalRef: NgbModalRef;
 
     constructor(private modalService: NgbModal, private router: Router, private messageService: MessageService) {
-        this.ngbModalRef = null;
+        this.ngbModalRef = null!;
     }
 
     open(component: Component, id?: number | any): Promise<NgbModalRef> {
         return new Promise<NgbModalRef>((resolve, reject) => {
             const isOpen = this.ngbModalRef !== null;
             if (isOpen) {
-                this.ngbModalRef = null;
+                this.ngbModalRef = null!;
             }
 
             if (id) {
                 this.messageService.find(id).subscribe(message => {
-                    this.ngbModalRef = this.messageModalRef(component, message.body);
+                    this.ngbModalRef = this.messageModalRef(component, message.body!);
                     resolve(this.ngbModalRef);
                 });
             } else {

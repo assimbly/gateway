@@ -16,7 +16,7 @@ import { MessageService } from './message.service';
     imports: [CommonModule, FontAwesomeModule, AlertError],
 })
 export class MessageDeleteDialogComponent {
-    message: IMessage;
+    message!: IMessage;
     errorMessage = false;
     deleteMode = true;
 

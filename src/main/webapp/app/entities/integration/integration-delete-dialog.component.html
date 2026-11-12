@@ -11,7 +11,7 @@
         <button type="button" class="btn btn-fx btn-fx-secondary" (click)="clear()">
             <fa-icon [icon]="'ban'"></fa-icon><span>Cancel</span>
         </button>
-        <button id="jhi-confirm-delete-integration" type="button" (click)="confirmDelete(integration.id)" class="btn btn-fx btn-fx-danger" [disabled]="deleting()">
+        <button id="jhi-confirm-delete-integration" type="button" (click)="confirmDelete(integration.id!)" class="btn btn-fx btn-fx-danger" [disabled]="deleting()">
             <fa-icon [icon]="'trash'"></fa-icon><span>Delete</span>
         </button>
     </div>

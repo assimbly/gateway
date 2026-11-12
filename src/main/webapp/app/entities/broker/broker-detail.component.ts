@@ -13,7 +13,7 @@ import { IBroker } from 'app/shared/model/broker.model';
     imports: [CommonModule, RouterModule, FontAwesomeModule, AlertError],
 })
 export class BrokerDetailComponent implements OnInit {
-    broker: IBroker;
+    broker!: IBroker;
 
     constructor(protected activatedRoute: ActivatedRoute) {}
 

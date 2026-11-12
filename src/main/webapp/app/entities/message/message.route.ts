@@ -21,7 +21,7 @@ export class MessageResolve implements Resolve<IMessage> {
     if (id) {
       return this.service.find(id).pipe(
         filter((response: HttpResponse<Message>) => response.ok),
-        map((message: HttpResponse<Message>) => message.body)
+        map((message: HttpResponse<Message>) => message.body!)
       );
     }
     return of(new Message());

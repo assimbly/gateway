@@ -18,10 +18,10 @@ import { ConnectionService } from 'app/entities/connection/connection.service';
     imports: [CommonModule, RouterModule, AlertError],
 })
 export class ConnectionDetailComponent implements OnInit {
-    connection: IConnection;
-    public connectionKeys: Array<ConnectionKeys>;
-    private subscription: Subscription;
-    private eventSubscriber: Subscription;
+    connection!: IConnection;
+    public connectionKeys!: Array<ConnectionKeys>;
+    private subscription!: Subscription;
+    private eventSubscriber!: Subscription;
 
     constructor(
         protected eventManager: EventManager,
@@ -42,18 +42,18 @@ export class ConnectionDetailComponent implements OnInit {
 
     private load(id: number) {
         this.connectionService.find(id).subscribe(connection => {
-            this.connection = connection.body;
-            this.loadConnectionKeys(this.connection.id);
+            this.connection = connection.body!;
+            this.loadConnectionKeys(this.connection.id!);
         });
     }
 
     private loadConnectionKeys(id: number) {
         this.connectionKeysService.query().subscribe(res => {
-            this.connectionKeys = res.body.filter(sk => sk.connectionId === id);
+            this.connectionKeys = res.body!.filter(sk => sk.connectionId === id);
         });
     }
 
     registerChangeInServices() {
-        this.eventSubscriber = this.eventManager.subscribe('connectionListModification', response => this.load(this.connection.id));
+        this.eventSubscriber = this.eventManager.subscribe('connectionListModification', response => this.load(this.connection.id!));
     }
 }

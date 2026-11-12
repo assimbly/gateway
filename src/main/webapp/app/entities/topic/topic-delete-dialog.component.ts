@@ -31,12 +31,12 @@ export class TopicDeleteDialogComponent {
     }
 
     confirmDelete(name: string): void {
-        if (this.address?.numberOfConsumers > 0) {
+        if (this.address?.numberOfConsumers! > 0) {
             this.message = 'Cannot delete topic because there is at least one active consumer';
             this.disableDelete = true;
             return;
         }
-        if (this.address?.numberOfMessages > 0) {
+        if (this.address?.numberOfMessages! > 0) {
             this.message = 'Cannot delete topic because there is at least one message on the topic. Please clear the topic before deleting';
             this.disableDelete = true;
             return;

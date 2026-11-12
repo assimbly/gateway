@@ -7,7 +7,7 @@ import { NG_VALIDATORS, Validator, AbstractControl } from '@angular/forms';
 })
 export class ForbiddenConnectionNamesValidatorDirective implements Validator {
     // tslint:disable-next-line:no-input-rename
-    @Input('jhiExistingConnectionNames') existingNames: Array<string>;
+    @Input('jhiExistingConnectionNames') existingNames!: Array<string>;
 
     validate(control: AbstractControl): { [key: string]: any } | null {
         return this.existingNames.some(k => k === control.value) ? { existingConnectionName: true } : null;

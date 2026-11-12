@@ -18,11 +18,11 @@ import { colorLog, logEntries } from './log-display';
     imports: [RouterModule, FormsModule, FontAwesomeModule, LogViewerLineValidationDirective, SearchToolbar],
 })
 export default class LogViewerComponent implements OnInit {
-  @ViewChild('logArea', { static: false }) private logArea: ElementRef;
+  @ViewChild('logArea', { static: false }) private logArea!: ElementRef;
 
   public log = '';
   public logEntries: string[] = [];
-  public lines: number;
+  public lines!: number;
   public coloredLog: SafeHtml = '';
 
   /** With a Flow, only the entries that Flow logged. */

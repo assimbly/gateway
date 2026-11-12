@@ -23,7 +23,7 @@ export class CertificateResolve implements Resolve<ICertificate> {
     if (id) {
       return this.service.find(id).pipe(
         filter((response: HttpResponse<Certificate>) => response.ok),
-        map((certificate: HttpResponse<Certificate>) => certificate.body)
+        map((certificate: HttpResponse<Certificate>) => certificate.body!)
       );
     }
     return of(new Certificate());

@@ -100,7 +100,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         cursorBlinkRate: -1,
     }));
 
-    messageSenderForm: FormGroup;
+    messageSenderForm!: FormGroup;
     finished = false;
     // true when the page was opened from a Flow (query param flowId), false when opened from the sidebar
     openedFromFlow = false;
@@ -125,7 +125,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     componentDescription = '';
     uriPlaceholder = '';
 
-    modalRef: NgbModalRef | null;
+    modalRef!: NgbModalRef | null;
 
     private camelDocUrl = '';
     private optionsRequest = 0;

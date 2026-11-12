@@ -15,7 +15,7 @@ import { EnvironmentVariablesService } from './environment-variables.service';
     imports: [FontAwesomeModule, AlertError],
 })
 export class EnvironmentVariablesDeleteDialogComponent {
-    environmentVariables: IEnvironmentVariables;
+    environmentVariables!: IEnvironmentVariables;
     /** True while the delete runs, so a second click doesn't send it again. */
     readonly deleting = signal(false);
 

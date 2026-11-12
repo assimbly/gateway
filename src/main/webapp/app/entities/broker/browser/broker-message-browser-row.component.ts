@@ -9,7 +9,7 @@ import { Message } from 'app/shared/model/message.model';
   imports: [RouterModule],
 })
 export class BrokerMessageBrowserRowComponent {
-  @Input() message: Message;
+  @Input() message!: Message;
 
-  messageRowID: string;
+  messageRowID!: string;
 }

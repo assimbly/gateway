@@ -15,15 +15,15 @@ import { Subscription } from 'rxjs';
     imports: [CommonModule, RouterModule, AlertError],
 })
 export class MessageDetailComponent implements OnInit {
-    message: IMessage;
+    message!: IMessage;
 
     constructor(
         protected activatedRoute: ActivatedRoute,
         protected messageService: MessageService,
         protected headerService: HeaderService
     ) {}
-    public headers: Array<Header>;
-    private subscription: Subscription;
+    public headers!: Array<Header>;
+    private subscription!: Subscription;
 
     ngOnInit() {
         this.activatedRoute.data.subscribe(({ message }) => {
@@ -33,14 +33,14 @@ export class MessageDetailComponent implements OnInit {
 
     private load(id: number) {
         this.messageService.find(id).subscribe(message => {
-            this.message = message.body;
-            this.loadHeader(this.message.id);
+            this.message = message.body!;
+            this.loadHeader(this.message.id!);
         });
     }
 
     private loadHeader(id: number) {
         this.headerService.query().subscribe(res => {
-            this.headers = res.body.filter(hk => hk.messageId === id);
+            this.headers = res.body!.filter(hk => hk.messageId === id);
         });
     }
 

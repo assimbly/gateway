@@ -41,7 +41,7 @@ import { VariableKeysService } from './variable-keys.service';
 export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
     environmentVariables: IEnvironmentVariables[] = [];
     currentAccount: any;
-    eventSubscriber: Subscription;
+    eventSubscriber!: Subscription;
     searchText = '';
     loading = true;
     loadFailed = false;

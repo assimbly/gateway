@@ -41,7 +41,7 @@ export class TopicComponent implements OnInit, OnDestroy {
   page: number;
   sortState: SortState = { predicate: 'name', order: 'asc' };
 
-  timeInterval: Subscription;
+  timeInterval!: Subscription;
   isBroker: boolean | undefined;
   /** Whether the Topics of the Broker have been asked for, so an empty list is known to be empty. */
   addressesLoaded = false;
@@ -152,12 +152,12 @@ export class TopicComponent implements OnInit, OnDestroy {
     this.topicService.getBrokers().subscribe(
       data => {
         if (data) {
-          for (let i = 0; i < data.body.length; i++) {
-            this.brokers.push(data.body[i]);
+          for (let i = 0; i < data.body!.length; i++) {
+            this.brokers.push(data.body![i]);
           }
           if (this.brokers[0]) {
             this.isBroker = true;
-            this.brokerType = this.brokers[0].type;
+            this.brokerType = this.brokers[0].type!;
             if (this.brokerType != null) {
               this.getAllTopics();
             }
@@ -179,11 +179,11 @@ export class TopicComponent implements OnInit, OnDestroy {
       this.topicService.getAllTopics(this.brokerType).subscribe(
         data => {
           this.addressesLoaded = true;
-          if (data && data.body.topics) {
+          if (data && data.body!.topics) {
             this.isBroker = true;
-            if (data.body.topics.topic) {
-              for (const address of data.body.topics.topic) {
-                if (address.temporary.toString() === 'false') {
+            if (data.body!.topics.topic) {
+              for (const address of data.body!.topics.topic) {
+                if (address.temporary!.toString() === 'false') {
                   this.addresses.push(address);
                 }
               }
@@ -207,10 +207,10 @@ export class TopicComponent implements OnInit, OnDestroy {
     if (this.isBroker) {
       this.topicService.getAllTopics(this.brokerType).subscribe(
         data => {
-          if (data && data.body.topics) {
+          if (data && data.body!.topics) {
             this.isBroker = true;
             // Replace the whole list, so Topics deleted on the Broker drop out of the table.
-            this.addresses = (data.body.topics.topic ?? []).filter(topic => topic.temporary.toString() === 'false');
+            this.addresses = (data.body!.topics.topic ?? []).filter(topic => topic.temporary!.toString() === 'false');
           }
           this.changeDetector.detectChanges();
         },

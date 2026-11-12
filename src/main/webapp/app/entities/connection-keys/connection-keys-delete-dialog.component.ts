@@ -15,7 +15,7 @@ import { ConnectionKeysService } from './connection-keys.service';
     imports: [FontAwesomeModule, AlertError],
 })
 export class ConnectionKeysDeleteDialogComponent {
-    connectionKeys: IConnectionKeys;
+    connectionKeys!: IConnectionKeys;
 
     constructor(
         protected connectionKeysService: ConnectionKeysService,

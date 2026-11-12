@@ -14,7 +14,7 @@ import { ICertificate } from 'app/shared/model/certificate.model';
     imports: [CommonModule, FontAwesomeModule, AlertError, FormatMediumDatetimePipe],
 })
 export class CertificateDetailComponent implements OnInit {
-    certificate: ICertificate;
+    certificate!: ICertificate;
     // e.g. [{ key: 'Type', value: 'X.509' }, { key: 'Signing Algorithm', value: 'SHA256withRSA' }, ...]
     certificateDetails: { key: string; value: string }[] = [];
 

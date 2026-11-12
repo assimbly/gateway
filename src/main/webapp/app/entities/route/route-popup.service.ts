@@ -9,19 +9,19 @@ export class RoutePopupService {
     private ngbModalRef: NgbModalRef;
 
     constructor(private modalService: NgbModal, private router: Router, private routeService: RouteService) {
-        this.ngbModalRef = null;
+        this.ngbModalRef = null!;
     }
 
     open(component: Component, id?: number | any, type?: string): Promise<NgbModalRef> {
         return new Promise<NgbModalRef>((resolve, reject) => {
             const isOpen = this.ngbModalRef !== null;
             if (isOpen) {
-                this.ngbModalRef = null;
+                this.ngbModalRef = null!;
             }
 
             if (id) {
                 this.routeService.find(id).subscribe(route => {
-                    this.ngbModalRef = this.routeModalRef(component, route.body, type);
+                    this.ngbModalRef = this.routeModalRef(component, route.body!, type);
                     resolve(this.ngbModalRef);
                 });
             } else {

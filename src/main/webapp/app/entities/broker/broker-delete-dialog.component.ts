@@ -15,7 +15,7 @@ import { BrokerService } from './broker.service';
     imports: [FormsModule, FontAwesomeModule, AlertError],
 })
 export class BrokerDeleteDialogComponent {
-    broker: IBroker;
+    broker!: IBroker;
     /** True while the delete runs, so a second click doesn't send it again. */
     readonly deleting = signal(false);
 

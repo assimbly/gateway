@@ -55,25 +55,25 @@ import { CodemirrorComponent } from "@ctrl/ngx-codemirror";
 export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   readonly themeService = inject(ThemeService);
 
-  @ViewChild('codeEditor') private codeEditor: CodemirrorComponent;
+  @ViewChild('codeEditor') private codeEditor!: CodemirrorComponent;
 
   messages: IMessage[];
-  message: IMessage;
+  message!: IMessage;
   selectedMessage: IMessage = {};
-  selectedHighlight: string;
+  selectedHighlight!: string;
   allMessages: any;
   headers: any;
-  headerKeys: IHeader[];
+  headerKeys!: IHeader[];
 
-  brokers: IBroker[];
-  brokerType: string;
-  endpointName: string;
-  endpointType: string;
-  targetEndpointName: string;
+  brokers!: IBroker[];
+  brokerType!: string;
+  endpointName!: string;
+  endpointType!: string;
+  targetEndpointName!: string;
 
 
   currentAccount: any;
-  eventSubscriber: Subscription;
+  eventSubscriber!: Subscription;
   itemsPerPage: number;
   links: any;
 
@@ -82,20 +82,20 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
 
   page: any;
   numberOfMessages = 100;
-  messagesCount: number;
-  fileExtension: string;
+  messagesCount!: number;
+  fileExtension!: string;
   isLoading = false;
   finished = false;
   searchText = '';
   active = '0';
   descending = false;
-  subtitle: string;
+  subtitle!: string;
 
   editorMode: any = 'text';
 
   objectKeys = Object.keys;
 
-  modalRef: NgbModalRef | null;
+  modalRef!: NgbModalRef | null;
 
   private readonly changeDetector = inject(ChangeDetectorRef);
 
@@ -147,7 +147,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
       //this.showMessage(this.message);
       //document.getElementById("codemirror").click();
       //this.subContent.nativeElement.click();
-      this.codeEditor.codeMirror.refresh()
+      this.codeEditor.codeMirror!.refresh()
   	}
 
   loadMessages() {
@@ -158,10 +158,10 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
       this.brokerService.getBrokers().subscribe(
         data => {
           if (data) {
-            for (let i = 0; i < data.body.length; i++) {
-              this.brokers.push(data.body[i]);
+            for (let i = 0; i < data.body!.length; i++) {
+              this.brokers.push(data.body![i]);
             }
-            this.brokerType = this.brokers[0].type;
+            this.brokerType = this.brokers[0].type!;
             if (this.brokerType != null) {
               this.getMessages();
             } else {
@@ -179,7 +179,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   getMessages() {
 
     this.brokerService.countMessages(this.brokerType, this.endpointName).subscribe(
-      (res: HttpResponse<string>) => this.onSuccessCount(res.body, res.headers),
+      (res: HttpResponse<string>) => this.onSuccessCount(res.body!, res.headers),
       (res: HttpErrorResponse) => this.onError(res.message)
     );
 
@@ -319,10 +319,10 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
 
   sortByTimestamp() {
     if (this.descending) {
-      this.messages.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+      this.messages.sort((a, b) => b.timestamp!.localeCompare(a.timestamp!));
       this.descending = false;
     } else {
-      this.messages.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+      this.messages.sort((a, b) => a.timestamp!.localeCompare(b.timestamp!));
       this.descending = true;
     }
 
@@ -338,7 +338,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   }
 
   clearMessage(message: IMessage) {
-    this.brokerService.deleteMessage(this.brokerType, this.endpointName, message.messageid).subscribe(
+    this.brokerService.deleteMessage(this.brokerType, this.endpointName, message.messageid!).subscribe(
       (res: HttpResponse<any>) => {
         this.loadMessages();
       },
@@ -362,7 +362,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   }
 
   moveMessage(message: IMessage) {
-    this.brokerService.moveMessage(this.brokerType, this.endpointName, this.targetEndpointName, message.messageid).subscribe(
+    this.brokerService.moveMessage(this.brokerType, this.endpointName, this.targetEndpointName, message.messageid!).subscribe(
       (res: HttpResponse<any>) => {
         this.loadMessages();
         this.cancelModal();
@@ -381,10 +381,10 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     const today = new Date().toISOString().slice(0, 10);
 
     if (bodyOnly) {
-      const blob = new Blob([message.body], { type: 'application/' + this.fileExtension });
+      const blob = new Blob([message.body!], { type: 'application/' + this.fileExtension });
       saveAs(blob, `${today}-${this.endpointName}-${message.messageid}.${this.fileExtension}`);
     } else {
-      this.brokerService.browseMessage(this.brokerType, this.endpointName, message.messageid).subscribe(
+      this.brokerService.browseMessage(this.brokerType, this.endpointName, message.messageid!).subscribe(
         (res: HttpResponse<any>) => {
           const exportMessage = JSON.stringify(res.body);
           const blob = new Blob([exportMessage], { type: 'application/json' });
@@ -409,8 +409,8 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   }
 
   showMessage(message: IMessage) {
-    this.selectedHighlight = message.messageid;
-    this.brokerService.browseMessage(this.brokerType, this.endpointName, message.messageid).subscribe(
+    this.selectedHighlight = message.messageid!;
+    this.brokerService.browseMessage(this.brokerType, this.endpointName, message.messageid!).subscribe(
       (res: HttpResponse<IMessage[]>) => this.onSuccessBrowse(res.body, res.headers),
       (res: HttpErrorResponse) => this.onError(res.message)
     );

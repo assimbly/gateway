@@ -56,7 +56,7 @@
                 required
                 maxlength="1000"
                 [jhiExistingConnectionKeys]="connectionKeysKeys"
-                [disabled]="connectionKey.isDisabled || connectionKey.isRequired"
+                [disabled]="!!(connectionKey.isDisabled || connectionKey.isRequired)"
                 id="connectionKey-key-{{ idx }}"
                 #key="ngModel"
               />
@@ -76,7 +76,7 @@
               required
               maxlength="1000"
               value="connectionKey.value"
-              [disabled]="connectionKey.isDisabled"
+              [disabled]="!!connectionKey.isDisabled"
               #value="ngModel"
               placeholder="{{ connectionKey.placeholder }}"
             />

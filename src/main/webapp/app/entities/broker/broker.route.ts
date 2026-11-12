@@ -22,7 +22,7 @@ export class BrokerResolve implements Resolve<IBroker> {
     if (id) {
       return this.service.find(id).pipe(
         filter((response: HttpResponse<Broker>) => response.ok),
-        map((broker: HttpResponse<Broker>) => broker.body)
+        map((broker: HttpResponse<Broker>) => broker.body!)
       );
     }
     return of(new Broker());

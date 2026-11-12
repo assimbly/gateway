@@ -28,7 +28,7 @@ export class TopicService {
   private gatewayid = 1;
   private brokerid = 1;
 
-  brokerType: string;
+  brokerType!: string;
 
   constructor(protected http: HttpClient, protected router: Router, protected $window: WindowRef, protected brokerService: BrokerService) {
   }
