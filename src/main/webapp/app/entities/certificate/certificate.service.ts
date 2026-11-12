@@ -4,7 +4,6 @@ import { Observable, forkJoin } from 'rxjs';
 import dayjs from 'dayjs/esm';
 import { DATE_FORMAT } from 'app/config/input.constants';
 import { map } from 'rxjs/operators';
-import { environment } from 'environments/environment';
 
 import { serverApiUrl } from 'app/config';
 
@@ -107,7 +106,6 @@ export class CertificateService {
     const options = new HttpHeaders({
       'Content-Type': 'text/plain',
       keystoreName: TRUSTSTORE,
-      keystorePassword: environment.KEYSTORE_PWD,
     });
     return this.http.post(`${this.keystoreUrl}/${encodeURIComponent(name)}`, certificates, {
       headers: options,
@@ -118,14 +116,10 @@ export class CertificateService {
 
   /** Imports a server identity: a PKCS12 file (private key + certificate chain) as base64 or data URL. */
   importIdentity(name: string, p12: string, password: string): Observable<HttpResponse<string>> {
-    const options = new HttpHeaders({
-      'Content-Type': 'text/plain',
-      keystoreName: IDENTITY_STORE,
-      keystorePassword: environment.KEYSTORE_PWD,
-      password,
-    });
+    const options = new HttpHeaders({ keystoreName: IDENTITY_STORE });
 
-    return this.http.post(`${this.keystoreUrl}/identity/${encodeURIComponent(name)}`, p12, {
+    // the password of the file goes in the body: headers end up in proxy and access logs
+    return this.http.post(`${this.keystoreUrl}/identity/${encodeURIComponent(name)}`, { p12, password }, {
       headers: options,
       observe: 'response',
       responseType: 'text',
@@ -136,7 +130,6 @@ export class CertificateService {
   generateIdentity(cn: string): Observable<HttpResponse<string>> {
     const options = new HttpHeaders({
       keystoreName: IDENTITY_STORE,
-      keystorePassword: environment.KEYSTORE_PWD,
       cn,
     });
 
@@ -181,7 +174,6 @@ export class CertificateService {
   private domainHeaders(certificateType?: string): HttpHeaders {
     const headers = new HttpHeaders({
       keystoreName: TRUSTSTORE,
-      keystorePassword: environment.KEYSTORE_PWD,
     });
     return certificateType ? headers.set('certificateType', certificateType) : headers;
   }
@@ -192,7 +184,6 @@ export class CertificateService {
     const keystoreName = certificateStore || TRUSTSTORE;
     const options = new HttpHeaders({
       keystoreName,
-      keystorePassword: environment.KEYSTORE_PWD,
     });
     const path = keystoreName === IDENTITY_STORE ? 'identity/' : '';
 
