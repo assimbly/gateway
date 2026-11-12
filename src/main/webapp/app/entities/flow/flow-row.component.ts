@@ -73,7 +73,6 @@ enum Status {
   ],
 })
 export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
-  sslUrl: any;
 
   @Input() flow: Flow;
   /** The API and Operation this Flow handles, when it is a Handler Flow. */
@@ -581,56 +580,6 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
         this.responseStepTooltips.push(this.stepTooltip(step.componentType, step.uri, step.options));
       }
     });
-  }
-
-  getSSLUrl(type: String, uri: String, options: String) {
-    let hostname;
-
-    switch (type) {
-      case 'FTPS':
-        if (uri.includes('@')) {
-          uri = uri.substring(uri.indexOf('@') + 1);
-        }
-        hostname = new URL('https://' + uri).hostname;
-        this.sslUrl = 'https://' + hostname;
-        break;
-      case 'HTTPS':
-        hostname = new URL('https://' + uri).hostname;
-        this.sslUrl = 'https://' + hostname;
-        break;
-      case 'IMAPS':
-        if (uri.includes('@')) {
-          uri = uri.substring(uri.indexOf('@') + 1);
-        }
-        hostname = new URL('https://' + uri).hostname;
-        this.sslUrl = 'https://' + hostname;
-        break;
-      case 'KAFKA':
-        if (options.includes(',')) {
-          options = options.substring(options.lastIndexOf('brokers=') + 1, options.lastIndexOf(','));
-        } else {
-          options = options.substring(uri.indexOf(',') + 1);
-        }
-        hostname = new URL('https://' + options).hostname;
-        this.sslUrl = 'https://' + hostname;
-        break;
-      case 'NETTY4':
-        hostname = new URL('https://' + uri).hostname;
-        this.sslUrl = 'https://' + hostname;
-        break;
-      case 'SMTPS':
-        if (uri.includes('@')) {
-          uri = uri.substring(uri.indexOf('@') + 1);
-        }
-        hostname = new URL('https://' + uri).hostname;
-        this.sslUrl = 'https://' + hostname;
-        break;
-      default:
-        this.sslUrl = `0`;
-        break;
-    }
-
-    return this.sslUrl;
   }
 
   stepTooltip(type, uri, options): string {
