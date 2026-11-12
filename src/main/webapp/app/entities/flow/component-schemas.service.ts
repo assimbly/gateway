@@ -29,7 +29,7 @@ export class ComponentSchemas {
   load(componentTypes: (string | undefined)[]): Observable<void> {
     const wanted = [...new Set(componentTypes.filter((type): type is string => !!type).map(type => type.toLowerCase()))];
     const loads = wanted.filter(type => !this.rules.has(type)).map(type => this.loadOne(type));
-    return loads.length ? forkJoin(loads).pipe(map(() => undefined)) : of(undefined);
+    return loads.length ? forkJoin(loads).pipe(map((): void => undefined)) : of(undefined);
   }
 
   private loadOne(componentType: string): Observable<void> {

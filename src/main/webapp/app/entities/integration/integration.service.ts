@@ -58,21 +58,21 @@ export class IntegrationService {
         return this.http.post(`${this.environmentUrl}/${integrationId}`, configuration, options);
     }
 
-    updateBackupFrequency(frequency, url): Observable<any> {
+    updateBackupFrequency(frequency: string, url: string): Observable<any> {
         const options = {
             headers: new HttpHeaders({ observe: 'response', 'Content-Type': 'application/xml', Accept: 'application/json' })
         };
         return this.http.post(`${this.resourceUrl}/$updatebackup/${frequency}`, url, options);
     }
 
-    addCollector(collectorid, collection){
+    addCollector(collectorid: number | string, collection: unknown){
         const options = {
             headers: new HttpHeaders({ observe: 'response', 'Content-Type': 'application/json', Accept: 'application/json' })
         };
         return this.http.post(`${this.integrationUrl}/collector/${collectorid}/add`, collection, options);
     }
 
-    removeCollector(collectorid){
+    removeCollector(collectorid: number | string){
           return this.http.delete(`${this.integrationUrl}/collector/${collectorid}/remove`, { responseType: 'text' });
     }
 

@@ -145,7 +145,7 @@ export class ConnectionKeysComponent implements OnInit, OnChanges {
         }
     }
 
-    editConnectionKey(connectionKey) {
+    editConnectionKey(connectionKey: IConnectionKeys) {
         connectionKey.isDisabled = false;
     }
 

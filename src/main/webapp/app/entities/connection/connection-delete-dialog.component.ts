@@ -39,7 +39,7 @@ export class ConnectionDeleteDialogComponent {
         );
     }
 
-    private onDeleteError(error) {
+    private onDeleteError(error: unknown) {
         this.errorMessage = true;
         this.deleteMode = false;
     }

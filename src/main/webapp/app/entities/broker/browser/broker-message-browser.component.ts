@@ -189,7 +189,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     );
   }
 
-  private onSuccess(data, headers) {
+  private onSuccess(data: any, headers: HttpHeaders) {
     this.isLoading = false;
     this.messages = new Array<IMessage>();
     this.allMessages = data;
@@ -225,7 +225,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     this.changeDetector.detectChanges();
   }
 
-  private onSuccessCount(data, headers) {
+  private onSuccessCount(data: string, headers: HttpHeaders) {
     this.messagesCount = parseInt(data);
 
     if (this.messagesCount === 0) {
@@ -238,7 +238,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     this.changeDetector.detectChanges();
   }
 
-  private onSuccessBrowse(data, headers) {
+  private onSuccessBrowse(data: any, headers: HttpHeaders) {
     if (data.messages.message) {
       for (let i = 0; i < data.messages.message.length; i++) {
         const message = data.messages.message[i];
@@ -357,7 +357,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
         this.page = 1;
         this.loadMessages();
       },
-      () => undefined
+      (): void => undefined
     );
   }
 
@@ -439,7 +439,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     }
   }
 
-  getFileType(doc) {
+  getFileType(doc: unknown) {
     if (typeof doc !== 'string' || !doc.trim()) {
       return 'txt';
     }
@@ -476,7 +476,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
         }
     }
 
-  timeConverter(UNIX_timestamp) {
+  timeConverter(UNIX_timestamp: number | string) {
     const a = new Date(UNIX_timestamp);
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const year = a.getFullYear();

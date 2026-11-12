@@ -147,7 +147,7 @@ export class RouteDialogComponent implements OnInit {
         }, 0);
     }
 
-    private subscribeToSaveResponse(result: Observable<HttpResponse<IRoute>>, closePopup) {
+    private subscribeToSaveResponse(result: Observable<HttpResponse<IRoute>>, closePopup: boolean) {
         result.subscribe(data => {
             if (data.ok) {
                 this.onSaveSuccess(data.body, closePopup);

@@ -66,12 +66,12 @@ export class ConnectionUpdateComponent implements OnInit {
       },
       res => this.onError(res.body)
     );
-    if (this.activatedRoute.fragment['value'] && this.activatedRoute.fragment['value'] !== 'clone') {
-      this.connection.type = this.connections.connectionsList.find(st => st === this.activatedRoute.fragment['value']);
-      this.disableType = this.connections.connectionsList.some(st => st === this.activatedRoute.fragment['value']);
+    if (this.activatedRoute.snapshot.fragment && this.activatedRoute.snapshot.fragment !== 'clone') {
+      this.connection.type = this.connections.connectionsList.find(st => st === this.activatedRoute.snapshot.fragment);
+      this.disableType = this.connections.connectionsList.some(st => st === this.activatedRoute.snapshot.fragment);
     }
 
-    if (this.activatedRoute.fragment['value'] === 'clone') {
+    if (this.activatedRoute.snapshot.fragment === 'clone') {
       this.loadConnectionKeys(true);
     } else {
       this.loadConnectionKeys(false);
@@ -186,7 +186,7 @@ export class ConnectionUpdateComponent implements OnInit {
     this.isSaving = false;
   }
 
-  deleteConnectionKeys(connectionKey) {
+  deleteConnectionKeys(connectionKey: ConnectionKeys) {
     this.connectionKeysService.delete(connectionKey.id).subscribe(() => {
       this.removeConnectionKeys(this.connectionKeys.indexOf(connectionKey));
     });

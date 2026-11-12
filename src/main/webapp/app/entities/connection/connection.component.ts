@@ -92,8 +92,8 @@ export class ConnectionComponent implements OnInit, OnDestroy, OnChanges {
             this.selectedConnection = new Connection();
         } else {
             this.connectionKeysService.query().subscribe(
-                res => {
-                    this.connectionKeys = res.json;
+                (res: HttpResponse<ConnectionKeys[]>) => {
+                    this.connectionKeys = res.body;
                     this.connectionKeys = this.connectionKeys.filter(k => k.connectionId === this.selectedConnection.id);
                     if (this.connectionKeys.length === 0) {
                         const newConnectionKeys = new ConnectionKeys();
@@ -101,7 +101,7 @@ export class ConnectionComponent implements OnInit, OnDestroy, OnChanges {
                         this.connectionKeys.push(newConnectionKeys);
                     }
                 },
-                res => this.onError(res.json)
+                (res: HttpErrorResponse) => this.onError(res.message)
             );
         }
     }

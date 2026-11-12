@@ -36,7 +36,7 @@ export class MessageDeleteDialogComponent {
         );
     }
 
-    private onDeleteError(error) {
+    private onDeleteError(error: unknown) {
         this.errorMessage = true;
         this.deleteMode = false;
     }

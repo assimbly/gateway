@@ -232,7 +232,7 @@ function copy(copyable: HTMLElement): void {
   if (document.execCommand('copy')) {
     copied();
   } else {
-    void navigator.clipboard?.writeText(range.toString()).then(copied, () => undefined);
+    void navigator.clipboard?.writeText(range.toString()).then(copied, (): void => undefined);
   }
 }
 

@@ -60,7 +60,7 @@ export class IntegrationUpdateComponent implements OnInit {
             this.integration.defaultErrorComponentType = 'file';
         }
 
-        if (this.activatedRoute.fragment['value'] === 'clone') {
+        if (this.activatedRoute.snapshot.fragment === 'clone') {
             this.integration.id = null;
         }
     }

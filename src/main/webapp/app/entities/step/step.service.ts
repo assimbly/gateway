@@ -74,7 +74,7 @@ export class StepService {
      */
     private convertItemsFromServer(json: any): Array<IStep> {
         const entities: Array<IStep> = new Array<IStep>();
-        json.forEach(element => {
+        json.forEach((element: Partial<IStep>) => {
             entities.push(Object.assign(new Step(), element));
         });
         return entities;

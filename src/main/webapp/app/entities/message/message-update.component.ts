@@ -45,7 +45,7 @@ export class MessageUpdateComponent implements OnInit {
     this.isSaving = false;
     this.activatedRoute.data.subscribe(({ message }) => {
       this.message = message;
-      if (this.activatedRoute.fragment['value'] === 'clone') {
+      if (this.activatedRoute.snapshot.fragment === 'clone') {
         this.loadHeader(true);
       } else {
         this.loadHeader(false);
@@ -99,7 +99,7 @@ export class MessageUpdateComponent implements OnInit {
     this.isSaving = false;
   }
 
-  deleteHeader(header) {
+  deleteHeader(header: IHeader) {
     this.headerService.delete(header.id).subscribe(res => {
       this.removeHeader(this.headers.indexOf(header));
     });

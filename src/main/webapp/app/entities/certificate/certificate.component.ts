@@ -103,7 +103,7 @@ export class CertificateComponent implements OnInit, OnDestroy {
     this.loadAll();
   }
 
-  loadPage(page) {
+  loadPage(page: number) {
     this.page = page;
     this.loadAll();
   }
@@ -172,7 +172,7 @@ export class CertificateComponent implements OnInit, OnDestroy {
     	this.certificatePopupService.open(CertificateSelfSignDialogComponent as Component);
   }
 
-  exportCertificate(id) {
+  exportCertificate(id: number) {
     console.log('Export certificate');
     this.certificateService.find(id).subscribe(data => {
       const certificate = data.body;

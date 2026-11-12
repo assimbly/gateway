@@ -34,6 +34,6 @@ export function confirmChoice<T extends string>(modal: NgbModal, title: string, 
   Object.assign(ref.componentInstance as ConfirmDialogComponent, { title, message, choices });
   return ref.result.then(
     (value: T) => value,
-    () => undefined,
+    (): undefined => undefined,
   );
 }

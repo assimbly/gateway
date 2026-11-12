@@ -15,7 +15,7 @@ describe('ConnectionDialogComponent', () => {
       new Connections(),
       {} as any,
       {} as any,
-      { fragment: { value: null } } as any,
+      { snapshot: { fragment: null } } as any,
       {} as any,
       { markForCheck: jest.fn() } as any,
     );

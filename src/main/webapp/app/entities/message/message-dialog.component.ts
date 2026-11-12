@@ -56,7 +56,7 @@ export class MessageDialogComponent implements OnInit {
       },
       res => this.onError(res.body)
     );
-    this.loadHeader(this.route.fragment['value'] === 'clone');
+    this.loadHeader(this.route.snapshot.fragment === 'clone');
   }
 
 
@@ -87,7 +87,7 @@ export class MessageDialogComponent implements OnInit {
     }
   }
 
-  deleteHeader(header) {
+  deleteHeader(header: IHeader) {
     this.headerService.delete(header.id).subscribe(res => {
       this.removeHeader(this.headers.indexOf(header));
     });
@@ -131,7 +131,7 @@ export class MessageDialogComponent implements OnInit {
     }
   }
 
-  private subscribeToSaveResponse(result: Observable<HttpResponse<IMessage>>, closePopup) {
+  private subscribeToSaveResponse(result: Observable<HttpResponse<IMessage>>, closePopup: boolean) {
     result.subscribe(data => {
       if (data.ok) {
         this.onSaveSuccess(data.body, closePopup);

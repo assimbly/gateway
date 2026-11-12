@@ -126,7 +126,7 @@ export class FlowAlertsDrawerComponent {
     if (document.execCommand('copy')) {
       copied();
     } else {
-      void navigator.clipboard?.writeText(source.textContent ?? '').then(copied, () => undefined);
+      void navigator.clipboard?.writeText(source.textContent ?? '').then(copied, (): void => undefined);
     }
   }
 

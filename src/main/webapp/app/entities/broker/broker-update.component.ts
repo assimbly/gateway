@@ -128,7 +128,7 @@ export class BrokerUpdateComponent implements OnInit {
         }
     }
 
-    onTypeChange(brokerType) {
+    onTypeChange(brokerType: string) {
         if (brokerType === 'classic') {
             this.artemisConfiguration = this.brokerConfiguration;
             this.brokerConfiguration = this.activemqConfiguration;
@@ -169,7 +169,7 @@ export class BrokerUpdateComponent implements OnInit {
         );
     }
 
-    protected onCreateSuccess(createdBroker) {
+    protected onCreateSuccess(createdBroker: IBroker) {
         this.brokerService
             .setBrokerConfiguration(createdBroker.id, createdBroker.type, createdBroker.configurationType, this.brokerConfiguration)
             .subscribe(

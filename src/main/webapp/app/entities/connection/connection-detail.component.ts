@@ -40,7 +40,7 @@ export class ConnectionDetailComponent implements OnInit {
         window.history.back();
     }
 
-    private load(id) {
+    private load(id: number) {
         this.connectionService.find(id).subscribe(connection => {
             this.connection = connection.body;
             this.loadConnectionKeys(this.connection.id);

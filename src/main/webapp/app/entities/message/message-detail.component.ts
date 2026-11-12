@@ -31,7 +31,7 @@ export class MessageDetailComponent implements OnInit {
         });
     }
 
-    private load(id) {
+    private load(id: number) {
         this.messageService.find(id).subscribe(message => {
             this.message = message.body;
             this.loadHeader(this.message.id);

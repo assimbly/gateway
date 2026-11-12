@@ -77,7 +77,7 @@ export class ConnectionAllComponent implements OnInit, OnDestroy {
 		});
 	}
 
-  private onError(error) {
+  private onError(error: { message: string }) {
 	this.alertService.addAlert({
 	  type: 'danger',
 	  message: error.message,

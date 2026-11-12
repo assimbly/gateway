@@ -87,7 +87,7 @@ export class MessageAllComponent implements OnInit, OnDestroy {
     this.eventSubscriber = this.eventManager.subscribe('messageListModification', () => this.loadAll());
   }
 
-  private onError(error) {
+  private onError(error: { message: string }) {
             this.alertService.addAlert({
 		  type: 'danger',
 		  message: error.message,

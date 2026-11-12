@@ -396,7 +396,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		this.filterConnection = [[]];
 	}
 
-	load(id, isCloning?: boolean): void {
+	load(id: number | string, isCloning?: boolean): void {
 
 		forkJoin([
 			this.flowService.getWikiDocUrl(),
@@ -438,7 +438,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 					}
 
 					if (id) {
-						forkJoin([this.flowService.find(id), this.apiService.handlerOf(Number(id)), this.flowService.query({ page: 0, size: 1000 })])
+						forkJoin([this.flowService.find(Number(id)), this.apiService.handlerOf(Number(id)), this.flowService.query({ page: 0, size: 1000 })])
 							.subscribe(
 								([flow, handler, flows]) => {
 									this.flow = flow.body;
@@ -702,7 +702,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     this.steps[index].options = options;
   }
 
-  setTypeLinks(step: any, stepFormIndex?, e?: Event): void {
+  setTypeLinks(step: any, stepFormIndex?: number, e?: Event): void {
 
     const stepForm = <FormGroup>(<FormArray>this.editFlowForm.controls.stepsData).controls[stepFormIndex];
 
@@ -932,10 +932,10 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 	}
 
-	  setURIlist(index): void {
+	  setURIlist(index: number): void {
 
       this.URIList[index] = [];
-      let updatedList = [];
+      const updatedList: Step[] = [];
 
       const tStepsUnique = this.allsteps.filter((v, i, a) => a.findIndex(t => t.uri === v.uri) === i);
 
@@ -1086,7 +1086,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	addStep(step, index, stepType?: StepType): void {
+	addStep(step: Step, index: number, stepType?: StepType): void {
 
 		let newIndex = index + 1;
 
@@ -1293,7 +1293,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 	private readonly readOnlyScriptOptionsCache = new Map<string, Record<string, unknown>>();
 
-	removeStep(step, index): void {
+	removeStep(step: Step, index: number): void {
 
 		// The first Step stays, except a Route while the Flow has other Routes.
 		if (index === 0 && !(step.stepType === StepType.ROUTE && this.routeCount > 1)) {
@@ -1329,7 +1329,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		this.selectedOptions.splice(i, 1);
 		[this.uriPlaceholders, this.uriPopoverMessages, this.URIList, this.componentTypeCamelLinks, this.filterConnection, this.connectionType]
 			.forEach(perStep => perStep.splice(i, 1));
-		this.editFlowForm.removeControl(index);
+		this.editFlowForm.removeControl(String(index));
 		(<FormArray>this.editFlowForm.controls.stepsData).removeAt(i);
 		this.editFlowForm.markAsDirty();
 	}
@@ -1425,12 +1425,12 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		return !!step.connectionId || this.componentsWithConnection.includes(step.componentType?.toLowerCase());
 	}
 
-	addConnection(step, index): void {
+	addConnection(step: Step, index: number): void {
 	     this.enableConnection[index] = true;
 	}
 
 	/** A Connection added to a Step is no longer needed: it is hidden again and the Step is saved without it. */
-	removeConnection(step, index): void {
+	removeConnection(step: Step, index: number): void {
 		this.enableConnection[index] = false;
 		step.connectionId = null;
 		const connection = this.stepFormAt(index).controls.connection;
@@ -1438,7 +1438,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		connection.markAsDirty();
 	}
 
-	addMessage(step, index): void {
+	addMessage(step: Step, index: number): void {
 	     this.enableMessage[index] = true;
 	}
 
@@ -1446,7 +1446,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     return from(
       new Promise<void>((resolve, reject) => {
         setTimeout(() => {
-          this.getComponentOptions(componentType, step.stepType).subscribe(data => {
+          this.getComponentOptions(componentType, step.stepType).subscribe((data: any) => {
 
             const componentOptions = data.properties;
             const stepIndex = typeof stepFormIndex === 'number' ? stepFormIndex : this.steps.indexOf(step);
@@ -1455,7 +1455,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
               ...componentOptions[key],
               ...{ name: key },
             }));
-            this.componentOptions[stepIndex].sort(function (a, b) {
+            this.componentOptions[stepIndex].sort(function (a: any, b: any) {
               return a.displayName.toLowerCase().localeCompare(b.displayName.toLowerCase());
             });
 
@@ -1525,7 +1525,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
             });
 
             if (this.componentOptions[index]) {
-              const optionNameExist = this.componentOptions[index].some(el => el.name === o.key);
+              const optionNameExist = this.componentOptions[index].some((el: any) => el.name === o.key);
 
               if (!optionNameExist && o.key) {
                 this.componentOptions[index].push({
@@ -1585,9 +1585,9 @@ splitOptions0(query: string): string[] {
 }
 
 //chatgpt
-splitOptions1(str) {
+splitOptions1(str: string) {
     const regex = /([^=&]+)=([^&]*)/g;
-    const result = [];
+    const result: any = [];
     let match;
 
     while ((match = regex.exec(str)) !== null) {
@@ -1602,7 +1602,7 @@ splitOptions1(str) {
 }
 
 //claude
-splitOptions2(queryStr) {
+splitOptions2(queryStr: string) {
   const result = [];
   // Regex to match potential parameter starts
   const regex = /([^&=]+)=|^=/g;
@@ -1677,7 +1677,7 @@ splitOptions4(options: string): string[] {
     });
   }
 
-  setStepOptions(stepOptions: Array<Option>, step, formOptions: FormArray): void {
+  setStepOptions(stepOptions: Array<Option>, step: Step, formOptions: FormArray): void {
     let index = 0;
 
     stepOptions.forEach((option, i) => {
@@ -1691,7 +1691,7 @@ splitOptions4(options: string): string[] {
     });
   }
 
-  removeOption(options: Array<Option>, option: Option, stepIndex): void {
+  removeOption(options: Array<Option>, option: Option, stepIndex: number): void {
     const optionIndex = options.indexOf(option);
     const formOptions: FormArray = this.selectOptions(stepIndex);
 
@@ -1704,7 +1704,7 @@ splitOptions4(options: string): string[] {
     this.selectedOptions[stepIndex].splice(optionIndex, 1);
   }
 
-  selectOptions(stepIndex): FormArray {
+  selectOptions(stepIndex: number): FormArray {
     const stepData = (<FormArray>this.editFlowForm.controls.stepsData).controls[stepIndex];
     return <FormArray>(<FormGroup>stepData).controls.options;
   }
@@ -1720,7 +1720,7 @@ splitOptions4(options: string): string[] {
     this.filterConnection[index] = filteredConnections;
   }
 
-  createOrEditMessage(step, formMessage: AbstractControl): void {
+  createOrEditMessage(step: Step, formMessage: AbstractControl): void {
 
     step.messageId = formMessage.value;
 
@@ -1747,7 +1747,7 @@ splitOptions4(options: string): string[] {
 
   }
 
-  setMessage(step, id, formMessage: AbstractControl): void {
+  setMessage(step: Step, id: number, formMessage: AbstractControl): void {
 
     this.messageService
       .getAllMessages()
@@ -1832,7 +1832,7 @@ splitOptions4(options: string): string[] {
 		);
 	}
 
-  createOrEditConnection(step, connectionType: string, formConnection: AbstractControl): void {
+  createOrEditConnection(step: Step, connectionType: string, formConnection: AbstractControl): void {
 
     const previousConnectionId = formConnection.value;
     step.connectionId = previousConnectionId;
@@ -1853,7 +1853,7 @@ splitOptions4(options: string): string[] {
 
   }
 
-  setConnection(step, id, formConnection: AbstractControl): void {
+  setConnection(step: Step, id: number, formConnection: AbstractControl): void {
     this.connectionService.getAllConnections().subscribe(
       res => {
         this.connections = res.body;
@@ -2111,7 +2111,7 @@ splitOptions4(options: string): string[] {
 		);
 	}
 
-	setDataFromFormOnStep(step: Step, formStepData, index: number) {
+	setDataFromFormOnStep(step: Step, formStepData: any, index: number) {
 
 		step.id = formStepData.id.value;
 		step.componentType = formStepData.componentType.value;
@@ -2173,7 +2173,7 @@ splitOptions4(options: string): string[] {
 				return;
 			}
 			((stepForm.get('options') as FormArray)?.controls ?? []).forEach(row => {
-				const schema = this.componentOptions[index]?.find(option => option.name === row.get('key')?.value);
+				const schema = this.componentOptions[index]?.find((option: any) => option.name === row.get('key')?.value);
 				const value = row.get('value')!;
 				if (notAnInteger(schema, value.value)) {
 					value.setErrors({ integer: true });
@@ -2203,7 +2203,7 @@ splitOptions4(options: string): string[] {
 		this.isSaving = false;
 	}
 
-	private onError(error): void {
+	private onError(error: { message: string }): void {
 		this.alertService.addAlert({ type: "danger", message: error.message });
 	}
 
@@ -3276,7 +3276,7 @@ splitOptions4(options: string): string[] {
 			);
 	}
 
-	getElementByXpath(xml, path) {
+	getElementByXpath(xml: Node, path: string) {
     return document.evaluate(path, xml, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
   }
 

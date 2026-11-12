@@ -559,7 +559,7 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
     );
   }
 
-  flowConfigurationNotObtained(id) {
+  flowConfigurationNotObtained(id: number) {
     this.isFlowStatusOK = false;
     this.flowStatusError = `Configuration for flow with id=${id} is not obtained.`;
   }
@@ -582,7 +582,7 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
-  stepTooltip(type, uri, options): string {
+  stepTooltip(type: string | null, uri: string, options: string): string {
     if (type === null) {
       return '';
     } else {

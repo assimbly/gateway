@@ -878,9 +878,9 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
     this.selectedOptions?.splice(optionIndex, 1);
   }
 
-  changeOptionSelection(selectedOption, optionIndex: number): void {
+  changeOptionSelection(selectedOption: { name?: string } | string, optionIndex: number): void {
     let defaultValue;
-    const optionName = selectedOption?.name ?? selectedOption;
+    const optionName = typeof selectedOption === 'string' ? selectedOption : selectedOption?.name;
     const componentOption = (this.componentOptions || []).filter(option => option.name === optionName);
 
     if (componentOption[0]) {
@@ -918,7 +918,7 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
     this.fillDefaultLanguage(optionIndex);
   }
 
-  addOptionTag = (name): any => {
+  addOptionTag = (name: string): any => {
     return { name, displayName: name, description: 'Custom option', group: 'custom', type: 'string', componentType: 'file' };
   };
 

@@ -16,7 +16,7 @@
     "outDir": "./target/classes/static/",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "strictNullChecks": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
@@ -41,6 +41,7 @@
   "angularCompilerOptions": {
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
+    "strictTemplates": true,
     "preserveWhitespaces": true
   }
 }

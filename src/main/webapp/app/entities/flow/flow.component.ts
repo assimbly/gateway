@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit, OnDestroy, QueryList, ViewChildren, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Subscription, forkJoin, interval } from 'rxjs';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -128,10 +128,9 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
   }
 
-  getFlowsForSelectedIntegration(event) {
-    let id = (event.target as HTMLSelectElement).value as string;
+  getFlowsForSelectedIntegration(integrationId: number) {
     this.flowService
-      .getFlowByIntegrationId(Number(id), {
+      .getFlowByIntegrationId(integrationId, {
         page: this.page,
         size: this.itemsPerPage,
         sort: this.sort(),
@@ -150,7 +149,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.loadFlows();
   }
 
-  loadPage(page) {
+  loadPage(page: number) {
     this.page = 0; // page;
     this.itemsPerPage = this.itemsPerPage + 5;
     this.loadFlows();
@@ -324,7 +323,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.eventManager.broadcast({ name: 'trigerAction', content: selectedAction });
   }
 
-  private onSuccess(data, headers) {
+  private onSuccess(data: IFlow[], headers: HttpHeaders) {
     if (this.integrations.length === 1) {
       this.links = this.parseLinks.parse(headers.get('link'));
     }
@@ -332,7 +331,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     for (let i = 0; i < data.length; i++) {
       this.flows.push(data[i]);
     }
-    this.totalItems = headers.get('X-Total-Count');
+    this.totalItems = Number(headers.get('X-Total-Count'));
     this.flowsLoading = false;
     if (!this.flows.length) {
       // A first-time user on an empty Gateway gets the Tutorials to start with.

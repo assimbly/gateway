@@ -72,7 +72,7 @@ export class ConnectionDialogComponent implements OnInit {
             res => this.onError(res.body)
         );
 
-        if (this.activatedRoute.fragment['value'] === 'clone') {
+        if (this.activatedRoute.snapshot.fragment === 'clone') {
             this.loadConnectionKeys(true);
         } else {
             this.loadConnectionKeys(false);
@@ -144,7 +144,7 @@ export class ConnectionDialogComponent implements OnInit {
         }
     }
 
-    deleteConnectionKeys(connectionKey) {
+    deleteConnectionKeys(connectionKey: ConnectionKeys) {
         this.connectionKeysService.delete(connectionKey.id).subscribe(() => {
             this.removeConnectionKeys(this.connectionKeys.indexOf(connectionKey));
             this.cdr.markForCheck();

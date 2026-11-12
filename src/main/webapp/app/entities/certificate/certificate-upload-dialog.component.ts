@@ -29,15 +29,15 @@ export class CertificateUploadDialogComponent {
     this.activeModal.dismiss('cancel');
   }
 
-  openFile(event) {
+  openFile(event: Event) {
     const reader = new FileReader();
     reader.onload = () => {
       // as data URL (base64), so binary DER files arrive intact
       this.certificateFile = reader.result as string;
     };
-    reader.readAsDataURL(event.target.files[0]);
+    reader.readAsDataURL((event.target as HTMLInputElement).files[0]);
 
-    this.fileName = event.target.files[0].name;
+    this.fileName = (event.target as HTMLInputElement).files[0].name;
     this.fileNameWithoutExtension = this.fileName.split('.').slice(0, -1).join('.');
     if (!this.name) {
       this.name = toCertificateName(this.fileNameWithoutExtension);
