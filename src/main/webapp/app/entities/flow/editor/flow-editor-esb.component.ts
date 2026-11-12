@@ -76,6 +76,7 @@ import { confirmChoice } from "./confirm-dialog.component";
 import { ApiService } from "app/entities/api/api.service";
 import { operationUrl } from "app/entities/api/operation-url";
 import { IApiHandler } from "app/entities/api/api.model";
+import { EditorReferenceData, FlowEditorDataService, OpenedFlow } from "./flow-editor-data.service";
 import { FlowGraphHistory } from "../designer/flow-graph-history";
 import {
   addBranch,
@@ -169,6 +170,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	/** The Example Flow a new Flow starts from, from the `template` query parameter. */
 	private template?: FlowTemplate;
 	private readonly apiService = inject(ApiService);
+	private readonly editorData = inject(FlowEditorDataService);
 	private readonly offcanvas = inject(NgbOffcanvas);
 
 	/** The API and Operation this Flow handles, when it is a Handler Flow: its Source is that Operation. */
@@ -397,146 +399,134 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	}
 
 	load(id: number | string, isCloning?: boolean): void {
+		this.editorData.load(id ? Number(id) : undefined).subscribe(({ reference, opened }) => {
+			this.applyReferenceData(reference);
 
-		forkJoin([
-			this.flowService.getWikiDocUrl(),
-			this.flowService.getCamelDocUrl(),
-			this.messageService.getAllMessages(),
-			this.routeService.getAllRoutes(),
-      this.connectionService.getAllConnections(),
-			this.integrationService.query(),
-			this.stepService.query(),
-			this.flowService.getIntegrationName(),
-		])
-			.subscribe(
-				([wikiDocUrl, camelDocUrl, messages, routes, connections, integrations, allsteps, integrationName]) => {
+			if (opened) {
+				this.openFlow(opened, isCloning);
+			} else {
+				if (!this.finished) {
+					this.startNewFlow();
+				}
+				this.active = "0";
+			}
+		});
+	}
 
-					this.wikiDocUrl = wikiDocUrl.body;
-					this.camelDocUrl = camelDocUrl.body;
+	private applyReferenceData(reference: EditorReferenceData): void {
+		this.wikiDocUrl = reference.wikiDocUrl;
+		this.camelDocUrl = reference.camelDocUrl;
 
-          this.messages = messages.body;
-          this.messageCreated = this.messages.length > 0;
+		this.messages = reference.messages;
+		this.messageCreated = this.messages.length > 0;
 
-					this.routes = routes.body;
+		this.routes = reference.routes;
 
-          this.connections = connections.body;
-          this.connectionCreated = this.connections.length > 0;
+		this.connections = reference.connections;
+		this.connectionCreated = this.connections.length > 0;
 
-					this.integrations = integrations.body;
-					this.singleIntegration = this.integrations.length === 1;
-					this.integrationName = integrationName.body;
+		this.integrations = reference.integrations;
+		this.singleIntegration = this.integrations.length === 1;
+		this.integrationName = reference.integrationName;
 
-					this.allsteps = allsteps.body;
+		this.allsteps = reference.allsteps;
 
-					if (this.singleIntegration) {
-						this.indexIntegration = 0;
-					} else {
-						this.indexIntegration =
-							this.integrations.findIndex(
-								(integration) => integration.name === this.integrationName,
-							);
-					}
+		this.indexIntegration = this.singleIntegration
+			? 0
+			: this.integrations.findIndex(integration => integration.name === this.integrationName);
+	}
 
-					if (id) {
-						forkJoin([this.flowService.find(Number(id)), this.apiService.handlerOf(Number(id)), this.flowService.query({ page: 0, size: 1000 })])
-							.subscribe(
-								([flow, handler, flows]) => {
-									this.flow = flow.body;
-									// A clone is an ordinary Flow: its Source becomes a placeholder (see clone()).
-									this.handler = isCloning ? undefined : handler;
-									this.clonedHandler = isCloning ? handler : undefined;
-									this.loadOperationUrl();
-									this.callableFlows = callableFlows(flows.body ?? [], this.flow.id);
-									if (this.singleIntegration) {
-										this.flow.integrationId = this.integrations[this.indexIntegration].id;
-									}
+	private openFlow({ flow, handler, flows }: OpenedFlow, isCloning?: boolean): void {
+		this.flow = flow;
+		// A clone is an ordinary Flow: its Source becomes a placeholder (see clone()).
+		this.handler = isCloning ? undefined : handler;
+		this.clonedHandler = isCloning ? handler : undefined;
+		this.loadOperationUrl();
+		this.callableFlows = callableFlows(flows, this.flow.id);
+		if (this.singleIntegration) {
+			this.flow.integrationId = this.integrations[this.indexIntegration].id;
+		}
 
-									this.initializeForm(this.flow);
+		this.initializeForm(this.flow);
 
-                  if (this.useCanvas) {
-                    this.loadDesigner(this.flow);
-                  } else {
-                    this.loadSteps();
-                  }
+		if (this.useCanvas) {
+			this.loadDesigner(this.flow);
+		} else {
+			this.loadSteps();
+		}
 
-                  if (this.activeStep) {
-                    const activeIndex = this.steps.findIndex(
-                      (item) => item.id.toString() === this.activeStep,
-                    );
-                    if (activeIndex === -1) {
-                      this.active = "0";
-                    } else {
-                      this.active = activeIndex.toString();
-                    }
-                  } else {
-                    this.active = "0";
-                  }
-
-                  if (isCloning) {
-                    this.clone();
-                  }
-
-                  this.finished = true;
-                  this.cdr.detectChanges();
-                  this.focusFlowNameIfEmpty();
-
-								},
-							);
-					} else if (!this.finished) {
-								// create new flow object
-								this.flow = new Flow();
-								this.flow.type = this.activeEditor;
-								this.flow.notes = '';
-								this.flow.autoStart = false;
-								this.flow.parallelProcessing = false;
-								this.flow.maximumRedeliveries = 0;
-								this.flow.redeliveryDelay = 3000;
-								this.flow.logLevel = LogLevelType.OFF;
-								if (this.singleIntegration) {
-									this.indexIntegration = 0;
-									this.flow.integrationId = this.integrations[this.indexIntegration].id;
-								} else {
-									this.configuredIntegration =
-										this.integrations.find(
-											(integration) => integration.name === this.integrationName,
-										);
-									this.indexIntegration =
-										this.integrations.findIndex(
-											(integration) => integration.name === this.integrationName,
-										);
-									this.flow.integrationId = this.configuredIntegration.id;
-								}
-
-								this.initializeForm(this.flow);
-
-								this.numberOfSteps = 1;
-
-								// every new Flow starts from the starter Source, or from the Example Flow it was made from
-                if(this.useCanvas){
-                    this.loadDesigner(this.flow, this.template ?? STARTER_FLOW);
-                    if (this.template && !this.nameControl.value) {
-                        this.nameControl.setValue(this.template.title);
-                    }
-                }else if(this.activeEditor === 'script'){
-                    this.createNewStep(StepType.SOURCE,SCRIPT_STARTER_SOURCE.componentType,0);
-                    this.createNewStep(StepType.SCRIPT,DEFAULT_SCRIPT_LANGUAGE,1);
-                    this.addStepForm(defaultResultLogStep());
-                    this.addStepForm(defaultErrorHandlerStep());
-                    this.applyScriptFlowDefaults();
-                }else if(this.activeEditor === 'route'){
-                    this.createNewStep(StepType.ROUTE,'',0);
-                    this.createNewStep(StepType.ERROR,'',1);
-                    this.stepFormAt(0).patchValue({ routeName: nextRouteName([]), routeContent: STARTER_ROUTE });
-                }
-
-								this.finished = true;
-								this.cdr.detectChanges();
-								this.focusFlowNameIfEmpty();
-					}
-
-					this.active = "0";
-				},
+		if (this.activeStep) {
+			const activeIndex = this.steps.findIndex(
+				(item) => item.id.toString() === this.activeStep,
 			);
+			if (activeIndex === -1) {
+				this.active = "0";
+			} else {
+				this.active = activeIndex.toString();
+			}
+		} else {
+			this.active = "0";
+		}
+
+		if (isCloning) {
+			this.clone();
+		}
+
+		this.finished = true;
+		this.cdr.detectChanges();
+		this.focusFlowNameIfEmpty();
+	}
+
+	private startNewFlow(): void {
+		// create new flow object
+		this.flow = new Flow();
+		this.flow.type = this.activeEditor;
+		this.flow.notes = '';
+		this.flow.autoStart = false;
+		this.flow.parallelProcessing = false;
+		this.flow.maximumRedeliveries = 0;
+		this.flow.redeliveryDelay = 3000;
+		this.flow.logLevel = LogLevelType.OFF;
+		if (this.singleIntegration) {
+			this.indexIntegration = 0;
+			this.flow.integrationId = this.integrations[this.indexIntegration].id;
+		} else {
+			this.configuredIntegration =
+				this.integrations.find(
+					(integration) => integration.name === this.integrationName,
+				);
+			this.indexIntegration =
+				this.integrations.findIndex(
+					(integration) => integration.name === this.integrationName,
+				);
+			this.flow.integrationId = this.configuredIntegration.id;
+		}
+
+		this.initializeForm(this.flow);
+
+		this.numberOfSteps = 1;
+
+		// every new Flow starts from the starter Source, or from the Example Flow it was made from
+		if(this.useCanvas){
+			this.loadDesigner(this.flow, this.template ?? STARTER_FLOW);
+			if (this.template && !this.nameControl.value) {
+				this.nameControl.setValue(this.template.title);
+			}
+		}else if(this.activeEditor === 'script'){
+			this.createNewStep(StepType.SOURCE,SCRIPT_STARTER_SOURCE.componentType,0);
+			this.createNewStep(StepType.SCRIPT,DEFAULT_SCRIPT_LANGUAGE,1);
+			this.addStepForm(defaultResultLogStep());
+			this.addStepForm(defaultErrorHandlerStep());
+			this.applyScriptFlowDefaults();
+		}else if(this.activeEditor === 'route'){
+			this.createNewStep(StepType.ROUTE,'',0);
+			this.createNewStep(StepType.ERROR,'',1);
+			this.stepFormAt(0).patchValue({ routeName: nextRouteName([]), routeContent: STARTER_ROUTE });
+		}
+
+		this.finished = true;
+		this.cdr.detectChanges();
+		this.focusFlowNameIfEmpty();
 	}
 
   loadSteps(){

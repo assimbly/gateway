@@ -1,6 +1,6 @@
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { DefaultUrlSerializer, UrlTree } from '@angular/router';
-import { Subject } from 'rxjs';
+import { Subject, of } from 'rxjs';
 
 import { Flow } from 'app/shared/model/flow.model';
 import { Step, StepType } from 'app/shared/model/step.model';
@@ -759,5 +759,79 @@ describe('Script editor', () => {
     expect(component.viewMode).toBe('test');
     expect(component.testRun).toBeUndefined();
     expect(component.scriptRun(1)).toBeUndefined();
+  });
+});
+
+describe('Flow editor loading', () => {
+  const reference = {
+    wikiDocUrl: 'https://wiki',
+    camelDocUrl: 'https://camel',
+    messages: [{ id: 1 }],
+    routes: [],
+    connections: [],
+    integrations: [{ id: 3, name: 'default' }],
+    allsteps: [],
+    integrationName: 'default',
+  };
+
+  /** The editor without rendering it: what it loads comes from `opened`, and what builds the form is left out. */
+  function editor(opened?: { flow: Flow; handler?: object; flows: Flow[] }) {
+    const component = Object.create(FlowEditorEsbComponent.prototype) as FlowEditorEsbComponent;
+    const load = jest.fn(() => of({ reference, opened }));
+    Object.assign(component, {
+      editorData: { load },
+      cdr: { detectChanges: jest.fn() },
+      activeEditor: 'canvas',
+      initializeForm: jest.fn(),
+      loadDesigner: jest.fn(),
+      loadOperationUrl: jest.fn(),
+      focusFlowNameIfEmpty: jest.fn(),
+      clone: jest.fn(),
+    });
+    return { component, load };
+  }
+
+  it('opens a saved Flow on the tab of the Step in the URL', () => {
+    const flow = new Flow(7, 'Orders');
+    const callable = Object.assign(new Flow(8, 'Invoices'), { steps: [Object.assign(new Step(21, StepType.SOURCE), { componentType: 'flowlink' })] });
+    const { component, load } = editor({ flow, handler: { apiId: 1 }, flows: [flow, callable] });
+    component.steps = [new Step(11, StepType.SOURCE), new Step(12, StepType.ACTION)];
+    component.activeStep = '12';
+
+    component.load('7');
+
+    expect(load).toHaveBeenCalledWith(7);
+    expect(component.flow).toBe(flow);
+    expect(component.flow.integrationId).toBe(3);
+    expect(component.handler).toEqual({ apiId: 1 });
+    expect(component.callableFlows.map(callable => callable.id)).toEqual([8]);
+    expect(component.active).toBe('1');
+    expect(component.messageCreated).toBe(true);
+    expect(component.connectionCreated).toBe(false);
+    expect(component.finished).toBe(true);
+  });
+
+  it('opens a clone without the Operation the Flow handles', () => {
+    const { component } = editor({ flow: new Flow(7, 'Orders'), handler: { apiId: 1 }, flows: [] });
+    component.steps = [];
+
+    component.load(7, true);
+
+    expect(component.handler).toBeUndefined();
+    expect(component.clone).toHaveBeenCalled();
+    expect(component.active).toBe('0');
+  });
+
+  it('starts a new Flow in the only integration, on its first tab', () => {
+    const { component, load } = editor();
+
+    component.load(undefined);
+
+    expect(load).toHaveBeenCalledWith(undefined);
+    expect(component.flow.id).toBeUndefined();
+    expect(component.flow.integrationId).toBe(3);
+    expect(component.flow.type).toBe('canvas');
+    expect(component.active).toBe('0');
+    expect(component.finished).toBe(true);
   });
 });
