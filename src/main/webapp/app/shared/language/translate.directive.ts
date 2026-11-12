@@ -1,4 +1,5 @@
-import { Directive, ElementRef, OnChanges, OnDestroy, OnInit, inject, input } from '@angular/core';
+import { Directive, ElementRef, OnChanges, OnDestroy, OnInit, SecurityContext, inject, input } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 
 import { TranslateService } from '@ngx-translate/core';
 import { Subject, takeUntil } from 'rxjs';
@@ -19,6 +20,7 @@ export default class TranslateDirective implements OnChanges, OnInit, OnDestroy 
 
   private readonly el = inject(ElementRef);
   private readonly translateService = inject(TranslateService);
+  private readonly sanitizer = inject(DomSanitizer);
 
   ngOnInit(): void {
     this.translateService.onLangChange.pipe(takeUntil(this.directiveDestroyed)).subscribe(() => {
@@ -44,9 +46,12 @@ export default class TranslateDirective implements OnChanges, OnInit, OnDestroy 
       .pipe(takeUntil(this.directiveDestroyed))
       .subscribe({
         next: value => {
-          this.el.nativeElement.innerHTML = value;
+          // translations may hold markup, their values (a login, a name) come from users
+          this.el.nativeElement.innerHTML = this.sanitizer.sanitize(SecurityContext.HTML, value) ?? '';
         },
-        error: () => `${translationNotFoundMessage}[${this.jhiTranslate()}]`,
+        error: () => {
+          this.el.nativeElement.textContent = `${translationNotFoundMessage}[${this.jhiTranslate()}]`;
+        },
       });
   }
 }
