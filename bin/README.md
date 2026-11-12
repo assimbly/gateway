@@ -184,3 +184,35 @@ To print a report:
 example
 
 ```updateversion 1.1.0```
+
+---
+
+## checkfrontendversions
+
+Checks the frontend (`package.json`) dependencies for the latest versions using `npx npm-check-updates`.
+
+### Usage:
+
+```checkfrontendversions```
+
+---
+
+## updatefrontendversion
+
+Updates the frontend (`package.json`) dependency versions using `npx npm-check-updates`.
+
+### Usage:
+
+```updatefrontendversion [target]```
+
+* Target: valid values are `patch`, `minor` (patch + minor), `major`, or `all` (patch + minor + major). Default is `patch`.
+
+### Examples:
+
+```
+updatefrontendversion
+updatefrontendversion patch
+updatefrontendversion minor
+updatefrontendversion major
+updatefrontendversion all
+```
