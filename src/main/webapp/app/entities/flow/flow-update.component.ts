@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
@@ -18,7 +17,7 @@ import { IntegrationService } from 'app/entities/integration/integration.service
 @Component({
   selector: 'jhi-flow-update',
   templateUrl: './flow-update.component.html',
-  imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, SaveShortcutDirective],
+  imports: [FormsModule, FontAwesomeModule, AlertError, SaveShortcutDirective],
 })
 export class FlowUpdateComponent implements OnInit {
   flow!: IFlow;
@@ -89,9 +88,5 @@ export class FlowUpdateComponent implements OnInit {
       type: 'danger',
       message: errorMessage,
     });
-  }
-
-  trackIntegrationById(index: number, item: IIntegration) {
-    return item.id;
   }
 }

@@ -1,5 +1,5 @@
 import { afterNextRender, ChangeDetectorRef, Component, ElementRef, EventEmitter, inject, Injectable, Injector, Input, OnChanges, OnDestroy, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import { AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 import { optionForm } from './step-form';
@@ -70,7 +70,7 @@ export class StepEditorRegistry {
   selector: 'jhi-flow-editor-step',
   templateUrl: './flow-editor-step.component.html',
   styleUrl: './flow-editor-step.component.scss',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgbModule, FontAwesomeModule, NgSelectModule, PopoverModule, CodemirrorModule, CdkDragHandle],
+  imports: [ReactiveFormsModule, RouterLink, NgbModule, FontAwesomeModule, NgSelectModule, PopoverModule, CodemirrorModule, CdkDragHandle, NgTemplateOutlet],
 })
 export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   @Input({ required: true }) step!: IStep;

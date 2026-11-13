@@ -86,11 +86,14 @@
 
   <div class="row">
 
-    <form [formGroup]="editFlowForm" class="form-fx-validate" [class.form-submitted]="formSubmitted" (ngSubmit)="save()" (jhiSaveShortcut)="save()" [saveShortcutDisabled]="isSaving" *ngIf="finished" novalidate jhiFieldTab>
+    @if (finished) {
+    <form [formGroup]="editFlowForm" class="form-fx-validate" [class.form-submitted]="formSubmitted" (ngSubmit)="save()" (jhiSaveShortcut)="save()" [saveShortcutDisabled]="isSaving" novalidate jhiFieldTab>
       <jhi-alert-error></jhi-alert-error>
       <div class="form-group" [style.display]="'none'">
         <label for="id">ID</label>
-        <input type="text" class="form-control" id="id" *ngIf="flow" readonly formControlName="id"/>
+        @if (flow) {
+          <input type="text" class="form-control" id="id" readonly formControlName="id"/>
+        }
       </div>
 
       <jhi-flow-editor-header
@@ -243,14 +246,15 @@
       <!-- The Notes tab of every editor. -->
       <ng-template #codeNotes>
         <div class="code-flow-notes">
+          @if (flow) {
           <ngx-codemirror
-            *ngIf="flow"
             class="notes-codemirror"
             id="field_notes"
             formControlName="notes"
             [options]="notesEditorOptions()"
             (codeMirrorLoaded)="refreshCodeMirror($event)">
           </ngx-codemirror>
+          }
         </div>
       </ng-template>
 
@@ -815,5 +819,6 @@
       }
 
     </form>
+    }
   </div>
 </div>

@@ -268,7 +268,9 @@
                  [attr.placeholder]="pathUnused ? componentLabel + ' has no path' : (autoPath ?? null)"
                  [attr.aria-describedby]="autoPath ? 'field_uri_auto_' + index + ' field_uri_syntax_' + index : 'field_uri_syntax_' + index" />
           <datalist id="urilist_{{index}}">
-            <option *ngFor="let uriStep of uriList" [value]="uriStep.uri">{{uriStep.uri}}</option>
+            @for (uriStep of uriList; track uriStep) {
+              <option [value]="uriStep.uri">{{uriStep.uri}}</option>
+            }
           </datalist>
           @if (autoPath && stepType === 'SINK') {
             <small class="step-field__hint" id="field_uri_auto_{{index}}">
@@ -336,18 +338,19 @@
               </ng-template>
               <ng-template ng-footer-tmp>
                 <div class="option-desc-footer">
-                  <ng-container *ngIf="hoveredOption as opt; else optionDescPlaceholder">
+                  @if (hoveredOption; as opt) {
                     <div class="option-desc-footer-title">{{opt.displayName}}</div>
                     <div class="option-desc-footer-body">{{opt.description}}</div>
                     <div class="option-desc-footer-meta">
                       <span><b>Group:</b> {{opt.group}}</span>
                       <span><b>Type:</b> {{opt.type}}</span>
-                      <span *ngIf="opt.hasOwnProperty('defaultValue')"><b>Default:</b> {{opt.defaultValue}}</span>
+                      @if (opt.hasOwnProperty('defaultValue')) {
+                        <span><b>Default:</b> {{opt.defaultValue}}</span>
+                      }
                     </div>
-                  </ng-container>
-                  <ng-template #optionDescPlaceholder>
+                  } @else {
                     <div class="option-desc-footer-placeholder">Hover an option to see its description</div>
-                  </ng-template>
+                  }
                 </div>
               </ng-template>
             </ng-select>

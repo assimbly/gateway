@@ -1,5 +1,4 @@
 import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, TemplateRef, computed, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { optionForm } from '../editor/step-form';
@@ -52,16 +51,15 @@ type SendOutcome = FlowResponse & { error?: unknown };
     selector: 'jhi-flow-message-sender',
     templateUrl: './flow-message-sender.component.html',
     imports: [
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        FontAwesomeModule,
-        NgSelectModule,
-        CodemirrorModule,
-        SendToolbar,
-        SendResultPanel,
-        SendMessageEditor,
-    ],
+    FormsModule,
+    ReactiveFormsModule,
+    FontAwesomeModule,
+    NgSelectModule,
+    CodemirrorModule,
+    SendToolbar,
+    SendResultPanel,
+    SendMessageEditor
+],
     host: {
         '(document:keydown.control.enter)': 'send()',
         '(document:keydown.meta.enter)': 'send()',

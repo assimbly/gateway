@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { canDeleteBranch, canRenameBranch, defaultBranch, DesignLink, FlowGraph, LinkSettings, routerOf, routerTitle, takesCondition } from './flow-graph';
@@ -9,7 +8,7 @@ import { canDeleteBranch, canRenameBranch, defaultBranch, DesignLink, FlowGraph,
   selector: 'jhi-link-editor',
   templateUrl: './link-editor.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
 })
 export class LinkEditorComponent {
   @Input({ required: true }) graph!: FlowGraph;

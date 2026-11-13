@@ -1,37 +1,37 @@
 <div>
   @if (hasFlows) {
-  <jhi-search-toolbar
-    [(query)]="searchText"
-    placeholder="Filter by Flow name"
-    inputId="searchTextId"
-    hint="A Flow receives messages from a Source, processes them in Steps and delivers them to a Sink."
-  >
-    <ng-container actions>
-      <button type="button" class="btn btn-fx btn-fx-primary" (click)="openNewFlow()" aria-label="Add" title="Add a Flow (N)" aria-keyshortcuts="N">
-        <fa-icon icon="plus"></fa-icon>
-        <span class="d-none d-md-inline"> Add</span>
-      </button>
-      <button type="button" class="btn btn-fx btn-fx-secondary" (click)="openImport()" aria-label="Import">
-        <fa-icon icon="file-import"></fa-icon>
-        <span class="d-none d-md-inline"> Import</span>
-      </button>
-      <button
-        type="button"
-        class="btn btn-fx btn-fx-secondary"
-        (click)="openFluxygenExport()"
-        [disabled]="!integrationId || !flows.length"
-        aria-label="Export for Fluxygen"
-        title="Export the Flows as a zip to import into Fluxygen"
+    <jhi-search-toolbar
+      [(query)]="searchText"
+      placeholder="Filter by Flow name"
+      inputId="searchTextId"
+      hint="A Flow receives messages from a Source, processes them in Steps and delivers them to a Sink."
       >
-        <fa-icon icon="file-export"></fa-icon>
-        <span class="d-none d-md-inline"> Export for Fluxygen</span>
-      </button>
-      <button class="btn btn-fx btn-fx-secondary" type="button" (click)="reset()" aria-label="Refresh">
-        <fa-icon icon="sync"></fa-icon>
-        <span class="d-none d-md-inline"> Refresh</span>
-      </button>
-    </ng-container>
-  </jhi-search-toolbar>
+      <ng-container actions>
+        <button type="button" class="btn btn-fx btn-fx-primary" (click)="openNewFlow()" aria-label="Add" title="Add a Flow (N)" aria-keyshortcuts="N">
+          <fa-icon icon="plus"></fa-icon>
+          <span class="d-none d-md-inline"> Add</span>
+        </button>
+        <button type="button" class="btn btn-fx btn-fx-secondary" (click)="openImport()" aria-label="Import">
+          <fa-icon icon="file-import"></fa-icon>
+          <span class="d-none d-md-inline"> Import</span>
+        </button>
+        <button
+          type="button"
+          class="btn btn-fx btn-fx-secondary"
+          (click)="openFluxygenExport()"
+          [disabled]="!integrationId || !flows.length"
+          aria-label="Export for Fluxygen"
+          title="Export the Flows as a zip to import into Fluxygen"
+          >
+          <fa-icon icon="file-export"></fa-icon>
+          <span class="d-none d-md-inline"> Export for Fluxygen</span>
+        </button>
+        <button class="btn btn-fx btn-fx-secondary" type="button" (click)="reset()" aria-label="Refresh">
+          <fa-icon icon="sync"></fa-icon>
+          <span class="d-none d-md-inline"> Refresh</span>
+        </button>
+      </ng-container>
+    </jhi-search-toolbar>
   }
 
   @if (showEmptyState) {
@@ -39,7 +39,7 @@
       heading="Add your first Flow"
       description="A Flow receives messages from a Source, processes them in Steps and delivers them to a Sink. How do you want to build it?"
       [docs]="true"
-    >
+      >
       <jhi-flow-type-choices />
       <span secondary>
         Or <button type="button" class="btn btn-link empty-state__link" (click)="openImport()">import</button> a Flow, Camel XML, a script or an OpenAPI document.
@@ -54,15 +54,16 @@
       [loading]="flowsLoading"
       [emptyMessage]="flowsLoadFailed ? 'The Flows could not be loaded. Click Refresh to try again.' : 'No Flows match this filter.'"
       ariaLabel="Flows"
-    >
-      <tr
-        jhi-flow-row
-        *ngFor="let flow of filteredFlows; trackBy: trackId"
-        [flow]="flow"
-        [attr.data-flow-name]="flow.name"
-        [handler]="handlers[flow.id!]"
-        (runtimeChange)="onRuntimeChange(flow.id!, $event)"
-      ></tr>
+      >
+      @for (flow of filteredFlows; track flow.id) {
+        <tr
+          jhi-flow-row
+          [flow]="flow"
+          [attr.data-flow-name]="flow.name"
+          [handler]="handlers[flow.id!]"
+          (runtimeChange)="onRuntimeChange(flow.id!, $event)"
+        ></tr>
+      }
     </jhi-data-table>
   }
 </div>

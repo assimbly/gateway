@@ -1,5 +1,4 @@
 import { ChangeDetectorRef, Component, OnInit, OnDestroy, QueryList, ViewChildren, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Subscription, forkJoin, interval } from 'rxjs';
 
@@ -38,7 +37,7 @@ import { IApiHandler } from 'app/entities/api/api.model';
 @Component({
   selector: 'jhi-flow',
   templateUrl: './flow.component.html',
-  imports: [CommonModule, RouterModule, FontAwesomeModule, EmptyState, SearchToolbar, DataTable, FlowRowComponent, FlowTypeChoicesComponent],
+  imports: [RouterModule, FontAwesomeModule, EmptyState, SearchToolbar, DataTable, FlowRowComponent, FlowTypeChoicesComponent],
   host: {
     '(document:keydown)': 'onKeydown($event)',
   },
@@ -290,9 +289,6 @@ export class FlowComponent implements OnInit, OnDestroy {
     }
   }
 
-  trackId(index: number, item: IFlow) {
-    return item.id;
-  }
 
   registerChangeInFlows() {
     this.eventSubscriptions.add(this.eventManager.subscribe('flowListModification', () => this.reset()));

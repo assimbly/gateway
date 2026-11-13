@@ -1,5 +1,4 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 import { FlowStatsSection } from './flow-stats';
 
@@ -7,7 +6,7 @@ import { FlowStatsSection } from './flow-stats';
 @Component({
   selector: 'jhi-flow-stats-sections',
   templateUrl: './flow-stats-sections.component.html',
-  imports: [CommonModule],
+  imports: [],
 })
 export class FlowStatsSections {
   @Input() loading = false;

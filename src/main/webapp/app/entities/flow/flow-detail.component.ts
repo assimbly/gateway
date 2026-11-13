@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 
@@ -21,7 +20,7 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'jhi-flow-detail',
   templateUrl: './flow-detail.component.html',
-  imports: [CommonModule, RouterModule, AlertError],
+  imports: [RouterModule, AlertError],
 })
 export class FlowDetailComponent implements OnInit, OnDestroy {
   flow: IFlow;

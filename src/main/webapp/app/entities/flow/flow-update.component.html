@@ -1,56 +1,62 @@
 <div class="row justify-content-center">
-    <div class="col-8">
-        <form (jhiSaveShortcut)="save()" [saveShortcutDisabled]="editForm.form.invalid || isSaving" name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
-            <h2 id="jhi-flow-heading">{{ flow?.id ? 'Edit Flow' : 'Add Flow' }}</h2>
-            <div>
-                <jhi-alert-error></jhi-alert-error>
-                <div class="form-group" [hidden]="!flow.id">
-                    <label for="id">ID</label>
-                    <input type="text" class="form-control" id="id" name="id"
-                        [(ngModel)]="flow.id" readonly />
+  <div class="col-8">
+    <form (jhiSaveShortcut)="save()" [saveShortcutDisabled]="editForm.form.invalid || isSaving" name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
+      <h2 id="jhi-flow-heading">{{ flow?.id ? 'Edit Flow' : 'Add Flow' }}</h2>
+      <div>
+        <jhi-alert-error></jhi-alert-error>
+        <div class="form-group" [hidden]="!flow.id">
+          <label for="id">ID</label>
+          <input type="text" class="form-control" id="id" name="id"
+            [(ngModel)]="flow.id" readonly />
+          </div>
+          <div class="form-group">
+            <label class="form-control-label" for="field_name">Name</label>
+            <input type="text" class="form-control" name="name" id="field_name"
+              [(ngModel)]="flow.name" />
+            </div>
+            <div class="form-group">
+              <label class="form-control-label" for="field_autoStart">Auto Start</label>
+              <input type="checkbox" class="form-control" name="autoStart" id="field_autoStart"
+                [(ngModel)]="flow.autoStart" />
+              </div>
+              <div class="form-group">
+                <label class="form-control-label" for="field_maximumRedeliveries">Maximum Redeliveries</label>
+                <input type="checkbox" class="form-control" name="maximumRedeliveries" id="field_maximumRedeliveries"
+                  [(ngModel)]="flow.maximumRedeliveries" />
                 </div>
                 <div class="form-group">
-                    <label class="form-control-label" for="field_name">Name</label>
-                    <input type="text" class="form-control" name="name" id="field_name"
-                        [(ngModel)]="flow.name" />
-                </div>
-                <div class="form-group">
-                    <label class="form-control-label" for="field_autoStart">Auto Start</label>
-                    <input type="checkbox" class="form-control" name="autoStart" id="field_autoStart"
-                        [(ngModel)]="flow.autoStart" />
-                </div>
-				<div class="form-group">
-                    <label class="form-control-label" for="field_maximumRedeliveries">Maximum Redeliveries</label>
-                    <input type="checkbox" class="form-control" name="maximumRedeliveries" id="field_maximumRedeliveries"
-                        [(ngModel)]="flow.maximumRedeliveries" />
-                </div>
-                <div class="form-group">
-                    <label class="form-control-label" for="field_redeliveryDelay">Redelivery Delay</label>
-                    <input type="checkbox" class="form-control" name="redeliveryDelay" id="field_redeliveryDelay"
-                        [(ngModel)]="flow.redeliveryDelay" />
-                </div>
-                <div class="form-group">
+                  <label class="form-control-label" for="field_redeliveryDelay">Redelivery Delay</label>
+                  <input type="checkbox" class="form-control" name="redeliveryDelay" id="field_redeliveryDelay"
+                    [(ngModel)]="flow.redeliveryDelay" />
+                  </div>
+                  <div class="form-group">
                     <label class="form-control-label" for="field_logLevel">Log Level</label>
-                    <select class="form-control form-select" id="field_logLevel" *ngIf="flow" formControlName="integration">
-								<option  *ngFor="let logLevel of logLevelListType" [ngValue]="flow.logLevel">{{flow.logLevel}}</option>
-							</select>
-                </div>
-                <div class="form-group">
+                    @if (flow) {
+                      <select class="form-control form-select" id="field_logLevel" formControlName="integration">
+                        @for (logLevel of logLevelListType; track logLevel) {
+                          <option  [ngValue]="flow.logLevel">{{flow.logLevel}}</option>
+                        }
+                      </select>
+                    }
+                  </div>
+                  <div class="form-group">
                     <label class="form-control-label" for="field_integration">Gateway</label>
                     <select class="form-control form-select" id="field_integration" name="integration" [(ngModel)]="flow.integrationId" >
-                        <option [ngValue]="null"></option>
-                        <option [ngValue]="integrationOption.id" *ngFor="let integrationOption of integrations; trackBy: trackIntegrationById">{{integrationOption.id}}</option>
+                      <option [ngValue]="null"></option>
+                      @for (integrationOption of integrations; track integrationOption.id) {
+                        <option [ngValue]="integrationOption.id">{{integrationOption.id}}</option>
+                      }
                     </select>
+                  </div>
                 </div>
-            </div>
-            <div>
-                <button type="button" id="cancel-save" class="btn btn-secondary"  (click)="previousState()">
+                <div>
+                  <button type="button" id="cancel-save" class="btn btn-secondary"  (click)="previousState()">
                     <fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span>Cancel</span>
-                </button>
-                <button type="submit" id="save-entity" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
+                  </button>
+                  <button type="submit" id="save-entity" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
                     <fa-icon [icon]="'save'"></fa-icon>&nbsp;<span>Save</span>
-                </button>
+                  </button>
+                </div>
+              </form>
             </div>
-        </form>
-    </div>
-</div>
+          </div>

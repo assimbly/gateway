@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, DestroyRef, ElementRef, HostListener, OnDestroy, OnInit, TemplateRef, ViewChild, ViewEncapsulation, inject } from "@angular/core";
-import { CommonModule, Location } from "@angular/common";
+import { Location, NgClass, NgTemplateOutlet } from "@angular/common";
 import { AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { NgbModal, NgbModalRef, NgbModule, NgbOffcanvas } from "@ng-bootstrap/ng-bootstrap";
@@ -119,7 +119,7 @@ import {
   styleUrl: '../designer/flow-designer.scss',
   encapsulation: ViewEncapsulation.None,
   providers: [StepEditorRegistry],
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, NgbModule, FontAwesomeModule, PopoverModule, AlertError, FlowEditorStepComponent, FieldTabDirective, SaveShortcutDirective, CodemirrorModule, FlowCanvasComponent, LinkEditorComponent, FlowEditorHeaderComponent, ResponseEditorComponent, CallFlowEditorComponent, FlowTestPanelComponent, FlowRunStatsComponent, FlowLogDrawerComponent, CamelRouteDrawerComponent, CdkDropList, CdkDrag, CdkDragPlaceholder],
+  imports: [ReactiveFormsModule, RouterModule, NgbModule, FontAwesomeModule, PopoverModule, AlertError, FlowEditorStepComponent, FieldTabDirective, SaveShortcutDirective, CodemirrorModule, FlowCanvasComponent, LinkEditorComponent, FlowEditorHeaderComponent, ResponseEditorComponent, CallFlowEditorComponent, FlowTestPanelComponent, FlowRunStatsComponent, FlowLogDrawerComponent, CamelRouteDrawerComponent, CdkDropList, CdkDrag, CdkDragPlaceholder, NgClass, NgTemplateOutlet],
 })
 export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 

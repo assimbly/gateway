@@ -1,5 +1,4 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbDropdownModule, NgbModal, NgbOffcanvas, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
@@ -58,7 +57,6 @@ enum Status {
   selector: '[jhi-flow-row]',
   templateUrl: './flow-row.component.html',
   imports: [
-    CommonModule,
     RouterModule,
     FontAwesomeModule,
     NgbDropdownModule,
@@ -69,8 +67,8 @@ enum Status {
     StatusControls,
     Truncate,
     FlowRowAlerts,
-    FlowRowStats,
-  ],
+    FlowRowStats
+],
 })
 export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
 

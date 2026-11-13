@@ -12,7 +12,7 @@ import {
   ViewChildren,
   inject,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { EFMarkerType, FCanvasComponent, FFlowComponent, FFlowModule, FMinimapComponent, FMoveNodesEvent, FSelectionChangeEvent, FZoomDirective } from '@foblex/flow';
@@ -56,7 +56,7 @@ export type DesignerSelection = { type: 'step'; key: string } | { type: 'steps';
   templateUrl: './flow-canvas.component.html',
   styleUrl: './flow-canvas.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FFlowModule, FontAwesomeModule, StepPickerComponent],
+  imports: [FFlowModule, FontAwesomeModule, StepPickerComponent, NgClass],
 })
 export class FlowCanvasComponent {
   @Input({ required: true }) graph!: FlowGraph;

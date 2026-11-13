@@ -12,7 +12,7 @@ import {
   afterNextRender,
   inject,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { LowerCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbDropdown, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -71,7 +71,7 @@ const DESIGNER_ENTRIES: Record<string, CatalogueEntry> = {
   templateUrl: './step-picker.component.html',
   styleUrl: './step-picker.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, NgbDropdownModule, FontAwesomeModule],
+  imports: [FormsModule, NgbDropdownModule, FontAwesomeModule, LowerCasePipe],
 })
 export class StepPickerComponent implements OnChanges {
   @Input({ required: true }) kinds: PickedKind[] = [];

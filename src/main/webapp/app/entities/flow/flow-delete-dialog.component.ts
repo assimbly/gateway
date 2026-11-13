@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -13,7 +12,7 @@ import { FlowService } from './flow.service';
 @Component({
   selector: 'jhi-flow-delete-dialog',
   templateUrl: './flow-delete-dialog.component.html',
-  imports: [CommonModule, FontAwesomeModule, AlertError],
+  imports: [FontAwesomeModule, AlertError],
 })
 export class FlowDeleteDialogComponent {
   flow?: IFlow;
