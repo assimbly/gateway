@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Subscription, interval } from 'rxjs';
 import { EventManager } from 'app/core/util/event-manager.service';
@@ -27,7 +26,7 @@ import { filterAddresses } from 'app/shared/util/address-filter';
 @Component({
   selector: 'jhi-queue',
   templateUrl: './queue.component.html',
-  imports: [CommonModule, RouterModule, FontAwesomeModule, SearchToolbar, EndpointTypeSwitch, EndpointsEmptyState, DataTable, AddressRowComponent, AddressTotalsRowComponent],
+  imports: [RouterModule, FontAwesomeModule, SearchToolbar, EndpointTypeSwitch, EndpointsEmptyState, DataTable, AddressRowComponent, AddressTotalsRowComponent],
 })
 export class QueueComponent implements OnInit, OnDestroy {
   queues: IQueue[] = [];
@@ -109,10 +108,6 @@ export class QueueComponent implements OnInit, OnDestroy {
 
   get filteredAddresses(): IAddress[] {
     return filterAddresses(this.addresses, this.searchQueueText, this.sortState.order === 'asc', this.sortState.predicate ?? 'name');
-  }
-
-  trackId(index: number, item: IAddress): number {
-    return item.id!;
   }
 
   registerChangeInQueues(): void {

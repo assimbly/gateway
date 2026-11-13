@@ -1,5 +1,4 @@
 import { Component, ElementRef, OnDestroy, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { map, timeout } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
@@ -25,7 +24,7 @@ export const JMS_HEADER_NAMES = ['JMSCorrelationID', 'JMSReplyTo', 'JMSType'];
 @Component({
     selector: 'jhi-broker-message-sender',
     templateUrl: './broker-message-sender.component.html',
-    imports: [CommonModule, ReactiveFormsModule, NgSelectModule, SendToolbar, SendResultPanel, SendMessageEditor],
+    imports: [ReactiveFormsModule, NgSelectModule, SendToolbar, SendResultPanel, SendMessageEditor],
     host: {
         '(document:keydown.control.enter)': 'send()',
         '(document:keydown.meta.enter)': 'send()',

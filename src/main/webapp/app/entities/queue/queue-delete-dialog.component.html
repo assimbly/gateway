@@ -1,22 +1,20 @@
-<form *ngIf="address" (submit)="$event.preventDefault()">
+@if (address) {
+  <form (submit)="$event.preventDefault()">
     <div class="modal-header">
-        <h4 class="modal-title">Delete Queue</h4>
-        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" (click)="cancel()"></button>
+      <h4 class="modal-title">Delete Queue</h4>
+      <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" (click)="cancel()"></button>
     </div>
-
     <div class="modal-body">
-        <jhi-alert-error></jhi-alert-error>
-
-        <p id="jhi-delete-queue-heading">{{text}}</p>
+      <jhi-alert-error></jhi-alert-error>
+      <p id="jhi-delete-queue-heading">{{text}}</p>
     </div>
-
     <div class="modal-footer">
-        <button type="button" class="btn btn-fx btn-fx-secondary" data-dismiss="modal" (click)="cancel()">
-            <fa-icon icon="ban"></fa-icon><span>Cancel</span>
-        </button>
-
-        <button id="jhi-confirm-delete-queue" type="button" class="btn btn-fx btn-fx-danger" [disabled]="disableDelete" (click)="confirmDelete(address.name!)">
-            <fa-icon icon="trash"></fa-icon><span>Delete</span>
-        </button>
+      <button type="button" class="btn btn-fx btn-fx-secondary" data-dismiss="modal" (click)="cancel()">
+        <fa-icon icon="ban"></fa-icon><span>Cancel</span>
+      </button>
+      <button id="jhi-confirm-delete-queue" type="button" class="btn btn-fx btn-fx-danger" [disabled]="disableDelete" (click)="confirmDelete(address.name!)">
+        <fa-icon icon="trash"></fa-icon><span>Delete</span>
+      </button>
     </div>
-</form>
+  </form>
+}

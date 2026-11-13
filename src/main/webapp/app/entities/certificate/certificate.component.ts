@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit, OnDestroy, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
@@ -31,7 +31,6 @@ import { saveAs } from 'file-saver/FileSaver';
   selector: 'jhi-certificate',
   templateUrl: './certificate.component.html',
   imports: [
-    CommonModule,
     RouterModule,
     FontAwesomeModule,
     NgbModule,
@@ -42,7 +41,8 @@ import { saveAs } from 'file-saver/FileSaver';
     PrimaryActionDirective,
     OverflowActionDirective,
     Truncate,
-  ],
+    NgTemplateOutlet
+],
 })
 export class CertificateComponent implements OnInit, OnDestroy {
   securities: ICertificate[] = [];
@@ -126,10 +126,6 @@ export class CertificateComponent implements OnInit, OnDestroy {
 		// the dialog broadcasts 'certificateListModification' after deleting, which reloads the list
 	}
 
-
-  trackId(index: number, item: ICertificate) {
-    return item.id;
-  }
 
   /** With no Certificate at all, the list gives way to an explanation of Certificates and how to add the first. */
   get showEmptyState(): boolean {

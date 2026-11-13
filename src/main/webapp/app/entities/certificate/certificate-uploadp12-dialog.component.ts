@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { switchMap } from 'rxjs/operators';
 
@@ -10,7 +9,7 @@ import { CertificateService, CERTIFICATE_NAME_PATTERN, IDENTITY_STORE, toCertifi
 @Component({
   selector: 'jhi-certificate-uploadp12-dialog',
   templateUrl: './certificate-uploadp12-dialog.component.html',
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
 })
 export class CertificateUploadP12DialogComponent {
   readonly identityStore = IDENTITY_STORE;

@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { switchMap } from 'rxjs/operators';
 
@@ -10,7 +9,7 @@ import { CertificateService, CERTIFICATE_NAME_PATTERN, TRUSTSTORE, toCertificate
 @Component({
   selector: 'jhi-certificate-upload-dialog',
   templateUrl: './certificate-upload-dialog.component.html',
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
 })
 export class CertificateUploadDialogComponent {
   readonly truststore = TRUSTSTORE;

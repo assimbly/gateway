@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
@@ -23,7 +22,7 @@ import 'codemirror/addon/edit/closetag';
 @Component({
     selector: 'jhi-broker-update',
     templateUrl: './broker-update.component.html',
-    imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, NgbModule, PopoverModule, CodemirrorModule, SaveShortcutDirective],
+    imports: [FormsModule, FontAwesomeModule, AlertError, NgbModule, PopoverModule, CodemirrorModule, SaveShortcutDirective],
 })
 export class BrokerUpdateComponent implements OnInit {
     @ViewChild('codeEditor') private codeEditor?: CodemirrorComponent;

@@ -1,5 +1,4 @@
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AlertError } from 'app/shared/alert';
@@ -11,7 +10,7 @@ import { ICertificate } from 'app/shared/model/certificate.model';
 @Component({
     selector: 'jhi-certificate-detail',
     templateUrl: './certificate-detail.component.html',
-    imports: [CommonModule, FontAwesomeModule, AlertError, FormatMediumDatetimePipe],
+    imports: [FontAwesomeModule, AlertError, FormatMediumDatetimePipe],
 })
 export class CertificateDetailComponent implements OnInit {
     certificate!: ICertificate;

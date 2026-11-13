@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, TemplateRef, ChangeDetectorRef, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { NgClass, NgStyle, KeyValuePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
@@ -37,7 +37,6 @@ import { CodemirrorComponent } from "@ctrl/ngx-codemirror";
   selector: 'jhi-broker-message-browser',
   templateUrl: './broker-message-browser.component.html',
   imports: [
-    CommonModule,
     FormsModule,
     FontAwesomeModule,
     RouterLink,
@@ -50,7 +49,10 @@ import { CodemirrorComponent } from "@ctrl/ngx-codemirror";
     BrokerMessageBrowserRowComponent,
     MessageSearchByMessageIdPipe,
     MessageSortByHeaderPipePipe,
-  ],
+    KeyValuePipe,
+    NgClass,
+    NgStyle
+],
 })
 export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   readonly themeService = inject(ThemeService);
@@ -307,10 +309,6 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     this.page = 0;
     this.messages = [];
     this.loadMessages();
-  }
-
-  trackTimestamp(index: number, item: IMessage) {
-    return item.timestamp;
   }
 
   registerChangeInFlows() {

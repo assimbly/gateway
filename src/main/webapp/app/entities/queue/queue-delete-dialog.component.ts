@@ -1,5 +1,4 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AlertError } from 'app/shared/alert';
@@ -10,7 +9,7 @@ import { QueueService } from './queue.service';
 
 @Component({
     templateUrl: './queue-delete-dialog.component.html',
-    imports: [CommonModule, FontAwesomeModule, AlertError],
+    imports: [FontAwesomeModule, AlertError],
 })
 export class QueueDeleteDialogComponent {
     address?: IAddress;
