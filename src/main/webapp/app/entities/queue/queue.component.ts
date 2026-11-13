@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Subscription, interval } from 'rxjs';
@@ -31,29 +31,27 @@ import { filterAddresses } from 'app/shared/util/address-filter';
 })
 export class QueueComponent implements OnInit, OnDestroy {
   queues: IQueue[] = [];
-  addresses: IAddress[] = [];
-  brokers: IBroker[] = [];
+  readonly addresses = signal<IAddress[]>([]);
+  readonly brokers = signal<IBroker[]>([]);
   eventSubscriber = new Subscription();
   currentAccount: any;
   itemsPerPage: number;
   links: any;
   page: number;
-  sortState: SortState = { predicate: 'name', order: 'asc' };
+  readonly sortState = signal<SortState>({ predicate: 'name', order: 'asc' });
   timeInterval!: Subscription;
-  isBroker: boolean | undefined;
+  readonly isBroker = signal<boolean | undefined>(undefined);
   /** Whether the Queues of the Broker have been asked for, so an empty list is known to be empty. */
-  addressesLoaded = false;
+  readonly addressesLoaded = signal(false);
 
-  searchQueueText = '';
-  brokerType = '';
+  readonly searchQueueText = signal('');
+  readonly brokerType = signal('');
   readonly columns: DataTableColumn[] = [
     { key: 'name', header: 'Name', sortable: true },
     { key: 'numberOfConsumers', header: 'Consumers', sortable: true, numeric: true },
     { key: 'numberOfMessages', header: 'Messages', sortable: true, numeric: true },
     { key: 'actions', header: 'Actions', align: 'end' },
   ];
-
-  private readonly changeDetector = inject(ChangeDetectorRef);
 
   constructor(
     protected queueService: QueueService,
@@ -63,7 +61,6 @@ export class QueueComponent implements OnInit, OnDestroy {
     protected accountService: AccountService,
   ) {
     this.queues = [];
-    this.brokers = [];
     this.itemsPerPage = ITEMS_PER_PAGE;
     this.page = 0;
     this.links = {
@@ -100,16 +97,17 @@ export class QueueComponent implements OnInit, OnDestroy {
   }
 
   /** Without a running Broker, or without any Queue, the list gives way to an explanation of Endpoints and what to do first. */
-  get showEmptyState(): boolean {
-    if (this.isBroker === undefined) {
+  readonly showEmptyState = computed(() => {
+    if (this.isBroker() === undefined) {
       return false;
     }
-    return !this.isBroker || (this.addressesLoaded && !this.addresses.length);
-  }
+    return !this.isBroker() || (this.addressesLoaded() && !this.addresses().length);
+  });
 
-  get filteredAddresses(): IAddress[] {
-    return filterAddresses(this.addresses, this.searchQueueText, this.sortState.order === 'asc', this.sortState.predicate ?? 'name');
-  }
+  readonly filteredAddresses = computed(() => {
+    const { order, predicate } = this.sortState();
+    return filterAddresses(this.addresses(), this.searchQueueText(), order === 'asc', predicate ?? 'name');
+  });
 
   trackId(index: number, item: IAddress): number {
     return item.id!;
@@ -139,28 +137,24 @@ export class QueueComponent implements OnInit, OnDestroy {
   }
 
   sort(): string[] {
-    return sortParams(this.sortState);
+    return sortParams(this.sortState());
   }
 
   getBrokerType() {
     this.queueService.getBrokers().subscribe(
       data => {
         if (data) {
-          for (let i = 0; i < data.body!.length; i++) {
-            this.brokers.push(data.body![i]);
-          }
-
-          if (this.brokers[0]) {
-            this.isBroker = true;
-
-            this.brokerType = this.brokers[0].type!;
-            if (this.brokerType != null) {
+          const brokers = data.body ?? [];
+          this.brokers.set(brokers);
+          if (brokers[0]) {
+            this.isBroker.set(true);
+            this.brokerType.set(brokers[0].type!);
+            if (this.brokerType() != null) {
               this.getAllQueues();
             }
           } else {
-            this.isBroker = false;
+            this.isBroker.set(false);
           }
-          this.changeDetector.detectChanges();
         }
       },
       error => console.log(error)
@@ -168,54 +162,44 @@ export class QueueComponent implements OnInit, OnDestroy {
   }
 
   getAllQueues() {
-    this.addresses = [];
-    this.addressesLoaded = false;
+    this.addresses.set([]);
+    this.addressesLoaded.set(false);
 
-    if (this.isBroker) {
-      this.queueService.getAllQueues(this.brokerType).subscribe(
+    if (this.isBroker()) {
+      this.queueService.getAllQueues(this.brokerType()).subscribe(
         data => {
-          this.addressesLoaded = true;
+          this.addressesLoaded.set(true);
           if (data && data.body!.queues) {
-            this.isBroker = true;
-            if (data.body!.queues.queue) {
-              for (let i = 0; i < data.body!.queues.queue.length; i++) {
-                if (data.body!.queues.queue[i].temporary!.toString() === 'false') {
-                  this.addresses.push(data.body!.queues.queue[i]);
-                }
-              }
-            }
+            this.isBroker.set(true);
+            this.addresses.set((data.body!.queues.queue ?? []).filter(queue => queue.temporary!.toString() === 'false'));
           } else {
-            this.isBroker = false;
+            this.isBroker.set(false);
           }
-          this.changeDetector.detectChanges();
         },
         error => {
           console.log(error);
-          this.addressesLoaded = true;
-          this.isBroker = false;
-          this.changeDetector.detectChanges();
+          this.addressesLoaded.set(true);
+          this.isBroker.set(false);
         }
       );
     }
   }
 
   updateAllQueues() {
-    if (this.isBroker) {
-      this.queueService.getAllQueues(this.brokerType).subscribe(
+    if (this.isBroker()) {
+      this.queueService.getAllQueues(this.brokerType()).subscribe(
         data => {
           if (data && data.body!.queues) {
-            this.isBroker = true;
+            this.isBroker.set(true);
             // Replace the whole list, so Queues deleted on the Broker drop out of the table.
-            this.addresses = (data.body!.queues.queue ?? []).filter(queue => queue.temporary!.toString() === 'false');
+            this.addresses.set((data.body!.queues.queue ?? []).filter(queue => queue.temporary!.toString() === 'false'));
           } else {
-            this.isBroker = false;
+            this.isBroker.set(false);
           }
-          this.changeDetector.detectChanges();
         },
         error => {
           console.log(error);
-          this.isBroker = false;
-          this.changeDetector.detectChanges();
+          this.isBroker.set(false);
         }
       );
     }
