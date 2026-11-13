@@ -1,37 +1,33 @@
-import { Injectable } from '@angular/core';
+import { inject } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, Routes } from '@angular/router';
+import { ResolveFn, Routes } from '@angular/router';
 import { userRouteAccessService } from 'app/core/auth';
-import { Observable, of } from 'rxjs';
+import { of } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { IFlow, Flow } from 'app/shared/model/flow.model';
 import { FlowService } from './flow.service';
-import { FlowComponent } from './flow.component';
-import { FlowUpdateComponent } from './flow-update.component';
-import { FlowEditorComponent } from './editor/flow-editor.component';
-import { FlowMessageSenderComponent } from './sender/flow-message-sender.component';
-import { FlowStatsPageComponent } from './stats/flow-stats-page.component';
+// A type-only import, so the editor stays out of this chunk
+import type { FlowEditorComponent } from './editor/flow-editor.component';
 
-@Injectable({ providedIn: 'root' })
-export class FlowResolve implements Resolve<IFlow> {
-  constructor(private service: FlowService) {}
-
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Flow> {
-    const id = route.params['id'] ? route.params['id'] : null;
-    if (id) {
-      return this.service.find(id).pipe(
+const flowResolve: ResolveFn<IFlow> = route => {
+  const id = route.params['id'];
+  if (id) {
+    return inject(FlowService)
+      .find(id)
+      .pipe(
         filter((response: HttpResponse<Flow>) => response.ok),
-        map((flow: HttpResponse<Flow>) => flow.body!)
+        map((flow: HttpResponse<Flow>) => flow.body!),
       );
-    }
-    return of(new Flow());
   }
-}
+  return of(new Flow());
+};
+
+const loadFlowEditor = () => import('./editor/flow-editor.component').then(m => m.FlowEditorComponent);
 
 const flowRoute: Routes = [
   {
     path: 'flow',
-    component: FlowComponent,
+    loadComponent: () => import('./flow.component').then(m => m.FlowComponent),
     data: {
       authorities: ['ROLE_USER'],
     },
@@ -39,7 +35,7 @@ const flowRoute: Routes = [
   },
   {
     path: 'flow/message-sender',
-    component: FlowMessageSenderComponent,
+    loadComponent: () => import('./sender/flow-message-sender.component').then(m => m.FlowMessageSenderComponent),
     data: {
       authorities: ['ROLE_ADMIN'],
     },
@@ -47,7 +43,7 @@ const flowRoute: Routes = [
   },
   {
     path: 'flow/:id/stats',
-    component: FlowStatsPageComponent,
+    loadComponent: () => import('./stats/flow-stats-page.component').then(m => m.FlowStatsPageComponent),
     data: {
       authorities: ['ROLE_USER'],
     },
@@ -55,7 +51,7 @@ const flowRoute: Routes = [
   },
   {
     path: 'flow/editor',
-    component: FlowEditorComponent,
+    loadComponent: loadFlowEditor,
     data: {
       authorities: ['ROLE_ADMIN'],
     },
@@ -64,7 +60,7 @@ const flowRoute: Routes = [
   },
   {
     path: 'flow/editor/:id',
-    component: FlowEditorComponent,
+    loadComponent: loadFlowEditor,
     data: {
       authorities: ['ROLE_ADMIN'],
     },
@@ -73,7 +69,7 @@ const flowRoute: Routes = [
   },
   {
     path: 'flow/editor/:id/:clone',
-    component: FlowEditorComponent,
+    loadComponent: loadFlowEditor,
     data: {
       authorities: ['ROLE_ADMIN'],
     },
@@ -82,9 +78,9 @@ const flowRoute: Routes = [
   },
   {
     path: 'flow/new',
-    component: FlowUpdateComponent,
+    loadComponent: () => import('./flow-update.component').then(m => m.FlowUpdateComponent),
     resolve: {
-      flow: FlowResolve,
+      flow: flowResolve,
     },
     data: {
       authorities: ['ROLE_USER'],
@@ -93,9 +89,9 @@ const flowRoute: Routes = [
   },
   {
     path: 'flow/:id/edit',
-    component: FlowUpdateComponent,
+    loadComponent: () => import('./flow-update.component').then(m => m.FlowUpdateComponent),
     resolve: {
-      flow: FlowResolve,
+      flow: flowResolve,
     },
     data: {
       authorities: ['ROLE_USER'],

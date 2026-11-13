@@ -1,43 +1,37 @@
-import { Injectable } from '@angular/core';
+import { inject } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { Resolve, ActivatedRouteSnapshot, Routes, Router } from '@angular/router';
-import { Observable, of, EMPTY } from 'rxjs';
-import { flatMap } from 'rxjs/operators';
+import { ResolveFn, Routes, Router } from '@angular/router';
+import { of, EMPTY } from 'rxjs';
+import { mergeMap } from 'rxjs/operators';
 
 import { userRouteAccessService } from 'app/core/auth';
 import { ITopic, Topic } from 'app/shared/model/topic.model';
 import { TopicService } from './topic.service';
-import { TopicComponent } from './topic.component';
-import { TopicDetailComponent } from './topic-detail.component';
-import { TopicUpdateComponent } from './topic-update.component';
 
-
-@Injectable({ providedIn: 'root' })
-export class TopicResolve implements Resolve<ITopic> {
-  constructor(private service: TopicService, private router: Router) {}
-
-  resolve(route: ActivatedRouteSnapshot): Observable<ITopic> | Observable<never> {
-    const id = route.params['id'];
-    if (id) {
-      return this.service.find(id).pipe(
-        flatMap((topic: HttpResponse<Topic>) => {
+const topicResolve: ResolveFn<ITopic> = route => {
+  const id = route.params['id'];
+  if (id) {
+    const router = inject(Router);
+    return inject(TopicService)
+      .find(id)
+      .pipe(
+        mergeMap((topic: HttpResponse<Topic>) => {
           if (topic.body) {
             return of(topic.body);
           } else {
-            this.router.navigate(['404']);
+            router.navigate(['404']);
             return EMPTY;
           }
-        })
+        }),
       );
-    }
-    return of(new Topic());
   }
-}
+  return of(new Topic());
+};
 
 export const topicRoute: Routes = [
   {
     path: 'topic',
-    component: TopicComponent,
+    loadComponent: () => import('./topic.component').then(m => m.TopicComponent),
     data: {
       authorities: ['ROLE_USER'],
     },
@@ -45,9 +39,9 @@ export const topicRoute: Routes = [
   },
   {
     path: 'topic/:id/view',
-    component: TopicDetailComponent,
+    loadComponent: () => import('./topic-detail.component').then(m => m.TopicDetailComponent),
     resolve: {
-      topic: TopicResolve,
+      topic: topicResolve,
     },
     data: {
       authorities: ['ROLE_USER'],
@@ -56,9 +50,9 @@ export const topicRoute: Routes = [
   },
   {
     path: 'topic/new',
-    component: TopicUpdateComponent,
+    loadComponent: () => import('./topic-update.component').then(m => m.TopicUpdateComponent),
     resolve: {
-      topic: TopicResolve,
+      topic: topicResolve,
     },
     data: {
       authorities: ['ROLE_USER'],
@@ -67,9 +61,9 @@ export const topicRoute: Routes = [
   },
   {
     path: 'topic/:id/edit',
-    component: TopicUpdateComponent,
+    loadComponent: () => import('./topic-update.component').then(m => m.TopicUpdateComponent),
     resolve: {
-      topic: TopicResolve,
+      topic: topicResolve,
     },
     data: {
       authorities: ['ROLE_USER'],

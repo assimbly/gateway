@@ -1,43 +1,37 @@
-import { Injectable } from '@angular/core';
+import { inject } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { Resolve, ActivatedRouteSnapshot, Routes, Router } from '@angular/router';
-import { Observable, of, EMPTY } from 'rxjs';
-import { flatMap } from 'rxjs/operators';
+import { ResolveFn, Routes, Router } from '@angular/router';
+import { of, EMPTY } from 'rxjs';
+import { mergeMap } from 'rxjs/operators';
 
 import { userRouteAccessService } from 'app/core/auth';
 import { IRoute, Route } from 'app/shared/model/route.model';
 import { RouteService } from './route.service';
-import { RouteComponent } from './route.component';
-import { RouteDetailComponent } from './route-detail.component';
-import { RouteUpdateComponent } from './route-update.component';
-import { MessageResolve } from 'app/entities/message/message.route';
 
-@Injectable({ providedIn: 'root' })
-export class RouteResolve implements Resolve<IRoute> {
-  constructor(private service: RouteService, private router: Router) {}
-
-  resolve(route: ActivatedRouteSnapshot): Observable<IRoute> | Observable<never> {
-    const id = route.params['id'];
-    if (id) {
-      return this.service.find(id).pipe(
-        flatMap((route: HttpResponse<Route>) => {
+const routeResolve: ResolveFn<IRoute> = activatedRoute => {
+  const id = activatedRoute.params['id'];
+  if (id) {
+    const router = inject(Router);
+    return inject(RouteService)
+      .find(id)
+      .pipe(
+        mergeMap((route: HttpResponse<Route>) => {
           if (route.body) {
             return of(route.body);
           } else {
-            this.router.navigate(['404']);
+            router.navigate(['404']);
             return EMPTY;
           }
-        })
+        }),
       );
-    }
-    return of(new Route());
   }
-}
+  return of(new Route());
+};
 
 export const routeRoute: Routes = [
   {
     path: 'route',
-    component: RouteComponent,
+    loadComponent: () => import('./route.component').then(m => m.RouteComponent),
     data: {
       authorities: ['ROLE_USER'],
     },
@@ -45,9 +39,9 @@ export const routeRoute: Routes = [
   },
   {
     path: 'route/:id/view',
-    component: RouteDetailComponent,
+    loadComponent: () => import('./route-detail.component').then(m => m.RouteDetailComponent),
     resolve: {
-      route: RouteResolve,
+      route: routeResolve,
     },
     data: {
       authorities: ['ROLE_USER'],
@@ -56,9 +50,9 @@ export const routeRoute: Routes = [
   },
   {
     path: 'route/new',
-    component: RouteUpdateComponent,
+    loadComponent: () => import('./route-update.component').then(m => m.RouteUpdateComponent),
     resolve: {
-      route: RouteResolve,
+      route: routeResolve,
     },
     data: {
       authorities: ['ROLE_USER'],
@@ -67,9 +61,9 @@ export const routeRoute: Routes = [
   },
   {
     path: 'route/:id/edit',
-    component: RouteUpdateComponent,
+    loadComponent: () => import('./route-update.component').then(m => m.RouteUpdateComponent),
     resolve: {
-      route: RouteResolve,
+      route: routeResolve,
     },
     data: {
       authorities: ['ROLE_USER'],
