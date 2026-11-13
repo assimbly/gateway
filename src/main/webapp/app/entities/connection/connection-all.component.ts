@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
@@ -17,7 +16,7 @@ import { AccountService } from 'app/core/auth/account.service';
 @Component({
   selector: 'jhi-connection-all',
   templateUrl: './connection-all.component.html',
-  imports: [CommonModule, RouterModule, FontAwesomeModule, InfiniteScrollModule, SortDirective, SortByDirective],
+  imports: [RouterModule, FontAwesomeModule, InfiniteScrollModule, SortDirective, SortByDirective],
 })
 export class ConnectionAllComponent implements OnInit, OnDestroy {
   public connections: Array<Connection> = [];

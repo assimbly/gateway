@@ -33,45 +33,47 @@
         </tr>
       </thead>
       <tbody infinite-scroll>
-        <tr *ngFor="let connection of connections">
-          <td style="width:20%">
-            <a [routerLink]="['/connection', connection.id, 'edit']" queryParamsHandling="merge">{{ connection.name }}</a>
-          </td>
-          <td style="width:65%">
-            {{ connection.type }}
-          </td>
-          <td style="width:15%" class="text-right">
-            <div class="btn-group flex-btn-group-container">
-              <button
-                type="button"
-                [routerLink]="['/connection', connection.id, 'edit']"
-                queryParamsHandling="merge"
-                class="btn btn-primary btn-sm"
-              >
-                <fa-icon icon="pencil-alt"></fa-icon>
-                <span class="d-none d-md-inline">Edit</span>
-              </button>
-              <button
-                type="button"
-                [routerLink]="['/connection', connection.id, 'edit']"
-                queryParamsHandling="merge"
-                fragment="clone"
-                class="btn btn-info btn-sm"
-              >
-      				<fa-icon icon="clone"></fa-icon>
-					<span class="d-none d-md-inline">Clone</span>
-              </button>
-              <button
-                type="button"
-				(click)="delete(connection)"
-                class="btn btn-danger btn-sm"
-              >
-                <fa-icon icon="times"></fa-icon>
-                <span class="d-none d-md-inline">Delete</span>
-              </button>
-            </div>
-          </td>
-        </tr>
+        @for (connection of connections; track connection.id) {
+          <tr>
+            <td style="width:20%">
+              <a [routerLink]="['/connection', connection.id, 'edit']" queryParamsHandling="merge">{{ connection.name }}</a>
+            </td>
+            <td style="width:65%">
+              {{ connection.type }}
+            </td>
+            <td style="width:15%" class="text-right">
+              <div class="btn-group flex-btn-group-container">
+                <button
+                  type="button"
+                  [routerLink]="['/connection', connection.id, 'edit']"
+                  queryParamsHandling="merge"
+                  class="btn btn-primary btn-sm"
+                  >
+                  <fa-icon icon="pencil-alt"></fa-icon>
+                  <span class="d-none d-md-inline">Edit</span>
+                </button>
+                <button
+                  type="button"
+                  [routerLink]="['/connection', connection.id, 'edit']"
+                  queryParamsHandling="merge"
+                  fragment="clone"
+                  class="btn btn-info btn-sm"
+                  >
+                  <fa-icon icon="clone"></fa-icon>
+                  <span class="d-none d-md-inline">Clone</span>
+                </button>
+                <button
+                  type="button"
+                  (click)="delete(connection)"
+                  class="btn btn-danger btn-sm"
+                  >
+                  <fa-icon icon="times"></fa-icon>
+                  <span class="d-none d-md-inline">Delete</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
       </tbody>
     </table>
   </div>

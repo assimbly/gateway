@@ -1,5 +1,4 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -22,7 +21,7 @@ import { ForbiddenConnectionKeysValidatorDirective } from './connection-keys-val
 @Component({
     selector: 'jhi-connection-keys',
     templateUrl: './connection-keys.component.html',
-    imports: [CommonModule, FormsModule, RouterModule, FontAwesomeModule, Alert, ForbiddenConnectionKeysValidatorDirective],
+    imports: [FormsModule, RouterModule, FontAwesomeModule, Alert, ForbiddenConnectionKeysValidatorDirective],
 })
 export class ConnectionKeysComponent implements OnInit, OnChanges {
     @Input() connectionKeys: Array<IConnectionKeys> = [];
@@ -200,10 +199,6 @@ export class ConnectionKeysComponent implements OnInit, OnChanges {
 
     ngOnDestroy() {
         this.eventManager.destroy(this.eventSubscriber);
-    }
-
-    trackId(index: number, item: IConnectionKeys) {
-        return item.id;
     }
 
     registerChangeInConnectionKeys() {

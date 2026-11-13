@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy, SimpleChanges, OnChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
@@ -21,7 +20,7 @@ import { Observable } from 'rxjs';
 @Component({
     selector: 'jhi-connection',
     templateUrl: './connection.component.html',
-    imports: [CommonModule, FormsModule, RouterModule, FontAwesomeModule, NgSelectModule, ConnectionKeysComponent],
+    imports: [FormsModule, RouterModule, FontAwesomeModule, NgSelectModule, ConnectionKeysComponent],
 })
 export class ConnectionComponent implements OnInit, OnDestroy, OnChanges {
     [x: string]: any;

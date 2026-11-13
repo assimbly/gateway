@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { AlertError } from 'app/shared/alert';
@@ -15,7 +15,7 @@ import { ConnectionService } from 'app/entities/connection/connection.service';
 @Component({
     selector: 'jhi-connection-detail',
     templateUrl: './connection-detail.component.html',
-    imports: [CommonModule, RouterModule, AlertError],
+    imports: [RouterModule, AlertError, NgClass],
 })
 export class ConnectionDetailComponent implements OnInit {
     connection!: IConnection;

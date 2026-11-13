@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
@@ -16,7 +15,7 @@ import { ConnectionService } from 'app/entities/connection/connection.service';
 @Component({
     selector: 'jhi-connection-keys-update',
     templateUrl: './connection-keys-update.component.html',
-    imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, SaveShortcutDirective],
+    imports: [FormsModule, FontAwesomeModule, AlertError, SaveShortcutDirective],
 })
 export class ConnectionKeysUpdateComponent implements OnInit {
     connectionKeys: IConnectionKeys;
@@ -78,9 +77,5 @@ export class ConnectionKeysUpdateComponent implements OnInit {
 		  type: 'danger',
 		  message: errorMessage,
 		});
-    }
-
-    trackConnectionById(index: number, item: IConnection) {
-        return item.id;
     }
 }
