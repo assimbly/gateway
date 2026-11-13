@@ -1,4 +1,4 @@
-import { Injectable, Component } from '@angular/core';
+import { Injectable, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { CertificateService } from './certificate.service';
@@ -6,9 +6,13 @@ import { Certificate } from 'app/shared/model/certificate.model';
 
 @Injectable({ providedIn: 'root' })
 export class CertificatePopupService {
+    private modalService = inject(NgbModal);
+    private router = inject(Router);
+    private certificateService = inject(CertificateService);
+
     private ngbModalRef: NgbModalRef;
 
-    constructor(private modalService: NgbModal, private router: Router, private certificateService: CertificateService) {
+    constructor() {
         this.ngbModalRef = null!;
     }
 

@@ -29,6 +29,11 @@ import { filterAddresses } from 'app/shared/util/address-filter';
   imports: [RouterModule, FontAwesomeModule, SearchToolbar, EndpointTypeSwitch, EndpointsEmptyState, DataTable, AddressRowComponent, AddressTotalsRowComponent],
 })
 export class TopicComponent implements OnInit, OnDestroy {
+  protected topicService = inject(TopicService);
+  protected alertService = inject(AlertService);
+  protected eventManager = inject(EventManager);
+  protected modalService = inject(NgbModal);
+  protected accountService = inject(AccountService);
 
   topics: ITopic[] = [];
   addresses: IAddress[] = [];
@@ -56,13 +61,7 @@ export class TopicComponent implements OnInit, OnDestroy {
 
   private readonly changeDetector = inject(ChangeDetectorRef);
 
-  constructor(
-    protected topicService: TopicService,
-    protected alertService: AlertService,
-    protected eventManager: EventManager,
-    protected modalService: NgbModal,
-    protected accountService: AccountService
-  ) {
+  constructor() {
     this.topics = [];
     this.brokers = [];
     this.itemsPerPage = ITEMS_PER_PAGE;

@@ -53,6 +53,12 @@ enum Status {
 ],
 })
 export class BrokerComponent implements OnInit, OnDestroy {
+    protected brokerService = inject(BrokerService);
+    protected alertService = inject(AlertService);
+    protected eventManager = inject(EventManager);
+    protected accountService = inject(AccountService);
+    protected modalService = inject(NgbModal);
+
     brokers: IBroker[] = [];
     brokersLoading = true;
     brokersLoadFailed = false;
@@ -102,14 +108,6 @@ export class BrokerComponent implements OnInit, OnDestroy {
     }
 
     private readonly changeDetector = inject(ChangeDetectorRef);
-
-    constructor(
-        protected brokerService: BrokerService,
-        protected alertService: AlertService,
-        protected eventManager: EventManager,
-        protected accountService: AccountService,
-		protected modalService: NgbModal,
-    ) {}
 
     ngOnInit() {
         this.setBrokerStatusDefaults();

@@ -13,13 +13,14 @@ import { ICertificate } from 'app/shared/model/certificate.model';
     imports: [FontAwesomeModule, AlertError, FormatMediumDatetimePipe],
 })
 export class CertificateDetailComponent implements OnInit {
+    protected activatedRoute = inject(ActivatedRoute);
+    protected certificateService = inject(CertificateService);
+
     certificate!: ICertificate;
     // e.g. [{ key: 'Type', value: 'X.509' }, { key: 'Signing Algorithm', value: 'SHA256withRSA' }, ...]
     certificateDetails: { key: string; value: string }[] = [];
 
     private readonly changeDetector = inject(ChangeDetectorRef);
-
-    constructor(protected activatedRoute: ActivatedRoute, protected certificateService: CertificateService) {}
 
     ngOnInit() {
         this.activatedRoute.data.subscribe(({ certificate }) => {

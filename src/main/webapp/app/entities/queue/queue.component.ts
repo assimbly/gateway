@@ -29,6 +29,12 @@ import { filterAddresses } from 'app/shared/util/address-filter';
   imports: [RouterModule, FontAwesomeModule, SearchToolbar, EndpointTypeSwitch, EndpointsEmptyState, DataTable, AddressRowComponent, AddressTotalsRowComponent],
 })
 export class QueueComponent implements OnInit, OnDestroy {
+  protected queueService = inject(QueueService);
+  protected alertService = inject(AlertService);
+  protected eventManager = inject(EventManager);
+  protected modalService = inject(NgbModal);
+  protected accountService = inject(AccountService);
+
   queues: IQueue[] = [];
   addresses: IAddress[] = [];
   brokers: IBroker[] = [];
@@ -54,13 +60,7 @@ export class QueueComponent implements OnInit, OnDestroy {
 
   private readonly changeDetector = inject(ChangeDetectorRef);
 
-  constructor(
-    protected queueService: QueueService,
-    protected alertService: AlertService,
-    protected eventManager: EventManager,
-    protected modalService: NgbModal,
-    protected accountService: AccountService,
-  ) {
+  constructor() {
     this.queues = [];
     this.brokers = [];
     this.itemsPerPage = ITEMS_PER_PAGE;

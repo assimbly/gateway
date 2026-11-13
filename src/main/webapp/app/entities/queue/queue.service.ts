@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpContext, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, Observer } from 'rxjs';
 
@@ -20,13 +20,15 @@ type EntityArrayResponseType = HttpResponse<IQueue[]>;
 
 @Injectable({ providedIn: 'root' })
 export class QueueService {
+  protected http = inject(HttpClient);
+  protected router = inject(Router);
+  protected $window = inject(WindowRef);
+  protected brokerService = inject(BrokerService);
+
   public queuesResourceUrl = `${serverApiUrl}api/queues`;
   public brokersResourceUrl = `${serverApiUrl}api/brokers`;
 
   brokerType!: string;
-
-  constructor(protected http: HttpClient, protected router: Router, protected $window: WindowRef, protected brokerService: BrokerService) {   
-  }
 
   create(queue: IQueue): Observable<EntityResponseType> {
     return this.http.post<IQueue>(this.queuesResourceUrl, queue, { observe: 'response' });

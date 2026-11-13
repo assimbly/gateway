@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpResponse } from '@angular/common/http';
@@ -21,6 +21,11 @@ import { PopoverModule } from 'ngx-bootstrap/popover';
   imports: [ReactiveFormsModule, FontAwesomeModule, AlertError, PopoverModule, SaveShortcutDirective],
 })
 export class TopicUpdateComponent implements OnInit {
+    protected topicService = inject(TopicService);
+    protected activatedRoute = inject(ActivatedRoute);
+    private router = inject(Router);
+    private formBuilder = inject(FormBuilder);
+
     isSaving = false;
     isClose!: boolean;
 
@@ -30,12 +35,7 @@ export class TopicUpdateComponent implements OnInit {
     brokerType = '';
     brokers: IBroker[];
 
-    constructor(
-        protected topicService: TopicService,
-        protected activatedRoute: ActivatedRoute,
-        private router: Router,
-        private formBuilder: FormBuilder
-    ) {
+    constructor() {
         this.brokers = [];
     }
 

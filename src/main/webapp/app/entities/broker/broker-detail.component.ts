@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -12,9 +12,9 @@ import { IBroker } from 'app/shared/model/broker.model';
     imports: [RouterModule, FontAwesomeModule, AlertError],
 })
 export class BrokerDetailComponent implements OnInit {
-    broker!: IBroker;
+    protected activatedRoute = inject(ActivatedRoute);
 
-    constructor(protected activatedRoute: ActivatedRoute) {}
+    broker!: IBroker;
 
     ngOnInit() {
         this.activatedRoute.data.subscribe(({ broker }) => {

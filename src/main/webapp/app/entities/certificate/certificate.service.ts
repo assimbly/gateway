@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, forkJoin } from 'rxjs';
 import dayjs from 'dayjs/esm';
@@ -30,13 +30,12 @@ type EntityArrayResponseType = HttpResponse<ICertificate[]>;
 
 @Injectable({ providedIn: 'root' })
 export class CertificateService {
+  protected http = inject(HttpClient);
 
   /** The gateway's certificate records. */
   public resourceUrl = `${serverApiUrl}api/certificate-resources`;
   /** The runtime's keystores. */
   public keystoreUrl = `${serverApiUrl}api/certificates`;
-
-  constructor(protected http: HttpClient) {}
 
   create(certificate: ICertificate): Observable<EntityResponseType> {
     const copy = this.convertDateFromClient(certificate);

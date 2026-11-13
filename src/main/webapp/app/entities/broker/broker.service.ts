@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpContext, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -12,9 +12,9 @@ type EntityArrayResponseType = HttpResponse<IBroker[]>;
 
 @Injectable({ providedIn: 'root' })
 export class BrokerService {
-    public resourceUrl = `${serverApiUrl}api/brokers`;
+    protected http = inject(HttpClient);
 
-    constructor(protected http: HttpClient) {}
+    public resourceUrl = `${serverApiUrl}api/brokers`;
 
     create(broker: IBroker): Observable<EntityResponseType> {
         return this.http.post<IBroker>(this.resourceUrl, broker, { observe: 'response' });

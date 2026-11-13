@@ -45,6 +45,14 @@ import { saveAs } from 'file-saver/FileSaver';
 ],
 })
 export class CertificateComponent implements OnInit, OnDestroy {
+  protected certificateService = inject(CertificateService);
+  protected certificatePopupService = inject(CertificatePopupService);
+  protected alertService = inject(AlertService);
+  protected modalService = inject(NgbModal);
+  protected eventManager = inject(EventManager);
+  protected parseLinks = inject(ParseLinks);
+  protected accountService = inject(AccountService);
+
   securities: ICertificate[] = [];
   currentAccount: any;
   eventSubscriber!: Subscription;
@@ -65,15 +73,7 @@ export class CertificateComponent implements OnInit, OnDestroy {
 
   private readonly changeDetector = inject(ChangeDetectorRef);
 
-  constructor(
-    protected certificateService: CertificateService,
-	protected certificatePopupService: CertificatePopupService,
-    protected alertService: AlertService,
-	protected modalService: NgbModal,
-    protected eventManager: EventManager,
-    protected parseLinks: ParseLinks,
-    protected accountService: AccountService
-  ) {
+  constructor() {
     this.securities = [];
     this.itemsPerPage = ITEMS_PER_PAGE;
     this.page = 0;

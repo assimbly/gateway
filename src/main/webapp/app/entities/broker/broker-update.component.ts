@@ -25,6 +25,9 @@ import 'codemirror/addon/edit/closetag';
     imports: [FormsModule, FontAwesomeModule, AlertError, NgbModule, PopoverModule, CodemirrorModule, SaveShortcutDirective],
 })
 export class BrokerUpdateComponent implements OnInit {
+    protected brokerService = inject(BrokerService);
+    protected activatedRoute = inject(ActivatedRoute);
+
     @ViewChild('codeEditor') private codeEditor?: CodemirrorComponent;
     readonly themeService = inject(ThemeService);
 
@@ -40,10 +43,6 @@ export class BrokerUpdateComponent implements OnInit {
     typePopoverMessage!: string;
     configurationTypePopoverMessage!: string;
     brokerConfigurationPopoverMessage!: string;
-
-
-    constructor(protected brokerService: BrokerService, protected activatedRoute: ActivatedRoute) {
-	}
 
     ngOnInit() {
         this.isSaving = false;

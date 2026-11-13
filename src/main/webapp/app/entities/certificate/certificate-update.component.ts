@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -20,18 +20,16 @@ import { CertificateService } from './certificate.service';
   imports: [FormsModule, FontAwesomeModule, AlertError],
 })
 export class CertificateUpdateComponent implements OnInit {
+  protected certificateService = inject(CertificateService);
+  protected activatedRoute = inject(ActivatedRoute);
+  protected router = inject(Router);
+  protected eventManager = inject(EventManager);
+
   certificate!: ICertificate;
   isSaving!: boolean;
   certificateExpiry!: string;
   certificateType = 'root';
   errorMessage!: string;
-
-  constructor(
-    protected certificateService: CertificateService,
-    protected activatedRoute: ActivatedRoute,
-    protected router: Router,
-    protected eventManager: EventManager,
-  ) {}
 
   ngOnInit() {
     this.isSaving = false;

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AlertError } from 'app/shared/alert';
@@ -12,18 +12,16 @@ import { TopicService } from './topic.service';
     imports: [FontAwesomeModule, AlertError],
 })
 export class TopicDeleteDialogComponent {
+    protected topicService = inject(TopicService);
+    activeModal = inject(NgbActiveModal);
+    protected eventManager = inject(EventManager);
+
     address?: IAddress;
     brokerType = '';
 
     /** Replaces the confirmation question once the delete is refused. */
     message?: string;
     disableDelete = false;
-
-    constructor(
-        protected topicService: TopicService,
-        public activeModal: NgbActiveModal,
-        protected eventManager: EventManager,
-    ) {}
 
     cancel(): void {
         this.activeModal.dismiss();

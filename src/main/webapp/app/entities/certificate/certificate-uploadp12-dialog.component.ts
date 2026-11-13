@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { switchMap } from 'rxjs/operators';
 
@@ -12,6 +12,10 @@ import { CertificateService, CERTIFICATE_NAME_PATTERN, IDENTITY_STORE, toCertifi
   imports: [FormsModule],
 })
 export class CertificateUploadP12DialogComponent {
+  private eventManager = inject(EventManager);
+  private certificateService = inject(CertificateService);
+  activeModal = inject(NgbActiveModal);
+
   readonly identityStore = IDENTITY_STORE;
   readonly namePattern = CERTIFICATE_NAME_PATTERN;
   name = '';
@@ -22,8 +26,6 @@ export class CertificateUploadP12DialogComponent {
   isSaving = false;
   uploadError = false;
   uploadErrorMessage!: String;
-
-  constructor(private eventManager: EventManager, private certificateService: CertificateService, public activeModal: NgbActiveModal) {}
 
   clear() {
     this.activeModal.dismiss('cancel');

@@ -55,6 +55,14 @@ import { CodemirrorComponent } from "@ctrl/ngx-codemirror";
 ],
 })
 export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
+  private brokerService = inject(BrokerService);
+  protected alertService = inject(AlertService);
+  protected eventManager = inject(EventManager);
+  private modalService = inject(NgbModal);
+  protected accountService = inject(AccountService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
   readonly themeService = inject(ThemeService);
 
   @ViewChild('codeEditor') private codeEditor!: CodemirrorComponent;
@@ -101,15 +109,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
 
   private readonly changeDetector = inject(ChangeDetectorRef);
 
-  constructor(
-    private brokerService: BrokerService,
-    protected alertService: AlertService,
-    protected eventManager: EventManager,
-    private modalService: NgbModal,
-    protected accountService: AccountService,
-    private router: Router,
-    private route: ActivatedRoute
-  ) {
+  constructor() {
     this.messages = [];
     this.itemsPerPage = ITEMS_PER_PAGE + 5;
     this.page = 1;

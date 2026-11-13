@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { Address, IAddress } from 'app/shared/model/address.model';
@@ -16,15 +16,13 @@ import { OverflowActionDirective, PrimaryActionDirective, RowActions, Truncate }
   imports: [RouterModule, FontAwesomeModule, NgbDropdownModule, RowActions, PrimaryActionDirective, OverflowActionDirective, Truncate],
 })
 export class AddressRowComponent {
+  private modalService = inject(NgbModal);
+  private router = inject(Router);
+  private eventManager = inject(EventManager);
+
   @Input() address!: Address;
   @Input() brokerType!: string;
   @Input() endpointType: 'queue' | 'topic' = 'queue';
-
-  constructor(
-    private modalService: NgbModal,
-    private router: Router,
-    private eventManager: EventManager,
-  ) {}
 
   get clearLabel(): string {
     return this.endpointType === 'topic' && this.brokerType === 'classic' ? 'Reset' : 'Clear';
