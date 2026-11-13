@@ -40,9 +40,9 @@ export class TutorialPanelComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly lightbox = viewChild.required<ElementRef<HTMLDialogElement>>('lightbox');
 
-  // the tutorials are first-party Markdown bundled with the Gateway; their Show me buttons need their data attribute
   /** The tutorials by track, such as Get started and Messaging. */
   readonly tracks = computed(() => groupByTrack(this.tutorials.summaries()));
+  // trusted: first-party Markdown bundled from content/tutorials/; its Show me buttons need their data attribute
   readonly html = computed(() => this.sanitizer.bypassSecurityTrustHtml(this.tutorials.step()?.html ?? ''));
   /**
    * Why the last Show me found nothing: the element is on a page the panel couldn't open, or it's in the Test view of

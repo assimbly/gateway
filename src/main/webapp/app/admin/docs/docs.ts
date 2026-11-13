@@ -120,6 +120,7 @@ export default class Docs {
   private show(definition: string, names: Map<string, string>): void {
     if (names.size === 0) {
       // The groups are unknown, so Swagger UI picks its first definition.
+      // trusted: a constant same-origin path, not user input
       this.frameSrc.set(this.sanitizer.bypassSecurityTrustResourceUrl(SWAGGER_UI));
       return;
     }
@@ -131,6 +132,7 @@ export default class Docs {
     }
     if (definition !== this.shown()) {
       this.shown.set(definition);
+      // trusted: the constant path plus an encodeURIComponent-ed group name
       this.frameSrc.set(this.sanitizer.bypassSecurityTrustResourceUrl(`${SWAGGER_UI}?${PRIMARY_NAME}=${encodeURIComponent(name)}`));
     }
   }

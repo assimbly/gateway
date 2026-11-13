@@ -34,6 +34,7 @@ export class FlowLogDrawerComponent {
   readonly loading = signal(false);
   readonly failed = signal<string | null>(null);
   readonly flow = signal<LogFlow | undefined>(undefined);
+  // trusted: colorLog escapes every log entry as HTML before adding its own color spans
   readonly coloredLog = computed<SafeHtml>(() => this.sanitizer.bypassSecurityTrustHtml(colorLog(this.entries(), this.searchText())));
 
   /** Shown in a page rather than a drawer: the Flow to show the log of. */
