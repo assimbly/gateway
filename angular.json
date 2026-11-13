@@ -25,7 +25,7 @@
               "path": "./webpack/webpack.custom.js"
             },
 			"allowedCommonJsDependencies": [
-				"codemirror", "buffer", "file-saver/FileSaver"
+				"codemirror", "buffer"
 			],
             "outputPath": "build/resources/main/static/",
             "index": "src/main/webapp/index.html",

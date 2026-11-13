@@ -8,7 +8,7 @@ import { createRequestOption } from 'app/shared/util/request-util';
 
 import { Router } from '@angular/router';
 import { WindowRef } from 'app/shared/window/window.service';
-import { saveAs } from 'file-saver/FileSaver';
+import { saveAs } from 'app/shared/util/save-as';
 import { IIntegration } from 'app/shared/model/integration.model';
 import { IFlow, Flow, LogLevelType } from 'app/shared/model/flow.model';
 import { traceCollector } from 'app/shared/collect/collectors';

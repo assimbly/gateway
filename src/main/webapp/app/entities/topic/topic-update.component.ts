@@ -13,12 +13,12 @@ import { Address, IAddress } from 'app/shared/model/address.model';
 import { TopicService } from './topic.service';
 import { IBroker } from 'app/shared/model/broker.model';
 import { SaveShortcutDirective } from 'app/shared/keyboard';
-import { PopoverModule } from 'ngx-bootstrap/popover';
+import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'jhi-topic-update',
   templateUrl: './topic-update.component.html',
-  imports: [ReactiveFormsModule, FontAwesomeModule, AlertError, PopoverModule, SaveShortcutDirective],
+  imports: [ReactiveFormsModule, FontAwesomeModule, AlertError, NgbPopoverModule, SaveShortcutDirective],
 })
 export class TopicUpdateComponent implements OnInit {
     isSaving = false;

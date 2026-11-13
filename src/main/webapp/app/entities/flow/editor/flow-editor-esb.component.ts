@@ -4,7 +4,6 @@ import { AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { NgbModal, NgbModalRef, NgbModule, NgbOffcanvas } from "@ng-bootstrap/ng-bootstrap";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { PopoverModule } from "ngx-bootstrap/popover";
 import { AlertService } from "app/core/util/alert.service";
 import { FlowEditorStepComponent, StepEditorRegistry } from "./flow-editor-step.component";
 import { AlertError } from "app/shared/alert";
@@ -119,7 +118,7 @@ import {
   styleUrl: '../designer/flow-designer.scss',
   encapsulation: ViewEncapsulation.None,
   providers: [StepEditorRegistry],
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, NgbModule, FontAwesomeModule, PopoverModule, AlertError, FlowEditorStepComponent, FieldTabDirective, SaveShortcutDirective, CodemirrorModule, FlowCanvasComponent, LinkEditorComponent, FlowEditorHeaderComponent, ResponseEditorComponent, CallFlowEditorComponent, FlowTestPanelComponent, FlowRunStatsComponent, FlowLogDrawerComponent, CamelRouteDrawerComponent, CdkDropList, CdkDrag, CdkDragPlaceholder],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, NgbModule, FontAwesomeModule, AlertError, FlowEditorStepComponent, FieldTabDirective, SaveShortcutDirective, CodemirrorModule, FlowCanvasComponent, LinkEditorComponent, FlowEditorHeaderComponent, ResponseEditorComponent, CallFlowEditorComponent, FlowTestPanelComponent, FlowRunStatsComponent, FlowLogDrawerComponent, CamelRouteDrawerComponent, CdkDropList, CdkDrag, CdkDragPlaceholder],
 })
 export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 

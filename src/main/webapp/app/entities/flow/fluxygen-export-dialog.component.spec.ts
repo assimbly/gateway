@@ -5,7 +5,7 @@ import { provideRouter } from '@angular/router';
 
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { saveAs } from 'file-saver/FileSaver';
+import { saveAs } from 'app/shared/util/save-as';
 
 import { fontAwesomeIcons } from 'app/config/font-awesome-icons';
 import { IFlow } from 'app/shared/model/flow.model';
@@ -13,7 +13,7 @@ import { IFlow } from 'app/shared/model/flow.model';
 import { FluxygenExportDialogComponent, fluxygenExportProblem } from './fluxygen-export-dialog.component';
 import { attachmentName } from './flow.service';
 
-jest.mock('file-saver/FileSaver', () => ({ saveAs: jest.fn() }));
+jest.mock('app/shared/util/save-as', () => ({ saveAs: jest.fn() }));
 
 const PASSPHRASE = 'correct horse battery';
 

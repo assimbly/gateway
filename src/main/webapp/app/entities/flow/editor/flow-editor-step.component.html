@@ -205,7 +205,7 @@
         <div class="step-field">
           <div class="step-field__head">
             <label class="step-field__label" for="field_component_type">Component</label>
-            <i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="uriPopover" container="body" placement="right">
+            <i triggers="mouseenter:mouseleave" popoverTitle="Info" [ngbPopover]="uriPopover" container="body" placement="right">
               <fa-icon icon="info-circle"></fa-icon>
             </i>
             <div class="step-field__actions">
@@ -249,7 +249,7 @@
           <div class="step-field__head">
             <label class="step-field__label" for="field_uri_{{index}}">{{pathFieldLabel}}</label>
             @if (!pathUnused) {
-              <i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="pathPopover" container="body" placement="right">
+              <i triggers="mouseenter:mouseleave" popoverTitle="Info" [ngbPopover]="pathPopover" container="body" placement="right">
                 <fa-icon icon="info-circle"></fa-icon>
               </i>
               <div class="step-field__actions">
@@ -291,7 +291,7 @@
         <div class="step-field" formArrayName="options">
           <div class="step-field__head">
             <span class="step-field__label">Options</span>
-            <i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="optionsPopover" container="body" placement="right">
+            <i triggers="mouseenter:mouseleave" popoverTitle="Info" [ngbPopover]="optionsPopover" container="body" placement="right">
               <fa-icon icon="info-circle"></fa-icon>
             </i>
             <div class="step-field__actions">
@@ -443,7 +443,7 @@
           <div class="step-field__head">
             <label class="step-field__label" for="field_routeContent_{{index}}">Camel route</label>
             @if (stepType === 'ERROR') {
-              <i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info" [popover]="errorHandlerPopover">
+              <i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info" [ngbPopover]="errorHandlerPopover">
                 <fa-icon icon="info-circle"></fa-icon>
               </i>
             }
