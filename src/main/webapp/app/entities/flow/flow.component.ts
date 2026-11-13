@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit, OnDestroy, QueryList, ViewChildren, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
-import { Subscription, forkJoin, interval } from 'rxjs';
+import { EMPTY, Subscription, concatMap, forkJoin, interval } from 'rxjs';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -183,43 +183,47 @@ export class FlowComponent implements OnInit, OnDestroy {
   }
 
   getIntegrations(): void {
-    forkJoin(this.flowService.getIntegrationName(), this.integrationService.query()).subscribe(([integrationName, integrations]) => {
-      this.integrations = integrations.body!;
-      this.checkIntegrationType(this.integrations, integrationName.body!);
+    forkJoin(this.flowService.getIntegrationName(), this.integrationService.query())
+      .pipe(
+        concatMap(([integrationName, integrations]) => {
+          this.integrations = integrations.body!;
+          this.checkIntegrationType(this.integrations, integrationName.body!);
 
-      if (!this.integrationExists) {
-        console.log('Creating integration');
-        this.integration = new Object();
-        this.integration.name = integrationName.body!;
-        this.integration.type = GatewayType.FULL;
-        this.integration.environmentName = 'Dev1';
-        this.integration.stage = EnvironmentType.DEVELOPMENT;
-        this.integration.defaultFromComponentType = 'file';
-        this.integration.defaultToComponentType = 'file';
-        this.integration.defaultErrorComponentType = 'file';
+          if (!this.integrationExists) {
+            console.log('Creating integration');
+            this.integration = new Object();
+            this.integration.name = integrationName.body!;
+            this.integration.type = GatewayType.FULL;
+            this.integration.environmentName = 'Dev1';
+            this.integration.stage = EnvironmentType.DEVELOPMENT;
+            this.integration.defaultFromComponentType = 'file';
+            this.integration.defaultToComponentType = 'file';
+            this.integration.defaultErrorComponentType = 'file';
+            return this.integrationService.create(this.integration);
+          }
 
-        this.integrationService.create(this.integration).subscribe(integration => {
-          console.log('integration created');
-          this.integration = integration.body!;
-          this.integrations.push(this.integration);
-          this.integrationExists = true;
-          this.singleIntegrationName = integration.body!.name!;
-          this.singleIntegrationId = integration.body!.id!;
-          this.singleIntegrationStage = integration.body!.stage ? integration.body!.stage.toString().toLowerCase() : '';
-          this.flowsLoading = false;
-          this.changeDetector.detectChanges();
-        });
-      } else {
-        this.loadFlows();
-        if (!this.multipleIntegrations) {
-          this.singleIntegrationName = this.integrations[this.indexIntegration].name!;
-          this.singleIntegrationId = this.integrations[this.indexIntegration].id!;
-          this.singleIntegrationStage = this.integrations[this.indexIntegration].stage
-            ? this.integrations[this.indexIntegration].stage!.toString().toLowerCase()
-            : '';
-        }
-      }
-    });
+          this.loadFlows();
+          if (!this.multipleIntegrations) {
+            this.singleIntegrationName = this.integrations[this.indexIntegration].name!;
+            this.singleIntegrationId = this.integrations[this.indexIntegration].id!;
+            this.singleIntegrationStage = this.integrations[this.indexIntegration].stage
+              ? this.integrations[this.indexIntegration].stage!.toString().toLowerCase()
+              : '';
+          }
+          return EMPTY;
+        }),
+      )
+      .subscribe(integration => {
+        console.log('integration created');
+        this.integration = integration.body!;
+        this.integrations.push(this.integration);
+        this.integrationExists = true;
+        this.singleIntegrationName = integration.body!.name!;
+        this.singleIntegrationId = integration.body!.id!;
+        this.singleIntegrationStage = integration.body!.stage ? integration.body!.stage.toString().toLowerCase() : '';
+        this.flowsLoading = false;
+        this.changeDetector.detectChanges();
+      });
   }
 
   checkIntegrationType(integrations: IIntegration[], integrationName: String): void {

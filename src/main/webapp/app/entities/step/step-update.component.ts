@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map, of, switchMap } from 'rxjs';
 import { AlertService } from 'app/core/util/alert.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AlertError } from 'app/shared/alert';
@@ -52,36 +52,36 @@ export class StepUpdateComponent implements OnInit {
             },
             (res: HttpErrorResponse) => this.onError(res.message)
         );
-        this.connectionService.query({ filter: 'step-is-null' }).subscribe(
-            (res: HttpResponse<IConnection[]>) => {
-                if (!this.step.connectionId) {
-                    this.connections = res.body;
-                } else {
-                    this.connectionService.find(this.step.connectionId).subscribe(
-                        (subRes: HttpResponse<IConnection>) => {
-                            this.connections = [subRes.body].concat(res.body);
-                        },
-                        (subRes: HttpErrorResponse) => this.onError(subRes.message)
-                    );
-                }
-            },
-            (res: HttpErrorResponse) => this.onError(res.message)
-        );
-        this.messageService.query({ filter: 'step-is-null' }).subscribe(
-            (res: HttpResponse<IMessage[]>) => {
-                if (!this.step.messageId) {
-                    this.messages = res.body;
-                } else {
-                    this.messageService.find(this.step.messageId).subscribe(
-                        (subRes: HttpResponse<IMessage>) => {
-                            this.messages = [subRes.body].concat(res.body);
-                        },
-                        (subRes: HttpErrorResponse) => this.onError(subRes.message)
-                    );
-                }
-            },
-            (res: HttpErrorResponse) => this.onError(res.message)
-        );
+        this.connectionService
+            .query({ filter: 'step-is-null' })
+            .pipe(
+                switchMap((res: HttpResponse<IConnection[]>) =>
+                    !this.step.connectionId
+                        ? of(res.body)
+                        : this.connectionService
+                              .find(this.step.connectionId)
+                              .pipe(map((subRes: HttpResponse<IConnection>) => [subRes.body].concat(res.body)))
+                )
+            )
+            .subscribe(
+                connections => (this.connections = connections),
+                (res: HttpErrorResponse) => this.onError(res.message)
+            );
+        this.messageService
+            .query({ filter: 'step-is-null' })
+            .pipe(
+                switchMap((res: HttpResponse<IMessage[]>) =>
+                    !this.step.messageId
+                        ? of(res.body)
+                        : this.messageService
+                              .find(this.step.messageId)
+                              .pipe(map((subRes: HttpResponse<IMessage>) => [subRes.body].concat(res.body)))
+                )
+            )
+            .subscribe(
+                messages => (this.messages = messages),
+                (res: HttpErrorResponse) => this.onError(res.message)
+            );
     }
 
     previousState() {

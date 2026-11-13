@@ -3,6 +3,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router } from '@angular/router';
 
 import { TranslatePipe } from '@ngx-translate/core';
+import { concatMap, filter, tap } from 'rxjs';
 
 import { AccountService } from 'app/core/auth';
 import { TranslateDirective } from 'app/shared/language';
@@ -48,17 +49,20 @@ export default class Password {
     const { newPassword, confirmPassword, currentPassword } = this.passwordForm.getRawValue();
     if (newPassword === confirmPassword) {
       const wasRequired = this.changeRequired();
-      this.passwordService.save(newPassword, currentPassword).subscribe({
-        next: () => {
-          this.success.set(true);
-          if (wasRequired) {
-            // Read the account again, so the Gateway opens up, and carry on where a new user starts, with the Tutorials
-            this.tutorialPanel.showOnFirstVisit();
-            this.accountService.identity(true).subscribe(() => this.router.navigate(['']));
-          }
-        },
-        error: () => this.error.set(true),
-      });
+      this.passwordService
+        .save(newPassword, currentPassword)
+        .pipe(
+          tap(() => this.success.set(true)),
+          filter(() => wasRequired),
+          // Read the account again, so the Gateway opens up, and carry on where a new user starts, with the Tutorials
+          tap(() => this.tutorialPanel.showOnFirstVisit()),
+          // identity() never errors, so the error handler below still only sees a failed save
+          concatMap(() => this.accountService.identity(true)),
+        )
+        .subscribe({
+          next: () => this.router.navigate(['']),
+          error: () => this.error.set(true),
+        });
     } else {
       this.doNotMatch.set(true);
     }

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { EMPTY, Observable, concatMap, switchMap } from 'rxjs';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AlertError } from 'app/shared/alert';
@@ -50,35 +50,39 @@ export class BrokerUpdateComponent implements OnInit {
         this.isSaving = false;
         this.setPopoverMessages();
         this.setDefaultConfiguration();
-        this.activatedRoute.data.subscribe(({ broker }) => {
-            this.broker = broker;
-            if (this.broker.id !== undefined) {
-                this.brokerService.getBrokerConfiguration(this.broker.id, this.broker.type!).subscribe(brokerConfiguration => {
-                    const body = brokerConfiguration.body ?? '';
-                    if (this.broker.type === 'artemis') {
-                        this.artemisConfiguration = body;
-                        this.brokerConfiguration = body;
-                    } else {
-                        this.activemqConfiguration = body;
-                        this.brokerConfiguration = body;
+        this.activatedRoute.data
+            .pipe(
+                switchMap(({ broker }) => {
+                    this.broker = broker;
+                    if (this.broker.id !== undefined) {
+                        return this.brokerService.getBrokerConfiguration(this.broker.id, this.broker.type!);
                     }
-                    // Force CodeMirror to pick up late-loaded content (ngModel does not update CM after init).
-                    setTimeout(() => {
-                        const cm = this.codeEditor?.codeMirror as { setValue?: (v: string) => void; refresh?: () => void } | undefined;
-                        if (cm?.setValue) {
-                            cm.setValue(body);
-                            cm.refresh?.();
-                        }
-                    }, 0);
-                });
-            } else {
-                this.broker.name = this.broker.name || 'default';
-                this.broker.autoStart = true;
-                this.broker.type = 'artemis';
-                this.broker.configurationType = 'file';
-                this.brokerConfiguration = this.artemisConfiguration;
-            }
-        });
+                    this.broker.name = this.broker.name || 'default';
+                    this.broker.autoStart = true;
+                    this.broker.type = 'artemis';
+                    this.broker.configurationType = 'file';
+                    this.brokerConfiguration = this.artemisConfiguration;
+                    return EMPTY;
+                }),
+            )
+            .subscribe(brokerConfiguration => {
+                const body = brokerConfiguration.body ?? '';
+                if (this.broker.type === 'artemis') {
+                    this.artemisConfiguration = body;
+                    this.brokerConfiguration = body;
+                } else {
+                    this.activemqConfiguration = body;
+                    this.brokerConfiguration = body;
+                }
+                // Force CodeMirror to pick up late-loaded content (ngModel does not update CM after init).
+                setTimeout(() => {
+                    const cm = this.codeEditor?.codeMirror as { setValue?: (v: string) => void; refresh?: () => void } | undefined;
+                    if (cm?.setValue) {
+                        cm.setValue(body);
+                        cm.refresh?.();
+                    }
+                }, 0);
+            });
     }
 
     setDefaultConfiguration() {
@@ -95,26 +99,28 @@ export class BrokerUpdateComponent implements OnInit {
 
         if (this.broker.configurationType === 'file' && this.broker.id !== undefined) {
             this.isSaving = true;
-            this.brokerService.update(this.broker).subscribe(
-                response => {
-                    this.brokerService
-                        .setBrokerConfiguration(this.broker.id!, this.broker.type!, this.broker.configurationType!, this.brokerConfiguration)
-                        .subscribe(
-                            response => {
-                                this.isSaving = false;
-                                this.previousState();
-                            },
-                            err => {
-                                this.isSaving = false;
-                                this.brokerConfigurationFailed = err.error;
-                            }
-                        );
-                },
-                err => {
-                    this.isSaving = false;
-                    this.brokerConfigurationFailed = err.error;
-                }
-            );
+            this.brokerService
+                .update(this.broker)
+                .pipe(
+                    concatMap(() =>
+                        this.brokerService.setBrokerConfiguration(
+                            this.broker.id!,
+                            this.broker.type!,
+                            this.broker.configurationType!,
+                            this.brokerConfiguration,
+                        ),
+                    ),
+                )
+                .subscribe({
+                    next: () => {
+                        this.isSaving = false;
+                        this.previousState();
+                    },
+                    error: err => {
+                        this.isSaving = false;
+                        this.brokerConfigurationFailed = err.error;
+                    },
+                });
         } else if (this.broker.configurationType === 'file') {
             this.isSaving = true;
             this.subscribeToCreateResponse(this.brokerService.create(this.broker));
