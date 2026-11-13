@@ -18,7 +18,7 @@ export const errorHandlerInterceptor: HttpInterceptorFn = (req, next) => {
           return;
         }
         if (!(err.status === 401 && (err.message === '' || err.url?.includes('api/account')))) {
-          eventManager.broadcast(new EventWithContent('jhipsterGradleSampleApplicationApp.httpError', err));
+          eventManager.broadcast(new EventWithContent('gatewayApp.httpError', err));
         }
       },
     }),

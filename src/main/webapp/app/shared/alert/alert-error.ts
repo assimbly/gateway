@@ -26,13 +26,13 @@ export class AlertError implements OnDestroy {
   private readonly translateService = inject(TranslateService);
 
   constructor() {
-    this.errorListener = this.eventManager.subscribe('jhipsterGradleSampleApplicationApp.error', (response: EventWithContent<unknown>) => {
+    this.errorListener = this.eventManager.subscribe('gatewayApp.error', (response: EventWithContent<unknown>) => {
       const errorResponse = (response as EventWithContent<AlertErrorModel>).content;
       this.addErrorAlert(errorResponse.message, errorResponse.key, errorResponse.params);
     });
 
     this.httpErrorListener = this.eventManager.subscribe(
-      'jhipsterGradleSampleApplicationApp.httpError',
+      'gatewayApp.httpError',
       (response: EventWithContent<unknown>) => {
         this.handleHttpError(response);
       },

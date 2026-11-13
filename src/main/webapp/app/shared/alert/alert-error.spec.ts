@@ -37,7 +37,7 @@ describe('Alert Error Component', () => {
   describe('Error Handling', () => {
     it('should display an alert on status 0', () => {
       // GIVEN
-      eventManager.broadcast({ name: 'jhipsterGradleSampleApplicationApp.httpError', content: { status: 0 } });
+      eventManager.broadcast({ name: 'gatewayApp.httpError', content: { status: 0 } });
       // THEN
       expect(comp.alerts()).toHaveLength(1);
       expect(comp.alerts()[0].translationKey).toBe('error.server.not.reachable');
@@ -45,7 +45,7 @@ describe('Alert Error Component', () => {
 
     it('should display an alert on status 404', () => {
       // GIVEN
-      eventManager.broadcast({ name: 'jhipsterGradleSampleApplicationApp.httpError', content: { status: 404 } });
+      eventManager.broadcast({ name: 'gatewayApp.httpError', content: { status: 404 } });
       // THEN
       expect(comp.alerts()).toHaveLength(1);
       expect(comp.alerts()[0].translationKey).toBe('error.url.not.found');
@@ -53,8 +53,8 @@ describe('Alert Error Component', () => {
 
     it('should display an alert on generic error', () => {
       // GIVEN
-      eventManager.broadcast({ name: 'jhipsterGradleSampleApplicationApp.httpError', content: { error: { message: 'Error Message' } } });
-      eventManager.broadcast({ name: 'jhipsterGradleSampleApplicationApp.httpError', content: { error: 'Second Error Message' } });
+      eventManager.broadcast({ name: 'gatewayApp.httpError', content: { error: { message: 'Error Message' } } });
+      eventManager.broadcast({ name: 'gatewayApp.httpError', content: { error: 'Second Error Message' } });
       // THEN
       expect(comp.alerts()).toHaveLength(2);
       expect(comp.alerts()[0].translationKey).toBe('Error Message');
@@ -76,7 +76,7 @@ describe('Alert Error Component', () => {
           message: 'error.validation',
         },
       });
-      eventManager.broadcast({ name: 'jhipsterGradleSampleApplicationApp.httpError', content: response });
+      eventManager.broadcast({ name: 'gatewayApp.httpError', content: response });
       // THEN
       expect(comp.alerts()).toHaveLength(1);
       expect(comp.alerts()[0].translationKey).toBe('error.validation');
@@ -90,7 +90,7 @@ describe('Alert Error Component', () => {
         status: 400,
         error: 'Bad Request',
       });
-      eventManager.broadcast({ name: 'jhipsterGradleSampleApplicationApp.httpError', content: response });
+      eventManager.broadcast({ name: 'gatewayApp.httpError', content: response });
       // THEN
       expect(comp.alerts()).toHaveLength(1);
       expect(comp.alerts()[0].translationKey).toBe('Bad Request');
@@ -112,7 +112,7 @@ describe('Alert Error Component', () => {
           fieldErrors: [{ objectName: 'foo', field: 'minField', message: 'Min' }],
         },
       });
-      eventManager.broadcast({ name: 'jhipsterGradleSampleApplicationApp.httpError', content: response });
+      eventManager.broadcast({ name: 'gatewayApp.httpError', content: response });
       // THEN
       expect(comp.alerts()).toHaveLength(1);
       expect(comp.alerts()[0].translationKey).toBe('error.Size');
@@ -130,7 +130,7 @@ describe('Alert Error Component', () => {
           message: 'error.validation',
         },
       });
-      eventManager.broadcast({ name: 'jhipsterGradleSampleApplicationApp.httpError', content: response });
+      eventManager.broadcast({ name: 'gatewayApp.httpError', content: response });
       // THEN
       expect(comp.alerts()).toHaveLength(1);
       expect(comp.alerts()[0].translationKey).toBe('header.error');
@@ -149,7 +149,7 @@ describe('Alert Error Component', () => {
           detail: 'Detailed error message',
         },
       });
-      eventManager.broadcast({ name: 'jhipsterGradleSampleApplicationApp.httpError', content: response });
+      eventManager.broadcast({ name: 'gatewayApp.httpError', content: response });
       // THEN
       expect(comp.alerts()).toHaveLength(1);
       expect(comp.alerts()[0].translationKey).toBe('error.http.500');
