@@ -100,7 +100,6 @@ export class CertificateUpdateComponent implements OnInit {
   protected onSaveError(err: HttpErrorResponse) {
     this.isSaving = false;
     this.errorMessage = err.status === 409 ? 'The certificates of this url were already added, use Renew to download them again.' : err.error || err.message;
-    console.log(err);
   }
 
   protected goBack() {

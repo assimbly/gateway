@@ -451,8 +451,7 @@ export class FlowService {
         data => {
           const blob = new Blob([data.body!], { type: 'application/xml' });
           saveAs(blob, `export_integration_${integration.name}_${exportDate}.xml`);
-        },
-        error => console.log(error)
+        }
       );
   }
 
@@ -501,8 +500,7 @@ export class FlowService {
         data => {
           const blob = new Blob([data.body!], { type: 'application/xml' });
           saveAs(blob, `export_flow_${flow.name}_${exportDate}.xml`);
-        },
-        error => console.log(error)
+        }
       );
   }
 

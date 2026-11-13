@@ -59,7 +59,6 @@ export class CertificateUploadDialogComponent {
           this.isSaving = false;
           this.uploadError = true;
           this.uploadErrorMessage = err.error;
-          console.log(err);
         },
       );
   }

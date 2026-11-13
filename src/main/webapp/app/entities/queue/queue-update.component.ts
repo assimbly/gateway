@@ -141,8 +141,7 @@ export class QueueUpdateComponent implements OnInit {
                         this.brokerType = broker.type!;
                     }
                 }
-            },
-            error => console.log(error)
+            }
         );
     }
 }

@@ -188,7 +188,6 @@ export class FlowComponent implements OnInit, OnDestroy {
       this.checkIntegrationType(this.integrations, integrationName.body!);
 
       if (!this.integrationExists) {
-        console.log('Creating integration');
         this.integration = new Object();
         this.integration.name = integrationName.body!;
         this.integration.type = GatewayType.FULL;
@@ -199,7 +198,6 @@ export class FlowComponent implements OnInit, OnDestroy {
         this.integration.defaultErrorComponentType = 'file';
 
         this.integrationService.create(this.integration).subscribe(integration => {
-          console.log('integration created');
           this.integration = integration.body!;
           this.integrations.push(this.integration);
           this.integrationExists = true;

@@ -184,7 +184,6 @@ export class MessagePopupComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.routeSub = this.route.params.subscribe(params => {
-      console.log('message popup');
       if (params['id']) {
         this.messagePopupService.open(MessageDialogComponent as Component, params['id']);
       } else {

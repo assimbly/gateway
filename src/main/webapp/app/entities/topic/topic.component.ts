@@ -166,8 +166,7 @@ export class TopicComponent implements OnInit, OnDestroy {
           }
           this.changeDetector.detectChanges();
         }
-      },
-      error => console.log(error)
+      }
     );
   }
 
@@ -194,7 +193,6 @@ export class TopicComponent implements OnInit, OnDestroy {
           this.changeDetector.detectChanges();
         },
         error => {
-          console.log(error);
           this.addressesLoaded = true;
           this.isBroker = false;
           this.changeDetector.detectChanges();
@@ -215,7 +213,6 @@ export class TopicComponent implements OnInit, OnDestroy {
           this.changeDetector.detectChanges();
         },
         error => {
-          console.log(error);
           this.isBroker = false;
           this.changeDetector.detectChanges();
         }

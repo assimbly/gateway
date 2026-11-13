@@ -173,7 +173,6 @@ export class CertificateComponent implements OnInit, OnDestroy {
   }
 
   exportCertificate(id: number) {
-    console.log('Export certificate');
     this.certificateService.find(id).subscribe(data => {
       const certificate = data.body;
       let exportFileName = 'certificate';

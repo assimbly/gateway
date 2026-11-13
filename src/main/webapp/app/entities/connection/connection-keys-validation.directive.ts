@@ -10,9 +10,6 @@ export class ForbiddenConnectionKeysValidatorDirective implements Validator {
     @Input('jhiExistingConnectionKeys') existingKeys!: Array<string>;
 
     validate(control: AbstractControl): { [key: string]: any } | null {
-        console.log('validating connections');
-        console.log(this.existingKeys);
-
         return this.existingKeys.some(k => k === control.value) ? { existingConnectionKey: true } : null;
     }
 }

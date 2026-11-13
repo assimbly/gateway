@@ -1567,8 +1567,6 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
             this.setMessage(step, reason.id, formMessage);
           }
         );
-    },(reason)=>{
-       //console.log('createHeader error: ', reason);
     });
 
   }
@@ -1672,8 +1670,6 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
        // Save hands back the Connection; Cancel or close keeps the one that was selected
        const done = (outcome: any) => this.setConnection(step, outcome?.id ?? previousConnectionId, formConnection);
        res.result.then(done, done);
-       }, (error)=>{
-          console.log('Set connection failed');
        }
     )
 
