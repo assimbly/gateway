@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, inject, output } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbDropdownModule, NgbModal, NgbOffcanvas, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
@@ -83,7 +83,7 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
   /** The API and Operation this Flow handles, when it is a Handler Flow. */
   @Input() handler?: IApiHandler;
   /** The Flow's runtime state, each time it changes. */
-  @Output() runtimeChange = new EventEmitter<FlowRuntime>();
+  readonly runtimeChange = output<FlowRuntime>();
 
   steps: Array<Step> = [new Step()];
   fromStep: Array<Step> = [];

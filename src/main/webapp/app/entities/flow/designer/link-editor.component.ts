@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { canDeleteBranch, canRenameBranch, defaultBranch, DesignLink, FlowGraph, LinkSettings, routerOf, routerTitle, takesCondition } from './flow-graph';
@@ -16,8 +16,8 @@ export class LinkEditorComponent {
   @Input() readOnly = false;
   @Input() problem?: string;
 
-  @Output() linkChange = new EventEmitter<Partial<LinkSettings>>();
-  @Output() deleteBranch = new EventEmitter<void>();
+  readonly linkChange = output<Partial<LinkSettings>>();
+  readonly deleteBranch = output<void>();
 
   readonly languages = ['simple', 'constant', 'header', 'jsonpath', 'xpath', 'groovy', 'javascript'];
   readonly transports = ['sync', 'async'];

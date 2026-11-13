@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { Component, Input, OnChanges, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
@@ -24,8 +24,8 @@ export class ResponseEditorComponent implements OnChanges {
   @Input() problem?: string;
   @Input() deletable = false;
 
-  @Output() settingsChange = new EventEmitter<{ uri: string | undefined; options: string }>();
-  @Output() remove = new EventEmitter<void>();
+  readonly settingsChange = output<{ uri: string | undefined; options: string }>();
+  readonly remove = output<void>();
 
   readonly languages = ['simple', 'constant', 'jsonpath', 'xpath', 'groovy'];
 

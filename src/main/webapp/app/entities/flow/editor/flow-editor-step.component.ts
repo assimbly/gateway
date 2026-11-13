@@ -1,4 +1,4 @@
-import { afterNextRender, ChangeDetectorRef, Component, ElementRef, EventEmitter, inject, Injectable, Injector, Input, OnChanges, OnDestroy, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
+import { afterNextRender, ChangeDetectorRef, Component, ElementRef, inject, Injectable, Injector, Input, OnChanges, OnDestroy, SimpleChanges, TemplateRef, ViewChild, output } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
@@ -127,19 +127,19 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   @Input() optionsPopoverMessage!: string;
   @Input() customOptions: Array<any> = [];
 
-  @Output() removeStep = new EventEmitter<{ step: IStep; index: number }>();
-  @Output() addStep = new EventEmitter<{ step: IStep; index: number; stepType?: StepType }>();
-  @Output() addConnection = new EventEmitter<{ step: IStep; index: number }>();
-  @Output() removeConnection = new EventEmitter<{ step: IStep; index: number }>();
-  @Output() componentTypeChange = new EventEmitter<{ step: IStep; index: number; componentType: any }>();
+  readonly removeStep = output<{ step: IStep; index: number }>();
+  readonly addStep = output<{ step: IStep; index: number; stepType?: StepType }>();
+  readonly addConnection = output<{ step: IStep; index: number }>();
+  readonly removeConnection = output<{ step: IStep; index: number }>();
+  readonly componentTypeChange = output<{ step: IStep; index: number; componentType: any }>();
   /** The Component changed between HTTP and HTTPS to match a pasted URL, keeping the path and Options. */
-  @Output() schemeChange = new EventEmitter<{ step: IStep; index: number }>();
+  readonly schemeChange = output<{ step: IStep; index: number }>();
   /** Opens the large Route editor on the Step's form, which holds its Route as `route`, `routeName` and `routeContent`. */
-  @Output() createOrEditRoute = new EventEmitter<{ step: IStep; form: FormGroup }>();
-  @Output() createOrEditMessage = new EventEmitter<{ step: IStep; control: AbstractControl }>();
-  @Output() createOrEditConnection = new EventEmitter<{ step: IStep; connectionType: string; control: AbstractControl }>();
+  readonly createOrEditRoute = output<{ step: IStep; form: FormGroup }>();
+  readonly createOrEditMessage = output<{ step: IStep; control: AbstractControl }>();
+  readonly createOrEditConnection = output<{ step: IStep; connectionType: string; control: AbstractControl }>();
   /** Opens the Router's `conditionBranch`, where its Condition is set. */
-  @Output() editBranch = new EventEmitter<void>();
+  readonly editBranch = output<void>();
 
   readonly themeService = inject(ThemeService);
   private readonly flowService = inject(FlowService);

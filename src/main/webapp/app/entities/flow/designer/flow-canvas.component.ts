@@ -3,14 +3,13 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
-  EventEmitter,
   Input,
-  Output,
   QueryList,
   TemplateRef,
   ViewChild,
   ViewChildren,
   inject,
+  output,
 } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -73,19 +72,19 @@ export class FlowCanvasComponent {
   /** What each Step did in the last test run, by Step key, shown as a badge with its time. */
   @Input() runResults?: ReadonlyMap<string, StepRunMark>;
 
-  @Output() selectionChange = new EventEmitter<DesignerSelection>();
+  readonly selectionChange = output<DesignerSelection>();
   /** A Step was double-clicked, to show or hide its editor. */
-  @Output() openStep = new EventEmitter<string>();
-  @Output() insertStep = new EventEmitter<{ linkTo: string; kind: 'ACTION' | 'ROUTER'; componentType: string }>();
-  @Output() appendStep = new EventEmitter<{ after: string; kind: PickedKind; componentType: string }>();
-  @Output() addBranch = new EventEmitter<string>();
-  @Output() moveSteps = new EventEmitter<StepMove[]>();
+  readonly openStep = output<string>();
+  readonly insertStep = output<{ linkTo: string; kind: 'ACTION' | 'ROUTER'; componentType: string }>();
+  readonly appendStep = output<{ after: string; kind: PickedKind; componentType: string }>();
+  readonly addBranch = output<string>();
+  readonly moveSteps = output<StepMove[]>();
   /** The × on a Step was clicked. */
-  @Output() deleteStep = new EventEmitter<string>();
+  readonly deleteStep = output<string>();
   /** A Step got a new name; an empty one takes its name away. */
-  @Output() renameStep = new EventEmitter<{ key: string; name: string }>();
+  readonly renameStep = output<{ key: string; name: string }>();
   /** Auto-arrange on the minimap was clicked, to lay the Flow out from left to right. */
-  @Output() autoArrange = new EventEmitter<void>();
+  readonly autoArrange = output<void>();
 
   @ViewChild(FFlowComponent) private flow?: FFlowComponent;
   @ViewChild(FCanvasComponent) canvas?: FCanvasComponent;

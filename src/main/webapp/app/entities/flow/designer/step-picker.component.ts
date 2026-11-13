@@ -3,14 +3,13 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
-  EventEmitter,
   Injector,
   Input,
   OnChanges,
-  Output,
   ViewChild,
   afterNextRender,
   inject,
+  output,
 } from '@angular/core';
 import { LowerCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -80,7 +79,7 @@ export class StepPickerComponent implements OnChanges {
   /** Where this + adds a Step, such as `after:<step key>` or `link:<key of the Step the Link leads to>`. */
   @Input() target?: string;
 
-  @Output() picked = new EventEmitter<{ kind: PickedKind; componentType: string }>();
+  readonly picked = output<{ kind: PickedKind; componentType: string }>();
 
   @ViewChild('search') search?: ElementRef<HTMLInputElement>;
   @ViewChild('toggle') toggle?: ElementRef<HTMLButtonElement>;

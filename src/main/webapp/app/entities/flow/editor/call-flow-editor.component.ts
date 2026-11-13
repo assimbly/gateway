@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { Component, Input, OnChanges, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
@@ -31,8 +31,8 @@ export class CallFlowEditorComponent implements OnChanges {
   @Input() problem?: string;
   @Input() deletable = false;
 
-  @Output() optionsChange = new EventEmitter<string>();
-  @Output() remove = new EventEmitter<void>();
+  readonly optionsChange = output<string>();
+  readonly remove = output<void>();
 
   targetFlowId = '';
   transport = 'sync';
