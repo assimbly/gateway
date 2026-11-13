@@ -1,11 +1,11 @@
 <td class="table-fx-identity">
     <a [routerLink]="['/broker/browser/message-browser']"
-       [queryParams]="{ endpointName: address.name, endpointType: endpointType, brokerType: brokerType }">
-        <jhi-truncate [text]="address.name" />
+       [queryParams]="{ endpointName: address().name, endpointType: endpointType(), brokerType: brokerType() }">
+        <jhi-truncate [text]="address().name" />
     </a>
 </td>
-<td class="text-end table-fx-numeric">{{ address.numberOfConsumers }}</td>
-<td class="text-end table-fx-numeric">{{ address.numberOfMessages }}</td>
+<td class="text-end table-fx-numeric">{{ address().numberOfConsumers }}</td>
+<td class="text-end table-fx-numeric">{{ address().numberOfMessages }}</td>
 <td class="text-end">
     <jhi-row-actions>
         <button
@@ -13,7 +13,7 @@
             type="button"
             ngbDropdownItem
             class="btn-fx-dropdown-item"
-            (click)="navigateToMessageBrowser(address.name!)"
+            (click)="navigateToMessageBrowser(address().name!)"
         >
             <fa-icon icon="eye"></fa-icon>
             <span>Browse</span>
@@ -23,7 +23,7 @@
             jhiPrimaryAction
             type="button"
             class="btn btn-fx btn-fx-sm btn-fx-ghost"
-            (click)="navigateToMessageSender(address.name!)"
+            (click)="navigateToMessageSender(address().name!)"
             aria-label="Send"
         >
             <fa-icon icon="envelope"></fa-icon>
@@ -35,7 +35,7 @@
             type="button"
             ngbDropdownItem
             class="btn-fx-dropdown-item btn-fx-dropdown-warning"
-            (click)="clear(address)"
+            (click)="clear(address())"
         >
             <fa-icon icon="trash"></fa-icon>
             <span>{{ clearLabel }}</span>
@@ -45,7 +45,7 @@
             type="button"
             ngbDropdownItem
             class="btn-fx-dropdown-item btn-fx-dropdown-danger"
-            (click)="delete(address)"
+            (click)="delete(address())"
         >
             <fa-icon icon="times"></fa-icon>
             <span>Delete</span>

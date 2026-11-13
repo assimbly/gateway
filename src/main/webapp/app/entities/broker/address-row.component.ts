@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { Address, IAddress } from 'app/shared/model/address.model';
@@ -20,19 +20,19 @@ export class AddressRowComponent {
   private router = inject(Router);
   private eventManager = inject(EventManager);
 
-  @Input() address!: Address;
-  @Input() brokerType!: string;
-  @Input() endpointType: 'queue' | 'topic' = 'queue';
+  readonly address = input.required<Address>();
+  readonly brokerType = input.required<string>();
+  readonly endpointType = input<'queue' | 'topic'>('queue');
 
   get clearLabel(): string {
-    return this.endpointType === 'topic' && this.brokerType === 'classic' ? 'Reset' : 'Clear';
+    return this.endpointType() === 'topic' && this.brokerType() === 'classic' ? 'Reset' : 'Clear';
   }
 
   delete(address: IAddress): void {
-    const dialog = this.endpointType === 'queue' ? QueueDeleteDialogComponent : TopicDeleteDialogComponent;
+    const dialog = this.endpointType() === 'queue' ? QueueDeleteDialogComponent : TopicDeleteDialogComponent;
     const modalRef = this.modalService.open(dialog);
     modalRef.componentInstance.address = address;
-    modalRef.componentInstance.brokerType = this.brokerType;
+    modalRef.componentInstance.brokerType = this.brokerType();
     modalRef.result.then(
       () => this.broadcastDeleted(),
       reason => {
@@ -44,26 +44,26 @@ export class AddressRowComponent {
   }
 
   clear(address: IAddress): void {
-    const dialog = this.endpointType === 'queue' ? QueueClearDialogComponent : TopicClearDialogComponent;
+    const dialog = this.endpointType() === 'queue' ? QueueClearDialogComponent : TopicClearDialogComponent;
     const modalRef = this.modalService.open(dialog);
     modalRef.componentInstance.address = address;
-    modalRef.componentInstance.brokerType = this.brokerType;
+    modalRef.componentInstance.brokerType = this.brokerType();
   }
 
   navigateToMessageSender(addressName: string) {
     this.router.navigate(['../broker/sender/message-sender'], {
-      queryParams: { endpointName: addressName, endpointType: this.endpointType, brokerType: this.brokerType },
+      queryParams: { endpointName: addressName, endpointType: this.endpointType(), brokerType: this.brokerType() },
     });
   }
 
   navigateToMessageBrowser(addressName: string) {
     this.router.navigate(['../broker/browser/message-browser'], {
-      queryParams: { endpointName: addressName, endpointType: this.endpointType, brokerType: this.brokerType },
+      queryParams: { endpointName: addressName, endpointType: this.endpointType(), brokerType: this.brokerType() },
     });
   }
 
   private broadcastDeleted(): void {
-    const eventName = this.endpointType === 'queue' ? 'queueDeleted' : 'topicDeleted';
-    this.eventManager.broadcast(new EventWithContent(eventName, this.address));
+    const eventName = this.endpointType() === 'queue' ? 'queueDeleted' : 'topicDeleted';
+    this.eventManager.broadcast(new EventWithContent(eventName, this.address()));
   }
 }
