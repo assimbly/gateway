@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input, OnChanges, SimpleChanges, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, OnChanges, SimpleChanges, inject, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
@@ -29,7 +29,7 @@ export class HeaderComponent implements OnInit, OnChanges {
     protected accountService = inject(AccountService);
 
     @Input() headers: IHeader[];
-    @Input() messageId: number;
+    readonly messageId = input<number>();
 
     headersArray: Array<string> = [];
     headerSelected: boolean;
@@ -93,7 +93,7 @@ export class HeaderComponent implements OnInit, OnChanges {
         if (header.id) {
             this.subscribeToSaveResponse(this.headerService.update(header), false, i);
         } else {
-            header.messageId = this.messageId;
+            header.messageId = this.messageId();
             this.subscribeToSaveResponse(this.headerService.create(header), true, i);
         }
     }
