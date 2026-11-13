@@ -1,4 +1,4 @@
-import { Directive, Input } from '@angular/core';
+import { Directive, input } from '@angular/core';
 import { NG_VALIDATORS, Validator, AbstractControl } from '@angular/forms';
 
 @Directive({
@@ -7,9 +7,9 @@ import { NG_VALIDATORS, Validator, AbstractControl } from '@angular/forms';
 })
 export class ForbiddenRouteNamesValidatorDirective implements Validator {
     // tslint:disable-next-line:no-input-rename
-    @Input('jhiExistingRouteNames') existingNames!: Array<string>;
+    readonly existingNames = input.required<Array<string>>({ alias: 'jhiExistingRouteNames' });
 
     validate(control: AbstractControl): { [key: string]: any } | null {
-        return this.existingNames.some(k => k === control.value) ? { existingRouteName: true } : null;
+        return this.existingNames().some(k => k === control.value) ? { existingRouteName: true } : null;
     }
 }
