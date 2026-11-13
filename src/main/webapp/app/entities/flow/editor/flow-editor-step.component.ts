@@ -1,6 +1,8 @@
 import { afterNextRender, ChangeDetectorRef, Component, ElementRef, EventEmitter, inject, Injectable, Injector, Input, OnChanges, OnDestroy, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+
+import { optionForm } from './step-form';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -863,7 +865,7 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   }
 
   addOption(): void {
-    (this.stepForm.get('options') as FormArray).push(this.initializeOption());
+    (this.stepForm.get('options') as FormArray).push(optionForm());
     this.stepOptions.push({ key: undefined, value: undefined });
   }
 
@@ -934,14 +936,6 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
 
   refreshView(): void {
     this.cdr.detectChanges();
-  }
-
-  private initializeOption(): FormGroup {
-    return new FormGroup({
-      key: new FormControl(null),
-      value: new FormControl(null),
-      defaultValue: new FormControl(''),
-    });
   }
 }
 

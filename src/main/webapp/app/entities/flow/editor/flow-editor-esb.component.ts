@@ -49,6 +49,7 @@ import { CamelRouteDrawerComponent } from "../camel-route-drawer.component";
 import { FlowTestRun, StepRun, StepRunMark, graphShape, runResultsByStepKey, shortDuration, stepRunsById } from "../test/flow-test-run";
 import { automaticErrorHandlerPath, defaultErrorHandlerStep, errorHandlerPath, errorHandlerPathOnSave } from "./error-handler";
 import { chainLinks } from "./step-links";
+import { Option, newStepFor, optionForm, parseOptions, stepForm } from "./step-form";
 import { isRouteConfiguration, isRouteStep, missingRouteFields, nextRouteName, routeToSave } from "./route-step";
 import { CdkDrag, CdkDragPlaceholder, CdkDropList, moveItemInArray } from "@angular/cdk/drag-drop";
 import {
@@ -557,7 +558,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
         this.steps.push(step);
 
-        const formgroup = this.initializeStepData(step);
+        const formgroup = stepForm(step, this.routeOf(step.routeId));
 
         (<FormArray>this.editFlowForm.controls.stepsData).insert(index, formgroup);
 
@@ -644,7 +645,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
 		(<FormArray>this.editFlowForm.controls.stepsData).insert(
 			index,
-			this.initializeStepData(newStep!),
+			stepForm(newStep!, this.routeOf(newStep!.routeId)),
 		);
 
     // Pass component type as change event so options load for the default component
@@ -679,7 +680,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     const pairs = options.split('&').map(pair => pair.split('='));
     const formOptions = <FormArray>this.stepFormAt(index).controls.options;
     while (formOptions.length < pairs.length) {
-      formOptions.push(this.initializeOption());
+      formOptions.push(optionForm());
     }
     // The Step editor holds this array, so it is refilled rather than replaced.
     const stepOptions = this.stepsOptions[index];
@@ -999,30 +1000,6 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 		return (this.editFlowForm.get('stepsData') as FormArray).at(index) as FormGroup;
 	}
 
-	initializeStepData(step: Step): FormGroup {
-		return new FormGroup({
-			id: new FormControl(step.id),
-      componentType: new FormControl(step.componentType),
-			stepType: new FormControl(step.stepType),
-      uri: new FormControl(step.uri),
-      options: new FormArray([this.initializeOption()]),
-      message: new FormControl(step.messageId),
-			route: new FormControl(step.routeId),
-			routeName: new FormControl(this.routeOf(step.routeId)?.name ?? ''),
-			routeContent: new FormControl(this.routeOf(step.routeId)?.content ?? ''),
-			connection: new FormControl(step.connectionId),
-			links: new FormControl(step.links),
-		});
-	}
-
-  initializeOption(): FormGroup {
-    return new FormGroup({
-      key: new FormControl(null),
-      value: new FormControl(null),
-      defaultValue: new FormControl(''),
-    });
-  }
-
   initializeTestConnectionForm(): void {
     this.testConnectionForm = new FormGroup({
       connectionHost: new FormControl(null, Validators.required),
@@ -1099,44 +1076,29 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
     }
 
-		this.steps.splice(newIndex, 0, new Step());
+		const newStep = newStepFor(this.activeEditor, stepType);
+		this.steps.splice(newIndex, 0, newStep);
     this.stepsOptions.splice(newIndex, 0, [new Option()]);
     this.componentOptions.splice(newIndex, 0, []);
 
 		this.numberOfSteps = this.numberOfSteps + 1;
 
-		const newStep = this.steps.find((e, i) => i === newIndex);
-
-    if(this.activeEditor === 'flow'){
-      newStep!.stepType = StepType.ACTION;
-      newStep!.componentType = 'log';
-    }else if(this.activeEditor === 'script' && stepType === StepType.SINK){
-      newStep!.stepType = StepType.SINK;
-      newStep!.componentType = DEFAULT_RESULT_LOG.componentType;
-    }else if(this.activeEditor === 'script'){
-      newStep!.stepType = StepType.SCRIPT;
-      newStep!.componentType = DEFAULT_SCRIPT_LANGUAGE;
-    }else if(this.activeEditor === 'route'){
-      newStep!.stepType = StepType.ROUTE;
-      newStep!.componentType = '';
-    }
-
 		// Named before it joins the form, so it takes the first name the other Routes don't use.
-		const routeName = newStep!.stepType === StepType.ROUTE ? nextRouteName(this.typedRouteNames()) : '';
+		const routeName = newStep.stepType === StepType.ROUTE ? nextRouteName(this.typedRouteNames()) : '';
 
 		(<FormArray>this.editFlowForm.controls.stepsData).insert(
 			newIndex,
-			this.initializeStepData(newStep!),
+			stepForm(newStep, this.routeOf(newStep.routeId)),
 		);
 		if (routeName) {
 			this.stepFormAt(newIndex).patchValue({ routeName });
 		}
 
     // Pass component type as change event so options load for the default component (e.g. log)
-    this.setTypeLinks(newStep, newIndex, newStep!.componentType as any);
+    this.setTypeLinks(newStep, newIndex, newStep.componentType as any);
 
-    if (newStep!.stepType === StepType.SCRIPT) {
-      this.stepFormAt(newIndex).patchValue({ uri: starterScript(newStep!.componentType) });
+    if (newStep.stepType === StepType.SCRIPT) {
+      this.stepFormAt(newIndex).patchValue({ uri: starterScript(newStep.componentType) });
     }
 
     this.enableConnection[newIndex] = false;
@@ -1146,8 +1108,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     optionArray.splice(0, 0, '');
     this.selectedOptions.splice(newIndex, 0, optionArray);
 
-    if (newStep!.stepType === StepType.SINK && this.activeEditor === 'script') {
-      newStep!.uri = '';
+    if (newStep.stepType === StepType.SINK && this.activeEditor === 'script') {
+      newStep.uri = '';
       this.fillOptions(newIndex, DEFAULT_RESULT_LOG.options);
     }
 
@@ -1481,30 +1443,10 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
       this.setComponentOptions(step, camelComponentType, index).subscribe(data => {
 
-          let options: Array<string> = [];
-
-          if(step.options!.includes('&')){
-            // note this splits the options with a regex, because some options have & in them.
-            // implement options (key-values) into a separate table to avoid this.
-             const regex = /&(?=[^=&]+=)/;
-             options = step.options!.split(regex);
-          }else{
-            options.push(step.options!);
-          }
-
-          options.forEach((option, optionIndex) => {
-            const o = new Option();
+          parseOptions(step.options!).forEach((o, optionIndex) => {
 
             if (typeof stepForm.controls.options.controls[optionIndex] === 'undefined') {
-              stepForm.controls.options.push(this.initializeOption());
-            }
-
-            if (option.includes('=')) {
-              o.key = option.split('=')[0];
-              o.value = option.split('=').slice(1).join('=');
-            } else {
-              o.key = null!;
-              o.value = null!;
+              stepForm.controls.options.push(optionForm());
             }
 
             optionArray.splice(optionIndex, 0, o.key!);
@@ -1549,112 +1491,6 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
     this.selectedOptions.splice(index, 0, optionArray);
   }
-
-//chatgpt
-splitOptions0(query: string): string[] {
-    const result: string[] = [];
-    let current = "";
-    let insideValue = false;
-
-    for (let i = 0; i < query.length; i++) {
-        if (query[i] === '&' && !insideValue) {
-            result.push(current);
-            current = "";
-        } else {
-            current += query[i];
-            if (query[i] === '=' && (i === 0 || query[i - 1] !== '&')) {
-                insideValue = true;
-            } else if (query[i] === '&') {
-                insideValue = false;
-            }
-        }
-    }
-    if (current) result.push(current);
-
-    return result;
-}
-
-//chatgpt
-splitOptions1(str: string) {
-    const regex = /([^=&]+)=([^&]*)/g;
-    const result: any = [];
-    let match;
-
-    while ((match = regex.exec(str)) !== null) {
-        const key = match[1];
-        const value = match[2];
-
-        // If the key already exists, append the value with '&'
-        result[key] = result[key] ? result[key] + "&" + value : value;
-    }
-
-    return result;
-}
-
-//claude
-splitOptions2(queryStr: string) {
-  const result = [];
-  // Regex to match potential parameter starts
-  const regex = /([^&=]+)=|^=/g;
-  let lastIndex = 0;
-  let match;
-
-  while ((match = regex.exec(queryStr)) !== null) {
-    // If this isn't the first parameter, add the previous one to the result
-    if (lastIndex > 0) {
-      result.push(queryStr.substring(lastIndex, match.index));
-    }
-    lastIndex = match.index;
-  }
-
-  // Add the last parameter
-  if (lastIndex < queryStr.length) {
-    result.push(queryStr.substring(lastIndex));
-  }
-
-  return result;
-}
-
-//gemini
-splitOptions3(optionsString: string): string[] {
-  // Handle empty or null input string gracefully
-  if (!optionsString) {
-    return [];
-  }
-
-  const regex = /&(?=[^=&]+=)/;
-
-  return optionsString.split(regex);
-}
-
-//deepseek
-splitOptions4(options: string): string[] {
-    const segments = options.split('&');
-    const result: string[] = [];
-    let currentSegment: string | null = null;
-
-    for (const segment of segments) {
-        const equalsIndex = segment.indexOf('=');
-        if (equalsIndex > 0) { // Check if the segment has a non-empty key
-            if (currentSegment !== null) {
-                result.push(currentSegment);
-            }
-            currentSegment = segment;
-        } else if (currentSegment === null) {
-          currentSegment = segment;
-        } else {
-          currentSegment += '&' + segment;
-        }
-
-    }
-
-    if (currentSegment !== null) {
-        result.push(currentSegment);
-    }
-
-    return result;
-}
-
 
   setOptions(): void {
     this.steps.forEach((step, i) => {
@@ -2421,7 +2257,7 @@ splitOptions4(options: string): string[] {
 			this.stepsOptions.push([]);
 		}
 		this.steps.push(step);
-		(<FormArray>this.editFlowForm.controls.stepsData).insert(index, this.initializeStepData(step));
+		(<FormArray>this.editFlowForm.controls.stepsData).insert(index, stepForm(step, this.routeOf(step.routeId)));
 		this.setTypeLinks(step, index);
 		this.getOptions(step, this.editFlowForm.controls.stepsData.get(index.toString()), this.stepsOptions[index], index);
 		this.enableConnection[index] = this.showsConnection(step);
@@ -3288,6 +3124,3 @@ function hasModes(editor: string | undefined): boolean {
 /** The height in pixels the designer never shrinks below, however small the window. */
 const DESIGNER_MIN_HEIGHT = 400;
 
-export class Option {
-  constructor(public key?: string, public value?: string) {}
-}

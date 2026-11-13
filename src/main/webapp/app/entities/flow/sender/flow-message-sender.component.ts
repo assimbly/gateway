@@ -1,6 +1,8 @@
 import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, TemplateRef, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+
+import { optionForm } from '../editor/step-form';
 import { ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Observable, defer, forkJoin, from, of } from 'rxjs';
@@ -192,17 +194,9 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
         this.messageSenderForm = new FormGroup({
             componentType: new FormControl('file', Validators.required),
             uri: new FormControl<string | null>(null, Validators.required),
-            options: new FormArray([this.initializeOption()]),
+            options: new FormArray([optionForm()]),
             connection: new FormControl('', Validators.required),
             exchangepattern: new FormControl('RequestAndReply'),
-        });
-    }
-
-    private initializeOption(key: string | null = null, value: string | null = null): FormGroup {
-        return new FormGroup({
-            key: new FormControl(key),
-            value: new FormControl(value),
-            defaultValue: new FormControl(''),
         });
     }
 
@@ -358,7 +352,7 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     // options of the endpoint
 
     addOption() {
-        this.options.push(this.initializeOption());
+        this.options.push(optionForm());
     }
 
     removeOption(index: number) {
@@ -376,10 +370,10 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
             .filter(option => option.includes('='))
             .forEach(option => {
                 const [key, ...value] = option.split('=');
-                this.options.push(this.initializeOption(key, value.join('=')));
+                this.options.push(optionForm(key, value.join('=')));
             });
         if (this.options.length === 0) {
-            this.options.push(this.initializeOption());
+            this.options.push(optionForm());
         }
         this.ensureOptionItems();
     }
