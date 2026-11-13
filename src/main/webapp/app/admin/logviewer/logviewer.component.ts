@@ -35,8 +35,7 @@ export default class LogViewerComponent implements OnInit {
   private readonly sanitizer = inject(DomSanitizer);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-
-  constructor(private logViewerService: LogViewerService) {}
+  private readonly logViewerService = inject(LogViewerService);
 
   ngOnInit() {
     this.lines = 250;

@@ -56,7 +56,9 @@ export default class Main implements OnInit {
   private readonly theme = inject(ThemeService);
   private readonly translateService = inject(TranslateService);
 
-  constructor(rootRenderer: RendererFactory2) {
+  constructor() {
+    const rootRenderer = inject(RendererFactory2);
+
     this.renderer = rootRenderer.createRenderer(document.querySelector('html'), null);
 
     effect(() => {
