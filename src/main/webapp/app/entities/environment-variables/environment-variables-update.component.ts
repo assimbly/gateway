@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
@@ -19,7 +18,7 @@ import { forbiddenEnvironmentKeysValidator } from './environment-variables-valid
 @Component({
     selector: 'jhi-environment-variables-update',
     templateUrl: './environment-variables-update.component.html',
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, FontAwesomeModule, AlertError, SaveShortcutDirective],
+    imports: [FormsModule, ReactiveFormsModule, FontAwesomeModule, AlertError, SaveShortcutDirective],
 })
 export class EnvironmentVariablesUpdateComponent implements OnInit {
     environmentVariables: IEnvironmentVariables = new EnvironmentVariables();

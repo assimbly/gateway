@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
@@ -17,7 +16,7 @@ import { Router } from '@angular/router';
 @Component({
     selector: 'jhi-integration-update',
     templateUrl: './integration-update.component.html',
-    imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, PopoverModule, SaveShortcutDirective],
+    imports: [FormsModule, FontAwesomeModule, AlertError, PopoverModule, SaveShortcutDirective],
 })
 export class IntegrationUpdateComponent implements OnInit {
     integration!: IIntegration;

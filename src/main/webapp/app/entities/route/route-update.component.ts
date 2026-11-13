@@ -1,5 +1,4 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpResponse } from '@angular/common/http';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -19,7 +18,7 @@ import { ThemeService } from 'app/core/theme';
 @Component({
     selector: 'jhi-route-update',
     templateUrl: './route-update.component.html',
-    imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, CodemirrorModule, SaveShortcutDirective],
+    imports: [ReactiveFormsModule, FontAwesomeModule, CodemirrorModule, SaveShortcutDirective],
 })
 export class RouteUpdateComponent implements OnInit {
     isSaving = false;

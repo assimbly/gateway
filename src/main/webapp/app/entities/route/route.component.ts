@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
@@ -16,7 +15,7 @@ import { RouteDeleteDialogComponent } from './route-delete-dialog.component';
 @Component({
   selector: 'jhi-route',
   templateUrl: './route.component.html',
-  imports: [CommonModule, RouterModule, FontAwesomeModule, AlertError],
+  imports: [RouterModule, FontAwesomeModule, AlertError],
 })
 export class RouteComponent implements OnInit, OnDestroy {
     routes?: IRoute[];
@@ -44,10 +43,6 @@ export class RouteComponent implements OnInit, OnDestroy {
         }
     }
 
-    trackId(index: number, item: IRoute): number {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-        return item.id!;
-    }
 
     byteSize(base64String: string): string {
         return this.dataUtils.byteSize(base64String);

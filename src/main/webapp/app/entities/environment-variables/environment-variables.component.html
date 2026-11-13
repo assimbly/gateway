@@ -4,116 +4,118 @@
       [heading]="isAdmin ? 'Add your first Variable' : 'No Variables yet'"
       description="A Variable is a named value, such as a host name or a folder. A Flow refers to it as @{key} in a Path or Option, or with the @{} button next to those fields. It keeps the settings that differ per environment out of your Flows."
       [docs]="true"
-    >
+      >
       <a
         primary
         *jhiHasAnyAuthority="'ROLE_ADMIN'"
         id="jh-create-entity"
         class="btn btn-fx btn-fx-primary jh-create-entity create-environment-variables"
         [routerLink]="['/environment-variables/new']"
-      >
+        >
         <fa-icon icon="plus"></fa-icon>
         <span> Add</span>
       </a>
     </jhi-empty-state>
   } @else {
-  <jhi-search-toolbar
-    [(query)]="searchText"
-    placeholder="Filter by key or value"
-    persistKey="searchVariablesText"
-    inputId="searchVariablesId"
-    hint="A Variable is a named value, such as a host name or a folder. A Flow refers to it as @{key} in a Path or Option."
-  >
-    <ng-container actions>
-      <a
-        *jhiHasAnyAuthority="'ROLE_ADMIN'"
-        id="jh-create-entity"
-        class="btn btn-fx btn-fx-primary jh-create-entity create-environment-variables"
-        [routerLink]="['/environment-variables/new']"
-        aria-label="Add variable"
+    <jhi-search-toolbar
+      [(query)]="searchText"
+      placeholder="Filter by key or value"
+      persistKey="searchVariablesText"
+      inputId="searchVariablesId"
+      hint="A Variable is a named value, such as a host name or a folder. A Flow refers to it as @{key} in a Path or Option."
       >
-        <fa-icon icon="plus"></fa-icon>
-        <span class="d-none d-md-inline"> Add</span>
-      </a>
-      <button class="btn btn-fx btn-fx-secondary" type="button" (click)="reset()" aria-label="Refresh">
-        <fa-icon icon="sync"></fa-icon>
-        <span class="d-none d-md-inline"> Refresh</span>
-      </button>
-    </ng-container>
-  </jhi-search-toolbar>
+      <ng-container actions>
+        <a
+          *jhiHasAnyAuthority="'ROLE_ADMIN'"
+          id="jh-create-entity"
+          class="btn btn-fx btn-fx-primary jh-create-entity create-environment-variables"
+          [routerLink]="['/environment-variables/new']"
+          aria-label="Add variable"
+          >
+          <fa-icon icon="plus"></fa-icon>
+          <span class="d-none d-md-inline"> Add</span>
+        </a>
+        <button class="btn btn-fx btn-fx-secondary" type="button" (click)="reset()" aria-label="Refresh">
+          <fa-icon icon="sync"></fa-icon>
+          <span class="d-none d-md-inline"> Refresh</span>
+        </button>
+      </ng-container>
+    </jhi-search-toolbar>
 
-  <jhi-data-table
-    [columns]="columns"
-    [(sortState)]="sortState"
-    (sortChange)="onSortChange()"
-    [hasRows]="!!filteredVariables.length"
-    [loading]="loading"
-    [emptyMessage]="'No variables match this filter.'"
-    ariaLabel="Variables"
-  >
-    <tr *ngFor="let environmentVariables of filteredVariables; trackBy: trackId">
-      <td class="table-fx-identity">
-        @if (isAdmin) {
-          <a [routerLink]="['/environment-variables', environmentVariables.id, 'edit']">
-            <jhi-truncate [text]="environmentVariables.key" />
-          </a>
-        } @else {
-          <jhi-truncate [text]="environmentVariables.key" />
-        }
-      </td>
-      <td class="table-fx-identity">
-        @if (environmentVariables.value) {
-          <jhi-truncate [text]="environmentVariables.value" />
-        } @else {
-          <span class="text-muted">—</span>
-        }
-      </td>
-      <td>
-        <span class="d-inline-flex align-items-center gap-1">
-          <code>{{ reference(environmentVariables.key) }}</code>
-          <button type="button" class="btn btn-fx btn-fx-sm btn-fx-ghost btn-fx-icon" (click)="copyReference(environmentVariables.key)"
-                  [title]="copiedKey === environmentVariables.key ? 'Copied' : 'Copy ' + reference(environmentVariables.key)"
-                  [attr.aria-label]="'Copy ' + reference(environmentVariables.key)">
-            <fa-icon [icon]="copiedKey === environmentVariables.key ? 'check' : 'copy'"></fa-icon>
-          </button>
-        </span>
-      </td>
-      <td class="text-end">
-        <jhi-row-actions *jhiHasAnyAuthority="'ROLE_ADMIN'">
-          <a
-            jhiPrimaryAction
-            class="btn btn-fx btn-fx-sm btn-fx-ghost"
-            [routerLink]="['/environment-variables', environmentVariables.id, 'edit']"
-            aria-label="Edit"
-          >
-            <fa-icon icon="pencil-alt"></fa-icon>
-            <span class="d-none d-md-inline">Edit</span>
-          </a>
-          <button
-            jhiOverflowAction
-            type="button"
-            ngbDropdownItem
-            class="btn-fx-dropdown-item"
-            [routerLink]="['/environment-variables', environmentVariables.id, 'edit']"
-            fragment="clone"
-            queryParamsHandling="merge"
-          >
-            <fa-icon icon="clone"></fa-icon>
-            <span>Clone</span>
-          </button>
-          <button
-            jhiOverflowAction
-            type="button"
-            ngbDropdownItem
-            class="btn-fx-dropdown-item btn-fx-dropdown-danger"
-            (click)="delete(environmentVariables)"
-          >
-            <fa-icon icon="trash"></fa-icon>
-            <span>Delete</span>
-          </button>
-        </jhi-row-actions>
-      </td>
-    </tr>
-  </jhi-data-table>
+    <jhi-data-table
+      [columns]="columns"
+      [(sortState)]="sortState"
+      (sortChange)="onSortChange()"
+      [hasRows]="!!filteredVariables.length"
+      [loading]="loading"
+      [emptyMessage]="'No variables match this filter.'"
+      ariaLabel="Variables"
+      >
+      @for (environmentVariables of filteredVariables; track environmentVariables.id) {
+        <tr>
+          <td class="table-fx-identity">
+            @if (isAdmin) {
+              <a [routerLink]="['/environment-variables', environmentVariables.id, 'edit']">
+                <jhi-truncate [text]="environmentVariables.key" />
+              </a>
+            } @else {
+              <jhi-truncate [text]="environmentVariables.key" />
+            }
+          </td>
+          <td class="table-fx-identity">
+            @if (environmentVariables.value) {
+              <jhi-truncate [text]="environmentVariables.value" />
+            } @else {
+              <span class="text-muted">—</span>
+            }
+          </td>
+          <td>
+            <span class="d-inline-flex align-items-center gap-1">
+              <code>{{ reference(environmentVariables.key) }}</code>
+              <button type="button" class="btn btn-fx btn-fx-sm btn-fx-ghost btn-fx-icon" (click)="copyReference(environmentVariables.key)"
+                [title]="copiedKey === environmentVariables.key ? 'Copied' : 'Copy ' + reference(environmentVariables.key)"
+                [attr.aria-label]="'Copy ' + reference(environmentVariables.key)">
+                <fa-icon [icon]="copiedKey === environmentVariables.key ? 'check' : 'copy'"></fa-icon>
+              </button>
+            </span>
+          </td>
+          <td class="text-end">
+            <jhi-row-actions *jhiHasAnyAuthority="'ROLE_ADMIN'">
+              <a
+                jhiPrimaryAction
+                class="btn btn-fx btn-fx-sm btn-fx-ghost"
+                [routerLink]="['/environment-variables', environmentVariables.id, 'edit']"
+                aria-label="Edit"
+                >
+                <fa-icon icon="pencil-alt"></fa-icon>
+                <span class="d-none d-md-inline">Edit</span>
+              </a>
+              <button
+                jhiOverflowAction
+                type="button"
+                ngbDropdownItem
+                class="btn-fx-dropdown-item"
+                [routerLink]="['/environment-variables', environmentVariables.id, 'edit']"
+                fragment="clone"
+                queryParamsHandling="merge"
+                >
+                <fa-icon icon="clone"></fa-icon>
+                <span>Clone</span>
+              </button>
+              <button
+                jhiOverflowAction
+                type="button"
+                ngbDropdownItem
+                class="btn-fx-dropdown-item btn-fx-dropdown-danger"
+                (click)="delete(environmentVariables)"
+                >
+                <fa-icon icon="trash"></fa-icon>
+                <span>Delete</span>
+              </button>
+            </jhi-row-actions>
+          </td>
+        </tr>
+      }
+    </jhi-data-table>
   }
 </div>

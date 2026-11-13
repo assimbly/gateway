@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy, TemplateRef, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -24,19 +23,18 @@ import { FlowService } from '../flow/flow.service';
     selector: 'jhi-integration',
     templateUrl: './integration.component.html',
     imports: [
-        CommonModule,
-        RouterModule,
-        FontAwesomeModule,
-        NgbDropdownModule,
-        HasAnyAuthorityDirective,
-        EmptyState,
-        SearchToolbar,
-        DataTable,
-        RowActions,
-        PrimaryActionDirective,
-        OverflowActionDirective,
-        Truncate,
-    ],
+    RouterModule,
+    FontAwesomeModule,
+    NgbDropdownModule,
+    HasAnyAuthorityDirective,
+    EmptyState,
+    SearchToolbar,
+    DataTable,
+    RowActions,
+    PrimaryActionDirective,
+    OverflowActionDirective,
+    Truncate
+],
 })
 export class IntegrationComponent implements OnInit, OnDestroy {
     readonly integrations = signal<IIntegration[]>([]);
@@ -88,9 +86,6 @@ export class IntegrationComponent implements OnInit, OnDestroy {
         this.eventManager.destroy(this.eventSubscriber);
     }
 
-    trackId(index: number, item: IIntegration) {
-        return item.id;
-    }
 
     get isAdmin(): boolean {
         return this.accountService.hasAnyAuthority('ROLE_ADMIN');

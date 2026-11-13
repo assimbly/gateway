@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpResponse } from '@angular/common/http';
@@ -25,7 +24,7 @@ import 'codemirror/addon/edit/closetag';
 @Component({
     selector: 'jhi-route-dialog',
     templateUrl: './route-dialog.component.html',
-    imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, AlertError, CodemirrorModule, ForbiddenRouteNamesValidatorDirective, SaveShortcutDirective],
+    imports: [ReactiveFormsModule, FontAwesomeModule, AlertError, CodemirrorModule, ForbiddenRouteNamesValidatorDirective, SaveShortcutDirective],
 })
 export class RouteDialogComponent implements OnInit {
     readonly themeService = inject(ThemeService);

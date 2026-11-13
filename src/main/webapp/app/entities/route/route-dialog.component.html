@@ -1,43 +1,53 @@
 <div name="editForm" class="route-dialog">
-    <div class="modal-body">
-	<form (jhiSaveShortcut)="save(true)" [saveShortcutDisabled]="editForm.invalid || isSaving" role="form" [formGroup]="editForm" novalidate>
-        <jhi-alert-error></jhi-alert-error>
-        <div class="form-group" *ngIf="!show" [hidden]="!editForm.get('id')!.value">
-            <label for="id">ID</label>
-            <input type="text" class="form-control" id="id" name="id" formControlName="id" readonly />
+  <div class="modal-body">
+    <form (jhiSaveShortcut)="save(true)" [saveShortcutDisabled]="editForm.invalid || isSaving" role="form" [formGroup]="editForm" novalidate>
+      <jhi-alert-error></jhi-alert-error>
+      @if (!show) {
+        <div class="form-group" [hidden]="!editForm.get('id')!.value">
+          <label for="id">ID</label>
+          <input type="text" class="form-control" id="id" name="id" formControlName="id" readonly />
         </div>
-        <div class="form-group">
-            <label class="form-control-label" for="field_name">Name</label>
-            <input type="text" class="form-control" name="name" id="field_name" formControlName="name"
-                   required maxlength="255" [jhiExistingRouteNames]='routeNames'/>
-            <div *ngIf="editForm.controls.name.invalid && (editForm.controls.name.dirty || editForm.controls.name.touched)" class="invalid-field-message">
-                <span *ngIf="editForm.controls.name.errors?.required" >Name is required.</span>
-                <span *ngIf="editForm.controls.name.errors?.existingRouteName">Name already exists.</span>
+      }
+      <div class="form-group">
+        <label class="form-control-label" for="field_name">Name</label>
+        <input type="text" class="form-control" name="name" id="field_name" formControlName="name"
+          required maxlength="255" [jhiExistingRouteNames]='routeNames'/>
+          @if (editForm.controls.name.invalid && (editForm.controls.name.dirty || editForm.controls.name.touched)) {
+            <div class="invalid-field-message">
+              @if (editForm.controls.name.errors?.required) {
+                <span >Name is required.</span>
+              }
+              @if (editForm.controls.name.errors?.existingRouteName) {
+                <span>Name already exists.</span>
+              }
             </div>
+          }
         </div>
-        <div class="form-group" *ngIf="!show">
+        @if (!show) {
+          <div class="form-group">
             <label class="form-control-label" for="field_type">Type</label>
             <select type="text" class="form-control form-select" name="type" id="field_type" formControlName="type">
-                <option value="xml">xml</option>
+              <option value="xml">xml</option>
             </select>
+          </div>
+        }
+        <br/>
+        <div class="form-group route-field">
+          <label class="form-control-label" for="field_route">Route</label>
+          <ngx-codemirror #codeEditor
+            class="route-codemirror" name="content" id="field_content"
+            formControlName="content"
+            [options]="routeEditorOptions()"
+            (codeMirrorLoaded)="refreshCodeMirror($event)">
+          </ngx-codemirror>
         </div>
-		<br/>
-		<div class="form-group route-field">
-      <label class="form-control-label" for="field_route">Route</label>
-			<ngx-codemirror #codeEditor
-				class="route-codemirror" name="content" id="field_content"
-                    formControlName="content"
-   				  [options]="routeEditorOptions()"
-                  (codeMirrorLoaded)="refreshCodeMirror($event)">
-			</ngx-codemirror>
-        </div>
-		</form>
+      </form>
     </div>
-	<div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="clear()" data-bs-dismiss="modal">
-          <fa-icon icon="ban" style="color: white;"></fa-icon> <span>Cancel</span></button>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="clear()" data-bs-dismiss="modal">
+        <fa-icon icon="ban" style="color: white;"></fa-icon> <span>Cancel</span></button>
         <button type="button" (click)="save(true)"  id="save-entity" [disabled]="editForm.invalid || isSaving" class="btn btn-primary">
-            <fa-icon icon="save" style="color: white;"></fa-icon>&nbsp;<span>Save</span>
+          <fa-icon icon="save" style="color: white;"></fa-icon>&nbsp;<span>Save</span>
         </button>
+      </div>
     </div>
-</div>

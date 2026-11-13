@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
@@ -22,7 +21,7 @@ import { SaveShortcutDirective } from 'app/shared/keyboard';
 @Component({
     selector: 'jhi-environment-variables-dialog',
     templateUrl: './environment-variables-dialog.component.html',
-    imports: [CommonModule, ReactiveFormsModule, AlertError, SaveShortcutDirective],
+    imports: [ReactiveFormsModule, AlertError, SaveShortcutDirective],
 })
 export class EnvironmentVariablesDialogComponent implements OnInit {
     environmentVariables: IEnvironmentVariables = new EnvironmentVariables();

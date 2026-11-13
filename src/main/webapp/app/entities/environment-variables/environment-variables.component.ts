@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
@@ -24,19 +23,18 @@ import { VariableKeysService } from './variable-keys.service';
     selector: 'jhi-environment-variables',
     templateUrl: './environment-variables.component.html',
     imports: [
-        CommonModule,
-        RouterModule,
-        FontAwesomeModule,
-        NgbDropdownModule,
-        HasAnyAuthorityDirective,
-        EmptyState,
-        SearchToolbar,
-        DataTable,
-        RowActions,
-        PrimaryActionDirective,
-        OverflowActionDirective,
-        Truncate,
-    ],
+    RouterModule,
+    FontAwesomeModule,
+    NgbDropdownModule,
+    HasAnyAuthorityDirective,
+    EmptyState,
+    SearchToolbar,
+    DataTable,
+    RowActions,
+    PrimaryActionDirective,
+    OverflowActionDirective,
+    Truncate
+],
 })
 export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
     environmentVariables: IEnvironmentVariables[] = [];
@@ -162,9 +160,6 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
         return result;
     }
 
-    trackId(index: number, item: IEnvironmentVariables) {
-        return item.id;
-    }
 
     registerChangeInEnvironmentVariables() {
         this.eventSubscriber = this.eventManager.subscribe('environmentVariablesListModification', response => {

@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy, AfterContentInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
@@ -13,7 +12,7 @@ import { DeploymentService } from 'app/admin/deployment/deployment.service';
 @Component({
     selector: 'jhi-integration-export-dialog',
     templateUrl: './integration-export-dialog.component.html',
-    imports: [CommonModule, FormsModule, AlertError],
+    imports: [FormsModule, AlertError],
 })
 export class IntegrationExportDialogComponent implements AfterContentInit {
     integrationId: number;
