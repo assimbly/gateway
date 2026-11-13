@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 import { Message } from 'app/shared/model/message.model';
@@ -9,7 +9,7 @@ import { Message } from 'app/shared/model/message.model';
   imports: [RouterModule],
 })
 export class BrokerMessageBrowserRowComponent {
-  @Input() message!: Message;
+  readonly message = input.required<Message>();
 
   messageRowID!: string;
 }

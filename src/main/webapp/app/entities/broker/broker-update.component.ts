@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
@@ -22,9 +21,12 @@ import 'codemirror/addon/edit/closetag';
 @Component({
   selector: 'jhi-broker-update',
   templateUrl: './broker-update.component.html',
-  imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, NgbModule, CodemirrorModule, SaveShortcutDirective],
+  imports: [FormsModule, FontAwesomeModule, AlertError, NgbModule, CodemirrorModule, SaveShortcutDirective],
 })
 export class BrokerUpdateComponent implements OnInit {
+  protected brokerService = inject(BrokerService);
+  protected activatedRoute = inject(ActivatedRoute);
+
   @ViewChild('codeEditor') private codeEditor?: CodemirrorComponent;
   readonly themeService = inject(ThemeService);
 
@@ -40,11 +42,6 @@ export class BrokerUpdateComponent implements OnInit {
   typePopoverMessage!: string;
   configurationTypePopoverMessage!: string;
   brokerConfigurationPopoverMessage!: string;
-
-  constructor(
-    protected brokerService: BrokerService,
-    protected activatedRoute: ActivatedRoute,
-  ) {}
 
   ngOnInit() {
     this.isSaving = false;

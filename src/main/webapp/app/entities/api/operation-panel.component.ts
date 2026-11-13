@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnChanges, inject, output, input } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -39,16 +39,16 @@ type OperationTab = 'general' | 'parameters' | 'request' | 'responses' | 'try';
   imports: [NgTemplateOutlet, FormsModule, RouterModule, FontAwesomeModule, CodemirrorModule],
 })
 export class OperationPanelComponent implements OnChanges {
-  @Input({ required: true }) api!: IApi;
+  readonly api = input.required<IApi>();
   /** The Operation to edit; none for a new one. */
-  @Input() operation?: IApiOperation;
-  @Input() state?: HandlerFlowState;
+  readonly operation = input<IApiOperation>();
+  readonly state = input<HandlerFlowState>();
   /** The full URL the Operation is served on, once known; its path links to it. */
-  @Input() url?: string;
+  readonly url = input<string>();
 
-  @Output() saved = new EventEmitter<IApiOperation>();
-  @Output() deleted = new EventEmitter<void>();
-  @Output() closed = new EventEmitter<void>();
+  readonly saved = output<IApiOperation>();
+  readonly deleted = output<void>();
+  readonly closed = output<void>();
 
   private readonly apiService = inject(ApiService);
   private readonly themeService = inject(ThemeService);
@@ -91,16 +91,17 @@ export class OperationPanelComponent implements OnChanges {
   private optionsCache?: Record<string, unknown>;
 
   get isNew(): boolean {
-    return !this.operation?.id;
+    return !this.operation()?.id;
   }
 
   ngOnChanges(): void {
-    if (this.operation?.id === undefined || this.operation.id !== this.shownId) {
+    const operation = this.operation();
+    if (operation?.id === undefined || operation.id !== this.shownId) {
       this.activeTab = 'general';
     }
-    this.shownId = this.operation?.id;
-    this.draft = this.operation
-      ? structuredClone(this.operation)
+    this.shownId = operation?.id;
+    this.draft = operation
+      ? structuredClone(operation)
       : { method: 'GET', path: '/', parameters: [], declaredResponses: [], requestMediaType: DEFAULT_MEDIA_TYPE, responseMediaType: DEFAULT_MEDIA_TYPE };
     this.message = undefined;
     this.exampleFor = undefined;
@@ -177,7 +178,7 @@ export class OperationPanelComponent implements OnChanges {
   save(): void {
     this.saving = true;
     this.message = undefined;
-    const request = this.isNew ? this.apiService.createOperation(this.api.id!, this.draft) : this.apiService.updateOperation(this.api.id!, this.draft);
+    const request = this.isNew ? this.apiService.createOperation(this.api().id!, this.draft) : this.apiService.updateOperation(this.api().id!, this.draft);
     request.subscribe({
       next: saved => {
         this.saving = false;
@@ -193,11 +194,11 @@ export class OperationPanelComponent implements OnChanges {
   }
 
   delete(): void {
-    const operation = this.operation!;
+    const operation = this.operation()!;
     if (!window.confirm(`Delete ${operation.method} ${operation.fullPath}? Its Handler Flow ${operation.handlerFlowName} is deleted too.`)) {
       return;
     }
-    this.apiService.deleteOperation(this.api.id!, operation.id!).subscribe({
+    this.apiService.deleteOperation(this.api().id!, operation.id!).subscribe({
       next: () => this.deleted.emit(),
       error: error => {
         this.message = errorMessage(error);
@@ -210,11 +211,12 @@ export class OperationPanelComponent implements OnChanges {
 
   /** Whether the contract differs from the saved Operation, which is what Try it calls. */
   hasUnsavedChanges(): boolean {
-    return !!this.operation && JSON.stringify(this.draft) !== JSON.stringify(this.operation);
+    const operation = this.operation();
+    return !!operation && JSON.stringify(this.draft) !== JSON.stringify(operation);
   }
 
   parametersIn(where: IApiParameter['in']): IApiParameter[] {
-    return (this.operation?.parameters ?? []).filter(p => p.in === where);
+    return (this.operation()?.parameters ?? []).filter(p => p.in === where);
   }
 
   tryKey(parameter: IApiParameter): string {
@@ -222,14 +224,14 @@ export class OperationPanelComponent implements OnChanges {
   }
 
   sendTry(): void {
-    const operation = this.operation!;
+    const operation = this.operation()!;
     const values = (where: IApiParameter['in']): Record<string, string> =>
       Object.fromEntries(this.parametersIn(where).map(p => [p.name, this.tryValues[this.tryKey(p)] ?? '']));
     this.trying = true;
     this.tryResult = undefined;
     this.tryError = undefined;
     this.apiService
-      .tryOperation(this.api.id!, operation.id!, { pathParameters: values('path'), query: values('query'), headers: values('header'), body: this.tryBody || undefined })
+      .tryOperation(this.api().id!, operation.id!, { pathParameters: values('path'), query: values('query'), headers: values('header'), body: this.tryBody || undefined })
       .subscribe({
         next: result => {
           this.trying = false;

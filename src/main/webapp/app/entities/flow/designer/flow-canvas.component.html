@@ -5,7 +5,7 @@
   </f-background>
   <f-canvas fZoom [position]="canvasPosition">
     <ng-container ngProjectAs="[fConnections]">
-      @for (link of graph.links; track link.to) {
+      @for (link of graph().links; track link.to) {
         <f-connection [fConnectionId]="'link-' + link.to" [fSourceId]="'out-' + link.from" [fTargetId]="'in-' + link.to"
                       fType="segment" fBehavior="fixed" [fRadius]="12" [fReassignDisabled]="true"
                       class="flow-link" [class.flow-link-problem]="linkHasProblem(link)" [class.flow-link-selected]="isLinkSelected(link)">
@@ -15,8 +15,8 @@
               <button type="button" fDragBlocker class="flow-link-label" [title]="text"
                       (click)="selectionChange.emit({ type: 'link', to: link.to })">{{ text }}</button>
             }
-            @if (!readOnly) {
-              <jhi-step-picker fDragBlocker [kinds]="insertKinds" [components]="components" title="Insert a Step here"
+            @if (!readOnly()) {
+              <jhi-step-picker fDragBlocker [kinds]="insertKinds" [components]="components()" title="Insert a Step here"
                                [target]="'link:' + link.to"
                                (picked)="insertStep.emit({ linkTo: link.to, kind: $any($event.kind), componentType: $event.componentType })">
               </jhi-step-picker>
@@ -27,13 +27,13 @@
     </ng-container>
 
     <ng-container ngProjectAs="[fNodes]">
-      @for (step of graph.steps; track step.key) {
+      @for (step of graph().steps; track step.key) {
         <div fNode fDragHandle [fNodeId]="step.key" [attr.data-step-key]="step.key" [fNodePosition]="{ x: step.x ?? 0, y: step.y ?? 0 }"
-             [fNodeDraggingDisabled]="readOnly" [fMinimapClass]="['flow-minimap-' + step.kind.toLowerCase()]"
+             [fNodeDraggingDisabled]="readOnly()" [fMinimapClass]="['flow-minimap-' + step.kind.toLowerCase()]"
              class="flow-step" [ngClass]="'flow-step-' + step.kind.toLowerCase()"
              [class.flow-step-problem]="hasProblem(step)" [class.flow-step-selected]="isSelected(step)"
              [class.flow-step-run-ok]="runOf(step)?.status === 'completed'" [class.flow-step-run-failed]="runOf(step)?.status === 'failed'"
-             [class.flow-step-run-unreached]="runResults?.get(step.key) === 'unreached'"
+             [class.flow-step-run-unreached]="runResults()?.get(step.key) === 'unreached'"
              (click)="selectionChange.emit({ type: 'step', key: step.key })" (dblclick)="openStep.emit(step.key)">
           @if (step.kind !== 'SOURCE') {
             <div fConnector fConnectorType="target" [fConnectorId]="'in-' + step.key" [fConnectorDisabled]="true"
@@ -41,8 +41,8 @@
           }
           <div class="flow-step-kind">{{ kindLabel(step) }}</div>
           <fa-icon class="flow-step-icon" [icon]="kindIcons[step.kind]"></fa-icon>
-          @if (operationUrl && isOperation(step)) {
-            <a fDragBlocker class="flow-step-label" [href]="operationUrl" target="_blank" rel="noopener" [title]="'Open ' + operationUrl + ' in a new tab'"
+          @if (operationUrl() && isOperation(step)) {
+            <a fDragBlocker class="flow-step-label" [href]="operationUrl()" target="_blank" rel="noopener" [title]="'Open ' + operationUrl() + ' in a new tab'"
                (click)="$event.stopPropagation()" (dblclick)="$event.stopPropagation()">{{ label(step) }}</a>
           } @else {
             <div class="flow-step-label" [title]="label(step)">{{ label(step) }}</div>
@@ -54,17 +54,17 @@
                    (click)="$event.stopPropagation()" (dblclick)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" />
           } @else if (shownName(step); as name) {
             <div class="flow-step-caption flow-step-name" [title]="step.uri ? name + ' — ' + step.uri : name"
-                 (dblclick)="!readOnly && editName(step.key); $event.stopPropagation()">{{ name }}</div>
+                 (dblclick)="!readOnly() && editName(step.key); $event.stopPropagation()">{{ name }}</div>
           } @else if (caption(step); as path) {
             <div class="flow-step-caption" [title]="step.uri"
-                 (dblclick)="!readOnly && editName(step.key); $event.stopPropagation()">{{ path }}</div>
+                 (dblclick)="!readOnly() && editName(step.key); $event.stopPropagation()">{{ path }}</div>
           }
           @if (problemOf(step); as problem) {
             <span class="flow-step-warning" [title]="problem"><fa-icon icon="exclamation-triangle"></fa-icon></span>
           } @else if (warningOf(step); as warning) {
             <span class="flow-step-warning flow-step-warning--soft" [title]="warning"><fa-icon icon="exclamation-circle"></fa-icon></span>
           }
-          @if (counts?.get(step.key); as count) {
+          @if (counts()?.get(step.key); as count) {
             <div class="flow-step-counts">
               @if (count.completed > 0) {
                 <span class="flow-step-count flow-step-count--completed" [title]="countTitle(count.completed, 'completed')">{{ compactCount(count.completed) }}</span>
@@ -74,20 +74,20 @@
               }
             </div>
           }
-          @if (runResults?.get(step.key) === 'input') {
+          @if (runResults()?.get(step.key) === 'input') {
             <div class="flow-step-run flow-step-run--input" title="The test message starts after the Source">Test input</div>
           } @else if (runOf(step); as run) {
             <div class="flow-step-run" [class.flow-step-run--failed]="run.status === 'failed'" [title]="runTitle(run)">
               <fa-icon [icon]="run.status === 'failed' ? 'times' : 'check'"></fa-icon>{{ shortDuration(run.ownMillis) }}
             </div>
           }
-          @if (!readOnly && canDelete(step)) {
+          @if (!readOnly() && canDelete(step)) {
             <button type="button" fDragBlocker class="flow-step-delete" title="Delete this Step (Delete)" aria-label="Delete this Step"
                     (click)="$event.stopPropagation(); deleteStep.emit(step.key)" (dblclick)="$event.stopPropagation()">
               <fa-icon icon="times"></fa-icon>
             </button>
           }
-          @if (canAddBranch(step) && !readOnly) {
+          @if (canAddBranch(step) && !readOnly()) {
             <button type="button" fDragBlocker class="flow-plus flow-add-branch" title="Add a Branch" aria-label="Add a Branch"
                     (click)="$event.stopPropagation(); addBranch.emit(step.key)" (dblclick)="$event.stopPropagation()">
               <fa-icon icon="plus"></fa-icon>
@@ -97,7 +97,7 @@
             <div fConnector fConnectorType="source" [fConnectorId]="'out-' + step.key" [fConnectorMultiple]="step.kind === 'ROUTER'"
                  [fConnectorDisabled]="true" class="flow-connector flow-connector-out"></div>
           }
-          @if (isOpenEnd(step) && !readOnly) {
+          @if (isOpenEnd(step) && !readOnly()) {
             <jhi-step-picker fDragBlocker class="flow-append" [kinds]="appendKinds" [components]="appendComponents(step)" title="Add the next Step (Space)"
                              [target]="'after:' + step.key"
                              (click)="$event.stopPropagation()" (dblclick)="$event.stopPropagation()"
@@ -111,7 +111,7 @@
 
   <!-- Shift+drag on the background draws a box that selects the Steps in it. Alone in its @if, without even whitespace
        around it (Foblex preserves whitespace), so it's projected into Foblex's selection-area slot. -->
-  @if (!readOnly) {<f-selection-area></f-selection-area>}
+  @if (!readOnly()) {<f-selection-area></f-selection-area>}
 
   <!-- Declared here, inside the flow, so the minimap can reach it; the editor shows it in a corner of the canvas. -->
   <ng-template #minimap>
@@ -124,7 +124,7 @@
       <button type="button" class="btn btn-fx btn-fx-ghost" title="Zoom out" aria-label="Zoom out" (click)="zoomOut()">
         <fa-icon icon="minus"></fa-icon>
       </button>
-      @if (!readOnly) {
+      @if (!readOnly()) {
         <button type="button" class="btn btn-fx btn-fx-ghost" title="Auto-arrange: lay the Flow out from left to right" aria-label="Auto-arrange"
                 data-cy="auto-arrange" (click)="autoArrange.emit()">
           <fa-icon icon="sitemap"></fa-icon>

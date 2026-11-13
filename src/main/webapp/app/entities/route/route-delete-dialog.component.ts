@@ -1,5 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AlertError } from 'app/shared/alert';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
@@ -11,12 +10,14 @@ import { RouteService } from './route.service';
 
 @Component({
   templateUrl: './route-delete-dialog.component.html',
-  imports: [CommonModule, FontAwesomeModule, AlertError],
+  imports: [FontAwesomeModule, AlertError],
 })
 export class RouteDeleteDialogComponent {
-    route?: IRoute;
+    protected routeService = inject(RouteService);
+    activeModal = inject(NgbActiveModal);
+    protected eventManager = inject(EventManager);
 
-    constructor(protected routeService: RouteService, public activeModal: NgbActiveModal, protected eventManager: EventManager) {}
+    route?: IRoute;
 
     cancel(): void {
         this.activeModal.dismiss();

@@ -1,5 +1,4 @@
-import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, input } from '@angular/core';
 
 import { FlowStatsSection } from './flow-stats';
 
@@ -7,11 +6,11 @@ import { FlowStatsSection } from './flow-stats';
 @Component({
   selector: 'jhi-flow-stats-sections',
   templateUrl: './flow-stats-sections.component.html',
-  imports: [CommonModule],
+  imports: [],
 })
 export class FlowStatsSections {
-  @Input() loading = false;
-  @Input() empty = false;
-  @Input() emptyMessage = 'There are no stats yet.';
-  @Input() sections: FlowStatsSection[] = [];
+  readonly loading = input(false);
+  readonly empty = input(false);
+  readonly emptyMessage = input('There are no stats yet.');
+  readonly sections = input<FlowStatsSection[]>([]);
 }

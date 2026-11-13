@@ -1,5 +1,4 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { switchMap } from 'rxjs/operators';
 
@@ -10,9 +9,13 @@ import { CertificateService, CERTIFICATE_NAME_PATTERN, TRUSTSTORE, toCertificate
 @Component({
   selector: 'jhi-certificate-upload-dialog',
   templateUrl: './certificate-upload-dialog.component.html',
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
 })
 export class CertificateUploadDialogComponent {
+  private eventManager = inject(EventManager);
+  private certificateService = inject(CertificateService);
+  activeModal = inject(NgbActiveModal);
+
   readonly truststore = TRUSTSTORE;
   readonly namePattern = CERTIFICATE_NAME_PATTERN;
   name = '';
@@ -22,8 +25,6 @@ export class CertificateUploadDialogComponent {
   isSaving = false;
   uploadError = false;
   uploadErrorMessage!: String;
-
-  constructor(private eventManager: EventManager, private certificateService: CertificateService, public activeModal: NgbActiveModal) {}
 
   clear() {
     this.activeModal.dismiss('cancel');
@@ -48,7 +49,9 @@ export class CertificateUploadDialogComponent {
     this.isSaving = true;
     this.certificateService
       .importTrustedCertificates(this.name, this.certificateFile)
-      .pipe(switchMap(res => this.certificateService.createFromRuntimeResponse(res.body!, 'Trusted (' + this.fileNameWithoutExtension + ')')))
+      .pipe(
+        switchMap(res => this.certificateService.createFromRuntimeResponse(res.body!, 'Trusted (' + this.fileNameWithoutExtension + ')')),
+      )
       .subscribe(
         () => {
           this.uploadError = false;

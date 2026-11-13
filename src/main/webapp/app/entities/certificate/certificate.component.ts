@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit, OnDestroy, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
@@ -31,7 +31,6 @@ import { saveAs } from 'app/shared/util/save-as';
   selector: 'jhi-certificate',
   templateUrl: './certificate.component.html',
   imports: [
-    CommonModule,
     RouterModule,
     FontAwesomeModule,
     NgbModule,
@@ -42,9 +41,18 @@ import { saveAs } from 'app/shared/util/save-as';
     PrimaryActionDirective,
     OverflowActionDirective,
     Truncate,
+    NgTemplateOutlet,
   ],
 })
 export class CertificateComponent implements OnInit, OnDestroy {
+  protected certificateService = inject(CertificateService);
+  protected certificatePopupService = inject(CertificatePopupService);
+  protected alertService = inject(AlertService);
+  protected modalService = inject(NgbModal);
+  protected eventManager = inject(EventManager);
+  protected parseLinks = inject(ParseLinks);
+  protected accountService = inject(AccountService);
+
   securities: ICertificate[] = [];
   currentAccount: any;
   eventSubscriber!: Subscription;
@@ -65,15 +73,7 @@ export class CertificateComponent implements OnInit, OnDestroy {
 
   private readonly changeDetector = inject(ChangeDetectorRef);
 
-  constructor(
-    protected certificateService: CertificateService,
-	protected certificatePopupService: CertificatePopupService,
-    protected alertService: AlertService,
-	protected modalService: NgbModal,
-    protected eventManager: EventManager,
-    protected parseLinks: ParseLinks,
-    protected accountService: AccountService
-  ) {
+  constructor() {
     this.securities = [];
     this.itemsPerPage = ITEMS_PER_PAGE;
     this.page = 0;
@@ -93,7 +93,7 @@ export class CertificateComponent implements OnInit, OnDestroy {
       })
       .subscribe(
         (res: HttpResponse<ICertificate[]>) => this.paginateSecurities(res.body!, res.headers),
-        (res: HttpErrorResponse) => this.onError(res.message)
+        (res: HttpErrorResponse) => this.onError(res.message),
       );
   }
 
@@ -120,15 +120,10 @@ export class CertificateComponent implements OnInit, OnDestroy {
     this.eventManager.destroy(this.eventSubscriber);
   }
 
-  	delete(certificate: ICertificate): void {
-		const modalRef = this.modalService.open(CertificateDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
-		modalRef.componentInstance.certificate = certificate;
-		// the dialog broadcasts 'certificateListModification' after deleting, which reloads the list
-	}
-
-
-  trackId(index: number, item: ICertificate) {
-    return item.id;
+  delete(certificate: ICertificate): void {
+    const modalRef = this.modalService.open(CertificateDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+    modalRef.componentInstance.certificate = certificate;
+    // the dialog broadcasts 'certificateListModification' after deleting, which reloads the list
   }
 
   /** With no Certificate at all, the list gives way to an explanation of Certificates and how to add the first. */
@@ -141,8 +136,7 @@ export class CertificateComponent implements OnInit, OnDestroy {
     let result = this.securities ?? [];
     if (query) {
       result = result.filter(
-        item =>
-          (item.certificateName ?? '').toLocaleLowerCase().includes(query) || (item.url ?? '').toLocaleLowerCase().includes(query)
+        item => (item.certificateName ?? '').toLocaleLowerCase().includes(query) || (item.url ?? '').toLocaleLowerCase().includes(query),
       );
     }
     return result;
@@ -161,15 +155,15 @@ export class CertificateComponent implements OnInit, OnDestroy {
   }
 
   uploadCertificate() {
-	    this.certificatePopupService.open(CertificateUploadDialogComponent as Component);
+    this.certificatePopupService.open(CertificateUploadDialogComponent as Component);
   }
 
   uploadP12Certificate() {
-  	this.certificatePopupService.open(CertificateUploadP12DialogComponent as Component);
+    this.certificatePopupService.open(CertificateUploadP12DialogComponent as Component);
   }
 
   generateCertificate() {
-    	this.certificatePopupService.open(CertificateSelfSignDialogComponent as Component);
+    this.certificatePopupService.open(CertificateSelfSignDialogComponent as Component);
   }
 
   exportCertificate(id: number) {
@@ -180,7 +174,7 @@ export class CertificateComponent implements OnInit, OnDestroy {
       if (certificate!.certificateName!.startsWith('Generic') || certificate!.certificateName!.startsWith('Self-Signed')) {
         exportFileName = certificate!.certificateName!.substring(
           certificate!.certificateName!.indexOf('(') + 1,
-          certificate!.certificateName!.lastIndexOf(')')
+          certificate!.certificateName!.lastIndexOf(')'),
         );
       } else {
         exportFileName = certificate!.certificateName!;
@@ -208,9 +202,9 @@ export class CertificateComponent implements OnInit, OnDestroy {
     this.loading = false;
     this.loadFailed = true;
     this.changeDetector.detectChanges();
-	this.alertService.addAlert({
-	  type: 'danger',
-	  message: errorMessage,
-	});
+    this.alertService.addAlert({
+      type: 'danger',
+      message: errorMessage,
+    });
   }
 }

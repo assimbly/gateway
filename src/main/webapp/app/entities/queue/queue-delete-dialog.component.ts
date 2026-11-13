@@ -1,5 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AlertError } from 'app/shared/alert';
@@ -10,22 +9,20 @@ import { QueueService } from './queue.service';
 
 @Component({
     templateUrl: './queue-delete-dialog.component.html',
-    imports: [CommonModule, FontAwesomeModule, AlertError],
+    imports: [FontAwesomeModule, AlertError],
 })
 export class QueueDeleteDialogComponent {
+    protected queueService = inject(QueueService);
+    activeModal = inject(NgbActiveModal);
+    protected eventManager = inject(EventManager);
+    private cdr = inject(ChangeDetectorRef);
+
     address?: IAddress;
     brokerType = '';
 
     /** Replaces the confirmation question once the delete is refused or fails. */
     message?: string;
     disableDelete = false;
-
-    constructor(
-        protected queueService: QueueService,
-        public activeModal: NgbActiveModal,
-        protected eventManager: EventManager,
-        private cdr: ChangeDetectorRef,
-    ) {}
 
     get text(): string {
         if (this.message) {

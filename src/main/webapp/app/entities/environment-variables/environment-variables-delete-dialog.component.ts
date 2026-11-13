@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
@@ -15,15 +15,13 @@ import { EnvironmentVariablesService } from './environment-variables.service';
     imports: [FontAwesomeModule, AlertError],
 })
 export class EnvironmentVariablesDeleteDialogComponent {
+    protected environmentVariablesService = inject(EnvironmentVariablesService);
+    activeModal = inject(NgbActiveModal);
+    protected eventManager = inject(EventManager);
+
     environmentVariables!: IEnvironmentVariables;
     /** True while the delete runs, so a second click doesn't send it again. */
     readonly deleting = signal(false);
-
-    constructor(
-        protected environmentVariablesService: EnvironmentVariablesService,
-        public activeModal: NgbActiveModal,
-        protected eventManager: EventManager
-    ) {}
 
     clear() {
         this.activeModal.dismiss('cancel');

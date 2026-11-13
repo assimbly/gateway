@@ -1,18 +1,20 @@
-<form *ngIf="flow" (submit)="$event.preventDefault()">
+@if (flow) {
+  <form (submit)="$event.preventDefault()">
     <div class="modal-header">
-        <h4 class="modal-title">Delete Flow</h4>
-        <button type="button" class="btn-close" aria-label="Close" (click)="clear()"></button>
+      <h4 class="modal-title">Delete Flow</h4>
+      <button type="button" class="btn-close" aria-label="Close" (click)="clear()"></button>
     </div>
     <div class="modal-body">
-        <jhi-alert-error></jhi-alert-error>
-        <p id="jhi-delete-flow-heading">{{ message ?? "Delete Flow '" + flow.name + "'? This cannot be undone." }}</p>
+      <jhi-alert-error></jhi-alert-error>
+      <p id="jhi-delete-flow-heading">{{ message ?? "Delete Flow '" + flow.name + "'? This cannot be undone." }}</p>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-fx btn-fx-secondary" (click)="clear()">
-            <fa-icon [icon]="'ban'"></fa-icon><span>Cancel</span>
-        </button>
-        <button id="jhi-confirm-delete-flow" type="button" class="btn btn-fx btn-fx-danger" [disabled]="disableDelete" (click)="confirmDelete(flow.id)">
-            <fa-icon [icon]="'trash'"></fa-icon><span>Delete</span>
-        </button>
+      <button type="button" class="btn btn-fx btn-fx-secondary" (click)="clear()">
+        <fa-icon [icon]="'ban'"></fa-icon><span>Cancel</span>
+      </button>
+      <button id="jhi-confirm-delete-flow" type="button" class="btn btn-fx btn-fx-danger" [disabled]="disableDelete" (click)="confirmDelete(flow.id)">
+        <fa-icon [icon]="'trash'"></fa-icon><span>Delete</span>
+      </button>
     </div>
-</form>
+  </form>
+}

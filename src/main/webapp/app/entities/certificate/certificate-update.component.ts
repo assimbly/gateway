@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -20,24 +20,23 @@ import { CertificateService } from './certificate.service';
   imports: [FormsModule, FontAwesomeModule, AlertError],
 })
 export class CertificateUpdateComponent implements OnInit {
+  protected certificateService = inject(CertificateService);
+  protected activatedRoute = inject(ActivatedRoute);
+  protected router = inject(Router);
+  protected eventManager = inject(EventManager);
+
   certificate!: ICertificate;
   isSaving!: boolean;
   certificateExpiry!: string;
   certificateType = 'root';
   errorMessage!: string;
 
-  constructor(
-    protected certificateService: CertificateService,
-    protected activatedRoute: ActivatedRoute,
-    protected router: Router,
-    protected eventManager: EventManager,
-  ) {}
-
   ngOnInit() {
     this.isSaving = false;
     this.activatedRoute.data.subscribe(({ certificate }) => {
       this.certificate = certificate;
-      this.certificateExpiry = this.certificate.certificateExpiry != null ? this.certificate.certificateExpiry.format(DATE_TIME_FORMAT) : null!;
+      this.certificateExpiry =
+        this.certificate.certificateExpiry != null ? this.certificate.certificateExpiry.format(DATE_TIME_FORMAT) : null!;
     });
   }
 
@@ -66,13 +65,15 @@ export class CertificateUpdateComponent implements OnInit {
   /** Downloads the certificates of the url's domain again and replaces the stored ones, and their records. */
   renew() {
     this.run(
-      this.certificateService.renewDomainCertificates(this.domain(), this.certificateType).pipe(
-        switchMap(res =>
-          this.certificateService
-            .remove(this.certificate.url!)
-            .pipe(switchMap(() => this.certificateService.createFromRuntimeResponse(res.body!, this.certificate.url!))),
+      this.certificateService
+        .renewDomainCertificates(this.domain(), this.certificateType)
+        .pipe(
+          switchMap(res =>
+            this.certificateService
+              .remove(this.certificate.url!)
+              .pipe(switchMap(() => this.certificateService.createFromRuntimeResponse(res.body!, this.certificate.url!))),
+          ),
         ),
-      ),
     );
   }
 
@@ -99,7 +100,8 @@ export class CertificateUpdateComponent implements OnInit {
 
   protected onSaveError(err: HttpErrorResponse) {
     this.isSaving = false;
-    this.errorMessage = err.status === 409 ? 'The certificates of this url were already added, use Renew to download them again.' : err.error || err.message;
+    this.errorMessage =
+      err.status === 409 ? 'The certificates of this url were already added, use Renew to download them again.' : err.error || err.message;
   }
 
   protected goBack() {

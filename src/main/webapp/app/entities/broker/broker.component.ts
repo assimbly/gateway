@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject, TemplateRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
@@ -38,23 +37,28 @@ enum Status {
     selector: 'jhi-broker',
     templateUrl: './broker.component.html',
     imports: [
-        CommonModule,
-        RouterModule,
-        FontAwesomeModule,
-        NgbModule,
-        NgbDropdownModule,
-        NgbPopoverModule,
-        EmptyState,
-        SearchToolbar,
-        DataTable,
-        RowActions,
-        PrimaryActionDirective,
-        OverflowActionDirective,
-        StatusControls,
-        Truncate,
-    ],
+    RouterModule,
+    FontAwesomeModule,
+    NgbModule,
+    NgbDropdownModule,
+    NgbPopoverModule,
+    EmptyState,
+    SearchToolbar,
+    DataTable,
+    RowActions,
+    PrimaryActionDirective,
+    OverflowActionDirective,
+    StatusControls,
+    Truncate
+],
 })
 export class BrokerComponent implements OnInit, OnDestroy {
+    protected brokerService = inject(BrokerService);
+    protected alertService = inject(AlertService);
+    protected eventManager = inject(EventManager);
+    protected accountService = inject(AccountService);
+    protected modalService = inject(NgbModal);
+
     brokers: IBroker[] = [];
     brokersLoading = true;
     brokersLoadFailed = false;
@@ -105,14 +109,6 @@ export class BrokerComponent implements OnInit, OnDestroy {
 
     private readonly changeDetector = inject(ChangeDetectorRef);
 
-    constructor(
-        protected brokerService: BrokerService,
-        protected alertService: AlertService,
-        protected eventManager: EventManager,
-        protected accountService: AccountService,
-		protected modalService: NgbModal,
-    ) {}
-
     ngOnInit() {
         this.setBrokerStatusDefaults();
 
@@ -136,7 +132,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
             (res: HttpResponse<IBroker[]>) => {
                 this.brokers = res.body ?? [];
                 this.brokersLoading = false;
-                // Http callback was not refreshing *ngIf views; force CD so Create/table appears.
+                // Http callback was not refreshing @if views; force CD so Create/table appears.
                 this.changeDetector.detectChanges();
 
                 if (this.brokers[0]) {
@@ -391,10 +387,6 @@ export class BrokerComponent implements OnInit, OnDestroy {
             result = result.filter(item => (item.name ?? '').toLocaleLowerCase().includes(query));
         }
         return sortRows(result, this.sortState, { name: broker => broker.name });
-    }
-
-    trackId(index: number, item: IBroker) {
-        return item.id;
     }
 
     registerChangeInBrokers() {

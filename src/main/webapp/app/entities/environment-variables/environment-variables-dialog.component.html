@@ -1,40 +1,50 @@
 <form (jhiSaveShortcut)="save()" [saveShortcutDisabled]="environmentVariablesForm.invalid || isSaving" [formGroup]="environmentVariablesForm" (ngSubmit)="save()" class="needs-validation">
 
-    <div class="modal-header">
-        <h4 class="modal-title" id="myEnvironmentVariablesLabel">Variable</h4>
-        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" (click)="clear()"></button>
-	</div>
-    <div class="modal-body">
-        <jhi-alert-error></jhi-alert-error>
-        <div class="form-group" [style.display]="'none'">
-            <label for="id">ID</label>
-            <input type="text" class="form-control" id="id" formControlName="id" readonly />
-        </div>
-
-        <div class="form-group">
-            <label class="form-control-label" for="key">Key</label>
-            <input type="text" class="form-control" id="key" formControlName="key"/>
-            <div *ngIf="!!environmentVariablesForm.controls.key.errors && (environmentVariablesForm.controls.key.dirty || environmentVariablesForm.controls.key.touched)" class="invalid-field-message">
-                <span *ngIf="environmentVariablesForm.controls.key.errors.required">Key is required.</span>
-                <span *ngIf="environmentVariablesForm.controls.key.errors.existingKey">Key already exists.</span>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label class="form-control-label" for="value">Value</label>
-            <input type="text" class="form-control" id="value" formControlName="value"/>
-            <div *ngIf="!!environmentVariablesForm.controls.value.errors && (environmentVariablesForm.controls.value.dirty || environmentVariablesForm.controls.value.touched)" class="invalid-field-message">
-                <span *ngIf="environmentVariablesForm.controls.value.errors.required">Value is required.</span>
-            </div>
-        </div>
-
+  <div class="modal-header">
+    <h4 class="modal-title" id="myEnvironmentVariablesLabel">Variable</h4>
+    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" (click)="clear()"></button>
+  </div>
+  <div class="modal-body">
+    <jhi-alert-error></jhi-alert-error>
+    <div class="form-group" [style.display]="'none'">
+      <label for="id">ID</label>
+      <input type="text" class="form-control" id="id" formControlName="id" readonly />
     </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">
-            <span class="fa fa-ban"></span>&nbsp;<span>Cancel</span>
-        </button>
-        <button type="button" (click)="save()" [disabled]="environmentVariablesForm.invalid || isSaving" class="btn btn-primary">
-            <span class="fa fa-save"></span>&nbsp;<span>Save</span>
-        </button>
+
+    <div class="form-group">
+      <label class="form-control-label" for="key">Key</label>
+      <input type="text" class="form-control" id="key" formControlName="key"/>
+      @if (!!environmentVariablesForm.controls.key.errors && (environmentVariablesForm.controls.key.dirty || environmentVariablesForm.controls.key.touched)) {
+        <div class="invalid-field-message">
+          @if (environmentVariablesForm.controls.key.errors.required) {
+            <span>Key is required.</span>
+          }
+          @if (environmentVariablesForm.controls.key.errors.existingKey) {
+            <span>Key already exists.</span>
+          }
+        </div>
+      }
     </div>
+
+    <div class="form-group">
+      <label class="form-control-label" for="value">Value</label>
+      <input type="text" class="form-control" id="value" formControlName="value"/>
+      @if (!!environmentVariablesForm.controls.value.errors && (environmentVariablesForm.controls.value.dirty || environmentVariablesForm.controls.value.touched)) {
+        <div class="invalid-field-message">
+          @if (environmentVariablesForm.controls.value.errors.required) {
+            <span>Value is required.</span>
+          }
+        </div>
+      }
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">
+      <span class="fa fa-ban"></span>&nbsp;<span>Cancel</span>
+    </button>
+    <button type="button" (click)="save()" [disabled]="environmentVariablesForm.invalid || isSaving" class="btn btn-primary">
+      <span class="fa fa-save"></span>&nbsp;<span>Save</span>
+    </button>
+  </div>
 </form>

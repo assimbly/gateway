@@ -3,16 +3,15 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
-  EventEmitter,
   Injector,
-  Input,
   OnChanges,
-  Output,
   ViewChild,
   afterNextRender,
   inject,
+  output,
+  input
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { LowerCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbDropdown, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -71,16 +70,16 @@ const DESIGNER_ENTRIES: Record<string, CatalogueEntry> = {
   templateUrl: './step-picker.component.html',
   styleUrl: './step-picker.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, NgbDropdownModule, FontAwesomeModule],
+  imports: [FormsModule, NgbDropdownModule, FontAwesomeModule, LowerCasePipe],
 })
 export class StepPickerComponent implements OnChanges {
-  @Input({ required: true }) kinds: PickedKind[] = [];
-  @Input({ required: true }) components: StepComponents = { actions: [], sinks: [] };
-  @Input() title = 'Add a Step';
+  readonly kinds = input.required<PickedKind[]>();
+  readonly components = input.required<StepComponents>();
+  readonly title = input('Add a Step');
   /** Where this + adds a Step, such as `after:<step key>` or `link:<key of the Step the Link leads to>`. */
-  @Input() target?: string;
+  readonly target = input<string>();
 
-  @Output() picked = new EventEmitter<{ kind: PickedKind; componentType: string }>();
+  readonly picked = output<{ kind: PickedKind; componentType: string }>();
 
   @ViewChild('search') search?: ElementRef<HTMLInputElement>;
   @ViewChild('toggle') toggle?: ElementRef<HTMLButtonElement>;
@@ -141,7 +140,7 @@ export class StepPickerComponent implements OnChanges {
   }
 
   get kind(): PickedKind {
-    return this.activeKind && this.kinds.includes(this.activeKind) ? this.activeKind : this.kinds[0];
+    return this.activeKind && this.kinds().includes(this.activeKind) ? this.activeKind : this.kinds()[0];
   }
 
   /**
@@ -181,7 +180,7 @@ export class StepPickerComponent implements OnChanges {
     if (!this.filter.trim() || kind === 'ROUTER') {
       return [];
     }
-    const routers = this.kinds.includes('ROUTER')
+    const routers = this.kinds().includes('ROUTER')
       ? []
       : this.routerMatches(kind).map(name => ({
           name,
@@ -222,7 +221,7 @@ export class StepPickerComponent implements OnChanges {
   /** Enter picks the closest match, from the chosen kind unless another kind has a closer one. */
   pickFirstMatch(): void {
     let best: { kind: PickedKind; name: string; rank: number } | undefined;
-    for (const kind of [this.kind, ...this.kinds]) {
+    for (const kind of [this.kind, ...this.kinds()]) {
       const name = this.matches(kind)[0];
       const rank = name === undefined ? NO_MATCH : this.filter.trim() ? matchRank(this.entry(name, kind), this.filter) : 0;
       if (name !== undefined && (!best || rank < best.rank)) {
@@ -248,9 +247,9 @@ export class StepPickerComponent implements OnChanges {
       case 'ROUTER':
         return ROUTER_KINDS;
       case 'SINK':
-        return this.components.sinks;
+        return this.components().sinks;
       case 'ACTION':
-        return [...new Set(this.components.actions)];
+        return [...new Set(this.components().actions)];
     }
   }
 }

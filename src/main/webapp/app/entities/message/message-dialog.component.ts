@@ -1,5 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
@@ -25,9 +24,24 @@ import { MessagePopupService } from 'app/entities/message/message-popup.service'
 @Component({
   selector: 'jhi-message-dialog',
   templateUrl: './message-dialog.component.html',
-  imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, ForbiddenHeaderValidatorDirective, ForbiddenMessageNamesValidatorDirective, SaveShortcutDirective],
+  imports: [
+    FormsModule,
+    FontAwesomeModule,
+    AlertError,
+    ForbiddenHeaderValidatorDirective,
+    ForbiddenMessageNamesValidatorDirective,
+    SaveShortcutDirective,
+  ],
 })
 export class MessageDialogComponent implements OnInit {
+  activeModal = inject(NgbActiveModal);
+  private messageService = inject(MessageService);
+  private headerService = inject(HeaderService);
+  private alertService = inject(AlertService);
+  private eventManager = inject(EventManager);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
   message!: IMessage;
   messages!: IMessage[];
   messageNames: Array<string> = [];
@@ -37,16 +51,6 @@ export class MessageDialogComponent implements OnInit {
   public typeHeader: string[] = ['header', 'property'];
   public languageHeader: string[] = ['constant', 'simple', 'groovy', 'jsonpath', 'xpath'];
 
-  constructor(
-    public activeModal: NgbActiveModal,
-    private messageService: MessageService,
-    private headerService: HeaderService,
-    private alertService: AlertService,
-    private eventManager: EventManager,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {}
-
   ngOnInit() {
     this.isSaving = false;
     this.messageService.query().subscribe(
@@ -54,11 +58,10 @@ export class MessageDialogComponent implements OnInit {
         this.messages = res.body!;
         this.messageNames = this.messages.map(h => h.name!);
       },
-      res => this.onError(res.body)
+      res => this.onError(res.body),
     );
     this.loadHeader(this.route.snapshot.fragment === 'clone');
   }
-
 
   private loadHeader(cloneHeader: boolean) {
     if (this.message.id) {
@@ -142,9 +145,9 @@ export class MessageDialogComponent implements OnInit {
   }
 
   private onSaveSuccess(result: IMessage, closePopup: boolean) {
-	this.eventManager.broadcast(new EventWithContent('messageListModification', 'OK'));
-	this.eventManager.broadcast(new EventWithContent('messageListModification', result.id ));
-	this.eventManager.broadcast(new EventWithContent('messageListModification', result));
+    this.eventManager.broadcast(new EventWithContent('messageListModification', 'OK'));
+    this.eventManager.broadcast(new EventWithContent('messageListModification', result.id));
+    this.eventManager.broadcast(new EventWithContent('messageListModification', result));
     this.isSaving = false;
     this.activeModal.dismiss(result);
 
@@ -166,10 +169,10 @@ export class MessageDialogComponent implements OnInit {
     this.isSaving = false;
   }
   private onError(error: any) {
-        this.alertService.addAlert({
-		  type: 'danger',
-		  message: error.message,
-		});
+    this.alertService.addAlert({
+      type: 'danger',
+      message: error.message,
+    });
   }
 }
 
@@ -178,9 +181,10 @@ export class MessageDialogComponent implements OnInit {
   template: '',
 })
 export class MessagePopupComponent implements OnInit, OnDestroy {
-  routeSub: any;
+  private route = inject(ActivatedRoute);
+  private messagePopupService = inject(MessagePopupService);
 
-  constructor(private route: ActivatedRoute, private messagePopupService: MessagePopupService) {}
+  routeSub: any;
 
   ngOnInit() {
     this.routeSub = this.route.params.subscribe(params => {

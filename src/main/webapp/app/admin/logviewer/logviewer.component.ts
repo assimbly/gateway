@@ -11,11 +11,11 @@ import { LogViewerLineValidationDirective } from './logviewer-line-validation.di
 import { colorLog, logEntries } from './log-display';
 
 @Component({
-    standalone: true,
-    selector: 'jhi-logviewer',
-    templateUrl: './logviewer.component.html',
-    styleUrl: './logviewer.component.scss',
-    imports: [RouterModule, FormsModule, FontAwesomeModule, LogViewerLineValidationDirective, SearchToolbar],
+  standalone: true,
+  selector: 'jhi-logviewer',
+  templateUrl: './logviewer.component.html',
+  styleUrl: './logviewer.component.scss',
+  imports: [RouterModule, FormsModule, FontAwesomeModule, LogViewerLineValidationDirective, SearchToolbar],
 })
 export default class LogViewerComponent implements OnInit {
   @ViewChild('logArea', { static: false }) private logArea!: ElementRef;
@@ -35,8 +35,7 @@ export default class LogViewerComponent implements OnInit {
   private readonly sanitizer = inject(DomSanitizer);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-
-  constructor(private logViewerService: LogViewerService) {}
+  private readonly logViewerService = inject(LogViewerService);
 
   ngOnInit() {
     this.lines = 250;

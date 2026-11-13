@@ -1,5 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { NgClass } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { AlertError } from 'app/shared/alert';
@@ -13,51 +13,49 @@ import { EventManager, EventWithContent } from 'app/core/util/event-manager.serv
 import { ConnectionService } from 'app/entities/connection/connection.service';
 
 @Component({
-    selector: 'jhi-connection-detail',
-    templateUrl: './connection-detail.component.html',
-    imports: [CommonModule, RouterModule, AlertError],
+  selector: 'jhi-connection-detail',
+  templateUrl: './connection-detail.component.html',
+  imports: [RouterModule, AlertError, NgClass],
 })
 export class ConnectionDetailComponent implements OnInit, OnDestroy {
-    connection!: IConnection;
-    public connectionKeys!: Array<ConnectionKeys>;
-    private subscription!: Subscription;
-    private eventSubscriber!: Subscription;
+  protected eventManager = inject(EventManager);
+  protected connectionService = inject(ConnectionService);
+  protected connectionKeysService = inject(ConnectionKeysService);
+  protected activatedRoute = inject(ActivatedRoute);
 
-    constructor(
-        protected eventManager: EventManager,
-        protected connectionService: ConnectionService,
-        protected connectionKeysService: ConnectionKeysService,
-        protected activatedRoute: ActivatedRoute
-    ) {}
+  connection!: IConnection;
+  public connectionKeys!: Array<ConnectionKeys>;
+  private subscription!: Subscription;
+  private eventSubscriber!: Subscription;
 
-    ngOnInit() {
-        this.activatedRoute.data.subscribe(({ connection }) => {
-            this.connection = connection;
-        });
-    }
+  ngOnInit() {
+    this.activatedRoute.data.subscribe(({ connection }) => {
+      this.connection = connection;
+    });
+  }
 
-    ngOnDestroy() {
-        this.eventSubscriber?.unsubscribe();
-    }
+  ngOnDestroy() {
+    this.eventSubscriber?.unsubscribe();
+  }
 
-    previousState() {
-        window.history.back();
-    }
+  previousState() {
+    window.history.back();
+  }
 
-    private load(id: number) {
-        this.connectionService.find(id).subscribe(connection => {
-            this.connection = connection.body!;
-            this.loadConnectionKeys(this.connection.id!);
-        });
-    }
+  private load(id: number) {
+    this.connectionService.find(id).subscribe(connection => {
+      this.connection = connection.body!;
+      this.loadConnectionKeys(this.connection.id!);
+    });
+  }
 
-    private loadConnectionKeys(id: number) {
-        this.connectionKeysService.query().subscribe(res => {
-            this.connectionKeys = res.body!.filter(sk => sk.connectionId === id);
-        });
-    }
+  private loadConnectionKeys(id: number) {
+    this.connectionKeysService.query().subscribe(res => {
+      this.connectionKeys = res.body!.filter(sk => sk.connectionId === id);
+    });
+  }
 
-    registerChangeInServices() {
-        this.eventSubscriber = this.eventManager.subscribe('connectionListModification', response => this.load(this.connection.id!));
-    }
+  registerChangeInServices() {
+    this.eventSubscriber = this.eventManager.subscribe('connectionListModification', response => this.load(this.connection.id!));
+  }
 }

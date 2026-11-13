@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -10,12 +9,12 @@ import { ITopic } from 'app/shared/model/topic.model';
 @Component({
   selector: 'jhi-topic-detail',
   templateUrl: './topic-detail.component.html',
-  imports: [CommonModule, RouterModule, FontAwesomeModule, AlertError],
+  imports: [RouterModule, FontAwesomeModule, AlertError],
 })
 export class TopicDetailComponent implements OnInit {
-    topic: ITopic | null = null;
+    protected activatedRoute = inject(ActivatedRoute);
 
-    constructor(protected activatedRoute: ActivatedRoute) {}
+    topic: ITopic | null = null;
 
     ngOnInit(): void {
         this.activatedRoute.data.subscribe(({ topic }) => (this.topic = topic));

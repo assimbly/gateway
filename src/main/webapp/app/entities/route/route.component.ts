@@ -1,5 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
@@ -16,18 +15,16 @@ import { RouteDeleteDialogComponent } from './route-delete-dialog.component';
 @Component({
   selector: 'jhi-route',
   templateUrl: './route.component.html',
-  imports: [CommonModule, RouterModule, FontAwesomeModule, AlertError],
+  imports: [RouterModule, FontAwesomeModule, AlertError],
 })
 export class RouteComponent implements OnInit, OnDestroy {
+    protected routeService = inject(RouteService);
+    protected dataUtils = inject(DataUtils);
+    protected eventManager = inject(EventManager);
+    protected modalService = inject(NgbModal);
+
     routes?: IRoute[];
     eventSubscriber?: Subscription;
-
-    constructor(
-        protected routeService: RouteService,
-        protected dataUtils: DataUtils,
-        protected eventManager: EventManager,
-        protected modalService: NgbModal
-    ) {}
 
     loadAll(): void {
         this.routeService.query().subscribe((res: HttpResponse<IRoute[]>) => (this.routes = res.body || []));
@@ -44,10 +41,6 @@ export class RouteComponent implements OnInit, OnDestroy {
         }
     }
 
-    trackId(index: number, item: IRoute): number {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-        return item.id!;
-    }
 
     byteSize(base64String: string): string {
         return this.dataUtils.byteSize(base64String);

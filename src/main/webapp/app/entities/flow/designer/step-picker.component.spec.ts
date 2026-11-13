@@ -15,8 +15,8 @@ describe('Step picker', () => {
     TestBed.inject(FaIconLibrary).addIcons(faPlus);
     fixture = TestBed.createComponent(StepPickerComponent);
     picker = fixture.componentInstance;
-    picker.kinds = ['ACTION', 'ROUTER', 'SINK'];
-    picker.components = { actions: ['azure-files', 'file', 'log', 'setbody'], sinks: ['azure-files', 'file', 'ftp'] };
+    fixture.componentRef.setInput('kinds', ['ACTION', 'ROUTER', 'SINK']);
+    fixture.componentRef.setInput('components', { actions: ['azure-files', 'file', 'log', 'setbody'], sinks: ['azure-files', 'file', 'ftp'] });
   });
 
   it('lists an exact match first, then the names that start with the search, shortest first', () => {
@@ -80,8 +80,6 @@ describe('Step picker', () => {
   describe('searching for a Router from the Action tab', () => {
     /** Opens the menu with a search; the menu is rendered in the body. */
     function searchFor(filter: string): HTMLElement[] {
-      fixture.componentRef.setInput('kinds', picker.kinds);
-      fixture.componentRef.setInput('components', picker.components);
       fixture.detectChanges();
       picker.open();
       picker.filter = filter;
@@ -113,7 +111,7 @@ describe('Step picker', () => {
     });
 
     it("shows Split as unavailable where a Router can't go", () => {
-      picker.kinds = ['ACTION', 'SINK'];
+      fixture.componentRef.setInput('kinds', ['ACTION', 'SINK']);
 
       const split = searchFor('split').filter(item => item.querySelector('.step-picker-item-id')?.textContent === 'split');
 

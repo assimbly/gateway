@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -13,11 +13,11 @@ type EntityArrayResponseType = HttpResponse<IStep[]>;
 
 @Injectable({ providedIn: 'root' })
 export class StepService {
+    protected http = inject(HttpClient);
+
     private resourceUrlStep = `${serverApiUrl}api/step`;
     private resourceUrlSteps = `${serverApiUrl}api/steps`;
     public resourceUrl = `${serverApiUrl}api/steps`;
-
-    constructor(protected http: HttpClient) {}
 
     create(step: IStep): Observable<HttpResponse<IStep>> {
         const copy = this.convert(step);

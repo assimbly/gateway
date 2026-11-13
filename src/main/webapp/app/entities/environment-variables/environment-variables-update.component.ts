@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
@@ -19,23 +18,21 @@ import { forbiddenEnvironmentKeysValidator } from './environment-variables-valid
 @Component({
     selector: 'jhi-environment-variables-update',
     templateUrl: './environment-variables-update.component.html',
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, FontAwesomeModule, AlertError, SaveShortcutDirective],
+    imports: [FormsModule, ReactiveFormsModule, FontAwesomeModule, AlertError, SaveShortcutDirective],
 })
 export class EnvironmentVariablesUpdateComponent implements OnInit {
+    protected alertService = inject(AlertService);
+    protected environmentVariablesService = inject(EnvironmentVariablesService);
+    protected integrationService = inject(IntegrationService);
+    protected activatedRoute = inject(ActivatedRoute);
+    protected router = inject(Router);
+
     environmentVariables: IEnvironmentVariables = new EnvironmentVariables();
     isSaving!: boolean;
 
     integrations: IIntegration[] = [];
     environmentVariablesForm!: FormGroup;
     private knownVariables: IEnvironmentVariables[] = [];
-
-    constructor(
-        protected alertService: AlertService,
-        protected environmentVariablesService: EnvironmentVariablesService,
-        protected integrationService: IntegrationService,
-        protected activatedRoute: ActivatedRoute,
-        protected router: Router
-    ) {}
 
     ngOnInit() {
         this.initializeForm();

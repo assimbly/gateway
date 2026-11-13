@@ -1,4 +1,4 @@
-import { Directive, Input } from '@angular/core';
+import { Directive, input } from '@angular/core';
 import { NG_VALIDATORS, Validator, AbstractControl } from '@angular/forms';
 
 @Directive({
@@ -7,9 +7,9 @@ import { NG_VALIDATORS, Validator, AbstractControl } from '@angular/forms';
 })
 export class ForbiddenHeaderValidatorDirective implements Validator {
     // tslint:disable-next-line:no-input-rename
-    @Input('jhiExistingHeader') existingKeys: Array<string>;
+    readonly existingKeys = input.required<Array<string>>({ alias: 'jhiExistingHeader' });
 
     validate(control: AbstractControl): { [key: string]: any } | null {
-        return this.existingKeys.some(k => k === control.value) ? { existingHeader: true } : null;
+        return this.existingKeys().some(k => k === control.value) ? { existingHeader: true } : null;
     }
 }

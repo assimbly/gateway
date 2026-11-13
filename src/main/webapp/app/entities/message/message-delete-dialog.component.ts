@@ -1,5 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
@@ -13,14 +12,16 @@ import { MessageService } from './message.service';
 @Component({
     selector: 'jhi-message-delete-dialog',
     templateUrl: './message-delete-dialog.component.html',
-    imports: [CommonModule, FontAwesomeModule, AlertError],
+    imports: [FontAwesomeModule, AlertError],
 })
 export class MessageDeleteDialogComponent {
+    protected messageService = inject(MessageService);
+    activeModal = inject(NgbActiveModal);
+    protected eventManager = inject(EventManager);
+
     message!: IMessage;
     errorMessage = false;
     deleteMode = true;
-
-    constructor(protected messageService: MessageService, public activeModal: NgbActiveModal, protected eventManager: EventManager) {}
 
     clear() {
         this.activeModal.dismiss('cancel');

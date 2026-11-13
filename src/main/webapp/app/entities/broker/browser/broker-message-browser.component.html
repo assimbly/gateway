@@ -41,176 +41,194 @@
     <h4 class="mb-0" style="margin-left: 0.7em">
       <b
         ><i>{{ subtitle }}</i></b
-      >
-    </h4>
-  </div>
-  <div class="d-flex justify-content-end gap-2 ms-auto">
-    <div ngbDropdown class="d-inline-block" *ngIf="messages?.length > 0">
-      <button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle>
-        <fa-icon icon="bars"></fa-icon>
-      </button>
-      <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
-        <button ngbDropdownItem (click)="openModal(moveMessageModal)">Move</button>
-        <button ngbDropdownItem (click)="clearMessage(selectedMessage)" title="Remove the selected message">Clear</button>
-        <button ngbDropdownItem (click)="clearAllMessages()" [title]="'Remove all messages from ' + endpointType + ' ' + endpointName">Clear all</button>
+        >
+      </h4>
+    </div>
+    <div class="d-flex justify-content-end gap-2 ms-auto">
+      @if (messages?.length > 0) {
+        <div ngbDropdown class="d-inline-block">
+          <button class="btn btn-outline-primary" id="dropdownMenuActions" ngbDropdownToggle>
+            <fa-icon icon="bars"></fa-icon>
+          </button>
+          <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
+            <button ngbDropdownItem (click)="openModal(moveMessageModal)">Move</button>
+            <button ngbDropdownItem (click)="clearMessage(selectedMessage)" title="Remove the selected message">Clear</button>
+            <button ngbDropdownItem (click)="clearAllMessages()" [title]="'Remove all messages from ' + endpointType + ' ' + endpointName">Clear all</button>
+          </div>
+        </div>
+      }
+
+      @if (messages?.length > 0) {
+        <div ngbDropdown class="d-inline-block">
+          <button class="btn btn-outline-primary" id="dropdownMenuActions2" ngbDropdownToggle>
+            <fa-icon icon="download"></fa-icon>
+          </button>
+          <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
+            <button ngbDropdownItem (click)="saveMessage(selectedMessage, true)">Body</button>
+            <button ngbDropdownItem (click)="saveMessage(selectedMessage, false)">Message</button>
+            <button ngbDropdownItem (click)="saveAllMessages()">All Messages</button>
+          </div>
+        </div>
+      }
+
+      <div>
+        <a class="btn btn-fx btn-fx-primary"
+          [routerLink]="['/broker/sender/message-sender']" [queryParams]="{ endpointName: endpointName, endpointType: endpointType, brokerType: brokerType }"
+          [title]="'Send a message to ' + (endpointType === 'topic' ? 'topic ' : 'queue ') + endpointName">
+          <fa-icon icon="paper-plane"></fa-icon>
+          <span>Send</span>
+        </a>
+      </div>
+
+      <div>
+        <button class="btn btn-fx btn-fx-secondary" type="button"
+          (click)="refreshMessages()" aria-label="Refresh">
+          <fa-icon icon="sync"></fa-icon>
+          <span>Refresh</span>
+        </button>
       </div>
     </div>
-
-    <div ngbDropdown class="d-inline-block" *ngIf="messages?.length > 0">
-      <button class="btn btn-outline-primary" id="dropdownMenuActions2" ngbDropdownToggle>
-        <fa-icon icon="download"></fa-icon>
-      </button>
-      <div ngbDropdownMenu aria-labelledby="dropdownMenuButton">
-        <button ngbDropdownItem (click)="saveMessage(selectedMessage, true)">Body</button>
-        <button ngbDropdownItem (click)="saveMessage(selectedMessage, false)">Message</button>
-        <button ngbDropdownItem (click)="saveAllMessages()">All Messages</button>
-      </div>
-    </div>
-
-    <div>
-      <a class="btn btn-fx btn-fx-primary"
-         [routerLink]="['/broker/sender/message-sender']" [queryParams]="{ endpointName: endpointName, endpointType: endpointType, brokerType: brokerType }"
-         [title]="'Send a message to ' + (endpointType === 'topic' ? 'topic ' : 'queue ') + endpointName">
-        <fa-icon icon="paper-plane"></fa-icon>
-        <span>Send</span>
-      </a>
-    </div>
-
-    <div>
-      <button class="btn btn-fx btn-fx-secondary" type="button"
-              (click)="refreshMessages()" aria-label="Refresh">
-        <fa-icon icon="sync"></fa-icon>
-        <span>Refresh</span>
-      </button>
-    </div>
   </div>
-</div>
 
-<!-- uncomment for adding searching to the table
-<div class="row">
+  <!-- uncomment for adding searching to the table
+  <div class="row">
     <div class="col-3">
-        <input type="text" align="left" style="margin-left: 0.3em"
-               [(ngModel)]="searchText"
-               id="searchTextId" name="searchText"
-               placeholder="Filter By Messages Name"/>
-    </div>
-    <div class="col-9">
-    </div>
-</div>-->
-
-<br />
-
-<div class="container-fluid" *ngIf="isLoading">
-  <br />
-  <div class="row">
-    <div class="col-6">Loading messages...</div>
-  </div>
-</div>
-
-<div class="container-fluid" *ngIf="messages?.length > 0">
-  <div class="row">
-    <div class="col-6" style="min-width: 0;">
-      <div class="table-responsive" [ngStyle]="{ visibility: finished ? 'visible' : 'hidden' }">
-        <table class="table table-hover table-striped table-condensed" style="width: 100%; table-layout: auto; word-break: break-word;">
-          <thead class="transparant">
-            <tr>
-              <th [style.display]="'none'"><span>ID</span></th>
-              <th><span>No.</span></th>
-              <th class="border-bottom-none" tabindex="0" (click)="sortByTimestamp()" (keydown.enter)="sortByTimestamp()" (keydown.space)="$event.preventDefault(); sortByTimestamp()"><span>Timestamp</span> <span class="fa fa-sort"></span></th>
-              <th><span>MessageID</span></th>
-              <th class="border-bottom-none"></th>
-            </tr>
-          </thead>
-          <tbody *ngIf="messages" infinite-scroll>
-            <tr
-              jhi-broker-message-browser-row
-              (click)="showMessage(message)"
-              [ngClass]="{ highlight: message.messageid === selectedHighlight }"
-              *ngFor="let message of messages | MessageSearchByMessageId: searchText; trackBy: trackTimestamp"
-              [message]="message"
-              ng-init="$last && finished()"
-            ></tr>
-          </tbody>
-        </table>
+      <input type="text" align="left" style="margin-left: 0.3em"
+        [(ngModel)]="searchText"
+        id="searchTextId" name="searchText"
+        placeholder="Filter By Messages Name"/>
       </div>
-      <button type="button" class="btn btn-outline-primary" style="margin-bottom: 0.3em" *ngIf="page > 1" (click)="previousPage()">
-        Previous
-      </button>
-      <div style="width: 3px; height: auto; display: inline-block" *ngIf="page > 1"></div>
-      <button type="button" class="btn btn-primary" style="margin-bottom: 0.3em" *ngIf="messagesCount > page * 100" (click)="nextPage()">
-        Next
-      </button>
-      <br />
-    </div>
-    <div class="col-6 overflow-auto" style="min-width: 0; position: sticky; top: 1rem; align-self: flex-start; max-height: calc(100vh - 2rem);">
+      <div class="col-9">
+      </div>
+    </div>-->
 
-      <div class="table-responsive" [ngStyle]="{ visibility: finished ? 'visible' : 'hidden' }">
-        <table class="table table-striped table-condensed">
-          <thead class="transparant">
-          <tr jhiSort [(sortState)]="sortState">
-            <th scope="col" >Body</th>
-          </tr>
-          </thead>
-          <tbody infinite-scroll style=" max-height: 100px;">
-          <tr>
-            <td>
-              <ngx-codemirror id="messageBrowserEditor"
-                  name="codemirror"
-                  [(ngModel)]="this.selectedMessage.body"
+    <br />
+
+    @if (isLoading) {
+      <div class="container-fluid">
+        <br />
+        <div class="row">
+          <div class="col-6">Loading messages...</div>
+        </div>
+      </div>
+    }
+
+    @if (messages?.length > 0) {
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-6" style="min-width: 0;">
+            <div class="table-responsive" [ngStyle]="{ visibility: finished ? 'visible' : 'hidden' }">
+              <table class="table table-hover table-striped table-condensed" style="width: 100%; table-layout: auto; word-break: break-word;">
+                <thead class="transparant">
+                  <tr>
+                    <th [style.display]="'none'"><span>ID</span></th>
+                    <th><span>No.</span></th>
+                    <th class="border-bottom-none" tabindex="0" (click)="sortByTimestamp()" (keydown.enter)="sortByTimestamp()" (keydown.space)="$event.preventDefault(); sortByTimestamp()"><span>Timestamp</span> <span class="fa fa-sort"></span></th>
+                    <th><span>MessageID</span></th>
+                    <th class="border-bottom-none"></th>
+                  </tr>
+                </thead>
+                @if (messages) {
+                  <tbody infinite-scroll>
+                    @for (message of messages | MessageSearchByMessageId: searchText; track message.timestamp) {
+                      <tr
+                        jhi-broker-message-browser-row
+                        (click)="showMessage(message)"
+                        [ngClass]="{ highlight: message.messageid === selectedHighlight }"
+                        [message]="message"
+                        ng-init="$last && finished()"
+                      ></tr>
+                    }
+                  </tbody>
+                }
+              </table>
+            </div>
+            @if (page > 1) {
+              <button type="button" class="btn btn-outline-primary" style="margin-bottom: 0.3em" (click)="previousPage()">
+                Previous
+              </button>
+            }
+            @if (page > 1) {
+              <div style="width: 3px; height: auto; display: inline-block"></div>
+            }
+            @if (messagesCount > page * 100) {
+              <button type="button" class="btn btn-primary" style="margin-bottom: 0.3em" (click)="nextPage()">
+                Next
+              </button>
+            }
+            <br />
+          </div>
+          <div class="col-6 overflow-auto" style="min-width: 0; position: sticky; top: 1rem; align-self: flex-start; max-height: calc(100vh - 2rem);">
+            <div class="table-responsive" [ngStyle]="{ visibility: finished ? 'visible' : 'hidden' }">
+              <table class="table table-striped table-condensed">
+                <thead class="transparant">
+                  <tr jhiSort [(sortState)]="sortState">
+                    <th scope="col" >Body</th>
+                  </tr>
+                </thead>
+                <tbody infinite-scroll style=" max-height: 100px;">
+                  <tr>
+                    <td>
+                      <ngx-codemirror id="messageBrowserEditor"
+                        name="codemirror"
+                        [(ngModel)]="this.selectedMessage.body"
                   [options]="{
                   lineNumbers: true,
                   height: 'auto',
                   theme: themeService.editorTheme(),
                   mode: editorMode
                   }"
-            ></ngx-codemirror>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
-      <br/>
-      <h3>Headers</h3>
-      <div class="table-responsive" [ngStyle]="{ visibility: finished ? 'visible' : 'hidden' }">
-              <table class="table table-striped table-condensed">
-                <thead>
-                <tr jhiSort [(sortState)]="sortState">
-                  <th scope="col" jhiSortBy="key" class="border-bottom-none"><span>Key</span><fa-icon></fa-icon></th>
-                  <th scope="col" jhisortby="value"><span>Value</span></th>
-                  <th class="border-bottom-none"></th>
-                </tr>
-                </thead>
-                <tbody infinite-scroll>
-                <tr
-                  *ngFor="let header of this.selectedMessage.headers | keyvalue | MessageSortByHeaderPipe: (sortState.order === 'asc'):sortState.predicate"
-                >
-                  <td>{{ header.key }}</td>
-                  <td>{{ header.value }}</td>
-                </tr>
+                      ></ngx-codemirror>
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
-      <br/>
-      <h3>JMS Headers</h3>
-      <div class="table-responsive" [ngStyle]="{ visibility: finished ? 'visible' : 'hidden' }">
-        <table class="table table-striped table-condensed">
-          <thead>
-          <tr jhiSort [(sortState)]="sortState">
-            <th scope="col" jhiSortBy="key" class="border-bottom-none"><span>Key</span><fa-icon></fa-icon></th>
-            <th scope="col" jhisortby="value"><span>Value</span></th>
-            <th class="border-bottom-none"></th>
-          </tr>
-          </thead>
-          <tbody infinite-scroll>
-          <tr
-            *ngFor="let jmsheader of this.selectedMessage.jmsHeaders | keyvalue | MessageSortByHeaderPipe: (sortState.order === 'asc'):sortState.predicate"
-          >
-            <td>{{ jmsheader.key }}</td>
-            <td>{{ jmsheader.value }}</td>
-          </tr>
-          </tbody>
-        </table>
+            <br/>
+            <h3>Headers</h3>
+            <div class="table-responsive" [ngStyle]="{ visibility: finished ? 'visible' : 'hidden' }">
+              <table class="table table-striped table-condensed">
+                <thead>
+                  <tr jhiSort [(sortState)]="sortState">
+                    <th scope="col" jhiSortBy="key" class="border-bottom-none"><span>Key</span><fa-icon></fa-icon></th>
+                    <th scope="col" jhisortby="value"><span>Value</span></th>
+                    <th class="border-bottom-none"></th>
+                  </tr>
+                </thead>
+                <tbody infinite-scroll>
+                  @for (header of this.selectedMessage.headers | keyvalue | MessageSortByHeaderPipe: (sortState.order === 'asc'):sortState.predicate; track header.key) {
+                    <tr
+                      >
+                      <td>{{ header.key }}</td>
+                      <td>{{ header.value }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            <br/>
+            <h3>JMS Headers</h3>
+            <div class="table-responsive" [ngStyle]="{ visibility: finished ? 'visible' : 'hidden' }">
+              <table class="table table-striped table-condensed">
+                <thead>
+                  <tr jhiSort [(sortState)]="sortState">
+                    <th scope="col" jhiSortBy="key" class="border-bottom-none"><span>Key</span><fa-icon></fa-icon></th>
+                    <th scope="col" jhisortby="value"><span>Value</span></th>
+                    <th class="border-bottom-none"></th>
+                  </tr>
+                </thead>
+                <tbody infinite-scroll>
+                  @for (jmsheader of this.selectedMessage.jmsHeaders | keyvalue | MessageSortByHeaderPipe: (sortState.order === 'asc'):sortState.predicate; track jmsheader.key) {
+                    <tr
+                      >
+                      <td>{{ jmsheader.key }}</td>
+                      <td>{{ jmsheader.value }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</div>
+    }

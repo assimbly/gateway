@@ -1,5 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef, Component, OnChanges, OnDestroy, OnInit, SimpleChanges, inject, output, input } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbDropdownModule, NgbModal, NgbOffcanvas, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
@@ -58,7 +57,6 @@ enum Status {
   selector: '[jhi-flow-row]',
   templateUrl: './flow-row.component.html',
   imports: [
-    CommonModule,
     RouterModule,
     FontAwesomeModule,
     NgbDropdownModule,
@@ -73,12 +71,19 @@ enum Status {
   ],
 })
 export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
+  private flowService = inject(FlowService);
+  private stepService = inject(StepService);
+  private integrationService = inject(IntegrationService);
+  private modalService = inject(NgbModal);
+  private router = inject(Router);
+  private eventManager = inject(EventManager);
+  private changeDetector = inject(ChangeDetectorRef);
 
-  @Input() flow!: Flow;
+  readonly flow = input.required<Flow>();
   /** The API and Operation this Flow handles, when it is a Handler Flow. */
-  @Input() handler?: IApiHandler;
+  readonly handler = input<IApiHandler>();
   /** The Flow's runtime state, each time it changes. */
-  @Output() runtimeChange = new EventEmitter<FlowRuntime>();
+  readonly runtimeChange = output<FlowRuntime>();
 
   steps: Array<Step> = [new Step()];
   fromStep: Array<Step> = [];
@@ -145,16 +150,6 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
 
   alreadyConnectedOnce = false;
 
-  constructor(
-    private flowService: FlowService,
-    private stepService: StepService,
-		private integrationService: IntegrationService,
-    private modalService: NgbModal,
-    private router: Router,
-    private eventManager: EventManager,
-    private changeDetector: ChangeDetectorRef
-  ) {}
-
   get state(): FlowStatusView {
     return flowStatusView(this.statusFlow, this.isDraft);
   }
@@ -172,19 +167,23 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
    * Route, whose `<from>` the list doesn't have: the Send page reads it.
    */
   get testMessageBlocked(): string | null {
-    const source = sourceStepOf(this.flow.steps)?.componentType;
-    if (!source && firstRouteStepOf(this.flow.steps)) {
+    const flow = this.flow();
+    const source = sourceStepOf(flow.steps)?.componentType;
+    if (!source && firstRouteStepOf(flow.steps)) {
       return testMessageBlocked(this.statusFlow, { name: 'route' });
     }
-    return testMessageBlocked(this.statusFlow, source ? (this.components.types.find(type => type.name === source) ?? { name: source }) : null);
+    return testMessageBlocked(
+      this.statusFlow,
+      source ? (this.components.types.find(type => type.name === source) ?? { name: source }) : null,
+    );
   }
 
   sendTestMessage(): void {
-    this.router.navigate(['/flow/message-sender'], { queryParams: { flowId: this.flow.id } });
+    this.router.navigate(['/flow/message-sender'], { queryParams: { flowId: this.flow().id } });
   }
 
   get typeLabel(): string {
-    return flowTypeLabel(this.flow.type);
+    return flowTypeLabel(this.flow().type);
   }
 
   count(value: number | null): string {
@@ -208,10 +207,11 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnInit() {
     this.setFlowStatusDefaults();
-    this.getStatus(this.flow.id!);
+    const flow = this.flow();
+    this.getStatus(flow.id!);
 
-    this.detailsLink = opensOnCanvas(this.flow.type) ? ['/flow', this.flow.id, 'stats'] : undefined;
-    this.steps = this.flow.steps!;
+    this.detailsLink = opensOnCanvas(flow.type) ? ['/flow', flow.id, 'stats'] : undefined;
+    this.steps = flow.steps!;
     this.getSteps();
     this.checkDraft();
     this.registerTriggeredAction();
@@ -226,14 +226,16 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
 
   /** Why Delete is refused: a Handler Flow is deleted with its Operation. */
   get deleteBlocked(): string | null {
-    return this.handler
-      ? `This Flow handles ${this.handler.method} ${this.handler.fullPath} of the API ${this.handler.apiName}. Delete that Operation instead; its Handler Flow goes with it.`
+    const handler = this.handler();
+    return handler
+      ? `This Flow handles ${handler.method} ${handler.fullPath} of the API ${handler.apiName}. Delete that Operation instead; its Handler Flow goes with it.`
       : null;
   }
 
   private checkDraft(): void {
-    if (opensOnCanvas(this.flow.type)) {
-      const graph = loadFlowGraph(this.flow, this.handler);
+    const flow = this.flow();
+    if (opensOnCanvas(flow.type)) {
+      const graph = loadFlowGraph(flow, this.handler());
       this.isDraft = isDraft(graph);
       // A Step with an empty required path part also makes a Draft, once its Component's schema is read.
       this.subscriptions.add(
@@ -264,12 +266,12 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
     if (this.destroyed || !this.isFlowStarted) {
       return;
     }
-    this.getFlowNumberOfAlerts(this.flow.id!);
+    this.getFlowNumberOfAlerts(this.flow().id!);
   }
 
   /** Opens the Alerts drawer; once they are cleared the row's count goes to zero and an Error becomes Stopped. */
   openAlerts(): void {
-    FlowAlertsDrawerComponent.open(this.offcanvas, { id: this.flow.id!, name: this.flow.name, type: this.flow.type }, () => {
+    FlowAlertsDrawerComponent.open(this.offcanvas, { id: this.flow().id!, name: this.flow().name, type: this.flow().type }, () => {
       this.failure = null;
       this.setFlowNumberOfAlerts(0);
       if (this.statusFlow === Status.inactiveError) {
@@ -281,22 +283,24 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
 
   /** Opens the drawer with what this Flow logged. */
   openLog(): void {
-    FlowLogDrawerComponent.open(this.offcanvas, { id: this.flow.id!, name: this.flow.name });
+    FlowLogDrawerComponent.open(this.offcanvas, { id: this.flow().id!, name: this.flow().name });
   }
 
   getStatus(id: number) {
     this.clickButton = true;
 
     this.subscriptions.add(
-      forkJoin(this.flowService.getFlowStatus(id), this.flowService.getFlowAlertsPage(id, 0, 0)).subscribe(([flowStatus, flowAlertsPage]) => {
-        if (this.destroyed) {
-          return;
-        }
-        if (flowStatus.body != 'unconfigured') {
-          this.setFlowStatus(flowStatus.body!);
-        }
-        this.setFlowNumberOfAlerts(flowAlertsPage.body?.total ?? 0);
-      }),
+      forkJoin(this.flowService.getFlowStatus(id), this.flowService.getFlowAlertsPage(id, 0, 0)).subscribe(
+        ([flowStatus, flowAlertsPage]) => {
+          if (this.destroyed) {
+            return;
+          }
+          if (flowStatus.body != 'unconfigured') {
+            this.setFlowStatus(flowStatus.body!);
+          }
+          this.setFlowNumberOfAlerts(flowAlertsPage.body?.total ?? 0);
+        },
+      ),
     );
   }
 
@@ -319,7 +323,6 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   setFlowStatus(status: string, refreshView = true): void {
-
     switch (status) {
       case '':
       case 'unconfigured':
@@ -375,7 +378,7 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
         this.flowStatusButton = `Failed`;
         this.failure = failureOfError(this.statusMessage);
         // The failure is an Alert now: count it.
-        this.getFlowNumberOfAlerts(this.flow.id!);
+        this.getFlowNumberOfAlerts(this.flow().id!);
         break;
       default:
         this.statusFlow = Status.inactive;
@@ -409,7 +412,7 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
     if (this.destroyed) {
       return;
     }
-    this.getFlowNumberOfAlerts(this.flow.id!);
+    this.getFlowNumberOfAlerts(this.flow().id!);
   }
 
   getFlowNumberOfAlerts(id: number) {
@@ -444,49 +447,51 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   navigateToFlowEditor(mode: string) {
-
-    if(!this.flow.type){
-      this.flow.type = 'flow';
+    const flow = this.flow();
+    if (!flow.type) {
+      flow.type = 'flow';
     }
 
     switch (mode) {
-        case 'edit':
-          this.router.navigate(['../../flow/editor', this.flow.id], {queryParams: { mode: mode, editor: this.flow.type, id: this.flow.id }});
-          break;
-        case 'clone':
-          this.router.navigate(['../../flow/editor', this.flow.id], {queryParams: { mode: mode, editor: this.flow.type, id: this.flow.id }});
-          break;
-        case 'test':
-          // The editor opens in Test, on the Visual flow with the Tester beside it.
-          this.router.navigate(['../../flow/editor', this.flow.id], {queryParams: { mode: 'edit', editor: this.flow.type, id: this.flow.id, view: 'test' }});
-          break;
-        case 'delete': {
-          const modalRef = this.modalService.open(FlowDeleteDialogComponent);
-          modalRef.componentInstance.flow = this.flow;
-          break;
-        }
-        default:
-          break;
+      case 'edit':
+        this.router.navigate(['../../flow/editor', flow.id], { queryParams: { mode: mode, editor: flow.type, id: flow.id } });
+        break;
+      case 'clone':
+        this.router.navigate(['../../flow/editor', flow.id], { queryParams: { mode: mode, editor: flow.type, id: flow.id } });
+        break;
+      case 'test':
+        // The editor opens in Test, on the Visual flow with the Tester beside it.
+        this.router.navigate(['../../flow/editor', flow.id], {
+          queryParams: { mode: 'edit', editor: flow.type, id: flow.id, view: 'test' },
+        });
+        break;
+      case 'delete': {
+        const modalRef = this.modalService.open(FlowDeleteDialogComponent);
+        modalRef.componentInstance.flow = flow;
+        break;
       }
+      default:
+        break;
+    }
   }
 
   navigateToStepEditor(mode: string, editorType: string, step: Step) {
-    this.router.navigate(['../../flow/editor', this.flow.id], {queryParams: { mode: mode, editor: editorType, stepid: step.id }});
+    this.router.navigate(['../../flow/editor', this.flow().id], { queryParams: { mode: mode, editor: editorType, stepid: step.id } });
   }
 
-  exportFlow(){
-    this.flowService.exportFlowConfiguration(this.flow);
+  exportFlow() {
+    this.flowService.exportFlowConfiguration(this.flow());
   }
 
   getFlowDetails() {
-    const createdFormatted = dayjs(this.flow.created).format('YYYY-MM-DD HH:mm:ss');
-    const lastModifiedFormatted = dayjs(this.flow.lastModified).format('YYYY-MM-DD HH:mm:ss');
+    const createdFormatted = dayjs(this.flow().created).format('YYYY-MM-DD HH:mm:ss');
+    const lastModifiedFormatted = dayjs(this.flow().lastModified).format('YYYY-MM-DD HH:mm:ss');
 
     this.flowDetails = `
 
-                <b>ID:</b> ${this.flow.id}<br/>
-                <b>Name:</b> ${this.flow.name}<br/>
-                <b>Version:</b> ${this.flow.version}<br/><br/>
+                <b>ID:</b> ${this.flow().id}<br/>
+                <b>Name:</b> ${this.flow().name}<br/>
+                <b>Version:</b> ${this.flow().version}<br/><br/>
                 <b>Created:</b> ${createdFormatted}<br/>
                 <b>Last modified:</b> ${lastModifiedFormatted}<br/><br/>
                 <b>Status:</b> ${this.flowStatusButton}<br/>
@@ -540,11 +545,12 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private loadFlowTransactions(): void {
-    if (!this.flow?.id || this.destroyed) {
+    const flow = this.flow();
+    if (!flow?.id || this.destroyed) {
       return;
     }
     this.subscriptions.add(
-      this.flowService.getFlowTransactions(this.flow.id).subscribe({
+      this.flowService.getFlowTransactions(flow.id).subscribe({
         next: response => {
           if (this.destroyed || !this.ran) {
             return;
@@ -596,48 +602,49 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   registerTriggeredAction() {
-    this.subscriptions.add(this.eventManager.subscribe('trigerAction', (response: EventWithContent<unknown>) => {
-      switch (response.content as string) {
-        case 'start':
-          if (this.statusFlow === Status.inactive && !this.isDraft) {
-            this.start();
-          }
-          break;
-        case 'stop':
-          if (this.statusFlow === Status.active || this.statusFlow === Status.paused) {
-            this.stop();
-          }
-          break;
-        case 'pause':
-          if (this.statusFlow === Status.active) {
-            this.pause();
-          }
-          break;
-        case 'restart':
-          if (this.statusFlow === Status.active) {
-            this.restart();
-          }
-          break;
-        case 'resume':
-          if (this.statusFlow === Status.paused) {
-            this.resume();
-          }
-          break;
-        default:
-          break;
-      }
-    }));
+    this.subscriptions.add(
+      this.eventManager.subscribe('trigerAction', (response: EventWithContent<unknown>) => {
+        switch (response.content as string) {
+          case 'start':
+            if (this.statusFlow === Status.inactive && !this.isDraft) {
+              this.start();
+            }
+            break;
+          case 'stop':
+            if (this.statusFlow === Status.active || this.statusFlow === Status.paused) {
+              this.stop();
+            }
+            break;
+          case 'pause':
+            if (this.statusFlow === Status.active) {
+              this.pause();
+            }
+            break;
+          case 'restart':
+            if (this.statusFlow === Status.active) {
+              this.restart();
+            }
+            break;
+          case 'resume':
+            if (this.statusFlow === Status.paused) {
+              this.resume();
+            }
+            break;
+          default:
+            break;
+        }
+      }),
+    );
   }
 
   start() {
-
     this.flowStatus = 'Starting';
     this.isFlowStatusOK = true;
     this.disableActionBtns = true;
     this.failure = null;
 
     this.configureAndRun(
-      this.flowService.applyTrace(this.flow.id!).pipe(switchMap(() => this.flowService.start(this.flow.id!))),
+      this.flowService.applyTrace(this.flow().id!).pipe(switchMap(() => this.flowService.start(this.flow().id!))),
       body => {
         this.applyAnswer(body);
       },
@@ -645,12 +652,12 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
         this.statusMessage = err.error;
         this.disableActionBtns = false;
         this.setFlowStatus('error');
-        this.flowStatusError = `Flow with id=${this.flow.id} is not started.`;
+        this.flowStatusError = `Flow with id=${this.flow().id} is not started.`;
         this.isFlowStatusOK = false;
       },
       () => {
-        this.flowStatusError = `Flow with id=${this.flow.id} is not started.`;
-        this.flowConfigurationNotObtained(this.flow.id!);
+        this.flowStatusError = `Flow with id=${this.flow().id} is not started.`;
+        this.flowConfigurationNotObtained(this.flow().id!);
         this.isFlowStatusOK = false;
         this.disableActionBtns = false;
       },
@@ -662,7 +669,7 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
     this.isFlowStatusOK = true;
     this.disableActionBtns = true;
     this.subscriptions.add(
-      this.flowService.pause(this.flow.id!).subscribe(
+      this.flowService.pause(this.flow().id!).subscribe(
         response => {
           if (this.destroyed) {
             return;
@@ -677,7 +684,7 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
           this.disableActionBtns = false;
           this.setFlowStatus('error');
           this.isFlowStatusOK = false;
-          this.flowStatusError = `Flow with id=${this.flow.id} is not paused`;
+          this.flowStatusError = `Flow with id=${this.flow().id} is not paused`;
         },
       ),
     );
@@ -689,7 +696,7 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
     this.disableActionBtns = true;
 
     this.configureAndRun(
-      this.flowService.resume(this.flow.id!),
+      this.flowService.resume(this.flow().id!),
       body => {
         this.applyAnswer(body);
       },
@@ -698,10 +705,10 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
         this.disableActionBtns = false;
         this.setFlowStatus('error');
         this.isFlowStatusOK = false;
-        this.flowStatusError = `Flow with id=${this.flow.id} is not resumed.`;
+        this.flowStatusError = `Flow with id=${this.flow().id} is not resumed.`;
       },
       () => {
-        this.flowConfigurationNotObtained(this.flow.id!);
+        this.flowConfigurationNotObtained(this.flow().id!);
         this.disableActionBtns = false;
       },
     );
@@ -714,7 +721,7 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
     this.flowAlerts = `false`;
 
     this.configureAndRun(
-      this.flowService.applyTrace(this.flow.id!).pipe(switchMap(() => this.flowService.restart(this.flow.id!))),
+      this.flowService.applyTrace(this.flow().id!).pipe(switchMap(() => this.flowService.restart(this.flow().id!))),
       body => {
         this.applyAnswer(body);
       },
@@ -723,10 +730,10 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
         this.disableActionBtns = false;
         this.setFlowStatus('error');
         this.isFlowStatusOK = false;
-        this.flowStatusError = `Flow with id=${this.flow.id} is not started.`;
+        this.flowStatusError = `Flow with id=${this.flow().id} is not started.`;
       },
       () => {
-        this.flowConfigurationNotObtained(this.flow.id!);
+        this.flowConfigurationNotObtained(this.flow().id!);
         this.disableActionBtns = false;
       },
     );
@@ -740,7 +747,7 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
     this.disableTracing();
 
     this.subscriptions.add(
-      this.flowService.stop(this.flow.id!).subscribe(
+      this.flowService.stop(this.flow().id!).subscribe(
         response => {
           if (this.destroyed) {
             return;
@@ -755,7 +762,7 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
           this.disableActionBtns = false;
           this.setFlowStatus('error');
           this.isFlowStatusOK = false;
-          this.flowStatusError = `Flow with id=${this.flow.id} is not stopped.`;
+          this.flowStatusError = `Flow with id=${this.flow().id} is not stopped.`;
         },
       ),
     );
@@ -777,7 +784,7 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
     let configured = false;
     this.subscriptions.add(
       this.flowService
-        .configure(this.flow.id!)
+        .configure(this.flow().id!)
         .pipe(
           tap(() => {
             configured = true;
@@ -806,10 +813,7 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
     );
   }
 
-  disableTracing(){
-
-   this.integrationService.removeCollector(this.flow.id!).subscribe();
-
+  disableTracing() {
+    this.integrationService.removeCollector(this.flow().id!).subscribe();
   }
-
 }

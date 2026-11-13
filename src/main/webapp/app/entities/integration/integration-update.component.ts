@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
@@ -15,136 +14,134 @@ import { Components } from '../../shared/camel/component-type';
 import { Router } from '@angular/router';
 
 @Component({
-    selector: 'jhi-integration-update',
-    templateUrl: './integration-update.component.html',
-    imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, NgbPopoverModule, SaveShortcutDirective],
+  selector: 'jhi-integration-update',
+  templateUrl: './integration-update.component.html',
+  imports: [FormsModule, FontAwesomeModule, AlertError, NgbPopoverModule, SaveShortcutDirective],
 })
 export class IntegrationUpdateComponent implements OnInit {
-    integration!: IIntegration;
-    isSaving!: boolean;
+  protected alertService = inject(AlertService);
+  protected integrationService = inject(IntegrationService);
+  protected activatedRoute = inject(ActivatedRoute);
+  protected router = inject(Router);
+  components = inject(Components);
 
-    public integrationListType = [GatewayType.FULL, GatewayType.BROKER, GatewayType.CONNECTOR];
-    public integrationListStage = [EnvironmentType.DEVELOPMENT, EnvironmentType.TEST, EnvironmentType.ACCEPTANCE, EnvironmentType.PRODUCTION];
+  integration!: IIntegration;
+  isSaving!: boolean;
 
-    consumerComponentsNames: Array<any> = [];
-    producerComponentsNames: Array<any> = [];
+  public integrationListType = [GatewayType.FULL, GatewayType.BROKER, GatewayType.CONNECTOR];
+  public integrationListStage = [EnvironmentType.DEVELOPMENT, EnvironmentType.TEST, EnvironmentType.ACCEPTANCE, EnvironmentType.PRODUCTION];
 
-    generalPopoverMessage!: string;
-    typePopoverMessage!: string;
-    environmentPopoverMessage!: string;
-    defaultPopoverMessage!: string;
+  consumerComponentsNames: Array<any> = [];
+  producerComponentsNames: Array<any> = [];
 
-    constructor(
-		protected alertService: AlertService,
-        protected integrationService: IntegrationService,
-        protected activatedRoute: ActivatedRoute,
-        protected router: Router,
-        public components: Components
-    ) {}
+  generalPopoverMessage!: string;
+  typePopoverMessage!: string;
+  environmentPopoverMessage!: string;
+  defaultPopoverMessage!: string;
 
-    ngOnInit() {
-        this.isSaving = false;
-        this.activatedRoute.data.subscribe(({ integration }) => {
-            this.integration = integration;
-        });
+  ngOnInit() {
+    this.isSaving = false;
+    this.activatedRoute.data.subscribe(({ integration }) => {
+      this.integration = integration;
+    });
 
-        this.setComponents();
+    this.setComponents();
 
-        this.setPopoverMessages();
+    this.setPopoverMessages();
 
-        if (typeof this.integration.id === 'undefined') {
-            this.integration.type = GatewayType.FULL;
-            this.integration.stage = EnvironmentType.DEVELOPMENT;
-            this.integration.defaultFromComponentType = 'file';
-            this.integration.defaultToComponentType = 'file';
-            this.integration.defaultErrorComponentType = 'file';
-        }
-
-        if (this.activatedRoute.snapshot.fragment === 'clone') {
-            this.integration.id = null!;
-        }
+    if (typeof this.integration.id === 'undefined') {
+      this.integration.type = GatewayType.FULL;
+      this.integration.stage = EnvironmentType.DEVELOPMENT;
+      this.integration.defaultFromComponentType = 'file';
+      this.integration.defaultToComponentType = 'file';
+      this.integration.defaultErrorComponentType = 'file';
     }
 
-    previousState() {
-        window.history.back();
+    if (this.activatedRoute.snapshot.fragment === 'clone') {
+      this.integration.id = null!;
     }
+  }
 
-    save() {
-        this.isSaving = true;
-        if (this.integration.id !== undefined) {
-            this.subscribeToSaveResponse(this.integrationService.update(this.integration));
-        } else {
-            this.subscribeToSaveResponse(this.integrationService.create(this.integration));
-        }
+  previousState() {
+    window.history.back();
+  }
+
+  save() {
+    this.isSaving = true;
+    if (this.integration.id !== undefined) {
+      this.subscribeToSaveResponse(this.integrationService.update(this.integration));
+    } else {
+      this.subscribeToSaveResponse(this.integrationService.create(this.integration));
     }
+  }
 
-    protected subscribeToSaveResponse(result: Observable<HttpResponse<IIntegration>>) {
-        result.subscribe(
-            (res: HttpResponse<IIntegration>) => this.onSaveSuccess(),
-            (res: HttpErrorResponse) => this.onSaveError()
-        );
+  protected subscribeToSaveResponse(result: Observable<HttpResponse<IIntegration>>) {
+    result.subscribe(
+      (res: HttpResponse<IIntegration>) => this.onSaveSuccess(),
+      (res: HttpErrorResponse) => this.onSaveError(),
+    );
+  }
+
+  protected onSaveSuccess() {
+    this.isSaving = false;
+    this.router.navigate(['/integration']);
+  }
+
+  protected onSaveError() {
+    this.isSaving = false;
+  }
+
+  protected onError(errorMessage: string) {
+    this.alertService.addAlert({
+      type: 'danger',
+      message: errorMessage,
+    });
+  }
+
+  setTypeIntegration() {
+    if (this.integration.type!.toString() === 'BROKER') {
+      this.integration.defaultFromComponentType = 'activemq';
+      this.integration.defaultToComponentType = 'activemq';
+      this.integration.defaultErrorComponentType = 'activemq';
+    } else if (this.integration.type!.toString() === 'ARTEMIS') {
+      this.integration.defaultFromComponentType = 'amqp';
+      this.integration.defaultToComponentType = 'amqp';
+      this.integration.defaultErrorComponentType = 'amqp';
+    } else {
+      this.integration.defaultFromComponentType = 'file';
+      this.integration.defaultToComponentType = 'file';
+      this.integration.defaultErrorComponentType = 'file';
     }
+  }
 
-    protected onSaveSuccess() {
-        this.isSaving = false;
-        this.router.navigate(['/integration']);
-    }
+  setComponents() {
+    const producerComponents = this.components.types.filter(function (component) {
+      return component.consumerOnly === false;
+    });
 
-    protected onSaveError() {
-        this.isSaving = false;
-    }
+    const consumerComponents = this.components.types.filter(function (component) {
+      return component.producerOnly === false;
+    });
 
-    protected onError(errorMessage: string) {
-		this.alertService.addAlert({
-		  type: 'danger',
-		  message: errorMessage,
-		});
-    }
+    this.producerComponentsNames = producerComponents.map(component => component.name);
+    this.producerComponentsNames.sort();
 
-    setTypeIntegration() {
-        if (this.integration.type!.toString() === 'BROKER') {
-            this.integration.defaultFromComponentType = 'activemq';
-            this.integration.defaultToComponentType = 'activemq';
-            this.integration.defaultErrorComponentType = 'activemq';
-        } else if (this.integration.type!.toString() === 'ARTEMIS') {
-            this.integration.defaultFromComponentType = 'amqp';
-            this.integration.defaultToComponentType = 'amqp';
-            this.integration.defaultErrorComponentType = 'amqp';
-        } else {
-            this.integration.defaultFromComponentType = 'file';
-            this.integration.defaultToComponentType = 'file';
-            this.integration.defaultErrorComponentType = 'file';
-        }
-    }
+    this.consumerComponentsNames = consumerComponents.map(component => component.name);
+    this.consumerComponentsNames.sort();
+  }
 
-    setComponents() {
-        const producerComponents = this.components.types.filter(function(component) {
-            return component.consumerOnly === false;
-        });
-
-        const consumerComponents = this.components.types.filter(function(component) {
-            return component.producerOnly === false;
-        });
-
-        this.producerComponentsNames = producerComponents.map(component => component.name);
-        this.producerComponentsNames.sort();
-
-        this.consumerComponentsNames = consumerComponents.map(component => component.name);
-        this.consumerComponentsNames.sort();
-    }
-
-    setPopoverMessages() {
-        this.generalPopoverMessage = `General settings of the integration<br></br><b>Name: </b>
+  setPopoverMessages() {
+    this.generalPopoverMessage = `General settings of the integration<br></br><b>Name: </b>
                     Name of the integration. Usually this is the name of the default source or destination,
                         like an application or system.<br/><br/>
                      <b>Type: </b>The type of integration: Connector or Broker. Full supports both. <br/><br/>Default is FULL.`;
-        this.environmentPopoverMessage = `Type of integration <br/></br>
+    this.environmentPopoverMessage = `Type of integration <br/></br>
                     <b/>Type: </b>The type of integration: Connector or Broker. Full supports both. <br/><br/>Default is FULL.`;
-        this.environmentPopoverMessage = `Environment settings of the integration <br/></br>
+    this.environmentPopoverMessage = `Environment settings of the integration <br/></br>
                     <b/>Name: </b>Name to indicate the stage. Default="Dev1".
                     <b>Stage: </b>The role of the environment: development, test, acceptance or production. Default=Development`;
-        this.defaultPopoverMessage = `Component settings of the integration <br/></br>
+    this.defaultPopoverMessage = `Component settings of the integration <br/></br>
                         Sets the default selected components when creating a flow. <br/><br/>
                         The component can always be changed when creating or editing a flow. <br/><br/> Default=FILE.`;
-    }
+  }
 }

@@ -5,7 +5,7 @@ describe('Flow row', () => {
   function row(): { component: FlowRowComponent; navigate: jest.Mock } {
     const component = Object.create(FlowRowComponent.prototype) as FlowRowComponent;
     const navigate = jest.fn();
-    Object.assign(component, { flow: { id: 7, type: 'flow' }, router: { navigate } });
+    Object.assign(component, { flow: () => ({ id: 7, type: 'flow' }), router: { navigate } });
     return { component, navigate };
   }
 

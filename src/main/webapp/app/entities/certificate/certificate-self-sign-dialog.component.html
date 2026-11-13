@@ -1,29 +1,31 @@
 <form name="importForm">
-    <div class="modal-header">
-        <h4 class="modal-title" id="selfSignLabel">Generate self-signed identity</h4>
-        <button type="button" class="btn-close" aria-label="Close" (click)="clear()"></button>
+  <div class="modal-header">
+    <h4 class="modal-title" id="selfSignLabel">Generate self-signed identity</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="clear()"></button>
+  </div>
+  <div class="modal-body">
+    @if (error) {
+      <div class="alert alert-danger">
+        <strong>Generate error!</strong> {{errorMessage}}
+      </div>
+    }
+    <p class="text-muted">
+      Generates a private key and a self-signed certificate for the common name, stored as server identity in {{identityStore}}.
+      An identity with the same name is replaced.
+    </p>
+    <div class="form-group">
+      <label for="cn" class="form-control-label font-weight-bold">Common Name (CN)</label>
+      <input type="text" id="cn" name="cn" class="form-control" [(ngModel)]="cn" placeholder="Example: localhost">
     </div>
-    <div class="modal-body">
-    	<div class="alert alert-danger" *ngIf="error">
-            <strong>Generate error!</strong> {{errorMessage}}
-        </div>
-        <p class="text-muted">
-            Generates a private key and a self-signed certificate for the common name, stored as server identity in {{identityStore}}.
-            An identity with the same name is replaced.
-        </p>
-        <div class="form-group">
-            <label for="cn" class="form-control-label font-weight-bold">Common Name (CN)</label>
-            <input type="text" id="cn" name="cn" class="form-control" [(ngModel)]="cn" placeholder="Example: localhost">
-        </div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-fx btn-fx-secondary" (click)="clear()">
-            <span class="fa fa-ban"></span>
-            <span>Cancel</span>
-        </button>
-        <button type="button" class="btn btn-fx btn-fx-primary" [disabled]="cn.trim() === '' || isSaving" (click)="generateIdentity()">
-            <span class="fa fa-upload"></span>
-            <span>Generate</span>
-        </button>
-    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-fx btn-fx-secondary" (click)="clear()">
+      <span class="fa fa-ban"></span>
+      <span>Cancel</span>
+    </button>
+    <button type="button" class="btn btn-fx btn-fx-primary" [disabled]="cn.trim() === '' || isSaving" (click)="generateIdentity()">
+      <span class="fa fa-upload"></span>
+      <span>Generate</span>
+    </button>
+  </div>
 </form>

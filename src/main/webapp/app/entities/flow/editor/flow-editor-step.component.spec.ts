@@ -15,6 +15,15 @@ import { FlowService } from '../flow.service';
 import { FlowEditorStepComponent, StepEditorRegistry } from './flow-editor-step.component';
 import { SCRIPT_LANGUAGES, ScriptTrial } from './script-flow';
 
+/** The step editor with the text inputs every Flow editor binds, before a test sets its own. */
+function createStep(): ComponentFixture<FlowEditorStepComponent> {
+  const created = TestBed.createComponent(FlowEditorStepComponent);
+  for (const name of ['activeEditor', 'uriPopoverMessage', 'componentTypeCamelLink', 'connectionType', 'errorHandlerPopoverMessage', 'optionsPopoverMessage']) {
+    created.componentRef.setInput(name, '');
+  }
+  return created;
+}
+
 describe('Flow editor Script Step', () => {
   let fixture: ComponentFixture<FlowEditorStepComponent>;
   let tryScript: jest.SpyInstance;
@@ -29,7 +38,7 @@ describe('Flow editor Script Step', () => {
     trial = new Subject<ScriptTrial>();
     tryScript = jest.spyOn(TestBed.inject(FlowService), 'tryScript').mockReturnValue(trial);
 
-    fixture = TestBed.createComponent(FlowEditorStepComponent);
+    fixture = createStep();
     fixture.componentRef.setInput('step', { stepType: StepType.SCRIPT, componentType: 'groovy' });
     fixture.componentRef.setInput('index', 1);
     fixture.componentRef.setInput(
@@ -147,7 +156,7 @@ describe('Flow editor Component Step', () => {
     });
     TestBed.inject(FaIconLibrary).addIcons(...fontAwesomeIcons);
 
-    fixture = TestBed.createComponent(FlowEditorStepComponent);
+    fixture = createStep();
     // A saved Step, so no Options are suggested on top of its own.
     fixture.componentRef.setInput('step', { stepType: StepType.ACTION, componentType, options: 'saved' });
     fixture.componentRef.setInput('index', 1);
@@ -225,7 +234,7 @@ describe('Flow editor Component Step', () => {
     fixture.detectChanges();
 
     expect(fixture.nativeElement.querySelectorAll('.option-row').length).toBe(0);
-    expect(fixture.componentInstance.stepOptions.length).toBe(0);
+    expect(fixture.componentInstance.stepOptions().length).toBe(0);
   });
 
   it('puts a picked Variable in a switch Option, making it a text field', () => {
@@ -333,7 +342,7 @@ describe('Flow editor Router Step', () => {
     });
     TestBed.inject(FaIconLibrary).addIcons(...fontAwesomeIcons);
 
-    fixture = TestBed.createComponent(FlowEditorStepComponent);
+    fixture = createStep();
     fixture.componentRef.setInput('step', { stepType: StepType.ROUTER, componentType: 'split', ...step });
     fixture.componentRef.setInput('index', 1);
     fixture.componentRef.setInput(
@@ -382,7 +391,7 @@ describe('Flow editor Router Step', () => {
   it("doesn't suggest them for a new Router either", () => {
     render([], { options: undefined });
 
-    const keys = (fixture.componentInstance.stepForm.get('options') as FormArray).controls.map(option => option.get('key')?.value);
+    const keys = (fixture.componentInstance.stepForm().get('options') as FormArray).controls.map(option => option.get('key')?.value);
     expect(keys).not.toContain('language');
     expect(keys).not.toContain('expression');
   });
@@ -401,7 +410,7 @@ describe('Flow editor Router Step', () => {
     (fixture.nativeElement.querySelector('.option-row [aria-label="Remove option"]') as HTMLButtonElement).click();
     fixture.detectChanges();
 
-    expect(step.stepOptions.map(option => option.key)).toEqual(['streaming']);
+    expect(step.stepOptions().map(option => option.key)).toEqual(['streaming']);
   });
 
   it('points to the Branch that holds the Condition, and opens it', () => {
@@ -441,7 +450,7 @@ describe('Flow editor Route Step', () => {
     });
     TestBed.inject(FaIconLibrary).addIcons(...fontAwesomeIcons);
 
-    fixture = TestBed.createComponent(FlowEditorStepComponent);
+    fixture = createStep();
     fixture.componentRef.setInput('step', { stepType, componentType: '' });
     fixture.componentRef.setInput('index', 1);
     fixture.componentRef.setInput(
@@ -510,7 +519,7 @@ describe('Flow editor Route Step', () => {
     step.addConnection.subscribe(added);
 
     addConnectionLink()!.click();
-    expect(added).toHaveBeenCalledWith({ step: step.step, index: 1 });
+    expect(added).toHaveBeenCalledWith({ step: step.step(), index: 1 });
   });
 
   it('hides the Connection link once the Connection is shown', () => {
@@ -525,7 +534,7 @@ describe('Flow editor Route Step', () => {
     step.removeConnection.subscribe(removed);
 
     removeConnectionButton()!.click();
-    expect(removed).toHaveBeenCalledWith({ step: step.step, index: 1 });
+    expect(removed).toHaveBeenCalledWith({ step: step.step(), index: 1 });
   });
 
   it('removes the Connection added to the Error handler of a Route Flow', () => {

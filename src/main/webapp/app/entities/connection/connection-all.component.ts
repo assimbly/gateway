@@ -1,5 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
@@ -17,22 +16,22 @@ import { AccountService } from 'app/core/auth/account.service';
 @Component({
   selector: 'jhi-connection-all',
   templateUrl: './connection-all.component.html',
-  imports: [CommonModule, RouterModule, FontAwesomeModule, InfiniteScrollModule, SortDirective, SortByDirective],
+  imports: [RouterModule, FontAwesomeModule, InfiniteScrollModule, SortDirective, SortByDirective],
 })
 export class ConnectionAllComponent implements OnInit, OnDestroy {
+  protected connectionService = inject(ConnectionService);
+  protected alertService = inject(AlertService);
+  protected modalService = inject(NgbModal);
+  protected eventManager = inject(EventManager);
+  protected accountService = inject(AccountService);
+
   public connections: Array<Connection> = [];
   public page: any;
   private currentAccount: any;
   private eventSubscriber!: Subscription;
   sortState: SortState = { predicate: 'name', order: 'asc' };
 
-  constructor(
-    protected connectionService: ConnectionService,
-    protected alertService: AlertService,
-	  protected modalService: NgbModal,
-    protected eventManager: EventManager,
-    protected accountService: AccountService
-  ) {
+  constructor() {
     this.page = 0;
   }
 

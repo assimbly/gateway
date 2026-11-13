@@ -1,5 +1,4 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpResponse } from '@angular/common/http';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -19,9 +18,15 @@ import { ThemeService } from 'app/core/theme';
 @Component({
     selector: 'jhi-route-update',
     templateUrl: './route-update.component.html',
-    imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, CodemirrorModule, SaveShortcutDirective],
+    imports: [ReactiveFormsModule, FontAwesomeModule, CodemirrorModule, SaveShortcutDirective],
 })
 export class RouteUpdateComponent implements OnInit {
+    protected dataUtils = inject(DataUtils);
+    protected eventManager = inject(EventManager);
+    protected routeService = inject(RouteService);
+    protected activatedRoute = inject(ActivatedRoute);
+    private fb = inject(FormBuilder);
+
     isSaving = false;
     showType = false;
     readonly themeService = inject(ThemeService);
@@ -61,14 +66,6 @@ export class RouteUpdateComponent implements OnInit {
             setTimeout(refresh);
         });
     }
-
-    constructor(
-        protected dataUtils: DataUtils,
-        protected eventManager: EventManager,
-        protected routeService: RouteService,
-        protected activatedRoute: ActivatedRoute,
-        private fb: FormBuilder
-    ) {}
 
     ngOnInit(): void {
         this.activatedRoute.data.subscribe(({ route }) => {

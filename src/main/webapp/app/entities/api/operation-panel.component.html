@@ -3,11 +3,11 @@
     @if (isNew) {
       New Operation
     } @else {
-      <span [class]="'api-method api-method--' + operation!.method.toLowerCase()">{{ operation!.method }}</span>
-      @if (url) {
-        <a [href]="url" target="_blank" rel="noopener" [title]="'Open ' + url + ' in a new tab'"><code>{{ operation!.fullPath }}</code></a>
+      <span [class]="'api-method api-method--' + operation()!.method.toLowerCase()">{{ operation()!.method }}</span>
+      @if (url(); as url) {
+        <a [href]="url" target="_blank" rel="noopener" [title]="'Open ' + url + ' in a new tab'"><code>{{ operation()!.fullPath }}</code></a>
       } @else {
-        <code>{{ operation!.fullPath }}</code>
+        <code>{{ operation()!.fullPath }}</code>
       }
     }
   </h3>
@@ -16,12 +16,12 @@
 
 @if (!isNew) {
   <p class="d-flex flex-wrap align-items-center gap-2">
-    <a class="btn btn-fx btn-fx-secondary btn-fx-sm" [routerLink]="['/flow/editor', operation!.handlerFlowId]" [queryParams]="handlerFlowQueryParams(operation!)">
+    <a class="btn btn-fx btn-fx-secondary btn-fx-sm" [routerLink]="['/flow/editor', operation()!.handlerFlowId]" [queryParams]="handlerFlowQueryParams(operation()!)">
       <fa-icon icon="arrow-up-right-from-square"></fa-icon> Open Handler Flow
     </a>
     <span class="text-muted small">
-      {{ operation!.handlerFlowName }}
-      @if (state?.draft) {
+      {{ operation()!.handlerFlowName }}
+      @if (state()?.draft) {
         <span class="badge text-bg-secondary ms-1">Draft</span>
       }
     </span>
@@ -61,7 +61,7 @@
           <div class="col-8">
             <label class="form-label" for="operation-path">Path</label>
             <div class="input-group">
-              <span class="input-group-text" title="The API's base path">{{ api.basePath === '/' ? '' : api.basePath }}</span>
+              <span class="input-group-text" title="The API's base path">{{ api().basePath === '/' ? '' : api().basePath }}</span>
               <input id="operation-path" class="form-control" name="path" required placeholder="/{id}" [ngModel]="draft.path" (ngModelChange)="onPathChange($event)" />
             </div>
           </div>
@@ -243,13 +243,13 @@
   @if (hasUnsavedChanges()) {
     <div class="alert alert-warning py-2 small">You have unsaved changes. Try it uses the saved Operation: save them first.</div>
   }
-  @for (parameter of operation!.parameters; track tryKey(parameter)) {
+  @for (parameter of operation()!.parameters; track tryKey(parameter)) {
     <div class="mb-1">
       <label class="form-label small mb-0" [for]="'try-' + tryKey(parameter)">{{ parameter.name }} <span class="text-muted">({{ parameter.in }})</span></label>
       <input class="form-control form-control-sm" [id]="'try-' + tryKey(parameter)" [(ngModel)]="tryValues[tryKey(parameter)]" />
     </div>
   }
-  @if (operation!.method !== 'GET' && operation!.method !== 'HEAD') {
+  @if (operation()!.method !== 'GET' && operation()!.method !== 'HEAD') {
     <label class="form-label small mb-0" for="try-body">Body</label>
     <textarea id="try-body" class="form-control form-control-sm font-monospace" rows="5" [(ngModel)]="tryBody"></textarea>
   }

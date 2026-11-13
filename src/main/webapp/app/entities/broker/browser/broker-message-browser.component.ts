@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, TemplateRef, ChangeDetectorRef, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { NgClass, NgStyle, KeyValuePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
@@ -30,14 +30,13 @@ import { IBroker } from 'app/shared/model/broker.model';
 
 import { IHeader } from 'app/shared/model/header.model';
 
-import { ViewChild } from '@angular/core'
-import { CodemirrorComponent } from "@ctrl/ngx-codemirror";
+import { ViewChild } from '@angular/core';
+import { CodemirrorComponent } from '@ctrl/ngx-codemirror';
 
 @Component({
   selector: 'jhi-broker-message-browser',
   templateUrl: './broker-message-browser.component.html',
   imports: [
-    CommonModule,
     FormsModule,
     FontAwesomeModule,
     RouterLink,
@@ -50,9 +49,20 @@ import { CodemirrorComponent } from "@ctrl/ngx-codemirror";
     BrokerMessageBrowserRowComponent,
     MessageSearchByMessageIdPipe,
     MessageSortByHeaderPipePipe,
+    KeyValuePipe,
+    NgClass,
+    NgStyle,
   ],
 })
 export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
+  private brokerService = inject(BrokerService);
+  protected alertService = inject(AlertService);
+  protected eventManager = inject(EventManager);
+  private modalService = inject(NgbModal);
+  protected accountService = inject(AccountService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
   readonly themeService = inject(ThemeService);
 
   @ViewChild('codeEditor') private codeEditor!: CodemirrorComponent;
@@ -70,7 +80,6 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   endpointName!: string;
   endpointType!: string;
   targetEndpointName!: string;
-
 
   currentAccount: any;
   eventSubscriber!: Subscription;
@@ -99,15 +108,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
 
   private readonly changeDetector = inject(ChangeDetectorRef);
 
-  constructor(
-    private brokerService: BrokerService,
-    protected alertService: AlertService,
-    protected eventManager: EventManager,
-    private modalService: NgbModal,
-    protected accountService: AccountService,
-    private router: Router,
-    private route: ActivatedRoute
-  ) {
+  constructor() {
     this.messages = [];
     this.itemsPerPage = ITEMS_PER_PAGE + 5;
     this.page = 1;
@@ -141,47 +142,44 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   }
 
   onNavChange(changeEvent: NgbNavChangeEvent) {
-  		//this.selectedMessage.body = 'blabla';
-      //this.showMessage(this.message);
-      //document.getElementById("codemirror").click();
-      //this.subContent.nativeElement.click();
-      this.codeEditor.codeMirror!.refresh()
-  	}
+    //this.selectedMessage.body = 'blabla';
+    //this.showMessage(this.message);
+    //document.getElementById("codemirror").click();
+    //this.subContent.nativeElement.click();
+    this.codeEditor.codeMirror!.refresh();
+  }
 
   loadMessages() {
     this.isLoading = true;
     if (this.brokerType) {
       this.getMessages();
     } else {
-      this.brokerService.getBrokers().subscribe(
-        data => {
-          if (data) {
-            for (let i = 0; i < data.body!.length; i++) {
-              this.brokers.push(data.body![i]);
-            }
-            this.brokerType = this.brokers[0].type!;
-            if (this.brokerType != null) {
-              this.getMessages();
-            } else {
-              this.brokerType = 'artemis';
-              this.getMessages();
-            }
+      this.brokerService.getBrokers().subscribe(data => {
+        if (data) {
+          for (let i = 0; i < data.body!.length; i++) {
+            this.brokers.push(data.body![i]);
+          }
+          this.brokerType = this.brokers[0].type!;
+          if (this.brokerType != null) {
+            this.getMessages();
+          } else {
+            this.brokerType = 'artemis';
+            this.getMessages();
           }
         }
-      );
+      });
     }
   }
 
   getMessages() {
-
     this.brokerService.countMessages(this.brokerType, this.endpointName).subscribe(
       (res: HttpResponse<string>) => this.onSuccessCount(res.body!, res.headers),
-      (res: HttpErrorResponse) => this.onError(res.message)
+      (res: HttpErrorResponse) => this.onError(res.message),
     );
 
     this.brokerService.browseMessages(this.brokerType, this.endpointName, this.page, this.numberOfMessages, true).subscribe(
       (res: HttpResponse<IMessage[]>) => this.onSuccess(res.body, res.headers),
-      (res: HttpErrorResponse) => this.onError(res.message)
+      (res: HttpErrorResponse) => this.onError(res.message),
     );
   }
 
@@ -253,7 +251,6 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   }
 
   getBody(message: any) {
-
     let body = '';
 
     if (message.body) {
@@ -271,42 +268,34 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   }
 
   getHeaders(message: any) {
-
-      if(Object.keys(message.headers).length === 0){
-          return { "": ""};
-      }else{
-          return message.headers;
-      }
-
+    if (Object.keys(message.headers).length === 0) {
+      return { '': '' };
+    } else {
+      return message.headers;
+    }
   }
 
-  getJMSHeaders(message: any){
-
-      if(Object.keys(message.jmsHeaders).length === 0){
-          return { "": ""};
-      }else{
-          return message.jmsHeaders;
-      }
-
+  getJMSHeaders(message: any) {
+    if (Object.keys(message.jmsHeaders).length === 0) {
+      return { '': '' };
+    } else {
+      return message.jmsHeaders;
+    }
   }
 
   private onError(errorMessage: string) {
     this.isLoading = false;
     this.changeDetector.detectChanges();
-	this.alertService.addAlert({
-	  type: 'danger',
-	  message: errorMessage,
-	});
+    this.alertService.addAlert({
+      type: 'danger',
+      message: errorMessage,
+    });
   }
 
   reset() {
     this.page = 0;
     this.messages = [];
     this.loadMessages();
-  }
-
-  trackTimestamp(index: number, item: IMessage) {
-    return item.timestamp;
   }
 
   registerChangeInFlows() {
@@ -338,7 +327,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
       (res: HttpResponse<any>) => {
         this.loadMessages();
       },
-      (res: HttpErrorResponse) => this.onError(res.message)
+      (res: HttpErrorResponse) => this.onError(res.message),
     );
   }
 
@@ -353,7 +342,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
         this.page = 1;
         this.loadMessages();
       },
-      (): void => undefined
+      (): void => undefined,
     );
   }
 
@@ -363,7 +352,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
         this.loadMessages();
         this.cancelModal();
       },
-      (res: HttpErrorResponse) => this.onError(res.message)
+      (res: HttpErrorResponse) => this.onError(res.message),
     );
   }
 
@@ -386,7 +375,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
           const blob = new Blob([exportMessage], { type: 'application/json' });
           saveAs(blob, `${today}-${this.endpointName}-${message.messageid}.json`);
         },
-        (res: HttpErrorResponse) => this.onError(res.message)
+        (res: HttpErrorResponse) => this.onError(res.message),
       );
     }
   }
@@ -400,7 +389,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
         const today = new Date().toISOString().slice(0, 10);
         saveAs(blob, `${today}-${this.endpointName}.json`);
       },
-      (res: HttpErrorResponse) => this.onError(res.message)
+      (res: HttpErrorResponse) => this.onError(res.message),
     );
   }
 
@@ -408,7 +397,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     this.selectedHighlight = message.messageid!;
     this.brokerService.browseMessage(this.brokerType, this.endpointName, message.messageid!).subscribe(
       (res: HttpResponse<IMessage[]>) => this.onSuccessBrowse(res.body, res.headers),
-      (res: HttpErrorResponse) => this.onError(res.message)
+      (res: HttpErrorResponse) => this.onError(res.message),
     );
   }
 
@@ -458,15 +447,15 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     }
   }
 
-    setEditorMode(str: any) {
-        if (str.startsWith('{') || str.startsWith('[')) {
-            this.editorMode = 'javascript';
-        } else if (str.startsWith('<') && str.endsWith('>')) {
-            this.editorMode = 'xml';
-        } else {
-            this.editorMode = 'text';
-        }
+  setEditorMode(str: any) {
+    if (str.startsWith('{') || str.startsWith('[')) {
+      this.editorMode = 'javascript';
+    } else if (str.startsWith('<') && str.endsWith('>')) {
+      this.editorMode = 'xml';
+    } else {
+      this.editorMode = 'text';
     }
+  }
 
   timeConverter(UNIX_timestamp: number | string) {
     const a = new Date(UNIX_timestamp);
@@ -474,9 +463,9 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     const year = a.getFullYear();
     const month = months[a.getMonth()];
     const date = a.getDate();
-    const hour = ("0" + a.getHours()).slice(-2); // add "0" prefix and take last 2 digits
-    const min = ("0" + a.getMinutes()).slice(-2); // add "0" prefix and take last 2 digits
-    const sec = ("0" + a.getSeconds()).slice(-2); // add "0" prefix and take last 2 digits
+    const hour = ('0' + a.getHours()).slice(-2); // add "0" prefix and take last 2 digits
+    const min = ('0' + a.getMinutes()).slice(-2); // add "0" prefix and take last 2 digits
+    const sec = ('0' + a.getSeconds()).slice(-2); // add "0" prefix and take last 2 digits
     const time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec;
     return time;
   }

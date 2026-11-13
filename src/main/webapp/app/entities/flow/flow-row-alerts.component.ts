@@ -1,4 +1,4 @@
-import { Component, Input, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 /**
@@ -13,7 +13,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 })
 export class FlowRowAlerts {
   /** Whether the Flow failed the last time it was started, stopped and so on. */
-  @Input() failed = false;
-  @Input() numberOfAlerts = 0;
+  readonly failed = input(false);
+  readonly numberOfAlerts = input(0);
   readonly alertsOpen = output<void>();
 }

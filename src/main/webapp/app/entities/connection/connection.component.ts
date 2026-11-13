@@ -1,5 +1,4 @@
-import { Component, OnInit, OnDestroy, SimpleChanges, OnChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, SimpleChanges, OnChanges, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
@@ -21,9 +20,15 @@ import { Observable } from 'rxjs';
 @Component({
     selector: 'jhi-connection',
     templateUrl: './connection.component.html',
-    imports: [CommonModule, FormsModule, RouterModule, FontAwesomeModule, NgSelectModule, ConnectionKeysComponent],
+    imports: [FormsModule, RouterModule, FontAwesomeModule, NgSelectModule, ConnectionKeysComponent],
 })
 export class ConnectionComponent implements OnInit, OnDestroy, OnChanges {
+    protected connectionService = inject(ConnectionService);
+    protected alertService = inject(AlertService);
+    connectionsLists = inject(Connections);
+    protected eventManager = inject(EventManager);
+    protected accountService = inject(AccountService);
+
     [x: string]: any;
     connections!: IConnection[];
     currentAccount: any;
@@ -35,14 +40,6 @@ export class ConnectionComponent implements OnInit, OnDestroy, OnChanges {
     isSaving!: boolean;
     disabledConnectionType = true;
     selectedConnection: Connection = new Connection();
-
-    constructor(
-        protected connectionService: ConnectionService,
-        protected alertService: AlertService,
-        public connectionsLists: Connections,
-        protected eventManager: EventManager,
-        protected accountService: AccountService
-    ) {}
 
     loadAll() {
         this.connectionService.query().subscribe(

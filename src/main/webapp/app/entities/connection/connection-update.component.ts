@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
@@ -25,9 +24,17 @@ import { SaveShortcutDirective } from 'app/shared/keyboard';
 @Component({
   selector: 'jhi-connection-update',
   templateUrl: './connection-update.component.html',
-  imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, ForbiddenConnectionNamesValidatorDirective, ForbiddenConnectionKeysValidatorDirective, FieldTabDirective, SaveShortcutDirective],
+  imports: [FormsModule, FontAwesomeModule, AlertError, ForbiddenConnectionNamesValidatorDirective, ForbiddenConnectionKeysValidatorDirective, FieldTabDirective, SaveShortcutDirective],
 })
 export class ConnectionUpdateComponent implements OnInit {
+  protected connectionService = inject(ConnectionService);
+  protected connectionKeysService = inject(ConnectionKeysService);
+  connections = inject(Connections);
+  protected eventManager = inject(EventManager);
+  protected alertService = inject(AlertService);
+  protected activatedRoute = inject(ActivatedRoute);
+  protected router = inject(Router);
+
   connection!: IConnection;
   isSaving!: boolean;
   connectionKeys: Array<ConnectionKeys> = [];
@@ -43,16 +50,6 @@ export class ConnectionUpdateComponent implements OnInit {
   requiredConnectionKey: Array<RequiredConnectionKey> = [];
   requiredType!: RequiredConnectionKey;
   connectionKeysRemoveList: Array<ConnectionKeys> = [];
-
-  constructor(
-    protected connectionService: ConnectionService,
-    protected connectionKeysService: ConnectionKeysService,
-    public connections: Connections,
-    protected eventManager: EventManager,
-    protected alertService: AlertService,
-    protected activatedRoute: ActivatedRoute,
-    protected router: Router
-  ) {}
 
   ngOnInit() {
     this.isSaving = false;

@@ -1,5 +1,4 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { switchMap } from 'rxjs/operators';
 
@@ -10,9 +9,13 @@ import { CertificateService, CERTIFICATE_NAME_PATTERN, IDENTITY_STORE, toCertifi
 @Component({
   selector: 'jhi-certificate-uploadp12-dialog',
   templateUrl: './certificate-uploadp12-dialog.component.html',
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
 })
 export class CertificateUploadP12DialogComponent {
+  private eventManager = inject(EventManager);
+  private certificateService = inject(CertificateService);
+  activeModal = inject(NgbActiveModal);
+
   readonly identityStore = IDENTITY_STORE;
   readonly namePattern = CERTIFICATE_NAME_PATTERN;
   name = '';
@@ -23,8 +26,6 @@ export class CertificateUploadP12DialogComponent {
   isSaving = false;
   uploadError = false;
   uploadErrorMessage!: String;
-
-  constructor(private eventManager: EventManager, private certificateService: CertificateService, public activeModal: NgbActiveModal) {}
 
   clear() {
     this.activeModal.dismiss('cancel');
@@ -49,7 +50,9 @@ export class CertificateUploadP12DialogComponent {
     // the record stores the certificate the runtime returns, never the uploaded file with its private key
     this.certificateService
       .importIdentity(this.name, this.certificateFile, this.password)
-      .pipe(switchMap(res => this.certificateService.createFromRuntimeResponse(res.body!, 'Identity (' + this.fileNameWithoutExtension + ')')))
+      .pipe(
+        switchMap(res => this.certificateService.createFromRuntimeResponse(res.body!, 'Identity (' + this.fileNameWithoutExtension + ')')),
+      )
       .subscribe(
         () => {
           this.uploadError = false;

@@ -1,5 +1,4 @@
-import { Component, OnInit, OnDestroy, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, Input, OnChanges, SimpleChanges, inject, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
@@ -18,158 +17,152 @@ import { AccountService } from 'app/core/auth/account.service';
 import { HeaderService } from './header.service';
 
 @Component({
-    selector: 'jhi-header',
-    templateUrl: './header.component.html',
-    imports: [CommonModule, FormsModule, RouterModule, Alert, ForbiddenHeaderValidatorDirective],
+  selector: 'jhi-header',
+  templateUrl: './header.component.html',
+  imports: [FormsModule, RouterModule, Alert, ForbiddenHeaderValidatorDirective],
 })
 export class HeaderComponent implements OnInit, OnChanges, OnDestroy {
-    @Input() headers: IHeader[];
-    @Input() messageId: number;
+  protected headerService = inject(HeaderService);
+  protected alertService = inject(AlertService);
+  protected modalService = inject(NgbModal);
+  protected eventManager = inject(EventManager);
+  protected accountService = inject(AccountService);
 
-    headersArray: Array<string> = [];
-    headerSelected: boolean;
-    selectedId: number;
-    isSaving: boolean;
-    header: IHeader;
-    headerId: number;
-    languageHeader: string[] = ['constant', 'simple', 'groovy', 'jsonpath', 'xpath'];
-    typeHeader: string[] = ['header', 'property'];
-    eventSubscriber: Subscription;
+  @Input() headers: IHeader[];
+  readonly messageId = input<number>();
 
-    constructor(
-        protected headerService: HeaderService,
-        protected alertService: AlertService,
-		protected modalService: NgbModal,
-        protected eventManager: EventManager,
-        protected accountService: AccountService
-    ) {}
+  headersArray: Array<string> = [];
+  headerSelected: boolean;
+  selectedId: number;
+  isSaving: boolean;
+  header: IHeader;
+  headerId: number;
+  languageHeader: string[] = ['constant', 'simple', 'groovy', 'jsonpath', 'xpath'];
+  typeHeader: string[] = ['header', 'property'];
+  eventSubscriber: Subscription;
 
-    loadAll() {
-        this.headerService.query().subscribe(
-            (res: HttpResponse<IHeader[]>) => {
-                this.headers = res.body;
-            },
-            (res: HttpErrorResponse) => this.onError(res.message)
-        );
-    }
+  loadAll() {
+    this.headerService.query().subscribe(
+      (res: HttpResponse<IHeader[]>) => {
+        this.headers = res.body;
+      },
+      (res: HttpErrorResponse) => this.onError(res.message),
+    );
+  }
 
-    ngOnInit() {
+  ngOnInit() {
+    this.loadAll();
+    this.eventSubscriber = this.eventManager.subscribe('headerDeleted', res => this.updateHeader(parseInt(res.toString())));
+  }
+
+  ngOnDestroy() {
+    this.eventManager.destroy(this.eventSubscriber);
+  }
+
+  deleteHeader(header: IHeader): void {
+    const modalRef = this.modalService.open(HeaderDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+    modalRef.componentInstance.header = header;
+    // unsubscribe not needed because closed completes on modal close
+    modalRef.closed.subscribe(reason => {
+      if (reason === 'deleted') {
         this.loadAll();
-        this.eventSubscriber = this.eventManager.subscribe('headerDeleted', res => this.updateHeader(parseInt(res.toString())));
-    }
+      }
+    });
+  }
 
-    ngOnDestroy() {
-        this.eventManager.destroy(this.eventSubscriber);
+  updateHeader(id: number) {
+    this.headers = this.headers.filter(x => x.id !== id);
+    this.mapHeaders();
+    if (this.headers.length === 0) {
+      this.addHeader();
     }
+  }
 
-	deleteHeader(header: IHeader): void {
-		const modalRef = this.modalService.open(HeaderDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
-		modalRef.componentInstance.header = header;
-		// unsubscribe not needed because closed completes on modal close
-		modalRef.closed.subscribe(reason => {
-		  if (reason === 'deleted') {
-			this.loadAll();
-		  }
-		});
-	}
-
-    updateHeader(id: number) {
-        this.headers = this.headers.filter(x => x.id !== id);
-        this.mapHeaders();
-        if (this.headers.length === 0) {
-            this.addHeader();
-        }
-    }
-
-    ngOnChanges(changes: SimpleChanges) {
-        this.mapHeaders();
-        if (changes['headers'] && this.headers !== undefined) {
-            if (this.headers.length === 1 && this.headers[0].id === undefined) {
-                this.headers[0].isDisabled = false;
-                this.headers[0].type = this.typeHeader[0];
-                this.headers[0].language = this.languageHeader[0];
-            } else {
-                this.headers.forEach(header => {
-                    header.isDisabled = true;
-                });
-            }
-        }
-    }
-    save(header: IHeader, i: number) {
-        this.isSaving = true;
-        if (header.id) {
-            this.subscribeToSaveResponse(this.headerService.update(header), false, i);
-        } else {
-            header.messageId = this.messageId;
-            this.subscribeToSaveResponse(this.headerService.create(header), true, i);
-        }
-    }
-
-    private mapHeaders() {
-        if (typeof this.headers !== 'undefined') {
-            this.headersArray = this.headers.map(sk => sk.key);
-            this.headersArray = this.headersArray.filter(k => k !== undefined);
-        }
-    }
-
-    private subscribeToSaveResponse(result: Observable<HttpResponse<IHeader>>, closePopup, i: number) {
-        result.subscribe(data => {
-            if (data.ok) {
-                this.onSaveSuccess(data.body, closePopup, i);
-            } else {
-                this.onSaveError();
-            }
+  ngOnChanges(changes: SimpleChanges) {
+    this.mapHeaders();
+    if (changes['headers'] && this.headers !== undefined) {
+      if (this.headers.length === 1 && this.headers[0].id === undefined) {
+        this.headers[0].isDisabled = false;
+        this.headers[0].type = this.typeHeader[0];
+        this.headers[0].language = this.languageHeader[0];
+      } else {
+        this.headers.forEach(header => {
+          header.isDisabled = true;
         });
+      }
     }
+  }
+  save(header: IHeader, i: number) {
+    this.isSaving = true;
+    if (header.id) {
+      this.subscribeToSaveResponse(this.headerService.update(header), false, i);
+    } else {
+      header.messageId = this.messageId();
+      this.subscribeToSaveResponse(this.headerService.create(header), true, i);
+    }
+  }
 
-    private onSaveSuccess(result: IHeader, isCreate: boolean, i: number) {
-        if (isCreate) {
-            result.isDisabled = true;
-            this.headers.splice(i, 1, result);
-        } else {
-            // this.headers.find(k => k.id === result.id).isDisabled = true;
-        }
-	    this.eventManager.broadcast(new EventWithContent('headerUpdated', 'OK'));
+  private mapHeaders() {
+    if (typeof this.headers !== 'undefined') {
+      this.headersArray = this.headers.map(sk => sk.key);
+      this.headersArray = this.headersArray.filter(k => k !== undefined);
     }
+  }
 
-    private onSaveError() {
-        this.isSaving = false;
-    }
+  private subscribeToSaveResponse(result: Observable<HttpResponse<IHeader>>, closePopup, i: number) {
+    result.subscribe(data => {
+      if (data.ok) {
+        this.onSaveSuccess(data.body, closePopup, i);
+      } else {
+        this.onSaveError();
+      }
+    });
+  }
 
-    editHeader(header) {
-        header.isDisabled = false;
+  private onSaveSuccess(result: IHeader, isCreate: boolean, i: number) {
+    if (isCreate) {
+      result.isDisabled = true;
+      this.headers.splice(i, 1, result);
+    } else {
+      // this.headers.find(k => k.id === result.id).isDisabled = true;
     }
+    this.eventManager.broadcast(new EventWithContent('headerUpdated', 'OK'));
+  }
 
-    cloneHeader(header: IHeader) {
-        const headerForClone = new Header(header.messageId, header.key, header.value, header.type, header.language, header.messageId);
-        this.headers.push(headerForClone);
-    }
+  private onSaveError() {
+    this.isSaving = false;
+  }
 
-    addHeader() {
-        const newHeader = new Header();
-        newHeader.isDisabled = false;
-        newHeader.type = this.typeHeader[0];
-        newHeader.language = this.languageHeader[0];
-        this.headers.push(newHeader);
-        this.mapHeaders();
-    }
+  editHeader(header) {
+    header.isDisabled = false;
+  }
 
-    removeHeader(i: number) {
-        this.headers.splice(i, 1);
-        this.mapHeaders();
-        if (this.headers.length === 0) {
-            this.addHeader();
-        }
-    }
+  cloneHeader(header: IHeader) {
+    const headerForClone = new Header(header.messageId, header.key, header.value, header.type, header.language, header.messageId);
+    this.headers.push(headerForClone);
+  }
 
-    trackId(index: number, item: IHeader) {
-        return item.id;
-    }
+  addHeader() {
+    const newHeader = new Header();
+    newHeader.isDisabled = false;
+    newHeader.type = this.typeHeader[0];
+    newHeader.language = this.languageHeader[0];
+    this.headers.push(newHeader);
+    this.mapHeaders();
+  }
 
-    protected onError(errorMessage: string) {
-        this.alertService.addAlert({
-		  type: 'danger',
-		  message: errorMessage,
-		});
+  removeHeader(i: number) {
+    this.headers.splice(i, 1);
+    this.mapHeaders();
+    if (this.headers.length === 0) {
+      this.addHeader();
     }
+  }
+
+  protected onError(errorMessage: string) {
+    this.alertService.addAlert({
+      type: 'danger',
+      message: errorMessage,
+    });
+  }
 }

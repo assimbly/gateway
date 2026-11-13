@@ -1,5 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpResponse } from '@angular/common/http';
@@ -25,243 +24,246 @@ import { FieldTabDirective } from 'app/shared/form/field-tab.directive';
 import { SaveShortcutDirective } from 'app/shared/keyboard';
 
 @Component({
-    selector: 'jhi-connection-dialog',
-    templateUrl: './connection-dialog.component.html',
-    imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, ForbiddenConnectionNamesValidatorDirective, ForbiddenConnectionKeysValidatorDirective, FieldTabDirective, SaveShortcutDirective],
+  selector: 'jhi-connection-dialog',
+  templateUrl: './connection-dialog.component.html',
+  imports: [
+    FormsModule,
+    FontAwesomeModule,
+    AlertError,
+    ForbiddenConnectionNamesValidatorDirective,
+    ForbiddenConnectionKeysValidatorDirective,
+    FieldTabDirective,
+    SaveShortcutDirective,
+  ],
 })
 export class ConnectionDialogComponent implements OnInit {
+  activeModal = inject(NgbActiveModal);
+  protected connectionService = inject(ConnectionService);
+  protected connectionKeysService = inject(ConnectionKeysService);
+  connections = inject(Connections);
+  protected eventManager = inject(EventManager);
+  protected alertService = inject(AlertService);
+  protected activatedRoute = inject(ActivatedRoute);
+  protected router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
-    public connectionKeys: Array<ConnectionKeys> = [];
-    public connection!: Connection;
-    public connectionNames: Array<string> = [];
-    public isSaving!: boolean;
-    public connectionKeysKeys: Array<string> = [];
-    public driversList: Array<String> = this.connections.driversList;
-    jmsProvidersList: Array<String> = ['ActiveMQ Artemis', 'ActiveMQ Classic', 'AMQ'];
-    pooledList: Array<String> = ['true', 'false'];
+  public connectionKeys: Array<ConnectionKeys> = [];
+  public connection!: Connection;
+  public connectionNames: Array<string> = [];
+  public isSaving!: boolean;
+  public connectionKeysKeys: Array<string> = [];
+  public driversList: Array<String> = this.connections.driversList;
+  jmsProvidersList: Array<String> = ['ActiveMQ Artemis', 'ActiveMQ Classic', 'AMQ'];
+  pooledList: Array<String> = ['true', 'false'];
 
-    public disableType!: boolean;
-    public connectionType!: string;
-    private requiredConnectionKey: Array<RequiredConnectionKey> = [];
-    private requiredType!: RequiredConnectionKey;
-    private connectionKeysRemoveList: Array<ConnectionKeys> = [];
+  public disableType!: boolean;
+  public connectionType!: string;
+  private requiredConnectionKey: Array<RequiredConnectionKey> = [];
+  private requiredType!: RequiredConnectionKey;
+  private connectionKeysRemoveList: Array<ConnectionKeys> = [];
 
-    constructor(
-        public activeModal: NgbActiveModal,
-        protected connectionService: ConnectionService,
-        protected connectionKeysService: ConnectionKeysService,
-        public connections: Connections,
-        protected eventManager: EventManager,
-        protected alertService: AlertService,
-        protected activatedRoute: ActivatedRoute,
-        protected router: Router,
-        private cdr: ChangeDetectorRef
-    ) {}
+  ngOnInit() {
+    this.isSaving = false;
+    // The Type is fixed once it is known: from the Connection itself, or from the Step's Component
+    this.disableType = !!this.connection.type;
+    this.addRequiredConnectionKeys();
+    this.connectionService.query().subscribe(
+      res => {
+        this.connectionNames = res.body!.filter(s => s.id !== this.connection.id).map(s => s.name!);
+        this.cdr.markForCheck();
+      },
+      res => this.onError(res.body),
+    );
 
-    ngOnInit() {
+    if (this.activatedRoute.snapshot.fragment === 'clone') {
+      this.loadConnectionKeys(true);
+    } else {
+      this.loadConnectionKeys(false);
+    }
+  }
 
-        this.isSaving = false;
-        // The Type is fixed once it is known: from the Connection itself, or from the Step's Component
-        this.disableType = !!this.connection.type;
-        this.addRequiredConnectionKeys();
-        this.connectionService.query().subscribe(
-            res => {
-                this.connectionNames = res.body!.filter(s => s.id !== this.connection.id).map(s => s.name!);
-                this.cdr.markForCheck();
-            },
-            res => this.onError(res.body)
-        );
+  changeType(cloneHeader: boolean) {
+    const newType = this.requiredConnectionKey.find(x => x.name === this.connection.type);
 
-        if (this.activatedRoute.snapshot.fragment === 'clone') {
-            this.loadConnectionKeys(true);
-        } else {
-            this.loadConnectionKeys(false);
-        }
-
+    if (typeof this.requiredType !== 'undefined') {
+      // Drop the keys only the previous type needed; saved ones are deleted on save
+      const keep = (newType?.connectionKeys ?? []).map(rsk => rsk.connectionKeyName);
+      const drop = this.requiredType.connectionKeys.map(rsk => rsk.connectionKeyName).filter(key => !keep.includes(key));
+      this.connectionKeysRemoveList = this.connectionKeys.filter(sk => drop.includes(sk.key!) && sk.id);
+      this.connectionKeys = this.connectionKeys.filter(sk => !drop.includes(sk.key!));
     }
 
-    changeType(cloneHeader: boolean) {
+    this.requiredType = newType!;
+    if (typeof this.requiredType === 'undefined') {
+      return;
+    }
 
-        const newType = this.requiredConnectionKey.find(x => x.name === this.connection.type);
+    const requiredConnectionKeys = new Array<ConnectionKeys>();
+    this.requiredType.connectionKeys.forEach(sk => {
+      const ersk = this.connectionKeys.find(s => s.key === sk.connectionKeyName);
+      let rsk = new ConnectionKeys();
+      if (typeof ersk !== 'undefined') {
+        rsk = ersk;
+        this.connectionKeys.splice(this.connectionKeys.indexOf(ersk), 1);
+      }
+      rsk.id = cloneHeader ? null! : rsk.id;
+      rsk.key = sk.connectionKeyName;
+      rsk.valueType = sk.valueType;
+      rsk.placeholder = sk.placeholder;
+      rsk.isRequired = sk.isRequired;
+      rsk.value = rsk.value || sk.defaultValue;
+      requiredConnectionKeys.push(rsk);
+    });
+    this.connectionKeys.unshift(...requiredConnectionKeys);
+    this.mapConnectionKeysKeys();
+  }
 
-        if (typeof this.requiredType !== 'undefined') {
-            // Drop the keys only the previous type needed; saved ones are deleted on save
-            const keep = (newType?.connectionKeys ?? []).map(rsk => rsk.connectionKeyName);
-            const drop = this.requiredType.connectionKeys.map(rsk => rsk.connectionKeyName).filter(key => !keep.includes(key));
-            this.connectionKeysRemoveList = this.connectionKeys.filter(sk => drop.includes(sk.key!) && sk.id);
-            this.connectionKeys = this.connectionKeys.filter(sk => !drop.includes(sk.key!));
-        }
+  addConnectionKeys() {
+    const newConnectionKeys = new ConnectionKeys();
+    this.connectionKeys.push(newConnectionKeys);
+    this.mapConnectionKeysKeys();
+  }
 
-        this.requiredType = newType!;
-        if (typeof this.requiredType === 'undefined') {
-            return;
-        }
+  removeConnectionKeys(i: number) {
+    this.connectionKeys.splice(i, 1);
+    this.mapConnectionKeysKeys();
+    if (this.connectionKeys.length === 0) {
+      this.addConnectionKeys();
+    }
+  }
 
-        const requiredConnectionKeys = new Array<ConnectionKeys>();
-        this.requiredType.connectionKeys.forEach(sk => {
-            const ersk = this.connectionKeys.find(s => s.key === sk.connectionKeyName);
-            let rsk = new ConnectionKeys();
-            if (typeof ersk !== 'undefined') {
-                rsk = ersk;
-                this.connectionKeys.splice(this.connectionKeys.indexOf(ersk), 1);
-            }
-            rsk.id = cloneHeader ? null! : rsk.id;
-            rsk.key = sk.connectionKeyName;
-            rsk.valueType = sk.valueType;
-            rsk.placeholder = sk.placeholder;
-            rsk.isRequired = sk.isRequired;
-            rsk.value = rsk.value || sk.defaultValue;
-            requiredConnectionKeys.push(rsk);
+  previousState() {
+    window.history.back();
+  }
+
+  save(closePopup: boolean) {
+    this.isSaving = true;
+    if (this.connection.id !== undefined) {
+      this.subscribeToSaveResponse(this.connectionService.update(this.connection));
+    } else {
+      this.subscribeToSaveResponse(this.connectionService.create(this.connection));
+    }
+  }
+
+  deleteConnectionKeys(connectionKey: ConnectionKeys) {
+    this.connectionKeysService.delete(connectionKey.id!).subscribe(() => {
+      this.removeConnectionKeys(this.connectionKeys.indexOf(connectionKey));
+      this.cdr.markForCheck();
+    });
+  }
+
+  clear() {
+    this.activeModal.dismiss('cancel');
+  }
+
+  navigateToConnection() {
+    this.router.navigate(['/connection']);
+    setTimeout(() => {
+      this.activeModal.close();
+    }, 0);
+  }
+
+  navigateToConnectionDetail(connectionId: number) {
+    this.router.navigate(['/connection', connectionId]);
+    setTimeout(() => {
+      this.activeModal.close();
+    }, 0);
+  }
+
+  private loadConnectionKeys(cloneHeader: boolean) {
+    if (this.connection.id) {
+      this.connectionKeysService.query().subscribe(res => {
+        this.connectionKeys = res.body!.filter(sk => sk.connectionId === this.connection.id);
+        this.changeType(cloneHeader);
+        this.connection.id = cloneHeader ? null! : this.connection.id;
+        this.cdr.markForCheck();
+      });
+    } else if (this.connection.type) {
+      this.changeType(cloneHeader);
+      this.connection.id = cloneHeader ? null! : this.connection.id;
+    }
+  }
+
+  private mapConnectionKeysKeys() {
+    if (typeof this.connectionKeys !== 'undefined') {
+      this.connectionKeysKeys = this.connectionKeys.map(sk => sk.key!);
+      this.connectionKeysKeys = this.connectionKeysKeys.filter(k => k !== undefined);
+    }
+  }
+
+  private subscribeToSaveResponse(result: Observable<HttpResponse<IConnection>>) {
+    result.subscribe(data => {
+      if (data.ok) {
+        this.onSaveSuccess(data.body!, true);
+      } else {
+        this.onSaveError();
+      }
+    });
+  }
+
+  private onSaveSuccess(result: Connection, closePopup: boolean) {
+    this.eventManager.broadcast(new EventWithContent('connectionListModification', 'OK'));
+    this.eventManager.broadcast(new EventWithContent('connectionKeysUpdated', result));
+    this.eventManager.broadcast(new EventWithContent('connectionModified', result.id));
+    this.isSaving = false;
+    this.activeModal.dismiss(result);
+
+    this.connectionKeysRemoveList.forEach(skrl => {
+      this.connectionKeysService.delete(skrl.id!).subscribe();
+    });
+
+    this.connectionKeys.forEach(connectionKey => {
+      connectionKey.connectionId = result.id;
+      if (connectionKey.id) {
+        this.connectionKeysService.update(connectionKey).subscribe(sk => {
+          connectionKey = sk.body!;
         });
-        this.connectionKeys.unshift(...requiredConnectionKeys);
-        this.mapConnectionKeysKeys();
-    }
-
-    addConnectionKeys() {
-        const newConnectionKeys = new ConnectionKeys();
-        this.connectionKeys.push(newConnectionKeys);
-        this.mapConnectionKeysKeys();
-    }
-
-    removeConnectionKeys(i: number) {
-        this.connectionKeys.splice(i, 1);
-        this.mapConnectionKeysKeys();
-        if (this.connectionKeys.length === 0) {
-            this.addConnectionKeys();
-        }
-    }
-
-    previousState() {
-        window.history.back();
-    }
-
-    save(closePopup: boolean) {
-        this.isSaving = true;
-        if (this.connection.id !== undefined) {
-            this.subscribeToSaveResponse(this.connectionService.update(this.connection));
-        } else {
-            this.subscribeToSaveResponse(this.connectionService.create(this.connection));
-        }
-    }
-
-    deleteConnectionKeys(connectionKey: ConnectionKeys) {
-        this.connectionKeysService.delete(connectionKey.id!).subscribe(() => {
-            this.removeConnectionKeys(this.connectionKeys.indexOf(connectionKey));
-            this.cdr.markForCheck();
+      } else {
+        this.connectionKeysService.create(connectionKey).subscribe(sk => {
+          connectionKey = sk.body!;
         });
-    }
+      }
+    });
+    this.connectionKeysService.update(this.connectionKeys[0]);
+  }
 
-    clear() {
-        this.activeModal.dismiss('cancel');
-    }
+  private onError(error: any) {
+    this.alertService.addAlert({
+      type: 'danger',
+      message: error.message,
+    });
+  }
 
-    navigateToConnection() {
-        this.router.navigate(['/connection']);
-        setTimeout(() => {
-            this.activeModal.close();
-        }, 0);
-    }
+  private onSaveError() {
+    this.isSaving = false;
+  }
 
-    navigateToConnectionDetail(connectionId: number) {
-        this.router.navigate(['/connection', connectionId]);
-        setTimeout(() => {
-            this.activeModal.close();
-        }, 0);
-    }
-
-    private loadConnectionKeys(cloneHeader: boolean) {
-        if (this.connection.id) {
-            this.connectionKeysService.query().subscribe(res => {
-                this.connectionKeys = res.body!.filter(sk => sk.connectionId === this.connection.id);
-                this.changeType(cloneHeader);
-                this.connection.id = cloneHeader ? null! : this.connection.id;
-                this.cdr.markForCheck();
-            });
-        } else if (this.connection.type) {
-            this.changeType(cloneHeader);
-            this.connection.id = cloneHeader ? null! : this.connection.id;
-        }
-    }
-
-    private mapConnectionKeysKeys() {
-        if (typeof this.connectionKeys !== 'undefined') {
-            this.connectionKeysKeys = this.connectionKeys.map(sk => sk.key!);
-            this.connectionKeysKeys = this.connectionKeysKeys.filter(k => k !== undefined);
-        }
-    }
-
-    private subscribeToSaveResponse(result: Observable<HttpResponse<IConnection>>) {
-        result.subscribe(data => {
-            if (data.ok) {
-                this.onSaveSuccess(data.body!, true);
-            } else {
-                this.onSaveError();
-            }
-        });
-    }
-
-    private onSaveSuccess(result: Connection, closePopup: boolean) {
-	    this.eventManager.broadcast(new EventWithContent('connectionListModification', 'OK'));
-	    this.eventManager.broadcast(new EventWithContent('connectionKeysUpdated', result));
-	    this.eventManager.broadcast(new EventWithContent('connectionModified', result.id));
-        this.isSaving = false;
-        this.activeModal.dismiss(result);
-
-        this.connectionKeysRemoveList.forEach(skrl => {
-            this.connectionKeysService.delete(skrl.id!).subscribe();
-        });
-
-        this.connectionKeys.forEach(connectionKey => {
-            connectionKey.connectionId = result.id;
-            if (connectionKey.id) {
-                this.connectionKeysService.update(connectionKey).subscribe(sk => {
-                    connectionKey = sk.body!;
-                });
-            } else {
-                this.connectionKeysService.create(connectionKey).subscribe(sk => {
-                    connectionKey = sk.body!;
-                });
-            }
-        });
-        this.connectionKeysService.update(this.connectionKeys[0]);
-    }
-
-    private onError(error: any) {
-        this.alertService.addAlert({
-		  type: 'danger',
-		  message: error.message,
-		});
-    }
-
-    private onSaveError() {
-        this.isSaving = false;
-    }
-
-    private addRequiredConnectionKeys() {
-        this.requiredConnectionKey = this.connections.keysList;
-    }
+  private addRequiredConnectionKeys() {
+    this.requiredConnectionKey = this.connections.keysList;
+  }
 }
 
 @Component({
-    selector: 'jhi-connection-popup',
-    template: ''
+  selector: 'jhi-connection-popup',
+  template: '',
 })
 export class ConnectionPopupComponent implements OnInit, OnDestroy {
-    routeSub: any;
+  private route = inject(ActivatedRoute);
+  private connectionPopupService = inject(ConnectionPopupService);
 
-    constructor(private route: ActivatedRoute, private connectionPopupService: ConnectionPopupService) {}
+  routeSub: any;
 
-    ngOnInit() {
-        this.routeSub = this.route.params.subscribe(params => {
-            if (params['id']) {
-                this.connectionPopupService.open(ConnectionDialogComponent as Component, params['id']);
-            } else {
-                this.connectionPopupService.open(ConnectionDialogComponent as Component);
-            }
-        });
-    }
+  ngOnInit() {
+    this.routeSub = this.route.params.subscribe(params => {
+      if (params['id']) {
+        this.connectionPopupService.open(ConnectionDialogComponent as Component, params['id']);
+      } else {
+        this.connectionPopupService.open(ConnectionDialogComponent as Component);
+      }
+    });
+  }
 
-    ngOnDestroy() {
-        this.routeSub.unsubscribe();
-    }
+  ngOnDestroy() {
+    this.routeSub.unsubscribe();
+  }
 }

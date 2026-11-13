@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { Component, OnChanges, output, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
@@ -15,17 +15,17 @@ import { ResponseSettings, responseOptions, responseSettings } from '../designer
 })
 export class ResponseEditorComponent implements OnChanges {
   /** The Response Step's uri (its body) and options (status, language and headers). */
-  @Input() uri?: string | null;
-  @Input() options?: string | null;
-  @Input() declaredStatuses: string[] = [];
+  readonly uri = input<string | null>();
+  readonly options = input<string | null>();
+  readonly declaredStatuses = input<string[]>([]);
   /** The Operation's response media type, sent as Content-Type unless a header sets it. */
-  @Input() responseMediaType?: string;
-  @Input() warning?: string;
-  @Input() problem?: string;
-  @Input() deletable = false;
+  readonly responseMediaType = input<string>();
+  readonly warning = input<string>();
+  readonly problem = input<string>();
+  readonly deletable = input(false);
 
-  @Output() settingsChange = new EventEmitter<{ uri: string | undefined; options: string }>();
-  @Output() remove = new EventEmitter<void>();
+  readonly settingsChange = output<{ uri: string | undefined; options: string }>();
+  readonly remove = output<void>();
 
   readonly languages = ['simple', 'constant', 'jsonpath', 'xpath', 'groovy'];
 
@@ -33,12 +33,12 @@ export class ResponseEditorComponent implements OnChanges {
   keepBody = true;
 
   ngOnChanges(): void {
-    this.settings = responseSettings({ uri: this.uri, options: this.options });
+    this.settings = responseSettings({ uri: this.uri(), options: this.options() });
     this.keepBody = !this.settings.body;
   }
 
   get statusChoices(): string[] {
-    return this.declaredStatuses.filter(status => status !== 'default');
+    return this.declaredStatuses().filter(status => status !== 'default');
   }
 
   get statusValid(): boolean {

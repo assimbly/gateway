@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpContext, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -13,11 +13,11 @@ type EntityArrayResponseType = HttpResponse<IIntegration[]>;
 
 @Injectable({ providedIn: 'root' })
 export class IntegrationService {
+    protected http = inject(HttpClient);
+
     public resourceUrl = `${serverApiUrl}api/integrations`;
     public environmentUrl = `${serverApiUrl}api/environment`;
     public integrationUrl = `${serverApiUrl}api/integration`;
-
-    constructor(protected http: HttpClient) {}
 
     create(integration: IIntegration): Observable<EntityResponseType> {
         return this.http.post<IIntegration>(this.resourceUrl, integration, { observe: 'response' });

@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Subscription, interval } from 'rxjs';
 import { EventManager } from 'app/core/util/event-manager.service';
@@ -29,7 +28,6 @@ import { filterAddresses } from 'app/shared/util/address-filter';
   selector: 'jhi-queue',
   templateUrl: './queue.component.html',
   imports: [
-    CommonModule,
     RouterModule,
     FontAwesomeModule,
     SearchToolbar,
@@ -41,6 +39,12 @@ import { filterAddresses } from 'app/shared/util/address-filter';
   ],
 })
 export class QueueComponent implements OnInit, OnDestroy {
+  protected queueService = inject(QueueService);
+  protected alertService = inject(AlertService);
+  protected eventManager = inject(EventManager);
+  protected modalService = inject(NgbModal);
+  protected accountService = inject(AccountService);
+
   queues: IQueue[] = [];
   addresses: IAddress[] = [];
   brokers: IBroker[] = [];
@@ -66,13 +70,7 @@ export class QueueComponent implements OnInit, OnDestroy {
   private readonly changeDetector = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
 
-  constructor(
-    protected queueService: QueueService,
-    protected alertService: AlertService,
-    protected eventManager: EventManager,
-    protected modalService: NgbModal,
-    protected accountService: AccountService,
-  ) {
+  constructor() {
     this.queues = [];
     this.brokers = [];
     this.itemsPerPage = ITEMS_PER_PAGE;
@@ -119,10 +117,6 @@ export class QueueComponent implements OnInit, OnDestroy {
 
   get filteredAddresses(): IAddress[] {
     return filterAddresses(this.addresses, this.searchQueueText, this.sortState.order === 'asc', this.sortState.predicate ?? 'name');
-  }
-
-  trackId(index: number, item: IAddress): number {
-    return item.id!;
   }
 
   registerChangeInQueues(): void {

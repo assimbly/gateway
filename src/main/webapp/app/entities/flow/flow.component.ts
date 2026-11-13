@@ -1,5 +1,4 @@
 import { ChangeDetectorRef, Component, OnInit, OnDestroy, QueryList, ViewChildren, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { EMPTY, Subscription, concatMap, forkJoin, interval } from 'rxjs';
 
@@ -38,21 +37,21 @@ import { IApiHandler } from 'app/entities/api/api.model';
 @Component({
   selector: 'jhi-flow',
   templateUrl: './flow.component.html',
-  imports: [
-    CommonModule,
-    RouterModule,
-    FontAwesomeModule,
-    EmptyState,
-    SearchToolbar,
-    DataTable,
-    FlowRowComponent,
-    FlowTypeChoicesComponent,
-  ],
+  imports: [RouterModule, FontAwesomeModule, EmptyState, SearchToolbar, DataTable, FlowRowComponent, FlowTypeChoicesComponent],
   host: {
     '(document:keydown)': 'onKeydown($event)',
   },
 })
 export class FlowComponent implements OnInit, OnDestroy {
+  protected flowService = inject(FlowService);
+  protected alertService = inject(AlertService);
+  protected eventManager = inject(EventManager);
+  protected parseLinks = inject(ParseLinks);
+  protected accountService = inject(AccountService);
+  protected integrationService = inject(IntegrationService);
+  protected changeDetector = inject(ChangeDetectorRef);
+  protected modalService = inject(NgbModal);
+
   integrations!: IIntegration[];
   integration!: IIntegration;
   flows: IFlow[] = [];
@@ -102,16 +101,7 @@ export class FlowComponent implements OnInit, OnDestroy {
 
   @ViewChildren(FlowRowComponent) private flowRows!: QueryList<FlowRowComponent>;
 
-  constructor(
-    protected flowService: FlowService,
-    protected alertService: AlertService,
-    protected eventManager: EventManager,
-    protected parseLinks: ParseLinks,
-    protected accountService: AccountService,
-    protected integrationService: IntegrationService,
-    protected changeDetector: ChangeDetectorRef,
-    protected modalService: NgbModal,
-  ) {
+  constructor() {
     this.flows = [];
     this.itemsPerPage = ITEMS_PER_PAGE + 5;
     this.page = 0;
@@ -299,10 +289,6 @@ export class FlowComponent implements OnInit, OnDestroy {
     if (integrationId !== undefined) {
       FluxygenExportDialogComponent.open(this.modalService, integrationId);
     }
-  }
-
-  trackId(index: number, item: IFlow) {
-    return item.id;
   }
 
   registerChangeInFlows() {

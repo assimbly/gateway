@@ -1,5 +1,4 @@
-import { Component, OnInit, OnDestroy, TemplateRef, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, TemplateRef, signal, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -24,21 +23,28 @@ import { FlowService } from '../flow/flow.service';
     selector: 'jhi-integration',
     templateUrl: './integration.component.html',
     imports: [
-        CommonModule,
-        RouterModule,
-        FontAwesomeModule,
-        NgbDropdownModule,
-        HasAnyAuthorityDirective,
-        EmptyState,
-        SearchToolbar,
-        DataTable,
-        RowActions,
-        PrimaryActionDirective,
-        OverflowActionDirective,
-        Truncate,
-    ],
+    RouterModule,
+    FontAwesomeModule,
+    NgbDropdownModule,
+    HasAnyAuthorityDirective,
+    EmptyState,
+    SearchToolbar,
+    DataTable,
+    RowActions,
+    PrimaryActionDirective,
+    OverflowActionDirective,
+    Truncate
+],
 })
 export class IntegrationComponent implements OnInit, OnDestroy {
+    protected flowService = inject(FlowService);
+    protected integrationService = inject(IntegrationService);
+    protected alertService = inject(AlertService);
+    protected eventManager = inject(EventManager);
+    protected accountService = inject(AccountService);
+    private router = inject(Router);
+    private modalService = inject(NgbModal);
+
     readonly integrations = signal<IIntegration[]>([]);
     /** Whether the Gateways have been asked for, so an empty list is known to be empty. */
     readonly loaded = signal(false);
@@ -55,16 +61,6 @@ export class IntegrationComponent implements OnInit, OnDestroy {
         { key: 'stage', header: 'Stage', sortable: true },
         { key: 'actions', header: 'Actions', align: 'end' },
     ];
-
-    constructor(
-        protected flowService: FlowService,
-        protected integrationService: IntegrationService,
-        protected alertService: AlertService,
-        protected eventManager: EventManager,
-        protected accountService: AccountService,
-        private router: Router,
-        private modalService: NgbModal,
-    ) {}
 
     loadAll() {
         this.integrationService.query().subscribe(
@@ -88,9 +84,6 @@ export class IntegrationComponent implements OnInit, OnDestroy {
         this.eventManager.destroy(this.eventSubscriber);
     }
 
-    trackId(index: number, item: IIntegration) {
-        return item.id;
-    }
 
     get isAdmin(): boolean {
         return this.accountService.hasAnyAuthority('ROLE_ADMIN');

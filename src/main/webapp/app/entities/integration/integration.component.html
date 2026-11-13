@@ -21,31 +21,33 @@
       <h4 class="modal-title">Gateway info</h4>
       <button type="button" class="btn-close" aria-label="Close" (click)="cancelModal()"></button>
     </div>
-    <div class="modal-body" *ngIf="infoIntegration">
-      <dl class="row mb-0">
-        <dt class="col-sm-4">ID</dt>
-        <dd class="col-sm-8">{{ infoIntegration.id }}</dd>
-        <dt class="col-sm-4">Name</dt>
-        <dd class="col-sm-8">{{ infoIntegration.name }}</dd>
-        <dt class="col-sm-4">Type</dt>
-        <dd class="col-sm-8">{{ infoIntegration.type }}</dd>
-        <dt class="col-sm-4">Environment Name</dt>
-        <dd class="col-sm-8">{{ infoIntegration.environmentName }}</dd>
-        <dt class="col-sm-4">Stage</dt>
-        <dd class="col-sm-8">{{ infoIntegration.stage }}</dd>
-        <dt class="col-sm-4">Connector</dt>
-        <dd class="col-sm-8">{{ infoIntegration.connectorType }}</dd>
-      </dl>
-      <h5 class="mt-3">Step defaults</h5>
-      <dl class="row mb-0">
-        <dt class="col-sm-4">Source</dt>
-        <dd class="col-sm-8">{{ infoIntegration.defaultFromComponentType }}</dd>
-        <dt class="col-sm-4">Sink</dt>
-        <dd class="col-sm-8">{{ infoIntegration.defaultToComponentType }}</dd>
-        <dt class="col-sm-4">Error</dt>
-        <dd class="col-sm-8">{{ infoIntegration.defaultErrorComponentType }}</dd>
-      </dl>
-    </div>
+    @if (infoIntegration) {
+      <div class="modal-body">
+        <dl class="row mb-0">
+          <dt class="col-sm-4">ID</dt>
+          <dd class="col-sm-8">{{ infoIntegration.id }}</dd>
+          <dt class="col-sm-4">Name</dt>
+          <dd class="col-sm-8">{{ infoIntegration.name }}</dd>
+          <dt class="col-sm-4">Type</dt>
+          <dd class="col-sm-8">{{ infoIntegration.type }}</dd>
+          <dt class="col-sm-4">Environment Name</dt>
+          <dd class="col-sm-8">{{ infoIntegration.environmentName }}</dd>
+          <dt class="col-sm-4">Stage</dt>
+          <dd class="col-sm-8">{{ infoIntegration.stage }}</dd>
+          <dt class="col-sm-4">Connector</dt>
+          <dd class="col-sm-8">{{ infoIntegration.connectorType }}</dd>
+        </dl>
+        <h5 class="mt-3">Step defaults</h5>
+        <dl class="row mb-0">
+          <dt class="col-sm-4">Source</dt>
+          <dd class="col-sm-8">{{ infoIntegration.defaultFromComponentType }}</dd>
+          <dt class="col-sm-4">Sink</dt>
+          <dd class="col-sm-8">{{ infoIntegration.defaultToComponentType }}</dd>
+          <dt class="col-sm-4">Error</dt>
+          <dd class="col-sm-8">{{ infoIntegration.defaultErrorComponentType }}</dd>
+        </dl>
+      </div>
+    }
     <div class="modal-footer">
       <button type="button" class="btn btn-fx btn-fx-secondary" (click)="cancelModal()">Close</button>
     </div>
@@ -56,14 +58,14 @@
       [heading]="isAdmin ? 'Add your first Gateway' : 'No Gateway yet'"
       description="A Gateway is a running instance of Assimbly: it holds the configuration of your Flows and runs them."
       [docs]="true"
-    >
+      >
       <a
         primary
         *jhiHasAnyAuthority="'ROLE_ADMIN'"
         class="btn btn-fx btn-fx-primary jh-create-entity create-integration"
         id="newButton"
         [routerLink]="['/integration/new']"
-      >
+        >
         <fa-icon icon="plus"></fa-icon>
         <span> Add</span>
       </a>
@@ -72,103 +74,105 @@
       </span>
     </jhi-empty-state>
   } @else {
-  <jhi-search-toolbar
-    [(query)]="searchText"
-    placeholder="Filter by name"
-    persistKey="searchGatewayText"
-    inputId="searchGatewayId"
-    hint="A Gateway is a running instance of Assimbly: it holds the configuration of your Flows and runs them."
-  >
-    <ng-container actions>
-      <button
-        *jhiHasAnyAuthority="'ROLE_ADMIN'"
-        type="button"
-        (click)="openImportBackup()"
-        class="btn btn-fx btn-fx-secondary"
-        aria-label="Import backup"
+    <jhi-search-toolbar
+      [(query)]="searchText"
+      placeholder="Filter by name"
+      persistKey="searchGatewayText"
+      inputId="searchGatewayId"
+      hint="A Gateway is a running instance of Assimbly: it holds the configuration of your Flows and runs them."
       >
-        <fa-icon icon="file-import"></fa-icon>
-        <span class="d-none d-md-inline"> Import</span>
-      </button>
-      <button class="btn btn-fx btn-fx-secondary" type="button" (click)="reset()" aria-label="Refresh">
-        <fa-icon icon="sync"></fa-icon>
-        <span class="d-none d-md-inline"> Refresh</span>
-      </button>
-      <button
-        type="button"
-        (click)="openRestartIntegrationModal(restartIntegrationModal)"
-        class="btn btn-fx btn-fx-ghost-danger"
-        aria-label="Restart Gateway"
-        title="Restarts the Gateway and stops all its Flows while it restarts"
-      >
-        <fa-icon icon="power-off"></fa-icon>
-        <span class="d-none d-md-inline"> Restart Gateway</span>
-      </button>
-    </ng-container>
-  </jhi-search-toolbar>
+      <ng-container actions>
+        <button
+          *jhiHasAnyAuthority="'ROLE_ADMIN'"
+          type="button"
+          (click)="openImportBackup()"
+          class="btn btn-fx btn-fx-secondary"
+          aria-label="Import backup"
+          >
+          <fa-icon icon="file-import"></fa-icon>
+          <span class="d-none d-md-inline"> Import</span>
+        </button>
+        <button class="btn btn-fx btn-fx-secondary" type="button" (click)="reset()" aria-label="Refresh">
+          <fa-icon icon="sync"></fa-icon>
+          <span class="d-none d-md-inline"> Refresh</span>
+        </button>
+        <button
+          type="button"
+          (click)="openRestartIntegrationModal(restartIntegrationModal)"
+          class="btn btn-fx btn-fx-ghost-danger"
+          aria-label="Restart Gateway"
+          title="Restarts the Gateway and stops all its Flows while it restarts"
+          >
+          <fa-icon icon="power-off"></fa-icon>
+          <span class="d-none d-md-inline"> Restart Gateway</span>
+        </button>
+      </ng-container>
+    </jhi-search-toolbar>
 
-  <jhi-data-table
-    [columns]="columns"
-    [(sortState)]="sortState"
-    [hasRows]="!!filteredIntegrations.length"
-    emptyMessage="No gateway matches this filter."
-    ariaLabel="Gateways"
-  >
-    <tr *ngFor="let integration of filteredIntegrations; trackBy: trackId">
-      <td class="table-fx-identity">
-        <a [routerLink]="['/integration', integration.id, 'edit']" queryParamsHandling="merge">
-          <jhi-truncate [text]="integration.name" />
-        </a>
-      </td>
-      <td>
-        @if (integration.type) {
-          {{ integration.type }}
-        } @else {
-          <span class="text-muted">—</span>
-        }
-      </td>
-      <td>
-        @if (integration.stage) {
-          {{ integration.stage }}
-        } @else {
-          <span class="text-muted">—</span>
-        }
-      </td>
-      <td class="text-end">
-        <jhi-row-actions>
-          <a
-            jhiPrimaryAction
-            class="btn btn-fx btn-fx-sm btn-fx-ghost"
-            [routerLink]="['/integration', integration.id, 'edit']"
-            queryParamsHandling="merge"
-            aria-label="Edit"
-          >
-            <fa-icon icon="pencil-alt"></fa-icon>
-            <span class="d-none d-md-inline">Edit</span>
-          </a>
-          <button
-            jhiOverflowAction
-            type="button"
-            ngbDropdownItem
-            class="btn-fx-dropdown-item"
-            (click)="openInfoModal(infoIntegrationModal, integration)"
-          >
-            <fa-icon icon="info"></fa-icon>
-            <span>Info</span>
-          </button>
-          <button
-            jhiOverflowAction
-            type="button"
-            ngbDropdownItem
-            class="btn-fx-dropdown-item btn-fx-dropdown-danger"
-            (click)="delete(integration)"
-          >
-            <fa-icon icon="trash"></fa-icon>
-            <span>Delete</span>
-          </button>
-        </jhi-row-actions>
-      </td>
-    </tr>
-  </jhi-data-table>
+    <jhi-data-table
+      [columns]="columns"
+      [(sortState)]="sortState"
+      [hasRows]="!!filteredIntegrations.length"
+      emptyMessage="No gateway matches this filter."
+      ariaLabel="Gateways"
+      >
+      @for (integration of filteredIntegrations; track integration.id) {
+        <tr>
+          <td class="table-fx-identity">
+            <a [routerLink]="['/integration', integration.id, 'edit']" queryParamsHandling="merge">
+              <jhi-truncate [text]="integration.name" />
+            </a>
+          </td>
+          <td>
+            @if (integration.type) {
+              {{ integration.type }}
+            } @else {
+              <span class="text-muted">—</span>
+            }
+          </td>
+          <td>
+            @if (integration.stage) {
+              {{ integration.stage }}
+            } @else {
+              <span class="text-muted">—</span>
+            }
+          </td>
+          <td class="text-end">
+            <jhi-row-actions>
+              <a
+                jhiPrimaryAction
+                class="btn btn-fx btn-fx-sm btn-fx-ghost"
+                [routerLink]="['/integration', integration.id, 'edit']"
+                queryParamsHandling="merge"
+                aria-label="Edit"
+                >
+                <fa-icon icon="pencil-alt"></fa-icon>
+                <span class="d-none d-md-inline">Edit</span>
+              </a>
+              <button
+                jhiOverflowAction
+                type="button"
+                ngbDropdownItem
+                class="btn-fx-dropdown-item"
+                (click)="openInfoModal(infoIntegrationModal, integration)"
+                >
+                <fa-icon icon="info"></fa-icon>
+                <span>Info</span>
+              </button>
+              <button
+                jhiOverflowAction
+                type="button"
+                ngbDropdownItem
+                class="btn-fx-dropdown-item btn-fx-dropdown-danger"
+                (click)="delete(integration)"
+                >
+                <fa-icon icon="trash"></fa-icon>
+                <span>Delete</span>
+              </button>
+            </jhi-row-actions>
+          </td>
+        </tr>
+      }
+    </jhi-data-table>
   }
 </div>

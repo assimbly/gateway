@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
@@ -16,132 +16,130 @@ import { SaveShortcutDirective } from 'app/shared/keyboard';
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-    selector: 'jhi-queue-update',
-    templateUrl: './queue-update.component.html',
-    imports: [ReactiveFormsModule, FontAwesomeModule, AlertError, NgbPopoverModule, SaveShortcutDirective],
+  selector: 'jhi-queue-update',
+  templateUrl: './queue-update.component.html',
+  imports: [ReactiveFormsModule, FontAwesomeModule, AlertError, NgbPopoverModule, SaveShortcutDirective],
 })
 export class QueueUpdateComponent implements OnInit {
-    isSaving = false;
-    isClose!: boolean;
-    namePopoverMessage!: string;
+  protected queueService = inject(QueueService);
+  protected activatedRoute = inject(ActivatedRoute);
+  private router = inject(Router);
+  private formBuilder = inject(FormBuilder);
 
-    editForm!: FormGroup;
+  isSaving = false;
+  isClose!: boolean;
+  namePopoverMessage!: string;
 
-    brokerType = '';
-    brokers: IBroker[];
+  editForm!: FormGroup;
 
-    constructor(
-        protected queueService: QueueService,
-        protected activatedRoute: ActivatedRoute,
-        private router: Router,
-        private formBuilder: FormBuilder
-    ) {
-        this.brokers = [];
-    }
+  brokerType = '';
+  brokers: IBroker[];
 
-    ngOnInit(): void {
-        this.activatedRoute.data.subscribe(({ address }) => {
-            this.initForm();
-            if (address) {
-                this.updateForm(address);
-            }
-        });
-        this.getBrokerType();
-        this.namePopoverMessage = 'Name of the queue. Use a comma-separated list to add multiple queues';
-    }
+  constructor() {
+    this.brokers = [];
+  }
 
-    initForm() {
-        this.editForm = this.formBuilder.group({
-            address: new FormControl(''),
-            name: new FormControl(''),
-            numberOfConsumers: new FormControl(''),
-            numberoftimes: new FormControl(''),
-            numberOfMessages: new FormControl(''),
-            size: new FormControl(''),
-            temporary: new FormControl('')
-        });
-    }
+  ngOnInit(): void {
+    this.activatedRoute.data.subscribe(({ address }) => {
+      this.initForm();
+      if (address) {
+        this.updateForm(address);
+      }
+    });
+    this.getBrokerType();
+    this.namePopoverMessage = 'Name of the queue. Use a comma-separated list to add multiple queues';
+  }
 
-    updateForm(address: IAddress): void {
-        this.editForm.patchValue({
-            address: address.address,
-            name: address.name,
-            numberOfConsumers: address.numberOfConsumers,
-            numberOfMessages: address.numberOfMessages,
-            size: address.size,
-            temporary: address.temporary
-        });
-    }
+  initForm() {
+    this.editForm = this.formBuilder.group({
+      address: new FormControl(''),
+      name: new FormControl(''),
+      numberOfConsumers: new FormControl(''),
+      numberoftimes: new FormControl(''),
+      numberOfMessages: new FormControl(''),
+      size: new FormControl(''),
+      temporary: new FormControl(''),
+    });
+  }
 
-    previousState(): void {
-        window.history.back();
-    }
+  updateForm(address: IAddress): void {
+    this.editForm.patchValue({
+      address: address.address,
+      name: address.name,
+      numberOfConsumers: address.numberOfConsumers,
+      numberOfMessages: address.numberOfMessages,
+      size: address.size,
+      temporary: address.temporary,
+    });
+  }
 
-    save(): void {
-        this.isSaving = true;
+  previousState(): void {
+    window.history.back();
+  }
 
-        const address = this.createFromForm();
+  save(): void {
+    this.isSaving = true;
 
-        const queueNames = address.name!.split(',');
+    const address = this.createFromForm();
 
-        if (queueNames) {
-            for (let i = 0; i < queueNames.length; i++) {
-                if (i === queueNames.length - 1) {
-                    this.isClose = true;
-                    const queue = queueNames[i].trim();
-                    this.subscribeToSaveResponse(this.queueService.createQueue(queue, this.brokerType));
-                } else {
-                    this.isClose = false;
-                    const queue = queueNames[i].trim();
-                    this.subscribeToSaveResponse(this.queueService.createQueue(queue, this.brokerType));
-                }
-            }
+    const queueNames = address.name!.split(',');
+
+    if (queueNames) {
+      for (let i = 0; i < queueNames.length; i++) {
+        if (i === queueNames.length - 1) {
+          this.isClose = true;
+          const queue = queueNames[i].trim();
+          this.subscribeToSaveResponse(this.queueService.createQueue(queue, this.brokerType));
         } else {
-            this.isClose = true;
-            this.subscribeToSaveResponse(this.queueService.createQueue(address.name!, this.brokerType));
+          this.isClose = false;
+          const queue = queueNames[i].trim();
+          this.subscribeToSaveResponse(this.queueService.createQueue(queue, this.brokerType));
         }
+      }
+    } else {
+      this.isClose = true;
+      this.subscribeToSaveResponse(this.queueService.createQueue(address.name!, this.brokerType));
     }
+  }
 
-    private createFromForm(): IAddress {
-        return {
-            ...new Address(),
-            address: this.editForm.get(['address'])!.value,
-            name: this.editForm.get(['name'])!.value,
-            numberOfConsumers: this.editForm.get(['numberOfConsumers'])!.value,
-            numberOfMessages: this.editForm.get(['numberOfMessages'])!.value,
-            size: this.editForm.get(['size'])!.value,
-            temporary: this.editForm.get(['temporary'])!.value
-        };
+  private createFromForm(): IAddress {
+    return {
+      ...new Address(),
+      address: this.editForm.get(['address'])!.value,
+      name: this.editForm.get(['name'])!.value,
+      numberOfConsumers: this.editForm.get(['numberOfConsumers'])!.value,
+      numberOfMessages: this.editForm.get(['numberOfMessages'])!.value,
+      size: this.editForm.get(['size'])!.value,
+      temporary: this.editForm.get(['temporary'])!.value,
+    };
+  }
+
+  protected subscribeToSaveResponse(result: Observable<HttpResponse<any>>): void {
+    result.subscribe(
+      () => this.onSaveSuccess(),
+      () => this.onSaveError(),
+    );
+  }
+
+  protected onSaveSuccess(): void {
+    if (this.isClose) {
+      this.isSaving = false;
+      this.router.navigate(['/queue']);
     }
+  }
 
-    protected subscribeToSaveResponse(result: Observable<HttpResponse<any>>): void {
-        result.subscribe(
-            () => this.onSaveSuccess(),
-            () => this.onSaveError()
-        );
-    }
+  protected onSaveError(): void {
+    this.isSaving = false;
+  }
 
-    protected onSaveSuccess(): void {
-        if (this.isClose) {
-            this.isSaving = false;
-            this.router.navigate(['/queue']);
+  getBrokerType(): void {
+    this.queueService.getBrokers().subscribe(data => {
+      if (data) {
+        for (const broker of data.body!) {
+          this.brokers.push(broker);
+          this.brokerType = broker.type!;
         }
-    }
-
-    protected onSaveError(): void {
-        this.isSaving = false;
-    }
-
-    getBrokerType(): void {
-        this.queueService.getBrokers().subscribe(
-            data => {
-                if (data) {
-                    for (const broker of data.body!) {
-                        this.brokers.push(broker);
-                        this.brokerType = broker.type!;
-                    }
-                }
-            }
-        );
-    }
+      }
+    });
+  }
 }

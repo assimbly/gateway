@@ -1,49 +1,51 @@
 <div class="row justify-content-center">
-    <div class="col-8">
-		<form (jhiSaveShortcut)="save()" [saveShortcutDisabled]="editForm.invalid || isSaving" name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-            <h2 id="jhi-route-heading">{{ editForm.get('id')?.value ? 'Edit Route' : 'Add Route' }}</h2>
+  <div class="col-8">
+    <form (jhiSaveShortcut)="save()" [saveShortcutDisabled]="editForm.invalid || isSaving" name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-route-heading">{{ editForm.get('id')?.value ? 'Edit Route' : 'Add Route' }}</h2>
 
-            <div>
+      <div>
 
-                <div class="form-group" [hidden]="!editForm.get('id')!.value">
-                    <label for="id">ID</label>
-                    <input type="text" class="form-control" id="id" name="id" formControlName="id" readonly />
-                </div>
+        <div class="form-group" [hidden]="!editForm.get('id')!.value">
+          <label for="id">ID</label>
+          <input type="text" class="form-control" id="id" name="id" formControlName="id" readonly />
+        </div>
 
-                <div class="form-group">
-                    <label class="form-control-label" for="field_name">Name</label>
-                    <input type="text" class="form-control" name="name" id="field_name"
-                           formControlName="name"/>
-                </div>
+        <div class="form-group">
+          <label class="form-control-label" for="field_name">Name</label>
+          <input type="text" class="form-control" name="name" id="field_name"
+            formControlName="name"/>
+          </div>
 
-                <div class="form-group" *ngIf="showType">
-                    <label class="form-control-label" for="field_type">Type</label>
-                    <select type="text" class="form-control form-select" name="type" id="field_type" formControlName="type">
-                        <option value="xml">xml</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-control-label" for="field_content">Content</label>
-					<ngx-codemirror
-						class="route-codemirror" name="content" id="field_content"
-							formControlName="content"
-						  [options]="routeEditorOptions()"
-						  (codeMirrorLoaded)="refreshCodeMirror($event)"
-						>
-					</ngx-codemirror>
-                </div>
+          @if (showType) {
+            <div class="form-group">
+              <label class="form-control-label" for="field_type">Type</label>
+              <select type="text" class="form-control form-select" name="type" id="field_type" formControlName="type">
+                <option value="xml">xml</option>
+              </select>
             </div>
-			<br/>
-            <div>
-                <button type="button" id="cancel-save" class="btn btn-secondary" (click)="previousState()">
-                    <fa-icon icon="ban"></fa-icon>&nbsp;<span>Cancel</span>
-                </button>
+          }
 
-                <button type="submit" id="save-entity" [disabled]="editForm.invalid || isSaving" class="btn btn-primary">
-                    <fa-icon icon="save"></fa-icon>&nbsp;<span>Save</span>
-                </button>
-            </div>
-        </form>
+          <div class="form-group">
+            <label class="form-control-label" for="field_content">Content</label>
+            <ngx-codemirror
+              class="route-codemirror" name="content" id="field_content"
+              formControlName="content"
+              [options]="routeEditorOptions()"
+              (codeMirrorLoaded)="refreshCodeMirror($event)"
+              >
+            </ngx-codemirror>
+          </div>
+        </div>
+        <br/>
+        <div>
+          <button type="button" id="cancel-save" class="btn btn-secondary" (click)="previousState()">
+            <fa-icon icon="ban"></fa-icon>&nbsp;<span>Cancel</span>
+          </button>
+
+          <button type="submit" id="save-entity" [disabled]="editForm.invalid || isSaving" class="btn btn-primary">
+            <fa-icon icon="save"></fa-icon>&nbsp;<span>Save</span>
+          </button>
+        </div>
+      </form>
     </div>
-</div>
+  </div>

@@ -3,16 +3,16 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
-  EventEmitter,
-  Input,
-  Output,
+  
   QueryList,
   TemplateRef,
   ViewChild,
   ViewChildren,
   inject,
+  output,
+  input
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { EFMarkerType, FCanvasComponent, FFlowComponent, FFlowModule, FMinimapComponent, FMoveNodesEvent, FSelectionChangeEvent, FZoomDirective } from '@foblex/flow';
@@ -56,36 +56,36 @@ export type DesignerSelection = { type: 'step'; key: string } | { type: 'steps';
   templateUrl: './flow-canvas.component.html',
   styleUrl: './flow-canvas.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FFlowModule, FontAwesomeModule, StepPickerComponent],
+  imports: [FFlowModule, FontAwesomeModule, StepPickerComponent, NgClass],
 })
 export class FlowCanvasComponent {
-  @Input({ required: true }) graph!: FlowGraph;
-  @Input() problems: Problem[] = [];
+  readonly graph = input.required<FlowGraph>();
+  readonly problems = input<Problem[]>([]);
   /** What may not be meant but doesn't keep the Flow from running, such as an undeclared Response status. */
-  @Input() warnings: Problem[] = [];
-  @Input() selection: DesignerSelection = { type: 'flow' };
-  @Input() readOnly = false;
+  readonly warnings = input<Problem[]>([]);
+  readonly selection = input<DesignerSelection>({ type: 'flow' });
+  readonly readOnly = input(false);
   /** The full URL a Handler Flow's Operation is served on; the Operation's label links to it. */
-  @Input() operationUrl?: string;
-  @Input() components: StepComponents = { actions: [], sinks: [] };
+  readonly operationUrl = input<string>();
+  readonly components = input<StepComponents>({ actions: [], sinks: [] });
   /** The messages each Step completed and failed, by Step key, shown as badges; the editor shows none. */
-  @Input() counts?: ReadonlyMap<string, IFlowCounts>;
+  readonly counts = input<ReadonlyMap<string, IFlowCounts>>();
   /** What each Step did in the last test run, by Step key, shown as a badge with its time. */
-  @Input() runResults?: ReadonlyMap<string, StepRunMark>;
+  readonly runResults = input<ReadonlyMap<string, StepRunMark>>();
 
-  @Output() selectionChange = new EventEmitter<DesignerSelection>();
+  readonly selectionChange = output<DesignerSelection>();
   /** A Step was double-clicked, to show or hide its editor. */
-  @Output() openStep = new EventEmitter<string>();
-  @Output() insertStep = new EventEmitter<{ linkTo: string; kind: 'ACTION' | 'ROUTER'; componentType: string }>();
-  @Output() appendStep = new EventEmitter<{ after: string; kind: PickedKind; componentType: string }>();
-  @Output() addBranch = new EventEmitter<string>();
-  @Output() moveSteps = new EventEmitter<StepMove[]>();
+  readonly openStep = output<string>();
+  readonly insertStep = output<{ linkTo: string; kind: 'ACTION' | 'ROUTER'; componentType: string }>();
+  readonly appendStep = output<{ after: string; kind: PickedKind; componentType: string }>();
+  readonly addBranch = output<string>();
+  readonly moveSteps = output<StepMove[]>();
   /** The × on a Step was clicked. */
-  @Output() deleteStep = new EventEmitter<string>();
+  readonly deleteStep = output<string>();
   /** A Step got a new name; an empty one takes its name away. */
-  @Output() renameStep = new EventEmitter<{ key: string; name: string }>();
+  readonly renameStep = output<{ key: string; name: string }>();
   /** Auto-arrange on the minimap was clicked, to lay the Flow out from left to right. */
-  @Output() autoArrange = new EventEmitter<void>();
+  readonly autoArrange = output<void>();
 
   @ViewChild(FFlowComponent) private flow?: FFlowComponent;
   @ViewChild(FCanvasComponent) canvas?: FCanvasComponent;
@@ -112,11 +112,12 @@ export class FlowCanvasComponent {
 
   /** Whether the Step is the Operation a Handler Flow serves, which links to its URL. */
   isOperation(step: DesignStep): boolean {
-    return !!this.graph.handler && isLockedSource(this.graph, step.key);
+    const graph = this.graph();
+    return !!graph.handler && isLockedSource(graph, step.key);
   }
 
   label(step: DesignStep): string {
-    return stepLabel(this.graph, step, this.titles);
+    return stepLabel(this.graph(), step, this.titles);
   }
 
   /**
@@ -124,15 +125,16 @@ export class FlowCanvasComponent {
    * Routers, Responses, Call Flows and the Operation have none.
    */
   caption(step: DesignStep): string {
-    return shortened(stepPath(this.graph, step), CAPTION_LENGTH);
+    return shortened(stepPath(this.graph(), step), CAPTION_LENGTH);
   }
 
   /** What the step kind shows: a Handler Flow's Source is its Operation, and a Response is named as such. */
   kindLabel(step: DesignStep): string {
-    if (isLockedSource(this.graph, step.key)) {
+    const graph = this.graph();
+    if (isLockedSource(graph, step.key)) {
       return 'OPERATION';
     }
-    return isResponse(this.graph, step) ? 'RESPONSE' : step.kind;
+    return isResponse(graph, step) ? 'RESPONSE' : step.kind;
   }
 
   /** The components with a Response first; kept while the components stay the same, so the pickers keep theirs. */
@@ -140,11 +142,13 @@ export class FlowCanvasComponent {
 
   /** The components after an open end: in a Handler Flow, a Response comes first where the Branch ends the request. */
   appendComponents(step: DesignStep): StepComponents {
-    if (!this.graph.handler || !endsRequest(this.graph, step.key)) {
-      return this.components;
+    const graph = this.graph();
+    if (!graph.handler || !endsRequest(graph, step.key)) {
+      return this.components();
     }
-    if (this.withResponse?.from !== this.components) {
-      this.withResponse = { from: this.components, components: { ...this.components, sinks: [RESPONSE_COMPONENT, ...this.components.sinks] } };
+    const components = this.components();
+    if (this.withResponse?.from !== components) {
+      this.withResponse = { from: components, components: { ...components, sinks: [RESPONSE_COMPONENT, ...components.sinks] } };
     }
     return this.withResponse.components;
   }
@@ -155,7 +159,7 @@ export class FlowCanvasComponent {
 
   /** What the Step did in the last test run; nothing when it didn't run or there was no run. */
   runOf(step: DesignStep): StepRun | undefined {
-    const mark = this.runResults?.get(step.key);
+    const mark = this.runResults()?.get(step.key);
     return typeof mark === 'object' ? mark : undefined;
   }
 
@@ -170,17 +174,17 @@ export class FlowCanvasComponent {
   }
 
   warningOf(step: DesignStep): string | undefined {
-    const messages = this.warnings.filter(p => p.stepKey === step.key).map(p => p.message);
+    const messages = this.warnings().filter(p => p.stepKey === step.key).map(p => p.message);
     return messages.length ? messages.join(' ') : undefined;
   }
 
   /** The Branch name (or "default") and Condition shown on a Router's Link; nothing on other Links. */
   branchLabel(link: DesignLink): string | undefined {
-    const router = routerOf(this.graph, link);
+    const router = routerOf(this.graph(), link);
     if (!router) {
       return undefined;
     }
-    const name = link === defaultBranch(this.graph, router) ? 'default' : link.rule;
+    const name = link === defaultBranch(this.graph(), router) ? 'default' : link.rule;
     const returns = link.rule && routerShape(router).returnsToRouter ? ' ↩' : '';
     const text = [name, link.expression].filter(Boolean).join(': ');
     return text ? text + returns : undefined;
@@ -195,7 +199,7 @@ export class FlowCanvasComponent {
 
   /** Turns the line under the Step into a field for its name, as double-clicking that line or F2 does. */
   editName(key: string): void {
-    if (this.readOnly || !this.graph.steps.some(s => s.key === key)) {
+    if (this.readOnly() || !this.graph().steps.some(s => s.key === key)) {
       return;
     }
     this.editingName = key;
@@ -220,7 +224,7 @@ export class FlowCanvasComponent {
 
   /** Whether the Step gets a ×: not the Source, nor a Step its Branch can't do without. */
   canDelete(step: DesignStep): boolean {
-    return canDeleteStep(this.graph, step.key);
+    return canDeleteStep(this.graph(), step.key);
   }
 
   canAddBranch(step: DesignStep): boolean {
@@ -228,34 +232,35 @@ export class FlowCanvasComponent {
   }
 
   hasProblem(step: DesignStep): boolean {
-    return this.problems.some(p => p.stepKey === step.key);
+    return this.problems().some(p => p.stepKey === step.key);
   }
 
   problemOf(step: DesignStep): string | undefined {
-    const messages = this.problems.filter(p => p.stepKey === step.key).map(p => p.message);
+    const messages = this.problems().filter(p => p.stepKey === step.key).map(p => p.message);
     return messages.length ? messages.join(' ') : undefined;
   }
 
   isOpenEnd(step: DesignStep): boolean {
-    return openEnds(this.graph).includes(step);
+    return openEnds(this.graph()).includes(step);
   }
 
   linkHasProblem(link: DesignLink): boolean {
-    return this.problems.some(p => p.linkTo === link.to);
+    return this.problems().some(p => p.linkTo === link.to);
   }
 
   isSelected(step: DesignStep): boolean {
-    const selection = this.selection;
+    const selection = this.selection();
     return (selection.type === 'step' && selection.key === step.key) || (selection.type === 'steps' && selection.keys.includes(step.key));
   }
 
   isLinkSelected(link: DesignLink): boolean {
-    return this.selection.type === 'link' && this.selection.to === link.to;
+    const selection = this.selection();
+    return selection.type === 'link' && selection.to === link.to;
   }
 
   /** Several Steps are selected by Shift+dragging a box around them or Ctrl+clicking them; read-only views show one. */
   onSelectionChange(event: FSelectionChangeEvent): void {
-    if (event.nodeIds.length > 1 && !this.readOnly) {
+    if (event.nodeIds.length > 1 && !this.readOnly()) {
       this.selectionChange.emit({ type: 'steps', keys: event.nodeIds });
     } else if (event.nodeIds.length) {
       this.selectionChange.emit({ type: 'step', key: event.nodeIds[0] });
@@ -268,7 +273,7 @@ export class FlowCanvasComponent {
 
   /** Selects every Step, as Ctrl+A does; with a single Step that is just that one. */
   selectAllSteps(): void {
-    const keys = this.graph.steps.map(s => s.key);
+    const keys = this.graph().steps.map(s => s.key);
     // Marked as changed, so Foblex reports the next click (such as one on the background) as a new selection.
     this.flow?.select(keys, []);
     this.selectionChange.emit(keys.length === 1 ? { type: 'step', key: keys[0] } : { type: 'steps', keys });
@@ -344,7 +349,7 @@ export class FlowCanvasComponent {
    */
   openStepPicker(selection: DesignerSelection): boolean {
     const target = this.pickerTarget(selection);
-    const picker = target && this.pickers?.find(p => p.target === target);
+    const picker = target && this.pickers?.find(p => p.target() === target);
     if (!target || !picker) {
       return false;
     }
@@ -354,7 +359,7 @@ export class FlowCanvasComponent {
   }
 
   private pickerTarget(selection: DesignerSelection): string | undefined {
-    if (this.readOnly) {
+    if (this.readOnly()) {
       return undefined;
     }
     if (selection.type === 'link') {
@@ -363,14 +368,14 @@ export class FlowCanvasComponent {
     if (selection.type === 'steps') {
       return undefined;
     }
-    const ends = openEnds(this.graph);
+    const ends = openEnds(this.graph());
     if (selection.type === 'flow') {
       return ends.length ? `after:${ends[0].key}` : undefined;
     }
     if (ends.some(s => s.key === selection.key)) {
       return `after:${selection.key}`;
     }
-    const outbound = this.graph.links.filter(l => l.from === selection.key);
+    const outbound = this.graph().links.filter(l => l.from === selection.key);
     return outbound.length === 1 ? `link:${outbound[0].to}` : undefined;
   }
 

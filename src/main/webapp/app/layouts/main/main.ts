@@ -57,7 +57,9 @@ export default class Main implements OnInit {
   private readonly translateService = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
 
-  constructor(rootRenderer: RendererFactory2) {
+  constructor() {
+    const rootRenderer = inject(RendererFactory2);
+
     this.renderer = rootRenderer.createRenderer(document.querySelector('html'), null);
 
     effect(() => {

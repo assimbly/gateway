@@ -1,61 +1,71 @@
 <div class="row justify-content-center">
-	<div class="col-8">
-		<form (jhiSaveShortcut)="save()" [saveShortcutDisabled]="isSaving || environmentVariablesForm.invalid" [formGroup]="environmentVariablesForm" name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm" class="needs-validation">
-		    <h2 id="myEnvironmentVariablesLabel">{{ environmentVariables.id ? 'Edit Variable' : 'Add Variable' }}</h2>
-            <jhi-alert-error></jhi-alert-error>
-            <div class="form-group" hidden>
-                <label for="id">ID</label> <input [(ngModel)]="environmentVariables.id" type="text"
-                                                  class="form-control" id="id" formControlName="id" readonly/>
-            </div>
-            <div class="form-group">
-                <label class="form-control-label required" for="key">Key</label> <input
-                [(ngModel)]="environmentVariables.key" type="text" class="form-control" id="key"
-                formControlName="key"/>
-                <div
-                    *ngIf="!!environmentVariablesForm.controls.key.errors && (environmentVariablesForm.controls.key.dirty || environmentVariablesForm.controls.key.touched)"
-                    class="invalid-field-message">
-                    <span *ngIf="environmentVariablesForm.controls.key.errors.required">Key is required.</span>
-                    <span *ngIf="environmentVariablesForm.controls.key.errors.existingKey">Key already exists.</span>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="form-control-label" for="encrypted">Encrypt value</label>
-                <select class="form-control form-select" id="encrypted" [(ngModel)]="environmentVariables.encrypted"
-                        formControlName="encrypted" [value]="environmentVariables.encrypted">
-                    <option [ngValue]=false [selected]="!environmentVariables.encrypted">No</option>
-                    <option [ngValue]=true [selected]="environmentVariables.encrypted">Yes</option>
-                </select>
-            </div>
+  <div class="col-8">
+    <form (jhiSaveShortcut)="save()" [saveShortcutDisabled]="isSaving || environmentVariablesForm.invalid" [formGroup]="environmentVariablesForm" name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm" class="needs-validation">
+      <h2 id="myEnvironmentVariablesLabel">{{ environmentVariables.id ? 'Edit Variable' : 'Add Variable' }}</h2>
+      <jhi-alert-error></jhi-alert-error>
+      <div class="form-group" hidden>
+        <label for="id">ID</label> <input [(ngModel)]="environmentVariables.id" type="text"
+        class="form-control" id="id" formControlName="id" readonly/>
+      </div>
+      <div class="form-group">
+        <label class="form-control-label required" for="key">Key</label> <input
+        [(ngModel)]="environmentVariables.key" type="text" class="form-control" id="key"
+        formControlName="key"/>
+        @if (!!environmentVariablesForm.controls.key.errors && (environmentVariablesForm.controls.key.dirty || environmentVariablesForm.controls.key.touched)) {
+          <div
+            class="invalid-field-message">
+            @if (environmentVariablesForm.controls.key.errors.required) {
+              <span>Key is required.</span>
+            }
+            @if (environmentVariablesForm.controls.key.errors.existingKey) {
+              <span>Key already exists.</span>
+            }
+          </div>
+        }
+      </div>
+      <div class="form-group">
+        <label class="form-control-label" for="encrypted">Encrypt value</label>
+        <select class="form-control form-select" id="encrypted" [(ngModel)]="environmentVariables.encrypted"
+          formControlName="encrypted" [value]="environmentVariables.encrypted">
+          <option [ngValue]=false [selected]="!environmentVariables.encrypted">No</option>
+          <option [ngValue]=true [selected]="environmentVariables.encrypted">Yes</option>
+        </select>
+      </div>
 
-            <div class="form-group">
-                <label class="form-control-label" for="value">Value</label>
-                <input [(ngModel)]="environmentVariables.value" name="value"
-                       *ngIf="environmentVariablesForm.controls.encrypted.value == true"
-                       type="password" class="form-control" id="value" (click)="environmentVariables.value = ''"
-                       formControlName="value"/>
-                <input [(ngModel)]="environmentVariables.value"
-                       *ngIf="environmentVariablesForm.controls.encrypted.value == false"
-                       type="text" class="form-control" id="value"
-                       formControlName="value"/>
-                <div
-                    *ngIf="!!environmentVariablesForm.controls.value.errors && (environmentVariablesForm.controls.value.dirty || environmentVariablesForm.controls.value.touched)"
-                    class="invalid-field-message">
-                        <span
-                            *ngIf="environmentVariablesForm.controls.value.errors.required">Value is required.</span>
-                </div>
-            </div>
+      <div class="form-group">
+        <label class="form-control-label" for="value">Value</label>
+        @if (environmentVariablesForm.controls.encrypted.value == true) {
+          <input [(ngModel)]="environmentVariables.value" name="value"
+            type="password" class="form-control" id="value" (click)="environmentVariables.value = ''"
+            formControlName="value"/>
+        }
+        @if (environmentVariablesForm.controls.encrypted.value == false) {
+          <input [(ngModel)]="environmentVariables.value"
+            type="text" class="form-control" id="value"
+            formControlName="value"/>
+        }
+        @if (!!environmentVariablesForm.controls.value.errors && (environmentVariablesForm.controls.value.dirty || environmentVariablesForm.controls.value.touched)) {
+          <div
+            class="invalid-field-message">
+            @if (environmentVariablesForm.controls.value.errors.required) {
+              <span
+              >Value is required.</span>
+            }
+          </div>
+        }
+      </div>
 
 
-            <div class="form-fx-actions">
-                <button type="button" class="btn btn-fx btn-fx-secondary" (click)="navigateToEnvironmentVariables()">
-                    <fa-icon icon="ban"></fa-icon>
-                    <span>Cancel</span>
-                </button>
-                <button type="button" (click)="save()" [disabled]="isSaving || environmentVariablesForm.invalid" class="btn btn-fx btn-fx-primary">
-                    <fa-icon icon="save"></fa-icon>
-                    <span>Save</span>
-                </button>
-            </div>
-        </form>
-	</div>
+      <div class="form-fx-actions">
+        <button type="button" class="btn btn-fx btn-fx-secondary" (click)="navigateToEnvironmentVariables()">
+          <fa-icon icon="ban"></fa-icon>
+          <span>Cancel</span>
+        </button>
+        <button type="button" (click)="save()" [disabled]="isSaving || environmentVariablesForm.invalid" class="btn btn-fx btn-fx-primary">
+          <fa-icon icon="save"></fa-icon>
+          <span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
 </div>

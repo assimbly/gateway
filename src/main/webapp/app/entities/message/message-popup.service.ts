@@ -1,4 +1,4 @@
-import { Injectable, Component } from '@angular/core';
+import { Injectable, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { MessageService } from './message.service';
@@ -6,9 +6,13 @@ import { Message } from 'app/shared/model/message.model';
 
 @Injectable({ providedIn: 'root' })
 export class MessagePopupService {
+    private modalService = inject(NgbModal);
+    private router = inject(Router);
+    private messageService = inject(MessageService);
+
     private ngbModalRef: NgbModalRef;
 
-    constructor(private modalService: NgbModal, private router: Router, private messageService: MessageService) {
+    constructor() {
         this.ngbModalRef = null!;
     }
 

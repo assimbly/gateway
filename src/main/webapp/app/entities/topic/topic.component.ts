@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Subscription, interval } from 'rxjs';
 import { EventManager } from 'app/core/util/event-manager.service';
@@ -29,7 +28,6 @@ import { filterAddresses } from 'app/shared/util/address-filter';
   selector: 'jhi-topic',
   templateUrl: './topic.component.html',
   imports: [
-    CommonModule,
     RouterModule,
     FontAwesomeModule,
     SearchToolbar,
@@ -41,6 +39,12 @@ import { filterAddresses } from 'app/shared/util/address-filter';
   ],
 })
 export class TopicComponent implements OnInit, OnDestroy {
+  protected topicService = inject(TopicService);
+  protected alertService = inject(AlertService);
+  protected eventManager = inject(EventManager);
+  protected modalService = inject(NgbModal);
+  protected accountService = inject(AccountService);
+
   topics: ITopic[] = [];
   addresses: IAddress[] = [];
   brokers: IBroker[] = [];
@@ -67,13 +71,7 @@ export class TopicComponent implements OnInit, OnDestroy {
   private readonly changeDetector = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
 
-  constructor(
-    protected topicService: TopicService,
-    protected alertService: AlertService,
-    protected eventManager: EventManager,
-    protected modalService: NgbModal,
-    protected accountService: AccountService,
-  ) {
+  constructor() {
     this.topics = [];
     this.brokers = [];
     this.itemsPerPage = ITEMS_PER_PAGE;
@@ -121,10 +119,6 @@ export class TopicComponent implements OnInit, OnDestroy {
 
   get filteredAddresses(): IAddress[] {
     return filterAddresses(this.addresses, this.searchTopicText, this.sortState.order === 'asc', this.sortState.predicate ?? 'name', true);
-  }
-
-  trackId(index: number, item: IAddress): number {
-    return item.id!;
   }
 
   registerChangeInTopics(): void {
