@@ -1,6 +1,6 @@
 <div>
-  @if (showEmptyState) {
-    <jhi-endpoints-empty-state kind="topic" [brokerConfigured]="brokers.length > 0" [brokerRunning]="!!isBroker" />
+  @if (showEmptyState()) {
+    <jhi-endpoints-empty-state kind="topic" [brokerConfigured]="brokers().length > 0" [brokerRunning]="!!isBroker()" />
   } @else {
   <jhi-search-toolbar
     [(query)]="searchTopicText"
@@ -11,11 +11,11 @@
   >
     <jhi-endpoint-type-switch extras active="topic" />
     <ng-container actions>
-      <button *ngIf="isBroker" class="btn btn-fx btn-fx-primary" type="button" [routerLink]="['/topic/new']" aria-label="Add">
+      <button *ngIf="isBroker()" class="btn btn-fx btn-fx-primary" type="button" [routerLink]="['/topic/new']" aria-label="Add">
         <fa-icon icon="plus"></fa-icon><span class="d-none d-md-inline"> Add</span>
       </button>
       <button
-        *ngIf="isBroker && addresses?.length > 0"
+        *ngIf="isBroker() && addresses().length > 0"
         class="btn btn-fx btn-fx-secondary"
         type="button"
         (click)="updateAllTopics()"
@@ -29,23 +29,23 @@
   <jhi-data-table
     [columns]="columns"
     [(sortState)]="sortState"
-    [loading]="isBroker === undefined"
-    [hasRows]="!!filteredAddresses.length"
+    [loading]="isBroker() === undefined"
+    [hasRows]="!!filteredAddresses().length"
     [emptyMessage]="'No topics match this filter.'"
     ariaLabel="Topics"
   >
     <tr
       jhi-address-row
-      *ngFor="let address of filteredAddresses; trackBy: trackId"
+      *ngFor="let address of filteredAddresses(); trackBy: trackId"
       [address]="address"
-      [brokerType]="brokerType"
+      [brokerType]="brokerType()"
       endpointType="topic"
     ></tr>
     <tr
       jhiTableFooter
       jhi-address-totals-row
-      [shown]="filteredAddresses"
-      [count]="addresses.length"
+      [shown]="filteredAddresses()"
+      [count]="addresses().length"
       noun="topics"
     ></tr>
   </jhi-data-table>
