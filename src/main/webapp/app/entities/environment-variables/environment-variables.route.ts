@@ -33,7 +33,6 @@ export const environmentVariablesRoute: Routes = [
     component: EnvironmentVariablesComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
@@ -45,7 +44,6 @@ export const environmentVariablesRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
@@ -57,7 +55,6 @@ export const environmentVariablesRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
@@ -69,7 +66,6 @@ export const environmentVariablesRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },

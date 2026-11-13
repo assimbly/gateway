@@ -7,7 +7,7 @@ import { ImportFlowComponent } from './import-flow.component';
 import { ImportScriptComponent } from './import-script.component';
 import { ImportComponent } from './import.component';
 
-const adminOnly = { authorities: ['ROLE_ADMIN'], pageTitle: 'global.title' };
+const adminOnly = { authorities: ['ROLE_ADMIN'] };
 
 export const importRoute: Routes = [
   { path: 'import', component: ImportComponent, data: adminOnly, canActivate: [userRouteAccessService] },

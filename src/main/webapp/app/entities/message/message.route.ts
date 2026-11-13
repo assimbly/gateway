@@ -10,7 +10,6 @@ import { MessageDetailComponent } from './message-detail.component';
 import { MessageUpdateComponent } from './message-update.component';
 import { IMessage } from 'app/shared/model/message.model';
 import { MessageAllComponent } from './message-all.component';
-import { MessagePopupComponent } from 'app/entities/message/message-dialog.component';
 
 @Injectable({ providedIn: 'root' })
 export class MessageResolve implements Resolve<IMessage> {
@@ -34,7 +33,6 @@ export const messageRoute: Routes = [
     component: MessageAllComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
@@ -43,7 +41,6 @@ export const messageRoute: Routes = [
     component: MessageAllComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
@@ -55,7 +52,6 @@ export const messageRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
@@ -67,7 +63,6 @@ export const messageRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
@@ -79,31 +74,7 @@ export const messageRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
-];
-
-export const messagePopupRoute: Routes = [
-  {
-    path: 'message-new',
-    component: MessagePopupComponent,
-    data: {
-      authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
-    },
-    canActivate: [userRouteAccessService],
-    outlet: 'popup',
-  },
-  {
-    path: 'message/:id/edit',
-    component: MessagePopupComponent,
-    data: {
-      authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
-    },
-    canActivate: [userRouteAccessService],
-    outlet: 'popup',
-  }
 ];

@@ -10,7 +10,6 @@ import { RouteService } from './route.service';
 import { RouteComponent } from './route.component';
 import { RouteDetailComponent } from './route-detail.component';
 import { RouteUpdateComponent } from './route-update.component';
-import { MessagePopupComponent } from 'app/entities/message/message-dialog.component';
 import { MessageResolve } from 'app/entities/message/message.route';
 
 @Injectable({ providedIn: 'root' })
@@ -41,7 +40,6 @@ export const routeRoute: Routes = [
     component: RouteComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
@@ -53,7 +51,6 @@ export const routeRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
@@ -65,7 +62,6 @@ export const routeRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
@@ -77,31 +73,7 @@ export const routeRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
-];
-
-export const routePopupRoute: Routes = [
-  {
-    path: 'route-new',
-    component: MessagePopupComponent,
-    data: {
-      authorities: ['ROLE_ADMIN'],
-      pageTitle: 'Headers',
-    },
-    canActivate: [userRouteAccessService],
-    outlet: 'popup',
-  },
-  {
-    path: 'route/:id/edit',
-    component: MessagePopupComponent,
-    data: {
-      authorities: ['ROLE_ADMIN'],
-      pageTitle: 'Headers',
-    },
-    canActivate: [userRouteAccessService],
-    outlet: 'popup',
-  }
 ];

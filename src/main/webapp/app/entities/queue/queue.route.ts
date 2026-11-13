@@ -39,7 +39,6 @@ export const queueRoute: Routes = [
     component: QueueComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
@@ -51,7 +50,6 @@ export const queueRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
@@ -63,7 +61,6 @@ export const queueRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
@@ -75,7 +72,6 @@ export const queueRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },

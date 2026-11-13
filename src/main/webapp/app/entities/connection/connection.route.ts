@@ -11,7 +11,6 @@ import { ConnectionDetailComponent } from './connection-detail.component';
 import { ConnectionUpdateComponent } from './connection-update.component';
 import { IConnection } from 'app/shared/model/connection.model';
 import { ConnectionAllComponent } from './connection-all.component';
-import { ConnectionPopupComponent } from 'app/entities/connection/connection-dialog.component';
 
 @Injectable({ providedIn: 'root' })
 export class ConnectionResolve implements Resolve<IConnection> {
@@ -35,7 +34,6 @@ export const connectionRoute: Routes = [
     component: ConnectionComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
@@ -44,7 +42,6 @@ export const connectionRoute: Routes = [
     component: ConnectionAllComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
@@ -56,7 +53,6 @@ export const connectionRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
@@ -68,7 +64,6 @@ export const connectionRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
@@ -77,7 +72,6 @@ export const connectionRoute: Routes = [
     component: ConnectionComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
@@ -89,41 +83,7 @@ export const connectionRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
-];
-
-export const connectionPopupRoute: Routes = [
-  {
-    path: 'connection-new',
-    component: ConnectionPopupComponent,
-    data: {
-      authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
-    },
-    canActivate: [userRouteAccessService],
-    outlet: 'popup',
-  },
-  {
-    path: 'connection-all-new',
-    component: ConnectionComponent,
-    data: {
-      authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
-    },
-    canActivate: [userRouteAccessService],
-    outlet: 'popup',
-  },
-  {
-    path: 'connection/:id/edit',
-    component: ConnectionPopupComponent,
-    data: {
-      authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
-    },
-    canActivate: [userRouteAccessService],
-    outlet: 'popup',
-  }
 ];

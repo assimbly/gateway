@@ -10,19 +10,19 @@ export const apiRoute: Routes = [
   {
     path: 'rest-apis',
     component: ApiListComponent,
-    data: { authorities: ['ROLE_USER'], pageTitle: 'global.title' },
+    data: { authorities: ['ROLE_USER'] },
     canActivate: [userRouteAccessService],
   },
   {
     path: 'rest-apis/import',
     component: ApiImportComponent,
-    data: { authorities: ['ROLE_ADMIN'], pageTitle: 'global.title' },
+    data: { authorities: ['ROLE_ADMIN'] },
     canActivate: [userRouteAccessService],
   },
   {
     path: 'rest-apis/:id',
     component: ApiDetailComponent,
-    data: { authorities: ['ROLE_ADMIN'], pageTitle: 'global.title' },
+    data: { authorities: ['ROLE_ADMIN'] },
     canActivate: [userRouteAccessService],
   },
 ];

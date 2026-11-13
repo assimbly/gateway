@@ -34,7 +34,6 @@ const flowRoute: Routes = [
     component: FlowComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
@@ -43,7 +42,6 @@ const flowRoute: Routes = [
     component: FlowMessageSenderComponent,
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
@@ -52,7 +50,6 @@ const flowRoute: Routes = [
     component: FlowStatsPageComponent,
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
@@ -61,7 +58,6 @@ const flowRoute: Routes = [
     component: FlowEditorComponent,
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
     canDeactivate: [(component: FlowEditorComponent) => component.canDeactivate()],
@@ -71,7 +67,6 @@ const flowRoute: Routes = [
     component: FlowEditorComponent,
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
     canDeactivate: [(component: FlowEditorComponent) => component.canDeactivate()],
@@ -81,7 +76,6 @@ const flowRoute: Routes = [
     component: FlowEditorComponent,
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
     canDeactivate: [(component: FlowEditorComponent) => component.canDeactivate()],
@@ -94,7 +88,6 @@ const flowRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
@@ -106,7 +99,6 @@ const flowRoute: Routes = [
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
