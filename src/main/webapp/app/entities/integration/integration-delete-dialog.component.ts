@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
@@ -15,16 +15,14 @@ import { IntegrationService } from './integration.service';
     imports: [FontAwesomeModule, AlertError],
 })
 export class IntegrationDeleteDialogComponent {
+    protected integrationService = inject(IntegrationService);
+    activeModal = inject(NgbActiveModal);
+    protected eventManager = inject(EventManager);
+    protected router = inject(Router);
+
     integration!: IIntegration;
     /** True while the delete runs, so a second click doesn't send it again. */
     readonly deleting = signal(false);
-
-    constructor(
-        protected integrationService: IntegrationService,
-        public activeModal: NgbActiveModal,
-        protected eventManager: EventManager,
-        protected router: Router
-    ) {}
 
     clear() {
         this.activeModal.dismiss('cancel');

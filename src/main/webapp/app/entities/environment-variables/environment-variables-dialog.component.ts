@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
@@ -24,21 +24,19 @@ import { SaveShortcutDirective } from 'app/shared/keyboard';
     imports: [ReactiveFormsModule, AlertError, SaveShortcutDirective],
 })
 export class EnvironmentVariablesDialogComponent implements OnInit {
+    activeModal = inject(NgbActiveModal);
+    private alertService = inject(AlertService);
+    private environmentVariablesService = inject(EnvironmentVariablesService);
+    private integrationService = inject(IntegrationService);
+    private eventManager = inject(EventManager);
+    private route = inject(ActivatedRoute);
+
     environmentVariables: IEnvironmentVariables = new EnvironmentVariables();
     isSaving: boolean;
 
     integrations: Array<IIntegration> = [];
     environmentVariablesForm: FormGroup;
     private allEnvironmentVariablesKeys: Array<string> = [];
-
-    constructor(
-        public activeModal: NgbActiveModal,
-        private alertService: AlertService,
-        private environmentVariablesService: EnvironmentVariablesService,
-        private integrationService: IntegrationService,
-        private eventManager: EventManager,
-        private route: ActivatedRoute
-    ) {}
 
     ngOnInit() {
         this.initializeForm();

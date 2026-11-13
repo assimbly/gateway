@@ -37,6 +37,13 @@ import { VariableKeysService } from './variable-keys.service';
 ],
 })
 export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
+    protected environmentVariablesService = inject(EnvironmentVariablesService);
+    protected alertService = inject(AlertService);
+    protected eventManager = inject(EventManager);
+    protected modalService = inject(NgbModal);
+    protected accountService = inject(AccountService);
+    protected cdr = inject(ChangeDetectorRef);
+
     environmentVariables: IEnvironmentVariables[] = [];
     currentAccount: any;
     eventSubscriber!: Subscription;
@@ -55,14 +62,7 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
         { key: 'actions', header: 'Actions', align: 'end' },
     ];
 
-    constructor(
-        protected environmentVariablesService: EnvironmentVariablesService,
-        protected alertService: AlertService,
-        protected eventManager: EventManager,
-    		protected modalService: NgbModal,
-        protected accountService: AccountService,
-        protected cdr: ChangeDetectorRef
-    ) {
+    constructor() {
         this.page = 0;
     }
 

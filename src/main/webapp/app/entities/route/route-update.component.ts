@@ -21,6 +21,12 @@ import { ThemeService } from 'app/core/theme';
     imports: [ReactiveFormsModule, FontAwesomeModule, CodemirrorModule, SaveShortcutDirective],
 })
 export class RouteUpdateComponent implements OnInit {
+    protected dataUtils = inject(DataUtils);
+    protected eventManager = inject(EventManager);
+    protected routeService = inject(RouteService);
+    protected activatedRoute = inject(ActivatedRoute);
+    private fb = inject(FormBuilder);
+
     isSaving = false;
     showType = false;
     readonly themeService = inject(ThemeService);
@@ -60,14 +66,6 @@ export class RouteUpdateComponent implements OnInit {
             setTimeout(refresh);
         });
     }
-
-    constructor(
-        protected dataUtils: DataUtils,
-        protected eventManager: EventManager,
-        protected routeService: RouteService,
-        protected activatedRoute: ActivatedRoute,
-        private fb: FormBuilder
-    ) {}
 
     ngOnInit(): void {
         this.activatedRoute.data.subscribe(({ route }) => {

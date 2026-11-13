@@ -1,4 +1,4 @@
-import { Injectable, Component } from '@angular/core';
+import { Injectable, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { RouteService } from './route.service';
@@ -6,9 +6,13 @@ import { Route } from 'app/shared/model/route.model';
 
 @Injectable({ providedIn: 'root' })
 export class RoutePopupService {
+    private modalService = inject(NgbModal);
+    private router = inject(Router);
+    private routeService = inject(RouteService);
+
     private ngbModalRef: NgbModalRef;
 
-    constructor(private modalService: NgbModal, private router: Router, private routeService: RouteService) {
+    constructor() {
         this.ngbModalRef = null!;
     }
 

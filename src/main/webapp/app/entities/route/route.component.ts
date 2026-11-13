@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
@@ -18,15 +18,13 @@ import { RouteDeleteDialogComponent } from './route-delete-dialog.component';
   imports: [RouterModule, FontAwesomeModule, AlertError],
 })
 export class RouteComponent implements OnInit, OnDestroy {
+    protected routeService = inject(RouteService);
+    protected dataUtils = inject(DataUtils);
+    protected eventManager = inject(EventManager);
+    protected modalService = inject(NgbModal);
+
     routes?: IRoute[];
     eventSubscriber?: Subscription;
-
-    constructor(
-        protected routeService: RouteService,
-        protected dataUtils: DataUtils,
-        protected eventManager: EventManager,
-        protected modalService: NgbModal
-    ) {}
 
     loadAll(): void {
         this.routeService.query().subscribe((res: HttpResponse<IRoute[]>) => (this.routes = res.body || []));

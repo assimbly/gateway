@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -13,9 +13,10 @@ import { IRoute } from 'app/shared/model/route.model';
     imports: [RouterModule, FontAwesomeModule, AlertError],
 })
 export class RouteDetailComponent implements OnInit {
-    route: IRoute | null = null;
+    protected dataUtils = inject(DataUtils);
+    protected activatedRoute = inject(ActivatedRoute);
 
-    constructor(protected dataUtils: DataUtils, protected activatedRoute: ActivatedRoute) {}
+    route: IRoute | null = null;
 
     ngOnInit(): void {
         this.activatedRoute.data.subscribe(({ route }) => (this.route = route));

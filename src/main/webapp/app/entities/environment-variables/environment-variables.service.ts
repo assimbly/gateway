@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -12,9 +12,9 @@ type EntityArrayResponseType = HttpResponse<IEnvironmentVariables[]>;
 
 @Injectable({ providedIn: 'root' })
 export class EnvironmentVariablesService {
-    public resourceUrl = `${serverApiUrl}api/environment-variables`;
+    protected http = inject(HttpClient);
 
-    constructor(protected http: HttpClient) {}
+    public resourceUrl = `${serverApiUrl}api/environment-variables`;
 
     create(environmentVariables: IEnvironmentVariables): Observable<EntityResponseType> {
         return this.http.post<IEnvironmentVariables>(this.resourceUrl, environmentVariables, { observe: 'response' });

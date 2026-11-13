@@ -27,6 +27,14 @@ import 'codemirror/addon/edit/closetag';
     imports: [ReactiveFormsModule, FontAwesomeModule, AlertError, CodemirrorModule, ForbiddenRouteNamesValidatorDirective, SaveShortcutDirective],
 })
 export class RouteDialogComponent implements OnInit {
+    activeModal = inject(NgbActiveModal);
+    private routeService = inject(RouteService);
+    private alertService = inject(AlertService);
+    private eventManager = inject(EventManager);
+    private activatedRoute = inject(ActivatedRoute);
+    private router = inject(Router);
+    private fb = inject(FormBuilder);
+
     readonly themeService = inject(ThemeService);
     private routeOptionsTheme = '';
     private routeOptionsCache: Record<string, unknown> | null = null;
@@ -45,16 +53,6 @@ export class RouteDialogComponent implements OnInit {
             ''
         ]
     });
-
-    constructor(
-        public activeModal: NgbActiveModal,
-        private routeService: RouteService,
-        private alertService: AlertService,
-        private eventManager: EventManager,
-        private activatedRoute: ActivatedRoute,
-        private router: Router,
-        private fb: FormBuilder
-    ) {}
 
     routeEditorOptions(): Record<string, unknown> {
         const theme = this.themeService.editorTheme();
@@ -191,10 +189,10 @@ export class RouteDialogComponent implements OnInit {
     template: ''
 })
 export class RoutePopupComponent implements OnInit, OnDestroy {
+    private route = inject(ActivatedRoute);
+    private routePopupService = inject(RoutePopupService);
 
     routeSub: any;
-
-    constructor(private route: ActivatedRoute, private routePopupService: RoutePopupService) {}
 
     ngOnInit() {
         this.routeSub = this.route.params.subscribe(params => {

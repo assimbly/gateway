@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterContentInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterContentInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
@@ -15,17 +15,15 @@ import { DeploymentService } from 'app/admin/deployment/deployment.service';
     imports: [FormsModule, AlertError],
 })
 export class IntegrationExportDialogComponent implements AfterContentInit {
+    private integrationService = inject(IntegrationService);
+    activeModal = inject(NgbActiveModal);
+    protected deploymentService = inject(DeploymentService);
+
     integrationId: number;
     integrations: Array<IIntegration> = [];
     xmlConfiguration: any;
     fileName = 'Choose file';
     exportError = false;
-
-    constructor(
-        private integrationService: IntegrationService,
-        public activeModal: NgbActiveModal,
-        protected deploymentService: DeploymentService
-    ) {}
 
     ngAfterContentInit() {
         this.integrationService.query().subscribe(res => {

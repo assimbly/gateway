@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
@@ -19,6 +19,12 @@ import { Router } from '@angular/router';
     imports: [FormsModule, FontAwesomeModule, AlertError, PopoverModule, SaveShortcutDirective],
 })
 export class IntegrationUpdateComponent implements OnInit {
+    protected alertService = inject(AlertService);
+    protected integrationService = inject(IntegrationService);
+    protected activatedRoute = inject(ActivatedRoute);
+    protected router = inject(Router);
+    components = inject(Components);
+
     integration!: IIntegration;
     isSaving!: boolean;
 
@@ -32,14 +38,6 @@ export class IntegrationUpdateComponent implements OnInit {
     typePopoverMessage!: string;
     environmentPopoverMessage!: string;
     defaultPopoverMessage!: string;
-
-    constructor(
-		protected alertService: AlertService,
-        protected integrationService: IntegrationService,
-        protected activatedRoute: ActivatedRoute,
-        protected router: Router,
-        public components: Components
-    ) {}
 
     ngOnInit() {
         this.isSaving = false;
