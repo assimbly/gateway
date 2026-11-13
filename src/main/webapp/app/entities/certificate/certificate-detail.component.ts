@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -16,9 +16,7 @@ import { ICertificate } from 'app/shared/model/certificate.model';
 export class CertificateDetailComponent implements OnInit {
     certificate!: ICertificate;
     // e.g. [{ key: 'Type', value: 'X.509' }, { key: 'Signing Algorithm', value: 'SHA256withRSA' }, ...]
-    certificateDetails: { key: string; value: string }[] = [];
-
-    private readonly changeDetector = inject(ChangeDetectorRef);
+    readonly certificateDetails = signal<{ key: string; value: string }[]>([]);
 
     constructor(protected activatedRoute: ActivatedRoute, protected certificateService: CertificateService) {}
 
@@ -34,7 +32,7 @@ export class CertificateDetailComponent implements OnInit {
     }
 
     private loadDetails() {
-        this.certificateDetails = [];
+        this.certificateDetails.set([]);
 
         if (!this.certificate?.certificateName || this.certificate.url?.startsWith('P12')) {
             return;
@@ -42,16 +40,17 @@ export class CertificateDetailComponent implements OnInit {
 
         this.certificateService.getCertificateDetails(this.certificate.certificateName).subscribe({
             next: res => {
-                this.certificateDetails = (res.body ?? '')
-                    .split(';')
-                    .filter(detail => detail.length > 0)
-                    .map(detail => {
-                        const index = detail.indexOf('=');
-                        return index > 0
-                            ? { key: detail.substring(0, index), value: detail.substring(index + 1) }
-                            : { key: '', value: detail };
-                    });
-                this.changeDetector.detectChanges();
+                this.certificateDetails.set(
+                    (res.body ?? '')
+                        .split(';')
+                        .filter(detail => detail.length > 0)
+                        .map(detail => {
+                            const index = detail.indexOf('=');
+                            return index > 0
+                                ? { key: detail.substring(0, index), value: detail.substring(index + 1) }
+                                : { key: '', value: detail };
+                        }),
+                );
             },
             error: err => console.error('Could not load certificate details', err),
         });

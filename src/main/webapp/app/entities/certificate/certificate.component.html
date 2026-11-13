@@ -18,7 +18,7 @@
     </div>
   </ng-template>
 
-  @if (showEmptyState) {
+  @if (showEmptyState()) {
     <jhi-empty-state
       heading="Add your first Certificate"
       description="A Certificate lets the Gateway trust the systems it connects to over HTTPS, and identify itself to them. Add the certificate of a system, or create one of your own."
@@ -69,12 +69,12 @@
     [columns]="columns"
     [(sortState)]="sortState"
     (sortChange)="onSortChange()"
-    [hasRows]="!!filteredCertificates.length"
-    [loading]="loading"
+    [hasRows]="!!filteredCertificates().length"
+    [loading]="loading()"
     [emptyMessage]="'No certificates match this filter.'"
     ariaLabel="Certificates"
   >
-    <tr *ngFor="let certificate of filteredCertificates; trackBy: trackId">
+    <tr *ngFor="let certificate of filteredCertificates(); trackBy: trackId">
       <td class="table-fx-identity">
         <a [routerLink]="['/certificate', certificate.id, 'edit']">
           <jhi-truncate [text]="certificate.certificateName" />

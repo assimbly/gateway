@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -45,25 +45,23 @@ import { saveAs } from 'file-saver/FileSaver';
   ],
 })
 export class CertificateComponent implements OnInit, OnDestroy {
-  securities: ICertificate[] = [];
+  readonly securities = signal<ICertificate[]>([]);
   currentAccount: any;
   eventSubscriber!: Subscription;
   itemsPerPage: number;
   links: any;
   page: any;
-  sortState: SortState = { predicate: 'certificateName', order: 'asc' };
+  readonly sortState = signal<SortState>({ predicate: 'certificateName', order: 'asc' });
   totalItems!: number;
-  searchText = '';
-  loading = true;
-  loadFailed = false;
+  readonly searchText = signal('');
+  readonly loading = signal(true);
+  readonly loadFailed = signal(false);
   readonly columns: DataTableColumn[] = [
     { key: 'certificateName', header: 'Name', sortable: true },
     { key: 'url', header: 'URL', sortable: true },
     { key: 'certificateExpiry', header: 'Expiry', sortable: true },
     { key: 'actions', header: 'Actions', align: 'end' },
   ];
-
-  private readonly changeDetector = inject(ChangeDetectorRef);
 
   constructor(
     protected certificateService: CertificateService,
@@ -74,7 +72,6 @@ export class CertificateComponent implements OnInit, OnDestroy {
     protected parseLinks: ParseLinks,
     protected accountService: AccountService
   ) {
-    this.securities = [];
     this.itemsPerPage = ITEMS_PER_PAGE;
     this.page = 0;
     this.links = {
@@ -83,8 +80,8 @@ export class CertificateComponent implements OnInit, OnDestroy {
   }
 
   loadAll() {
-    this.loading = true;
-    this.loadFailed = false;
+    this.loading.set(true);
+    this.loadFailed.set(false);
     this.certificateService
       .query({
         page: this.page,
@@ -99,7 +96,7 @@ export class CertificateComponent implements OnInit, OnDestroy {
 
   reset() {
     this.page = 0;
-    this.securities = [];
+    this.securities.set([]);
     this.loadAll();
   }
 
@@ -132,13 +129,11 @@ export class CertificateComponent implements OnInit, OnDestroy {
   }
 
   /** With no Certificate at all, the list gives way to an explanation of Certificates and how to add the first. */
-  get showEmptyState(): boolean {
-    return !this.loading && !this.loadFailed && !this.securities.length;
-  }
+  readonly showEmptyState = computed(() => !this.loading() && !this.loadFailed() && !this.securities().length);
 
-  get filteredCertificates(): ICertificate[] {
-    const query = this.searchText?.toLocaleLowerCase() ?? '';
-    let result = this.securities ?? [];
+  readonly filteredCertificates = computed(() => {
+    const query = this.searchText().toLocaleLowerCase();
+    let result = this.securities();
     if (query) {
       result = result.filter(
         item =>
@@ -146,7 +141,7 @@ export class CertificateComponent implements OnInit, OnDestroy {
       );
     }
     return result;
-  }
+  });
 
   onSortChange() {
     this.reset();
@@ -157,7 +152,7 @@ export class CertificateComponent implements OnInit, OnDestroy {
   }
 
   sort(): string[] {
-    return sortParams(this.sortState, 'id');
+    return sortParams(this.sortState(), 'id');
   }
 
   uploadCertificate() {
@@ -197,18 +192,16 @@ export class CertificateComponent implements OnInit, OnDestroy {
     this.totalItems = parseInt(headers.get('X-Total-Count')!, 10);
     const body = data ?? [];
     if (this.page > 0) {
-      this.securities = [...this.securities, ...body];
+      this.securities.update(securities => [...securities, ...body]);
     } else {
-      this.securities = body;
+      this.securities.set(body);
     }
-    this.loading = false;
-    this.changeDetector.detectChanges();
+    this.loading.set(false);
   }
 
   protected onError(errorMessage: string) {
-    this.loading = false;
-    this.loadFailed = true;
-    this.changeDetector.detectChanges();
+    this.loading.set(false);
+    this.loadFailed.set(true);
 	this.alertService.addAlert({
 	  type: 'danger',
 	  message: errorMessage,
