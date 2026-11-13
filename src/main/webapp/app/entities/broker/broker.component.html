@@ -1,6 +1,6 @@
 <div>
   <ng-template #statsTemplate>
-    <div [innerHtml]="brokerInfo"></div>
+    <div [innerHtml]="brokerInfo()"></div>
   </ng-template>
   <ng-template #infoModal>
     <div class="modal-header">
@@ -8,14 +8,14 @@
       <button type="button" class="btn-close" aria-label="Close" (click)="cancelModal()"></button>
     </div>
     <div class="modal-body">
-      <div [innerHtml]="brokerDetails"></div>
+      <div [innerHtml]="brokerDetails()"></div>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-fx btn-fx-secondary" (click)="cancelModal()">Close</button>
     </div>
   </ng-template>
 
-  @if (showEmptyState) {
+  @if (showEmptyState()) {
     <jhi-empty-state
       heading="Add your first Broker"
       description="A Broker is the message server behind your Queues and Topics. Flows and the Send page exchange messages through it."
@@ -45,12 +45,12 @@
   <jhi-data-table
     [columns]="columns"
     [(sortState)]="sortState"
-    [hasRows]="!!filteredBrokers.length"
-    [loading]="brokersLoading"
+    [hasRows]="!!filteredBrokers().length"
+    [loading]="brokersLoading()"
     [emptyMessage]="'No broker matches this filter.'"
     ariaLabel="Brokers"
   >
-    <tr *ngFor="let rowBroker of filteredBrokers; trackBy: trackId">
+    <tr *ngFor="let rowBroker of filteredBrokers(); trackBy: trackId">
       <td class="table-fx-identity">
         <a [routerLink]="['/broker', rowBroker.id, 'edit']">
           <jhi-truncate [text]="rowBroker.name" />
@@ -58,21 +58,21 @@
       </td>
       <td>
         <jhi-status-controls
-          [busy]="disableActionBtns"
-          [tone]="statusTone"
-          [showStart]="!isBrokerStarted"
+          [busy]="disableActionBtns()"
+          [tone]="statusTone()"
+          [showStart]="!isBrokerStarted()"
           [showStop]="true"
-          [stopDisabled]="isBrokerStopped"
-          [showRestart]="!isBrokerRestarted"
+          [stopDisabled]="!isBrokerStarted()"
+          [showRestart]="isBrokerStarted()"
           (start)="start()"
           (stop)="stop()"
           (restart)="restart()"
         />
       </td>
-      <td class="text-end table-fx-numeric">{{ formatMetric(totalConsumers) }}</td>
-      <td class="text-end table-fx-numeric">{{ formatMetric(totalMessages) }}</td>
+      <td class="text-end table-fx-numeric">{{ formatMetric(totalConsumers()) }}</td>
+      <td class="text-end table-fx-numeric">{{ formatMetric(totalMessages()) }}</td>
       <td>
-        @if (isBrokerStarted) {
+        @if (isBrokerStarted()) {
           <button
             type="button"
             class="btn btn-fx btn-fx-sm btn-fx-icon btn-fx-ghost"

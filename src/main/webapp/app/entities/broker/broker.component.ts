@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject, TemplateRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, TemplateRef, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
@@ -27,13 +27,11 @@ import { AccountService } from 'app/core/auth/account.service';
 import { BrokerService } from './broker.service';
 import { BrokerDeleteDialogComponent } from './broker-delete-dialog.component';
 
-enum Status {
-    active = 'active',
-    paused = 'paused',
-    inactive = 'inactive',
-    inactiveError = 'inactiveError',
-    activeError = 'activeError'
-}
+/** The answers of the Broker's status, start and restart calls when it runs. */
+const STARTED_STATUSES = ['started', 'started with errors', 'restarted'];
+/** The statuses of a Broker that is not running; any other answer is an error message. */
+const STOPPED_STATUSES = ['unconfigured', 'stopped'];
+
 @Component({
     selector: 'jhi-broker',
     templateUrl: './broker.component.html',
@@ -55,12 +53,12 @@ enum Status {
     ],
 })
 export class BrokerComponent implements OnInit, OnDestroy {
-    brokers: IBroker[] = [];
-    brokersLoading = true;
-    brokersLoadFailed = false;
+    readonly brokers = signal<IBroker[]>([]);
+    readonly brokersLoading = signal(true);
+    readonly brokersLoadFailed = signal(false);
     broker!: IBroker;
-    searchText = '';
-    sortState: SortState = { predicate: 'name', order: 'asc' };
+    readonly searchText = signal('');
+    readonly sortState = signal<SortState>({ predicate: 'name', order: 'asc' });
     readonly columns: DataTableColumn[] = [
         { key: 'name', header: 'Name', sortable: true },
         { key: 'status', header: 'Status' },
@@ -69,41 +67,28 @@ export class BrokerComponent implements OnInit, OnDestroy {
         { key: 'stats', header: 'Stats' },
         { key: 'actions', header: 'Actions', align: 'end' },
     ];
-    totalConsumers: number | null = null;
-    totalMessages: number | null = null;
+    readonly totalConsumers = signal<number | null>(null);
+    readonly totalMessages = signal<number | null>(null);
     modalRef: NgbModalRef | null = null;
 
     currentAccount: any;
     eventSubscriber!: Subscription;
 
-    public isBrokerStarted!: boolean;
-    public isBrokerRestarted!: boolean;
-    public isBrokerStopped!: boolean;
-    public isBrokerPaused!: boolean;
-    public isBrokerResumed!: boolean;
-
-    public disableActionBtns!: boolean;
-
-    public brokerDetails!: string;
-    public brokerInfo!: string;
-    public brokerStatus!: string;
-    public brokerStatusError!: string;
-    public isBrokerStatusOK!: boolean;
-    public brokerStatusButton!: string;
-
-    lastError!: string;
-
-    get statusTone(): StatusControlsTone {
-        if (this.brokerStatus === Status.activeError || this.brokerStatus === Status.inactiveError || this.brokerStatus === 'inactiveError') {
+    /** What the Broker last said about its state, such as 'started' or 'stopped', or the error it gave instead. */
+    readonly status = signal('unconfigured');
+    readonly isBrokerStarted = computed(() => STARTED_STATUSES.includes(this.status()));
+    readonly statusTone = computed<StatusControlsTone>(() => {
+        const status = this.status();
+        if (status === 'started with errors' || (!this.isBrokerStarted() && !STOPPED_STATUSES.includes(status))) {
             return 'failed';
         }
-        if (this.isBrokerStarted) {
-            return 'started';
-        }
-        return 'default';
-    }
+        return this.isBrokerStarted() ? 'started' : 'default';
+    });
 
-    private readonly changeDetector = inject(ChangeDetectorRef);
+    readonly disableActionBtns = signal(false);
+
+    readonly brokerDetails = signal('');
+    readonly brokerInfo = signal('');
 
     constructor(
         protected brokerService: BrokerService,
@@ -114,8 +99,6 @@ export class BrokerComponent implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit() {
-        this.setBrokerStatusDefaults();
-
         this.loadAll();
 
         this.accountService.identity().subscribe(account => {
@@ -130,17 +113,16 @@ export class BrokerComponent implements OnInit, OnDestroy {
     }
 
     loadAll() {
-        this.brokersLoading = true;
-        this.brokersLoadFailed = false;
+        this.brokersLoading.set(true);
+        this.brokersLoadFailed.set(false);
         this.brokerService.query().subscribe(
             (res: HttpResponse<IBroker[]>) => {
-                this.brokers = res.body ?? [];
-                this.brokersLoading = false;
-                // Http callback was not refreshing *ngIf views; force CD so Create/table appears.
-                this.changeDetector.detectChanges();
+                const brokers = res.body ?? [];
+                this.brokers.set(brokers);
+                this.brokersLoading.set(false);
 
-                if (this.brokers[0]) {
-                    this.broker = this.brokers[0];
+                if (brokers[0]) {
+                    this.broker = brokers[0];
                     this.getbrokerStatus(this.broker.id!);
                     this.getBrokerInfo(this.broker.id!);
                 } else {
@@ -158,73 +140,7 @@ export class BrokerComponent implements OnInit, OnDestroy {
     }
 
     setbrokerStatus(status: string): void {
-        switch (status) {
-            case 'unconfigured':
-                this.brokerStatus = Status.inactive;
-                this.isBrokerStarted = this.isBrokerPaused = false;
-                this.isBrokerStopped = this.isBrokerRestarted = this.isBrokerResumed = true;
-                this.brokerStatusButton = `
-                            Last action: - <br/>
-                            Status: Stopped<br/>
-            `;
-
-                break;
-            case 'started with errors':
-                this.brokerStatus = Status.activeError;
-                this.isBrokerPaused = this.isBrokerStopped = this.isBrokerRestarted = false;
-                this.isBrokerStarted = this.isBrokerResumed = true;
-                this.brokerStatusButton = `
-                            Last action: Start <br/>
-                            Status: Started with error (check logs)
-                        `;
-
-                break;
-            case 'started':
-                this.brokerStatus = Status.active;
-                this.isBrokerPaused = this.isBrokerStopped = this.isBrokerRestarted = false;
-                this.isBrokerStarted = this.isBrokerResumed = true;
-                this.brokerStatusButton = `
-                            Last action: Start <br/>
-                            Status: Started succesfullly
-                        `;
-
-                break;
-            case 'restarted':
-                this.brokerStatus = Status.active;
-                this.isBrokerPaused = this.isBrokerStopped = this.isBrokerRestarted = false;
-                this.isBrokerResumed = this.isBrokerStarted = true;
-                this.brokerStatusButton = `
-                            Last action: Restart <br/>
-                            Status:  Restarted succesfully
-            `;
-                break;
-            case 'stopped':
-                this.brokerStatus = Status.inactive;
-                this.isBrokerStarted = this.isBrokerPaused = false;
-                this.isBrokerStopped = this.isBrokerRestarted = this.isBrokerResumed = true;
-                this.brokerStatusButton = `
-                            Last action: Stop <br/>
-                            Status: Stopped succesfully
-            `;
-                break;
-            default:
-                this.isBrokerStarted = this.isBrokerPaused = false;
-                this.isBrokerStopped = this.isBrokerRestarted = this.isBrokerResumed = true;
-                this.brokerStatusButton = `
-                            Message: ${status} <br/>
-                            Status: Stopped after error
-              `;
-                this.brokerStatus = 'inactiveError';
-                break;
-        }
-        this.changeDetector.detectChanges();
-    }
-
-    setBrokerStatusDefaults() {
-        this.isBrokerStatusOK = true;
-        this.brokerStatus = 'unconfigured';
-        this.lastError = '';
-        this.setbrokerStatus('unconfigured');
+        this.status.set(status);
     }
 
     getBrokerInfo(id: number) {
@@ -234,10 +150,10 @@ export class BrokerComponent implements OnInit, OnDestroy {
     }
 
     setBrokerInfo(info: String) {
-        this.totalConsumers = null;
-        this.totalMessages = null;
+        this.totalConsumers.set(null);
+        this.totalMessages.set(null);
         if (info.startsWith('no info')) {
-            this.brokerInfo = `Currently there are no statistics for this flow.`;
+            this.brokerInfo.set(`Currently there are no statistics for this flow.`);
         } else {
             const infoSplitted = info.split(',');
 
@@ -250,10 +166,10 @@ export class BrokerComponent implements OnInit, OnDestroy {
             const version = infoSplitted[6].split('=')[1];
             const type = infoSplitted[7].split('=')[1];
 
-            this.totalConsumers = totalConsumers ? Number(totalConsumers) : null;
-            this.totalMessages = totalMessages ? Number(totalMessages) : null;
+            this.totalConsumers.set(totalConsumers ? Number(totalConsumers) : null);
+            this.totalMessages.set(totalMessages ? Number(totalMessages) : null);
 
-            this.brokerInfo = `
+            this.brokerInfo.set(`
                <br/>
                <b>Broker type:</b> ${type}<br/>
                <b>Broker version:</b> ${version}<br/>
@@ -264,9 +180,8 @@ export class BrokerComponent implements OnInit, OnDestroy {
                <br/>
                <b>Total Connections:</b> ${totalConnections}<br/>
                <b>Total Consumers:</b> ${totalConsumers}<br/>
-               <b>Total Messages:</b> ${totalMessages}<br/>`;
+               <b>Total Messages:</b> ${totalMessages}<br/>`);
         }
-        this.changeDetector.detectChanges();
     }
 
 	delete(broker: IBroker): void {
@@ -281,30 +196,25 @@ export class BrokerComponent implements OnInit, OnDestroy {
 	}
 
     start() {
-        this.isBrokerStatusOK = true;
-        this.disableActionBtns = true;
+        this.disableActionBtns.set(true);
 
         this.brokerService.start(this.broker.id!, this.broker.type!, this.broker.configurationType!).subscribe(
             response => {
                 if (response.status === 200) {
                     this.setbrokerStatus(response.body!);
                 }
-                this.disableActionBtns = false;
-                this.changeDetector.detectChanges();
+                this.disableActionBtns.set(false);
             },
             err => {
                 // this.getFlowLastError(this.broker.id, 'Start', err.error);
-                this.isBrokerStatusOK = false;
-                this.brokerStatusError = `Broker with id=${this.broker.id} is not started.`;
-                this.disableActionBtns = false;
+                this.disableActionBtns.set(false);
                 this.setbrokerStatus(err.body);
             }
         );
     }
 
     restart() {
-        this.isBrokerStatusOK = true;
-        this.disableActionBtns = true;
+        this.disableActionBtns.set(true);
 
         this.brokerService.restart(this.broker.id!, this.broker.type!, this.broker.configurationType!).subscribe(
             response => {
@@ -315,50 +225,42 @@ export class BrokerComponent implements OnInit, OnDestroy {
                         this.setbrokerStatus(response.body!);
                     }
                 }
-                this.disableActionBtns = false;
-                this.changeDetector.detectChanges();
+                this.disableActionBtns.set(false);
             },
             err => {
                 // this.getFlowLastError(this.broker.id, 'Restart', err.error);
-                this.isBrokerStatusOK = false;
-                this.brokerStatusError = `Flow with id=${this.broker.id} is not restarted.`;
-                this.disableActionBtns = false;
+                this.disableActionBtns.set(false);
                 this.setbrokerStatus(err.body);
             }
         );
     }
 
     stop() {
-        this.isBrokerStatusOK = true;
-        this.disableActionBtns = true;
+        this.disableActionBtns.set(true);
 
         this.brokerService.stop(this.broker.id!, this.broker.type!, this.broker.configurationType!).subscribe(
             response => {
                 if (response.status === 200) {
                     this.setbrokerStatus(response.body!);
                 }
-                this.disableActionBtns = false;
-                this.changeDetector.detectChanges();
+                this.disableActionBtns.set(false);
             },
             err => {
                 // this.getFlowLastError(this.broker.id, 'Stop', err.error);
-                this.isBrokerStatusOK = false;
-                this.brokerStatusError = `Flow with id=${this.broker.id} is not stopped.`;
-                this.disableActionBtns = false;
-                this.changeDetector.detectChanges();
+                this.disableActionBtns.set(false);
             }
         );
     }
 
     getBrokerDetails() {
-        this.brokerDetails = `
+        this.brokerDetails.set(`
 
                 <b>ID:</b> ${this.broker.id}<br/>
                 <b>Name:</b> ${this.broker.name}<br/>
                 <b>Type:</b> ${this.broker.type}<br/>
                 <b>Autostart:</b> ${this.broker.autoStart}<br/>
                 <b>Configuration Type:</b> ${this.broker.configurationType}<br/>
-        `;
+        `);
     }
 
     openInfoModal(templateRef: TemplateRef<any>) {
@@ -380,18 +282,16 @@ export class BrokerComponent implements OnInit, OnDestroy {
     }
 
     /** With no Broker at all, the list gives way to an explanation of Brokers and how to add the first. */
-    get showEmptyState(): boolean {
-        return !this.brokersLoading && !this.brokersLoadFailed && !this.brokers?.length;
-    }
+    readonly showEmptyState = computed(() => !this.brokersLoading() && !this.brokersLoadFailed() && !this.brokers().length);
 
-    get filteredBrokers(): IBroker[] {
-        const query = this.searchText?.toLocaleLowerCase() ?? '';
-        let result = this.brokers ?? [];
+    readonly filteredBrokers = computed(() => {
+        const query = this.searchText().toLocaleLowerCase();
+        let result = this.brokers();
         if (query) {
             result = result.filter(item => (item.name ?? '').toLocaleLowerCase().includes(query));
         }
-        return sortRows(result, this.sortState, { name: broker => broker.name });
-    }
+        return sortRows(result, this.sortState(), { name: broker => broker.name });
+    });
 
     trackId(index: number, item: IBroker) {
         return item.id;
@@ -402,9 +302,8 @@ export class BrokerComponent implements OnInit, OnDestroy {
     }
 
     protected onError(errorMessage: string) {
-        this.brokersLoading = false;
-        this.brokersLoadFailed = true;
-        this.changeDetector.detectChanges();
+        this.brokersLoading.set(false);
+        this.brokersLoadFailed.set(true);
    		this.alertService.addAlert({
 		  type: 'danger',
 		  message: errorMessage,
