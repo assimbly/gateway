@@ -1,75 +1,64 @@
-import { Injectable } from '@angular/core';
+import { inject } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, Routes } from '@angular/router';
+import { ResolveFn, Routes } from '@angular/router';
 import { userRouteAccessService } from 'app/core/auth';
-import { Observable, of } from 'rxjs';
+import { of } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
-import { EnvironmentVariables } from 'app/shared/model/environment-variables.model';
+import { EnvironmentVariables, IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
 import { EnvironmentVariablesService } from './environment-variables.service';
-import { EnvironmentVariablesComponent } from './environment-variables.component';
-import { EnvironmentVariablesDetailComponent } from './environment-variables-detail.component';
-import { EnvironmentVariablesUpdateComponent } from './environment-variables-update.component';
-import { IEnvironmentVariables } from 'app/shared/model/environment-variables.model';
 
-@Injectable({ providedIn: 'root' })
-export class EnvironmentVariablesResolve implements Resolve<IEnvironmentVariables> {
-  constructor(private service: EnvironmentVariablesService) {}
-
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<EnvironmentVariables> {
-    const id = route.params['id'] ? route.params['id'] : null;
-    if (id) {
-      return this.service.find(id).pipe(
+const environmentVariablesResolve: ResolveFn<IEnvironmentVariables> = route => {
+  const id = route.params['id'];
+  if (id) {
+    return inject(EnvironmentVariablesService)
+      .find(id)
+      .pipe(
         filter((response: HttpResponse<EnvironmentVariables>) => response.ok),
-        map((environmentVariables: HttpResponse<EnvironmentVariables>) => environmentVariables.body!)
+        map((environmentVariables: HttpResponse<EnvironmentVariables>) => environmentVariables.body!),
       );
-    }
-    return of(new EnvironmentVariables());
   }
-}
+  return of(new EnvironmentVariables());
+};
 
 export const environmentVariablesRoute: Routes = [
   {
     path: 'environment-variables',
-    component: EnvironmentVariablesComponent,
+    loadComponent: () => import('./environment-variables.component').then(m => m.EnvironmentVariablesComponent),
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
   {
     path: 'environment-variables/:id/view',
-    component: EnvironmentVariablesDetailComponent,
+    loadComponent: () => import('./environment-variables-detail.component').then(m => m.EnvironmentVariablesDetailComponent),
     resolve: {
-      environmentVariables: EnvironmentVariablesResolve,
+      environmentVariables: environmentVariablesResolve,
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
   {
     path: 'environment-variables/new',
-    component: EnvironmentVariablesUpdateComponent,
+    loadComponent: () => import('./environment-variables-update.component').then(m => m.EnvironmentVariablesUpdateComponent),
     resolve: {
-      environmentVariables: EnvironmentVariablesResolve,
+      environmentVariables: environmentVariablesResolve,
     },
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
   {
     path: 'environment-variables/:id/edit',
-    component: EnvironmentVariablesUpdateComponent,
+    loadComponent: () => import('./environment-variables-update.component').then(m => m.EnvironmentVariablesUpdateComponent),
     resolve: {
-      environmentVariables: EnvironmentVariablesResolve,
+      environmentVariables: environmentVariablesResolve,
     },
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },

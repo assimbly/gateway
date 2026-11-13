@@ -1,78 +1,64 @@
-import { Injectable } from '@angular/core';
+import { inject } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, Routes } from '@angular/router';
+import { ResolveFn, Routes } from '@angular/router';
 import { userRouteAccessService } from 'app/core/auth';
-import { Observable, of } from 'rxjs';
+import { of } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
-import { Certificate } from 'app/shared/model/certificate.model';
+import { Certificate, ICertificate } from 'app/shared/model/certificate.model';
 import { CertificateService } from './certificate.service';
-import { CertificatePopupService } from './certificate-popup.service';
 
-import { CertificateComponent } from './certificate.component';
-import { CertificateDetailComponent } from './certificate-detail.component';
-import { CertificateUpdateComponent } from './certificate-update.component';
-
-import { ICertificate } from 'app/shared/model/certificate.model';
-
-@Injectable({ providedIn: 'root' })
-export class CertificateResolve implements Resolve<ICertificate> {
-  constructor(private service: CertificateService) {}
-
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Certificate> {
-    const id = route.params['id'] ? route.params['id'] : null;
-    if (id) {
-      return this.service.find(id).pipe(
+const certificateResolve: ResolveFn<ICertificate> = route => {
+  const id = route.params['id'];
+  if (id) {
+    return inject(CertificateService)
+      .find(id)
+      .pipe(
         filter((response: HttpResponse<Certificate>) => response.ok),
-        map((certificate: HttpResponse<Certificate>) => certificate.body!)
+        map((certificate: HttpResponse<Certificate>) => certificate.body!),
       );
-    }
-    return of(new Certificate());
   }
-}
+  return of(new Certificate());
+};
 
 export const certificateRoute: Routes = [
   {
     path: 'certificate',
-    component: CertificateComponent,
+    loadComponent: () => import('./certificate.component').then(m => m.CertificateComponent),
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
   {
     path: 'certificate/:id/view',
-    component: CertificateDetailComponent,
+    loadComponent: () => import('./certificate-detail.component').then(m => m.CertificateDetailComponent),
     resolve: {
-      certificate: CertificateResolve,
+      certificate: certificateResolve,
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
   {
     path: 'certificate/new',
-    component: CertificateUpdateComponent,
+    loadComponent: () => import('./certificate-update.component').then(m => m.CertificateUpdateComponent),
     resolve: {
-      certificate: CertificateResolve,
+      certificate: certificateResolve,
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
   {
     path: 'certificate/:id/edit',
-    component: CertificateUpdateComponent,
+    loadComponent: () => import('./certificate-update.component').then(m => m.CertificateUpdateComponent),
     resolve: {
-      certificate: CertificateResolve,
+      certificate: certificateResolve,
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },

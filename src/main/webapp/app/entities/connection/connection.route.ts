@@ -1,129 +1,81 @@
-import { Injectable } from '@angular/core';
+import { inject } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, Routes } from '@angular/router';
+import { ResolveFn, Routes } from '@angular/router';
 import { userRouteAccessService } from 'app/core/auth';
-import { Observable, of } from 'rxjs';
+import { of } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
-import { Connection } from 'app/shared/model/connection.model';
+import { Connection, IConnection } from 'app/shared/model/connection.model';
 import { ConnectionService } from './connection.service';
-import { ConnectionComponent } from './connection.component';
-import { ConnectionDetailComponent } from './connection-detail.component';
-import { ConnectionUpdateComponent } from './connection-update.component';
-import { IConnection } from 'app/shared/model/connection.model';
-import { ConnectionAllComponent } from './connection-all.component';
-import { ConnectionPopupComponent } from 'app/entities/connection/connection-dialog.component';
 
-@Injectable({ providedIn: 'root' })
-export class ConnectionResolve implements Resolve<IConnection> {
-  constructor(private connection: ConnectionService) {}
-
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Connection> {
-    const id = route.params['id'] ? route.params['id'] : null;
-    if (id) {
-      return this.connection.find(id).pipe(
+const connectionResolve: ResolveFn<IConnection> = route => {
+  const id = route.params['id'];
+  if (id) {
+    return inject(ConnectionService)
+      .find(id)
+      .pipe(
         filter((response: HttpResponse<Connection>) => response.ok),
-        map((connection: HttpResponse<Connection>) => connection.body!)
+        map((connection: HttpResponse<Connection>) => connection.body!),
       );
-    }
-    return of(new Connection());
   }
-}
+  return of(new Connection());
+};
 
 export const connectionRoute: Routes = [
   {
     path: 'connection/all',
-    component: ConnectionComponent,
+    loadComponent: () => import('./connection.component').then(m => m.ConnectionComponent),
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
   {
     path: 'connection',
-    component: ConnectionAllComponent,
+    loadComponent: () => import('./connection-all.component').then(m => m.ConnectionAllComponent),
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
   {
     path: 'connection/:id/view',
-    component: ConnectionDetailComponent,
+    loadComponent: () => import('./connection-detail.component').then(m => m.ConnectionDetailComponent),
     resolve: {
-      connection: ConnectionResolve,
+      connection: connectionResolve,
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
   {
     path: 'connection/new',
-    component: ConnectionUpdateComponent,
+    loadComponent: () => import('./connection-update.component').then(m => m.ConnectionUpdateComponent),
     resolve: {
-      connection: ConnectionResolve,
+      connection: connectionResolve,
     },
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
   {
     path: 'connection-all-new',
-    component: ConnectionComponent,
+    loadComponent: () => import('./connection.component').then(m => m.ConnectionComponent),
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
   {
     path: 'connection/:id/edit',
-    component: ConnectionUpdateComponent,
+    loadComponent: () => import('./connection-update.component').then(m => m.ConnectionUpdateComponent),
     resolve: {
-      connection: ConnectionResolve,
+      connection: connectionResolve,
     },
     data: {
       authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
-];
-
-export const connectionPopupRoute: Routes = [
-  {
-    path: 'connection-new',
-    component: ConnectionPopupComponent,
-    data: {
-      authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
-    },
-    canActivate: [userRouteAccessService],
-    outlet: 'popup',
-  },
-  {
-    path: 'connection-all-new',
-    component: ConnectionComponent,
-    data: {
-      authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
-    },
-    canActivate: [userRouteAccessService],
-    outlet: 'popup',
-  },
-  {
-    path: 'connection/:id/edit',
-    component: ConnectionPopupComponent,
-    data: {
-      authorities: ['ROLE_ADMIN'],
-      pageTitle: 'global.title',
-    },
-    canActivate: [userRouteAccessService],
-    outlet: 'popup',
-  }
 ];

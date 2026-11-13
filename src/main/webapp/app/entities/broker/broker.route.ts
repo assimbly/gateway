@@ -1,95 +1,80 @@
-import { Injectable } from '@angular/core';
+import { inject } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, Routes } from '@angular/router';
+import { ResolveFn, Routes } from '@angular/router';
 import { userRouteAccessService } from 'app/core/auth';
-import { Observable, of } from 'rxjs';
+import { of } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
-import { Broker } from 'app/shared/model/broker.model';
+import { Broker, IBroker } from 'app/shared/model/broker.model';
 import { BrokerService } from './broker.service';
-import { BrokerComponent } from './broker.component';
-import { BrokerDetailComponent } from './broker-detail.component';
-import { BrokerUpdateComponent } from './broker-update.component';
-import { BrokerMessageSenderComponent } from 'app/entities/broker/sender/broker-message-sender.component';
-import { IBroker } from 'app/shared/model/broker.model';
-import { BrokerMessageBrowserComponent } from 'app/entities/broker/browser/broker-message-browser.component';
 
-@Injectable({ providedIn: 'root' })
-export class BrokerResolve implements Resolve<IBroker> {
-  constructor(private service: BrokerService) {}
-
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Broker> {
-    const id = route.params['id'] ? route.params['id'] : null;
-    if (id) {
-      return this.service.find(id).pipe(
+const brokerResolve: ResolveFn<IBroker> = route => {
+  const id = route.params['id'];
+  if (id) {
+    return inject(BrokerService)
+      .find(id)
+      .pipe(
         filter((response: HttpResponse<Broker>) => response.ok),
-        map((broker: HttpResponse<Broker>) => broker.body!)
+        map((broker: HttpResponse<Broker>) => broker.body!),
       );
-    }
-    return of(new Broker());
   }
-}
+  return of(new Broker());
+};
 
 export const brokerRoute: Routes = [
   {
     path: 'broker',
-    component: BrokerComponent,
+    loadComponent: () => import('./broker.component').then(m => m.BrokerComponent),
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
   {
     path: 'broker/:id/view',
-    component: BrokerDetailComponent,
+    loadComponent: () => import('./broker-detail.component').then(m => m.BrokerDetailComponent),
     resolve: {
-      broker: BrokerResolve,
+      broker: brokerResolve,
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
   {
     path: 'broker/new',
-    component: BrokerUpdateComponent,
+    loadComponent: () => import('./broker-update.component').then(m => m.BrokerUpdateComponent),
     resolve: {
-      broker: BrokerResolve,
+      broker: brokerResolve,
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
   {
     path: 'broker/:id/edit',
-    component: BrokerUpdateComponent,
+    loadComponent: () => import('./broker-update.component').then(m => m.BrokerUpdateComponent),
     resolve: {
-      broker: BrokerResolve,
+      broker: brokerResolve,
     },
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
   {
     path: 'broker/browser/message-browser',
-    component: BrokerMessageBrowserComponent,
+    loadComponent: () => import('./browser/broker-message-browser.component').then(m => m.BrokerMessageBrowserComponent),
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
   {
     path: 'broker/sender/message-sender',
-    component: BrokerMessageSenderComponent,
+    loadComponent: () => import('./sender/broker-message-sender.component').then(m => m.BrokerMessageSenderComponent),
     data: {
       authorities: ['ROLE_USER'],
-      pageTitle: 'global.title',
     },
     canActivate: [userRouteAccessService],
   },
