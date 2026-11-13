@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
@@ -18,17 +18,15 @@ import { ConnectionService } from 'app/entities/connection/connection.service';
     imports: [RouterModule, AlertError, NgClass],
 })
 export class ConnectionDetailComponent implements OnInit {
+    protected eventManager = inject(EventManager);
+    protected connectionService = inject(ConnectionService);
+    protected connectionKeysService = inject(ConnectionKeysService);
+    protected activatedRoute = inject(ActivatedRoute);
+
     connection!: IConnection;
     public connectionKeys!: Array<ConnectionKeys>;
     private subscription!: Subscription;
     private eventSubscriber!: Subscription;
-
-    constructor(
-        protected eventManager: EventManager,
-        protected connectionService: ConnectionService,
-        protected connectionKeysService: ConnectionKeysService,
-        protected activatedRoute: ActivatedRoute
-    ) {}
 
     ngOnInit() {
         this.activatedRoute.data.subscribe(({ connection }) => {

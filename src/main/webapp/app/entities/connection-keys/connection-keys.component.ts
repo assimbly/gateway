@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -24,6 +24,13 @@ import { ForbiddenConnectionKeysValidatorDirective } from './connection-keys-val
     imports: [FormsModule, RouterModule, FontAwesomeModule, Alert, ForbiddenConnectionKeysValidatorDirective],
 })
 export class ConnectionKeysComponent implements OnInit, OnChanges {
+    protected connectionKeysService = inject(ConnectionKeysService);
+    protected connections = inject(Connections);
+    protected alertService = inject(AlertService);
+    protected modalService = inject(NgbModal);
+    protected eventManager = inject(EventManager);
+    protected accountService = inject(AccountService);
+
     @Input() connectionKeys: Array<IConnectionKeys> = [];
     @Input() connection!: Connection;
 
@@ -37,15 +44,6 @@ export class ConnectionKeysComponent implements OnInit, OnChanges {
     driversList: Array<String> = this.connections.driversList;
     jmsProvidersList: Array<String> = ['ActiveMQ Artemis', 'ActiveMQ Classic', 'AMQ'];
     pooledList: Array<String> = ['true', 'false'];
-
-    constructor(
-        protected connectionKeysService: ConnectionKeysService,
-        protected connections: Connections,
-        protected alertService: AlertService,
-		protected modalService: NgbModal,
-        protected eventManager: EventManager,
-        protected accountService: AccountService
-    ) {}
 
     loadAll() {
         this.connectionKeysService.query().subscribe(

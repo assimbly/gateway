@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpResponse } from '@angular/common/http';
@@ -29,6 +29,15 @@ import { SaveShortcutDirective } from 'app/shared/keyboard';
     imports: [FormsModule, FontAwesomeModule, AlertError, ForbiddenConnectionNamesValidatorDirective, ForbiddenConnectionKeysValidatorDirective, FieldTabDirective, SaveShortcutDirective],
 })
 export class ConnectionDialogComponent implements OnInit {
+    activeModal = inject(NgbActiveModal);
+    protected connectionService = inject(ConnectionService);
+    protected connectionKeysService = inject(ConnectionKeysService);
+    connections = inject(Connections);
+    protected eventManager = inject(EventManager);
+    protected alertService = inject(AlertService);
+    protected activatedRoute = inject(ActivatedRoute);
+    protected router = inject(Router);
+    private cdr = inject(ChangeDetectorRef);
 
     public connectionKeys: Array<ConnectionKeys> = [];
     public connection!: Connection;
@@ -44,18 +53,6 @@ export class ConnectionDialogComponent implements OnInit {
     private requiredConnectionKey: Array<RequiredConnectionKey> = [];
     private requiredType!: RequiredConnectionKey;
     private connectionKeysRemoveList: Array<ConnectionKeys> = [];
-
-    constructor(
-        public activeModal: NgbActiveModal,
-        protected connectionService: ConnectionService,
-        protected connectionKeysService: ConnectionKeysService,
-        public connections: Connections,
-        protected eventManager: EventManager,
-        protected alertService: AlertService,
-        protected activatedRoute: ActivatedRoute,
-        protected router: Router,
-        private cdr: ChangeDetectorRef
-    ) {}
 
     ngOnInit() {
 
@@ -247,9 +244,10 @@ export class ConnectionDialogComponent implements OnInit {
     template: ''
 })
 export class ConnectionPopupComponent implements OnInit, OnDestroy {
-    routeSub: any;
+    private route = inject(ActivatedRoute);
+    private connectionPopupService = inject(ConnectionPopupService);
 
-    constructor(private route: ActivatedRoute, private connectionPopupService: ConnectionPopupService) {}
+    routeSub: any;
 
     ngOnInit() {
         this.routeSub = this.route.params.subscribe(params => {

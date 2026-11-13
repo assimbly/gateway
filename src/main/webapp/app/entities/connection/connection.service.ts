@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpContext, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -12,9 +12,9 @@ type EntityArrayResponseType = HttpResponse<IConnection[]>;
 
 @Injectable({ providedIn: 'root' })
 export class ConnectionService {
-    public resourceUrl = `${serverApiUrl}api/connections`;
+    protected http = inject(HttpClient);
 
-    constructor(protected http: HttpClient) {}
+    public resourceUrl = `${serverApiUrl}api/connections`;
 
     create(connection: IConnection): Observable<EntityResponseType> {
         return this.http.post<IConnection>(this.resourceUrl, connection, { observe: 'response' });

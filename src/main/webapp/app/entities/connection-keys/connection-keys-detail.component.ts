@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -12,9 +12,9 @@ import { IConnectionKeys } from 'app/shared/model/connection-keys.model';
     imports: [RouterModule, FontAwesomeModule, AlertError],
 })
 export class ConnectionKeysDetailComponent implements OnInit {
-    connectionKeys: IConnectionKeys;
+    protected activatedRoute = inject(ActivatedRoute);
 
-    constructor(protected activatedRoute: ActivatedRoute) {}
+    connectionKeys: IConnectionKeys;
 
     ngOnInit() {
         this.activatedRoute.data.subscribe(({ connectionKeys }) => {

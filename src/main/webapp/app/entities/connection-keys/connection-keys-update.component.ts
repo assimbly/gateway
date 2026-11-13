@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
@@ -18,17 +18,15 @@ import { ConnectionService } from 'app/entities/connection/connection.service';
     imports: [FormsModule, FontAwesomeModule, AlertError, SaveShortcutDirective],
 })
 export class ConnectionKeysUpdateComponent implements OnInit {
+    protected alertService = inject(AlertService);
+    protected connectionKeysService = inject(ConnectionKeysService);
+    protected connectionService = inject(ConnectionService);
+    protected activatedRoute = inject(ActivatedRoute);
+
     connectionKeys: IConnectionKeys;
     isSaving: boolean;
 
     connections: IConnection[];
-
-    constructor(
-		protected alertService: AlertService,
-        protected connectionKeysService: ConnectionKeysService,
-        protected connectionService: ConnectionService,
-        protected activatedRoute: ActivatedRoute
-    ) {}
 
     ngOnInit() {
         this.isSaving = false;

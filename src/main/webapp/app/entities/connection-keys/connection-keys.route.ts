@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, Routes } from '@angular/router';
 import { userRouteAccessService } from 'app/core/auth';
@@ -13,7 +13,7 @@ import { IConnectionKeys } from 'app/shared/model/connection-keys.model';
 
 @Injectable({ providedIn: 'root' })
 export class ConnectionKeysResolve implements Resolve<IConnectionKeys> {
-  constructor(private connection: ConnectionKeysService) {}
+  private connection = inject(ConnectionKeysService);
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<ConnectionKeys> {
     const id = route.params['id'] ? route.params['id'] : null;

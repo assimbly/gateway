@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, Routes } from '@angular/router';
 import { userRouteAccessService } from 'app/core/auth';
@@ -15,7 +15,7 @@ import { ConnectionPopupComponent } from 'app/entities/connection/connection-dia
 
 @Injectable({ providedIn: 'root' })
 export class ConnectionResolve implements Resolve<IConnection> {
-  constructor(private connection: ConnectionService) {}
+  private connection = inject(ConnectionService);
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Connection> {
     const id = route.params['id'] ? route.params['id'] : null;

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
@@ -15,13 +15,11 @@ import { ConnectionKeysService } from './connection-keys.service';
     imports: [FontAwesomeModule, AlertError],
 })
 export class ConnectionKeysDeleteDialogComponent {
-    connectionKeys!: IConnectionKeys;
+    protected connectionKeysService = inject(ConnectionKeysService);
+    activeModal = inject(NgbActiveModal);
+    protected eventManager = inject(EventManager);
 
-    constructor(
-        protected connectionKeysService: ConnectionKeysService,
-        public activeModal: NgbActiveModal,
-        protected eventManager: EventManager
-    ) {}
+    connectionKeys!: IConnectionKeys;
 
     clear() {
         this.activeModal.dismiss('cancel');
