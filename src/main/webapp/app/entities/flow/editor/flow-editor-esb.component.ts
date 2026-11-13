@@ -18,7 +18,6 @@ import { ConnectionPopupService } from 'app/entities/connection/connection-popup
 import { Components } from "app/shared/camel/component-type";
 import { Connections } from "app/shared/camel/connections";
 import { notAnInteger } from "app/shared/camel/endpoint";
-import { Link, ILink } from "app/shared/model/link.model";
 import { Step, StepType, IStep } from "app/shared/model/step.model";
 import { Flow, IFlow, LogLevelType } from "app/shared/model/flow.model";
 import { Integration } from "app/shared/model/integration.model";
@@ -49,6 +48,7 @@ import { FlowLogDrawerComponent } from "../flow-log-drawer.component";
 import { CamelRouteDrawerComponent } from "../camel-route-drawer.component";
 import { FlowTestRun, StepRun, StepRunMark, graphShape, runResultsByStepKey, shortDuration, stepRunsById } from "../test/flow-test-run";
 import { automaticErrorHandlerPath, defaultErrorHandlerStep, errorHandlerPath, errorHandlerPathOnSave } from "./error-handler";
+import { chainLinks } from "./step-links";
 import { isRouteConfiguration, isRouteStep, missingRouteFields, nextRouteName, routeToSave } from "./route-step";
 import { CdkDrag, CdkDragPlaceholder, CdkDropList, moveItemInArray } from "@angular/cdk/drag-drop";
 import {
@@ -2039,32 +2039,9 @@ splitOptions4(options: string): string[] {
       });
   }
 
-  /**
-   * A Source, Action or Route links out under its own name; an Action, Sink, Route or Script links in under the name of the
-   * Step before it. A Script links out only when another Step follows it. The Error handler isn't part of the chain.
-   */
+  /** Saves the Links between the Steps, in the order the Steps run. */
   private createLinks$(): Observable<unknown> {
-    const requests: Observable<unknown>[] = [];
-    let previousStepId = 0;
-    const chain = this.steps.filter(step => step.stepType !== 'ERROR');
-
-    chain.forEach((step, index) => {
-      const hasNext = index < chain.length - 1;
-      if (step.stepType === 'ACTION' || step.stepType === 'SOURCE' || step.stepType === 'ROUTE' || (step.stepType === 'SCRIPT' && hasNext)) {
-        const linkName = this.flow.id + '-' + step.id;
-        requests.push(this.linkService.create(this.setLink(linkName, step.id!, 'out')));
-      }
-
-      if (step.stepType === 'ACTION' || step.stepType === 'SINK' || step.stepType === 'ROUTE' || step.stepType === 'SCRIPT') {
-        const linkName = this.flow.id + '-' + previousStepId;
-        if (previousStepId != 0) {
-          requests.push(this.linkService.create(this.setLink(linkName, step.id!, 'in')));
-        }
-      }
-
-      previousStepId = step.id!;
-    });
-
+    const requests = chainLinks(this.flow.id, this.steps).map(link => this.linkService.create(link));
     return requests.length ? forkJoin(requests) : of(null);
   }
 
@@ -2110,17 +2087,6 @@ splitOptions4(options: string): string[] {
 		step.messageId = formStepData.message.value;
 		step.routeId = formStepData.route.value;
 		step.connectionId = formStepData.connection.value;
-	}
-
-	setLink(name: string, stepId: number, bound: string): ILink {
-
-	    const link = new Link();
-      link.name = name;
-      link.bound = bound;
-      link.transport = 'sync';
-      link.stepId = stepId;
-
-      return link;
 	}
 
 	setVersion(): void {
