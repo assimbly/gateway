@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { EMPTY, concatMap } from 'rxjs';
 
 import { AlertError } from 'app/shared/alert';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
@@ -37,26 +38,25 @@ export class FlowDeleteDialogComponent {
     }
 
     this.disableDelete = true;
-    this.flowService.getFlowStatus(id).subscribe({
-      next: response => {
-        if (response.body === 'started') {
-          this.message = 'Active flow can not be deleted. Please stop the flow before deleting.';
-          return;
-        }
-
-        this.flowService.delete(id).subscribe({
-          next: () => {
-            this.eventManager.broadcast(new EventWithContent('flowListModification', 'deleted'));
-            this.activeModal.dismiss();
-          },
-          error: () => {
-            this.disableDelete = false;
-          },
-        });
-      },
-      error: () => {
-        this.disableDelete = false;
-      },
-    });
+    this.flowService
+      .getFlowStatus(id)
+      .pipe(
+        concatMap(response => {
+          if (response.body === 'started') {
+            this.message = 'Active flow can not be deleted. Please stop the flow before deleting.';
+            return EMPTY;
+          }
+          return this.flowService.delete(id);
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.eventManager.broadcast(new EventWithContent('flowListModification', 'deleted'));
+          this.activeModal.dismiss();
+        },
+        error: () => {
+          this.disableDelete = false;
+        },
+      });
   }
 }

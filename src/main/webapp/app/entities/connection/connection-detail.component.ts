@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
@@ -17,7 +17,7 @@ import { ConnectionService } from 'app/entities/connection/connection.service';
     templateUrl: './connection-detail.component.html',
     imports: [CommonModule, RouterModule, AlertError],
 })
-export class ConnectionDetailComponent implements OnInit {
+export class ConnectionDetailComponent implements OnInit, OnDestroy {
     connection!: IConnection;
     public connectionKeys!: Array<ConnectionKeys>;
     private subscription!: Subscription;
@@ -34,6 +34,10 @@ export class ConnectionDetailComponent implements OnInit {
         this.activatedRoute.data.subscribe(({ connection }) => {
             this.connection = connection;
         });
+    }
+
+    ngOnDestroy() {
+        this.eventSubscriber?.unsubscribe();
     }
 
     previousState() {

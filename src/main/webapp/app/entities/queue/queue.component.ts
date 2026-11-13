@@ -1,4 +1,5 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Subscription, interval } from 'rxjs';
@@ -27,7 +28,17 @@ import { filterAddresses } from 'app/shared/util/address-filter';
 @Component({
   selector: 'jhi-queue',
   templateUrl: './queue.component.html',
-  imports: [CommonModule, RouterModule, FontAwesomeModule, SearchToolbar, EndpointTypeSwitch, EndpointsEmptyState, DataTable, AddressRowComponent, AddressTotalsRowComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    FontAwesomeModule,
+    SearchToolbar,
+    EndpointTypeSwitch,
+    EndpointsEmptyState,
+    DataTable,
+    AddressRowComponent,
+    AddressTotalsRowComponent,
+  ],
 })
 export class QueueComponent implements OnInit, OnDestroy {
   queues: IQueue[] = [];
@@ -39,7 +50,6 @@ export class QueueComponent implements OnInit, OnDestroy {
   links: any;
   page: number;
   sortState: SortState = { predicate: 'name', order: 'asc' };
-  timeInterval!: Subscription;
   isBroker: boolean | undefined;
   /** Whether the Queues of the Broker have been asked for, so an empty list is known to be empty. */
   addressesLoaded = false;
@@ -54,6 +64,7 @@ export class QueueComponent implements OnInit, OnDestroy {
   ];
 
   private readonly changeDetector = inject(ChangeDetectorRef);
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor(
     protected queueService: QueueService,
@@ -96,7 +107,6 @@ export class QueueComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.eventSubscriber.unsubscribe();
-    this.timeInterval.unsubscribe();
   }
 
   /** Without a running Broker, or without any Queue, the list gives way to an explanation of Endpoints and what to do first. */
@@ -120,9 +130,9 @@ export class QueueComponent implements OnInit, OnDestroy {
   }
 
   poll(): void {
-    this.timeInterval = interval(10000).subscribe(x => {
-      this.updateAllQueues();
-    });
+    interval(10000)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.updateAllQueues());
   }
 
   registerDeletedQueues() {
@@ -143,27 +153,25 @@ export class QueueComponent implements OnInit, OnDestroy {
   }
 
   getBrokerType() {
-    this.queueService.getBrokers().subscribe(
-      data => {
-        if (data) {
-          for (let i = 0; i < data.body!.length; i++) {
-            this.brokers.push(data.body![i]);
-          }
-
-          if (this.brokers[0]) {
-            this.isBroker = true;
-
-            this.brokerType = this.brokers[0].type!;
-            if (this.brokerType != null) {
-              this.getAllQueues();
-            }
-          } else {
-            this.isBroker = false;
-          }
-          this.changeDetector.detectChanges();
+    this.queueService.getBrokers().subscribe(data => {
+      if (data) {
+        for (let i = 0; i < data.body!.length; i++) {
+          this.brokers.push(data.body![i]);
         }
+
+        if (this.brokers[0]) {
+          this.isBroker = true;
+
+          this.brokerType = this.brokers[0].type!;
+          if (this.brokerType != null) {
+            this.getAllQueues();
+          }
+        } else {
+          this.isBroker = false;
+        }
+        this.changeDetector.detectChanges();
       }
-    );
+    });
   }
 
   getAllQueues() {
@@ -192,7 +200,7 @@ export class QueueComponent implements OnInit, OnDestroy {
           this.addressesLoaded = true;
           this.isBroker = false;
           this.changeDetector.detectChanges();
-        }
+        },
       );
     }
   }
@@ -213,15 +221,15 @@ export class QueueComponent implements OnInit, OnDestroy {
         error => {
           this.isBroker = false;
           this.changeDetector.detectChanges();
-        }
+        },
       );
     }
   }
 
   protected onError(errorMessage: string) {
-	this.alertService.addAlert({
-	  type: 'danger',
-	  message: errorMessage,
-	});
+    this.alertService.addAlert({
+      type: 'danger',
+      message: errorMessage,
+    });
   }
 }

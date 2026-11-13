@@ -1,8 +1,8 @@
-import { Directive, ElementRef, OnChanges, OnDestroy, OnInit, SecurityContext, inject, input } from '@angular/core';
+import { DestroyRef, Directive, ElementRef, OnChanges, OnInit, SecurityContext, inject, input } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DomSanitizer } from '@angular/platform-browser';
 
 import { TranslateService } from '@ngx-translate/core';
-import { Subject, takeUntil } from 'rxjs';
 
 import { translationNotFoundMessage } from 'app/config';
 
@@ -12,21 +12,20 @@ import { translationNotFoundMessage } from 'app/config';
 @Directive({
   selector: '[jhiTranslate]',
 })
-export default class TranslateDirective implements OnChanges, OnInit, OnDestroy {
+export default class TranslateDirective implements OnChanges, OnInit {
   readonly jhiTranslate = input.required<string>();
   readonly translateValues = input<Record<string, unknown>>();
-
-  private readonly directiveDestroyed = new Subject();
 
   private readonly el = inject(ElementRef);
   private readonly translateService = inject(TranslateService);
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    this.translateService.onLangChange.pipe(takeUntil(this.directiveDestroyed)).subscribe(() => {
+    this.translateService.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.getTranslation();
     });
-    this.translateService.onTranslationChange.pipe(takeUntil(this.directiveDestroyed)).subscribe(() => {
+    this.translateService.onTranslationChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.getTranslation();
     });
   }
@@ -35,15 +34,10 @@ export default class TranslateDirective implements OnChanges, OnInit, OnDestroy 
     this.getTranslation();
   }
 
-  ngOnDestroy(): void {
-    this.directiveDestroyed.next(null);
-    this.directiveDestroyed.complete();
-  }
-
   private getTranslation(): void {
     this.translateService
       .get(this.jhiTranslate(), this.translateValues())
-      .pipe(takeUntil(this.directiveDestroyed))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: value => {
           // translations may hold markup, their values (a login, a name) come from users

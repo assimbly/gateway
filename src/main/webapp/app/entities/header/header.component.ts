@@ -22,7 +22,7 @@ import { HeaderService } from './header.service';
     templateUrl: './header.component.html',
     imports: [CommonModule, FormsModule, RouterModule, Alert, ForbiddenHeaderValidatorDirective],
 })
-export class HeaderComponent implements OnInit, OnChanges {
+export class HeaderComponent implements OnInit, OnChanges, OnDestroy {
     @Input() headers: IHeader[];
     @Input() messageId: number;
 
@@ -55,7 +55,11 @@ export class HeaderComponent implements OnInit, OnChanges {
 
     ngOnInit() {
         this.loadAll();
-        this.eventManager.subscribe('headerDeleted', res => this.updateHeader(parseInt(res.toString())));
+        this.eventSubscriber = this.eventManager.subscribe('headerDeleted', res => this.updateHeader(parseInt(res.toString())));
+    }
+
+    ngOnDestroy() {
+        this.eventManager.destroy(this.eventSubscriber);
     }
 
 	deleteHeader(header: IHeader): void {
@@ -160,10 +164,6 @@ export class HeaderComponent implements OnInit, OnChanges {
 
     trackId(index: number, item: IHeader) {
         return item.id;
-    }
-
-    registerChangeInHeader() {
-        this.eventSubscriber = this.eventManager.subscribe('headerListModification', response => this.loadAll());
     }
 
     protected onError(errorMessage: string) {

@@ -5,7 +5,7 @@ import { FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Va
 import { optionForm } from '../editor/step-form';
 import { ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
-import { Observable, defer, forkJoin, from, of } from 'rxjs';
+import { EMPTY, Observable, defer, forkJoin, from, of } from 'rxjs';
 import { catchError, concatMap, map, switchMap, take } from 'rxjs/operators';
 import { VariableKeysService } from 'app/entities/environment-variables/variable-keys.service';
 import { referencedVariables, resolveVariables } from 'app/shared/camel/variables';
@@ -205,25 +205,28 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
      * Source, so it goes to where its first Route reads from, with that Route's Connection.
      */
     private prefillFromFlowSource(flowId: number): void {
-        this.flowService.find(flowId).subscribe(response => {
-            this.flowVariables = response.body?.variables ?? {};
-            const steps = response.body?.steps;
-            const source = sourceStepOf(steps);
-            const route = firstRouteStepOf(steps);
-            if (!source && route?.routeId) {
-                this.routeService.find(route.routeId).subscribe({
-                    next: saved => {
-                        const from = routeSourceOf(saved.body?.content);
-                        if (from) {
-                            this.prefillSource({ ...from, connectionId: route.connectionId });
-                        }
-                    },
-                    error: () => undefined,
-                });
-            } else if (source) {
-                this.prefillSource(source);
-            }
-        });
+        this.flowService
+            .find(flowId)
+            .pipe(
+                concatMap(response => {
+                    this.flowVariables = response.body?.variables ?? {};
+                    const steps = response.body?.steps;
+                    const source = sourceStepOf(steps);
+                    const route = firstRouteStepOf(steps);
+                    if (!source && route?.routeId) {
+                        return this.routeService.find(route.routeId).pipe(
+                            // a Route that can't be read leaves the form as it is
+                            catchError(() => EMPTY),
+                            concatMap(saved => {
+                                const from = routeSourceOf(saved.body?.content);
+                                return from ? of({ ...from, connectionId: route.connectionId }) : EMPTY;
+                            }),
+                        );
+                    }
+                    return source ? of(source) : EMPTY;
+                }),
+            )
+            .subscribe(source => this.prefillSource(source));
     }
 
     private prefillSource(source: Pick<IStep, 'componentType' | 'uri' | 'options' | 'connectionId'>): void {

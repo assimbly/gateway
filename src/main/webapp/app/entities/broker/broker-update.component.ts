@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { EMPTY, Observable, concatMap, switchMap } from 'rxjs';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AlertError } from 'app/shared/alert';
@@ -20,170 +20,177 @@ import { artemisBrokerConfiguration, activemqBrokerConfiguration } from './broke
 import 'codemirror/addon/edit/closetag';
 
 @Component({
-    selector: 'jhi-broker-update',
-    templateUrl: './broker-update.component.html',
-    imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, NgbModule, CodemirrorModule, SaveShortcutDirective],
+  selector: 'jhi-broker-update',
+  templateUrl: './broker-update.component.html',
+  imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, NgbModule, CodemirrorModule, SaveShortcutDirective],
 })
 export class BrokerUpdateComponent implements OnInit {
-    @ViewChild('codeEditor') private codeEditor?: CodemirrorComponent;
-    readonly themeService = inject(ThemeService);
+  @ViewChild('codeEditor') private codeEditor?: CodemirrorComponent;
+  readonly themeService = inject(ThemeService);
 
-    broker!: IBroker;
-    brokerConfiguration!: string;
-    artemisConfiguration!: string;
-    activemqConfiguration!: string;
-    brokerConfigurationFailed!: string;
-    isSaving!: boolean;
+  broker!: IBroker;
+  brokerConfiguration!: string;
+  artemisConfiguration!: string;
+  activemqConfiguration!: string;
+  brokerConfigurationFailed!: string;
+  isSaving!: boolean;
 
-    namePopoverMessage!: string;
-    autostartPopoverMessage!: string;
-    typePopoverMessage!: string;
-    configurationTypePopoverMessage!: string;
-    brokerConfigurationPopoverMessage!: string;
+  namePopoverMessage!: string;
+  autostartPopoverMessage!: string;
+  typePopoverMessage!: string;
+  configurationTypePopoverMessage!: string;
+  brokerConfigurationPopoverMessage!: string;
 
+  constructor(
+    protected brokerService: BrokerService,
+    protected activatedRoute: ActivatedRoute,
+  ) {}
 
-    constructor(protected brokerService: BrokerService, protected activatedRoute: ActivatedRoute) {
-	}
+  ngOnInit() {
+    this.isSaving = false;
+    this.setPopoverMessages();
+    this.setDefaultConfiguration();
+    this.activatedRoute.data
+      .pipe(
+        switchMap(({ broker }) => {
+          this.broker = broker;
+          if (this.broker.id !== undefined) {
+            return this.brokerService.getBrokerConfiguration(this.broker.id, this.broker.type!);
+          }
+          this.broker.name = this.broker.name || 'default';
+          this.broker.autoStart = true;
+          this.broker.type = 'artemis';
+          this.broker.configurationType = 'file';
+          this.brokerConfiguration = this.artemisConfiguration;
+          return EMPTY;
+        }),
+      )
+      .subscribe(brokerConfiguration => {
+        const body = brokerConfiguration.body ?? '';
+        if (this.broker.type === 'artemis') {
+          this.artemisConfiguration = body;
+          this.brokerConfiguration = body;
+        } else {
+          this.activemqConfiguration = body;
+          this.brokerConfiguration = body;
+        }
+        // Force CodeMirror to pick up late-loaded content (ngModel does not update CM after init).
+        setTimeout(() => {
+          const cm = this.codeEditor?.codeMirror as { setValue?: (v: string) => void; refresh?: () => void } | undefined;
+          if (cm?.setValue) {
+            cm.setValue(body);
+            cm.refresh?.();
+          }
+        }, 0);
+      });
+  }
 
-    ngOnInit() {
-        this.isSaving = false;
-        this.setPopoverMessages();
-        this.setDefaultConfiguration();
-        this.activatedRoute.data.subscribe(({ broker }) => {
-            this.broker = broker;
-            if (this.broker.id !== undefined) {
-                this.brokerService.getBrokerConfiguration(this.broker.id, this.broker.type!).subscribe(brokerConfiguration => {
-                    const body = brokerConfiguration.body ?? '';
-                    if (this.broker.type === 'artemis') {
-                        this.artemisConfiguration = body;
-                        this.brokerConfiguration = body;
-                    } else {
-                        this.activemqConfiguration = body;
-                        this.brokerConfiguration = body;
-                    }
-                    // Force CodeMirror to pick up late-loaded content (ngModel does not update CM after init).
-                    setTimeout(() => {
-                        const cm = this.codeEditor?.codeMirror as { setValue?: (v: string) => void; refresh?: () => void } | undefined;
-                        if (cm?.setValue) {
-                            cm.setValue(body);
-                            cm.refresh?.();
-                        }
-                    }, 0);
-                });
-            } else {
-                this.broker.name = this.broker.name || 'default';
-                this.broker.autoStart = true;
-                this.broker.type = 'artemis';
-                this.broker.configurationType = 'file';
-                this.brokerConfiguration = this.artemisConfiguration;
-            }
+  setDefaultConfiguration() {
+    this.artemisConfiguration = artemisBrokerConfiguration;
+    this.activemqConfiguration = activemqBrokerConfiguration;
+  }
+
+  previousState() {
+    window.history.back();
+  }
+
+  save() {
+    this.brokerConfigurationFailed = '';
+
+    if (this.broker.configurationType === 'file' && this.broker.id !== undefined) {
+      this.isSaving = true;
+      this.brokerService
+        .update(this.broker)
+        .pipe(
+          concatMap(() =>
+            this.brokerService.setBrokerConfiguration(
+              this.broker.id!,
+              this.broker.type!,
+              this.broker.configurationType!,
+              this.brokerConfiguration,
+            ),
+          ),
+        )
+        .subscribe({
+          next: () => {
+            this.isSaving = false;
+            this.previousState();
+          },
+          error: err => {
+            this.isSaving = false;
+            this.brokerConfigurationFailed = err.error;
+          },
         });
+    } else if (this.broker.configurationType === 'file') {
+      this.isSaving = true;
+      this.subscribeToCreateResponse(this.brokerService.create(this.broker));
+    } else {
+      this.isSaving = true;
+      if (this.broker.id !== undefined) {
+        this.subscribeToSaveResponse(this.brokerService.update(this.broker));
+      } else {
+        this.subscribeToSaveResponse(this.brokerService.create(this.broker));
+      }
     }
+  }
 
-    setDefaultConfiguration() {
-        this.artemisConfiguration = artemisBrokerConfiguration;
-        this.activemqConfiguration = activemqBrokerConfiguration;
+  onTypeChange(brokerType: string) {
+    if (brokerType === 'classic') {
+      this.artemisConfiguration = this.brokerConfiguration;
+      this.brokerConfiguration = this.activemqConfiguration;
+    } else {
+      this.activemqConfiguration = this.brokerConfiguration;
+      this.brokerConfiguration = this.artemisConfiguration;
     }
+  }
 
-    previousState() {
-        window.history.back();
-    }
+  setPopoverMessages() {
+    this.namePopoverMessage = `Name of the broker.`;
+    this.autostartPopoverMessage = `If true then the broker starts automatically when the gateway starts.`;
+    this.typePopoverMessage = `The ActiveMQ broker to use. Either ActiveMQ Classic or Artemis. Artemis is default`;
+    this.configurationTypePopoverMessage = `The type of configuration. Embedded starts a broker as localhost (for quick testing), File is default.`;
+    this.brokerConfigurationPopoverMessage = `The broker file (activemq.xml for Classic and broker.xml for Artemis). When the configuration is empty than a default file is created. Check the ActiveMQ or Artemis documentation how to configure the brokers.`;
+  }
 
-    save() {
-        this.brokerConfigurationFailed = '';
+  protected subscribeToSaveResponse(result: Observable<HttpResponse<IBroker>>) {
+    result.subscribe(
+      (res: HttpResponse<IBroker>) => this.onSaveSuccess(),
+      (res: HttpErrorResponse) => this.onSaveError(),
+    );
+  }
 
-        if (this.broker.configurationType === 'file' && this.broker.id !== undefined) {
-            this.isSaving = true;
-            this.brokerService.update(this.broker).subscribe(
-                response => {
-                    this.brokerService
-                        .setBrokerConfiguration(this.broker.id!, this.broker.type!, this.broker.configurationType!, this.brokerConfiguration)
-                        .subscribe(
-                            response => {
-                                this.isSaving = false;
-                                this.previousState();
-                            },
-                            err => {
-                                this.isSaving = false;
-                                this.brokerConfigurationFailed = err.error;
-                            }
-                        );
-                },
-                err => {
-                    this.isSaving = false;
-                    this.brokerConfigurationFailed = err.error;
-                }
-            );
-        } else if (this.broker.configurationType === 'file') {
-            this.isSaving = true;
-            this.subscribeToCreateResponse(this.brokerService.create(this.broker));
-        } else {
-            this.isSaving = true;
-            if (this.broker.id !== undefined) {
-                this.subscribeToSaveResponse(this.brokerService.update(this.broker));
-            } else {
-                this.subscribeToSaveResponse(this.brokerService.create(this.broker));
-            }
-        }
-    }
+  protected onSaveSuccess() {
+    this.isSaving = false;
+    this.previousState();
+  }
 
-    onTypeChange(brokerType: string) {
-        if (brokerType === 'classic') {
-            this.artemisConfiguration = this.brokerConfiguration;
-            this.brokerConfiguration = this.activemqConfiguration;
-        } else {
-            this.activemqConfiguration = this.brokerConfiguration;
-            this.brokerConfiguration = this.artemisConfiguration;
-        }
-    }
+  protected onSaveError() {
+    this.isSaving = false;
+  }
 
-    setPopoverMessages() {
-        this.namePopoverMessage = `Name of the broker.`;
-        this.autostartPopoverMessage = `If true then the broker starts automatically when the gateway starts.`;
-        this.typePopoverMessage = `The ActiveMQ broker to use. Either ActiveMQ Classic or Artemis. Artemis is default`;
-        this.configurationTypePopoverMessage = `The type of configuration. Embedded starts a broker as localhost (for quick testing), File is default.`;
-        this.brokerConfigurationPopoverMessage = `The broker file (activemq.xml for Classic and broker.xml for Artemis). When the configuration is empty than a default file is created. Check the ActiveMQ or Artemis documentation how to configure the brokers.`;
-    }
+  protected subscribeToCreateResponse(result: Observable<HttpResponse<IBroker>>) {
+    result.subscribe(
+      (res: HttpResponse<IBroker>) => this.onCreateSuccess(res.body!),
+      (res: HttpErrorResponse) => this.onCreateError(),
+    );
+  }
 
-    protected subscribeToSaveResponse(result: Observable<HttpResponse<IBroker>>) {
-        result.subscribe(
-            (res: HttpResponse<IBroker>) => this.onSaveSuccess(),
-            (res: HttpErrorResponse) => this.onSaveError()
-        );
-    }
+  protected onCreateSuccess(createdBroker: IBroker) {
+    this.brokerService
+      .setBrokerConfiguration(createdBroker.id!, createdBroker.type!, createdBroker.configurationType!, this.brokerConfiguration)
+      .subscribe(
+        response => {
+          this.isSaving = false;
+          this.previousState();
+        },
+        err => {
+          this.isSaving = false;
+          this.brokerConfigurationFailed = err.error;
+        },
+      );
+  }
 
-    protected onSaveSuccess() {
-        this.isSaving = false;
-        this.previousState();
-    }
-
-    protected onSaveError() {
-        this.isSaving = false;
-    }
-
-    protected subscribeToCreateResponse(result: Observable<HttpResponse<IBroker>>) {
-        result.subscribe(
-            (res: HttpResponse<IBroker>) => this.onCreateSuccess(res.body!),
-            (res: HttpErrorResponse) => this.onCreateError()
-        );
-    }
-
-    protected onCreateSuccess(createdBroker: IBroker) {
-        this.brokerService
-            .setBrokerConfiguration(createdBroker.id!, createdBroker.type!, createdBroker.configurationType!, this.brokerConfiguration)
-            .subscribe(
-                response => {
-                    this.isSaving = false;
-                    this.previousState();
-                },
-                err => {
-                    this.isSaving = false;
-                    this.brokerConfigurationFailed = err.error;
-                }
-            );
-    }
-
-    protected onCreateError() {
-        this.isSaving = false;
-    }
+  protected onCreateError() {
+    this.isSaving = false;
+  }
 }

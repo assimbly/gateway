@@ -1,5 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
+import { EMPTY, catchError, concatMap, tap } from 'rxjs';
 
 import { Account, AccountService } from 'app/core/auth';
 import { TranslateDirective } from 'app/shared/language';
@@ -31,12 +32,17 @@ export default class Sessions implements OnInit {
     this.error = false;
     this.success = false;
 
-    this.sessionsService.delete(encodeURIComponent(series)).subscribe({
-      next: () => {
-        this.success = true;
-        this.sessionsService.findAll().subscribe(sessions => (this.sessions = sessions));
-      },
-      error: () => (this.error = true),
-    });
+    this.sessionsService
+      .delete(encodeURIComponent(series))
+      .pipe(
+        tap(() => (this.success = true)),
+        // only a failed delete is reported; reading the list again happens after it
+        catchError(() => {
+          this.error = true;
+          return EMPTY;
+        }),
+        concatMap(() => this.sessionsService.findAll()),
+      )
+      .subscribe(sessions => (this.sessions = sessions));
   }
 }
