@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
@@ -25,7 +24,7 @@ import { MessagePopupService } from 'app/entities/message/message-popup.service'
 @Component({
   selector: 'jhi-message-dialog',
   templateUrl: './message-dialog.component.html',
-  imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, ForbiddenHeaderValidatorDirective, ForbiddenMessageNamesValidatorDirective, SaveShortcutDirective],
+  imports: [FormsModule, FontAwesomeModule, AlertError, ForbiddenHeaderValidatorDirective, ForbiddenMessageNamesValidatorDirective, SaveShortcutDirective],
 })
 export class MessageDialogComponent implements OnInit {
   message!: IMessage;

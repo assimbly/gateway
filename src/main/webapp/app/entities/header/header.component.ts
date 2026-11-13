@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
@@ -20,7 +19,7 @@ import { HeaderService } from './header.service';
 @Component({
     selector: 'jhi-header',
     templateUrl: './header.component.html',
-    imports: [CommonModule, FormsModule, RouterModule, Alert, ForbiddenHeaderValidatorDirective],
+    imports: [FormsModule, RouterModule, Alert, ForbiddenHeaderValidatorDirective],
 })
 export class HeaderComponent implements OnInit, OnChanges {
     @Input() headers: IHeader[];
@@ -156,10 +155,6 @@ export class HeaderComponent implements OnInit, OnChanges {
         if (this.headers.length === 0) {
             this.addHeader();
         }
-    }
-
-    trackId(index: number, item: IHeader) {
-        return item.id;
     }
 
     registerChangeInHeader() {
