@@ -1,6 +1,6 @@
 <div>
   <ng-template #statsTemplate>
-    <div [innerHtml]="brokerInfo"></div>
+    <div [innerHtml]="brokerInfo()"></div>
   </ng-template>
   <ng-template #infoModal>
     <div class="modal-header">
@@ -8,19 +8,19 @@
       <button type="button" class="btn-close" aria-label="Close" (click)="cancelModal()"></button>
     </div>
     <div class="modal-body">
-      <div [innerHtml]="brokerDetails"></div>
+      <div [innerHtml]="brokerDetails()"></div>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-fx btn-fx-secondary" (click)="cancelModal()">Close</button>
     </div>
   </ng-template>
 
-  @if (showEmptyState) {
+  @if (showEmptyState()) {
     <jhi-empty-state
       heading="Add your first Broker"
       description="A Broker is the message server behind your Queues and Topics. Flows and the Send page exchange messages through it."
       [docs]="true"
-      >
+    >
       <a primary id="jh-create-entity" class="btn btn-fx btn-fx-primary jh-create-entity create-broker" [routerLink]="['/broker/new']">
         <fa-icon icon="plus"></fa-icon>
         <span> Add</span>
@@ -33,7 +33,7 @@
       persistKey="searchBrokerText"
       inputId="searchBrokerId"
       hint="A Broker is the message server behind your Queues and Topics. Flows and the Send page exchange messages through it."
-      >
+    >
       <ng-container actions>
         <button class="btn btn-fx btn-fx-secondary" type="button" (click)="loadAll()" aria-label="Refresh">
           <fa-icon icon="sync"></fa-icon>
@@ -45,12 +45,12 @@
     <jhi-data-table
       [columns]="columns"
       [(sortState)]="sortState"
-      [hasRows]="!!filteredBrokers.length"
-      [loading]="brokersLoading"
+      [hasRows]="!!filteredBrokers().length"
+      [loading]="brokersLoading()"
       [emptyMessage]="'No broker matches this filter.'"
       ariaLabel="Brokers"
-      >
-      @for (rowBroker of filteredBrokers; track rowBroker.id) {
+    >
+      @for (rowBroker of filteredBrokers(); track rowBroker.id) {
         <tr>
           <td class="table-fx-identity">
             <a [routerLink]="['/broker', rowBroker.id, 'edit']">
@@ -59,75 +59,69 @@
           </td>
           <td>
             <jhi-status-controls
-              [busy]="disableActionBtns"
-              [tone]="statusTone"
-              [showStart]="!isBrokerStarted"
+              [busy]="disableActionBtns()"
+              [tone]="statusTone()"
+              [showStart]="!isBrokerStarted()"
               [showStop]="true"
-              [stopDisabled]="isBrokerStopped"
-              [showRestart]="!isBrokerRestarted"
+              [stopDisabled]="!isBrokerStarted()"
+              [showRestart]="isBrokerStarted()"
               (start)="start()"
               (stop)="stop()"
               (restart)="restart()"
-              />
-            </td>
-            <td class="text-end table-fx-numeric">{{ formatMetric(totalConsumers) }}</td>
-            <td class="text-end table-fx-numeric">{{ formatMetric(totalMessages) }}</td>
-            <td>
-              @if (isBrokerStarted) {
-                <button
-                  type="button"
-                  class="btn btn-fx btn-fx-sm btn-fx-icon btn-fx-ghost"
-                  (click)="getBrokerInfo(rowBroker.id!)"
-                  [ngbPopover]="statsTemplate"
-                  popoverTitle="Stats"
-                  placement="left"
-                  container="body"
-                  triggers="click"
-                  [autoClose]="'outside'"
-                  aria-label="Stats"
-                  title="Stats"
-                  >
-                  <fa-icon icon="chart-bar"></fa-icon>
-                </button>
-              } @else {
-                <span class="text-muted">—</span>
-              }
-            </td>
-            <td class="text-end">
-              <jhi-row-actions>
-                <a
-                  jhiPrimaryAction
-                  class="btn btn-fx btn-fx-sm btn-fx-ghost"
-                  [routerLink]="['/broker', rowBroker.id, 'edit']"
-                  aria-label="Edit"
-                  >
-                  <fa-icon icon="pencil-alt"></fa-icon>
-                  <span class="d-none d-md-inline">Edit</span>
-                </a>
-                <button
-                  jhiOverflowAction
-                  type="button"
-                  ngbDropdownItem
-                  class="btn-fx-dropdown-item"
-                  (click)="openInfoModal(infoModal)"
-                  >
-                  <fa-icon icon="info"></fa-icon>
-                  <span>Info</span>
-                </button>
-                <button
-                  jhiOverflowAction
-                  type="button"
-                  ngbDropdownItem
-                  class="btn-fx-dropdown-item btn-fx-dropdown-danger"
-                  (click)="delete(rowBroker)"
-                  >
-                  <fa-icon icon="trash"></fa-icon>
-                  <span>Delete</span>
-                </button>
-              </jhi-row-actions>
-            </td>
-          </tr>
-        }
-      </jhi-data-table>
-    }
-  </div>
+            />
+          </td>
+          <td class="text-end table-fx-numeric">{{ formatMetric(totalConsumers()) }}</td>
+          <td class="text-end table-fx-numeric">{{ formatMetric(totalMessages()) }}</td>
+          <td>
+            @if (isBrokerStarted()) {
+              <button
+                type="button"
+                class="btn btn-fx btn-fx-sm btn-fx-icon btn-fx-ghost"
+                (click)="getBrokerInfo(rowBroker.id!)"
+                [ngbPopover]="statsTemplate"
+                popoverTitle="Stats"
+                placement="left"
+                container="body"
+                triggers="click"
+                [autoClose]="'outside'"
+                aria-label="Stats"
+                title="Stats"
+              >
+                <fa-icon icon="chart-bar"></fa-icon>
+              </button>
+            } @else {
+              <span class="text-muted">—</span>
+            }
+          </td>
+          <td class="text-end">
+            <jhi-row-actions>
+              <a
+                jhiPrimaryAction
+                class="btn btn-fx btn-fx-sm btn-fx-ghost"
+                [routerLink]="['/broker', rowBroker.id, 'edit']"
+                aria-label="Edit"
+              >
+                <fa-icon icon="pencil-alt"></fa-icon>
+                <span class="d-none d-md-inline">Edit</span>
+              </a>
+              <button jhiOverflowAction type="button" ngbDropdownItem class="btn-fx-dropdown-item" (click)="openInfoModal(infoModal)">
+                <fa-icon icon="info"></fa-icon>
+                <span>Info</span>
+              </button>
+              <button
+                jhiOverflowAction
+                type="button"
+                ngbDropdownItem
+                class="btn-fx-dropdown-item btn-fx-dropdown-danger"
+                (click)="delete(rowBroker)"
+              >
+                <fa-icon icon="trash"></fa-icon>
+                <span>Delete</span>
+              </button>
+            </jhi-row-actions>
+          </td>
+        </tr>
+      }
+    </jhi-data-table>
+  }
+</div>

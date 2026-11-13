@@ -1,58 +1,47 @@
 <div>
-  @if (showEmptyState) {
-    <jhi-endpoints-empty-state kind="queue" [brokerConfigured]="brokers.length > 0" [brokerRunning]="!!isBroker" />
-    } @else {
-      <jhi-search-toolbar
-        [(query)]="searchQueueText"
-        placeholder="Filter by queue name"
-        persistKey="searchQueueText"
-        inputId="searchTextId"
-        hint="An Endpoint is a Queue or a Topic on your Broker: a named place where messages wait until a Flow or an application picks them up."
-        >
-        <jhi-endpoint-type-switch extras active="queue" />
-        <ng-container actions>
-          @if (isBroker) {
-            <button class="btn btn-fx btn-fx-primary" type="button" [routerLink]="['/queue/new']" aria-label="Add">
-              <fa-icon icon="plus"></fa-icon><span class="d-none d-md-inline"> Add</span>
-            </button>
-          }
-          @if (isBroker && addresses?.length > 0) {
-            <button
-              class="btn btn-fx btn-fx-secondary"
-              type="button"
-              (click)="updateAllQueues()"
-              aria-label="Refresh"
-              >
-              <fa-icon icon="sync"></fa-icon><span class="d-none d-md-inline"> Refresh</span>
-            </button>
-          }
-        </ng-container>
-      </jhi-search-toolbar>
-
-      <jhi-data-table
-        [columns]="columns"
-        [(sortState)]="sortState"
-        [loading]="isBroker === undefined"
-        [hasRows]="!!filteredAddresses.length"
-        [emptyMessage]="'No queues match this filter.'"
-        ariaLabel="Queues"
-        >
-        @for (address of filteredAddresses; track address.id) {
-          <tr
-            jhi-address-row
-            [address]="address"
-            [brokerType]="brokerType"
-            [attr.data-endpoint-name]="address.name"
-            endpointType="queue"
-          ></tr>
+  @if (showEmptyState()) {
+    <jhi-endpoints-empty-state kind="queue" [brokerConfigured]="brokers().length > 0" [brokerRunning]="!!isBroker()" />
+  } @else {
+    <jhi-search-toolbar
+      [(query)]="searchQueueText"
+      placeholder="Filter by queue name"
+      persistKey="searchQueueText"
+      inputId="searchTextId"
+      hint="An Endpoint is a Queue or a Topic on your Broker: a named place where messages wait until a Flow or an application picks them up."
+    >
+      <jhi-endpoint-type-switch extras active="queue" />
+      <ng-container actions>
+        @if (isBroker()) {
+          <button class="btn btn-fx btn-fx-primary" type="button" [routerLink]="['/queue/new']" aria-label="Add">
+            <fa-icon icon="plus"></fa-icon><span class="d-none d-md-inline"> Add</span>
+          </button>
         }
+        @if (isBroker() && addresses().length > 0) {
+          <button class="btn btn-fx btn-fx-secondary" type="button" (click)="updateAllQueues()" aria-label="Refresh">
+            <fa-icon icon="sync"></fa-icon><span class="d-none d-md-inline"> Refresh</span>
+          </button>
+        }
+      </ng-container>
+    </jhi-search-toolbar>
+
+    <jhi-data-table
+      [columns]="columns"
+      [(sortState)]="sortState"
+      [loading]="isBroker() === undefined"
+      [hasRows]="!!filteredAddresses().length"
+      [emptyMessage]="'No queues match this filter.'"
+      ariaLabel="Queues"
+    >
+      @for (address of filteredAddresses(); track address.id) {
         <tr
-          jhiTableFooter
-          jhi-address-totals-row
-          [shown]="filteredAddresses"
-          [count]="addresses.length"
-          noun="queues"
+          jhi-address-row
+          [address]="address"
+          [brokerType]="brokerType()"
+          [attr.data-endpoint-name]="address.name"
+          endpointType="queue"
         ></tr>
-      </jhi-data-table>
-    }
-  </div>
+      }
+      <tr jhiTableFooter jhi-address-totals-row [shown]="filteredAddresses()" [count]="addresses().length" noun="queues"></tr>
+    </jhi-data-table>
+  }
+</div>

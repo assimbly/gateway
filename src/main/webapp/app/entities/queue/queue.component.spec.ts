@@ -27,19 +27,19 @@ describe('QueueComponent', () => {
       ],
     });
     const component = TestBed.createComponent(QueueComponent).componentInstance;
-    component.isBroker = true;
-    component.brokerType = 'classic';
+    component.isBroker.set(true);
+    component.brokerType.set('classic');
     return component;
   }
 
   it('drops a Queue from the list on refresh once the Broker no longer has it', () => {
     const component = create();
-    component.addresses = [queue('Dummy'), queue('orders')];
+    component.addresses.set([queue('Dummy'), queue('orders')]);
     brokerQueues = [queue('orders')];
 
     component.updateAllQueues();
 
-    expect(component.addresses.map(address => address.name)).toEqual(['orders']);
+    expect(component.addresses().map(address => address.name)).toEqual(['orders']);
   });
 
   it('leaves temporary Queues out on refresh', () => {
@@ -48,6 +48,6 @@ describe('QueueComponent', () => {
 
     component.updateAllQueues();
 
-    expect(component.addresses.map(address => address.name)).toEqual(['orders']);
+    expect(component.addresses().map(address => address.name)).toEqual(['orders']);
   });
 });

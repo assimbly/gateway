@@ -1,4 +1,17 @@
-import { Component, ElementRef, Injector, OnDestroy, OnInit, afterNextRender, computed, effect, inject, signal, viewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Injector,
+  OnDestroy,
+  OnInit,
+  afterNextRender,
+  computed,
+  effect,
+  inject,
+  linkedSignal,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
@@ -46,9 +59,12 @@ export class TutorialPanelComponent implements OnInit, OnDestroy {
   readonly html = computed(() => this.sanitizer.bypassSecurityTrustHtml(this.tutorials.step()?.html ?? ''));
   /**
    * Why the last Show me found nothing: the element is on a page the panel couldn't open, or it's in the Test view of
-   * the editor the user is in.
+   * the editor the user is in. Gone once the user moves to another step.
    */
-  readonly hint = signal<'elsewhere' | 'test' | undefined>(undefined);
+  readonly hint = linkedSignal<number, 'elsewhere' | 'test' | undefined>({
+    source: this.tutorials.stepIndex,
+    computation: () => undefined,
+  });
   /** The screenshot the user clicked, shown at full size. */
   readonly enlarged = signal<{ src: string; alt: string } | undefined>(undefined);
   /** Where the Variable `messages` points: the folder the tutorials keep their files in, or undefined when unknown. */
@@ -57,9 +73,9 @@ export class TutorialPanelComponent implements OnInit, OnDestroy {
   readonly mentionsMessagesFolder = computed(() => /@\{messages\}|messages folder/.test(this.tutorials.step()?.html ?? ''));
 
   constructor() {
+    // a Show me pointing belongs to the step it was started from
     effect(() => {
       this.tutorials.stepIndex();
-      this.hint.set(undefined);
       clearHighlight();
     });
   }

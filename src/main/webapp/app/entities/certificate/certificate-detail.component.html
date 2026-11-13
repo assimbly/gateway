@@ -22,7 +22,7 @@
                     <dd>
                         <span>{{certificate.certificateExpiry | formatMediumDatetime}}</span>
                     </dd>
-                    @for (detail of certificateDetails; track $index) {
+                    @for (detail of certificateDetails(); track $index) {
                         <dt><span>{{detail.key}}</span></dt>
                         <dd>
                             <span>{{detail.value}}</span>

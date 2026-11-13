@@ -1,13 +1,7 @@
 <div>
   <ng-template #addMenu let-compact="compact">
     <div ngbDropdown class="d-inline-block" placement="bottom-end">
-      <button
-        type="button"
-        class="btn btn-fx btn-fx-primary"
-        id="dropdownMenuCertificates"
-        ngbDropdownToggle
-        aria-label="Add certificate"
-        >
+      <button type="button" class="btn btn-fx btn-fx-primary" id="dropdownMenuCertificates" ngbDropdownToggle aria-label="Add certificate">
         <fa-icon icon="plus"></fa-icon>
         <span [class.d-none]="compact" [class.d-md-inline]="compact"> Add</span>
       </button>
@@ -18,12 +12,12 @@
     </div>
   </ng-template>
 
-  @if (showEmptyState) {
+  @if (showEmptyState()) {
     <jhi-empty-state
       heading="Add your first Certificate"
       description="A Certificate lets the Gateway trust the systems it connects to over HTTPS, and identify itself to them. Add the certificate of a system, or create one of your own."
       [docs]="true"
-      >
+    >
       <ng-container ngProjectAs="[primary]" [ngTemplateOutlet]="addMenu" [ngTemplateOutletContext]="{ compact: false }" />
       <span secondary>
         Or import a
@@ -39,7 +33,7 @@
       persistKey="searchCertificateText"
       inputId="searchCertificateId"
       hint="A Certificate lets the Gateway trust the systems it connects to over HTTPS, and identify itself to them."
-      >
+    >
       <ng-container actions>
         <ng-container [ngTemplateOutlet]="addMenu" [ngTemplateOutletContext]="{ compact: true }" />
         <div ngbDropdown class="d-inline-block" placement="bottom-end">
@@ -49,7 +43,7 @@
             id="dropdownImportCertificates"
             ngbDropdownToggle
             aria-label="Import certificate"
-            >
+          >
             <fa-icon icon="file-import"></fa-icon>
             <span class="d-none d-md-inline"> Import</span>
           </button>
@@ -69,12 +63,12 @@
       [columns]="columns"
       [(sortState)]="sortState"
       (sortChange)="onSortChange()"
-      [hasRows]="!!filteredCertificates.length"
-      [loading]="loading"
+      [hasRows]="!!filteredCertificates().length"
+      [loading]="loading()"
       [emptyMessage]="'No certificates match this filter.'"
       ariaLabel="Certificates"
-      >
-      @for (certificate of filteredCertificates; track certificate.id) {
+    >
+      @for (certificate of filteredCertificates(); track certificate.id) {
         <tr>
           <td class="table-fx-identity">
             <a [routerLink]="['/certificate', certificate.id, 'edit']">
@@ -102,7 +96,7 @@
                 class="btn btn-fx btn-fx-sm btn-fx-ghost"
                 [routerLink]="['/certificate', certificate.id, 'edit']"
                 aria-label="Edit"
-                >
+              >
                 <fa-icon icon="pencil-alt"></fa-icon>
                 <span class="d-none d-md-inline">Edit</span>
               </a>
@@ -112,7 +106,7 @@
                 ngbDropdownItem
                 class="btn-fx-dropdown-item"
                 [routerLink]="['/certificate', certificate.id, 'view']"
-                >
+              >
                 <fa-icon icon="eye"></fa-icon>
                 <span>View</span>
               </button>
@@ -122,7 +116,7 @@
                 ngbDropdownItem
                 class="btn-fx-dropdown-item"
                 (click)="exportCertificate(certificate.id!)"
-                >
+              >
                 <fa-icon icon="download"></fa-icon>
                 <span>Export</span>
               </button>
@@ -132,7 +126,7 @@
                 ngbDropdownItem
                 class="btn-fx-dropdown-item btn-fx-dropdown-danger"
                 (click)="delete(certificate)"
-                >
+              >
                 <fa-icon icon="trash"></fa-icon>
                 <span>Delete</span>
               </button>
