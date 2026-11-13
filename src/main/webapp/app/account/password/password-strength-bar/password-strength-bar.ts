@@ -1,4 +1,4 @@
-import { Component, ElementRef, Renderer2, effect, inject, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 
 import { TranslateDirective } from 'app/shared/language';
 
@@ -13,29 +13,12 @@ export default class PasswordStrengthBar {
 
   colors = ['#F00', '#F90', '#FF0', '#9F0', '#0F0'];
 
-  private readonly renderer = inject(Renderer2);
-  private readonly elementRef = inject(ElementRef);
-
-  constructor() {
-    effect(() => {
-      const password = this.passwordToCheck();
-      if (password) {
-        const c = this.getColor(this.measureStrength(password));
-        const element = this.elementRef.nativeElement;
-        if (element.className) {
-          this.renderer.removeClass(element, element.className);
-        }
-        const lis = element.getElementsByTagName('li');
-        for (let i = 0; i < lis.length; i++) {
-          if (i < c.idx) {
-            this.renderer.setStyle(lis[i], 'backgroundColor', c.color);
-          } else {
-            this.renderer.setStyle(lis[i], 'backgroundColor', 'var(--app-border)');
-          }
-        }
-      }
-    });
-  }
+  /** The colour of each of the five bars: as many as the password is strong get its strength's colour. */
+  readonly barColors = computed(() => {
+    const password = this.passwordToCheck();
+    const strength = password ? this.getColor(this.measureStrength(password)) : { idx: 0, color: '' };
+    return this.colors.map((_, i) => (i < strength.idx ? strength.color : null));
+  });
 
   measureStrength(p: string): number {
     let force = 0;

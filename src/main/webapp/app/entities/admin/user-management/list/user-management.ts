@@ -46,7 +46,9 @@ import { IUserManagement } from '../user-management.model';
   ],
 })
 export class UserManagement {
-  readonly userManagements = signal<IUserManagement[]>([]);
+  readonly userManagements = computed(() =>
+    this.fillComponentAttributesFromResponseBody([...this.userManagementService.userManagements()]),
+  );
   readonly searchText = signal('');
 
   sortState = sortStateSignal({});
@@ -73,7 +75,7 @@ export class UserManagement {
   });
 
   readonly itemsPerPage = signal(ITEMS_PER_PAGE);
-  readonly totalItems = signal(0);
+  readonly totalItems = computed(() => this.totalItemsFromResponseHeader(this.userManagementService.userManagementsResource.headers()));
   readonly page = signal(1);
 
   readonly router = inject(Router);
@@ -92,15 +94,6 @@ export class UserManagement {
   protected modalService = inject(NgbModal);
 
   constructor() {
-    effect(() => {
-      const headers = this.userManagementService.userManagementsResource.headers();
-      if (headers) {
-        this.fillComponentAttributesFromResponseHeader(headers);
-      }
-    });
-    effect(() => {
-      this.userManagements.set(this.fillComponentAttributesFromResponseBody([...this.userManagementService.userManagements()]));
-    });
     effect(() => {
       const activatedRouteState = this.activatedRouteState();
       untracked(() => {
@@ -151,8 +144,8 @@ export class UserManagement {
     return data;
   }
 
-  protected fillComponentAttributesFromResponseHeader(headers: HttpHeaders): void {
-    this.totalItems.set(Number(headers.get(TOTAL_COUNT_RESPONSE_HEADER)));
+  protected totalItemsFromResponseHeader(headers: HttpHeaders | undefined): number {
+    return headers ? Number(headers.get(TOTAL_COUNT_RESPONSE_HEADER)) : 0;
   }
 
   protected queryBackend(): void {
