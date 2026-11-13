@@ -1,8 +1,8 @@
 <td class="table-fx-identity">
-  <a [routerLink]="['/flow/editor', flow.id]" [queryParams]="{ mode: 'edit', editor: flow.type || 'flow', id: flow.id }">
-    <jhi-truncate [text]="flow.name" />
+  <a [routerLink]="['/flow/editor', flow().id]" [queryParams]="{ mode: 'edit', editor: flow().type || 'flow', id: flow().id }">
+    <jhi-truncate [text]="flow().name" />
   </a>
-  @if (handler) {
+  @if (handler(); as handler) {
     <a class="badge text-bg-light border fw-normal text-decoration-none ms-2" [routerLink]="['/rest-apis', handler.apiId]"
        [ngbTooltip]="'Handles ' + handler.method + ' ' + handler.fullPath + ' of the API ' + handler.apiName">
       <fa-icon icon="plug"></fa-icon> {{ handler.apiName }} · {{ handler.method }} {{ handler.fullPath }}
@@ -33,8 +33,8 @@
     @if (state.draft) {
       <a
         class="badge text-bg-secondary text-decoration-none"
-        [routerLink]="['/flow/editor', flow.id]"
-        [queryParams]="{ mode: 'edit', editor: flow.type || 'flow', id: flow.id }"
+        [routerLink]="['/flow/editor', flow().id]"
+        [queryParams]="{ mode: 'edit', editor: flow().type || 'flow', id: flow().id }"
         ngbTooltip="This Flow is a Draft. Finish its design to start it."
         >Draft</a
       >
@@ -51,7 +51,7 @@
       [empty]="flowStatsEmpty"
       [sections]="flowStatsSections"
       [detailsLink]="detailsLink"
-      (load)="getFlowStatistic(flow)"
+      (load)="getFlowStatistic(flow())"
     />
   } @else {
     <span class="text-muted">—</span>

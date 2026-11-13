@@ -1,7 +1,7 @@
 <ng-template #statsTemplate>
-  <jhi-flow-stats-sections [loading]="loading" [empty]="empty" [sections]="sections" />
-  @if (detailsLink && !loading && !empty) {
-    <a class="flow-stats-details" [routerLink]="detailsLink">Show details <fa-icon icon="arrow-right"></fa-icon></a>
+  <jhi-flow-stats-sections [loading]="loading()" [empty]="empty()" [sections]="sections()" />
+  @if (detailsLink() && !loading() && !empty()) {
+    <a class="flow-stats-details" [routerLink]="detailsLink()">Show details <fa-icon icon="arrow-right"></fa-icon></a>
   }
 </ng-template>
 

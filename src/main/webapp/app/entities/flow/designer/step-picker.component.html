@@ -1,13 +1,13 @@
 <div ngbDropdown container="body" placement="bottom-start bottom-end" autoClose="outside" class="d-inline-block"
      (openChange)="onOpenChange($event)">
-  <button #toggle type="button" class="flow-plus" ngbDropdownToggle [attr.aria-label]="title" [title]="title">
+  <button #toggle type="button" class="flow-plus" ngbDropdownToggle [attr.aria-label]="title()" [title]="title()">
     <fa-icon icon="plus"></fa-icon>
   </button>
   <div ngbDropdownMenu class="step-picker" [style.max-height.px]="maxHeight">
     <input #search type="search" class="form-control form-control-sm" placeholder="Search components…" aria-label="Search components"
            [(ngModel)]="filter" (keydown.enter)="$event.preventDefault(); pickFirstMatch()" />
     <div class="step-picker-kinds" role="tablist">
-      @for (k of kinds; track k) {
+      @for (k of kinds(); track k) {
         <button type="button" role="tab" class="step-picker-kind" [class.active]="k === kind" [attr.aria-selected]="k === kind"
                 (click)="activeKind = k; category = null; search.focus({ preventScroll: true })">
           {{ labels[k] }}
@@ -58,7 +58,7 @@
       } @empty {
         <div class="step-picker-empty">No {{ labels[kind] | lowercase }} matches "{{ filter }}".</div>
       }
-      @if (kinds.includes('ROUTER')) {
+      @if (kinds().includes('ROUTER')) {
         @for (name of routerMatches(kind); track name) {
           @let item = entry(name, 'ROUTER');
           <button type="button" role="option" class="step-picker-item" [title]="item.description ?? ''" (click)="pick('ROUTER', name)">

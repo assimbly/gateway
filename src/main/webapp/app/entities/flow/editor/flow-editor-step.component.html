@@ -25,17 +25,17 @@
 </ng-template>
 
 <ng-template #errorHandlerPopover let-message="message">
-  <div [innerHtml]="errorHandlerPopoverMessage"></div>
+  <div [innerHtml]="errorHandlerPopoverMessage()"></div>
 </ng-template>
 <ng-template #optionsPopover let-message="message">
-  <div [innerHtml]="optionsPopoverMessage"></div>
+  <div [innerHtml]="optionsPopoverMessage()"></div>
 </ng-template>
 <ng-template #uriPopover let-message="message">
-  <div style="min-width:200px; overflow-y: auto;" [innerHtml]="uriPopoverMessage"></div>
+  <div style="min-width:200px; overflow-y: auto;" [innerHtml]="uriPopoverMessage()"></div>
 </ng-template>
 <ng-template #pathPopover let-message="message">
   <div style="min-width:300px;">
-    <div class="font-monospace mb-1">{{uriPlaceholder}}</div>
+    <div class="font-monospace mb-1">{{uriPlaceholder()}}</div>
     @for (part of pathParts; track part.name) {
       <div><b>{{part.displayName}}</b>@if (part.required) { (required)}@if (part.description) {: {{part.description}}}</div>
     }
@@ -43,7 +43,7 @@
 </ng-template>
 
 <ng-template #uriFullscreenEditor>
-  <div [formGroup]="stepForm">
+  <div [formGroup]="stepForm()">
     <div class="modal-header">
       <h4 class="modal-title">Editor</h4>
       <button type="button" class="btn-close" aria-label="Close" (click)="cancelModal()"></button>
@@ -139,7 +139,7 @@
 </ng-template>
 
 <ng-template #uriEditor>
-  <div [formGroup]="stepForm">
+  <div [formGroup]="stepForm()">
     <div class="modal-header">
       <h4 class="modal-title">Edit Path</h4>
       <button type="button" class="btn-close" aria-label="Close" (click)="cancelModal()">
@@ -163,12 +163,12 @@
   Every field has the same shape: its label with the field's actions at the right, and the field below it at full
   width, so all fields line up on both sides whatever actions they have.
 -->
-<div class="form-group container" [formGroup]="stepForm">
+<div class="form-group container" [formGroup]="stepForm()">
   <div class="card bg-light">
     <div class="card-body step-card">
 
       <div class="step-card__head">
-        @if (draggable) {
+        @if (draggable()) {
           <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm step-card__drag" cdkDragHandle
                   [title]="dragLabel" [attr.aria-label]="dragLabel">
             <fa-icon icon="grip-vertical"></fa-icon>
@@ -176,10 +176,10 @@
         }
         @if (isRouteStep) {
           <div class="step-name text-start">
-            <label class="step-name__label" for="field_routeName_{{index}}">{{ routeStepLabel }} name</label>
+            <label class="step-name__label" for="field_routeName_{{index()}}">{{ routeStepLabel }} name</label>
             <div class="step-name__field" [class.is-invalid]="routeNameMissing">
               <fa-icon icon="pencil-alt" class="step-name__icon" aria-hidden="true"></fa-icon>
-              <input id="field_routeName_{{index}}" type="text" class="step-name__input" formControlName="routeName"
+              <input id="field_routeName_{{index()}}" type="text" class="step-name__input" formControlName="routeName"
                      [placeholder]="stepType === 'ERROR' ? 'e.g. Orders error handler' : 'e.g. Orders route'"
                      [attr.aria-invalid]="routeNameMissing" autocomplete="off"/>
             </div>
@@ -188,7 +188,7 @@
             }
           </div>
         } @else {
-          <h5 class="step-card__title">{{ step.stepType === 'ERROR' ? 'ERROR HANDLER' : step.stepType }}</h5>
+          <h5 class="step-card__title">{{ step().stepType === 'ERROR' ? 'ERROR HANDLER' : step().stepType }}</h5>
         }
         @if (showsRemove) {
           <button [title]="stepType === 'ROUTE' ? 'Remove route' : 'Remove step'" type="button" class="btn btn-close step-card__remove"
@@ -210,7 +210,7 @@
             </i>
             <div class="step-field__actions">
               <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm"
-                      [disabled]="!componentTypeCamelLink"
+                      [disabled]="!componentTypeCamelLink()"
                       (click)="openComponentDocs()"
                       title="Camel documentation"
                       aria-label="Camel documentation">
@@ -220,7 +220,7 @@
           </div>
           @if (stepType === 'ROUTER') {
             <input type="text" class="form-control" id="field_component_type"
-                   readonly [value]="routerTitle ?? ''"
+                   readonly [value]="routerTitle() ?? ''"
                    title="A Router keeps its kind. To use another kind, delete this Router and add a new one."/>
           } @else {
             <ng-select #componentSelect [items]="componentChoices" bindValue="name" bindLabel="label" [clearable]="false"
@@ -240,20 +240,20 @@
               </ng-template>
             </ng-select>
           }
-          @if (formSubmitted && componentTypeErrors?.required) {
+          @if (formSubmitted() && componentTypeErrors?.required) {
             <div class="invalid-field-message">*ComponentType is required. Please select one.</div>
           }
         </div>
 
         <div class="step-field">
           <div class="step-field__head">
-            <label class="step-field__label" for="field_uri_{{index}}">{{pathFieldLabel}}</label>
+            <label class="step-field__label" for="field_uri_{{index()}}">{{pathFieldLabel}}</label>
             @if (!pathUnused) {
               <i triggers="mouseenter:mouseleave" popoverTitle="Info" [popover]="pathPopover" container="body" placement="right">
                 <fa-icon icon="info-circle"></fa-icon>
               </i>
               <div class="step-field__actions">
-                <ng-container *ngTemplateOutlet="variableMenu; context: { control: stepForm.get('uri'), input: uriInput }"></ng-container>
+                <ng-container *ngTemplateOutlet="variableMenu; context: { control: stepForm().get('uri'), input: uriInput }"></ng-container>
                 <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm"
                         title="Edit the path in a larger editor" aria-label="Edit the path in a larger editor"
                         (click)="openPathModal(uriEditor)">
@@ -262,30 +262,30 @@
               </div>
             }
           </div>
-          <input #uriInput type="text" class="form-control" id="field_uri_{{index}}" [attr.list]="'urilist_' + index"
+          <input #uriInput type="text" class="form-control" id="field_uri_{{index()}}" [attr.list]="'urilist_' + index()"
                  formControlName="uri" [value]="uriValue" (blur)="normalizeHttpUrl()"
-                 [readonly]="pathUnused" [class.step-field__unused]="pathUnused" [attr.title]="variablesTitle(stepForm.get('uri')?.value)"
-                 [attr.placeholder]="pathUnused ? componentLabel + ' has no path' : (autoPath ?? null)"
-                 [attr.aria-describedby]="autoPath ? 'field_uri_auto_' + index + ' field_uri_syntax_' + index : 'field_uri_syntax_' + index" />
-          <datalist id="urilist_{{index}}">
-            @for (uriStep of uriList; track uriStep) {
+                 [readonly]="pathUnused" [class.step-field__unused]="pathUnused" [attr.title]="variablesTitle(stepForm().get('uri')?.value)"
+                 [attr.placeholder]="pathUnused ? componentLabel + ' has no path' : (autoPath() ?? null)"
+                 [attr.aria-describedby]="autoPath() ? 'field_uri_auto_' + index() + ' field_uri_syntax_' + index() : 'field_uri_syntax_' + index()" />
+          <datalist id="urilist_{{index()}}">
+            @for (uriStep of uriList(); track uriStep) {
               <option [value]="uriStep.uri">{{uriStep.uri}}</option>
             }
           </datalist>
-          @if (autoPath && stepType === 'SINK') {
-            <small class="step-field__hint" id="field_uri_auto_{{index}}">
+          @if (autoPath() && stepType === 'SINK') {
+            <small class="step-field__hint" id="field_uri_auto_{{index()}}">
               Writes each result to Administration → Log viewer.
             </small>
-          } @else if (autoPath) {
-            <small class="step-field__hint" id="field_uri_auto_{{index}}">
+          } @else if (autoPath(); as autoPath) {
+            <small class="step-field__hint" id="field_uri_auto_{{index()}}">
               Automatic: logs to <span class="font-monospace">{{autoPath}}</span>.
               Type a logger name to use your own.
             </small>
           }
-          @if (uriPlaceholder && !pathUnused) {
-            <small class="step-field__hint font-monospace" id="field_uri_syntax_{{index}}">{{uriPlaceholder}}</small>
+          @if (uriPlaceholder() && !pathUnused) {
+            <small class="step-field__hint font-monospace" id="field_uri_syntax_{{index()}}">{{uriPlaceholder()}}</small>
           }
-          @if (formSubmitted && uriErrors?.required) {
+          @if (formSubmitted() && uriErrors?.required) {
             <div class="invalid-field-message">*{{pathFieldLabel}} is required.</div>
           }
         </div>
@@ -304,14 +304,14 @@
               </button>
             </div>
           </div>
-          @for (option of stepOptions; track option; let idx = $index) {
+          @for (option of stepOptions(); track option; let idx = $index) {
           @if (isConditionOption(idx)) {
             <!-- Left by mistake or by an import: shown as unused, as the Router reads its Condition from its Branch. -->
             <div class="option-row">
               <input type="text" class="form-control step-field__unused" readonly [value]="optionTitle(idx)" aria-label="Option"
-                     [title]="'Not used: the Condition is set on the ' + conditionBranch + ' Branch'" />
-              <input type="text" class="form-control step-field__unused" readonly id="field_options-value-{{index}}-{{idx}}"
-                     [value]="optionValue(idx)" aria-label="Value" [title]="'Not used: the Condition is set on the ' + conditionBranch + ' Branch'" />
+                     [title]="'Not used: the Condition is set on the ' + conditionBranch() + ' Branch'" />
+              <input type="text" class="form-control step-field__unused" readonly id="field_options-value-{{index()}}-{{idx}}"
+                     [value]="optionValue(idx)" aria-label="Value" [title]="'Not used: the Condition is set on the ' + conditionBranch() + ' Branch'" />
               <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm" title="Remove option" aria-label="Remove option"
                       (click)="removeOption(option)">
                 <fa-icon icon="times"></fa-icon>
@@ -321,7 +321,7 @@
           <div class="option-row" [formGroupName]="idx">
             <ng-select [items]="optionChoices" bindLabel="displayName" groupBy="heading" panelClass="option-key-panel"
                        bindValue="name" [addTag]="addOptionTag" addTagText="Use the Option" formControlName="key" [clearable]="false"
-                       labelForId="field_options-key-{{index}}-{{idx}}" aria-label="Option"
+                       labelForId="field_options-key-{{index()}}-{{idx}}" aria-label="Option"
                        (change)="changeOptionSelection($event, idx)"
                        (close)="clearOptionHover()">
               <ng-template ng-label-tmp let-label="label">
@@ -357,16 +357,16 @@
 
             @switch (valueField(idx)) {
               @case ('switch') {
-                <label class="form-control option-row__switch" for="field_options-value-{{index}}-{{idx}}">
+                <label class="form-control option-row__switch" for="field_options-value-{{index()}}-{{idx}}">
                   <span class="form-check form-switch mb-0">
-                    <input class="form-check-input" type="checkbox" role="switch" id="field_options-value-{{index}}-{{idx}}"
+                    <input class="form-check-input" type="checkbox" role="switch" id="field_options-value-{{index()}}-{{idx}}"
                            [checked]="switchOn(idx)" (change)="setSwitch(idx, $any($event.target).checked)" />
                   </span>
                   <span>{{ switchOn(idx) ? 'On' : 'Off' }}@if (!hasValue(idx)) {<span class="text-muted ms-1">(default)</span>}</span>
                 </label>
               }
               @case ('choice') {
-                <select class="form-select" id="field_options-value-{{index}}-{{idx}}" formControlName="value" [compareWith]="sameValue"
+                <select class="form-select" id="field_options-value-{{index()}}-{{idx}}" formControlName="value" [compareWith]="sameValue"
                         aria-label="Value">
                   <option [ngValue]="''">{{ optionDefaultValue(idx) || 'Default' }}</option>
                   @for (choice of choicesOf(idx); track choice) {
@@ -375,15 +375,15 @@
                 </select>
               }
               @case ('number') {
-                <input type="text" inputmode="numeric" class="form-control" id="field_options-value-{{index}}-{{idx}}" formControlName="value"
+                <input type="text" inputmode="numeric" class="form-control" id="field_options-value-{{index()}}-{{idx}}" formControlName="value"
                        [placeholder]="optionDefaultValue(idx)" aria-label="Value" />
               }
               @case ('secret') {
-                <input type="password" autocomplete="new-password" class="form-control" id="field_options-value-{{index}}-{{idx}}"
+                <input type="password" autocomplete="new-password" class="form-control" id="field_options-value-{{index()}}-{{idx}}"
                        formControlName="value" [placeholder]="optionDefaultValue(idx)" aria-label="Value" />
               }
               @default {
-                <input type="text" class="form-control" id="field_options-value-{{index}}-{{idx}}" formControlName="value"
+                <input type="text" class="form-control" id="field_options-value-{{index()}}-{{idx}}" formControlName="value"
                        [placeholder]="optionDefaultValue(idx)" aria-label="Value"
                        [title]="variablesTitle(optionValue(idx)) ?? (optionValue(idx) || 'Value of the option. The book button by Component opens its documentation.')"/>
               }
@@ -415,7 +415,7 @@
           } @empty {
             <div class="step-field__hint">No options yet.</div>
           }
-          @if (conditionBranch) {
+          @if (conditionBranch(); as conditionBranch) {
             <div class="step-field__hint" data-cy="condition-branch-hint">
               The Condition (language and expression) is set on the {{ conditionBranch }} Branch: select its arrow on the canvas.
               <div>
@@ -444,7 +444,7 @@
       @if (isRouteStep) {
         <div class="step-field">
           <div class="step-field__head">
-            <label class="step-field__label" for="field_routeContent_{{index}}">Camel route</label>
+            <label class="step-field__label" for="field_routeContent_{{index()}}">Camel route</label>
             @if (stepType === 'ERROR') {
               <i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info" [popover]="errorHandlerPopover">
                 <fa-icon icon="info-circle"></fa-icon>
@@ -461,7 +461,7 @@
           <ngx-codemirror
             class="route-codemirror-inline"
             data-tour="route-content"
-            id="field_routeContent_{{index}}"
+            id="field_routeContent_{{index()}}"
             formControlName="routeContent"
             [options]="routeEditorOptions()"
             (codeMirrorLoaded)="refreshCodeMirror($event)">
@@ -476,12 +476,12 @@
       @if (stepType === 'SCRIPT') {
         <div class="step-field">
           <div class="step-field__head">
-            <label class="step-field__label" for="field_language_{{index}}">Language</label>
+            <label class="step-field__label" for="field_language_{{index()}}">Language</label>
           </div>
-          <ng-select [items]="languageComponentsNames" bindLabel="label" bindValue="value" [clearable]="false"
-                     formControlName="componentType" labelForId="field_language_{{index}}"
+          <ng-select [items]="languageComponentsNames()" bindLabel="label" bindValue="value" [clearable]="false"
+                     formControlName="componentType" labelForId="field_language_{{index()}}"
                      (change)="onScriptLanguageChange($event?.value)"></ng-select>
-          @if (formSubmitted && componentTypeErrors?.required) {
+          @if (formSubmitted() && componentTypeErrors?.required) {
             <div class="invalid-field-message">*Language is required. Please select one.</div>
           }
         </div>
@@ -507,14 +507,14 @@
           @if (scriptHint; as hint) {
             <div class="step-field__hint">{{ hint }}</div>
           }
-          @if (formSubmitted && uriErrors?.required) {
+          @if (formSubmitted() && uriErrors?.required) {
             <div class="invalid-field-message">*Script is required.</div>
           }
 
           <div class="script-trial text-start mt-2">
             @if (showsSampleBody) {
-              <label class="form-control-label" [for]="'field_sample_body_' + index">Sample body</label>
-              <textarea class="form-control font-monospace mb-2" rows="2" [id]="'field_sample_body_' + index"
+              <label class="form-control-label" [for]="'field_sample_body_' + index()">Sample body</label>
+              <textarea class="form-control font-monospace mb-2" rows="2" [id]="'field_sample_body_' + index()"
                         [formControl]="sampleBody" placeholder="Empty: runs the script without a body"></textarea>
             }
             <div class="d-flex align-items-center gap-3">
@@ -545,26 +545,26 @@
         </div>
       }
 
-      <div class="step-field" [style.display]="enableMessage ? '' : 'none'">
+      <div class="step-field" [style.display]="enableMessage() ? '' : 'none'">
         <div class="step-field__head">
-          <label class="step-field__label" for="field_message_{{index}}">Header</label>
+          <label class="step-field__label" for="field_message_{{index()}}">Header</label>
           <div class="step-field__actions">
-            @if (messageCreated && messageValue) {
+            @if (messageCreated() && messageValue) {
               <button type="button" title="Edit header" aria-label="Edit header" class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm"
                       (click)="onCreateOrEditMessage()">
                 <fa-icon icon="edit"></fa-icon>
               </button>
             } @else {
               <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm"
-                      [title]="messageCreated ? 'New header' : 'Create header'" [attr.aria-label]="messageCreated ? 'New header' : 'Create header'"
+                      [title]="messageCreated() ? 'New header' : 'Create header'" [attr.aria-label]="messageCreated() ? 'New header' : 'Create header'"
                       (click)="onCreateOrEditMessage()">
                 <fa-icon icon="plus"></fa-icon>
               </button>
             }
           </div>
         </div>
-        <ng-select [items]="messages" bindLabel="name" bindValue="id" formControlName="message"
-                   labelForId="field_message_{{index}}" dropdownPosition="top"></ng-select>
+        <ng-select [items]="messages()" bindLabel="name" bindValue="id" formControlName="message"
+                   labelForId="field_message_{{index()}}" dropdownPosition="top"></ng-select>
       </div>
 
       @if (showsAddConnection) {
@@ -575,19 +575,19 @@
         </div>
       }
 
-      <div class="step-field" [style.display]="enableConnection ? '' : 'none'">
+      <div class="step-field" [style.display]="enableConnection() ? '' : 'none'">
         <div class="step-field__head">
-          <label class="step-field__label" for="field_connection_{{index}}">Connection</label>
+          <label class="step-field__label" for="field_connection_{{index()}}">Connection</label>
           <div class="step-field__actions">
-            @if (connectionCreated && connectionValue) {
+            @if (connectionCreated() && connectionValue) {
               <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm" title="Edit connection" aria-label="Edit connection"
                       (click)="onCreateOrEditConnection()">
                 <fa-icon icon="edit"></fa-icon>
               </button>
             } @else {
               <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm" data-tour="step-new-connection"
-                      [title]="connectionCreated ? 'New connection' : 'Create connection'"
-                      [attr.aria-label]="connectionCreated ? 'New connection' : 'Create connection'"
+                      [title]="connectionCreated() ? 'New connection' : 'Create connection'"
+                      [attr.aria-label]="connectionCreated() ? 'New connection' : 'Create connection'"
                       (click)="onCreateOrEditConnection()"
                       [disabled]="connectionDisabled">
                 <fa-icon icon="plus"></fa-icon>
@@ -603,7 +603,7 @@
           </div>
         </div>
         <ng-select [items]="connectionChoices" bindLabel="name" bindValue="id"
-                   formControlName="connection" labelForId="field_connection_{{index}}"
+                   formControlName="connection" labelForId="field_connection_{{index()}}"
                    dropdownPosition="top"></ng-select>
       </div>
 

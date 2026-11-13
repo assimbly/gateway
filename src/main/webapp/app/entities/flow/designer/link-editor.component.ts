@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, output, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { canDeleteBranch, canRenameBranch, defaultBranch, DesignLink, FlowGraph, LinkSettings, routerOf, routerTitle, takesCondition } from './flow-graph';
@@ -11,10 +11,10 @@ import { canDeleteBranch, canRenameBranch, defaultBranch, DesignLink, FlowGraph,
   imports: [FormsModule],
 })
 export class LinkEditorComponent {
-  @Input({ required: true }) graph!: FlowGraph;
-  @Input({ required: true }) link!: DesignLink;
-  @Input() readOnly = false;
-  @Input() problem?: string;
+  readonly graph = input.required<FlowGraph>();
+  readonly link = input.required<DesignLink>();
+  readonly readOnly = input(false);
+  readonly problem = input<string>();
 
   readonly linkChange = output<Partial<LinkSettings>>();
   readonly deleteBranch = output<void>();
@@ -24,34 +24,34 @@ export class LinkEditorComponent {
   readonly patterns = ['', 'InOnly', 'InOut'];
 
   get router() {
-    return routerOf(this.graph, this.link);
+    return routerOf(this.graph(), this.link());
   }
 
   get fromLabel(): string {
-    const from = this.graph.steps.find(s => s.key === this.link.from);
+    const from = this.graph().steps.find(s => s.key === this.link().from);
     return from ? `${from.kind} ${from.kind === 'ROUTER' ? routerTitle(from) : from.componentType || ''}` : '';
   }
 
   get toLabel(): string {
-    const to = this.graph.steps.find(s => s.key === this.link.to);
+    const to = this.graph().steps.find(s => s.key === this.link().to);
     return to ? `${to.kind} ${to.componentType || to.uri || ''}` : '';
   }
 
   get isDefaultBranch(): boolean {
     const router = this.router;
-    return !!router && this.link === defaultBranch(this.graph, router);
+    return !!router && this.link() === defaultBranch(this.graph(), router);
   }
 
   get canRename(): boolean {
-    return !this.readOnly && canRenameBranch(this.graph, this.link.to);
+    return !this.readOnly() && canRenameBranch(this.graph(), this.link().to);
   }
 
   get hasCondition(): boolean {
-    return takesCondition(this.graph, this.link.to);
+    return takesCondition(this.graph(), this.link().to);
   }
 
   get canDelete(): boolean {
-    return !this.readOnly && canDeleteBranch(this.graph, this.link.to);
+    return !this.readOnly() && canDeleteBranch(this.graph(), this.link().to);
   }
 
   update(settings: Partial<LinkSettings>): void {

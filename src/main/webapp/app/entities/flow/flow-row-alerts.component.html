@@ -1,16 +1,16 @@
-@if (failed || numberOfAlerts > 0) {
+@if (failed() || numberOfAlerts() > 0) {
   <button
     type="button"
     class="badge border-0"
-    [class.bg-danger]="failed"
-    [class.text-white]="failed"
-    [class.bg-warning]="!failed"
-    [class.text-dark]="!failed"
-    [attr.data-tour]="failed ? 'flow-error-badge' : 'flow-alert-badge'"
-    [title]="failed ? 'The Flow failed: show why' : 'Show the alerts'"
+    [class.bg-danger]="failed()"
+    [class.text-white]="failed()"
+    [class.bg-warning]="!failed()"
+    [class.text-dark]="!failed()"
+    [attr.data-tour]="failed() ? 'flow-error-badge' : 'flow-alert-badge'"
+    [title]="failed() ? 'The Flow failed: show why' : 'Show the alerts'"
     (click)="alertsOpen.emit()"
   >
     <fa-icon icon="exclamation-triangle"></fa-icon>
-    {{ failed ? 'Error' : 'Alerts' }}{{ numberOfAlerts > 0 ? ' · ' + numberOfAlerts : '' }}
+    {{ failed() ? 'Error' : 'Alerts' }}{{ numberOfAlerts() > 0 ? ' · ' + numberOfAlerts() : '' }}
   </button>
 }

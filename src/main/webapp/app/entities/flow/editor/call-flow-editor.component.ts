@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, output } from '@angular/core';
+import { Component, OnChanges, output, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
@@ -25,11 +25,11 @@ export function callableFlows(flows: IFlow[], exceptFlowId?: number): IFlow[] {
   imports: [FormsModule, FontAwesomeModule],
 })
 export class CallFlowEditorComponent implements OnChanges {
-  @Input() options?: string | null;
-  @Input() kind: 'ACTION' | 'SINK' = 'ACTION';
-  @Input() flows: IFlow[] = [];
-  @Input() problem?: string;
-  @Input() deletable = false;
+  readonly options = input<string | null>();
+  readonly kind = input<'ACTION' | 'SINK'>('ACTION');
+  readonly flows = input<IFlow[]>([]);
+  readonly problem = input<string>();
+  readonly deletable = input(false);
 
   readonly optionsChange = output<string>();
   readonly remove = output<void>();
@@ -38,13 +38,13 @@ export class CallFlowEditorComponent implements OnChanges {
   transport = 'sync';
 
   ngOnChanges(): void {
-    const options = new Map((this.options ?? '').split('&').filter(Boolean).map(option => option.split('=', 2) as [string, string]));
+    const options = new Map((this.options() ?? '').split('&').filter(Boolean).map(option => option.split('=', 2) as [string, string]));
     this.targetFlowId = options.get('targetFlowId') ?? '';
     this.transport = options.get('transport') || 'sync';
   }
 
   get pattern(): string {
-    return this.kind === 'ACTION' ? 'InOut' : 'InOnly';
+    return this.kind() === 'ACTION' ? 'InOut' : 'InOnly';
   }
 
   emit(): void {

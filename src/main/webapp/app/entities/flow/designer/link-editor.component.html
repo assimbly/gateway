@@ -9,7 +9,7 @@
         @if (isDefaultBranch) {
           <input id="branch-name" class="form-control" value="default" readonly />
         } @else {
-          <input id="branch-name" class="form-control" [readonly]="!canRename" [ngModel]="link.rule"
+          <input id="branch-name" class="form-control" [readonly]="!canRename" [ngModel]="link().rule"
                  (change)="update({ rule: $any($event.target).value || undefined })" />
         }
       </div>
@@ -17,7 +17,7 @@
       @if (hasCondition) {
         <div class="mb-3">
           <label class="form-control-label" for="condition-language">Condition language</label>
-          <select id="condition-language" class="form-select" [disabled]="readOnly" [ngModel]="link.language ?? ''"
+          <select id="condition-language" class="form-select" [disabled]="readOnly()" [ngModel]="link().language ?? ''"
                   (ngModelChange)="update({ language: $event || undefined })">
             <option value=""></option>
             @for (language of languages; track language) {
@@ -27,10 +27,10 @@
         </div>
         <div class="mb-3">
           <label class="form-control-label" for="condition-expression">Condition</label>
-          <textarea id="condition-expression" class="form-control" rows="3" [readonly]="readOnly" [ngModel]="link.expression"
-                    [class.is-invalid]="!!problem"
+          <textarea id="condition-expression" class="form-control" rows="3" [readonly]="readOnly()" [ngModel]="link().expression"
+                    [class.is-invalid]="!!problem()"
                     (change)="update({ expression: $any($event.target).value || undefined })"></textarea>
-          @if (problem) {
+          @if (problem(); as problem) {
             <div class="invalid-feedback d-block">{{ problem }}</div>
           }
         </div>
@@ -41,7 +41,7 @@
       <summary>Advanced</summary>
       <div class="mt-2 mb-2">
         <label class="form-control-label" for="link-transport">Transport</label>
-        <select id="link-transport" class="form-select" [disabled]="readOnly" [ngModel]="link.transport"
+        <select id="link-transport" class="form-select" [disabled]="readOnly()" [ngModel]="link().transport"
                 (ngModelChange)="update({ transport: $event })">
           @for (transport of transports; track transport) {
             <option [value]="transport">{{ transport }}</option>
@@ -50,7 +50,7 @@
       </div>
       <div>
         <label class="form-control-label" for="link-pattern">Exchange pattern</label>
-        <select id="link-pattern" class="form-select" [disabled]="readOnly" [ngModel]="link.pattern ?? ''"
+        <select id="link-pattern" class="form-select" [disabled]="readOnly()" [ngModel]="link().pattern ?? ''"
                 (ngModelChange)="update({ pattern: $event || undefined })">
           @for (pattern of patterns; track pattern) {
             <option [value]="pattern">{{ pattern || '(default)' }}</option>

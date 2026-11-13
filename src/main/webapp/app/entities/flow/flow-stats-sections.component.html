@@ -1,12 +1,12 @@
 <div class="flow-stats">
-  @if (loading) {
+  @if (loading()) {
     <p class="flow-stats-empty">Loading stats…</p>
   }
-  @if (!loading && empty) {
-    <p class="flow-stats-empty">{{ emptyMessage }}</p>
+  @if (!loading() && empty()) {
+    <p class="flow-stats-empty">{{ emptyMessage() }}</p>
   }
-  @if (!loading && !empty) {
-    @for (section of sections; track section) {
+  @if (!loading() && !empty()) {
+    @for (section of sections(); track section) {
       <section class="flow-stats-section">
         <h6>{{ section.title }}</h6>
         @if (section.rows.length > 0) {
