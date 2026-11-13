@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
@@ -22,20 +22,18 @@ import { HasAnyAuthorityDirective } from 'app/shared/auth';
     imports: [FormsModule, RouterModule, NgSelectModule, HeaderComponent, HasAnyAuthorityDirective],
 })
 export class MessageComponent implements OnInit, OnDestroy {
+    protected messageService = inject(MessageService);
+    protected headerService = inject(HeaderService);
+    protected alertService = inject(AlertService);
+    protected eventManager = inject(EventManager);
+    protected accountService = inject(AccountService);
+
     messages: IMessage[];
     currentAccount: any;
     eventSubscriber: Subscription;
     headers: Array<IHeader>;
     header: IHeader;
     selectedMessageId: number;
-
-    constructor(
-        protected messageService: MessageService,
-        protected headerService: HeaderService,
-        protected alertService: AlertService,
-        protected eventManager: EventManager,
-        protected accountService: AccountService
-    ) {}
 
     loadAll() {
         this.messageService.query().subscribe(

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
@@ -15,13 +15,11 @@ import { Subscription } from 'rxjs';
     imports: [RouterModule, AlertError, NgClass],
 })
 export class MessageDetailComponent implements OnInit {
-    message!: IMessage;
+    protected activatedRoute = inject(ActivatedRoute);
+    protected messageService = inject(MessageService);
+    protected headerService = inject(HeaderService);
 
-    constructor(
-        protected activatedRoute: ActivatedRoute,
-        protected messageService: MessageService,
-        protected headerService: HeaderService
-    ) {}
+    message!: IMessage;
     public headers!: Array<Header>;
     private subscription!: Subscription;
 

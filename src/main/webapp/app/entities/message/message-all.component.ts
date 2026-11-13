@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
@@ -19,19 +19,19 @@ import { AccountService } from 'app/core/auth/account.service';
   imports: [RouterModule, FontAwesomeModule, InfiniteScrollModule, SortDirective, SortByDirective],
 })
 export class MessageAllComponent implements OnInit, OnDestroy {
+  protected messageService = inject(MessageService);
+  protected alertService = inject(AlertService);
+  protected modalService = inject(NgbModal);
+  protected eventManager = inject(EventManager);
+  protected accountService = inject(AccountService);
+
   public messages: IMessage[] = [];
   public page: any;
   private eventSubscriber!: Subscription;
   private currentAccount: any;
   sortState: SortState = { predicate: 'name', order: 'asc' };
 
-  constructor(
-    protected messageService: MessageService,
-    protected alertService: AlertService,
-	protected modalService: NgbModal,
-    protected eventManager: EventManager,
-    protected accountService: AccountService
-  ) {
+  constructor() {
     this.page = 0;
   }
 

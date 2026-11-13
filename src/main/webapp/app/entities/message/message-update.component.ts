@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
@@ -23,6 +23,12 @@ import { filter } from 'rxjs/operators';
   imports: [FormsModule, FontAwesomeModule, AlertError, ForbiddenHeaderValidatorDirective, ForbiddenMessageNamesValidatorDirective, SaveShortcutDirective],
 })
 export class MessageUpdateComponent implements OnInit {
+  protected messageService = inject(MessageService);
+  protected headerService = inject(HeaderService);
+  protected eventManager = inject(EventManager);
+  protected activatedRoute = inject(ActivatedRoute);
+  protected router = inject(Router);
+
   message!: IMessage;
   messages!: IMessage[];
   messageNames: Array<string> = [];
@@ -31,14 +37,6 @@ export class MessageUpdateComponent implements OnInit {
   isSaving!: boolean;
   public typeHeader: string[] = ['header', 'property'];
   public languageHeader: string[] = ['constant', 'simple', 'groovy', 'jsonpath', 'xpath'];
-
-  constructor(
-    protected messageService: MessageService,
-    protected headerService: HeaderService,
-    protected eventManager: EventManager,
-    protected activatedRoute: ActivatedRoute,
-    protected router: Router
-  ) {}
 
   ngOnInit() {
     this.isSaving = false;

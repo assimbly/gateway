@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
@@ -22,6 +22,12 @@ import { HeaderService } from './header.service';
     imports: [FormsModule, RouterModule, Alert, ForbiddenHeaderValidatorDirective],
 })
 export class HeaderComponent implements OnInit, OnChanges {
+    protected headerService = inject(HeaderService);
+    protected alertService = inject(AlertService);
+    protected modalService = inject(NgbModal);
+    protected eventManager = inject(EventManager);
+    protected accountService = inject(AccountService);
+
     @Input() headers: IHeader[];
     @Input() messageId: number;
 
@@ -34,14 +40,6 @@ export class HeaderComponent implements OnInit, OnChanges {
     languageHeader: string[] = ['constant', 'simple', 'groovy', 'jsonpath', 'xpath'];
     typeHeader: string[] = ['header', 'property'];
     eventSubscriber: Subscription;
-
-    constructor(
-        protected headerService: HeaderService,
-        protected alertService: AlertService,
-		protected modalService: NgbModal,
-        protected eventManager: EventManager,
-        protected accountService: AccountService
-    ) {}
 
     loadAll() {
         this.headerService.query().subscribe(

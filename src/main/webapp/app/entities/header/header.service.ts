@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -12,9 +12,9 @@ type EntityArrayResponseType = HttpResponse<IHeader[]>;
 
 @Injectable({ providedIn: 'root' })
 export class HeaderService {
-    public resourceUrl = `${serverApiUrl}api/header`;
+    protected http = inject(HttpClient);
 
-    constructor(protected http: HttpClient) {}
+    public resourceUrl = `${serverApiUrl}api/header`;
 
     create(header: IHeader): Observable<EntityResponseType> {
         return this.http.post<IHeader>(this.resourceUrl, header, { observe: 'response' });

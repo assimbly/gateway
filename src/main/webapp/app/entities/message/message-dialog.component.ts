@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
@@ -27,6 +27,14 @@ import { MessagePopupService } from 'app/entities/message/message-popup.service'
   imports: [FormsModule, FontAwesomeModule, AlertError, ForbiddenHeaderValidatorDirective, ForbiddenMessageNamesValidatorDirective, SaveShortcutDirective],
 })
 export class MessageDialogComponent implements OnInit {
+  activeModal = inject(NgbActiveModal);
+  private messageService = inject(MessageService);
+  private headerService = inject(HeaderService);
+  private alertService = inject(AlertService);
+  private eventManager = inject(EventManager);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
   message!: IMessage;
   messages!: IMessage[];
   messageNames: Array<string> = [];
@@ -35,16 +43,6 @@ export class MessageDialogComponent implements OnInit {
   isSaving!: boolean;
   public typeHeader: string[] = ['header', 'property'];
   public languageHeader: string[] = ['constant', 'simple', 'groovy', 'jsonpath', 'xpath'];
-
-  constructor(
-    public activeModal: NgbActiveModal,
-    private messageService: MessageService,
-    private headerService: HeaderService,
-    private alertService: AlertService,
-    private eventManager: EventManager,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {}
 
   ngOnInit() {
     this.isSaving = false;
@@ -177,9 +175,10 @@ export class MessageDialogComponent implements OnInit {
   template: '',
 })
 export class MessagePopupComponent implements OnInit, OnDestroy {
-  routeSub: any;
+  private route = inject(ActivatedRoute);
+  private messagePopupService = inject(MessagePopupService);
 
-  constructor(private route: ActivatedRoute, private messagePopupService: MessagePopupService) {}
+  routeSub: any;
 
   ngOnInit() {
     this.routeSub = this.route.params.subscribe(params => {
