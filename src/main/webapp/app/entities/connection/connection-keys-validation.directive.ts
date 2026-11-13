@@ -1,4 +1,4 @@
-import { Directive, Input } from '@angular/core';
+import { Directive, input } from '@angular/core';
 import { NG_VALIDATORS, Validator, AbstractControl } from '@angular/forms';
 
 @Directive({
@@ -7,12 +7,13 @@ import { NG_VALIDATORS, Validator, AbstractControl } from '@angular/forms';
 })
 export class ForbiddenConnectionKeysValidatorDirective implements Validator {
     // tslint:disable-next-line:no-input-rename
-    @Input('jhiExistingConnectionKeys') existingKeys!: Array<string>;
+    readonly existingKeys = input.required<Array<string>>({ alias: 'jhiExistingConnectionKeys' });
 
     validate(control: AbstractControl): { [key: string]: any } | null {
         console.log('validating connections');
-        console.log(this.existingKeys);
+        const existingKeys = this.existingKeys();
+        console.log(existingKeys);
 
-        return this.existingKeys.some(k => k === control.value) ? { existingConnectionKey: true } : null;
+        return existingKeys.some(k => k === control.value) ? { existingConnectionKey: true } : null;
     }
 }
