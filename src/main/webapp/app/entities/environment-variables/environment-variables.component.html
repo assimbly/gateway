@@ -1,5 +1,5 @@
 <div>
-  @if (showEmptyState) {
+  @if (showEmptyState()) {
     <jhi-empty-state
       [heading]="isAdmin ? 'Add your first Variable' : 'No Variables yet'"
       description="A Variable is a named value, such as a host name or a folder. A Flow refers to it as @{key} in a Path or Option, or with the @{} button next to those fields. It keeps the settings that differ per environment out of your Flows."
@@ -46,12 +46,12 @@
     [columns]="columns"
     [(sortState)]="sortState"
     (sortChange)="onSortChange()"
-    [hasRows]="!!filteredVariables.length"
-    [loading]="loading"
+    [hasRows]="!!filteredVariables().length"
+    [loading]="loading()"
     [emptyMessage]="'No variables match this filter.'"
     ariaLabel="Variables"
   >
-    <tr *ngFor="let environmentVariables of filteredVariables; trackBy: trackId">
+    <tr *ngFor="let environmentVariables of filteredVariables(); trackBy: trackId">
       <td class="table-fx-identity">
         @if (isAdmin) {
           <a [routerLink]="['/environment-variables', environmentVariables.id, 'edit']">
@@ -72,9 +72,9 @@
         <span class="d-inline-flex align-items-center gap-1">
           <code>{{ reference(environmentVariables.key) }}</code>
           <button type="button" class="btn btn-fx btn-fx-sm btn-fx-ghost btn-fx-icon" (click)="copyReference(environmentVariables.key)"
-                  [title]="copiedKey === environmentVariables.key ? 'Copied' : 'Copy ' + reference(environmentVariables.key)"
+                  [title]="copiedKey() === environmentVariables.key ? 'Copied' : 'Copy ' + reference(environmentVariables.key)"
                   [attr.aria-label]="'Copy ' + reference(environmentVariables.key)">
-            <fa-icon [icon]="copiedKey === environmentVariables.key ? 'check' : 'copy'"></fa-icon>
+            <fa-icon [icon]="copiedKey() === environmentVariables.key ? 'check' : 'copy'"></fa-icon>
           </button>
         </span>
       </td>

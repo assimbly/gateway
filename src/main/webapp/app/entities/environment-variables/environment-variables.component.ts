@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
@@ -39,14 +39,14 @@ import { VariableKeysService } from './variable-keys.service';
     ],
 })
 export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
-    environmentVariables: IEnvironmentVariables[] = [];
+    readonly environmentVariables = signal<IEnvironmentVariables[]>([]);
     currentAccount: any;
     eventSubscriber!: Subscription;
-    searchText = '';
-    loading = true;
-    loadFailed = false;
+    readonly searchText = signal('');
+    readonly loading = signal(true);
+    readonly loadFailed = signal(false);
 
-    sortState: SortState = { predicate: 'key', order: 'asc' };
+    readonly sortState = signal<SortState>({ predicate: 'key', order: 'asc' });
     page: any;
     last: any = 100;
     private loadRequest = 0;
@@ -63,7 +63,6 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
         protected eventManager: EventManager,
     		protected modalService: NgbModal,
         protected accountService: AccountService,
-        protected cdr: ChangeDetectorRef
     ) {
         this.page = 0;
     }
@@ -71,7 +70,7 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
     private readonly variableKeys = inject(VariableKeysService);
 
     /** The key whose reference was just copied, to show that it was. */
-    copiedKey?: string;
+    readonly copiedKey = signal<string | undefined>(undefined);
 
     /** How a Flow refers to the Variable. */
     reference(key: string | undefined): string {
@@ -81,12 +80,10 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
     copyReference(key: string | undefined): void {
         navigator.clipboard?.writeText(this.reference(key)).then(
             () => {
-                this.copiedKey = key;
-                this.cdr.markForCheck();
+                this.copiedKey.set(key);
                 setTimeout(() => {
-                    if (this.copiedKey === key) {
-                        this.copiedKey = undefined;
-                        this.cdr.markForCheck();
+                    if (this.copiedKey() === key) {
+                        this.copiedKey.set(undefined);
                     }
                 }, 2000);
             },
@@ -96,8 +93,8 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
 
     loadAll() {
         const requestId = ++this.loadRequest;
-        this.loading = true;
-        this.loadFailed = false;
+        this.loading.set(true);
+        this.loadFailed.set(false);
         this.environmentVariablesService
             .query({
                 page: this.page,
@@ -110,16 +107,15 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
                     }
                     const body = res.body || [];
                     if (this.page > 0) {
-                        this.environmentVariables = [...this.environmentVariables, ...body];
+                        this.environmentVariables.update(variables => [...variables, ...body]);
                     } else {
-                        this.environmentVariables = body;
+                        this.environmentVariables.set(body);
                     }
 
                     if (body.length < 20) {
                         this.last = this.page;
                     }
-                    this.loading = false;
-                    this.cdr.detectChanges();
+                    this.loading.set(false);
                 },
                 (res: HttpErrorResponse) => this.onError(res.message)
             );
@@ -147,20 +143,18 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
     }
 
     /** With no Variable at all, the list gives way to an explanation of Variables and how to add the first. */
-    get showEmptyState(): boolean {
-        return !this.loading && !this.loadFailed && !this.environmentVariables.length;
-    }
+    readonly showEmptyState = computed(() => !this.loading() && !this.loadFailed() && !this.environmentVariables().length);
 
-    get filteredVariables(): IEnvironmentVariables[] {
-        const query = this.searchText?.toLocaleLowerCase() ?? '';
-        let result = this.environmentVariables ?? [];
+    readonly filteredVariables = computed(() => {
+        const query = this.searchText().toLocaleLowerCase();
+        let result = this.environmentVariables();
         if (query) {
             result = result.filter(
                 item => (item.key ?? '').toLocaleLowerCase().includes(query) || (item.value ?? '').toLocaleLowerCase().includes(query)
             );
         }
         return result;
-    }
+    });
 
     trackId(index: number, item: IEnvironmentVariables) {
         return item.id;
@@ -174,9 +168,8 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
     }
 
     protected onError(errorMessage: string) {
-        this.loading = false;
-        this.loadFailed = true;
-        this.cdr.detectChanges();
+        this.loading.set(false);
+        this.loadFailed.set(true);
 		this.alertService.addAlert({
 		  type: 'danger',
 		  message: errorMessage,
@@ -188,19 +181,19 @@ export class EnvironmentVariablesComponent implements OnInit, OnDestroy {
 		modalRef.componentInstance.environmentVariables = environmentVariables;
 		modalRef.closed.subscribe(result => {
 			if (result === 'deleted') {
-				this.environmentVariables = this.environmentVariables.filter(item => item.id !== environmentVariables.id);
+				this.environmentVariables.update(variables => variables.filter(item => item.id !== environmentVariables.id));
 				this.reset();
 			}
 		});
 	}
 
     sort(): string[] {
-        return sortParams(this.sortState, 'key');
+        return sortParams(this.sortState(), 'key');
     }
 
     reset() {
         this.page = 0;
-        this.environmentVariables = [];
+        this.environmentVariables.set([]);
         this.loadAll();
     }
 
