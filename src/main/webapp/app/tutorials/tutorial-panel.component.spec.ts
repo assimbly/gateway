@@ -300,6 +300,17 @@ describe('Tutorial panel', () => {
 
       expect(element('.tutorial-panel__hint').textContent).toContain("That isn't on this page");
     });
+
+    it('drops the hint once the user moves to another step', async () => {
+      open('<p>Click the <strong>Sink</strong>.</p>');
+      pages.url.mockReturnValue(of(undefined));
+      await showMissing('flow:DebugFlow');
+
+      stepIndex.set(0);
+      fixture.detectChanges();
+
+      expect(fixture.nativeElement.querySelector('.tutorial-panel__hint')).toBeNull();
+    });
   });
 
   it('enlarges a screenshot that is clicked, until a click closes it', () => {
