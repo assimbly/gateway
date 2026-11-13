@@ -9,8 +9,14 @@ describe('Leaving the Flow editor', () => {
   /** The editor page whose dialog answers with `choice`, around an editor that has unsaved changes or not. */
   function page(choice: string | undefined, unsaved = true): { component: FlowEditorComponent; open: jest.Mock; saveBeforeLeaving: jest.Mock } {
     const open = jest.fn(() => ({ componentInstance: {}, result: choice === undefined ? Promise.reject('dismissed') : Promise.resolve(choice) }));
-    TestBed.configureTestingModule({ providers: [{ provide: NgbModal, useValue: { open } }] });
-    const component = TestBed.runInInjectionContext(() => new FlowEditorComponent({} as ActivatedRoute, {} as Router));
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: NgbModal, useValue: { open } },
+        { provide: ActivatedRoute, useValue: {} },
+        { provide: Router, useValue: {} },
+      ],
+    });
+    const component = TestBed.runInInjectionContext(() => new FlowEditorComponent());
     const saveBeforeLeaving = jest.fn(() => Promise.resolve(true));
     component.esbEditor = { hasUnsavedChanges: unsaved, saveBeforeLeaving } as unknown as FlowEditorEsbComponent;
     return { component, open, saveBeforeLeaving };

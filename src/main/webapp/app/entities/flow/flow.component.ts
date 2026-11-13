@@ -43,6 +43,15 @@ import { IApiHandler } from 'app/entities/api/api.model';
   },
 })
 export class FlowComponent implements OnInit, OnDestroy {
+  protected flowService = inject(FlowService);
+  protected alertService = inject(AlertService);
+  protected eventManager = inject(EventManager);
+  protected parseLinks = inject(ParseLinks);
+  protected accountService = inject(AccountService);
+  protected integrationService = inject(IntegrationService);
+  protected changeDetector = inject(ChangeDetectorRef);
+  protected modalService = inject(NgbModal);
+
   integrations!: IIntegration[];
   integration!: IIntegration;
   flows: IFlow[] = [];
@@ -92,16 +101,7 @@ export class FlowComponent implements OnInit, OnDestroy {
 
   @ViewChildren(FlowRowComponent) private flowRows!: QueryList<FlowRowComponent>;
 
-  constructor(
-    protected flowService: FlowService,
-    protected alertService: AlertService,
-    protected eventManager: EventManager,
-    protected parseLinks: ParseLinks,
-    protected accountService: AccountService,
-    protected integrationService: IntegrationService,
-    protected changeDetector: ChangeDetectorRef,
-    protected modalService: NgbModal,
-  ) {
+  constructor() {
     this.flows = [];
     this.itemsPerPage = ITEMS_PER_PAGE + 5;
     this.page = 0;

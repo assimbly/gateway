@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 
@@ -23,6 +23,13 @@ import { Subscription } from 'rxjs';
   imports: [RouterModule, AlertError],
 })
 export class FlowDetailComponent implements OnInit, OnDestroy {
+  protected integrationService = inject(IntegrationService);
+  protected stepService = inject(StepService);
+  protected eventManager = inject(EventManager);
+  protected flowService = inject(FlowService);
+  protected activatedRoute = inject(ActivatedRoute);
+  components = inject(Components);
+
   flow: IFlow;
   integration: Integration;
   steps: Array<Step>;
@@ -40,15 +47,6 @@ export class FlowDetailComponent implements OnInit, OnDestroy {
   private eventSubscriber: Subscription;
   private wikiDocUrl: string;
   private camelDocUrl: string;
-
-  constructor(
-    protected integrationService: IntegrationService,
-    protected stepService: StepService,
-    protected eventManager: EventManager,
-    protected flowService: FlowService,
-    protected activatedRoute: ActivatedRoute,
-    public components: Components
-  ) {}
 
   ngOnInit() {
     this.subscription = this.activatedRoute.data.subscribe(({ flow }) => {

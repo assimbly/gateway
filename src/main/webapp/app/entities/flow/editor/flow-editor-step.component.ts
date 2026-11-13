@@ -73,6 +73,11 @@ export class StepEditorRegistry {
   imports: [ReactiveFormsModule, RouterLink, NgbModule, FontAwesomeModule, NgSelectModule, PopoverModule, CodemirrorModule, CdkDragHandle, NgTemplateOutlet],
 })
 export class FlowEditorStepComponent implements OnChanges, OnDestroy {
+  private modalService = inject(NgbModal);
+  private components = inject(Components);
+  private cdr = inject(ChangeDetectorRef);
+  private stepEditorRegistry = inject(StepEditorRegistry);
+
   @Input({ required: true }) step!: IStep;
   @Input({ required: true }) index!: number;
   @Input({ required: true }) stepForm!: FormGroup;
@@ -175,12 +180,7 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
 
   private readonly injector = inject(Injector);
 
-  constructor(
-    private modalService: NgbModal,
-    private components: Components,
-    private cdr: ChangeDetectorRef,
-    private stepEditorRegistry: StepEditorRegistry,
-  ) {
+  constructor() {
     this.stepEditorRegistry.editors.push(this);
     inject(VariableKeysService)
       .known()

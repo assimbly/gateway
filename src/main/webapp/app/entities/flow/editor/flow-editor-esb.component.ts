@@ -122,6 +122,25 @@ import {
   imports: [ReactiveFormsModule, RouterModule, NgbModule, FontAwesomeModule, PopoverModule, AlertError, FlowEditorStepComponent, FieldTabDirective, SaveShortcutDirective, CodemirrorModule, FlowCanvasComponent, LinkEditorComponent, FlowEditorHeaderComponent, ResponseEditorComponent, CallFlowEditorComponent, FlowTestPanelComponent, FlowRunStatsComponent, FlowLogDrawerComponent, CamelRouteDrawerComponent, CdkDropList, CdkDrag, CdkDragPlaceholder, NgClass, NgTemplateOutlet],
 })
 export class FlowEditorEsbComponent implements OnInit, OnDestroy {
+	private eventManager = inject(EventManager);
+	private integrationService = inject(IntegrationService);
+	private flowService = inject(FlowService);
+	private stepService = inject(StepService);
+	private linkService = inject(LinkService);
+	private messageService = inject(MessageService);
+	private routeService = inject(RouteService);
+	private connectionService = inject(ConnectionService);
+	private alertService = inject(AlertService);
+	private route = inject(ActivatedRoute);
+	private router = inject(Router);
+	connectionsList = inject(Connections);
+	components = inject(Components);
+	private modalService = inject(NgbModal);
+	private messagePopupService = inject(MessagePopupService);
+	private routePopupService = inject(RoutePopupService);
+	private connectionPopupService = inject(ConnectionPopupService);
+	private cdr = inject(ChangeDetectorRef);
+	private stepEditorRegistry = inject(StepEditorRegistry);
 
 	private readonly themeService = inject(ThemeService);
 	private notesOptionsTheme = '';
@@ -300,28 +319,6 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 	private camelDocUrl!: string;
 
 	private readonly destroyRef = inject(DestroyRef);
-
-	constructor(
-		private eventManager: EventManager,
-		private integrationService: IntegrationService,
-		private flowService: FlowService,
-		private stepService: StepService,
-		private linkService: LinkService,
-		private messageService: MessageService,
-		private routeService: RouteService,
-    private connectionService: ConnectionService,
-		private alertService: AlertService,
-		private route: ActivatedRoute,
-		private router: Router,
-		public connectionsList: Connections,
-		public components: Components,
-		private modalService: NgbModal,
-		private messagePopupService: MessagePopupService,
-		private routePopupService: RoutePopupService,
-    private connectionPopupService: ConnectionPopupService,
-		private cdr: ChangeDetectorRef,
-		private stepEditorRegistry: StepEditorRegistry,
-	) {}
 
 	ngOnInit(): void {
 

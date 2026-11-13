@@ -71,6 +71,13 @@ enum Status {
 ],
 })
 export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
+  private flowService = inject(FlowService);
+  private stepService = inject(StepService);
+  private integrationService = inject(IntegrationService);
+  private modalService = inject(NgbModal);
+  private router = inject(Router);
+  private eventManager = inject(EventManager);
+  private changeDetector = inject(ChangeDetectorRef);
 
   @Input() flow!: Flow;
   /** The API and Operation this Flow handles, when it is a Handler Flow. */
@@ -142,16 +149,6 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
   private readonly subscriptions = new Subscription();
 
   alreadyConnectedOnce = false;
-
-  constructor(
-    private flowService: FlowService,
-    private stepService: StepService,
-		private integrationService: IntegrationService,
-    private modalService: NgbModal,
-    private router: Router,
-    private eventManager: EventManager,
-    private changeDetector: ChangeDetectorRef
-  ) {}
 
   get state(): FlowStatusView {
     return flowStatusView(this.statusFlow, this.isDraft);

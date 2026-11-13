@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -15,16 +15,14 @@ import { FlowService } from './flow.service';
   imports: [FontAwesomeModule, AlertError],
 })
 export class FlowDeleteDialogComponent {
+  protected flowService = inject(FlowService);
+  activeModal = inject(NgbActiveModal);
+  protected eventManager = inject(EventManager);
+
   flow?: IFlow;
   /** Replaces the confirmation question once the delete is refused. */
   message?: string;
   disableDelete = false;
-
-  constructor(
-    protected flowService: FlowService,
-    public activeModal: NgbActiveModal,
-    protected eventManager: EventManager,
-  ) {}
 
   clear(): void {
     this.activeModal.dismiss();

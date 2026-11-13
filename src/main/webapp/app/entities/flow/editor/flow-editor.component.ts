@@ -11,6 +11,8 @@ import { confirmChoice } from './confirm-dialog.component';
   imports: [FlowEditorEsbComponent],
 })
 export class FlowEditorComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   editor: string = 'esb';
 
@@ -34,11 +36,6 @@ export class FlowEditorComponent implements OnInit {
     }
     return choice === 'leave';
   }
-
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-  ) {}
 
   ngOnInit() {
     this.route.params.subscribe(params => {

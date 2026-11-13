@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
@@ -20,6 +20,11 @@ import { IntegrationService } from 'app/entities/integration/integration.service
   imports: [FormsModule, FontAwesomeModule, AlertError, SaveShortcutDirective],
 })
 export class FlowUpdateComponent implements OnInit {
+  protected alertService = inject(AlertService);
+  protected flowService = inject(FlowService);
+  protected integrationService = inject(IntegrationService);
+  protected activatedRoute = inject(ActivatedRoute);
+
   flow!: IFlow;
   isSaving!: boolean;
 
@@ -33,13 +38,6 @@ export class FlowUpdateComponent implements OnInit {
   ];
 
   integrations!: IIntegration[];
-
-  constructor(
-    protected alertService: AlertService,
-    protected flowService: FlowService,
-    protected integrationService: IntegrationService,
-    protected activatedRoute: ActivatedRoute
-  ) {}
 
   ngOnInit() {
     this.isSaving = false;
