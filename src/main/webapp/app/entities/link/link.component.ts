@@ -21,7 +21,7 @@ import { LinkService } from './link.service';
     templateUrl: './link.component.html',
     imports: [CommonModule, FormsModule, RouterModule, Alert],
 })
-export class LinkComponent implements OnInit, OnChanges {
+export class LinkComponent implements OnInit, OnChanges, OnDestroy {
     @Input() links: ILink[];
     @Input() stepId: number;
 
@@ -53,7 +53,11 @@ export class LinkComponent implements OnInit, OnChanges {
 
     ngOnInit() {
         this.loadAll();
-        this.eventManager.subscribe('linkDeleted', res => this.updateLink(parseInt(res.toString())));
+        this.eventSubscriber = this.eventManager.subscribe('linkDeleted', res => this.updateLink(parseInt(res.toString())));
+    }
+
+    ngOnDestroy() {
+        this.eventManager.destroy(this.eventSubscriber);
     }
 
 	delete(link: ILink): void {
@@ -144,10 +148,6 @@ export class LinkComponent implements OnInit, OnChanges {
 
     trackId(index: number, item: ILink) {
         return item.id;
-    }
-
-    registerChangeInLink() {
-        this.eventSubscriber = this.eventManager.subscribe('linkListModification', response => this.loadAll());
     }
 
     protected onError(errorMessage: string) {

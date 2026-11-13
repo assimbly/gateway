@@ -1,4 +1,5 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Subscription, interval } from 'rxjs';
@@ -39,7 +40,6 @@ export class QueueComponent implements OnInit, OnDestroy {
   links: any;
   page: number;
   sortState: SortState = { predicate: 'name', order: 'asc' };
-  timeInterval!: Subscription;
   isBroker: boolean | undefined;
   /** Whether the Queues of the Broker have been asked for, so an empty list is known to be empty. */
   addressesLoaded = false;
@@ -54,6 +54,7 @@ export class QueueComponent implements OnInit, OnDestroy {
   ];
 
   private readonly changeDetector = inject(ChangeDetectorRef);
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor(
     protected queueService: QueueService,
@@ -96,7 +97,6 @@ export class QueueComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.eventSubscriber.unsubscribe();
-    this.timeInterval.unsubscribe();
   }
 
   /** Without a running Broker, or without any Queue, the list gives way to an explanation of Endpoints and what to do first. */
@@ -120,9 +120,9 @@ export class QueueComponent implements OnInit, OnDestroy {
   }
 
   poll(): void {
-    this.timeInterval = interval(10000).subscribe(x => {
-      this.updateAllQueues();
-    });
+    interval(10000)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.updateAllQueues());
   }
 
   registerDeletedQueues() {

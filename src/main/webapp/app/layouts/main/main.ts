@@ -1,9 +1,9 @@
-import { Component, ElementRef, OnInit, RendererFactory2, Renderer2, computed, effect, inject, viewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, OnInit, RendererFactory2, Renderer2, computed, effect, inject, viewChild } from '@angular/core';
 import { NavigationEnd, RouterOutlet, Router, RouterLink } from '@angular/router';
 import { TranslateService, LangChangeEvent } from '@ngx-translate/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import dayjs from 'dayjs/esm';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
 
 import { AppPageTitleStrategy } from 'app/app-page-title-strategy';
@@ -55,6 +55,7 @@ export default class Main implements OnInit {
   private readonly accountService = inject(AccountService);
   private readonly theme = inject(ThemeService);
   private readonly translateService = inject(TranslateService);
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor(rootRenderer: RendererFactory2) {
     this.renderer = rootRenderer.createRenderer(document.querySelector('html'), null);
@@ -71,11 +72,16 @@ export default class Main implements OnInit {
         this.toPasswordPage();
       }
     });
-    this.router.events.pipe(filter(event => event instanceof NavigationEnd)).subscribe(() => {
-      if (this.accountService.account()?.passwordChangeRequired) {
-        this.toPasswordPage();
-      }
-    });
+    this.router.events
+      .pipe(
+        filter(event => event instanceof NavigationEnd),
+        takeUntilDestroyed(),
+      )
+      .subscribe(() => {
+        if (this.accountService.account()?.passwordChangeRequired) {
+          this.toPasswordPage();
+        }
+      });
 
     effect(() => {
       if (this.layout.hamburgerFocusRequested()) {
@@ -97,7 +103,7 @@ export default class Main implements OnInit {
     // try to log in automatically
     this.accountService.identity().subscribe();
 
-    this.translateService.onLangChange.subscribe((langChangeEvent: LangChangeEvent) => {
+    this.translateService.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((langChangeEvent: LangChangeEvent) => {
       this.appPageTitleStrategy.updateTitle(this.router.routerState.snapshot);
       dayjs.locale(langChangeEvent.lang);
       this.renderer.setAttribute(document.querySelector('html'), 'lang', langChangeEvent.lang);

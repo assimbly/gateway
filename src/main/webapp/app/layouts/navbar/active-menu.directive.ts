@@ -1,4 +1,5 @@
-import { Directive, ElementRef, OnInit, Renderer2, inject, input } from '@angular/core';
+import { DestroyRef, Directive, ElementRef, OnInit, Renderer2, inject, input } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 
@@ -11,9 +12,10 @@ export default class ActiveMenuDirective implements OnInit {
   private readonly el = inject(ElementRef);
   private readonly renderer = inject(Renderer2);
   private readonly translateService = inject(TranslateService);
+  private readonly destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    this.translateService.onLangChange.subscribe((event: LangChangeEvent) => {
+    this.translateService.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((event: LangChangeEvent) => {
       this.updateActiveFlag(event.lang);
     });
 

@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpResponse } from '@angular/common/http';
-import { of, Subscription } from 'rxjs';
+import { of } from 'rxjs';
 import { AccountService } from 'app/core/auth/account.service';
 import { AlertService } from 'app/core/util/alert.service';
 import { Address, IRootQueueAddress } from 'app/shared/model/address.model';
@@ -27,7 +27,6 @@ describe('QueueComponent', () => {
       ],
     });
     const component = TestBed.createComponent(QueueComponent).componentInstance;
-    component.timeInterval = new Subscription();
     component.isBroker = true;
     component.brokerType = 'classic';
     return component;

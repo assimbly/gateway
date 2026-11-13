@@ -1,4 +1,5 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Subscription, interval } from 'rxjs';
@@ -41,7 +42,6 @@ export class TopicComponent implements OnInit, OnDestroy {
   page: number;
   sortState: SortState = { predicate: 'name', order: 'asc' };
 
-  timeInterval!: Subscription;
   isBroker: boolean | undefined;
   /** Whether the Topics of the Broker have been asked for, so an empty list is known to be empty. */
   addressesLoaded = false;
@@ -56,6 +56,7 @@ export class TopicComponent implements OnInit, OnDestroy {
   ];
 
   private readonly changeDetector = inject(ChangeDetectorRef);
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor(
     protected topicService: TopicService,
@@ -91,7 +92,6 @@ export class TopicComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.eventSubscriber.unsubscribe();
-    this.timeInterval.unsubscribe();
   }
 
 
@@ -126,9 +126,9 @@ export class TopicComponent implements OnInit, OnDestroy {
   }
 
   poll(): void {
-    this.timeInterval = interval(10000).subscribe(x => {
-      this.updateAllTopics();
-    });
+    interval(10000)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.updateAllTopics());
   }
 
   registerDeletedTopics() {
