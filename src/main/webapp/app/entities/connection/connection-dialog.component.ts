@@ -152,7 +152,6 @@ export class ConnectionDialogComponent implements OnInit {
     }
 
     clear() {
-        console.log('clear');
         this.activeModal.dismiss('cancel');
     }
 

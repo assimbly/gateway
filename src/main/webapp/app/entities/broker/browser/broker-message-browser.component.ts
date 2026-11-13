@@ -25,7 +25,7 @@ import { BrokerService } from 'app/entities/broker/broker.service';
 import { QueueClearDialogComponent } from 'app/entities/queue/queue-clear-dialog.component';
 import { TopicClearDialogComponent } from 'app/entities/topic/topic-clear-dialog.component';
 
-import { saveAs } from 'file-saver/FileSaver';
+import { saveAs } from 'app/shared/util/save-as';
 import { IBroker } from 'app/shared/model/broker.model';
 
 import { IHeader } from 'app/shared/model/header.model';
@@ -141,8 +141,6 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   }
 
   onNavChange(changeEvent: NgbNavChangeEvent) {
-  		console.log('nav changed');
-  		console.log(changeEvent);
   		//this.selectedMessage.body = 'blabla';
       //this.showMessage(this.message);
       //document.getElementById("codemirror").click();
@@ -165,13 +163,11 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
             if (this.brokerType != null) {
               this.getMessages();
             } else {
-              console.log('Unknown broker: set brokertype to artemis');
               this.brokerType = 'artemis';
               this.getMessages();
             }
           }
-        },
-        error => console.log(error)
+        }
       );
     }
   }
@@ -460,10 +456,6 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
         return 'txt';
       }
     }
-  }
-
-  setEditorContent(event: any){
-      console.log('set editor');
   }
 
     setEditorMode(str: any) {

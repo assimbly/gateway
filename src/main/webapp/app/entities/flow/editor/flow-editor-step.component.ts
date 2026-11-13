@@ -8,7 +8,6 @@ import { RouterLink } from '@angular/router';
 import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select';
-import { PopoverModule } from 'ngx-bootstrap/popover';
 import { CodemirrorComponent, CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { CdkDragHandle } from '@angular/cdk/drag-drop';
 import { Components } from 'app/shared/camel/component-type';
@@ -70,7 +69,7 @@ export class StepEditorRegistry {
   selector: 'jhi-flow-editor-step',
   templateUrl: './flow-editor-step.component.html',
   styleUrl: './flow-editor-step.component.scss',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgbModule, FontAwesomeModule, NgSelectModule, PopoverModule, CodemirrorModule, CdkDragHandle],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgbModule, FontAwesomeModule, NgSelectModule, CodemirrorModule, CdkDragHandle],
 })
 export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   @Input({ required: true }) step!: IStep;

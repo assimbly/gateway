@@ -79,6 +79,7 @@ export default class LogViewerComponent implements OnInit {
   }
 
   private refreshDisplay(): void {
+    // trusted: colorLog escapes every log entry as HTML before adding its own color spans
     this.coloredLog = this.sanitizer.bypassSecurityTrustHtml(colorLog(this.logEntries, this.searchText));
   }
 }

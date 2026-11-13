@@ -808,12 +808,7 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
 
   disableTracing(){
 
-   this.integrationService.removeCollector(this.flow.id!).subscribe(
-        response => {},
-        err => {
-          console.log('Failed to remove tracing: ' + JSON.stringify(err));
-        }
-      );
+   this.integrationService.removeCollector(this.flow.id!).subscribe();
 
   }
 

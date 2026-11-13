@@ -40,7 +40,6 @@ export class CertificateSelfSignDialogComponent {
           this.error = true;
           this.isSaving = false;
           this.errorMessage = err.error;
-          console.log(err);
         },
       );
   }

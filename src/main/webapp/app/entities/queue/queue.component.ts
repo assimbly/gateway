@@ -162,8 +162,7 @@ export class QueueComponent implements OnInit, OnDestroy {
           }
           this.changeDetector.detectChanges();
         }
-      },
-      error => console.log(error)
+      }
     );
   }
 
@@ -190,7 +189,6 @@ export class QueueComponent implements OnInit, OnDestroy {
           this.changeDetector.detectChanges();
         },
         error => {
-          console.log(error);
           this.addressesLoaded = true;
           this.isBroker = false;
           this.changeDetector.detectChanges();
@@ -213,7 +211,6 @@ export class QueueComponent implements OnInit, OnDestroy {
           this.changeDetector.detectChanges();
         },
         error => {
-          console.log(error);
           this.isBroker = false;
           this.changeDetector.detectChanges();
         }

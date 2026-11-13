@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 import { AlertService } from 'app/core/util/alert.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AlertError } from 'app/shared/alert';
-import { PopoverModule } from 'ngx-bootstrap/popover';
+import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { IIntegration, EnvironmentType, GatewayType } from 'app/shared/model/integration.model';
 import { SaveShortcutDirective } from 'app/shared/keyboard';
 import { IntegrationService } from './integration.service';
@@ -17,7 +17,7 @@ import { Router } from '@angular/router';
 @Component({
     selector: 'jhi-integration-update',
     templateUrl: './integration-update.component.html',
-    imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, PopoverModule, SaveShortcutDirective],
+    imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, NgbPopoverModule, SaveShortcutDirective],
 })
 export class IntegrationUpdateComponent implements OnInit {
     integration!: IIntegration;

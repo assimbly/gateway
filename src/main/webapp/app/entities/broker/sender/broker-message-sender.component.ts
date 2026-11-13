@@ -216,8 +216,7 @@ export class BrokerMessageSenderComponent implements OnInit, OnDestroy {
                     }
                     this.loadSuggestions();
                 }
-            },
-            error => console.log(error)
+            }
         );
     }
 

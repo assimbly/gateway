@@ -10,9 +10,6 @@ export class ForbiddenHeaderValidatorDirective implements Validator {
     @Input('jhiExistingHeader') existingHeaders!: Array<string>;
 
     validate(control: AbstractControl): { [key: string]: any } | null {
-        console.log('validating headers');
-        console.log(this.existingHeaders);
-
         return this.existingHeaders.some(k => k === control.value) ? { existingHeaderHeaders: true } : null;
     }
 }

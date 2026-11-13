@@ -200,10 +200,8 @@ export class RoutePopupComponent implements OnInit, OnDestroy {
     ngOnInit() {
         this.routeSub = this.route.params.subscribe(params => {
             if (params['id']) {
-                console.log('set param' + params['id']);
                 this.routePopupService.open(RouteDialogComponent as Component, params['id']);
             } else {
-                console.log('no param');
                 this.routePopupService.open(RouteDialogComponent as Component);
             }
         });

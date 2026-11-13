@@ -181,3 +181,6 @@ activemq-data/**
 
 # Local secrets loaded by bin/win/run.bat
 /local-env-variables.txt
+
+# Message files the runtime writes into the working directory
+/@\[messages}/

@@ -25,7 +25,7 @@ import { CertificateUploadDialogComponent } from './certificate-upload-dialog.co
 import { CertificateUploadP12DialogComponent } from './certificate-uploadp12-dialog.component';
 import { CertificateSelfSignDialogComponent } from './certificate-self-sign-dialog.component';
 
-import { saveAs } from 'file-saver/FileSaver';
+import { saveAs } from 'app/shared/util/save-as';
 
 @Component({
   selector: 'jhi-certificate',
@@ -173,7 +173,6 @@ export class CertificateComponent implements OnInit, OnDestroy {
   }
 
   exportCertificate(id: number) {
-    console.log('Export certificate');
     this.certificateService.find(id).subscribe(data => {
       const certificate = data.body;
       let exportFileName = 'certificate';
