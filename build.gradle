@@ -106,16 +106,6 @@ idea {
     }
 }
 
-eclipse {
-    sourceSets {
-        main {
-            java {
-                srcDirs += ["build/generated/sources/annotationProcessor/java/main"]
-            }
-        }
-    }
-}
-
 // Example images
 // image = 'eclipse-temurin:21' (temurin on docker)
 // image = 'open-21-jdk-jammy' (semeru on dockerhub)
@@ -601,6 +591,5 @@ rewrite {
 }
 */
 
-compileJava.dependsOn processResources
-processResources.dependsOn cleanResources,bootBuildInfo
+processResources.dependsOn bootBuildInfo
 bootBuildInfo.mustRunAfter cleanResources

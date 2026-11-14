@@ -1,3 +1,4 @@
+def appVersion = project.version
 def profiles = "headless"
 profiles += ",no-liquibase"
 profiles += ",api-docs"
@@ -27,7 +28,7 @@ processResources {
     inputs.property('springProfiles', profiles)
     filesMatching("**/application.yml") {
         filter {
-            it.replace("#project.version#", version)
+            it.replace("#project.version#", appVersion)
         }
         filter {
             it.replace("#spring.profiles.active#", profiles)

@@ -2,6 +2,7 @@ dependencies {
     testImplementation "com.h2database:h2"
 }
 
+def appVersion = project.version
 def profiles = "prod"
 if (project.hasProperty("no-liquibase")) {
     profiles += ",no-liquibase"
@@ -36,7 +37,7 @@ processResources {
     inputs.property('springProfiles', profiles)
     filesMatching("**/application.yml") {
         filter {
-            it.replace("#project.version#", version)
+            it.replace("#project.version#", appVersion)
         }
         filter {
             it.replace("#spring.profiles.active#", profiles)

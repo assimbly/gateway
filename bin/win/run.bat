@@ -61,16 +61,8 @@ for /f "tokens=1* delims==" %%a in ('type "%propertyFile%"') do (
 move /y "%tempFile%" "%propertyFile%"
 
 
-if [%1]==[] (
-    cls & ..\..\gradlew --project-dir ./../../ "-Dorg.gradle.jvmargs=-Xmx4g" "-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.configuration-cache=true"
-) else (
-    if [%2]==[] (
-        cls & ..\..\gradlew --project-dir ./../../ "-Dorg.gradle.jvmargs=-Xmx4g" "-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.configuration-cache=true" -P%1
-    ) else (
-        if [%3]==[] (
-            cls & ..\..\gradlew --project-dir ./../../ "-Dorg.gradle.jvmargs=-Xmx4g" "-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.configuration-cache=true" -P%1 -P%2
-        ) else (
-            cls & ..\..\gradlew --project-dir ./../../ "-Dorg.gradle.jvmargs=-Xmx4g" "-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.configuration-cache=true" -P%1 -P%2 -P%3
-        )
-    )
-)
+rem Each -D flag must be its own argument, otherwise Gradle reads them as one property value
+set "profileArgs="
+for %%p in (%*) do set "profileArgs=!profileArgs! -P%%p"
+
+cls & ..\..\gradlew --project-dir ./../../ "-Dorg.gradle.jvmargs=-Xmx4g" "-Dorg.gradle.daemon=true" "-Dorg.gradle.parallel=true" "-Dorg.gradle.caching=true" "-Dorg.gradle.configuration-cache=true" "-Dorg.gradle.configuration-cache.problems=warn" !profileArgs!
