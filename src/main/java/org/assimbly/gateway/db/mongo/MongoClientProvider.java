@@ -5,18 +5,14 @@ import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.annotation.Configuration;
-
 import java.io.Serializable;
 import java.util.Arrays;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * A Singleton class for maintaining a connection to the MongoDatabase.
  * This Client connection is set up once it is requested for the first time.
  */
-
-@Configuration
 public class MongoClientProvider implements Serializable {
 
     private static final String MONGO_CONTAINER_NAME = "MONGO_CONTAINER_NAME";
@@ -49,10 +45,11 @@ public class MongoClientProvider implements Serializable {
      * Initialize the MongoClient.
      */
     private static void init() {
-        client = MongoClients.create(MongoClientSettings.builder()
-            .applyToClusterSettings(builder ->
-                builder.hosts(Arrays.asList(new ServerAddress(getMongoContainerName(), 27017))))
-            .build());
+        client = MongoClients.create(
+            MongoClientSettings.builder()
+                .applyToClusterSettings(builder -> builder.hosts(Arrays.asList(new ServerAddress(getMongoContainerName(), 27017))))
+                .build()
+        );
     }
 
     private static String getMongoContainerName() {
@@ -62,5 +59,4 @@ public class MongoClientProvider implements Serializable {
         }
         return "mongo"; // by default
     }
-
 }

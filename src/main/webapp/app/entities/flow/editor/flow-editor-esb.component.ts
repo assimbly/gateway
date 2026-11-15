@@ -28,7 +28,7 @@ import { ConnectionDialogComponent } from 'app/entities/connection/connection-di
 import { ConnectionPopupService } from 'app/entities/connection/connection-popup.service';
 import { Components } from 'app/shared/camel/component-type';
 import { Connections } from 'app/shared/camel/connections';
-import { notAnInteger } from 'app/shared/camel/endpoint';
+import { notAnInteger, splitHttpUrl } from 'app/shared/camel/endpoint';
 import { Step, StepType, IStep } from 'app/shared/model/step.model';
 import { Flow, IFlow, LogLevelType } from 'app/shared/model/flow.model';
 import { Integration } from 'app/shared/model/integration.model';
@@ -274,7 +274,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
   }
 
   savingFlowFailed = false;
-  savingFlowFailedMessage = 'Saving failed (check logs)';
+  savingFlowFailedMessage = SAVING_FAILED;
   savingFlowSuccess = false;
   savingFlowSuccessMessage = 'Flow successfully saved';
   savingCheckSteps = true;
@@ -1728,6 +1728,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     this.savedFlowName = this.flow.name;
     this.formSubmitted = true;
     this.savingFlowFailed = false;
+    // A check below may give its own reason; without one, a failed save shows the general message, not an earlier reason.
+    this.savingFlowFailedMessage = SAVING_FAILED;
     this.savingFlowSuccess = false;
 
     this.setDataFromForm();
@@ -1869,6 +1871,15 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
   }
 
   setDataFromFormOnStep(step: Step, formStepData: any, index: number) {
+    const split = splitHttpUrl(formStepData.componentType.value, formStepData.uri.value);
+    if (split) {
+      formStepData.uri.setValue(split.uri);
+      if (split.componentType !== formStepData.componentType.value) {
+        formStepData.componentType.setValue(split.componentType);
+        step.componentType = split.componentType;
+        this.setTypeLinks(step, index);
+      }
+    }
     step.id = formStepData.id.value;
     step.componentType = formStepData.componentType.value;
     step.stepType = formStepData.stepType.value;
@@ -2447,7 +2458,11 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     } else {
       this.showRouteTab(id as 'routes' | 'errorHandler' | 'notes');
     }
-    // A tab shows as the one before it did: beside the canvas, or full page once one was enlarged.
+    // A tab shows as the one before it did: beside the canvas, or full page once one was enlarged. The Visual flow is the
+    // canvas itself, so an enlarged Step goes back to the side panel, as its "Show in a side panel" button does.
+    if (this.viewMode === 'design' && id === 'flow' && this.tabLayout === 'full') {
+      this.setTabLayout('panel');
+    }
     this.openTabLayout();
   }
 
@@ -2666,7 +2681,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     this.edit(insertStep(this.designer!.current, event.linkTo, event.kind, event.componentType));
     const inserted = this.designer!.current.steps.find(s => !before.has(s.key) && s.kind === event.kind);
     if (inserted) {
-      this.selection = { type: 'step', key: inserted.key };
+      // Selected as a click would: its settings show, also when the panel was hidden or another tab was open.
+      this.onSelectionChange({ type: 'step', key: inserted.key });
       this.flowCanvas?.reveal(inserted.key);
     }
   }
@@ -2676,7 +2692,8 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     this.edit(appendStep(this.designer!.current, event.after, event.kind, event.componentType));
     const appended = this.designer!.current.steps.find(s => !before.has(s.key) && s.kind === event.kind);
     if (appended) {
-      this.selection = { type: 'step', key: appended.key };
+      // Selected as a click would: its settings show, also when the panel was hidden or another tab was open.
+      this.onSelectionChange({ type: 'step', key: appended.key });
       this.flowCanvas?.reveal(appended.key);
     }
   }
@@ -3043,6 +3060,9 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 }
 
 type AfterSave = 'stay' | 'start' | 'restart' | 'return';
+
+/** What a failed save shows when no check gave a reason of its own. */
+const SAVING_FAILED = 'The Flow could not be saved. Try again. If it keeps failing, look for the cause under Administration → Log viewer.';
 
 /** The graph key of a Flow's Error Step, which has its own Error handler panel rather than a place on the canvas. */
 const ERROR_STEP_KEY = 'error';

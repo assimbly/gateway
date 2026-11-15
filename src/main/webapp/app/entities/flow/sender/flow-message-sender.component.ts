@@ -16,6 +16,7 @@ import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { ThemeService } from 'app/core/theme';
 import { Components } from 'app/shared/camel/component-type';
 import { Connections } from 'app/shared/camel/connections';
+import { splitHttpUrl } from 'app/shared/camel/endpoint';
 import { Connection } from 'app/shared/model/connection.model';
 import { IStep, StepType } from 'app/shared/model/step.model';
 import { ConnectionDialogComponent } from 'app/entities/connection/connection-dialog.component';
@@ -229,8 +230,9 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
     if (!source.componentType) {
       return;
     }
-    this.setComponentType(source.componentType);
-    this.messageSenderForm.controls.uri.setValue(source.uri || null);
+    const split = splitHttpUrl(source.componentType, source.uri);
+    this.setComponentType(split?.componentType ?? source.componentType);
+    this.messageSenderForm.controls.uri.setValue((split?.uri ?? source.uri) || null);
     this.setOptionsFromString(source.options);
     if (source.connectionId) {
       this.messageSenderForm.controls.connection.setValue(source.connectionId);
@@ -499,7 +501,8 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
   // sending
 
   private targetOf(componentType: string, uri: string): string {
-    return componentType.toLowerCase() + '://' + uri;
+    const split = splitHttpUrl(componentType, uri);
+    return (split?.componentType ?? componentType.toLowerCase()) + '://' + (split?.uri ?? uri);
   }
 
   private requestUri(): string {

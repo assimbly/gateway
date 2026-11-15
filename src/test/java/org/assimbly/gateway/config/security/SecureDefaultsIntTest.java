@@ -1,6 +1,15 @@
 package org.assimbly.gateway.config.security;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import jakarta.servlet.Filter;
+import java.util.Arrays;
+import java.util.List;
 import org.assimbly.gateway.GatewayApp;
 import org.assimbly.gateway.repository.UserRepository;
 import org.assimbly.gateway.security.jwt.TokenProvider;
@@ -17,16 +26,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-
-import java.util.Arrays;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /** Outside dev, a Gateway is locked down: no open registration, management for administrators, no default passwords. */
 @SpringBootTest(classes = GatewayApp.class)
@@ -64,7 +63,9 @@ class SecureDefaultsIntTest {
     void theDefaultAccountsMustChooseANewPassword() {
         assertThat(gate.isRequired("admin")).isTrue();
         assertThat(gate.isRequired("user")).isTrue();
-        assertThat(userRepository.findOneByLogin("admin")).hasValueSatisfying(admin -> assertThat(admin.isPasswordChangeRequired()).isTrue());
+        assertThat(userRepository.findOneByLogin("admin")).hasValueSatisfying(admin ->
+            assertThat(admin.isPasswordChangeRequired()).isTrue()
+        );
     }
 
     @Test
@@ -72,16 +73,23 @@ class SecureDefaultsIntTest {
         gate.require("operator");
         String token = token("operator", "ROLE_USER");
 
-        mockMvc.perform(get("/api/flows").header(HttpHeaders.AUTHORIZATION, bearer(token)))
+        mockMvc
+            .perform(get("/api/flows").header(HttpHeaders.AUTHORIZATION, bearer(token)))
             .andExpect(status().isForbidden())
             .andExpect(jsonPath("$.type").value(PasswordChangeFilter.PROBLEM_TYPE));
         mockMvc.perform(get("/management/info").header(HttpHeaders.AUTHORIZATION, bearer(token))).andExpect(status().isOk());
 
         // What choosing a new password needs stays open (the operator has no account here, so it isn't found)
-        mockMvc.perform(get("/api/account").header(HttpHeaders.AUTHORIZATION, bearer(token)))
+        mockMvc
+            .perform(get("/api/account").header(HttpHeaders.AUTHORIZATION, bearer(token)))
             .andExpect(result -> assertThat(result.getResponse().getStatus()).isNotEqualTo(403));
-        mockMvc.perform(post("/api/account/change-password").header(HttpHeaders.AUTHORIZATION, bearer(token))
-                .contentType(MediaType.APPLICATION_JSON).content("{\"currentPassword\":\"operator\",\"newPassword\":\"a-new-password\"}"))
+        mockMvc
+            .perform(
+                post("/api/account/change-password")
+                    .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"currentPassword\":\"operator\",\"newPassword\":\"a-new-password\"}")
+            )
             .andExpect(result -> assertThat(result.getResponse().getStatus()).isNotEqualTo(403));
 
         gate.clear("operator");
@@ -90,21 +98,35 @@ class SecureDefaultsIntTest {
 
     @Test
     void nobodyCanRegisterThemselves() throws Exception {
-        String body = "{\"login\":\"stranger\",\"email\":\"stranger@example.com\",\"password\":\"stranger-password\",\"langKey\":\"en\"}";
+        String body = "{\"login\":\"stranger\",\"email\":\"stranger@example.com\",\"password\":\"stranger-password\"}";
         mockMvc.perform(post("/api/register").contentType(MediaType.APPLICATION_JSON).content(body)).andExpect(status().isUnauthorized());
-        mockMvc.perform(post("/api/register").header(HttpHeaders.AUTHORIZATION, bearer(token("operator", "ROLE_USER")))
-                .contentType(MediaType.APPLICATION_JSON).content(body))
+        mockMvc
+            .perform(
+                post("/api/register")
+                    .header(HttpHeaders.AUTHORIZATION, bearer(token("operator", "ROLE_USER")))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(body)
+            )
             .andExpect(status().isNotFound());
         assertThat(userRepository.findOneByLogin("stranger")).isEmpty();
     }
 
     @Test
     void managementIsForAdministrators() throws Exception {
-        for (String endpoint : List.of("/management/env", "/management/jolokia", "/management/metrics", "/management/prometheus", "/management/loggers")) {
+        for (String endpoint : List.of(
+            "/management/env",
+            "/management/jolokia",
+            "/management/metrics",
+            "/management/prometheus",
+            "/management/loggers"
+        )) {
             mockMvc.perform(get(endpoint)).andExpect(status().isUnauthorized());
-            mockMvc.perform(get(endpoint).header(HttpHeaders.AUTHORIZATION, bearer(token("operator", "ROLE_USER")))).andExpect(status().isForbidden());
+            mockMvc
+                .perform(get(endpoint).header(HttpHeaders.AUTHORIZATION, bearer(token("operator", "ROLE_USER"))))
+                .andExpect(status().isForbidden());
         }
-        mockMvc.perform(get("/management/env").header(HttpHeaders.AUTHORIZATION, bearer(token("operator", "ROLE_USER", "ROLE_ADMIN"))))
+        mockMvc
+            .perform(get("/management/env").header(HttpHeaders.AUTHORIZATION, bearer(token("operator", "ROLE_USER", "ROLE_ADMIN"))))
             .andExpect(status().isOk());
     }
 
@@ -112,21 +134,35 @@ class SecureDefaultsIntTest {
     void aNewPasswordNeedsTwelveCharactersOfAnyKind() throws Exception {
         String token = token("operator", "ROLE_USER");
 
-        mockMvc.perform(post("/api/account/change-password").header(HttpHeaders.AUTHORIZATION, bearer(token))
-                .contentType(MediaType.APPLICATION_JSON).content("{\"currentPassword\":\"operator\",\"newPassword\":\"elevenchars\"}"))
+        mockMvc
+            .perform(
+                post("/api/account/change-password")
+                    .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"currentPassword\":\"operator\",\"newPassword\":\"elevenchars\"}")
+            )
             .andExpect(status().isBadRequest());
-        mockMvc.perform(post("/api/account/change-password").header(HttpHeaders.AUTHORIZATION, bearer(token))
-                .contentType(MediaType.APPLICATION_JSON).content("{\"currentPassword\":\"operator\",\"newPassword\":\"twelve chars\"}"))
+        mockMvc
+            .perform(
+                post("/api/account/change-password")
+                    .header(HttpHeaders.AUTHORIZATION, bearer(token))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"currentPassword\":\"operator\",\"newPassword\":\"twelve chars\"}")
+            )
             .andExpect(result -> assertThat(result.getResponse().getStatus()).isNotEqualTo(400));
     }
 
     @Test
     void theSignInPageTellsOnlyAFirstTimeUserOnThisComputerHowToSignIn() throws Exception {
         mockMvc.perform(get("/api/account/first-sign-in")).andExpect(status().isOk()).andExpect(content().string("true"));
-        mockMvc.perform(get("/api/account/first-sign-in").with(request -> {
-            request.setRemoteAddr("192.168.1.20");
-            return request;
-        })).andExpect(content().string("false"));
+        mockMvc
+            .perform(
+                get("/api/account/first-sign-in").with(request -> {
+                    request.setRemoteAddr("192.168.1.20");
+                    return request;
+                })
+            )
+            .andExpect(content().string("false"));
 
         gate.clear("admin");
         try {

@@ -4,8 +4,6 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 
-import { provideTranslateService } from '@ngx-translate/core';
-
 import { AlertService } from 'app/core/util/alert.service';
 import { EventManager } from 'app/core/util/event-manager.service';
 
@@ -26,12 +24,7 @@ describe('Import service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        provideRouter([{ path: 'flow/editor/:id', component: EditorStub }]),
-        provideHttpClient(),
-        provideHttpClientTesting(),
-        provideTranslateService(),
-      ],
+      providers: [provideRouter([{ path: 'flow/editor/:id', component: EditorStub }]), provideHttpClient(), provideHttpClientTesting()],
     });
     service = TestBed.inject(ImportService);
     http = TestBed.inject(HttpTestingController);

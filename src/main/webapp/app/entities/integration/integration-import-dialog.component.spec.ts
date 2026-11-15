@@ -4,7 +4,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { provideTranslateService } from '@ngx-translate/core';
 
 import { fontAwesomeIcons } from 'app/config/font-awesome-icons';
 import { AlertService } from 'app/core/util/alert.service';
@@ -23,7 +22,7 @@ describe('Import Gateway backup dialog', () => {
   beforeEach(() => {
     activeModal = { close: jest.fn(), dismiss: jest.fn() };
     TestBed.configureTestingModule({
-      providers: [provideHttpClient(), provideHttpClientTesting(), provideTranslateService(), { provide: NgbActiveModal, useValue: activeModal }],
+      providers: [provideHttpClient(), provideHttpClientTesting(), { provide: NgbActiveModal, useValue: activeModal }],
     });
     TestBed.inject(FaIconLibrary).addIcons(...fontAwesomeIcons);
     fixture = TestBed.createComponent(IntegrationImportDialogComponent);
@@ -60,7 +59,11 @@ describe('Import Gateway backup dialog', () => {
     expect(activeModal.close).toHaveBeenCalledWith(true);
     expect(broadcast).toHaveBeenCalledWith(expect.objectContaining({ name: 'integrationListModification' }));
     expect(broadcast).toHaveBeenCalledWith(expect.objectContaining({ name: 'flowListModification' }));
-    expect(TestBed.inject(AlertService).get().map(alert => alert.message)).toEqual(['Imported backup.xml']);
+    expect(
+      TestBed.inject(AlertService)
+        .get()
+        .map(alert => alert.message),
+    ).toEqual(['Imported backup.xml']);
   });
 
   it('stays open and says why the Gateway refused the file', async () => {

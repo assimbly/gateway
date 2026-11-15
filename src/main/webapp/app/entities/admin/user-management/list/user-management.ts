@@ -11,10 +11,9 @@ import { combineLatest, filter, map, tap } from 'rxjs';
 
 import { DEFAULT_SORT_DATA, ITEMS_PER_PAGE, ITEM_DELETED_EVENT, PAGE_HEADER, SORT, TOTAL_COUNT_RESPONSE_HEADER } from 'app/config';
 import { AccountService } from 'app/core/auth';
-import { Alert, AlertError } from 'app/shared/alert';
+import { AlertError } from 'app/shared/alert';
 import { FormatMediumDatetimePipe } from 'app/shared/date';
 import { SearchToolbar } from 'app/shared/filter';
-import { TranslateDirective } from 'app/shared/language';
 import { ItemCount } from 'app/shared/pagination';
 import { SortService, type SortState, sortStateSignal } from 'app/shared/sort';
 import { RoleLabelPipe } from 'app/shared/auth';
@@ -31,8 +30,6 @@ import { IUserManagement } from '../user-management.model';
     FontAwesomeModule,
     NgbDropdownModule,
     AlertError,
-    Alert,
-    TranslateDirective,
     FormatMediumDatetimePipe,
     NgbPagination,
     ItemCount,
@@ -69,9 +66,7 @@ export class UserManagement {
     if (!query) {
       return users;
     }
-    return users.filter(
-      user => user.login.toLocaleLowerCase().includes(query) || (user.email ?? '').toLocaleLowerCase().includes(query),
-    );
+    return users.filter(user => user.login.toLocaleLowerCase().includes(query) || (user.email ?? '').toLocaleLowerCase().includes(query));
   });
 
   readonly itemsPerPage = signal(ITEMS_PER_PAGE);

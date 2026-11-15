@@ -1,22 +1,20 @@
 <div class="login">
-  <h1 class="login__title" data-cy="loginTitle" jhiTranslate="login.title">Log in to Gateway</h1>
+  <h1 class="login__title" data-cy="loginTitle">Log in to Gateway</h1>
 
   @if (firstSignIn()) {
-    <div class="alert alert-info login__first" role="note" data-cy="firstSignIn">
-      <strong>First time here?</strong> Log in with username <strong>admin</strong> and password <strong>admin</strong>. Right after,
-      you choose your own password of at least 12 characters.
-    </div>
-  }
-
-  @if (authenticationError()) {
-    <div class="alert alert-danger login__error" role="alert" data-cy="loginError" jhiTranslate="login.messages.error.authentication">
-      <strong>Failed to log in!</strong> Please check your credentials and try again.
-    </div>
+  <div class="alert alert-info login__first" role="note" data-cy="firstSignIn">
+    <strong>First time here?</strong> Log in with username <strong>admin</strong> and password <strong>admin</strong>. Right after, you
+    choose your own password of at least 12 characters.
+  </div>
+  } @if (authenticationError()) {
+  <div class="alert alert-danger login__error" role="alert" data-cy="loginError">
+    <strong>Failed to log in!</strong> Please check your credentials and try again.
+  </div>
   }
 
   <form class="login__form" (ngSubmit)="login()" [formGroup]="loginForm">
     <div class="login__field">
-      <label class="form-label" for="username" jhiTranslate="global.form.username.label">Username</label>
+      <label class="form-label" for="username">Username</label>
       <input
         type="text"
         #username
@@ -24,21 +22,21 @@
         name="username"
         id="username"
         autocomplete="username"
-        placeholder="{{ 'global.form.username.placeholder' | translate }}"
+        placeholder="Your username"
         formControlName="username"
         data-cy="username"
       />
     </div>
 
     <div class="login__field">
-      <label class="form-label" for="password" jhiTranslate="login.form.password">Password</label>
+      <label class="form-label" for="password">Password</label>
       <input
         type="password"
         class="form-control"
         name="password"
         id="password"
         autocomplete="current-password"
-        placeholder="{{ 'login.form.password.placeholder' | translate }}"
+        placeholder="Your password"
         formControlName="password"
         data-cy="password"
       />
@@ -46,21 +44,19 @@
 
     <div class="form-check login__remember">
       <input class="form-check-input" type="checkbox" name="rememberMe" id="rememberMe" formControlName="rememberMe" />
-      <label class="form-check-label" for="rememberMe" jhiTranslate="login.form.rememberme">Remember me</label>
+      <label class="form-check-label" for="rememberMe">Remember me</label>
     </div>
 
-    <button type="submit" class="btn btn-primary login__submit" data-cy="submit" jhiTranslate="login.form.button">Log in</button>
+    <button type="submit" class="btn btn-primary login__submit" data-cy="submit">Log in</button>
   </form>
 
-  <a class="login__forgot" routerLink="/account/reset/request" data-cy="forgetYourPasswordSelector" jhiTranslate="login.password.forgot"
-    >Forgot your password?</a
-  >
+  <a class="login__forgot" routerLink="/account/reset/request" data-cy="forgetYourPasswordSelector">Forgot your password?</a>
 
   @if (registration()) {
-    <hr class="login__divider" />
-    <p class="login__register">
-      <span jhiTranslate="global.messages.info.register.noaccount">Don&apos;t have an account?</span>
-      <a routerLink="/account/register" jhiTranslate="global.messages.info.register.link">Register</a>
-    </p>
+  <hr class="login__divider" />
+  <p class="login__register">
+    <span>Don&apos;t have an account?</span>
+    <a routerLink="/account/register">Register</a>
+  </p>
   }
 </div>

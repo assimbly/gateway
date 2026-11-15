@@ -1,4 +1,3 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { WritableSignal, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
@@ -18,7 +17,7 @@ describe('Alert Component', () => {
           provide: AlertService,
           useValue: {
             alerts: signal([]),
-            clear: vi.fn(),
+            clear: jest.fn(),
           },
         },
       ],
@@ -31,17 +30,26 @@ describe('Alert Component', () => {
     mockAlertService = TestBed.inject(AlertService);
   });
 
-  it('should render alerts added after init', () => {
-    // GIVEN
-    fixture.detectChanges();
-
-    // WHEN
+  // The alerts are read from the component, not from the page: the test setup has no $localize for a rendered ngb-alert.
+  it('should show alerts added after init', () => {
     const alerts = mockAlertService.alerts as WritableSignal<AlertModel[]>;
     alerts.set([{ id: 0, type: 'success', message: 'Hello' }]);
-    fixture.detectChanges();
 
-    // THEN
-    expect(fixture.nativeElement.querySelectorAll('ngb-alert')).toHaveLength(1);
+    expect(comp.alerts()).toHaveLength(1);
+  });
+
+  it('shows errors too, unless it is told to leave them out as the app-wide outlet is', () => {
+    const alerts = mockAlertService.alerts as WritableSignal<AlertModel[]>;
+    alerts.set([
+      { id: 0, type: 'success', message: 'Imported Flow Orders' },
+      { id: 1, type: 'warning', message: 'A Step was skipped' },
+      { id: 2, type: 'danger', message: 'Http failure response' },
+    ]);
+    expect(comp.alerts()).toHaveLength(3);
+
+    fixture.componentRef.setInput('withoutErrors', true);
+
+    expect(comp.alerts().map(alert => alert.message)).toEqual(['Imported Flow Orders', 'A Step was skipped']);
   });
 
   it('should call alertService.clear on destroy', () => {

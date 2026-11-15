@@ -166,6 +166,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.registerDeletedFlows();
     this.polls.add(interval(10000).subscribe(() => this.flowRows?.forEach(row => row.pollMessages())));
     this.polls.add(interval(10000).subscribe(() => this.flowRows?.forEach(row => row.pollAlerts())));
+    this.polls.add(interval(10000).subscribe(() => this.flowRows?.forEach(row => row.pollStatus())));
   }
 
   loadHandlers(): void {

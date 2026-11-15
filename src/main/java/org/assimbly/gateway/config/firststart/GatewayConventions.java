@@ -1,13 +1,19 @@
 package org.assimbly.gateway.config.firststart;
 
 import jakarta.annotation.PostConstruct;
+import java.nio.file.Path;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.EncryptionProperties;
 import org.assimbly.gateway.domain.EnvironmentVariables;
 import org.assimbly.gateway.domain.Integration;
+import org.assimbly.gateway.repository.BrokerRepository;
+import org.assimbly.gateway.repository.ConnectionRepository;
 import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
 import org.assimbly.gateway.repository.IntegrationRepository;
-import org.assimbly.gateway.service.BrokerService;
 import org.assimbly.gateway.service.ConnectionKeysService;
 import org.assimbly.gateway.service.ConnectionService;
 import org.assimbly.gateway.service.dto.ConnectionDTO;
@@ -20,12 +26,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
-
-import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
 
 /**
  * What a Gateway offers by convention, so a Flow (and a tutorial) can use it without setting it up first:
@@ -50,20 +50,29 @@ public class GatewayConventions {
     private final ApplicationProperties applicationProperties;
     private final IntegrationRepository integrationRepository;
     private final EnvironmentVariablesRepository variablesRepository;
-    private final BrokerService brokerService;
+    private final BrokerRepository brokerRepository;
+    private final ConnectionRepository connectionRepository;
     private final ConnectionService connectionService;
     private final ConnectionKeysService connectionKeysService;
     private final EncryptionProperties encryptionProperties;
     private final TransactionTemplate transactionTemplate;
 
-    public GatewayConventions(ApplicationProperties applicationProperties, IntegrationRepository integrationRepository,
-                              EnvironmentVariablesRepository variablesRepository, BrokerService brokerService,
-                              ConnectionService connectionService, ConnectionKeysService connectionKeysService,
-                              EncryptionProperties encryptionProperties, PlatformTransactionManager transactionManager) {
+    public GatewayConventions(
+        ApplicationProperties applicationProperties,
+        IntegrationRepository integrationRepository,
+        EnvironmentVariablesRepository variablesRepository,
+        BrokerRepository brokerRepository,
+        ConnectionRepository connectionRepository,
+        ConnectionService connectionService,
+        ConnectionKeysService connectionKeysService,
+        EncryptionProperties encryptionProperties,
+        PlatformTransactionManager transactionManager
+    ) {
         this.applicationProperties = applicationProperties;
         this.integrationRepository = integrationRepository;
         this.variablesRepository = variablesRepository;
-        this.brokerService = brokerService;
+        this.brokerRepository = brokerRepository;
+        this.connectionRepository = connectionRepository;
         this.connectionService = connectionService;
         this.connectionKeysService = connectionKeysService;
         this.encryptionProperties = encryptionProperties;
@@ -88,11 +97,10 @@ public class GatewayConventions {
         if (integration.isEmpty()) {
             return;
         }
-        if (variablesRepository.findAll().stream().noneMatch(variable -> MESSAGES_VARIABLE.equals(variable.getKey()))) {
+        if (!variablesRepository.existsByKey(MESSAGES_VARIABLE)) {
             addMessagesVariable(integration.get());
         }
-        if (!brokerService.findAll().isEmpty()
-                && connectionService.getAll().stream().noneMatch(connection -> BROKER_CONNECTION_TYPE.equalsIgnoreCase(connection.getType()))) {
+        if (brokerRepository.count() > 0 && !connectionRepository.existsByTypeIgnoreCase(BROKER_CONNECTION_TYPE)) {
             addBrokerConnection();
         }
     }

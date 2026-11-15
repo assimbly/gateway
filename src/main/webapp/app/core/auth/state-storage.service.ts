@@ -3,7 +3,6 @@ import { Service } from '@angular/core';
 @Service()
 export class StateStorageService {
   private readonly previousUrlKey = 'previousUrl';
-  private readonly localeKey = 'locale';
 
   storeUrl(url: string): void {
     sessionStorage.setItem(this.previousUrlKey, JSON.stringify(url));
@@ -16,17 +15,5 @@ export class StateStorageService {
 
   clearUrl(): void {
     sessionStorage.removeItem(this.previousUrlKey);
-  }
-
-  storeLocale(locale: string): void {
-    sessionStorage.setItem(this.localeKey, locale);
-  }
-
-  getLocale(): string | null {
-    return sessionStorage.getItem(this.localeKey);
-  }
-
-  clearLocale(): void {
-    sessionStorage.removeItem(this.localeKey);
   }
 }

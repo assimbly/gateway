@@ -228,13 +228,16 @@
           <h5 class="step-card__title">{{ step().stepType === 'ERROR' ? 'ERROR HANDLER' : step().stepType }}</h5>
         }
         @if (showsRemove) {
+          <!-- A trash can, not a ×: beside the × that hides the panel, a × here was taken for closing too. -->
           <button
-            [title]="stepType === 'ROUTE' ? 'Remove route' : 'Remove step'"
+            [title]="onCanvas() ? removeLabel + ' (Delete)' : removeLabel"
             type="button"
-            class="btn btn-close step-card__remove"
-            [attr.aria-label]="stepType === 'ROUTE' ? 'Remove route' : 'Remove step'"
+            class="btn btn-fx btn-fx-sm btn-fx-icon btn-fx-ghost-danger step-card__remove"
+            [attr.aria-label]="removeLabel"
             (click)="onRemoveStep()"
-          ></button>
+          >
+            <fa-icon icon="trash"></fa-icon>
+          </button>
         }
       </div>
 
@@ -242,7 +245,7 @@
 
       <!-- source, action, sink, router -->
       @if (isComponentStep) {
-        <div class="step-field">
+        <div class="step-field step-field--bounded">
           <div class="step-field__head">
             <label class="step-field__label" for="field_component_type">Component</label>
             <i triggers="mouseenter:mouseleave" popoverTitle="Info" [ngbPopover]="uriPopover" container="body" placement="right">
@@ -302,7 +305,7 @@
           }
         </div>
 
-        <div class="step-field">
+        <div class="step-field step-field--bounded">
           <div class="step-field__head">
             <label class="step-field__label" for="field_uri_{{ index() }}">{{ pathFieldLabel }}</label>
             @if (!pathUnused) {
@@ -360,7 +363,7 @@
           }
         </div>
 
-        <div class="step-field" formArrayName="options">
+        <div class="step-field step-field--options" formArrayName="options">
           <div class="step-field__head">
             <span class="step-field__label">Options</span>
             <i triggers="mouseenter:mouseleave" popoverTitle="Info" [ngbPopover]="optionsPopover" container="body" placement="right">
@@ -410,7 +413,8 @@
                 </button>
               </div>
             } @else {
-              <div class="option-row" [formGroupName]="idx">
+              @let field = valueField(idx);
+              <div class="option-row" [formGroupName]="idx" [attr.data-field]="field">
                 <ng-select
                   [items]="optionChoices"
                   bindLabel="displayName"
@@ -465,9 +469,9 @@
                   </ng-template>
                 </ng-select>
 
-                @switch (valueField(idx)) {
+                @switch (field) {
                   @case ('switch') {
-                    <label class="form-control option-row__switch" for="field_options-value-{{ index() }}-{{ idx }}">
+                    <label class="form-control option-row__switch option-row__value" for="field_options-value-{{ index() }}-{{ idx }}">
                       <span class="form-check form-switch mb-0">
                         <input
                           class="form-check-input"
@@ -488,7 +492,7 @@
                   }
                   @case ('choice') {
                     <select
-                      class="form-select"
+                      class="form-select option-row__value"
                       id="field_options-value-{{ index() }}-{{ idx }}"
                       formControlName="value"
                       [compareWith]="sameValue"
@@ -504,18 +508,40 @@
                     <input
                       type="text"
                       inputmode="numeric"
-                      class="form-control"
+                      class="form-control option-row__value"
                       id="field_options-value-{{ index() }}-{{ idx }}"
                       formControlName="value"
                       [placeholder]="optionDefaultValue(idx)"
                       aria-label="Value"
                     />
                   }
+                  @case ('duration') {
+                    <input
+                      type="text"
+                      class="form-control option-row__value"
+                      id="field_options-value-{{ index() }}-{{ idx }}"
+                      formControlName="value"
+                      [placeholder]="optionDefaultValue(idx)"
+                      aria-label="Value"
+                      title="A duration: milliseconds, or with a unit such as 5s, 2m or 1h"
+                    />
+                  }
+                  @case ('multiline') {
+                    <textarea
+                      class="form-control font-monospace option-row__value"
+                      id="field_options-value-{{ index() }}-{{ idx }}"
+                      formControlName="value"
+                      [rows]="valueRows(idx)"
+                      [placeholder]="optionDefaultValue(idx)"
+                      aria-label="Value"
+                      [attr.title]="variablesTitle(optionValue(idx))"
+                    ></textarea>
+                  }
                   @case ('secret') {
                     <input
                       type="password"
                       autocomplete="new-password"
-                      class="form-control"
+                      class="form-control option-row__value"
                       id="field_options-value-{{ index() }}-{{ idx }}"
                       formControlName="value"
                       [placeholder]="optionDefaultValue(idx)"
@@ -525,7 +551,7 @@
                   @default {
                     <input
                       type="text"
-                      class="form-control"
+                      class="form-control option-row__value"
                       id="field_options-value-{{ index() }}-{{ idx }}"
                       formControlName="value"
                       [placeholder]="optionDefaultValue(idx)"
@@ -549,7 +575,7 @@
                     <fa-icon icon="ellipsis-vertical"></fa-icon>
                   </button>
                   <div ngbDropdownMenu class="variable-menu">
-                    @if (valueField(idx) === 'text') {
+                    @if (field === 'text' || field === 'multiline') {
                       <button type="button" ngbDropdownItem (click)="openOptionValueModal(idx, optionValueEditor)">
                         Edit in a larger editor
                       </button>
@@ -637,7 +663,7 @@
 
       <!-- script -->
       @if (stepType === 'SCRIPT') {
-        <div class="step-field">
+        <div class="step-field step-field--bounded">
           <div class="step-field__head">
             <label class="step-field__label" for="field_language_{{ index() }}">Language</label>
           </div>
@@ -731,7 +757,7 @@
         </div>
       }
 
-      <div class="step-field" [style.display]="enableMessage() ? '' : 'none'">
+      <div class="step-field step-field--bounded" [style.display]="enableMessage() ? '' : 'none'">
         <div class="step-field__head">
           <label class="step-field__label" for="field_message_{{ index() }}">Header</label>
           <div class="step-field__actions">
@@ -776,7 +802,7 @@
         </div>
       }
 
-      <div class="step-field" [style.display]="enableConnection() ? '' : 'none'">
+      <div class="step-field step-field--bounded" [style.display]="enableConnection() ? '' : 'none'">
         <div class="step-field__head">
           <label class="step-field__label" for="field_connection_{{ index() }}">Connection</label>
           <div class="step-field__actions">

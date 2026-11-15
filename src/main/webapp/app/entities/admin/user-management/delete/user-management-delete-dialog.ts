@@ -6,13 +6,12 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap/modal';
 
 import { ITEM_DELETED_EVENT } from 'app/config';
 import { AlertError } from 'app/shared/alert';
-import { TranslateDirective } from 'app/shared/language';
 import { UserManagementService } from '../service/user-management.service';
 import { IUserManagement } from '../user-management.model';
 
 @Component({
   templateUrl: './user-management-delete-dialog.html',
-  imports: [TranslateDirective, FormsModule, FontAwesomeModule, AlertError],
+  imports: [FormsModule, FontAwesomeModule, AlertError],
 })
 export class UserManagementDeleteDialog {
   userManagement?: IUserManagement;

@@ -5,7 +5,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
-import { provideTranslateService } from '@ngx-translate/core';
 
 import { fontAwesomeIcons } from 'app/config/font-awesome-icons';
 import { AlertService } from 'app/core/util/alert.service';
@@ -49,7 +48,6 @@ describe('Import a Flow (DIL)', () => {
         ]),
         provideHttpClient(),
         provideHttpClientTesting(),
-        provideTranslateService(),
       ],
     });
     TestBed.inject(FaIconLibrary).addIcons(...fontAwesomeIcons);
@@ -86,7 +84,11 @@ describe('Import a Flow (DIL)', () => {
     const url = router.parseUrl(router.url);
     expect(url.root.children['primary'].segments.map(s => s.path)).toEqual(['flow', 'editor', '31']);
     expect(url.queryParams).toEqual({ mode: 'edit', editor: 'flow', id: '31' });
-    expect(TestBed.inject(AlertService).get().map(alert => alert.message)).toEqual(['Imported Flow Orders to SFTP']);
+    expect(
+      TestBed.inject(AlertService)
+        .get()
+        .map(alert => alert.message),
+    ).toEqual(['Imported Flow Orders to SFTP']);
   });
 
   it('imports a Flow exported as JSON, sending it as JSON', () => {

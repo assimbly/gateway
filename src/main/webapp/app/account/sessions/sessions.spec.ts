@@ -18,7 +18,6 @@ describe('Sessions', () => {
     lastName: 'Doe',
     activated: true,
     email: 'john.doe@mail.com',
-    langKey: 'en',
     login: 'john',
     authorities: [],
     imageUrl: '',

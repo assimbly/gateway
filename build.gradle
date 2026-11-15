@@ -467,9 +467,14 @@ tasks.named('bootJar') {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
+if (!file('src/main/java/org/assimbly/gateway/config/security/LegacySecretMigration.java').exists()) {
+    sourceSets.test.java.exclude 'org/assimbly/gateway/config/security/LegacySecretMigrationTest.java'
+}
+
 tasks.named("bootRun") {
     // Ehcache 3 still calls sun.misc.Unsafe (already reported upstream); allow it so JDK 24+ prints no deprecation warning.
-    jvmArgs "--sun-misc-unsafe-memory-access=allow"
+    // Artemis' LibaioContext loads a native library from an unnamed module; enable native access so JDK 25+ prints no restricted-method warning.
+    jvmArgs "--sun-misc-unsafe-memory-access=allow", "--enable-native-access=ALL-UNNAMED"
     environment "ASSIMBLY_ENCRYPTION_SECRET", System.getenv("ASSIMBLY_ENCRYPTION_SECRET") ?: "Pl34s3_Ch4ng3!_Th1s_1s_N0t_V3ry_S3c4r3!"
 }
 
@@ -528,8 +533,8 @@ wrapper {
 
 if (project.hasProperty("nodeInstall")) {
     node {
-        version = "20.20.0"
-        npmVersion = "11.11.0"
+        version = "26.13.1"
+        npmVersion = "11.20.0"
         yarnVersion = "1.22.22"
         download = true
     }

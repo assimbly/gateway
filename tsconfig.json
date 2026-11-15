@@ -8,7 +8,6 @@
       "app/shared/alert": ["./src/main/webapp/app/shared/alert/index.ts"],
       "app/shared/auth": ["./src/main/webapp/app/shared/auth/index.ts"],
       "app/shared/date": ["./src/main/webapp/app/shared/date/index.ts"],
-      "app/shared/language": ["./src/main/webapp/app/shared/language/index.ts"],
       "app/shared/pagination": ["./src/main/webapp/app/shared/pagination/index.ts"],
       "app/shared/sort": ["./src/main/webapp/app/shared/sort/index.ts"],
       "*": ["./src/main/webapp/*"]
@@ -31,7 +30,7 @@
     "target": "es2022",
     "module": "es2020",
     "types": [],
-    "lib": ["es2018", "es2020", "es2021", "dom"]
+    "lib": ["es2018", "es2020", "es2021", "es2022", "dom"]
   },
   "references": [
     {

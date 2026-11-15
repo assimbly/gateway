@@ -2,7 +2,6 @@ import { HttpClient } from '@angular/common/http';
 import { Service, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { TranslateService } from '@ngx-translate/core';
 import { Observable, catchError, of, shareReplay, tap } from 'rxjs';
 
 import { serverApiUrl } from 'app/config';
@@ -18,7 +17,6 @@ export class AccountService {
   readonly account = this.userIdentity.asReadonly();
   private accountCache$?: Observable<Account> | null;
 
-  private readonly translateService = inject(TranslateService);
   private readonly http = inject(HttpClient);
   private readonly stateStorageService = inject(StateStorageService);
   private readonly router = inject(Router);
@@ -51,14 +49,6 @@ export class AccountService {
       this.accountCache$ = this.fetch().pipe(
         tap((account: Account) => {
           this.authenticate(account);
-
-          // After retrieve the account info, the language will be changed to
-          // the user's preferred language configured in the account setting
-          // unless user have chosen another language in the current session
-          if (account.langKey && !this.stateStorageService.getLocale()) {
-            this.translateService.use(account.langKey);
-          }
-
           this.themeService.syncFromAccount(account);
 
           this.navigateToStoredUrl();

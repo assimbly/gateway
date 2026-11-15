@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { provideTranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 
 import Health from './health';
@@ -13,12 +12,6 @@ describe('Health', () => {
   let comp: Health;
   let fixture: ComponentFixture<Health>;
   let service: HealthService;
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [provideTranslateService()],
-    });
-  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(Health);

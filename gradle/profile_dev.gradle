@@ -25,7 +25,7 @@ bootRun {
 }
 
 task webapp(type: NpmTask) {
-    inputs.property('appVersion', project.version)
+    inputs.property('type', project.type)
     inputs.files("package-lock.json")
         .withPropertyName('package-lock')
         .withPathSensitivity(PathSensitivity.RELATIVE)
@@ -38,9 +38,6 @@ task webapp(type: NpmTask) {
     inputs.files("tsconfig.json", "tsconfig.base.json")
         .withPropertyName("tsconfig")
         .withPathSensitivity(PathSensitivity.RELATIVE)
-    inputs.dir("webpack/")
-        .withPropertyName("webpack/")
-        .withPathSensitivity(PathSensitivity.RELATIVE)
     inputs.dir("src/main/webapp/")
         .withPropertyName("webapp-source-dir")
         .withPathSensitivity(PathSensitivity.RELATIVE)
@@ -49,9 +46,7 @@ task webapp(type: NpmTask) {
 
     dependsOn npmInstall
 
-    args = ["run", "webapp:build"]
-    environment = [APP_VERSION: project.version]
-    environment = [TYPE: project.type]
+    args = project.type.equalsIgnoreCase("headless") ? ["run", "webapp:headless"] : ["run", "webapp:build"]
 }
 
 processResources {

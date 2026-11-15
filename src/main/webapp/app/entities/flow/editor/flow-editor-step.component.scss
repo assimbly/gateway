@@ -96,6 +96,57 @@
   }
 }
 
+// In the enlarged (full page) Step editor the row is wide: the key keeps a modest width and the value gets the rest.
+:host-context(.flow-designer-tab--full) .option-row {
+  grid-template-columns: minmax(0, 16rem) minmax(0, 1fr) var(--app-btn-height-sm);
+}
+
+// A text area (an expression) is as tall as a text field beside the canvas, where there is no room for more, and can be
+// pulled taller; the enlarged editor gives it its lines.
+[data-field='multiline'] .option-row__value {
+  height: 2.375rem;
+  resize: vertical;
+}
+
+// The enlarged Step editor is as wide as the page, so its fields stop at a width of their own: Component, Path and the
+// Options are as wide as each other. Each Option's menu hangs past that edge, so every value ends where Component and
+// Path end, and the + of the Options is level with the buttons of the fields above.
+@media (min-width: 900px) {
+  :host-context(.flow-designer-tab--full) {
+    .step-field--bounded {
+      max-width: 40rem;
+    }
+
+    .step-field--options {
+      --option-menu-width: calc(var(--app-btn-height-sm) + 0.5rem);
+      max-width: calc(40rem + var(--option-menu-width));
+
+      .step-field__head {
+        padding-right: var(--option-menu-width);
+      }
+    }
+
+    // A tall field: the key and the menu stay level with its first line.
+    .option-row[data-field='multiline'] {
+      align-items: start;
+    }
+
+    // A switch is just the switch and its state, not a box as wide as the value column.
+    [data-field='switch'] .option-row__value {
+      justify-self: start;
+      width: auto;
+      border-color: transparent;
+      background: transparent;
+      padding-inline: 0;
+    }
+
+    // An expression gets room for several lines.
+    [data-field='multiline'] .option-row__value {
+      height: auto;
+    }
+  }
+}
+
 .option-row__required {
   margin-left: 0.125rem;
   color: var(--app-danger);

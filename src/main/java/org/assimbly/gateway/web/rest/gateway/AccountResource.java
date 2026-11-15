@@ -2,9 +2,12 @@ package org.assimbly.gateway.web.rest.gateway;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import org.apache.commons.lang3.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Optional;
+import org.apache.commons.lang3.StringUtils;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.security.PasswordChangeGate;
 import org.assimbly.gateway.domain.User;
@@ -27,10 +30,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import tech.jhipster.config.JHipsterConstants;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Optional;
 
 /**
  * REST controller for managing the current user's account.
@@ -60,13 +59,20 @@ public class AccountResource {
     /** Anyone may create an account: on dev, or when application.security.registration is on. */
     private final boolean registrationOpen;
 
-    public AccountResource(UserRepository userRepository, UserService userService, MailService mailService,
-                           PasswordChangeGate passwordChangeGate, ApplicationProperties applicationProperties, Environment env) {
+    public AccountResource(
+        UserRepository userRepository,
+        UserService userService,
+        MailService mailService,
+        PasswordChangeGate passwordChangeGate,
+        ApplicationProperties applicationProperties,
+        Environment env
+    ) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.mailService = mailService;
         this.passwordChangeGate = passwordChangeGate;
-        this.registrationOpen = applicationProperties.getSecurity().isRegistration() ||
+        this.registrationOpen =
+            applicationProperties.getSecurity().isRegistration() ||
             env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT));
     }
 
@@ -153,11 +159,11 @@ public class AccountResource {
     @Operation(summary = "Update the current user")
     @PostMapping("/account")
     public void saveAccount(@Valid @RequestBody AdminUserDTO userDTO) {
-        String userLogin = SecurityUtils
-            .getCurrentUserLogin()
-            .orElseThrow(() -> new AccountResourceException("Current user login not found"));
+        String userLogin = SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new AccountResourceException("Current user login not found")
+        );
         Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
-        if (existingUser.isPresent() && (!existingUser.orElseThrow().getLogin().equalsIgnoreCase(userLogin))) {
+        if (existingUser.isPresent() && !existingUser.orElseThrow().getLogin().equalsIgnoreCase(userLogin)) {
             throw new EmailAlreadyUsedException();
         }
         Optional<User> user = userRepository.findOneByLogin(userLogin);
@@ -168,7 +174,6 @@ public class AccountResource {
             userDTO.getFirstName(),
             userDTO.getLastName(),
             userDTO.getEmail(),
-            userDTO.getLangKey(),
             userDTO.getImageUrl(),
             userDTO.getThemePreference()
         );
@@ -230,8 +235,8 @@ public class AccountResource {
     private static boolean isPasswordLengthInvalid(String password) {
         return (
             StringUtils.isEmpty(password) ||
-                password.length() < ManagedUserVM.PASSWORD_MIN_LENGTH ||
-                password.length() > ManagedUserVM.PASSWORD_MAX_LENGTH
+            password.length() < ManagedUserVM.PASSWORD_MIN_LENGTH ||
+            password.length() > ManagedUserVM.PASSWORD_MAX_LENGTH
         );
     }
 }

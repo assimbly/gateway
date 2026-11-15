@@ -4,11 +4,14 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 import { ESSENTIALS } from 'app/shared/camel/catalogue';
 
-import { PickedKind, StepPickerComponent } from './step-picker.component';
+import { PickedKind, ROUTER_CATEGORY, StepPickerComponent } from './step-picker.component';
 
 describe('Step picker', () => {
   let fixture: ComponentFixture<StepPickerComponent>;
   let picker: StepPickerComponent;
+
+  /** The ids listed on a tab. */
+  const names = (tab: PickedKind): string[] => picker.matches(tab).map(item => item.name);
 
   beforeEach(() => {
     TestBed.configureTestingModule({ imports: [StepPickerComponent] });
@@ -16,15 +19,18 @@ describe('Step picker', () => {
     fixture = TestBed.createComponent(StepPickerComponent);
     picker = fixture.componentInstance;
     fixture.componentRef.setInput('kinds', ['ACTION', 'ROUTER', 'SINK']);
-    fixture.componentRef.setInput('components', { actions: ['azure-files', 'file', 'log', 'setbody'], sinks: ['azure-files', 'file', 'ftp'] });
+    fixture.componentRef.setInput('components', {
+      actions: ['azure-files', 'file', 'log', 'setbody'],
+      sinks: ['azure-files', 'file', 'ftp'],
+    });
   });
 
   it('lists an exact match first, then the names that start with the search, shortest first', () => {
     picker.filter = 'f';
-    expect(picker.matches('SINK')).toEqual(['ftp', 'file', 'azure-files']);
+    expect(names('SINK')).toEqual(['ftp', 'file', 'azure-files']);
 
     picker.filter = 'file';
-    expect(picker.matches('SINK')).toEqual(['file', 'azure-files', 'ftp']);
+    expect(names('SINK')).toEqual(['file', 'azure-files', 'ftp']);
   });
 
   it('picks the first match of the chosen kind on Enter', () => {
@@ -41,6 +47,7 @@ describe('Step picker', () => {
   it('picks from another kind on Enter when the chosen kind has no match', () => {
     const picked: { kind: PickedKind; componentType: string }[] = [];
     picker.picked.subscribe(p => picked.push(p));
+    picker.activeKind = 'SINK';
     picker.filter = 'content';
 
     picker.pickFirstMatch();
@@ -49,35 +56,76 @@ describe('Step picker', () => {
   });
 
   it('shows a Router by its own name and description, not by a catalogue component with the same id', () => {
-    expect(picker.entry('split', 'ROUTER')).toEqual(expect.objectContaining({ title: 'Split', description: expect.stringContaining('each item') }));
+    expect(picker.entry('split', 'ROUTER')).toEqual(
+      expect.objectContaining({ title: 'Split', description: expect.stringContaining('each item') }),
+    );
     expect(picker.entry('if', 'ROUTER').title).toBe('If / else');
   });
 
   it('finds a Router by words from its name', () => {
     picker.filter = 'else';
 
-    expect(picker.matches('ROUTER')).toEqual(['if']);
+    expect(names('ACTION')).toEqual(['if']);
   });
 
   it("lists Assimbly's own Actions first, and offers them as the Essentials chip", () => {
-    expect(picker.matches('ACTION')[0]).toBe('setbody');
+    expect(names('ACTION')[0]).toBe('setbody');
     expect(picker.essentialsOf('ACTION')).toEqual(['setbody']);
     expect(picker.essentialsOf('SINK')).toEqual([]);
 
     picker.chooseCategory(ESSENTIALS);
 
-    expect(picker.matches('ACTION')).toEqual(['setbody']);
+    expect(names('ACTION')).toEqual(['setbody']);
   });
 
   it('shows Set body by its title', () => {
     expect(picker.entry('setbody').title).toBe('Set body');
   });
 
-  it('lists the most used Routers first', () => {
-    expect(picker.matches('ROUTER').slice(0, 3)).toEqual(['content', 'if', 'split']);
+  describe('with Actions and Routers in one list', () => {
+    it('has no Router tab, as the Routers are listed with the Actions', () => {
+      expect(picker.tabs).toEqual(['ACTION', 'SINK']);
+
+      fixture.componentRef.setInput('kinds', ['ACTION', 'ROUTER']);
+
+      expect(picker.tabs).toEqual(['ACTION']);
+    });
+
+    it('lists the Routers after the Essentials and before the other Actions', () => {
+      expect(picker.matches('ACTION').slice(0, 4)).toEqual([
+        { kind: 'ACTION', name: 'setbody' },
+        { kind: 'ROUTER', name: 'content' },
+        { kind: 'ROUTER', name: 'if' },
+        { kind: 'ROUTER', name: 'split' },
+      ]);
+      expect(names('ACTION')).toEqual(expect.arrayContaining(['azure-files', 'file', 'log']));
+    });
+
+    it('lists only the Routers, the most used first, once the Router chip is chosen', () => {
+      expect(picker.offersRouterChip('ACTION')).toBe(true);
+
+      picker.chooseCategory(ROUTER_CATEGORY);
+
+      expect(picker.matches('ACTION').every(item => item.kind === 'ROUTER')).toBe(true);
+      expect(names('ACTION').slice(0, 3)).toEqual(['content', 'if', 'split']);
+    });
+
+    it('has no Router chip where Routers cannot go', () => {
+      fixture.componentRef.setInput('kinds', ['ACTION', 'SINK']);
+
+      expect(picker.offersRouterChip('ACTION')).toBe(false);
+    });
+
+    it('lists Wiretap as a Router only, not as an Action or Sink', () => {
+      fixture.componentRef.setInput('components', { actions: ['file', 'wiretap'], sinks: ['file', 'wiretap'] });
+      picker.filter = 'wiretap';
+
+      expect(picker.matches('ACTION')).toEqual([{ kind: 'ROUTER', name: 'wiretap' }]);
+      expect(picker.matches('SINK')).toEqual([]);
+    });
   });
 
-  describe('searching for a Router from the Action tab', () => {
+  describe('searching for a Router', () => {
     /** Opens the menu with a search; the menu is rendered in the body. */
     function searchFor(filter: string): HTMLElement[] {
       fixture.detectChanges();
@@ -90,12 +138,18 @@ describe('Step picker', () => {
 
     afterEach(() => fixture.destroy());
 
-    it("offers Split as a Router, not as a catalogue component that can't be used", () => {
+    it('offers Split in the list of Actions, not as a catalogue component that can not be used', () => {
       picker.filter = 'split';
 
-      expect(picker.routerMatches('ACTION')[0]).toBe('split');
+      expect(picker.matches('ACTION')[0]).toEqual({ kind: 'ROUTER', name: 'split' });
       expect(picker.hiddenMatches('ACTION').map(hidden => hidden.name)).not.toContain('split');
-      expect(picker.routerMatches('ROUTER')).toEqual([]);
+      expect(picker.routerMatches('ACTION')).toEqual([]);
+    });
+
+    it('offers Split on the Sink tab too', () => {
+      picker.filter = 'split';
+
+      expect(picker.routerMatches('SINK')[0]).toBe('split');
     });
 
     it('adds a Split Router when it is clicked', () => {

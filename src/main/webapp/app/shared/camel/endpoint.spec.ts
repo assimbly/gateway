@@ -1,4 +1,15 @@
-import { OptionSchema, groupOptions, missingPathParts, pathLabel, pathRule, requiredOptions, splitHttpUrl, suggestedOptions, valueFieldOf, notAnInteger } from './endpoint';
+import {
+  OptionSchema,
+  groupOptions,
+  missingPathParts,
+  pathLabel,
+  pathRule,
+  requiredOptions,
+  splitHttpUrl,
+  suggestedOptions,
+  valueFieldOf,
+  notAnInteger,
+} from './endpoint';
 
 const sftp: Record<string, Omit<OptionSchema, 'name'>> = {
   host: { kind: 'path', displayName: 'Host', group: 'common', type: 'string', required: true, description: 'Hostname of the FTP server' },
@@ -58,10 +69,14 @@ describe('Endpoint editing', () => {
       [{ type: 'enum', enum: ['Override', 'Append'] }, 'choice'],
       [{ type: 'integer' }, 'number'],
       [{ type: 'number' }, 'number'],
+      [{ type: 'object', enum: ['SelectOne', 'SelectList'] }, 'choice'],
       [{ type: 'string', secret: true }, 'secret'],
       [{ type: 'string' }, 'text'],
       [{ name: 'language', type: 'string' }, 'choice'],
-      [{ type: 'duration' }, 'text'],
+      [{ type: 'duration' }, 'duration'],
+      [{ type: 'string', largeInput: true }, 'multiline'],
+      [{ type: 'string', inputLanguage: 'sql' }, 'multiline'],
+      [{ type: 'string', secret: true, largeInput: true }, 'secret'],
       [undefined, 'text'],
     ] as const)('gives an Option of %o a %s field', (option, field) => {
       expect(valueFieldOf(option)).toBe(field);
@@ -132,10 +147,26 @@ describe('Endpoint editing', () => {
         componentType: 'http',
         uri: 'www.dneonline.com/calculator.asmx',
       });
+      expect(splitHttpUrl('http', 'https://0.0.0.0:9001/hello')).toEqual({
+        componentType: 'https',
+        uri: '0.0.0.0:9001/hello',
+      });
+    });
+
+    it('strips leading slashes while keeping the current Component', () => {
+      expect(splitHttpUrl('http', '//0.0.0.0:9001/hello')).toEqual({
+        componentType: 'http',
+        uri: '0.0.0.0:9001/hello',
+      });
+      expect(splitHttpUrl('https', ' //0.0.0.0:9001/hello ')).toEqual({
+        componentType: 'https',
+        uri: '0.0.0.0:9001/hello',
+      });
     });
 
     it('leaves a path without a scheme, or another Component, alone', () => {
       expect(splitHttpUrl('https', 'api.open-meteo.com/v1/forecast')).toBeNull();
+      expect(splitHttpUrl('http', '0.0.0.0:9001/hello')).toBeNull();
       expect(splitHttpUrl('file', 'https://example.com')).toBeNull();
       expect(splitHttpUrl('http', null)).toBeNull();
     });
@@ -143,9 +174,9 @@ describe('Endpoint editing', () => {
 
   describe('Path label', () => {
     it('names the Path field after the one value it takes', () => {
-      expect(pathLabel(pathRule('file:directoryName', [{ name: 'directoryName', kind: 'path', displayName: 'Directory Name' }]).parts)).toBe(
-        'Directory Name',
-      );
+      expect(
+        pathLabel(pathRule('file:directoryName', [{ name: 'directoryName', kind: 'path', displayName: 'Directory Name' }]).parts),
+      ).toBe('Directory Name');
     });
 
     it('names it after the required last part when the optional parts before it can be left out', () => {
@@ -177,8 +208,8 @@ describe('Endpoint editing', () => {
       { name: 'expression', kind: 'parameter', displayName: 'Expression', group: 'common', type: 'string' },
     ];
 
-    it('suggests every Common Option of a Component with only a few Options', () => {
-      expect(suggestedOptions(setbody, 'producer')).toEqual(['expression', 'language']);
+    it('suggests every Common Option of a Component with only a few Options, the language first', () => {
+      expect(suggestedOptions(setbody, 'producer')).toEqual(['language', 'expression']);
     });
 
     it('suggests only the required Options of a Component with many Options', () => {

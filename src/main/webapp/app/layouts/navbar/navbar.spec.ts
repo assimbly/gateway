@@ -4,7 +4,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
-import { provideTranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 
 import { fontAwesomeIcons } from 'app/config/font-awesome-icons';
@@ -45,7 +44,6 @@ describe('Navbar Component', () => {
     authorities: [],
     email: '',
     firstName: 'John',
-    langKey: '',
     lastName: 'Doe',
     login: 'john.doe',
     imageUrl: '',
@@ -56,7 +54,7 @@ describe('Navbar Component', () => {
     stubMatchMedia(true);
     localStorage.removeItem(LayoutService.STORAGE_KEY);
     TestBed.configureTestingModule({
-      providers: [provideTranslateService(), provideRouter([]), provideHttpClient(), provideHttpClientTesting(), LoginService],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting(), LoginService],
     });
   });
 
@@ -187,8 +185,8 @@ describe('Navbar Component', () => {
     accountService.authenticate({ ...account, authorities: ['ROLE_ADMIN'] });
     fixture.detectChanges();
 
-    const labels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#broker-menu-items span')).map(
-      (span: HTMLElement) => span.textContent?.trim(),
+    const labels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#broker-menu-items span')).map((span: HTMLElement) =>
+      span.textContent?.trim(),
     );
     expect(labels).toEqual(['Manage', 'Send', 'Endpoints']);
 
@@ -200,8 +198,8 @@ describe('Navbar Component', () => {
     accountService.authenticate({ ...account, authorities: ['ROLE_ADMIN'] });
     fixture.detectChanges();
 
-    const labels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#broker-menu-items span')).map(
-      (span: HTMLElement) => span.textContent?.trim(),
+    const labels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#broker-menu-items span')).map((span: HTMLElement) =>
+      span.textContent?.trim(),
     );
     expect(labels).toContain('Endpoints');
     expect(labels).not.toContain('Queues');
@@ -224,8 +222,8 @@ describe('Navbar Component', () => {
     fixture.nativeElement.querySelector('#flows-menu').click();
     fixture.detectChanges();
 
-    const labels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#flows-menu-items span')).map(
-      (span: HTMLElement) => span.textContent?.trim(),
+    const labels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#flows-menu-items span')).map((span: HTMLElement) =>
+      span.textContent?.trim(),
     );
     expect(labels).toContain('Variables');
     expect(labels).not.toContain('Environment Variables');
@@ -235,8 +233,8 @@ describe('Navbar Component', () => {
     accountService.authenticate(account);
     fixture.detectChanges();
 
-    const labels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#flows-menu-items span')).map(
-      (span: HTMLElement) => span.textContent?.trim(),
+    const labels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#flows-menu-items span')).map((span: HTMLElement) =>
+      span.textContent?.trim(),
     );
     expect(labels).toContain('Send');
     expect(labels).not.toContain('Test message');
@@ -287,13 +285,10 @@ describe('Navbar Component', () => {
     const items = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#admin-menu-items > *')).map(item =>
       item.textContent?.trim(),
     );
-    // Translated labels render as their keys in this test setup.
-    expect(items.slice(0, 3)).toEqual(['System', 'Gateways', 'Certificates']);
-    expect(items[3]).toContain('userManagement');
-    expect(items[4]).toContain('configuration');
+    expect(items.slice(0, 5)).toEqual(['System', 'Gateways', 'Certificates', 'Users', 'Configuration']);
     const diagnostics = items.indexOf('Diagnostics');
     expect(diagnostics).toBeGreaterThan(4);
-    const database = items.findIndex(item => item?.includes('database'));
+    const database = items.indexOf('Database');
     if (database !== -1) {
       expect(database).toBeLessThan(diagnostics);
     }

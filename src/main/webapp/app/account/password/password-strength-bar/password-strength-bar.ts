@@ -1,10 +1,7 @@
 import { Component, computed, input } from '@angular/core';
 
-import { TranslateDirective } from 'app/shared/language';
-
 @Component({
   selector: 'jhi-password-strength-bar',
-  imports: [TranslateDirective],
   templateUrl: './password-strength-bar.html',
   styleUrl: './password-strength-bar.scss',
 })

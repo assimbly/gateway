@@ -2,31 +2,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { WritableSignal, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-import { MissingTranslationHandler, TranslateService, provideTranslateService } from '@ngx-translate/core';
-
-import { missingTranslationHandler } from '../../config/translation.config';
-
 import { AlertModel, AlertService } from './alert.service';
 
 describe('Alert Service Test', () => {
   let extAlerts: WritableSignal<AlertModel[]>;
   let service: AlertService;
-  let translateService: TranslateService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [
-        provideTranslateService({
-          missingTranslationHandler: {
-            provide: MissingTranslationHandler,
-            useFactory: missingTranslationHandler,
-          },
-        }),
-      ],
-    });
     service = TestBed.inject(AlertService);
-    translateService = TestBed.inject(TranslateService);
-    translateService.setFallbackLang('en');
     vi.useFakeTimers();
     extAlerts = signal([]);
   });
@@ -244,36 +227,6 @@ describe('Alert Service Test', () => {
       expect.objectContaining({
         type: 'info',
         message: 'Hello Jhipster',
-      }),
-    );
-  });
-
-  it('should produce an info message with translated message if key exists', () => {
-    translateService.setTranslation('en', {
-      'hello.jhipster': 'Translated message',
-    });
-    expect(service.addAlert({ type: 'info', message: 'Hello Jhipster', translationKey: 'hello.jhipster' })).toEqual(
-      expect.objectContaining({
-        type: 'info',
-        message: 'Translated message',
-      }),
-    );
-  });
-
-  it('should produce an info message with provided message if key does not exist', () => {
-    expect(service.addAlert({ type: 'info', message: 'Hello Jhipster', translationKey: 'hello.jhipster' })).toEqual(
-      expect.objectContaining({
-        type: 'info',
-        message: 'Hello Jhipster',
-      }),
-    );
-  });
-
-  it('should produce an info message with provided key if translation key does not exist in translations and message is not provided', () => {
-    expect(service.addAlert({ type: 'info', translationKey: 'hello.jhipster' })).toEqual(
-      expect.objectContaining({
-        type: 'info',
-        message: 'hello.jhipster',
       }),
     );
   });

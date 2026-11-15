@@ -7,8 +7,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap/modal';
 import { combineLatest, filter, map, tap } from 'rxjs';
 
 import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config';
-import { Alert, AlertError } from 'app/shared/alert';
-import { TranslateDirective } from 'app/shared/language';
+import { AlertError } from 'app/shared/alert';
 import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
 import { IAuthority } from '../authority.model';
 import { AuthorityDeleteDialog } from '../delete/authority-delete-dialog';
@@ -17,7 +16,7 @@ import { AuthorityService } from '../service/authority.service';
 @Component({
   selector: 'jhi-authority',
   templateUrl: './authority.html',
-  imports: [RouterLink, FontAwesomeModule, AlertError, Alert, SortDirective, SortByDirective, TranslateDirective],
+  imports: [RouterLink, FontAwesomeModule, AlertError, SortDirective, SortByDirective],
 })
 export class Authority {
   sortState = sortStateSignal({});

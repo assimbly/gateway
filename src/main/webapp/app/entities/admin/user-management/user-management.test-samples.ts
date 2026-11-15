@@ -14,7 +14,6 @@ export const sampleWithPartialData: IUserManagement = {
   lastName: 'Dietrich',
   email: 'Janessa44@hotmail.com',
   activated: false,
-  langKey: 'en',
   lastModifiedBy: 'schematise hm',
   lastModifiedDate: dayjs('2019-12-21T12:30'),
 };
@@ -26,7 +25,6 @@ export const sampleWithFullData: IUserManagement = {
   lastName: 'Bode',
   email: 'Rylan_Altenwerth65@hotmail.com',
   activated: false,
-  langKey: 'en',
   imageUrl: 'as vastly than',
   createdBy: 'out absentmindedly',
   createdDate: dayjs('2019-12-21T16:45'),

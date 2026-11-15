@@ -1,4 +1,4 @@
-import { Component, OnDestroy, inject } from '@angular/core';
+import { Component, OnDestroy, computed, inject, input } from '@angular/core';
 
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap/alert';
 
@@ -10,7 +10,16 @@ import { AlertModel, AlertService } from 'app/core/util';
   imports: [NgbAlert],
 })
 export class Alert implements OnDestroy {
-  readonly alerts = inject(AlertService).alerts;
+  /**
+   * Leaves errors out, as the app-wide outlet does: a page shows its own errors, and older pages still raise
+   * the raw HTTP text as an alert.
+   */
+  readonly withoutErrors = input(false);
+
+  readonly alerts = computed(() => {
+    const alerts = this.alertService.alerts();
+    return this.withoutErrors() ? alerts.filter(alert => alert.type !== 'danger') : alerts;
+  });
 
   private readonly alertService = inject(AlertService);
 

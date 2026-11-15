@@ -14,16 +14,21 @@ export interface OptionSchema {
   /** Comma-separated tags, such as `consumer,scheduler`. */
   label?: string;
   type?: string;
+  javaType?: string;
   enum?: readonly string[];
   defaultValue?: unknown;
   required?: boolean;
   secret?: boolean;
+  /** Camel marks an Option that holds a long text, such as a SQL query or a script. */
+  largeInput?: boolean;
+  /** The language such a long text is written in, such as `sql`. */
+  inputLanguage?: string;
 }
 
 export type OptionHeading = 'Common' | 'Advanced' | 'Security';
 const HEADINGS: OptionHeading[] = ['Common', 'Advanced', 'Security'];
 
-export type ValueField = 'switch' | 'choice' | 'number' | 'secret' | 'text';
+export type ValueField = 'switch' | 'choice' | 'number' | 'duration' | 'secret' | 'text' | 'multiline';
 
 function tagsOf(option: OptionSchema): string[] {
   return [option.group ?? '', ...(option.label ?? '').split(',')].map(tag =>
@@ -66,8 +71,19 @@ export function groupOptions<T extends OptionSchema>(properties: T[], role: Endp
 /** The Option that picks the expression language of steps such as Set header and Set body. */
 export const LANGUAGE_OPTION = 'language';
 /** The expression languages a `language` Option offers; Simple is the default. */
-export const EXPRESSION_LANGUAGES: readonly string[] = ['constant', 'simple', 'groovy', 'xpath', 'jsonpath', 'header', 'exchangeProperty', 'javascript'];
+export const EXPRESSION_LANGUAGES: readonly string[] = [
+  'constant',
+  'simple',
+  'groovy',
+  'xpath',
+  'jsonpath',
+  'header',
+  'exchangeProperty',
+  'javascript',
+];
 export const DEFAULT_LANGUAGE = 'simple';
+/** The Options of such a step that hold an expression in that language, which can run over several lines. */
+export const EXPRESSION_OPTIONS: readonly string[] = ['expression', 'value'];
 
 /** The values an Option's value is chosen from: its enum, or the expression languages for a `language` Option without one. */
 export function valueChoicesOf(option: Pick<OptionSchema, 'enum'> & { name?: string }): readonly string[] {
@@ -78,9 +94,14 @@ export function valueChoicesOf(option: Pick<OptionSchema, 'enum'> & { name?: str
 }
 
 /** The field an Option's value is entered in, from its type. An Option the schema doesn't know gets a text field. */
-export function valueFieldOf(option: (Pick<OptionSchema, 'type' | 'enum' | 'secret'> & { name?: string }) | undefined): ValueField {
+export function valueFieldOf(
+  option: (Pick<OptionSchema, 'type' | 'enum' | 'secret' | 'largeInput' | 'inputLanguage'> & { name?: string }) | undefined,
+): ValueField {
   if (option?.secret) {
     return 'secret';
+  }
+  if (option?.largeInput || option?.inputLanguage) {
+    return 'multiline';
   }
   switch (option?.type) {
     case 'boolean':
@@ -90,6 +111,8 @@ export function valueFieldOf(option: (Pick<OptionSchema, 'type' | 'enum' | 'secr
     case 'integer':
     case 'number':
       return 'number';
+    case 'duration':
+      return 'duration';
     default:
       return option && valueChoicesOf(option).length ? 'choice' : 'text';
   }
@@ -118,11 +141,13 @@ export const FEW_OPTIONS = 4;
 /**
  * The Options a new Step starts with as empty rows: the required ones, plus every Common Option when the Component
  * has only a few Options, so a small step such as Set body shows what it needs without searching the key list.
+ * The `language` Option comes first, as the expression that follows is written in it.
  */
 export function suggestedOptions(properties: OptionSchema[], role: EndpointRole): string[] {
   const options = groupOptions(properties, role);
   const common = options.length <= FEW_OPTIONS ? options.filter(option => option.heading === 'Common').map(option => option.name) : [];
-  return [...new Set([...requiredOptions(properties, role), ...common])];
+  const names = [...new Set([...requiredOptions(properties, role), ...common])];
+  return [...names.filter(name => name === LANGUAGE_OPTION), ...names.filter(name => name !== LANGUAGE_OPTION)];
 }
 
 export interface PathPart {
@@ -145,7 +170,12 @@ export function pathRule(syntax: string, properties: OptionSchema[]): PathRule {
   const byName = new Map(properties.filter(p => p.kind === 'path').map(p => [p.name, p]));
   const parts = (rest.match(/[A-Za-z0-9_]+/g) ?? []).map(name => {
     const property = byName.get(name);
-    return { name, displayName: property?.displayName ?? titleOf(name), description: property?.description, required: !!property?.required };
+    return {
+      name,
+      displayName: property?.displayName ?? titleOf(name),
+      description: property?.description,
+      required: !!property?.required,
+    };
   });
   const delimiters = [...new Set(rest.replace(/[A-Za-z0-9_]+/g, ''))].join('');
   return { syntax, parts, delimiters };
@@ -169,16 +199,20 @@ export function pathLabel(parts: PathPart[]): string {
 }
 
 /**
- * A full URL in the path of an HTTP or HTTPS Step, such as one pasted from a browser: the address without its
- * scheme, and the Component that scheme names. Null when the path has no scheme or the Step isn't HTTP(S).
+ * A full or scheme-relative URL in the path of an HTTP or HTTPS Step, such as one pasted from a browser: the address
+ * without its scheme or leading slashes, and the Component that scheme names. Null when the path has neither or the
+ * Step isn't HTTP(S).
  */
-export function splitHttpUrl(componentType: string | null | undefined, path: string | null | undefined): { componentType: string; uri: string } | null {
+export function splitHttpUrl(
+  componentType: string | null | undefined,
+  path: string | null | undefined,
+): { componentType: string; uri: string } | null {
   const type = componentType?.toLowerCase();
-  const match = /^\s*(https?):\/\/(.*)$/i.exec(path ?? '');
+  const match = /^\s*(?:(https?):)?\/\/+(.*)$/i.exec(path ?? '');
   if ((type !== 'http' && type !== 'https') || !match) {
     return null;
   }
-  return { componentType: match[1].toLowerCase(), uri: match[2].trim() };
+  return { componentType: (match[1] ?? type).toLowerCase(), uri: match[2].trim() };
 }
 
 /**

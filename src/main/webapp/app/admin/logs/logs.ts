@@ -4,7 +4,6 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { finalize } from 'rxjs';
 
-import { TranslateDirective } from 'app/shared/language';
 import { SearchToolbar } from 'app/shared/filter';
 import { SortByDirective, SortDirective, SortService, sortStateSignal } from 'app/shared/sort';
 
@@ -15,7 +14,7 @@ import { LogsService } from './logs.service';
   selector: 'jhi-logs',
   templateUrl: './logs.html',
   styleUrl: './logs.scss',
-  imports: [TranslateDirective, FontAwesomeModule, SortDirective, SortByDirective, SlicePipe, NgClass, SearchToolbar],
+  imports: [FontAwesomeModule, SortDirective, SortByDirective, SlicePipe, NgClass, SearchToolbar],
 })
 export default class Logs implements OnInit {
   readonly loggers = signal<Log[] | undefined>(undefined);

@@ -1,5 +1,15 @@
 package org.assimbly.gateway.config.importing;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.assimbly.gateway.domain.*;
 import org.assimbly.gateway.domain.enumeration.LogLevelType;
@@ -14,17 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
 @Service
 @Transactional
 public class ImportXMLFlows {
@@ -35,7 +34,7 @@ public class ImportXMLFlows {
     private IntegrationRepository integrationRepository;
 
     @Autowired
-	private FlowRepository flowRepository;
+    private FlowRepository flowRepository;
 
     @Autowired
     private MessageRepository messageRepository;
@@ -51,19 +50,17 @@ public class ImportXMLFlows {
 
     private Set<Step> steps;
 
-	public void setFlowsFromXML(Document doc, Long integrationId) throws Exception {
-
+    public void setFlowsFromXML(Document doc, Long integrationId) throws Exception {
         log.info("Importing flows");
 
-		List<String> flowIds = ImportXMLUtil.getList(doc, "/dil/integrations/integration/flows/flow/id/text()");
+        List<String> flowIds = ImportXMLUtil.getList(doc, "/dil/integrations/integration/flows/flow/id/text()");
 
-		for (String flowId : flowIds) {
-			setFlowFromXML(doc, integrationId, flowId);
-		}
+        for (String flowId : flowIds) {
+            setFlowFromXML(doc, integrationId, flowId);
+        }
 
         log.info("Importing flows finished");
-
-	}
+    }
 
     /** The Flow's own Variables by key, from {@code <variables><variable><key/><value/></variable></variables>}. */
     private Map<String, String> getVariablesFromXML(Document doc, String flowId, XPath xPath) throws XPathExpressionException {
@@ -79,89 +76,90 @@ public class ImportXMLFlows {
     }
 
     /** Imports the Flow with this DIL id; returns the saved Flow, or null when the Flow or the Integration isn't found. */
-	public Flow setFlowFromXML(Document doc, Long integrationId, String flowId) throws Exception {
-
+    public Flow setFlowFromXML(Document doc, Long integrationId, String flowId) throws Exception {
         log.info("Importing flow: {}", flowId);
 
-		XPath xPath = XPathFactory.newInstance().newXPath();
-		String flowName = xPath.evaluate("//flows/flow[id='" + flowId + "']/name", doc);
-		String flowType = xPath.evaluate("//flows/flow[id='" + flowId + "']/type", doc);
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        String flowName = xPath.evaluate("//flows/flow[id='" + flowId + "']/name", doc);
+        String flowType = xPath.evaluate("//flows/flow[id='" + flowId + "']/type", doc);
         String flowVersion = xPath.evaluate("//flows/flow[id='" + flowId + "']/version", doc);
         String flowNotes = xPath.evaluate("//flows/flow[id='" + flowId + "']/notes", doc);
 
         //options
-		String flowAutostart = xPath.evaluate("//flows/flow[id='" + flowId + "']/options/autostart", doc);
+        String flowAutostart = xPath.evaluate("//flows/flow[id='" + flowId + "']/options/autostart", doc);
         String flowParallelProcessing = xPath.evaluate("//flows/flow[id='" + flowId + "']/options/parallelProcessing", doc);
-		String flowMaximumRedeliveries = xPath.evaluate("//flows/flow[id='" + flowId + "']/options/maximumRedeliveries", doc);
-		String flowRedeliveryDelay = xPath.evaluate("//flows/flow[id='" + flowId + "']/options/redeliveryDelay", doc);
-		String flowLogLevel = xPath.evaluate("//flows/flow[id='" + flowId + "']/options/logLevel", doc);
+        String flowMaximumRedeliveries = xPath.evaluate("//flows/flow[id='" + flowId + "']/options/maximumRedeliveries", doc);
+        String flowRedeliveryDelay = xPath.evaluate("//flows/flow[id='" + flowId + "']/options/redeliveryDelay", doc);
+        String flowLogLevel = xPath.evaluate("//flows/flow[id='" + flowId + "']/options/logLevel", doc);
         String flowLastModified = xPath.evaluate("//flows/flow[id='" + flowId + "']/options/lastModified", doc);
 
-		if (!flowId.isEmpty() && !flowName.isEmpty()) {
-
+        if (!flowId.isEmpty() && !flowName.isEmpty()) {
             Optional<Flow> flowOptional = flowRepository.findByName(flowName);
             Optional<Integration> integrationOptional = integrationRepository.findById(integrationId);
 
             Flow flow;
             if (flowOptional.isEmpty()) {
-				flow = new Flow();
+                flow = new Flow();
 
                 steps = getStepsFromXML(flowId, doc, flow, true);
-
-			} else {
-				flow = flowOptional.get();
-				steps = getStepsFromXML(flow.getId().toString(), doc, flow, false);
-			}
+            } else {
+                flow = flowOptional.get();
+                steps = getStepsFromXML(flow.getId().toString(), doc, flow, false);
+            }
 
             if (integrationOptional.isEmpty()) {
                 log.warn("Integration not found: {}", integrationId);
-				return null;
-			} else {
+                return null;
+            } else {
                 Integration integration = integrationOptional.get();
-				flow.setIntegration(integration);
-			}
+                flow.setIntegration(integration);
+            }
 
             flow.setName(ImportXMLUtil.setStringValue(flowName, flowId));
 
-			flow.setType(ImportXMLUtil.setStringValue(flowType,"connector"));
+            flow.setType(ImportXMLUtil.setStringValue(flowType, "connector"));
 
-			flow.setNotes(ImportXMLUtil.setStringValue(flowNotes,""));
+            flow.setNotes(ImportXMLUtil.setStringValue(flowNotes, ""));
 
             flow.getVariables().clear();
             flow.getVariables().putAll(getVariablesFromXML(doc, flowId, xPath));
 
-			flow.setAutoStart(ImportXMLUtil.setBooleanValue(flowAutostart));
+            flow.setAutoStart(ImportXMLUtil.setBooleanValue(flowAutostart));
 
             flow.setParallelProcessing(ImportXMLUtil.setBooleanValue(flowParallelProcessing));
 
-			flow.setMaximumRedeliveries(ImportXMLUtil.setIntegerValue(flowMaximumRedeliveries, 0));
+            flow.setMaximumRedeliveries(ImportXMLUtil.setIntegerValue(flowMaximumRedeliveries, 0));
 
-			flow.setRedeliveryDelay(ImportXMLUtil.setIntegerValue(flowRedeliveryDelay, 3000));
+            flow.setRedeliveryDelay(ImportXMLUtil.setIntegerValue(flowRedeliveryDelay, 3000));
 
             flow.setVersion(ImportXMLUtil.setIntegerValue(flowVersion, 1));
 
             if (flowLogLevel != null && !flowLogLevel.isEmpty()) {
-				flowLogLevel = flowLogLevel.toUpperCase();
-				if(flowLogLevel.equals("ERROR")||flowLogLevel.equals("WARN")||flowLogLevel.equals("INFO")||flowLogLevel.equals("DEBUG")||flowLogLevel.equals("TRACE")) {
-					flow.setLogLevel(LogLevelType.valueOf(flowLogLevel));
-				}else {
-					flow.setLogLevel(LogLevelType.OFF);
-				}
-			} else {
-				flow.setLogLevel(LogLevelType.OFF);
-			}
+                flowLogLevel = flowLogLevel.toUpperCase();
+                if (
+                    flowLogLevel.equals("ERROR") ||
+                    flowLogLevel.equals("WARN") ||
+                    flowLogLevel.equals("INFO") ||
+                    flowLogLevel.equals("DEBUG") ||
+                    flowLogLevel.equals("TRACE")
+                ) {
+                    flow.setLogLevel(LogLevelType.valueOf(flowLogLevel));
+                } else {
+                    flow.setLogLevel(LogLevelType.OFF);
+                }
+            } else {
+                flow.setLogLevel(LogLevelType.OFF);
+            }
 
             if (flowLastModified != null) {
                 try {
-                    LocalDateTime  lastModifiedDateTime = LocalDateTime.parse(flowLastModified);
+                    LocalDateTime lastModifiedDateTime = LocalDateTime.parse(flowLastModified);
                     ZoneId zone = ZoneId.of("Europe/Berlin");
                     ZoneOffset zoneOffSet = zone.getRules().getOffset(LocalDateTime.now());
                     Instant lastModified = lastModifiedDateTime.toInstant(zoneOffSet);
                     flow.lastModified(lastModified);
                     flow.created(Instant.now());
-                }
-                catch (Exception _)
-                {
+                } catch (Exception _) {
                     flow.lastModified(Instant.now());
                     flow.created(Instant.now());
                 }
@@ -186,70 +184,61 @@ public class ImportXMLFlows {
             log.info("Importing flow finished: " + flowId);
 
             return flow;
-
         } else {
             log.warn("Flow not found: {}", flowId);
             return null;
         }
+    }
 
-	}
-
-	private Set<Step> getStepsFromXML(String id, Document doc, Flow flow, boolean newFlow)
-			throws Exception {
-
-		if (newFlow) {
-
+    private Set<Step> getStepsFromXML(String id, Document doc, Flow flow, boolean newFlow) throws Exception {
+        if (newFlow) {
             steps = new HashSet<>();
-			XPath xPath = XPathFactory.newInstance().newXPath();
-			int numberOfSteps = Integer.parseInt(xPath.evaluate("count(//flows/flow[id='" + id + "']/steps/step)", doc));
-			numberOfSteps = numberOfSteps + 1;
+            XPath xPath = XPathFactory.newInstance().newXPath();
+            int numberOfSteps = Integer.parseInt(xPath.evaluate("count(//flows/flow[id='" + id + "']/steps/step)", doc));
+            numberOfSteps = numberOfSteps + 1;
 
-			for (int i = 1; i < numberOfSteps; i++) {
-				String index = Integer.toString(i);
+            for (int i = 1; i < numberOfSteps; i++) {
+                String index = Integer.toString(i);
                 Step step = getStepFromXML(id, doc, flow, null, index);
-				steps.add(step);
-			}
-		} else {
+                steps.add(step);
+            }
+        } else {
+            steps = flow.getSteps();
 
-			steps = flow.getSteps();
+            Integer index = 1;
 
-			Integer index = 1;
-
-			for (Step step : steps) {
-
+            for (Step step : steps) {
                 XPath xPath = XPathFactory.newInstance().newXPath();
                 id = xPath.evaluate("//flows/flow[name='" + flow.getName() + "']/id", doc);
 
-				step = getStepFromXML(id, doc, flow, step, index.toString());
-				steps.add(step);
-				index++;
-			}
-
-		}
+                step = getStepFromXML(id, doc, flow, step, index.toString());
+                steps.add(step);
+                index++;
+            }
+        }
 
         return steps;
-	}
+    }
 
-	private Step getStepFromXML(String flowId, Document doc, Flow flow, Step step, String index) throws Exception {
+    private Step getStepFromXML(String flowId, Document doc, Flow flow, Step step, String index) throws Exception {
+        XPath xPath = XPathFactory.newInstance().newXPath();
 
-		XPath xPath = XPathFactory.newInstance().newXPath();
-
-		String stepXPath = "/dil/integrations/integration/flows/flow[id='" + flowId + "']/steps/step[" + index + "]/";
+        String stepXPath = "/dil/integrations/integration/flows/flow[id='" + flowId + "']/steps/step[" + index + "]/";
 
         String id = xPath.evaluate(stepXPath + "id", doc);
         String name = xPath.evaluate(stepXPath + "name", doc);
         String type = xPath.evaluate(stepXPath + "type", doc);
-		String uri = xPath.evaluate(stepXPath + "uri", doc);
-		StringBuilder options = new StringBuilder();
-		String connectionId = xPath.evaluate(stepXPath + "blocks/block[type='connection']/id", doc);
-		String messageId = xPath.evaluate(stepXPath + "blocks/block[type='message']/id", doc);
+        String uri = xPath.evaluate(stepXPath + "uri", doc);
+        StringBuilder options = new StringBuilder();
+        String connectionId = xPath.evaluate(stepXPath + "blocks/block[type='connection']/id", doc);
+        String messageId = xPath.evaluate(stepXPath + "blocks/block[type='message']/id", doc);
         String responseIdAsString = xPath.evaluate(stepXPath + "blocks/blockk[type='response']/id", doc);
         String routeIdAsString = xPath.evaluate(stepXPath + "blocks/block[type='route']/id", doc);
         String coordinateX = xPath.evaluate(stepXPath + "coordinates/x", doc);
         String coordinateY = xPath.evaluate(stepXPath + "coordinates/y", doc);
 
         // get type
-		StepType stepType = StepType.valueOf(type.toUpperCase());
+        StepType stepType = StepType.valueOf(type.toUpperCase());
 
         // get componenType & uri
         // The name before the first ':' (or '://') is the component (scheme), the rest is the path.
@@ -270,6 +259,14 @@ public class ImportXMLFlows {
         }
         // Components are listed in lower case, so this is the name that gets selected
         componentType = componentType.strip().replace("-", "").toLowerCase(Locale.ROOT);
+        if (componentType.equals("http") || componentType.equals("https")) {
+            if (path.regionMatches(true, 0, "https://", 0, 8)) {
+                componentType = "https";
+            } else if (path.regionMatches(true, 0, "http://", 0, 7)) {
+                componentType = "http";
+            }
+            path = path.replaceFirst("^(?i)(https?:)?/+", "");
+        }
         uri = path;
 
         // A Response exported for the runtime: its settings come back from its generated message.
@@ -280,108 +277,101 @@ public class ImportXMLFlows {
         }
 
         // get options
-		Map<String, String> optionsMap = ImportXMLUtil.getMap(doc, stepXPath + "options/*");
+        Map<String, String> optionsMap = ImportXMLUtil.getMap(doc, stepXPath + "options/*");
 
-		for (Map.Entry<String, String> entry : optionsMap.entrySet()) {
+        for (Map.Entry<String, String> entry : optionsMap.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
 
-			String key = entry.getKey();
-			String value = entry.getValue();
-
-			if (!options.isEmpty()) {
-				options.append('&').append(key).append('=').append(value);
+            if (!options.isEmpty()) {
+                options.append('&').append(key).append('=').append(value);
             } else {
-				options = new StringBuilder(key).append('=').append(value);
-			}
-
-		}
+                options = new StringBuilder(key).append('=').append(value);
+            }
+        }
 
         // get connection if configured
-		Connection connection;
-		try {
-
+        Connection connection;
+        try {
             Long connectionIdLong = Long.parseLong(connectionId, 10);
 
-            String connectionName = xPath.evaluate("/dil/core/connections/connection[id=" + connectionIdLong + "]/name",doc);
+            String connectionName = xPath.evaluate("/dil/core/connections/connection[id=" + connectionIdLong + "]/name", doc);
 
-            Optional<Connection>connectionOptional = connectionRepository.findByName(connectionName);
+            Optional<Connection> connectionOptional = connectionRepository.findByName(connectionName);
 
-			if(connectionOptional.isPresent()) {
+            if (connectionOptional.isPresent()) {
                 connection = connectionOptional.get();
-            }else {
+            } else {
                 connection = null;
-			}
-		} catch (NumberFormatException _) {
-			connection = null;
-		}
+            }
+        } catch (NumberFormatException _) {
+            connection = null;
+        }
 
-		// get message if configured
-		Message message;
-		try {
-			Long messageIdLong = Long.parseLong(messageId, 10);
-			String messageName = xPath.evaluate("/dil/core/messages/message[id=" + messageIdLong + "]/name",doc);
+        // get message if configured
+        Message message;
+        try {
+            Long messageIdLong = Long.parseLong(messageId, 10);
+            String messageName = xPath.evaluate("/dil/core/messages/message[id=" + messageIdLong + "]/name", doc);
 
             Optional<Message> messageOptional = messageRepository.findByName(messageName);
 
-			if(messageOptional.isPresent()) {
+            if (messageOptional.isPresent()) {
                 message = messageOptional.get();
-			}else {
-				message = null;
-			}
+            } else {
+                message = null;
+            }
+        } catch (NumberFormatException _) {
+            message = null;
+        }
 
-		} catch (NumberFormatException _) {
-			message = null;
-		}
-
-		// get route if configured
+        // get route if configured
         Integer routeId = null;
-        if(StringUtils.isNumeric(routeIdAsString)){
+        if (StringUtils.isNumeric(routeIdAsString)) {
             routeId = Integer.parseInt(routeIdAsString);
         }
 
-		//get responseId if configured
+        //get responseId if configured
         Integer responseId = null;
-        if(StringUtils.isNumeric(responseIdAsString)){
+        if (StringUtils.isNumeric(responseIdAsString)) {
             responseId = Integer.parseInt(responseIdAsString);
         }
 
-		if (step == null) {
-			step = new Step();
-		}
+        if (step == null) {
+            step = new Step();
+        }
 
         step.setStepType(stepType);
 
-		step.setComponentType(componentType);
+        step.setComponentType(componentType);
         step.responseId(responseId);
         step.setUri(uri);
-		step.setFlow(flow);
-		step.setOptions(response != null ? response.toOptions() : options.toString());
+        step.setFlow(flow);
+        step.setOptions(response != null ? response.toOptions() : options.toString());
         step.setCoordinateX(parseCoordinate(coordinateX));
         step.setCoordinateY(parseCoordinate(coordinateY));
 
-
-
         if (name == null || name.isEmpty()) {
             step.setName(id);
-        }else{
+        } else {
             step.setName(name);
         }
 
-		if (connection != null) {
-			step.setConnection(connection);
-		}
-		if (message != null) {
-			step.setMessage(message);
-		}
-		if (routeId != null) {
-			step.setRouteId(routeId);
-		}
-		if(responseId != null){
-		    step.setResponseId(responseId);
+        if (connection != null) {
+            step.setConnection(connection);
+        }
+        if (message != null) {
+            step.setMessage(message);
+        }
+        if (routeId != null) {
+            step.setRouteId(routeId);
+        }
+        if (responseId != null) {
+            step.setResponseId(responseId);
         }
 
         return step;
-
-	}
+    }
 
     /**
      * Links are named {flowId}-{downstreamStepId}: every Step has at most one inbound Link,
@@ -389,7 +379,6 @@ public class ImportXMLFlows {
      * A Link without both ends in this Flow (for example to another Flow) keeps its DIL id.
      */
     public Flow setLinks(Document doc, String flowId, Flow flow) throws XPathExpressionException {
-
         steps = flow.getSteps();
         XPath xPath = XPathFactory.newInstance().newXPath();
 
@@ -413,8 +402,7 @@ public class ImportXMLFlows {
             }
         }
 
-        for(Step step: steps) {
-
+        for (Step step : steps) {
             // set links
             Set<Link> links = new HashSet<>();
 
@@ -423,9 +411,8 @@ public class ImportXMLFlows {
             int numberOfLinks = Integer.parseInt(xPath.evaluate("count(" + stepXPath + "links/link)", doc));
 
             for (int i = 1; i <= numberOfLinks; i++) {
-
                 String linkIndex = Integer.toString(i);
-                String linkXpath =  stepXPath + "links/link[" + linkIndex + "]/";
+                String linkXpath = stepXPath + "links/link[" + linkIndex + "]/";
 
                 String linkBound = xPath.evaluate(linkXpath + "bound", doc);
                 String linkPattern = xPath.evaluate(linkXpath + "pattern", doc);
@@ -446,19 +433,17 @@ public class ImportXMLFlows {
 
                 Optional<Set<Link>> linkSet = linkRepository.findByName(linkName);
 
-
-
                 Link link = null;
-                if(linkSet.isPresent()){
+                if (linkSet.isPresent()) {
                     for (Link existingLink : linkSet.get()) {
-                        if(existingLink.getBound().equals(linkBound)){
+                        if (existingLink.getBound().equals(linkBound)) {
                             link = existingLink;
                         }
                     }
-                    if(link == null){
+                    if (link == null) {
                         link = new Link();
                     }
-                }else{
+                } else {
                     link = new Link();
                 }
 
@@ -474,14 +459,12 @@ public class ImportXMLFlows {
                 link.setStep(step);
 
                 links.add(link);
-
             }
 
             step.setLinks(links);
         }
 
         return flow;
-
     }
 
     /**
@@ -531,7 +514,12 @@ public class ImportXMLFlows {
         boolean hasBody = (Boolean) xPath.evaluate("boolean(" + messageXPath + "body)", doc, XPathConstants.BOOLEAN);
         String body = hasBody ? xPath.evaluate(messageXPath + "body/content", doc) : null;
         String language = hasBody ? xPath.evaluate(messageXPath + "body/language", doc) : null;
-        return new ResponseSettings(status, body == null || body.isEmpty() ? null : body, language == null || language.isEmpty() ? null : language, headers);
+        return new ResponseSettings(
+            status,
+            body == null || body.isEmpty() ? null : body,
+            language == null || language.isEmpty() ? null : language,
+            headers
+        );
     }
 
     private Double parseCoordinate(String coordinate) {
@@ -550,5 +538,4 @@ public class ImportXMLFlows {
         }
         return stepsXPath + "step[id='" + step.getName() + "']/";
     }
-
 }

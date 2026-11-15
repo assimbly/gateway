@@ -38,7 +38,8 @@ def jpackageExecutable = new File(hostJavaHome, isWindowsHost ? 'bin/jpackage.ex
 // start opens the running Gateway (application.gateway.desktop).
 // Ehcache 3 still calls sun.misc.Unsafe (already reported upstream); allow it so JDK 24+ prints no deprecation warning.
 def unsafeMemoryAccessOption = '--sun-misc-unsafe-memory-access=allow'
-def desktopJavaOptions = ['-Xmx2g', '-Dapplication.gateway.desktop=true', unsafeMemoryAccessOption]
+def nativeAccessOption = '--enable-native-access=ALL-UNNAMED'
+def desktopJavaOptions = ['-Xmx2g', '-Dapplication.gateway.desktop=true', unsafeMemoryAccessOption, nativeAccessOption]
 
 def macLauncherCommandContent = { String jarFileName ->
     """#!/bin/bash

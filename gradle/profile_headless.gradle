@@ -16,10 +16,7 @@ task webapp_test(type: NpmTask, dependsOn: "npm_install") {
 }
 
 task webapp(type: NpmTask, dependsOn: "npm_install") {
-    args = ["run", "webapp:prod"]
-    environment = [APP_VERSION: project.version]
-    environment = [TYPE: project.type]
-
+    args = project.type.equalsIgnoreCase("headless") ? ["run", "webapp:headless"] : ["run", "webapp:prod"]
 }
 
 processResources {

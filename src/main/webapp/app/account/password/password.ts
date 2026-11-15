@@ -2,11 +2,9 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { TranslatePipe } from '@ngx-translate/core';
 import { concatMap, filter, tap } from 'rxjs';
 
 import { AccountService } from 'app/core/auth';
-import { TranslateDirective } from 'app/shared/language';
 import { TutorialPanelState } from 'app/tutorials/tutorial-panel.state';
 
 import PasswordStrengthBar from './password-strength-bar/password-strength-bar';
@@ -14,7 +12,7 @@ import { PasswordService } from './password.service';
 
 @Component({
   selector: 'jhi-password',
-  imports: [TranslateDirective, TranslatePipe, ReactiveFormsModule, PasswordStrengthBar],
+  imports: [ReactiveFormsModule, PasswordStrengthBar],
   templateUrl: './password.html',
 })
 export default class Password {

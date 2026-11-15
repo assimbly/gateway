@@ -41,6 +41,6 @@ describe('authInterceptor', () => {
 
   it('sends no token to the public endpoints', () => {
     expect(authorizationOf('/api/authenticate')).toBeNull();
-    expect(authorizationOf('i18n/en.json')).toBeNull();
+    expect(authorizationOf('/management/info')).toBeNull();
   });
 });

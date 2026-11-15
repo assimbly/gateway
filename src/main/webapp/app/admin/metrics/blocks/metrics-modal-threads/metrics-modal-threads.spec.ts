@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap/modal';
-import { provideTranslateService } from '@ngx-translate/core';
 
 import { Thread, ThreadState } from '../../metrics.model';
 
@@ -17,7 +16,7 @@ describe('MetricsModalThreads', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [provideTranslateService(), NgbActiveModal],
+      providers: [NgbActiveModal],
     });
 
     fixture = TestBed.createComponent(MetricsModalThreads);

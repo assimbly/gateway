@@ -622,6 +622,10 @@
                     (deleteStep)="onDeleteStep($event)"
                     (renameStep)="onRenameStep($event.key, $event.name)"
                     (autoArrange)="autoArrangeCanvas()"
+                    [canUndo]="!!designer?.canUndo"
+                    [canRedo]="!!designer?.canRedo"
+                    (undo)="undo()"
+                    (redo)="redo()"
                   ></jhi-flow-canvas>
                   <div
                     class="flow-designer-minimap"
@@ -655,7 +659,12 @@
                   </div>
                 </div>
               }
-              <div class="flow-designer-tab" [class.flow-designer-tab--panel]="tabLayout === 'panel'" [class.d-none]="!tabShown">
+              <div
+                class="flow-designer-tab"
+                [class.flow-designer-tab--panel]="tabLayout === 'panel'"
+                [class.flow-designer-tab--full]="tabLayout === 'full'"
+                [class.d-none]="!tabShown"
+              >
                 @if (viewMode === 'design') {
                   <div class="code-flow-pane" [attr.data-cy]="'design-' + designTab">
                     @if (!canvasShown) {

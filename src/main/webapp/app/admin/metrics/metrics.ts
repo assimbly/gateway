@@ -3,8 +3,6 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { combineLatest } from 'rxjs';
 
-import { TranslateDirective } from 'app/shared/language';
-
 import { JvmMemory } from './blocks/jvm-memory/jvm-memory';
 import { JvmThreads } from './blocks/jvm-threads/jvm-threads';
 import { MetricsCache } from './blocks/metrics-cache/metrics-cache';
@@ -20,7 +18,6 @@ import { MetricsService } from './metrics.service';
   selector: 'jhi-metrics',
   templateUrl: './metrics.html',
   imports: [
-    TranslateDirective,
     FontAwesomeModule,
     JvmMemory,
     JvmThreads,

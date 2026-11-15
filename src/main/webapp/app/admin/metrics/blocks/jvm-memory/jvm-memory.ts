@@ -4,12 +4,11 @@ import { Component, input } from '@angular/core';
 import { NgbProgressbar } from '@ng-bootstrap/ng-bootstrap/progressbar';
 
 import { JvmMetrics } from 'app/admin/metrics/metrics.model';
-import { TranslateDirective } from 'app/shared/language';
 
 @Component({
   selector: 'jhi-jvm-memory',
   templateUrl: './jvm-memory.html',
-  imports: [NgbProgressbar, KeyValuePipe, DecimalPipe, TranslateDirective],
+  imports: [NgbProgressbar, KeyValuePipe, DecimalPipe],
 })
 export class JvmMemory {
   /**

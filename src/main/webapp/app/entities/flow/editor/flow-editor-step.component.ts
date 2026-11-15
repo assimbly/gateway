@@ -38,6 +38,7 @@ import {
 } from 'app/shared/camel/catalogue';
 import {
   DEFAULT_LANGUAGE,
+  EXPRESSION_OPTIONS,
   LANGUAGE_OPTION,
   OptionSchema,
   PathPart,
@@ -431,7 +432,37 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   valueField(idx: number): ValueField {
     const field = valueFieldOf(this.optionSchema(idx) ?? { name: this.optionKey(idx) });
     const value = this.optionValue(idx);
-    return field === 'switch' && value !== '' && value !== 'true' && value !== 'false' ? 'text' : field;
+    if (field === 'switch') {
+      return value !== '' && value !== 'true' && value !== 'false' ? 'text' : field;
+    }
+    return field === 'text' && this.runsOverLines(idx, value) ? 'multiline' : field;
+  }
+
+  /** The rows that held a line break, which keep their text area when it is removed, so the field isn't swapped under the cursor. */
+  private readonly multilineRows = new WeakSet<object>();
+
+  /**
+   * Whether a text value gets a text area: an expression of a step that has a language to write it in, or a text that
+   * already holds a line break (a one-line field would drop it).
+   */
+  private runsOverLines(idx: number, value: string): boolean {
+    const row = this.optionGroup(idx);
+    if (!row) {
+      return false;
+    }
+    if (value.includes('\n')) {
+      this.multilineRows.add(row);
+    }
+    return this.multilineRows.has(row) || (EXPRESSION_OPTIONS.includes(this.optionKey(idx) ?? '') && this.hasLanguageOption);
+  }
+
+  private get hasLanguageOption(): boolean {
+    return ((this.stepForm().get('options') as FormArray)?.controls ?? []).some(option => option.get('key')?.value === LANGUAGE_OPTION);
+  }
+
+  /** The height of an Option's text area: its lines, from three to twelve. */
+  valueRows(idx: number): number {
+    return Math.min(12, Math.max(3, this.optionValue(idx).split('\n').length));
   }
 
   /** Whether the value of an integer Option isn't one; such a Flow isn't saved or started. */
@@ -624,6 +655,18 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
       return true;
     }
     return this.stepType === 'ROUTE' || this.stepType === 'SCRIPT' ? this.deletable() : this.index() > 0;
+  }
+
+  /** What the delete button of this card deletes, in the words of its editor. */
+  get removeLabel(): string {
+    switch (this.stepType) {
+      case 'ROUTE':
+        return 'Delete this Route';
+      case 'SCRIPT':
+        return 'Delete this Script';
+      default:
+        return 'Delete this Step';
+    }
   }
 
   /** A Route, or the Error handler of a Route Flow: a name and a Camel route in XML. */
@@ -845,6 +888,10 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
 
   openPathModal(templateRef: TemplateRef<any>): void {
     this.modalRef = this.modalService.open(templateRef, { size: 'xl' });
+    this.modalRef?.hidden.subscribe(() => {
+      this.normalizeHttpUrl();
+      this.cdr.markForCheck();
+    });
   }
 
   /**
@@ -885,7 +932,7 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
 
   openOptionValueModal(idx: number, templateRef: TemplateRef<any>): void {
     this.editingOption = idx;
-    this.openPathModal(templateRef);
+    this.modalRef = this.modalService.open(templateRef, { size: 'xl' });
     // A value typed in the larger editor only reaches the form, not the row's own field bound to the same control;
     // setting it again once the editor closes shows it in the row too.
     this.modalRef?.hidden.subscribe(() => {

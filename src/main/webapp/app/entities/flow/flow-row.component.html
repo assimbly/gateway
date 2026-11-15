@@ -3,8 +3,11 @@
     <jhi-truncate [text]="flow().name" />
   </a>
   @if (handler(); as handler) {
-    <a class="badge text-bg-light border fw-normal text-decoration-none ms-2" [routerLink]="['/rest-apis', handler.apiId]"
-       [ngbTooltip]="'Handles ' + handler.method + ' ' + handler.fullPath + ' of the API ' + handler.apiName">
+    <a
+      class="badge text-bg-light border fw-normal text-decoration-none ms-2"
+      [routerLink]="['/rest-apis', handler.apiId]"
+      [ngbTooltip]="'Handles ' + handler.method + ' ' + handler.fullPath + ' of the API ' + handler.apiName"
+    >
       <fa-icon icon="plug"></fa-icon> {{ handler.apiName }} · {{ handler.method }} {{ handler.fullPath }}
     </a>
   }
@@ -12,7 +15,9 @@
 <td class="text-muted">{{ typeLabel }}</td>
 <td>
   <div class="d-flex align-items-center gap-2 text-nowrap">
-    <span class="visually-hidden">{{ state.label }}</span>
+    <span class="table-fx-state" data-cy="flow-row-state">
+      <span class="table-fx-state__dot" [attr.data-tone]="state.tone" aria-hidden="true"></span>{{ statusLabel }}
+    </span>
     <jhi-status-controls
       [busy]="disableActionBtns"
       [tone]="state.tone"

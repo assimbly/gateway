@@ -2,8 +2,6 @@ import { type Mock, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Component, ElementRef, WritableSignal, signal, viewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-import { provideTranslateService } from '@ngx-translate/core';
-
 import { Account, AccountService } from 'app/core/auth';
 
 import HasAnyAuthorityDirective from './has-any-authority.directive';
@@ -26,7 +24,6 @@ describe('HasAnyAuthorityDirective tests', () => {
 
     TestBed.configureTestingModule({
       providers: [
-        provideTranslateService(),
         {
           provide: AccountService,
           useValue: {

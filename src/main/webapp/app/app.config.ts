@@ -21,7 +21,6 @@ import { errorHandlerInterceptor } from 'app/core/interceptor/error-handler.inte
 import { notificationInterceptor } from 'app/core/interceptor/notification.interceptor';
 
 import './config/dayjs';
-import { provideTranslation } from 'app/shared/language';
 
 import { AppPageTitleStrategy } from './app-page-title-strategy';
 import routes from './app.routes';
@@ -49,7 +48,6 @@ if (environment.DEBUG_INFO_ENABLED) {
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideTranslation(),
     provideRouter(routes, ...routerFeatures),
     provideHttpClient(withInterceptors([authInterceptor, authExpiredInterceptor, errorHandlerInterceptor, notificationInterceptor])),
     Title,

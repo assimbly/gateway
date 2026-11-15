@@ -27,6 +27,18 @@ export function runtimeStatusOf(reported: string | null | undefined): RuntimeSta
   }
 }
 
+/**
+ * The status word a row takes from a later reading of the runtime, or null to keep what it shows. An Error stays
+ * while the runtime only says the Flow isn't running: the row clears it with the Flow's Alerts.
+ */
+export function polledStatus(shown: RuntimeStatus, reported: string | null | undefined): string | null {
+  const status = runtimeStatusOf(reported);
+  if (status === shown || (shown === 'inactiveError' && status === 'inactive')) {
+    return null;
+  }
+  return reported ?? '';
+}
+
 /** What a row reports about its Flow's runtime state, for the list to sort on. A null count means the Flow never ran. */
 export interface FlowRuntime {
   status: RuntimeStatus;
@@ -37,7 +49,7 @@ export interface FlowRuntime {
 export type FlowAction = 'start' | 'stop' | 'resume' | 'pause' | 'restart';
 
 export interface FlowStatusView {
-  /** The Flow status in words, for the controls' tooltip and screen readers. */
+  /** The Flow status in words, shown beside the controls. */
   label: 'Running' | 'Paused' | 'Stopped' | 'Error';
   /** The colour of the controls, which shows the Flow status. */
   tone: StatusControlsTone;
@@ -153,10 +165,16 @@ export function flowFailureOf(answer: unknown): FlowFailure | null {
     const text = typeof answer === 'string' ? answer.trim() : '';
     return text ? { summary: text, steps: [] } : null;
   }
-  const steps: Array<{ id?: string | number; uri?: string; message: string; status?: string }> = Array.isArray(flow?.steps) ? flow.steps : [];
+  const steps: Array<{ id?: string | number; uri?: string; message: string; status?: string }> = Array.isArray(flow?.steps)
+    ? flow.steps
+    : [];
   const failedSteps = steps
     .filter(step => step?.status === 'error')
-    .map(step => ({ ...(step.id != null && step.id !== '' ? { id: String(step.id) } : {}), uri: step.uri || undefined, message: step.message ?? 'Failed.' }));
+    .map(step => ({
+      ...(step.id != null && step.id !== '' ? { id: String(step.id) } : {}),
+      uri: step.uri || undefined,
+      message: step.message ?? 'Failed.',
+    }));
   const installed = flow?.installed;
   const failed = flow?.status === 'failed' || flow?.status === 'error' || failedSteps.length > 0 || Number(installed?.failed) > 0;
   if (!failed) {
@@ -170,7 +188,10 @@ export function flowFailureOf(answer: unknown): FlowFailure | null {
 }
 
 /** The Steps a failed start names, as problems on the canvas: matched by saved Step id, by Step key. */
-export function failureProblems(steps: ReadonlyArray<{ key: string; id?: number }>, failure: FlowFailure | null): Array<{ stepKey: string; message: string }> {
+export function failureProblems(
+  steps: ReadonlyArray<{ key: string; id?: number }>,
+  failure: FlowFailure | null,
+): Array<{ stepKey: string; message: string }> {
   if (!failure) {
     return [];
   }

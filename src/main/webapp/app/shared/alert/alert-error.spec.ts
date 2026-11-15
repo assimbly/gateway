@@ -3,8 +3,6 @@ import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { WritableSignal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { provideTranslateService } from '@ngx-translate/core';
-
 import { AlertModel, AlertService, EventManager } from 'app/core/util';
 import { MESSAGE_ERROR_HEADER_NAME, MESSAGE_PARAM_HEADER_NAME } from 'app/shared/jhipster/constants';
 import { ProblemWithMessageType } from 'app/shared/jhipster/problem-details';
@@ -19,7 +17,7 @@ describe('Alert Error Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [provideTranslateService(), EventManager, AlertService],
+      providers: [EventManager, AlertService],
     });
   });
 
@@ -40,7 +38,7 @@ describe('Alert Error Component', () => {
       eventManager.broadcast({ name: 'gatewayApp.httpError', content: { status: 0 } });
       // THEN
       expect(comp.alerts()).toHaveLength(1);
-      expect(comp.alerts()[0].translationKey).toBe('error.server.not.reachable');
+      expect(comp.alerts()[0].message).toBe('Server not reachable');
     });
 
     it('should display an alert on status 404', () => {
@@ -48,7 +46,7 @@ describe('Alert Error Component', () => {
       eventManager.broadcast({ name: 'gatewayApp.httpError', content: { status: 404 } });
       // THEN
       expect(comp.alerts()).toHaveLength(1);
-      expect(comp.alerts()[0].translationKey).toBe('error.url.not.found');
+      expect(comp.alerts()[0].message).toBe('Not found');
     });
 
     it('should display an alert on generic error', () => {
@@ -57,8 +55,8 @@ describe('Alert Error Component', () => {
       eventManager.broadcast({ name: 'gatewayApp.httpError', content: { error: 'Second Error Message' } });
       // THEN
       expect(comp.alerts()).toHaveLength(2);
-      expect(comp.alerts()[0].translationKey).toBe('Error Message');
-      expect(comp.alerts()[1].translationKey).toBe('Second Error Message');
+      expect(comp.alerts()[0].message).toBe('Error Message');
+      expect(comp.alerts()[1].message).toBe('Second Error Message');
     });
 
     it('should display an alert on status 400 for generic error', () => {
@@ -79,7 +77,7 @@ describe('Alert Error Component', () => {
       eventManager.broadcast({ name: 'gatewayApp.httpError', content: response });
       // THEN
       expect(comp.alerts()).toHaveLength(1);
-      expect(comp.alerts()[0].translationKey).toBe('error.validation');
+      expect(comp.alerts()[0].message).toBe('error.validation');
     });
 
     it('should display an alert on status 400 for generic error without message', () => {
@@ -93,7 +91,7 @@ describe('Alert Error Component', () => {
       eventManager.broadcast({ name: 'gatewayApp.httpError', content: response });
       // THEN
       expect(comp.alerts()).toHaveLength(1);
-      expect(comp.alerts()[0].translationKey).toBe('Bad Request');
+      expect(comp.alerts()[0].message).toBe('Bad Request');
     });
 
     it('should display an alert on status 400 for invalid parameters', () => {
@@ -115,7 +113,7 @@ describe('Alert Error Component', () => {
       eventManager.broadcast({ name: 'gatewayApp.httpError', content: response });
       // THEN
       expect(comp.alerts()).toHaveLength(1);
-      expect(comp.alerts()[0].translationKey).toBe('error.Size');
+      expect(comp.alerts()[0].message).toBe('Error on field "minField"');
     });
 
     it('should display an alert on status 400 for error headers', () => {
@@ -133,7 +131,7 @@ describe('Alert Error Component', () => {
       eventManager.broadcast({ name: 'gatewayApp.httpError', content: response });
       // THEN
       expect(comp.alerts()).toHaveLength(1);
-      expect(comp.alerts()[0].translationKey).toBe('header.error');
+      expect(comp.alerts()[0].message).toBe('header.error');
     });
 
     it('should display an alert on status 500 with detail', () => {
@@ -152,7 +150,7 @@ describe('Alert Error Component', () => {
       eventManager.broadcast({ name: 'gatewayApp.httpError', content: response });
       // THEN
       expect(comp.alerts()).toHaveLength(1);
-      expect(comp.alerts()[0].translationKey).toBe('error.http.500');
+      expect(comp.alerts()[0].message).toBe('Detailed error message');
     });
   });
 });

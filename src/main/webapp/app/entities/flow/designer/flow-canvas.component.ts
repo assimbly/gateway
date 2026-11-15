@@ -3,19 +3,27 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
-  
   QueryList,
   TemplateRef,
   ViewChild,
   ViewChildren,
   inject,
   output,
-  input
+  input,
 } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
-import { EFMarkerType, FCanvasComponent, FFlowComponent, FFlowModule, FMinimapComponent, FMoveNodesEvent, FSelectionChangeEvent, FZoomDirective } from '@foblex/flow';
+import {
+  EFMarkerType,
+  FCanvasComponent,
+  FFlowComponent,
+  FFlowModule,
+  FMinimapComponent,
+  FMoveNodesEvent,
+  FSelectionChangeEvent,
+  FZoomDirective,
+} from '@foblex/flow';
 
 import { Components } from 'app/shared/camel/component-type';
 
@@ -45,7 +53,8 @@ import { StepRun, StepRunMark, shortDuration } from '../test/flow-test-run';
 import { PickedKind, StepComponents, StepPickerComponent } from './step-picker.component';
 
 /** What is selected on the canvas: a Step, several Steps, the Link leading to a Step, or nothing (the Flow). */
-export type DesignerSelection = { type: 'step'; key: string } | { type: 'steps'; keys: string[] } | { type: 'link'; to: string } | { type: 'flow' };
+export type DesignerSelection =
+  { type: 'step'; key: string } | { type: 'steps'; keys: string[] } | { type: 'link'; to: string } | { type: 'flow' };
 
 /**
  * The visual designer's canvas: draws a Flow graph and reports what the user does with it.
@@ -86,6 +95,11 @@ export class FlowCanvasComponent {
   readonly renameStep = output<{ key: string; name: string }>();
   /** Auto-arrange on the minimap was clicked, to lay the Flow out from left to right. */
   readonly autoArrange = output<void>();
+  /** Whether the editor has a change on the canvas to take back, and one to bring back. */
+  readonly canUndo = input(false);
+  readonly canRedo = input(false);
+  readonly undo = output<void>();
+  readonly redo = output<void>();
 
   @ViewChild(FFlowComponent) private flow?: FFlowComponent;
   @ViewChild(FCanvasComponent) canvas?: FCanvasComponent;
@@ -164,7 +178,8 @@ export class FlowCanvasComponent {
   }
 
   runTitle(run: StepRun): string {
-    const what = run.status === 'failed' ? `Failed: ${run.error ?? 'no message'}` : run.status === 'running' ? 'Still running' : 'Completed';
+    const what =
+      run.status === 'failed' ? `Failed: ${run.error ?? 'no message'}` : run.status === 'running' ? 'Still running' : 'Completed';
     return `${what}. ${shortDuration(run.ownMillis)} in this Step, ${shortDuration(run.totalMillis)} with the Steps after it.`;
   }
 
@@ -174,7 +189,9 @@ export class FlowCanvasComponent {
   }
 
   warningOf(step: DesignStep): string | undefined {
-    const messages = this.warnings().filter(p => p.stepKey === step.key).map(p => p.message);
+    const messages = this.warnings()
+      .filter(p => p.stepKey === step.key)
+      .map(p => p.message);
     return messages.length ? messages.join(' ') : undefined;
   }
 
@@ -236,7 +253,9 @@ export class FlowCanvasComponent {
   }
 
   problemOf(step: DesignStep): string | undefined {
-    const messages = this.problems().filter(p => p.stepKey === step.key).map(p => p.message);
+    const messages = this.problems()
+      .filter(p => p.stepKey === step.key)
+      .map(p => p.message);
     return messages.length ? messages.join(' ') : undefined;
   }
 
@@ -322,7 +341,9 @@ export class FlowCanvasComponent {
   private fit(): void {
     const canvas = this.canvas;
     const flow = this.host.nativeElement.querySelector('f-flow')?.getBoundingClientRect();
-    const nodes = Array.from(this.host.nativeElement.querySelectorAll<HTMLElement>('[data-step-key]'), node => node.getBoundingClientRect());
+    const nodes = Array.from(this.host.nativeElement.querySelectorAll<HTMLElement>('[data-step-key]'), node =>
+      node.getBoundingClientRect(),
+    );
     if (!canvas || !flow?.width || !nodes.length) {
       return;
     }
@@ -388,7 +409,8 @@ export class FlowCanvasComponent {
       const flow = this.host.nativeElement.querySelector('f-flow')?.getBoundingClientRect();
       const node = this.host.nativeElement.querySelector(`[data-step-key="${key}"]`)?.getBoundingClientRect();
       // The room on the right is for the Step's + button.
-      const inView = !!flow && !!node && node.left >= flow.left && node.right + 40 <= flow.right && node.top >= flow.top && node.bottom <= flow.bottom;
+      const inView =
+        !!flow && !!node && node.left >= flow.left && node.right + 40 <= flow.right && node.top >= flow.top && node.bottom <= flow.bottom;
       if (node && !inView) {
         this.canvas?.centerGroupOrNode(key, false);
       }

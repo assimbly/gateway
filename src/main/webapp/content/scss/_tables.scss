@@ -103,6 +103,35 @@ th.table-fx-th-sorted .svg-inline--fa {
   white-space: nowrap;
 }
 
+// A row's status in words with a dot in its colour, as the Flow editor's header shows it. The width fits the
+// longest word, Restarting…, so the controls beside it line up from row to row.
+.table-fx-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-width: 6.5rem;
+}
+
+.table-fx-state__dot {
+  flex-shrink: 0;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--app-text-muted);
+
+  &[data-tone='started'] {
+    background: var(--app-success);
+  }
+
+  &[data-tone='paused'] {
+    background: var(--app-warning);
+  }
+
+  &[data-tone='failed'] {
+    background: var(--app-danger);
+  }
+}
+
 .table-fx-skeleton {
   display: inline-block;
   width: 70%;

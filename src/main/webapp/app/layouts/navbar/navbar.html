@@ -1,20 +1,17 @@
-@let accountRef = account();
-@let iconOnly = layout.iconOnly();
-
-@if (sidebarVisible()) {
+@let accountRef = account(); @let iconOnly = layout.iconOnly(); @if (sidebarVisible()) {
 <aside class="app-sidebar__panel" data-cy="navbar">
   <div class="app-sidebar__header">
     <a
       class="app-sidebar__brand"
       routerLink="/"
       (click)="collapseNavbar()"
-      [attr.aria-label]="iconOnly ? brandTitle() : null"
-      [ngbTooltip]="iconOnly ? brandTitle() : ''"
+      [attr.aria-label]="iconOnly ? 'Gateway' : null"
+      [ngbTooltip]="iconOnly ? 'Gateway' : ''"
       [disableTooltip]="!iconOnly"
       placement="end"
     >
       <img class="app-sidebar__brand-icon" [src]="brandIcon()" alt="" aria-hidden="true" />
-      <span jhiTranslate="global.title" class="app-sidebar__brand-full navbar-title">Gateway</span>
+      <span class="app-sidebar__brand-full navbar-title">Gateway</span>
     </a>
     <button
       type="button"
@@ -40,318 +37,282 @@
   </div>
 
   <nav class="app-sidebar__nav" aria-label="Application">
-    @if (accountRef !== null) {
-      @if (type === 'INTEGRATION' || type === 'FULL') {
-        @if (iconOnly) {
-          <div ngbDropdown class="app-sidebar__group dropend" placement="end" container="body">
-            <button
-              type="button"
-              class="app-sidebar__link app-sidebar__group-toggle"
-              ngbDropdownToggle
-              id="flows-menu"
-              [class.active]="isFlowsActive()"
-              aria-label="Flows"
-            >
-              <fa-icon icon="exchange-alt" [fixedWidth]="true" />
-            </button>
-            <div class="dropdown-menu" ngbDropdownMenu aria-labelledby="flows-menu">
-              <ng-container [ngTemplateOutlet]="flowsLinks" [ngTemplateOutletContext]="{ itemClass: 'dropdown-item' }" />
-            </div>
-          </div>
-        } @else {
-          <div class="app-sidebar__group">
-            <button
-              type="button"
-              class="app-sidebar__link app-sidebar__group-toggle"
-              id="flows-menu"
-              [class.active]="isFlowsActive()"
-              [attr.aria-expanded]="flowsExpanded()"
-              aria-controls="flows-menu-items"
-              (click)="toggleFlows()"
-            >
-              <fa-icon icon="exchange-alt" [fixedWidth]="true" />
-              <span class="app-sidebar__label">Flows</span>
-              <fa-icon class="app-sidebar__chevron" [icon]="flowsExpanded() ? 'chevron-down' : 'chevron-right'" />
-            </button>
-            <div id="flows-menu-items" class="app-sidebar__subnav" [class.app-sidebar__subnav--collapsed]="!flowsExpanded()">
-              <ng-container
-                [ngTemplateOutlet]="flowsLinks"
-                [ngTemplateOutletContext]="{ itemClass: 'app-sidebar__link app-sidebar__link--nested' }"
-              />
-            </div>
-          </div>
-        }
-
-        <a
-          class="app-sidebar__link"
-          routerLink="/rest-apis"
-          [class.active]="isActivePath('/rest-apis')"
-          [attr.aria-label]="iconOnly ? 'APIs' : null"
-          [title]="iconOnly ? 'APIs' : ''"
-          (click)="collapseNavbar()"
-        >
-          <fa-icon icon="plug" [fixedWidth]="true" />
-          @if (!iconOnly) {
-            <span class="app-sidebar__label">APIs</span>
-          }
-        </a>
-
-        <ng-template #flowsLinks let-itemClass="itemClass">
-          <a
-            [class]="itemClass"
-            routerLink="/"
-            [class.active]="isFlowListActive()"
-            (click)="layout.openMenu('flows'); collapseNavbar()"
-          >
-            <fa-icon icon="list" [fixedWidth]="true" />
-            <span>Manage</span>
-          </a>
-          <a
-            [class]="itemClass"
-            routerLink="/flow/message-sender"
-            [class.active]="isActivePath('/flow/message-sender')"
-            (click)="collapseNavbar()"
-          >
-            <fa-icon icon="paper-plane" [fixedWidth]="true" />
-            <span>Send</span>
-          </a>
-          <a
-            [class]="itemClass"
-            routerLink="/environment-variables"
-            [class.active]="isActivePath('/environment-variables')"
-            (click)="collapseNavbar()"
-          >
-            <fa-icon icon="sliders" [fixedWidth]="true" />
-            <span>Variables</span>
-          </a>
-        </ng-template>
-      }
-      @if (type === 'BROKER' || type === 'FULL') {
-        @if (iconOnly) {
-          <div ngbDropdown class="app-sidebar__group dropend" placement="end" container="body">
-            <button
-              type="button"
-              class="app-sidebar__link app-sidebar__group-toggle"
-              ngbDropdownToggle
-              id="broker-menu"
-              [class.active]="isBrokerActive()"
-              aria-label="Broker"
-            >
-              <fa-icon icon="envelope" [fixedWidth]="true" />
-            </button>
-            <div class="dropdown-menu" ngbDropdownMenu aria-labelledby="broker-menu">
-              <ng-container [ngTemplateOutlet]="brokerLinks" [ngTemplateOutletContext]="{ itemClass: 'dropdown-item' }" />
-            </div>
-          </div>
-        } @else {
-          <div class="app-sidebar__group">
-            <button
-              type="button"
-              class="app-sidebar__link app-sidebar__group-toggle"
-              id="broker-menu"
-              [class.active]="isBrokerActive()"
-              [attr.aria-expanded]="brokerExpanded()"
-              aria-controls="broker-menu-items"
-              (click)="toggleBroker()"
-            >
-              <fa-icon icon="envelope" [fixedWidth]="true" />
-              <span class="app-sidebar__label">Broker</span>
-              <fa-icon class="app-sidebar__chevron" [icon]="brokerExpanded() ? 'chevron-down' : 'chevron-right'" />
-            </button>
-            <div id="broker-menu-items" class="app-sidebar__subnav" [class.app-sidebar__subnav--collapsed]="!brokerExpanded()">
-              <ng-container
-                [ngTemplateOutlet]="brokerLinks"
-                [ngTemplateOutletContext]="{ itemClass: 'app-sidebar__link app-sidebar__link--nested' }"
-              />
-            </div>
-          </div>
-        }
-
-        <ng-template #brokerLinks let-itemClass="itemClass">
-          <a
-            [class]="itemClass"
-            routerLink="/broker"
-            [class.active]="isBrokerManageActive()"
-            (click)="collapseNavbar()"
-          >
-            <fa-icon icon="list" [fixedWidth]="true" />
-            <span>Manage</span>
-          </a>
-          <a
-            [class]="itemClass"
-            routerLink="/broker/sender/message-sender"
-            [class.active]="isBrokerSendActive()"
-            (click)="collapseNavbar()"
-          >
-            <fa-icon icon="paper-plane" [fixedWidth]="true" />
-            <span>Send</span>
-          </a>
-          <a
-            [class]="itemClass"
-            routerLink="/queue"
-            [class.active]="isEndpointsActive()"
-            (click)="collapseNavbar()"
-          >
-            <fa-icon icon="inbox" [fixedWidth]="true" />
-            <span>Endpoints</span>
-          </a>
-        </ng-template>
-      }
+    @if (accountRef !== null) { @if (type === 'INTEGRATION' || type === 'FULL') { @if (iconOnly) {
+    <div ngbDropdown class="app-sidebar__group dropend" placement="end" container="body">
+      <button
+        type="button"
+        class="app-sidebar__link app-sidebar__group-toggle"
+        ngbDropdownToggle
+        id="flows-menu"
+        [class.active]="isFlowsActive()"
+        aria-label="Flows"
+      >
+        <fa-icon icon="exchange-alt" [fixedWidth]="true" />
+      </button>
+      <div class="dropdown-menu" ngbDropdownMenu aria-labelledby="flows-menu">
+        <ng-container [ngTemplateOutlet]="flowsLinks" [ngTemplateOutletContext]="{ itemClass: 'dropdown-item' }" />
+      </div>
+    </div>
+    } @else {
+    <div class="app-sidebar__group">
+      <button
+        type="button"
+        class="app-sidebar__link app-sidebar__group-toggle"
+        id="flows-menu"
+        [class.active]="isFlowsActive()"
+        [attr.aria-expanded]="flowsExpanded()"
+        aria-controls="flows-menu-items"
+        (click)="toggleFlows()"
+      >
+        <fa-icon icon="exchange-alt" [fixedWidth]="true" />
+        <span class="app-sidebar__label">Flows</span>
+        <fa-icon class="app-sidebar__chevron" [icon]="flowsExpanded() ? 'chevron-down' : 'chevron-right'" />
+      </button>
+      <div id="flows-menu-items" class="app-sidebar__subnav" [class.app-sidebar__subnav--collapsed]="!flowsExpanded()">
+        <ng-container
+          [ngTemplateOutlet]="flowsLinks"
+          [ngTemplateOutletContext]="{ itemClass: 'app-sidebar__link app-sidebar__link--nested' }"
+        />
+      </div>
+    </div>
     }
 
-    <ng-container *jhiHasAnyAuthority="'ROLE_ADMIN'">
-      @if (openAPIEnabled()) {
-        @if (iconOnly) {
-          <div ngbDropdown class="app-sidebar__group dropend" placement="end" container="body" data-cy="apiMenu">
-            <button
-              type="button"
-              class="app-sidebar__link app-sidebar__group-toggle"
-              ngbDropdownToggle
-              id="api-menu"
-              [class.active]="isApiActive()"
-              aria-label="API Explorer"
-            >
-              <fa-icon icon="code" [fixedWidth]="true" />
-            </button>
-            <div class="dropdown-menu" ngbDropdownMenu aria-labelledby="api-menu">
-              <ng-container [ngTemplateOutlet]="apiLinks" [ngTemplateOutletContext]="{ itemClass: 'dropdown-item' }" />
-            </div>
-          </div>
-        } @else {
-          <div class="app-sidebar__group" data-cy="apiMenu">
-            <button
-              type="button"
-              class="app-sidebar__link app-sidebar__group-toggle"
-              id="api-menu"
-              [class.active]="isApiActive()"
-              [attr.aria-expanded]="apiExpanded()"
-              aria-controls="api-menu-items"
-              (click)="toggleApi()"
-            >
-              <fa-icon icon="code" [fixedWidth]="true" />
-              <span class="app-sidebar__label" jhiTranslate="global.menu.apiExplorer">API Explorer</span>
-              <fa-icon class="app-sidebar__chevron" [icon]="apiExpanded() ? 'chevron-down' : 'chevron-right'" />
-            </button>
-            <div id="api-menu-items" class="app-sidebar__subnav" [class.app-sidebar__subnav--collapsed]="!apiExpanded()">
-              <ng-container
-                [ngTemplateOutlet]="apiLinks"
-                [ngTemplateOutletContext]="{ itemClass: 'app-sidebar__link app-sidebar__link--nested' }"
-              />
-            </div>
-          </div>
-        }
+    <a
+      class="app-sidebar__link"
+      routerLink="/rest-apis"
+      [class.active]="isActivePath('/rest-apis')"
+      [attr.aria-label]="iconOnly ? 'APIs' : null"
+      [title]="iconOnly ? 'APIs' : ''"
+      (click)="collapseNavbar()"
+    >
+      <fa-icon icon="plug" [fixedWidth]="true" />
+      @if (!iconOnly) {
+      <span class="app-sidebar__label">APIs</span>
+      }
+    </a>
 
-        <ng-template #apiLinks let-itemClass="itemClass">
-          @for (definition of apiDefinitions; track definition.id) {
-            <a
-              [class]="itemClass"
-              [routerLink]="[apiExplorerPath, definition.id]"
-              [class.active]="isActivePath(apiExplorerPath + '/' + definition.id)"
-              (click)="collapseNavbar()"
-            >
-              <fa-icon [icon]="definition.icon" [fixedWidth]="true" />
-              <span>{{ definition.label }}</span>
-            </a>
-          }
-        </ng-template>
+    <ng-template #flowsLinks let-itemClass="itemClass">
+      <a [class]="itemClass" routerLink="/" [class.active]="isFlowListActive()" (click)="layout.openMenu('flows'); collapseNavbar()">
+        <fa-icon icon="list" [fixedWidth]="true" />
+        <span>Manage</span>
+      </a>
+      <a
+        [class]="itemClass"
+        routerLink="/flow/message-sender"
+        [class.active]="isActivePath('/flow/message-sender')"
+        (click)="collapseNavbar()"
+      >
+        <fa-icon icon="paper-plane" [fixedWidth]="true" />
+        <span>Send</span>
+      </a>
+      <a
+        [class]="itemClass"
+        routerLink="/environment-variables"
+        [class.active]="isActivePath('/environment-variables')"
+        (click)="collapseNavbar()"
+      >
+        <fa-icon icon="sliders" [fixedWidth]="true" />
+        <span>Variables</span>
+      </a>
+    </ng-template>
+    } @if (type === 'BROKER' || type === 'FULL') { @if (iconOnly) {
+    <div ngbDropdown class="app-sidebar__group dropend" placement="end" container="body">
+      <button
+        type="button"
+        class="app-sidebar__link app-sidebar__group-toggle"
+        ngbDropdownToggle
+        id="broker-menu"
+        [class.active]="isBrokerActive()"
+        aria-label="Broker"
+      >
+        <fa-icon icon="envelope" [fixedWidth]="true" />
+      </button>
+      <div class="dropdown-menu" ngbDropdownMenu aria-labelledby="broker-menu">
+        <ng-container [ngTemplateOutlet]="brokerLinks" [ngTemplateOutletContext]="{ itemClass: 'dropdown-item' }" />
+      </div>
+    </div>
+    } @else {
+    <div class="app-sidebar__group">
+      <button
+        type="button"
+        class="app-sidebar__link app-sidebar__group-toggle"
+        id="broker-menu"
+        [class.active]="isBrokerActive()"
+        [attr.aria-expanded]="brokerExpanded()"
+        aria-controls="broker-menu-items"
+        (click)="toggleBroker()"
+      >
+        <fa-icon icon="envelope" [fixedWidth]="true" />
+        <span class="app-sidebar__label">Broker</span>
+        <fa-icon class="app-sidebar__chevron" [icon]="brokerExpanded() ? 'chevron-down' : 'chevron-right'" />
+      </button>
+      <div id="broker-menu-items" class="app-sidebar__subnav" [class.app-sidebar__subnav--collapsed]="!brokerExpanded()">
+        <ng-container
+          [ngTemplateOutlet]="brokerLinks"
+          [ngTemplateOutletContext]="{ itemClass: 'app-sidebar__link app-sidebar__link--nested' }"
+        />
+      </div>
+    </div>
+    }
+
+    <ng-template #brokerLinks let-itemClass="itemClass">
+      <a [class]="itemClass" routerLink="/broker" [class.active]="isBrokerManageActive()" (click)="collapseNavbar()">
+        <fa-icon icon="list" [fixedWidth]="true" />
+        <span>Manage</span>
+      </a>
+      <a [class]="itemClass" routerLink="/broker/sender/message-sender" [class.active]="isBrokerSendActive()" (click)="collapseNavbar()">
+        <fa-icon icon="paper-plane" [fixedWidth]="true" />
+        <span>Send</span>
+      </a>
+      <a [class]="itemClass" routerLink="/queue" [class.active]="isEndpointsActive()" (click)="collapseNavbar()">
+        <fa-icon icon="inbox" [fixedWidth]="true" />
+        <span>Endpoints</span>
+      </a>
+    </ng-template>
+    } }
+
+    <ng-container *jhiHasAnyAuthority="'ROLE_ADMIN'">
+      @if (openAPIEnabled()) { @if (iconOnly) {
+      <div ngbDropdown class="app-sidebar__group dropend" placement="end" container="body" data-cy="apiMenu">
+        <button
+          type="button"
+          class="app-sidebar__link app-sidebar__group-toggle"
+          ngbDropdownToggle
+          id="api-menu"
+          [class.active]="isApiActive()"
+          aria-label="API Explorer"
+        >
+          <fa-icon icon="code" [fixedWidth]="true" />
+        </button>
+        <div class="dropdown-menu" ngbDropdownMenu aria-labelledby="api-menu">
+          <ng-container [ngTemplateOutlet]="apiLinks" [ngTemplateOutletContext]="{ itemClass: 'dropdown-item' }" />
+        </div>
+      </div>
+      } @else {
+      <div class="app-sidebar__group" data-cy="apiMenu">
+        <button
+          type="button"
+          class="app-sidebar__link app-sidebar__group-toggle"
+          id="api-menu"
+          [class.active]="isApiActive()"
+          [attr.aria-expanded]="apiExpanded()"
+          aria-controls="api-menu-items"
+          (click)="toggleApi()"
+        >
+          <fa-icon icon="code" [fixedWidth]="true" />
+          <span class="app-sidebar__label">API Explorer</span>
+          <fa-icon class="app-sidebar__chevron" [icon]="apiExpanded() ? 'chevron-down' : 'chevron-right'" />
+        </button>
+        <div id="api-menu-items" class="app-sidebar__subnav" [class.app-sidebar__subnav--collapsed]="!apiExpanded()">
+          <ng-container
+            [ngTemplateOutlet]="apiLinks"
+            [ngTemplateOutletContext]="{ itemClass: 'app-sidebar__link app-sidebar__link--nested' }"
+          />
+        </div>
+      </div>
+      }
+
+      <ng-template #apiLinks let-itemClass="itemClass">
+        @for (definition of apiDefinitions; track definition.id) {
+        <a
+          [class]="itemClass"
+          [routerLink]="[apiExplorerPath, definition.id]"
+          [class.active]="isActivePath(apiExplorerPath + '/' + definition.id)"
+          (click)="collapseNavbar()"
+        >
+          <fa-icon [icon]="definition.icon" [fixedWidth]="true" />
+          <span>{{ definition.label }}</span>
+        </a>
+        }
+      </ng-template>
       }
     </ng-container>
 
     <ng-container *jhiHasAnyAuthority="'ROLE_ADMIN'">
       @if (iconOnly) {
-        <div ngbDropdown class="app-sidebar__group app-sidebar__group--divided dropend" placement="end" container="body" data-cy="adminMenu">
-          <button
-            type="button"
-            class="app-sidebar__link app-sidebar__group-toggle"
-            ngbDropdownToggle
-            id="admin-menu"
-            [class.active]="isAdminActive()"
-            aria-label="Administration"
-          >
-            <fa-icon icon="users-cog" [fixedWidth]="true" />
-          </button>
-          <div class="dropdown-menu" ngbDropdownMenu aria-labelledby="admin-menu">
-            <ng-container
-              [ngTemplateOutlet]="adminLinks"
-              [ngTemplateOutletContext]="{ itemClass: 'dropdown-item', sectionClass: 'dropdown-header' }"
-            />
-          </div>
+      <div ngbDropdown class="app-sidebar__group app-sidebar__group--divided dropend" placement="end" container="body" data-cy="adminMenu">
+        <button
+          type="button"
+          class="app-sidebar__link app-sidebar__group-toggle"
+          ngbDropdownToggle
+          id="admin-menu"
+          [class.active]="isAdminActive()"
+          aria-label="Administration"
+        >
+          <fa-icon icon="users-cog" [fixedWidth]="true" />
+        </button>
+        <div class="dropdown-menu" ngbDropdownMenu aria-labelledby="admin-menu">
+          <ng-container
+            [ngTemplateOutlet]="adminLinks"
+            [ngTemplateOutletContext]="{ itemClass: 'dropdown-item', sectionClass: 'dropdown-header' }"
+          />
         </div>
+      </div>
       } @else {
-        <div class="app-sidebar__group app-sidebar__group--divided" data-cy="adminMenu">
-          <button
-            type="button"
-            class="app-sidebar__link app-sidebar__group-toggle"
-            id="admin-menu"
-            [class.active]="isAdminActive()"
-            [attr.aria-expanded]="adminExpanded()"
-            aria-controls="admin-menu-items"
-            (click)="toggleAdmin()"
-          >
-            <fa-icon icon="users-cog" [fixedWidth]="true" />
-            <span class="app-sidebar__label" jhiTranslate="global.menu.admin.main">Administration</span>
-            <fa-icon class="app-sidebar__chevron" [icon]="adminExpanded() ? 'chevron-down' : 'chevron-right'" />
-          </button>
-          <div id="admin-menu-items" class="app-sidebar__subnav" [class.app-sidebar__subnav--collapsed]="!adminExpanded()">
-            <ng-container
-              [ngTemplateOutlet]="adminLinks"
-              [ngTemplateOutletContext]="{ itemClass: 'app-sidebar__link app-sidebar__link--nested', sectionClass: 'app-sidebar__section' }"
-            />
-          </div>
+      <div class="app-sidebar__group app-sidebar__group--divided" data-cy="adminMenu">
+        <button
+          type="button"
+          class="app-sidebar__link app-sidebar__group-toggle"
+          id="admin-menu"
+          [class.active]="isAdminActive()"
+          [attr.aria-expanded]="adminExpanded()"
+          aria-controls="admin-menu-items"
+          (click)="toggleAdmin()"
+        >
+          <fa-icon icon="users-cog" [fixedWidth]="true" />
+          <span class="app-sidebar__label">Administration</span>
+          <fa-icon class="app-sidebar__chevron" [icon]="adminExpanded() ? 'chevron-down' : 'chevron-right'" />
+        </button>
+        <div id="admin-menu-items" class="app-sidebar__subnav" [class.app-sidebar__subnav--collapsed]="!adminExpanded()">
+          <ng-container
+            [ngTemplateOutlet]="adminLinks"
+            [ngTemplateOutletContext]="{ itemClass: 'app-sidebar__link app-sidebar__link--nested', sectionClass: 'app-sidebar__section' }"
+          />
         </div>
+      </div>
       }
 
       <ng-template #adminLinks let-itemClass="itemClass" let-sectionClass="sectionClass">
         <div [class]="sectionClass" id="admin-system-heading">System</div>
-        <a
-          [class]="itemClass"
-          routerLink="/integration"
-          [class.active]="isActivePath('/integration')"
-          (click)="collapseNavbar()"
-        >
+        <a [class]="itemClass" routerLink="/integration" [class.active]="isActivePath('/integration')" (click)="collapseNavbar()">
           <fa-icon icon="tasks" [fixedWidth]="true" />
           <span>Gateways</span>
         </a>
-        <a
-          [class]="itemClass"
-          routerLink="/certificate"
-          [class.active]="isActivePath('/certificate')"
-          (click)="collapseNavbar()"
-        >
+        <a [class]="itemClass" routerLink="/certificate" [class.active]="isActivePath('/certificate')" (click)="collapseNavbar()">
           <fa-icon icon="certificate" [fixedWidth]="true" />
           <span>Certificates</span>
         </a>
+        <a [class]="itemClass" routerLink="/user-management" [class.active]="isActivePath('/user-management')" (click)="collapseNavbar()">
+          <fa-icon icon="users" [fixedWidth]="true" />
+          <span>Users</span>
+        </a>
         <a
           [class]="itemClass"
-          routerLink="/user-management"
-          [class.active]="isActivePath('/user-management')"
+          routerLink="/admin/configuration"
+          [class.active]="isActivePath('/admin/configuration')"
           (click)="collapseNavbar()"
         >
-          <fa-icon icon="users" [fixedWidth]="true" />
-          <span jhiTranslate="global.menu.admin.userManagement">Users</span>
-        </a>
-        <a [class]="itemClass" routerLink="/admin/configuration" [class.active]="isActivePath('/admin/configuration')" (click)="collapseNavbar()">
           <fa-icon icon="cogs" [fixedWidth]="true" />
-          <span jhiTranslate="global.menu.admin.configuration">Configuration</span>
+          <span>Configuration</span>
         </a>
         @if (!inProduction()) {
-          <a [class]="itemClass" href="./h2-console/" target="_blank" rel="noopener noreferrer" (click)="collapseNavbar()">
-            <fa-icon icon="database" [fixedWidth]="true" />
-            <span jhiTranslate="global.menu.admin.database">Database</span>
-          </a>
+        <a [class]="itemClass" href="./h2-console/" target="_blank" rel="noopener noreferrer" (click)="collapseNavbar()">
+          <fa-icon icon="database" [fixedWidth]="true" />
+          <span>Database</span>
+        </a>
         }
         <div [class]="sectionClass" id="admin-diagnostics-heading">Diagnostics</div>
         <a [class]="itemClass" routerLink="/admin/health" [class.active]="isActivePath('/admin/health')" (click)="collapseNavbar()">
           <fa-icon icon="heart" [fixedWidth]="true" />
-          <span jhiTranslate="global.menu.admin.health">Health</span>
+          <span>Health</span>
         </a>
         <a [class]="itemClass" routerLink="/admin/metrics" [class.active]="isActivePath('/admin/metrics')" (click)="collapseNavbar()">
           <fa-icon icon="tachometer-alt" [fixedWidth]="true" />
-          <span jhiTranslate="global.menu.admin.metrics">Metrics</span>
+          <span>Metrics</span>
         </a>
         <a [class]="itemClass" routerLink="/admin/logs" [class.active]="isActivePath('/admin/logs')" (click)="collapseNavbar()">
           <fa-icon icon="file-alt" [fixedWidth]="true" />
-          <span jhiTranslate="global.menu.admin.logs">Logs</span>
+          <span>Logs</span>
         </a>
         <a [class]="itemClass" routerLink="/admin/logviewer" [class.active]="isActivePath('/admin/logviewer')" (click)="collapseNavbar()">
           <fa-icon icon="search" [fixedWidth]="true" />
@@ -362,110 +323,121 @@
     </ng-container>
   </nav>
 
-  @if (accountRef !== null) {
-    @if (type === 'INTEGRATION' || type === 'FULL') {
+  @if (accountRef !== null) { @if (type === 'INTEGRATION' || type === 'FULL') {
+  <button
+    type="button"
+    class="app-sidebar__link"
+    [class.active]="tutorialPanel.open()"
+    [attr.aria-pressed]="tutorialPanel.open()"
+    [attr.aria-label]="iconOnly ? 'Tutorials' : null"
+    [ngbTooltip]="iconOnly ? 'Tutorials' : ''"
+    [disableTooltip]="!iconOnly"
+    placement="end"
+    (click)="tutorialPanel.toggle(); collapseNavbar()"
+    data-cy="tutorials"
+  >
+    <fa-icon icon="graduation-cap" [fixedWidth]="true" />
+    @if (!iconOnly) {
+    <span class="app-sidebar__label">Tutorials</span>
+    }
+  </button>
+  }
+  <a
+    class="app-sidebar__link app-sidebar__upgrade"
+    routerLink="/fluxygen"
+    [class.active]="isActivePath('/fluxygen')"
+    [attr.aria-label]="iconOnly ? 'Upgrade to Fluxygen' : null"
+    [ngbTooltip]="iconOnly ? 'Upgrade to Fluxygen' : ''"
+    [disableTooltip]="!iconOnly"
+    placement="end"
+    (click)="collapseNavbar()"
+    data-cy="fluxygen"
+  >
+    <fa-icon icon="rocket" [fixedWidth]="true" />
+    @if (!iconOnly) {
+    <span class="app-sidebar__label">Upgrade to Fluxygen</span>
+    }
+  </a>
+
+  <div class="app-sidebar__account" data-cy="accountMenu">
+    @if (iconOnly) {
+    <div ngbDropdown class="app-sidebar__group dropend" placement="end" container="body">
       <button
         type="button"
-        class="app-sidebar__link"
-        [class.active]="tutorialPanel.open()"
-        [attr.aria-pressed]="tutorialPanel.open()"
-        [attr.aria-label]="iconOnly ? 'Tutorials' : null"
-        [ngbTooltip]="iconOnly ? 'Tutorials' : ''"
+        class="app-sidebar__link app-sidebar__group-toggle"
+        ngbDropdownToggle
+        id="account-menu"
+        [class.active]="isAccountActive()"
+        aria-label="Account"
+        [ngbTooltip]="'Account'"
         [disableTooltip]="!iconOnly"
         placement="end"
-        (click)="tutorialPanel.toggle(); collapseNavbar()"
-        data-cy="tutorials"
       >
-        <fa-icon icon="graduation-cap" [fixedWidth]="true" />
-        @if (!iconOnly) {
-          <span class="app-sidebar__label">Tutorials</span>
+        @if (!accountRef.imageUrl) {
+        <fa-icon icon="user" [fixedWidth]="true" />
+        } @else {
+        <img [src]="accountRef.imageUrl" class="profile-image rounded-circle" alt="Avatar" />
         }
       </button>
-    }
-    <a
-      class="app-sidebar__link app-sidebar__upgrade"
-      routerLink="/fluxygen"
-      [class.active]="isActivePath('/fluxygen')"
-      [attr.aria-label]="iconOnly ? 'Upgrade to Fluxygen' : null"
-      [ngbTooltip]="iconOnly ? 'Upgrade to Fluxygen' : ''"
-      [disableTooltip]="!iconOnly"
-      placement="end"
-      (click)="collapseNavbar()"
-      data-cy="fluxygen"
-    >
-      <fa-icon icon="rocket" [fixedWidth]="true" />
-      @if (!iconOnly) {
-        <span class="app-sidebar__label">Upgrade to Fluxygen</span>
-      }
-    </a>
-
-    <div class="app-sidebar__account" data-cy="accountMenu">
-      @if (iconOnly) {
-        <div ngbDropdown class="app-sidebar__group dropend" placement="end" container="body">
-          <button
-            type="button"
-            class="app-sidebar__link app-sidebar__group-toggle"
-            ngbDropdownToggle
-            id="account-menu"
-            [class.active]="isAccountActive()"
-            aria-label="Account"
-            [ngbTooltip]="'Account'"
-            [disableTooltip]="!iconOnly"
-            placement="end"
-          >
-            @if (!accountRef.imageUrl) {
-              <fa-icon icon="user" [fixedWidth]="true" />
-            } @else {
-              <img [src]="accountRef.imageUrl" class="profile-image rounded-circle" alt="Avatar" />
-            }
-          </button>
-          <div class="dropdown-menu" ngbDropdownMenu aria-labelledby="account-menu">
-            <ng-container [ngTemplateOutlet]="accountLinks" [ngTemplateOutletContext]="{ itemClass: 'dropdown-item' }" />
-          </div>
-        </div>
-      } @else {
-        <div class="app-sidebar__group">
-          <button
-            type="button"
-            class="app-sidebar__link app-sidebar__group-toggle"
-            id="account-menu"
-            [class.active]="isAccountActive()"
-            [attr.aria-expanded]="accountExpanded()"
-            aria-controls="account-menu-items"
-            (click)="toggleAccount()"
-          >
-            @if (!accountRef.imageUrl) {
-              <fa-icon icon="user" [fixedWidth]="true" />
-            } @else {
-              <img [src]="accountRef.imageUrl" class="profile-image rounded-circle" alt="Avatar" />
-            }
-            <span class="app-sidebar__label" jhiTranslate="global.menu.account.main">Account</span>
-            <fa-icon class="app-sidebar__chevron" [icon]="accountExpanded() ? 'chevron-down' : 'chevron-right'" />
-          </button>
-          <div id="account-menu-items" class="app-sidebar__subnav" [class.app-sidebar__subnav--collapsed]="!accountExpanded()">
-            <ng-container
-              [ngTemplateOutlet]="accountLinks"
-              [ngTemplateOutletContext]="{ itemClass: 'app-sidebar__link app-sidebar__link--nested' }"
-            />
-          </div>
-        </div>
-      }
-
-      <ng-template #accountLinks let-itemClass="itemClass">
-        <a [class]="itemClass" routerLink="/account/settings" [class.active]="isActivePath('/account/settings')" (click)="collapseNavbar()" data-cy="settings">
-          <fa-icon icon="wrench" [fixedWidth]="true" />
-          <span jhiTranslate="global.menu.account.settings">Settings</span>
-        </a>
-        <a [class]="itemClass" routerLink="/account/password" [class.active]="isActivePath('/account/password')" (click)="collapseNavbar()" data-cy="passwordItem">
-          <fa-icon icon="lock" [fixedWidth]="true" />
-          <span jhiTranslate="global.menu.account.password">Password</span>
-        </a>
-        <a [class]="itemClass" (click)="logout()" id="logout" data-cy="logout">
-          <fa-icon icon="sign-out-alt" [fixedWidth]="true" />
-          <span jhiTranslate="global.menu.account.logout">Log out</span>
-        </a>
-      </ng-template>
+      <div class="dropdown-menu" ngbDropdownMenu aria-labelledby="account-menu">
+        <ng-container [ngTemplateOutlet]="accountLinks" [ngTemplateOutletContext]="{ itemClass: 'dropdown-item' }" />
+      </div>
     </div>
+    } @else {
+    <div class="app-sidebar__group">
+      <button
+        type="button"
+        class="app-sidebar__link app-sidebar__group-toggle"
+        id="account-menu"
+        [class.active]="isAccountActive()"
+        [attr.aria-expanded]="accountExpanded()"
+        aria-controls="account-menu-items"
+        (click)="toggleAccount()"
+      >
+        @if (!accountRef.imageUrl) {
+        <fa-icon icon="user" [fixedWidth]="true" />
+        } @else {
+        <img [src]="accountRef.imageUrl" class="profile-image rounded-circle" alt="Avatar" />
+        }
+        <span class="app-sidebar__label">Account</span>
+        <fa-icon class="app-sidebar__chevron" [icon]="accountExpanded() ? 'chevron-down' : 'chevron-right'" />
+      </button>
+      <div id="account-menu-items" class="app-sidebar__subnav" [class.app-sidebar__subnav--collapsed]="!accountExpanded()">
+        <ng-container
+          [ngTemplateOutlet]="accountLinks"
+          [ngTemplateOutletContext]="{ itemClass: 'app-sidebar__link app-sidebar__link--nested' }"
+        />
+      </div>
+    </div>
+    }
+
+    <ng-template #accountLinks let-itemClass="itemClass">
+      <a
+        [class]="itemClass"
+        routerLink="/account/settings"
+        [class.active]="isActivePath('/account/settings')"
+        (click)="collapseNavbar()"
+        data-cy="settings"
+      >
+        <fa-icon icon="wrench" [fixedWidth]="true" />
+        <span>Settings</span>
+      </a>
+      <a
+        [class]="itemClass"
+        routerLink="/account/password"
+        [class.active]="isActivePath('/account/password')"
+        (click)="collapseNavbar()"
+        data-cy="passwordItem"
+      >
+        <fa-icon icon="lock" [fixedWidth]="true" />
+        <span>Password</span>
+      </a>
+      <a [class]="itemClass" (click)="logout()" id="logout" data-cy="logout">
+        <fa-icon icon="sign-out-alt" [fixedWidth]="true" />
+        <span>Log out</span>
+      </a>
+    </ng-template>
+  </div>
   }
 </aside>
 }

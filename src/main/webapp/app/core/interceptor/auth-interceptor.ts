@@ -6,12 +6,7 @@ import { serverApiUrl } from 'app/config';
 import { AuthServerProvider } from 'app/core/auth';
 
 function isPublicUnauthenticatedUrl(url: string): boolean {
-  return (
-    url.includes('/i18n/') ||
-    url.includes('i18n/') ||
-    url.includes('/management/info') ||
-    url.includes('/api/authenticate')
-  );
+  return url.includes('/management/info') || url.includes('/api/authenticate');
 }
 
 /** Whether the request goes to the app's own host or its API server: no other host may receive the token. */

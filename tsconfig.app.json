@@ -4,6 +4,6 @@
     "outDir": "./build/out-tsc/app",
     "types": ["node", "@angular/localize"]
   },
-  "files": ["src/main/webapp/main.ts"],
+  "files": ["src/main/webapp/main.ts", "src/main/webapp/polyfills.ts"],
   "include": ["src/main/webapp/**/*.d.ts"]
 }

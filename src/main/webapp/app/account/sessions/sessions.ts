@@ -3,14 +3,13 @@ import { Component, OnInit, inject } from '@angular/core';
 import { EMPTY, catchError, concatMap, tap } from 'rxjs';
 
 import { Account, AccountService } from 'app/core/auth';
-import { TranslateDirective } from 'app/shared/language';
 
 import { Session } from './session.model';
 import { SessionsService } from './sessions.service';
 
 @Component({
   selector: 'jhi-sessions',
-  imports: [DatePipe, TranslateDirective],
+  imports: [DatePipe],
   templateUrl: './sessions.html',
 })
 export default class Sessions implements OnInit {

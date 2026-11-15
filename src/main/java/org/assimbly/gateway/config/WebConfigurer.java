@@ -19,7 +19,6 @@ import tech.jhipster.config.JHipsterConstants;
 import tech.jhipster.config.JHipsterProperties;
 import tech.jhipster.config.h2.H2ConfigurationHelper;
 
-
 /**
  * Configuration of web application with Servlet 3.0 APIs.
  */
@@ -43,7 +42,10 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
             log.info("Web application configuration, using profiles: {}", (Object[]) env.getActiveProfiles());
         }
 
-        if (env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT))) {
+        if (
+            env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT)) &&
+            Boolean.TRUE.equals(env.getProperty("spring.h2.console.enabled", Boolean.class, false))
+        ) {
             initH2Console(servletContext);
         }
         log.info("Web application fully configured");
@@ -57,7 +59,7 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
         // When running in an IDE or with ./mvnw spring-boot:run, set location of the static web assets.
     }
 
-     @Bean
+    @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = jHipsterProperties.getCors();

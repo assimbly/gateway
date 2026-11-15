@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { provideTranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 
 import { Account, AccountService } from 'app/core/auth';
@@ -35,7 +34,6 @@ describe('Settings', () => {
     lastName: 'Doe',
     activated: true,
     email: 'john.doe@mail.com',
-    langKey: 'en',
     login: 'john',
     authorities: [],
     imageUrl: '',
@@ -47,7 +45,6 @@ describe('Settings', () => {
     localStorage.removeItem(ThemeService.STORAGE_KEY);
     TestBed.configureTestingModule({
       providers: [
-        provideTranslateService(),
         {
           provide: AccountService,
           useValue: {
@@ -72,7 +69,6 @@ describe('Settings', () => {
       firstName: 'John',
       lastName: 'Doe',
       email: 'john.doe@mail.com',
-      langKey: 'en',
     };
 
     // WHEN

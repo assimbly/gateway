@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { provideTranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 
 import Metrics from './metrics';
@@ -12,12 +11,6 @@ describe('Metrics', () => {
   let comp: Metrics;
   let fixture: ComponentFixture<Metrics>;
   let service: MetricsService;
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [provideTranslateService()],
-    });
-  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(Metrics);

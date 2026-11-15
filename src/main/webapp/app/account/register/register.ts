@@ -3,17 +3,14 @@ import { AfterViewInit, Component, ElementRef, inject, signal, viewChild } from 
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-
 import { EMAIL_ALREADY_USED_TYPE, LOGIN_ALREADY_USED_TYPE } from 'app/shared/jhipster/error.constants';
-import { TranslateDirective } from 'app/shared/language';
 import PasswordStrengthBar from '../password/password-strength-bar/password-strength-bar';
 
 import { RegisterService } from './register.service';
 
 @Component({
   selector: 'jhi-register',
-  imports: [TranslateDirective, TranslatePipe, RouterLink, ReactiveFormsModule, PasswordStrengthBar],
+  imports: [RouterLink, ReactiveFormsModule, PasswordStrengthBar],
   templateUrl: './register.html',
 })
 export default class Register implements AfterViewInit {
@@ -49,7 +46,6 @@ export default class Register implements AfterViewInit {
     }),
   });
 
-  private readonly translateService = inject(TranslateService);
   private readonly registerService = inject(RegisterService);
 
   ngAfterViewInit(): void {
@@ -66,7 +62,7 @@ export default class Register implements AfterViewInit {
     if (password === confirmPassword) {
       const { login, email } = this.registerForm.getRawValue();
       this.registerService
-        .save({ login, email, password, langKey: this.translateService.getCurrentLang() ?? 'en' })
+        .save({ login, email, password })
         .subscribe({ next: () => this.success.set(true), error: response => this.processError(response) });
     } else {
       this.doNotMatch.set(true);

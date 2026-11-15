@@ -1,38 +1,88 @@
-<div ngbDropdown container="body" placement="bottom-start bottom-end" autoClose="outside" class="d-inline-block"
-     (openChange)="onOpenChange($event)">
+<div
+  ngbDropdown
+  container="body"
+  placement="bottom-start bottom-end"
+  autoClose="outside"
+  class="d-inline-block"
+  (openChange)="onOpenChange($event)"
+>
   <button #toggle type="button" class="flow-plus" ngbDropdownToggle [attr.aria-label]="title()" [title]="title()">
     <fa-icon icon="plus"></fa-icon>
   </button>
   <div ngbDropdownMenu class="step-picker" [style.max-height.px]="maxHeight">
-    <input #search type="search" class="form-control form-control-sm" placeholder="Search components…" aria-label="Search components"
-           [(ngModel)]="filter" (keydown.enter)="$event.preventDefault(); pickFirstMatch()" />
-    <div class="step-picker-kinds" role="tablist">
-      @for (k of kinds(); track k) {
-        <button type="button" role="tab" class="step-picker-kind" [class.active]="k === kind" [attr.aria-selected]="k === kind"
-                (click)="activeKind = k; category = null; search.focus({ preventScroll: true })">
-          {{ labels[k] }}
-          @if (filter) {
-            <span class="step-picker-count">{{ matches(k).length }}</span>
-          }
-        </button>
-      }
-    </div>
+    <input
+      #search
+      type="search"
+      class="form-control form-control-sm"
+      placeholder="Search components…"
+      aria-label="Search components"
+      [(ngModel)]="filter"
+      (keydown.enter)="$event.preventDefault(); pickFirstMatch()"
+    />
+    @if (tabs.length > 1) {
+      <div class="step-picker-kinds" role="tablist">
+        @for (k of tabs; track k) {
+          <button
+            type="button"
+            role="tab"
+            class="step-picker-kind"
+            [class.active]="k === kind"
+            [attr.aria-selected]="k === kind"
+            (click)="activeKind = k; category = null; search.focus({ preventScroll: true })"
+          >
+            {{ labels[k] }}
+            @if (filter) {
+              <span class="step-picker-count">{{ matches(k).length }}</span>
+            }
+          </button>
+        }
+      </div>
+    }
     @if (kind !== 'ROUTER') {
       <div class="step-picker-chips" aria-label="Categories">
         @if (essentialsOf(kind).length) {
-          <button type="button" class="step-picker-chip" [class.active]="category === essentials" [attr.aria-pressed]="category === essentials"
-                  title="Assimbly's own Actions that work on the message, such as Set body or XML to JSON"
-                  (click)="chooseCategory(essentials)">
+          <button
+            type="button"
+            class="step-picker-chip"
+            [class.active]="category === essentials"
+            [attr.aria-pressed]="category === essentials"
+            title="Assimbly's own Actions that work on the message, such as Set body or XML to JSON"
+            (click)="chooseCategory(essentials)"
+          >
             Essentials <span class="step-picker-count">{{ essentialsOf(kind).length }}</span>
           </button>
         }
         @if (recentOf(kind).length) {
-          <button type="button" class="step-picker-chip" [class.active]="category === 'recent'" [attr.aria-pressed]="category === 'recent'"
-                  (click)="chooseCategory('recent')">Recently used</button>
+          <button
+            type="button"
+            class="step-picker-chip"
+            [class.active]="category === 'recent'"
+            [attr.aria-pressed]="category === 'recent'"
+            (click)="chooseCategory('recent')"
+          >
+            Recently used
+          </button>
+        }
+        @if (offersRouterChip(kind)) {
+          <button
+            type="button"
+            class="step-picker-chip"
+            [class.active]="category === routerCategory"
+            [attr.aria-pressed]="category === routerCategory"
+            title="Steps that send messages down one or more Branches, such as Split or If / else"
+            (click)="chooseCategory(routerCategory)"
+          >
+            Router <span class="step-picker-count">{{ routerCount }}</span>
+          </button>
         }
         @for (chip of showAllCategories ? chips(kind).shown.concat(chips(kind).more) : chips(kind).shown; track chip.label) {
-          <button type="button" class="step-picker-chip" [class.active]="category === chip.label" [attr.aria-pressed]="category === chip.label"
-                  (click)="chooseCategory(chip.label)">
+          <button
+            type="button"
+            class="step-picker-chip"
+            [class.active]="category === chip.label"
+            [attr.aria-pressed]="category === chip.label"
+            (click)="chooseCategory(chip.label)"
+          >
             {{ chip.label }} <span class="step-picker-count">{{ chip.count }}</span>
           </button>
         }
@@ -44,10 +94,16 @@
       </div>
     }
     <div class="step-picker-list" role="listbox" [attr.aria-label]="labels[kind] + ' components'">
-      @for (name of matches(kind); track name) {
-        @let item = entry(name, kind);
-        <button type="button" role="option" class="step-picker-item" [title]="item.description ?? ''" (click)="pick(kind, name)">
-          <span class="step-picker-item-title">{{ item.title ?? name }}</span>
+      @for (match of matches(kind); track match.kind + ':' + match.name) {
+        @let name = match.name;
+        @let item = entry(name, match.kind);
+        <button type="button" role="option" class="step-picker-item" [title]="item.description ?? ''" (click)="pick(match.kind, name)">
+          <span class="step-picker-item-title">
+            {{ item.title ?? name }}
+            @if (match.kind === 'ROUTER' && kind !== 'ROUTER') {
+              <span class="step-picker-item-tag">{{ labels.ROUTER }}</span>
+            }
+          </span>
           @if (item.title) {
             <span class="step-picker-item-id">{{ name }}</span>
           }
@@ -56,13 +112,17 @@
           }
         </button>
       } @empty {
-        <div class="step-picker-empty">No {{ labels[kind] | lowercase }} matches "{{ filter }}".</div>
+        <div class="step-picker-empty">
+          No {{ listsRouters(kind) && kind !== 'ROUTER' ? 'components' : (labels[kind] | lowercase) }} match "{{ filter }}".
+        </div>
       }
       @if (kinds().includes('ROUTER')) {
         @for (name of routerMatches(kind); track name) {
           @let item = entry(name, 'ROUTER');
           <button type="button" role="option" class="step-picker-item" [title]="item.description ?? ''" (click)="pick('ROUTER', name)">
-            <span class="step-picker-item-title">{{ item.title ?? name }} <span class="step-picker-item-tag">{{ labels.ROUTER }}</span></span>
+            <span class="step-picker-item-title"
+              >{{ item.title ?? name }} <span class="step-picker-item-tag">{{ labels.ROUTER }}</span></span
+            >
             <span class="step-picker-item-id">{{ name }}</span>
             @if (item.description) {
               <span class="step-picker-item-description">{{ item.description }}</span>

@@ -4,12 +4,11 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap/modal';
 
 import { Thread, ThreadState } from 'app/admin/metrics/metrics.model';
-import { TranslateDirective } from 'app/shared/language';
 
 @Component({
   selector: 'jhi-thread-modal',
   templateUrl: './metrics-modal-threads.html',
-  imports: [FontAwesomeModule, TranslateDirective],
+  imports: [FontAwesomeModule],
 })
 export class MetricsModalThreads implements OnInit {
   ThreadState = ThreadState;

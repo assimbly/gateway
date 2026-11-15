@@ -18,7 +18,14 @@ import { SCRIPT_LANGUAGES, ScriptTrial } from './script-flow';
 /** The step editor with the text inputs every Flow editor binds, before a test sets its own. */
 function createStep(): ComponentFixture<FlowEditorStepComponent> {
   const created = TestBed.createComponent(FlowEditorStepComponent);
-  for (const name of ['activeEditor', 'uriPopoverMessage', 'componentTypeCamelLink', 'connectionType', 'errorHandlerPopoverMessage', 'optionsPopoverMessage']) {
+  for (const name of [
+    'activeEditor',
+    'uriPopoverMessage',
+    'componentTypeCamelLink',
+    'connectionType',
+    'errorHandlerPopoverMessage',
+    'optionsPopoverMessage',
+  ]) {
     created.componentRef.setInput(name, '');
   }
   return created;
@@ -136,6 +143,8 @@ describe('Flow editor Component Step', () => {
   const bridgeErrorHandler = { name: 'bridgeErrorHandler', displayName: 'Bridge error handler', type: 'boolean', defaultValue: false };
   const expression = { name: 'expression', displayName: 'Expression', type: 'string' };
   const timeout = { name: 'timeout', displayName: 'Timeout', type: 'integer' };
+  const delay = { name: 'delay', displayName: 'Delay', type: 'duration' };
+  const query = { name: 'query', displayName: 'Query', type: 'string', largeInput: true, inputLanguage: 'sql' };
 
   function render(
     componentType: string,
@@ -170,18 +179,32 @@ describe('Flow editor Component Step', () => {
         componentType: new FormControl(componentType),
         uri: new FormControl(''),
         options: new FormArray(
-          options.map(option => new FormGroup({ key: new FormControl(option.key), value: new FormControl(option.value), defaultValue: new FormControl('') })),
+          options.map(
+            option =>
+              new FormGroup({ key: new FormControl(option.key), value: new FormControl(option.value), defaultValue: new FormControl('') }),
+          ),
         ),
       }),
     );
-    fixture.componentRef.setInput('stepOptions', options.map(option => ({ ...option })));
-    fixture.componentRef.setInput('componentOptions', [bridgeErrorHandler, expression, timeout]);
+    fixture.componentRef.setInput(
+      'stepOptions',
+      options.map(option => ({ ...option })),
+    );
+    fixture.componentRef.setInput('componentOptions', [bridgeErrorHandler, expression, timeout, delay, query]);
     fixture.componentRef.setInput('uriPlaceholder', uriPlaceholder);
     fixture.detectChanges();
   }
 
   function pathField(): HTMLInputElement {
     return fixture.nativeElement.querySelector('#field_uri_1');
+  }
+
+  function valueControl(row: number): HTMLElement {
+    return fixture.nativeElement.querySelector(`#field_options-value-1-${row}`);
+  }
+
+  function fieldKind(row: number): string | undefined {
+    return (valueControl(row).closest('.option-row') as HTMLElement).dataset['field'];
   }
 
   afterEach(() => document.body.querySelectorAll('.dropdown-menu').forEach(menu => menu.remove()));
@@ -265,10 +288,15 @@ describe('Flow editor Component Step', () => {
   });
 
   it('shows each Variable with its value, hides an encrypted value, and sets Manage Variables apart', () => {
-    render('file', 'file:directoryName', [], [
-      { key: 'messages', value: 'C:/Users/me/messages', encrypted: false },
-      { key: 'password', value: 'ENC(abc)', encrypted: true },
-    ]);
+    render(
+      'file',
+      'file:directoryName',
+      [],
+      [
+        { key: 'messages', value: 'C:/Users/me/messages', encrypted: false },
+        { key: 'password', value: 'ENC(abc)', encrypted: true },
+      ],
+    );
 
     (fixture.nativeElement.querySelector('[aria-label="Insert a Variable"]') as HTMLButtonElement).click();
     fixture.detectChanges();
@@ -286,10 +314,15 @@ describe('Flow editor Component Step', () => {
   });
 
   it('shows the values of the Variables a Path or Option refers to when hovering it', () => {
-    render('file', 'file:directoryName', [{ key: 'expression', value: 'x=@{password}' }], [
-      { key: 'messages', value: 'C:/Users/me/messages', encrypted: false },
-      { key: 'password', value: 'ENC(abc)', encrypted: true },
-    ]);
+    render(
+      'file',
+      'file:directoryName',
+      [{ key: 'expression', value: 'x=@{password}' }],
+      [
+        { key: 'messages', value: 'C:/Users/me/messages', encrypted: false },
+        { key: 'password', value: 'ENC(abc)', encrypted: true },
+      ],
+    );
 
     pathField().value = '@{messages}/in';
     pathField().dispatchEvent(new Event('input'));
@@ -316,6 +349,70 @@ describe('Flow editor Component Step', () => {
     fixture.detectChanges();
     expect(pathField().title).toBe('@{messages} = /flow/messages\n@{inbox} = /flow/in');
     expect(fixture.componentInstance.unknownVariablesWarning).toBeUndefined();
+  });
+
+  describe('value fields', () => {
+    it('gives each Option the field of its type', () => {
+      render('file', 'file:directoryName', [
+        { key: 'bridgeErrorHandler', value: '' },
+        { key: 'timeout', value: '1000' },
+        { key: 'delay', value: '5s' },
+        { key: 'expression', value: '${body}' },
+        { key: 'query', value: 'select 1' },
+      ]);
+
+      expect([0, 1, 2, 3, 4].map(fieldKind)).toEqual(['switch', 'number', 'duration', 'text', 'multiline']);
+      expect(valueControl(2).tagName).toBe('INPUT');
+      expect(valueControl(3).tagName).toBe('INPUT');
+      expect(valueControl(4).tagName).toBe('TEXTAREA');
+    });
+
+    it('gives the expression of a step with a language a text area', () => {
+      render('setbody', '', [
+        { key: 'language', value: 'simple' },
+        { key: 'expression', value: '${body}' },
+      ]);
+
+      expect(fieldKind(1)).toBe('multiline');
+      expect(valueControl(1).tagName).toBe('TEXTAREA');
+      expect((valueControl(1) as HTMLTextAreaElement).rows).toBe(3);
+    });
+
+    it('grows the text area with its lines, up to twelve', () => {
+      render('setbody', '', [
+        { key: 'language', value: 'simple' },
+        { key: 'expression', value: Array.from({ length: 20 }, (_, line) => `line ${line}`).join('\n') },
+      ]);
+
+      expect((valueControl(1) as HTMLTextAreaElement).rows).toBe(12);
+    });
+
+    it('keeps a text field for an expression with no language to write it in', () => {
+      render('file', 'file:directoryName', [{ key: 'expression', value: '${body}' }]);
+
+      expect(valueControl(0).tagName).toBe('INPUT');
+    });
+
+    it('gives a text with a line break a text area, and keeps it when the break is removed', () => {
+      render('file', 'file:directoryName', [{ key: 'expression', value: 'one\ntwo' }]);
+      expect(valueControl(0).tagName).toBe('TEXTAREA');
+
+      fixture.componentInstance.optionGroup(0)!.get('value')!.setValue('onetwo');
+      fixture.detectChanges();
+
+      expect(valueControl(0).tagName).toBe('TEXTAREA');
+    });
+
+    it('offers the larger editor for a text area as for a text field', () => {
+      render('file', 'file:directoryName', [
+        { key: 'query', value: 'select 1' },
+        { key: 'timeout', value: '1000' },
+      ]);
+
+      expect(menuItem(0, 'Edit in a larger editor')).toBeDefined();
+      document.body.querySelectorAll('.dropdown-menu').forEach(menu => menu.remove());
+      expect(menuItem(1, 'Edit in a larger editor')).toBeUndefined();
+    });
   });
 
   function menuItem(row: number, text: string): HTMLButtonElement {
@@ -355,14 +452,20 @@ describe('Flow editor Router Step', () => {
         componentType: new FormControl('split'),
         uri: new FormControl(''),
         options: new FormArray(
-          options.map(option => new FormGroup({ key: new FormControl(option.key), value: new FormControl(option.value), defaultValue: new FormControl('') })),
+          options.map(
+            option =>
+              new FormGroup({ key: new FormControl(option.key), value: new FormControl(option.value), defaultValue: new FormControl('') }),
+          ),
         ),
       }),
     );
     fixture.componentRef.setInput('onCanvas', true);
     fixture.componentRef.setInput('routerTitle', 'Split');
     fixture.componentRef.setInput('conditionBranch', 'split');
-    fixture.componentRef.setInput('stepOptions', options.map(option => ({ ...option })));
+    fixture.componentRef.setInput(
+      'stepOptions',
+      options.map(option => ({ ...option })),
+    );
     fixture.componentRef.setInput('componentOptions', [language, expression, streaming]);
     fixture.detectChanges();
     return fixture.componentInstance;
@@ -509,7 +612,7 @@ describe('Flow editor Route Step', () => {
     fixture.componentRef.setInput('draggable', true);
     fixture.detectChanges();
 
-    expect(remove().getAttribute('aria-label')).toBe('Remove route');
+    expect(remove().getAttribute('aria-label')).toBe('Delete this Route');
     expect(fixture.nativeElement.querySelector('.step-card__drag')).not.toBeNull();
   });
 
@@ -567,7 +670,7 @@ describe('Flow editor Route Step', () => {
     fixture.componentRef.setInput('draggable', true);
     fixture.detectChanges();
 
-    expect(remove().getAttribute('aria-label')).toBe('Remove step');
+    expect(remove().getAttribute('aria-label')).toBe('Delete this Script');
     expect(drag().getAttribute('aria-label')).toBe('Drag to move this Script');
   });
 

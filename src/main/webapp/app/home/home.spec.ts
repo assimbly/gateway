@@ -2,8 +2,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 
-import { provideTranslateService } from '@ngx-translate/core';
-
 import { AccountService } from 'app/core/auth';
 
 import Home from './home';
@@ -16,7 +14,6 @@ describe('Home Component', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        provideTranslateService(),
         {
           provide: AccountService,
         },

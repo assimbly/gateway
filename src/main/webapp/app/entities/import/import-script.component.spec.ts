@@ -5,7 +5,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
-import { provideTranslateService } from '@ngx-translate/core';
 
 import { fontAwesomeIcons } from 'app/config/font-awesome-icons';
 
@@ -21,12 +20,7 @@ describe('Import a script', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        provideRouter([{ path: 'flow/editor/:id', component: EditorStub }]),
-        provideHttpClient(),
-        provideHttpClientTesting(),
-        provideTranslateService(),
-      ],
+      providers: [provideRouter([{ path: 'flow/editor/:id', component: EditorStub }]), provideHttpClient(), provideHttpClientTesting()],
     });
     TestBed.inject(FaIconLibrary).addIcons(...fontAwesomeIcons);
     fixture = TestBed.createComponent(ImportScriptComponent);
@@ -38,7 +32,9 @@ describe('Import a script', () => {
   afterEach(() => http.verify());
 
   it('offers the languages of the script editor alphabetically, with Groovy chosen', () => {
-    const options = Array.from<HTMLOptionElement>(fixture.nativeElement.querySelectorAll('#import-script-language option')).map(o => o.value);
+    const options = Array.from<HTMLOptionElement>(fixture.nativeElement.querySelectorAll('#import-script-language option')).map(
+      o => o.value,
+    );
 
     expect(options).toEqual(['datasonnet', 'groovy', 'jactl', 'javascript', 'jslt', 'python', 'simple', 'xslt']);
     expect(page.language()).toBe('groovy');

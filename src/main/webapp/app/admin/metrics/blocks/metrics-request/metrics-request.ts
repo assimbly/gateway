@@ -5,12 +5,11 @@ import { NgbProgressbar } from '@ng-bootstrap/ng-bootstrap/progressbar';
 
 import { HttpServerRequests } from 'app/admin/metrics/metrics.model';
 import { filterNaN } from 'app/core/util';
-import { TranslateDirective } from 'app/shared/language';
 
 @Component({
   selector: 'jhi-metrics-request',
   templateUrl: './metrics-request.html',
-  imports: [NgbProgressbar, KeyValuePipe, DecimalPipe, TranslateDirective],
+  imports: [NgbProgressbar, KeyValuePipe, DecimalPipe],
 })
 export class MetricsRequest {
   /**

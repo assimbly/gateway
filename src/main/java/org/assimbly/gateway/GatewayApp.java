@@ -1,6 +1,16 @@
 package org.assimbly.gateway;
 
 import jakarta.annotation.PostConstruct;
+import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
 import org.apache.commons.lang3.StringUtils;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.config.CommandsUtil;
@@ -16,24 +26,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.liquibase.autoconfigure.LiquibaseProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.liquibase.autoconfigure.LiquibaseProperties;
 import org.springframework.core.env.Environment;
 import tech.jhipster.config.JHipsterConstants;
 
-import java.io.IOException;
-import java.lang.management.ManagementFactory;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-
 // @SpringBootApplication
-@SpringBootApplication(scanBasePackages = { "org.assimbly.gateway", "org.assimbly.cookies", "org.assimbly.gateway.web.rest.integration", "org.assimbly.brokerrest", "org.assimbly.integrationrest" })
+@SpringBootApplication(scanBasePackages = { "org.assimbly.gateway", "org.assimbly.brokerrest", "org.assimbly.integrationrest" })
 @EnableConfigurationProperties({ LiquibaseProperties.class, ApplicationProperties.class, EncryptionProperties.class })
 public class GatewayApp {
 
@@ -113,7 +112,6 @@ public class GatewayApp {
     }
 
     private static String logApplicationStartup(Environment env) {
-
         String protocol = "http";
         if (env.getProperty("server.ssl.key-store") != null) {
             protocol = "https";
@@ -124,8 +122,8 @@ public class GatewayApp {
         String encryptionPassword = env.getProperty("encryption.jasypt.password");
         String encryptionAlgorithm = env.getProperty("encryption.jasypt.algorithm");
 
-        if(encryptionPassword!=null && encryptionAlgorithm != null){
-           new EncryptionUtil(encryptionPassword, encryptionAlgorithm);
+        if (encryptionPassword != null && encryptionAlgorithm != null) {
+            new EncryptionUtil(encryptionPassword, encryptionAlgorithm);
         }
 
         List<String> risks = SecuritySummary.risks(env);
@@ -145,7 +143,7 @@ public class GatewayApp {
 
         long vmStartTime = ManagementFactory.getRuntimeMXBean().getStartTime();
 
-        long startupTime = ((System.currentTimeMillis() - vmStartTime) / 1000);
+        long startupTime = (System.currentTimeMillis() - vmStartTime) / 1000;
 
         String applicationName = "Assimbly";
         String applicationVersion = env.getProperty("application.info.version");
@@ -154,7 +152,7 @@ public class GatewayApp {
         String javaVersion = Runtime.version().toString();
         String javaWorkingDirectory = Path.of(".").toAbsolutePath().normalize().toString();
 
-       log.info(
+        log.info(
             """
 
 
@@ -186,7 +184,7 @@ public class GatewayApp {
             serverPort,
             contextPath,
             applicationStartupTime
-           );
+        );
 
         String localUrl = protocol + "://localhost:" + serverPort + contextPath;
         try {
@@ -201,10 +199,12 @@ public class GatewayApp {
         if (!env.getProperty("application.gateway.open-browser", Boolean.class, true)) {
             return;
         }
-        if (Arrays.asList(env.getActiveProfiles()).contains("headless")
-            || "true".equalsIgnoreCase(System.getenv("CI"))
-            || System.getenv("CONTAINER") != null
-            || Files.exists(Path.of("/.dockerenv"))) {
+        if (
+            Arrays.asList(env.getActiveProfiles()).contains("headless") ||
+            "true".equalsIgnoreCase(System.getenv("CI")) ||
+            System.getenv("CONTAINER") != null ||
+            Files.exists(Path.of("/.dockerenv"))
+        ) {
             return;
         }
         openBrowser(url);

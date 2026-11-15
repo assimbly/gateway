@@ -1,5 +1,7 @@
 package org.assimbly.gateway.config;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 import org.assimbly.gateway.config.security.PasswordChangeFilter;
 import org.assimbly.gateway.config.security.PasswordChangeGate;
 import org.assimbly.gateway.security.AuthoritiesConstants;
@@ -28,26 +30,51 @@ import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWrite
 import tech.jhipster.config.JHipsterConstants;
 import tech.jhipster.config.JHipsterProperties;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 @Configuration
 @EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfiguration {
 
     private static final String[] STATIC_RESOURCES = {
-        "/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico", "/static/**", "/public/**", "/resources/**",
-        "/*.js", "/*.txt", "/*.json", "/*.map", "/*.css", "/*.ico", "/*.png", "/*.svg", "/*.webapp",
-        "/index.html", "/app/**", "/i18n/**", "/content/**"
+        "/css/**",
+        "/js/**",
+        "/images/**",
+        "/webjars/**",
+        "/favicon.ico",
+        "/static/**",
+        "/public/**",
+        "/resources/**",
+        "/*.js",
+        "/*.txt",
+        "/*.json",
+        "/*.map",
+        "/*.css",
+        "/*.ico",
+        "/*.png",
+        "/*.svg",
+        "/*.webapp",
+        "/index.html",
+        "/app/**",
+        "/content/**",
+        "/media/**",
     };
 
     // Only whether the Gateway is up and what it is
     private static final String[] PUBLIC_ACTUATOR_ENDPOINTS = {
-        "/health/**", "/management/health", "/management/health/**", "/management/info"
+        "/health/**",
+        "/management/health",
+        "/management/health/**",
+        "/management/info",
     };
 
     private static final String[] OPEN_MODE_ENDPOINTS = {
-        "/v3/api-docs/**", "/swagger-ui/**", "/management/prometheus", "/management/jhiopenapigroups",
-        "/management/jolokia", "/management/jolokia/**", "/management/hawtio", "/management/metrics"
+        "/v3/api-docs/**",
+        "/swagger-ui/**",
+        "/management/prometheus",
+        "/management/jhiopenapigroups",
+        "/management/jolokia",
+        "/management/jolokia/**",
+        "/management/hawtio",
+        "/management/metrics",
     };
 
     private static final String API = "/api/**";
@@ -63,8 +90,13 @@ public class SecurityConfiguration {
     // The headless endpoints check their own credentials (Basic header or their own JWT).
     private final boolean secured;
 
-    public SecurityConfiguration(Environment env, JHipsterProperties jHipsterProperties, ApplicationProperties applicationProperties,
-                                 JwtAuthenticationConverter jwtAuthenticationConverter, PasswordChangeGate passwordChangeGate) {
+    public SecurityConfiguration(
+        Environment env,
+        JHipsterProperties jHipsterProperties,
+        ApplicationProperties applicationProperties,
+        JwtAuthenticationConverter jwtAuthenticationConverter,
+        PasswordChangeGate passwordChangeGate
+    ) {
         this.jHipsterProperties = jHipsterProperties;
         this.security = applicationProperties.getSecurity();
         this.jwtAuthenticationConverter = jwtAuthenticationConverter;
@@ -84,8 +116,7 @@ public class SecurityConfiguration {
     @SuppressWarnings("java:S4502")
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) {
-        http
-            .cors(withDefaults())
+        http.cors(withDefaults())
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .headers(this::securityHeaders)
@@ -117,11 +148,16 @@ public class SecurityConfiguration {
     // The first matching rule wins, so the order of these rules matters
     private void authorizeRequests(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authz) {
         authz
-            .requestMatchers(STATIC_RESOURCES).permitAll()
-            .requestMatchers(HttpMethod.POST, "/api/authenticate").permitAll()
-            .requestMatchers(HttpMethod.GET, "/api/account/first-sign-in").permitAll()
-            .requestMatchers("/api/account/reset-password/init", "/api/account/reset-password/finish").permitAll()
-            .requestMatchers(PUBLIC_ACTUATOR_ENDPOINTS).permitAll();
+            .requestMatchers(STATIC_RESOURCES)
+            .permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/authenticate")
+            .permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/account/first-sign-in")
+            .permitAll()
+            .requestMatchers("/api/account/reset-password/init", "/api/account/reset-password/finish")
+            .permitAll()
+            .requestMatchers(PUBLIC_ACTUATOR_ENDPOINTS)
+            .permitAll();
 
         if (!secured || security.isRegistration()) {
             authz.requestMatchers("/api/register", "/api/activate").permitAll();
@@ -141,26 +177,28 @@ public class SecurityConfiguration {
             authz.requestMatchers("/management/prometheus").permitAll();
         }
         authz
-            .requestMatchers(API).authenticated()
+            .requestMatchers(API)
+            .authenticated()
             // Swagger UI itself is static, and the API Explorer frames it; the API description needs a sign-in
-            .requestMatchers("/swagger-ui/**").permitAll()
-            .requestMatchers("/v3/api-docs/**").authenticated()
+            .requestMatchers("/swagger-ui/**")
+            .permitAll()
+            .requestMatchers("/v3/api-docs/**")
+            .authenticated()
             // Configuration, environment, threads, JMX (Jolokia): administrators only
-            .requestMatchers(MANAGEMENT).hasAuthority(AuthoritiesConstants.ADMIN);
+            .requestMatchers(MANAGEMENT)
+            .hasAuthority(AuthoritiesConstants.ADMIN);
     }
 
     // On dev and headless the API is open, so Swagger UI and curl work without logging in
     private void openAccess(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authz) {
         if (development) {
             authz
-                .requestMatchers("/h2-console/**").permitAll()
+                .requestMatchers("/h2-console/**")
+                .permitAll()
                 // The UI still logs in: it asks the account to know who is logged in
-                .requestMatchers("/api/account", "/api/account/**").authenticated();
+                .requestMatchers("/api/account", "/api/account/**")
+                .authenticated();
         }
-        authz
-            .requestMatchers(API).permitAll()
-            .requestMatchers(OPEN_MODE_ENDPOINTS).permitAll()
-            .requestMatchers(MANAGEMENT).authenticated();
+        authz.requestMatchers(API).permitAll().requestMatchers(OPEN_MODE_ENDPOINTS).permitAll().requestMatchers(MANAGEMENT).authenticated();
     }
-
 }

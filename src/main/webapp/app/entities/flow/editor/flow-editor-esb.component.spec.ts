@@ -3,8 +3,10 @@ import { DefaultUrlSerializer, UrlTree } from '@angular/router';
 import { Subject, of } from 'rxjs';
 
 import { Flow } from 'app/shared/model/flow.model';
-import { Step, StepType } from 'app/shared/model/step.model';
+import { IStep, Step, StepType } from 'app/shared/model/step.model';
 
+import { EditResult, loadFlowGraph } from '../designer/flow-graph';
+import { FlowGraphHistory } from '../designer/flow-graph-history';
 import { FlowEditorEsbComponent } from './flow-editor-esb.component';
 
 describe('Flow editor Connection of a Step', () => {
@@ -163,7 +165,12 @@ describe('Flow editor modes', () => {
         parseUrl: (path: string) => serializer.parse(path),
         serializeUrl: (tree: UrlTree) => serializer.serialize(tree),
         createUrlTree: (commands: unknown[], extras: { queryParams: Record<string, unknown> }) =>
-          serializer.parse(`${commands.join('/')}?${Object.entries(extras.queryParams).filter(([, value]) => value !== undefined).map(([key, value]) => `${key}=${value}`).join('&')}`),
+          serializer.parse(
+            `${commands.join('/')}?${Object.entries(extras.queryParams)
+              .filter(([, value]) => value !== undefined)
+              .map(([key, value]) => `${key}=${value}`)
+              .join('&')}`,
+          ),
         navigate: jest.fn(),
       },
       location: { path: () => url, replaceState: (next: string) => (url = next) },
@@ -269,6 +276,22 @@ describe('Flow editor modes', () => {
       expect(component.activeTab).toBe('flow');
     });
 
+    it('shows the settings of a Step that was just added, also when the panel was hidden or another tab open', () => {
+      const { component } = editor();
+      const source = { id: 10, stepType: 'SOURCE', componentType: 'timer', links: [] } as IStep;
+      const designer = new FlowGraphHistory(loadFlowGraph({ id: 7, steps: [source] }));
+      Object.assign(component, { designer, edit: (result: EditResult) => designer.apply(result) });
+      component.showTab('settings');
+      component.setTabLayout('closed');
+
+      component.onAppendStep({ after: designer.current.steps[0].key, kind: 'SINK', componentType: 'log' });
+
+      const added = designer.current.steps.find(step => step.kind === 'SINK')!;
+      expect(component.selection).toEqual({ type: 'step', key: added.key });
+      expect(component.activeTab).toBe('flow');
+      expect(shows(component)).toEqual({ canvas: true, panel: true });
+    });
+
     it('keeps the panel as it is on a click on the empty canvas', () => {
       const { component } = editor();
       component.onSelectionChange({ type: 'step', key: 's1' });
@@ -287,6 +310,26 @@ describe('Flow editor modes', () => {
       expect(component.activeTab).toBe('flow');
       expect(shows(component)).toEqual({ canvas: false, panel: true });
       expect(component.selection).toEqual({ type: 'step', key: 's1' });
+    });
+
+    it('returns an enlarged Step to the side panel on a click on the Visual flow tab', () => {
+      const { component } = editor();
+      component.openStepEditor('s1');
+
+      component.showTab('flow');
+
+      expect(shows(component)).toEqual({ canvas: true, panel: true });
+      expect(component.selection).toEqual({ type: 'step', key: 's1' });
+    });
+
+    it('also returns to the side panel from another full page tab', () => {
+      const { component } = editor();
+      component.showTab('settings');
+      component.setTabLayout('full');
+
+      component.showTab('flow');
+
+      expect(component.tabLayout).toBe('panel');
     });
 
     it('opens a Step double-clicked in Test beside the Visual flow in Design', () => {
@@ -411,7 +454,11 @@ describe('Flow editor modes', () => {
     Object.assign(component, { flowCanvas: { reveal, keepInView: jest.fn() } });
     component.setMode('test');
 
-    component.onProblemSelected({ where: 'Sink · file', message: 'Fill in the Directory Name in the path.', selection: { type: 'step', key: 's3' } });
+    component.onProblemSelected({
+      where: 'Sink · file',
+      message: 'Fill in the Directory Name in the path.',
+      selection: { type: 'step', key: 's3' },
+    });
 
     expect(component.viewMode).toBe('design');
     expect(component.selection).toEqual({ type: 'step', key: 's3' });
@@ -449,7 +496,9 @@ describe('Flow editor modes', () => {
     expect(component.viewMode).toBe('design');
     expect(url()).not.toContain('view=test');
     expect(component.selection).toEqual({ type: 'step', key: 's2' });
-    expect(component.draftProblems).toEqual([{ where: 'Sink', message: 'Choose a component for this Step.', selection: { type: 'step', key: 's2' } }]);
+    expect(component.draftProblems).toEqual([
+      { where: 'Sink', message: 'Choose a component for this Step.', selection: { type: 'step', key: 's2' } },
+    ]);
   });
 
   it('switches to Test once Save & Test saved the Flow', () => {
@@ -476,13 +525,16 @@ describe('Flow editor canvas', () => {
       stepKeys: ['step-0', 'step-1'],
       steps: stepIds.map((id, i) => new Step(id ?? undefined, kinds[i] as StepType)),
       editFlowForm: new FormGroup({
-        stepsData: new FormArray(stepIds.map(id => new FormGroup({ id: new FormControl(id), componentType: new FormControl('file'), uri: new FormControl('') }))),
+        stepsData: new FormArray(
+          stepIds.map(id => new FormGroup({ id: new FormControl(id), componentType: new FormControl('file'), uri: new FormControl('') })),
+        ),
       }),
     });
     return component;
   }
 
-  const idsOnCanvas = (component: FlowEditorEsbComponent): unknown[] => (component as any).syncedGraph().steps.map((step: { id?: number }) => step.id);
+  const idsOnCanvas = (component: FlowEditorEsbComponent): unknown[] =>
+    (component as any).syncedGraph().steps.map((step: { id?: number }) => step.id);
 
   it('gives the Steps on the canvas the ids a save gave them, so Test and the counts find them', () => {
     expect(idsOnCanvas(editor([undefined, undefined], [21, 22]))).toEqual([21, 22]);
@@ -545,7 +597,8 @@ describe('Route editor', () => {
     return { component, url: () => url };
   }
 
-  const names = (component: FlowEditorEsbComponent) => (component.editFlowForm.controls.stepsData as FormArray).controls.map(form => form.value.routeName);
+  const names = (component: FlowEditorEsbComponent) =>
+    (component.editFlowForm.controls.stepsData as FormArray).controls.map(form => form.value.routeName);
 
   it('moves a Route with its form and everything else it has at its place, before the Error handler', () => {
     const { component } = editor();
@@ -663,7 +716,9 @@ describe('Script editor', () => {
       uriPopoverMessages: [],
       URIList: [],
       componentTypeCamelLinks: [],
-      editFlowForm: new FormGroup({ stepsData: new FormArray(types.map(([stepType, componentType], i) => stepForm(i + 1, stepType, componentType))) }),
+      editFlowForm: new FormGroup({
+        stepsData: new FormArray(types.map(([stepType, componentType], i) => stepForm(i + 1, stepType, componentType))),
+      }),
       cdr: { markForCheck: jest.fn(), detectChanges: jest.fn() },
       router: { parseUrl: (path: string) => serializer.parse(path), serializeUrl: (tree: UrlTree) => serializer.serialize(tree) },
       location: { path: () => url, replaceState: (next: string) => (url = next) },
@@ -751,7 +806,10 @@ describe('Script editor', () => {
       afterSaveAction: 'restart',
       header: { restart },
       load: jest.fn(),
-      router: { ...(component as any).router, createUrlTree: () => serializer.parse('/flow/editor/7?mode=edit&editor=script&id=7&view=test') },
+      router: {
+        ...(component as any).router,
+        createUrlTree: () => serializer.parse('/flow/editor/7?mode=edit&editor=script&id=7&view=test'),
+      },
     });
     (component as any).afterSave();
 
@@ -793,7 +851,9 @@ describe('Flow editor loading', () => {
 
   it('opens a saved Flow on the tab of the Step in the URL', () => {
     const flow = new Flow(7, 'Orders');
-    const callable = Object.assign(new Flow(8, 'Invoices'), { steps: [Object.assign(new Step(21, StepType.SOURCE), { componentType: 'flowlink' })] });
+    const callable = Object.assign(new Flow(8, 'Invoices'), {
+      steps: [Object.assign(new Step(21, StepType.SOURCE), { componentType: 'flowlink' })],
+    });
     const { component, load } = editor({ flow, handler: { apiId: 1 }, flows: [flow, callable] });
     component.steps = [new Step(11, StepType.SOURCE), new Step(12, StepType.ACTION)];
     component.activeStep = '12';

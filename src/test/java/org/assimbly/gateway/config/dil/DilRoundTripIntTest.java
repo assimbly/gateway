@@ -1,13 +1,26 @@
 package org.assimbly.gateway.config.dil;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.InputStream;
+import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
 import org.assimbly.gateway.GatewayApp;
 import org.assimbly.gateway.config.exporting.Export;
 import org.assimbly.gateway.config.importing.Import;
+import org.assimbly.gateway.domain.Flow;
 import org.assimbly.gateway.domain.Integration;
+import org.assimbly.gateway.domain.Step;
 import org.assimbly.gateway.domain.enumeration.EnvironmentType;
 import org.assimbly.gateway.domain.enumeration.GatewayType;
+import org.assimbly.gateway.domain.enumeration.StepType;
 import org.assimbly.gateway.repository.FlowRepository;
 import org.assimbly.gateway.repository.IntegrationRepository;
+import org.assimbly.gateway.repository.StepRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -18,16 +31,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * A DIL Flow imported into the Gateway and exported again keeps what the visual designer relies on:
@@ -49,11 +52,13 @@ class DilRoundTripIntTest {
     @Autowired
     private FlowRepository flowRepository;
 
+    @Autowired
+    private StepRepository stepRepository;
+
     private final XPath xPath = XPathFactory.newInstance().newXPath();
 
     @Test
     void contentRouterKeepsItsBranchNamesConditionsAndPatterns() throws Exception {
-
         Document exported = roundTrip("content-router.xml", "ContentRouterFlow");
 
         Element router = step(exported, "router");
@@ -78,7 +83,6 @@ class DilRoundTripIntTest {
 
     @Test
     void eachRouterBranchLeadsToItsOwnStep() throws Exception {
-
         Document exported = roundTrip("content-router.xml", "ContentRouterFlow");
 
         String checkBranchId = xPath.evaluate("links/link[bound='out' and rule='check']/id", step(exported, "router"));
@@ -91,7 +95,6 @@ class DilRoundTripIntTest {
 
     @Test
     void stepsKeepTheirCoordinates() throws Exception {
-
         Document exported = roundTrip("content-router.xml", "ContentRouterFlow");
 
         assertThat(xPath.evaluate("coordinates/x", step(exported, "source"))).isEqualTo("40");
@@ -103,7 +106,6 @@ class DilRoundTripIntTest {
 
     @Test
     void aNamedStepKeepsItsNameAndAnUnnamedStepGetsNone() throws Exception {
-
         Document exported = roundTrip("content-router.xml", "ContentRouterFlow");
 
         assertThat(xPath.evaluate("name", step(exported, "router"))).isEqualTo("Route orders");
@@ -112,14 +114,22 @@ class DilRoundTripIntTest {
     }
 
     @ParameterizedTest
-    @CsvSource(delimiter = '|', value = {
-        "if-router.xml        | IfRouterFlow        | if      | log:sink-if   | simple | ${body} contains 'Test'",
-        "split-router.xml     | SplitRouterFlow     | split   | log:sink-part | xpath  | /persons/person",
-        "enrich-router.xml    | EnrichRouterFlow    | enrich  | log:sink-enrich |      | ",
-    })
-    void fixedSlotRouterKeepsItsNamedBranchAndDefaultBranch(String fixture, String flowName, String branch, String branchSink,
-                                                             String language, String expression) throws Exception {
-
+    @CsvSource(
+        delimiter = '|',
+        value = {
+            "if-router.xml        | IfRouterFlow        | if      | log:sink-if   | simple | ${body} contains 'Test'",
+            "split-router.xml     | SplitRouterFlow     | split   | log:sink-part | xpath  | /persons/person",
+            "enrich-router.xml    | EnrichRouterFlow    | enrich  | log:sink-enrich |      | ",
+        }
+    )
+    void fixedSlotRouterKeepsItsNamedBranchAndDefaultBranch(
+        String fixture,
+        String flowName,
+        String branch,
+        String branchSink,
+        String language,
+        String expression
+    ) throws Exception {
         Document exported = roundTrip(fixture, flowName);
 
         Element router = step(exported, "router");
@@ -137,7 +147,6 @@ class DilRoundTripIntTest {
 
     @Test
     void recipientListBranchesStayDistinctAndKeepTheirPatterns() throws Exception {
-
         Document exported = roundTrip("recipient-router.xml", "RecipientRouterFlow");
 
         Element router = step(exported, "router");
@@ -153,12 +162,12 @@ class DilRoundTripIntTest {
         assertThat(patternBySink).containsOnly(
             java.util.Map.entry("log:sink-a", "InOnly"),
             java.util.Map.entry("log:sink-b", "InOnly"),
-            java.util.Map.entry("log:sink-c", "InOut"));
+            java.util.Map.entry("log:sink-c", "InOut")
+        );
     }
 
     @Test
     void flowWithOnlyAnErrorStepStaysEmpty() throws Exception {
-
         Document exported = roundTrip("empty-flow.xml", "EmptyFlow");
 
         NodeList steps = (NodeList) xPath.evaluate("//flow/steps/step", exported, XPathConstants.NODESET);
@@ -167,8 +176,81 @@ class DilRoundTripIntTest {
         assertThat(xPath.evaluate("//flow/steps/step/links", exported, XPathConstants.NODE)).isNull();
     }
 
+    @ParameterizedTest
+    @CsvSource(
+        delimiter = '|',
+        value = {
+            "SOURCE | http  | 0.0.0.0:9001/hello         | http://0.0.0.0:9001/hello  | http  | 0.0.0.0:9001/hello",
+            "SOURCE | http  | //0.0.0.0:9001/hello       | http://0.0.0.0:9001/hello  | http  | 0.0.0.0:9001/hello",
+            "SOURCE | http  | http://0.0.0.0:9001/hello  | http://0.0.0.0:9001/hello  | http  | 0.0.0.0:9001/hello",
+            "SOURCE | http  | https://0.0.0.0:9001/hello | https://0.0.0.0:9001/hello | https | 0.0.0.0:9001/hello",
+            "SOURCE | https | //0.0.0.0:9001/hello       | https://0.0.0.0:9001/hello | https | 0.0.0.0:9001/hello",
+            "SOURCE | https | https://0.0.0.0:9001/hello | https://0.0.0.0:9001/hello | https | 0.0.0.0:9001/hello",
+            "ACTION | http  | 0.0.0.0:9001/hello         | http:0.0.0.0:9001/hello    | http  | 0.0.0.0:9001/hello",
+            "ACTION | http  | //0.0.0.0:9001/hello       | http:0.0.0.0:9001/hello    | http  | 0.0.0.0:9001/hello",
+            "ACTION | http  | https://0.0.0.0:9001/hello | https:0.0.0.0:9001/hello   | https | 0.0.0.0:9001/hello",
+            "SINK   | https | //0.0.0.0:9001/hello       | https:0.0.0.0:9001/hello   | https | 0.0.0.0:9001/hello",
+            "SINK   | https | http://0.0.0.0:9001/hello  | http:0.0.0.0:9001/hello    | http  | 0.0.0.0:9001/hello",
+        }
+    )
+    void httpStepAcceptsBareSlashesOrFullUrlAndExportsExpectedDilUri(
+        StepType stepType,
+        String componentType,
+        String inputUri,
+        String expectedDilUri,
+        String expectedImportedComponent,
+        String expectedImportedUri
+    ) throws Exception {
+        Integration integration = new Integration();
+        integration.setName("http-roundtrip");
+        integration.setType(GatewayType.FULL);
+        integration.setStage(EnvironmentType.TEST);
+        integration = integrationRepository.save(integration);
+
+        dilImport.convertConfigurationToDB(integration.getId(), "application/xml", readFixture("empty-flow.xml"));
+
+        Flow flow = flowRepository.findByName("EmptyFlow").orElseThrow();
+
+        Step step = new Step();
+        step.setFlow(flow);
+        step.setStepType(stepType);
+        step.setComponentType(componentType);
+        step.setUri(inputUri);
+        step = stepRepository.save(step);
+        flow.getSteps().add(step);
+        flow = flowRepository.save(flow);
+
+        String xml = dilExport.convertDBToFlowConfiguration(flow.getId(), "application/xml", false);
+        Document exported = DocumentBuilderFactory.newInstance()
+            .newDocumentBuilder()
+            .parse(new InputSource(new StringReader(xml)));
+
+        Element exportedStep = step(exported, stepType.name().toLowerCase());
+        assertThat(text(exportedStep, "uri")).isEqualTo(expectedDilUri);
+
+        // Re-importing the exported XML normalizes componentType and uri in the database
+        flowRepository.delete(flow);
+        flowRepository.flush();
+
+        dilImport.convertConfigurationToDB(integration.getId(), "application/xml", xml);
+
+        Flow reimportedFlow = flowRepository.findByName("EmptyFlow").orElseThrow();
+        Step reimportedStep = reimportedFlow
+            .getSteps()
+            .stream()
+            .filter(s -> s.getStepType() == stepType)
+            .findFirst()
+            .orElseThrow();
+        assertThat(reimportedStep.getComponentType()).isEqualTo(expectedImportedComponent);
+        assertThat(reimportedStep.getUri()).isEqualTo(expectedImportedUri);
+    }
+
     private java.util.List<String> stepsWithInLink(Document doc, String linkId) throws Exception {
-        NodeList uris = (NodeList) xPath.evaluate("//flow/steps/step[links/link[bound='in' and id='" + linkId + "']]/uri", doc, XPathConstants.NODESET);
+        NodeList uris = (NodeList) xPath.evaluate(
+            "//flow/steps/step[links/link[bound='in' and id='" + linkId + "']]/uri",
+            doc,
+            XPathConstants.NODESET
+        );
         java.util.List<String> result = new java.util.ArrayList<>();
         for (int i = 0; i < uris.getLength(); i++) {
             result.add(uris.item(i).getTextContent());
@@ -177,7 +259,6 @@ class DilRoundTripIntTest {
     }
 
     private Document roundTrip(String fixture, String flowName) throws Exception {
-
         Integration integration = new Integration();
         integration.setName("roundtrip");
         integration.setType(GatewayType.FULL);
@@ -189,7 +270,9 @@ class DilRoundTripIntTest {
         Long flowId = flowRepository.findByName(flowName).orElseThrow().getId();
         String xml = dilExport.convertDBToFlowConfiguration(flowId, "application/xml", false);
 
-        return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(xml)));
+        return DocumentBuilderFactory.newInstance()
+            .newDocumentBuilder()
+            .parse(new InputSource(new StringReader(xml)));
     }
 
     private String readFixture(String fixture) throws Exception {

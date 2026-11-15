@@ -1,20 +1,21 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
-    <form (jhiSaveShortcut)="save()" [saveShortcutDisabled]="editForm.invalid || isSaving()" name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2
-        id="jhi-authority-heading"
-        data-cy="AuthorityCreateUpdateHeading"
-        jhiTranslate="jhipsterGradleSampleApplicationApp.adminAuthority.home.createOrEditLabel"
-      >
-        Add or edit an Authority
-      </h2>
+    <form
+      (jhiSaveShortcut)="save()"
+      [saveShortcutDisabled]="editForm.invalid || isSaving()"
+      name="editForm"
+      novalidate
+      (ngSubmit)="save()"
+      [formGroup]="editForm"
+    >
+      <h2 id="jhi-authority-heading" data-cy="AuthorityCreateUpdateHeading">Add or edit an Authority</h2>
 
       <div>
         <jhi-alert-error />
 
         @let nameRef = editForm.get('name')!;
         <div class="mb-3">
-          <label class="form-label" for="field_name" jhiTranslate="jhipsterGradleSampleApplicationApp.adminAuthority.name">Name</label>
+          <label class="form-label" for="field_name">Name</label>
           <input
             type="text"
             class="form-control"
@@ -25,23 +26,20 @@
             [readonly]="editForm.get('name')!.disabled"
           />
           @if (nameRef.invalid && (nameRef.dirty || nameRef.touched)) {
-            <div>
-              @if (nameRef.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
-              }
-              @if (nameRef.errors?.maxlength) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '50' }"
-                  >This field cannot be longer than 50 characters.</small
-                >
-              }
-            </div>
+          <div>
+            @if (nameRef.errors?.required) {
+            <small class="form-text text-danger">This field is required.</small>
+            } @if (nameRef.errors?.maxlength) {
+            <small class="form-text text-danger">This field cannot be longer than 50 characters.</small>
+            }
+          </div>
           }
         </div>
       </div>
 
       <div>
         <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+          <fa-icon icon="ban" />&nbsp;<span>Cancel</span>
         </button>
 
         <button
@@ -51,7 +49,7 @@
           [disabled]="editForm.invalid || isSaving()"
           class="btn btn-primary"
         >
-          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+          <fa-icon icon="save" />&nbsp;<span>Save</span>
         </button>
       </div>
     </form>

@@ -5,7 +5,6 @@ import { By } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
 
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
-import { provideTranslateService } from '@ngx-translate/core';
 
 import { fontAwesomeIcons } from 'app/config/font-awesome-icons';
 import { Components } from 'app/shared/camel/component-type';
@@ -20,7 +19,15 @@ const flow: IFlow = {
   id: 7,
   steps: [
     { id: 10, stepType: 'SOURCE', componentType: 'file', uri: 'in', links: [{ name: '7-11', bound: 'out' }] },
-    { id: 11, stepType: 'ACTION', componentType: 'setbody', links: [{ name: '7-11', bound: 'in' }, { name: '7-12', bound: 'out' }] },
+    {
+      id: 11,
+      stepType: 'ACTION',
+      componentType: 'setbody',
+      links: [
+        { name: '7-11', bound: 'in' },
+        { name: '7-12', bound: 'out' },
+      ],
+    },
     { id: 12, stepType: 'SINK', componentType: 'file', uri: 'out', links: [{ name: '7-12', bound: 'in' }] },
   ] as IStep[],
 };
@@ -61,7 +68,7 @@ describe('Flow test panel', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [FlowTestPanelComponent],
-      providers: [provideTranslateService(), provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
     });
     TestBed.inject(FaIconLibrary).addIcons(...fontAwesomeIcons);
     http = TestBed.inject(HttpTestingController);
@@ -78,7 +85,10 @@ describe('Flow test panel', () => {
     const ran: FlowTestRun[] = [];
     fixture.componentInstance.ran.subscribe(run => ran.push(run));
     fixture.componentInstance.body.set('Hello');
-    fixture.componentInstance.headers.set([{ key: 'Id', value: '7' }, { key: '', value: 'ignored' }]);
+    fixture.componentInstance.headers.set([
+      { key: 'Id', value: '7' },
+      { key: '', value: 'ignored' },
+    ]);
 
     runButton().click();
 

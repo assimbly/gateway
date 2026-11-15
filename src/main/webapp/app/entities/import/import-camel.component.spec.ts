@@ -5,7 +5,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
-import { provideTranslateService } from '@ngx-translate/core';
 
 import { fontAwesomeIcons } from 'app/config/font-awesome-icons';
 
@@ -14,7 +13,8 @@ import { ImportCamelComponent } from './import-camel.component';
 @Component({ template: '' })
 class EditorStub {}
 
-const route = '<route id="timer-to-log" xmlns="http://camel.apache.org/schema/spring"><from uri="timer:tick"/><log message="tick"/></route>';
+const route =
+  '<route id="timer-to-log" xmlns="http://camel.apache.org/schema/spring"><from uri="timer:tick"/><log message="tick"/></route>';
 
 describe('Import Camel XML', () => {
   let fixture: ComponentFixture<ImportCamelComponent>;
@@ -23,12 +23,7 @@ describe('Import Camel XML', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        provideRouter([{ path: 'flow/editor/:id', component: EditorStub }]),
-        provideHttpClient(),
-        provideHttpClientTesting(),
-        provideTranslateService(),
-      ],
+      providers: [provideRouter([{ path: 'flow/editor/:id', component: EditorStub }]), provideHttpClient(), provideHttpClientTesting()],
     });
     TestBed.inject(FaIconLibrary).addIcons(...fontAwesomeIcons);
     fixture = TestBed.createComponent(ImportCamelComponent);
@@ -81,7 +76,10 @@ describe('Import Camel XML', () => {
     page.start();
     http
       .expectOne(req => req.url === 'api/import/camel')
-      .flush({ detail: 'The file isn\'t Camel XML: expected <route>, <routes> or <camelContext> but found <other>.' }, { status: 400, statusText: 'Bad Request' });
+      .flush(
+        { detail: "The file isn't Camel XML: expected <route>, <routes> or <camelContext> but found <other>." },
+        { status: 400, statusText: 'Bad Request' },
+      );
     fixture.detectChanges();
 
     expect(fixture.nativeElement.textContent).toContain("Couldn't import the routes: The file isn't Camel XML");

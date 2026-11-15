@@ -6,17 +6,14 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbDropdown, NgbDropdownMenu, NgbDropdownToggle } from '@ng-bootstrap/ng-bootstrap/dropdown';
 import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap/tooltip';
-import { TranslateService } from '@ngx-translate/core';
 
 import { filter, map, startWith } from 'rxjs';
 
 import { API_DEFINITIONS, API_EXPLORER_PATH } from 'app/admin/docs/api-definitions';
-import { LANGUAGES } from 'app/config';
-import { AccountService, StateStorageService } from 'app/core/auth';
+import { AccountService } from 'app/core/auth';
 import { ProfileService } from 'app/layouts/profiles/profile.service';
 import { LoginService } from 'app/login/login.service';
 import { HasAnyAuthorityDirective } from 'app/shared/auth';
-import { TranslateDirective } from 'app/shared/language';
 import { LayoutService } from 'app/layouts/main/layout.service';
 import { ThemeService } from 'app/core/theme';
 import { TutorialPanelState } from 'app/tutorials/tutorial-panel.state';
@@ -36,7 +33,6 @@ import { environment } from 'environments/environment';
     NgbDropdownToggle,
     NgbTooltip,
     HasAnyAuthorityDirective,
-    TranslateDirective,
   ],
   host: {
     id: 'app-sidebar',
@@ -50,7 +46,6 @@ import { environment } from 'environments/environment';
 })
 export default class Navbar implements OnInit {
   readonly inProduction = signal(true);
-  readonly languages = LANGUAGES;
   readonly openAPIEnabled = signal(false);
   readonly account = inject(AccountService).account;
   readonly type = environment.TYPE;
@@ -63,8 +58,6 @@ export default class Navbar implements OnInit {
   readonly sidebarInert = computed(() => !this.sidebarVisible() || (!this.layout.isDesktop() && !this.layout.mobileOpen()));
 
   private readonly loginService = inject(LoginService);
-  private readonly translateService = inject(TranslateService);
-  private readonly stateStorageService = inject(StateStorageService);
   private readonly profileService = inject(ProfileService);
   private readonly router = inject(Router);
   private readonly sidebarClose = viewChild<ElementRef<HTMLButtonElement>>('sidebarClose');
@@ -108,11 +101,6 @@ export default class Navbar implements OnInit {
       this.inProduction.set(profileInfo.inProduction ?? true);
       this.openAPIEnabled.set(profileInfo.openAPIEnabled ?? false);
     });
-  }
-
-  brandTitle(): string {
-    const title = this.translateService.instant('global.title');
-    return typeof title === 'string' && title.length > 0 ? title : 'Gateway';
   }
 
   isFlowsActive(): boolean {
@@ -183,11 +171,6 @@ export default class Navbar implements OnInit {
     this.layout.toggleMenu('account');
   }
 
-  changeLanguage(languageKey: string): void {
-    this.stateStorageService.storeLocale(languageKey);
-    this.translateService.use(languageKey);
-  }
-
   collapseNavbar(): void {
     this.layout.closeMobile();
   }
@@ -233,10 +216,7 @@ export default class Navbar implements OnInit {
 
   private isAdminPath(url: string): boolean {
     return (
-      url.startsWith('/admin') ||
-      url.startsWith('/user-management') ||
-      url.startsWith('/integration') ||
-      url.startsWith('/certificate')
+      url.startsWith('/admin') || url.startsWith('/user-management') || url.startsWith('/integration') || url.startsWith('/certificate')
     );
   }
 

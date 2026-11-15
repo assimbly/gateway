@@ -9,7 +9,7 @@ import {
   afterNextRender,
   inject,
   output,
-  input
+  input,
 } from '@angular/core';
 import { LowerCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -23,7 +23,6 @@ import {
   ESSENTIALS,
   NO_MATCH,
   categoryChips,
-  essentialsFirst,
   isEssential,
   labelsOf,
   matchRank,
@@ -35,6 +34,12 @@ import { RESPONSE_COMPONENT, ROUTER_KINDS, routerKindDescription, routerKindTitl
 
 export type PickedKind = 'ACTION' | 'ROUTER' | 'SINK';
 
+/** One line in the list: a component, and the kind of Step it adds. */
+export interface PickerItem {
+  kind: PickedKind;
+  name: string;
+}
+
 /** The components a user can choose from, per kind of Step. */
 export interface StepComponents {
   actions: string[];
@@ -43,6 +48,8 @@ export interface StepComponents {
 
 /** The chip for the components this browser picked last; the only list that isn't from the catalogue. */
 export const RECENT = 'recent';
+/** The chip that narrows the list to the Routers, which are otherwise listed among the Actions. */
+export const ROUTER_CATEGORY = 'router';
 const RECENT_KEY = 'step-picker.recent';
 const RECENT_MAX = 8;
 const CHIPS_SHOWN = 6;
@@ -86,6 +93,8 @@ export class StepPickerComponent implements OnChanges {
   @ViewChild(NgbDropdown) dropdown?: NgbDropdown;
 
   readonly labels: Record<PickedKind, string> = { ACTION: 'Action', ROUTER: 'Router', SINK: 'Sink' };
+  readonly routerCategory = ROUTER_CATEGORY;
+  readonly routerCount = ROUTER_KINDS.length;
 
   private readonly injector = inject(Injector);
   private readonly cdr = inject(ChangeDetectorRef);
@@ -118,7 +127,13 @@ export class StepPickerComponent implements OnChanges {
   chips(kind: PickedKind): { shown: CategoryChip[]; more: CategoryChip[] } {
     let chips = this.chipsByKind.get(kind);
     if (!chips) {
-      chips = kind === 'ROUTER' ? { shown: [], more: [] } : categoryChips(this.componentsOf(kind).map(name => this.entry(name)), CHIPS_SHOWN);
+      chips =
+        kind === 'ROUTER'
+          ? { shown: [], more: [] }
+          : categoryChips(
+              this.componentsOf(kind).map(name => this.entry(name)),
+              CHIPS_SHOWN,
+            );
       this.chipsByKind.set(kind, chips);
     }
     return chips;
@@ -140,36 +155,68 @@ export class StepPickerComponent implements OnChanges {
   }
 
   get kind(): PickedKind {
-    return this.activeKind && this.kinds().includes(this.activeKind) ? this.activeKind : this.kinds()[0];
+    const tabs = this.tabs;
+    return this.activeKind && tabs.includes(this.activeKind) ? this.activeKind : tabs[0];
+  }
+
+  /** The tabs to choose from: Routers are listed among the Actions, so they only get a tab of their own without Actions. */
+  get tabs(): PickedKind[] {
+    const kinds = this.kinds();
+    return kinds.includes('ACTION') ? kinds.filter(kind => kind !== 'ROUTER') : kinds;
+  }
+
+  /** Whether the list of a tab holds the Routers: with the Actions, or on its own. */
+  listsRouters(tab: PickedKind): boolean {
+    return tab === 'ROUTER' || (tab === 'ACTION' && this.kinds().includes('ROUTER'));
+  }
+
+  /** Whether the Router chip is offered: only where Routers are listed among other components. */
+  offersRouterChip(tab: PickedKind): boolean {
+    return tab !== 'ROUTER' && this.listsRouters(tab);
   }
 
   /**
-   * The components of a kind in the chosen category that match the search, closest match first. Without a search,
-   * Actions list the Essentials first.
+   * The components of a tab in the chosen category that match the search, closest match first. The Action tab lists
+   * the Routers with the Actions; without a search, the Essentials come first, then the Routers. The Router chip
+   * narrows the list to the Routers.
    */
-  matches(kind: PickedKind): string[] {
-    let names = this.componentsOf(kind);
-    if (this.category === RECENT) {
-      names = this.recentOf(kind);
+  matches(tab: PickedKind): PickerItem[] {
+    let names = tab === 'ROUTER' ? [] : this.componentsOf(tab);
+    let routerNames = this.listsRouters(tab) ? ROUTER_KINDS : [];
+    if (this.category === ROUTER_CATEGORY) {
+      names = [];
+    } else if (this.category === RECENT) {
+      names = this.recentOf(tab);
+      routerNames = [];
     } else if (this.category === ESSENTIALS) {
-      names = this.essentialsOf(kind);
-    } else if (this.category && kind !== 'ROUTER') {
+      names = this.essentialsOf(tab);
+      routerNames = [];
+    } else if (this.category) {
       names = names.filter(name => labelsOf(this.entry(name)).includes(this.category!));
+      routerNames = [];
     }
-    const entries = names.map(name => this.entry(name, kind));
-    const ordered = kind === 'ACTION' && !this.filter.trim() ? essentialsFirst(entries) : entries;
-    return searchCatalogue(ordered, this.filter).map(entry => entry.name);
+    const components = names.map(name => ({ ...this.entry(name, tab), item: { kind: tab, name } }));
+    const routers = routerNames.map(name => ({ ...this.entry(name, 'ROUTER'), item: { kind: 'ROUTER' as PickedKind, name } }));
+    const ordered =
+      tab === 'ACTION' && !this.filter.trim()
+        ? [...components.filter(isEssential), ...routers, ...components.filter(entry => !isEssential(entry))]
+        : [...components, ...routers];
+    return searchCatalogue(ordered, this.filter).map(entry => entry.item);
   }
 
   /**
-   * Routers the search finds while another tab is chosen. Users look for something like Split among the Actions, so
-   * it is offered there too, rather than as a catalogue component that can't be used. Only shown while searching.
+   * Routers the search finds while a tab without Routers is chosen, such as the Sink tab. Users look for something
+   * like Split there too, so it is offered rather than shown as a catalogue component that can't be used. Only shown
+   * while searching.
    */
-  routerMatches(kind: PickedKind): string[] {
-    if (!this.filter.trim() || kind === 'ROUTER') {
+  routerMatches(tab: PickedKind): string[] {
+    if (!this.filter.trim() || this.listsRouters(tab)) {
       return [];
     }
-    return searchCatalogue(ROUTER_KINDS.map(name => this.entry(name, 'ROUTER')), this.filter).map(entry => entry.name);
+    return searchCatalogue(
+      ROUTER_KINDS.map(name => this.entry(name, 'ROUTER')),
+      this.filter,
+    ).map(entry => entry.name);
   }
 
   /**
@@ -218,14 +265,14 @@ export class StepPickerComponent implements OnChanges {
     }
   }
 
-  /** Enter picks the closest match, from the chosen kind unless another kind has a closer one. */
+  /** Enter picks the closest match, from the chosen tab unless another tab has a closer one. */
   pickFirstMatch(): void {
-    let best: { kind: PickedKind; name: string; rank: number } | undefined;
-    for (const kind of [this.kind, ...this.kinds()]) {
-      const name = this.matches(kind)[0];
-      const rank = name === undefined ? NO_MATCH : this.filter.trim() ? matchRank(this.entry(name, kind), this.filter) : 0;
-      if (name !== undefined && (!best || rank < best.rank)) {
-        best = { kind, name, rank };
+    let best: (PickerItem & { rank: number }) | undefined;
+    for (const tab of [this.kind, ...this.tabs]) {
+      const item = this.matches(tab)[0];
+      const rank = item === undefined ? NO_MATCH : this.filter.trim() ? matchRank(this.entry(item.name, item.kind), this.filter) : 0;
+      if (item !== undefined && (!best || rank < best.rank)) {
+        best = { ...item, rank };
       }
     }
     if (best) {
@@ -242,14 +289,16 @@ export class StepPickerComponent implements OnChanges {
     this.picked.emit({ kind, componentType });
   }
 
+  /** The components a tab can use; a Router kind is only listed as a Router, even when the catalogue has a component of that name. */
   private componentsOf(kind: PickedKind): string[] {
+    const notRouters = (names: string[]) => names.filter(name => !ROUTER_KINDS.includes(name));
     switch (kind) {
       case 'ROUTER':
         return ROUTER_KINDS;
       case 'SINK':
-        return this.components().sinks;
+        return notRouters(this.components().sinks);
       case 'ACTION':
-        return [...new Set(this.components().actions)];
+        return notRouters([...new Set(this.components().actions)]);
     }
   }
 }

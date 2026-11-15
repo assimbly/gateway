@@ -3,8 +3,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { catchError, map, of } from 'rxjs';
 
-import { TranslateDirective } from 'app/shared/language';
-
 import type { ProfileInfo } from './profile-info.model';
 import { ProfileService } from './profile.service';
 
@@ -13,12 +11,11 @@ import { ProfileService } from './profile.service';
   template: `
     @if (ribbonEnvSignal(); as ribbonEnv) {
       <div class="ribbon">
-        <a href="" [jhiTranslate]="'global.ribbon.' + (ribbonEnv ?? '')">{{ { dev: 'Development' }[ribbonEnv ?? ''] }}</a>
+        <a href="">{{ { dev: 'Development' }[ribbonEnv] ?? ribbonEnv }}</a>
       </div>
     }
   `,
   styleUrl: './page-ribbon.scss',
-  imports: [TranslateDirective],
 })
 export default class PageRibbon {
   readonly ribbonEnvSignal = signal<string | undefined>(undefined);

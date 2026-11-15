@@ -4,7 +4,6 @@ import { Router, provideRouter } from '@angular/router';
 
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { provideTranslateService } from '@ngx-translate/core';
 
 import { fontAwesomeIcons } from 'app/config/font-awesome-icons';
 
@@ -26,7 +25,6 @@ describe('New Flow dialog', () => {
           { path: 'flow/editor', component: EditorStub },
           { path: 'rest-apis/new', component: EditorStub },
         ]),
-        provideTranslateService(),
         { provide: NgbActiveModal, useValue: activeModal },
       ],
     });
@@ -63,8 +61,12 @@ describe('New Flow dialog', () => {
   });
 
   it('offers Visual, Camel route (low code), Script (code) and API, in that order, and no Import', () => {
-    const titles = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('.flow-type-choice__title')).map(e => e.textContent?.trim());
-    const levels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('.flow-type-choice__level')).map(e => e.textContent?.trim());
+    const titles = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('.flow-type-choice__title')).map(e =>
+      e.textContent?.trim(),
+    );
+    const levels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('.flow-type-choice__level')).map(e =>
+      e.textContent?.trim(),
+    );
 
     expect(titles).toEqual(['Visual', 'Camel route', 'Script', 'API']);
     expect(levels.slice(1, 4)).toEqual(['Low code', 'Code', 'Design']);

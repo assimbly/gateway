@@ -2,8 +2,6 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { ComponentRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { provideTranslateService } from '@ngx-translate/core';
-
 import ItemCount from './item-count';
 
 describe('ItemCount test', () => {
@@ -11,12 +9,6 @@ describe('ItemCount test', () => {
   let compRef: ComponentRef<ItemCount>;
   let fixture: ComponentFixture<ItemCount>;
   const inputParams = 'params';
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [provideTranslateService()],
-    });
-  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ItemCount);

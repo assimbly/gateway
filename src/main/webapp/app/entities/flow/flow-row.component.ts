@@ -32,6 +32,7 @@ import {
   flowStatusView,
   flowTypeLabel,
   hasRun,
+  polledStatus,
   sourceStepOf,
   testMessageBlocked,
 } from './flow-status';
@@ -43,8 +44,12 @@ import { FlowLogDrawerComponent } from './flow-log-drawer.component';
 import { Router } from '@angular/router';
 import dayjs from 'dayjs/esm';
 
-import { HttpResponse } from '@angular/common/http';
+import { HttpContext, HttpResponse } from '@angular/common/http';
+import { HANDLES_OWN_ERRORS } from 'app/core/interceptor/error-handler.interceptor';
 import { forkJoin, Observable, Subscription, switchMap, tap } from 'rxjs';
+
+/** A status reading that fails is not reported as an error: the row keeps what it shows. */
+const POLL_CONTEXT = new HttpContext().set(HANDLES_OWN_ERRORS, true);
 
 enum Status {
   active = 'active',
@@ -152,6 +157,11 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
 
   get state(): FlowStatusView {
     return flowStatusView(this.statusFlow, this.isDraft);
+  }
+
+  /** The Flow status in words; while an action of this row runs, what it is doing, such as Starting…. */
+  get statusLabel(): string {
+    return this.disableActionBtns ? `${this.flowStatus}…` : this.state.label;
   }
 
   shows(action: FlowAction): boolean {
@@ -267,6 +277,29 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
     this.getFlowNumberOfAlerts(this.flow().id!);
+  }
+
+  /** Reads the status again, so a Flow that was started, stopped or paused elsewhere shows as it is now. */
+  pollStatus(): void {
+    if (this.destroyed || this.disableActionBtns) {
+      return;
+    }
+    this.subscriptions.add(
+      this.flowService.getFlowStatus(this.flow().id!, POLL_CONTEXT).subscribe({
+        next: response => {
+          // An action of this row that began meanwhile sets the status with its own answer.
+          if (this.destroyed || this.disableActionBtns) {
+            return;
+          }
+          const status = polledStatus(this.statusFlow, response.body);
+          if (status !== null) {
+            this.setFlowStatus(status);
+          }
+        },
+        // A reading that fails keeps what the row shows; the next one is ten seconds away.
+        error: () => undefined,
+      }),
+    );
   }
 
   /** Opens the Alerts drawer; once they are cleared the row's count goes to zero and an Error becomes Stopped. */
