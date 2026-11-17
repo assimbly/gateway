@@ -49,7 +49,7 @@ plugins {
 }
 
 group = "org.assimbly.gateway"
-version = '6.1.0'
+version = '6.0.0'
 description = "A message gateway"
 
 java {
