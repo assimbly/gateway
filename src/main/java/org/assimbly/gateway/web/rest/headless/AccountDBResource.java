@@ -33,8 +33,8 @@ public class AccountDBResource {
 
     public enum DataBase {MONGO}
 
-    private MongoDao mongoDao;
-    private String database = ConfigHelper.get("baseDatabaseName");
+    private final MongoDao mongoDao;
+    private final String database = ConfigHelper.get("baseDatabaseName");
 
     public AccountDBResource() {
         this.mongoDao = new MongoDao(database);

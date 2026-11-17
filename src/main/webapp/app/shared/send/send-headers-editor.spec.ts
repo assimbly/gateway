@@ -5,7 +5,6 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { of } from 'rxjs';
 
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
-import { provideTranslateService } from '@ngx-translate/core';
 
 import { fontAwesomeIcons } from 'app/config/font-awesome-icons';
 import { AlertService } from 'app/core/util/alert.service';
@@ -20,7 +19,7 @@ describe('SendHeadersEditor', () => {
 
   function create(inputs: { templatesEnabled?: boolean; suggestions?: string[] } = {}): void {
     TestBed.configureTestingModule({
-      providers: [provideTranslateService(), provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
     });
     TestBed.inject(FaIconLibrary).addIcons(...fontAwesomeIcons);
     templates = TestBed.inject(SendTemplateService);
@@ -64,7 +63,10 @@ describe('SendHeadersEditor', () => {
 
   it('offers the suggestions and the keys that are in use as options for the key', () => {
     create({ suggestions: ['JMSType', 'JMSReplyTo'] });
-    comp.headers.set([{ key: 'color', value: 'red' }, { key: 'JMSType', value: 'x' }]);
+    comp.headers.set([
+      { key: 'color', value: 'red' },
+      { key: 'JMSType', value: 'x' },
+    ]);
 
     expect(comp.keyOptions()).toEqual(['JMSType', 'JMSReplyTo', 'color']);
   });
@@ -98,7 +100,7 @@ describe('SendHeadersEditor', () => {
       expect(templates.list).toHaveBeenCalled();
       expect(comp.templates()).toEqual([{ id: 7, name: 'orders' }]);
       expect(text()).toContain('Save as template');
-      expect(text()).toContain('Manage templates');
+      expect(text()).toContain('Manage message templates');
     });
 
     it('copies a template into the rows and marks the rows as modified when they change', () => {
@@ -158,7 +160,11 @@ describe('SendHeadersEditor', () => {
 
       comp.updateTemplate();
 
-      expect(update$).toHaveBeenCalledWith(7, stored.map(row => expect.objectContaining({ id: row.id })), expect.any(Array));
+      expect(update$).toHaveBeenCalledWith(
+        7,
+        stored.map(row => expect.objectContaining({ id: row.id })),
+        expect.any(Array),
+      );
       expect(comp.modified()).toBe(false);
       expect(comp.headers()[0].value).toBe('blue');
     });

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -15,18 +15,26 @@ import { BrokerService } from './broker.service';
     imports: [FormsModule, FontAwesomeModule, AlertError],
 })
 export class BrokerDeleteDialogComponent {
-    broker: IBroker;
+    protected brokerService = inject(BrokerService);
+    activeModal = inject(NgbActiveModal);
+    protected eventManager = inject(EventManager);
 
-    constructor(protected brokerService: BrokerService, public activeModal: NgbActiveModal, protected eventManager: EventManager) {}
+    broker!: IBroker;
+    /** True while the delete runs, so a second click doesn't send it again. */
+    readonly deleting = signal(false);
 
     clear() {
         this.activeModal.dismiss('cancel');
     }
 
     confirmDelete(id: number) {
-        this.brokerService.delete(id).subscribe(response => {
-            this.eventManager.broadcast(new EventWithContent('brokerListModification', 'Deleted an broker'));
-            this.activeModal.close('deleted');
+        this.deleting.set(true);
+        this.brokerService.delete(id).subscribe({
+            next: () => {
+                this.eventManager.broadcast(new EventWithContent('brokerListModification', 'Deleted an broker'));
+                this.activeModal.close('deleted');
+            },
+            error: () => this.deleting.set(false),
         });
     }
 }

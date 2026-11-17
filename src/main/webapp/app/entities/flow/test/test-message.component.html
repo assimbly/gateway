@@ -1,0 +1,54 @@
+@if (message(); as message) {
+  <ul ngbNav #nav="ngbNav" class="nav-pills send-tabs" [activeId]="activeTab()" (activeIdChange)="activeTab.set($event)">
+    <li ngbNavItem="body">
+      <a ngbNavLink>Body</a>
+      <ng-template ngbNavContent>
+        <!-- grey with a Read-only hint on hover, as the response on Flows > Send -->
+        <div class="response-body-readonly" title="Read-only">
+          <span class="response-body-readonly__hint">Read-only</span>
+          <ngx-codemirror
+            class="body-codemirror body-codemirror--compact"
+            data-cy="test-body"
+            [ngModel]="message.body"
+            [ngModelOptions]="{ standalone: true }"
+            [options]="bodyOptions()"
+            (codeMirrorLoaded)="refreshCodeMirror($event)"
+          >
+          </ngx-codemirror>
+        </div>
+        @if (!message.body) {
+          <div class="form-text">The body is empty.</div>
+        } @else if (message.truncated) {
+          <div class="form-text">The body is cut short.</div>
+        }
+      </ng-template>
+    </li>
+    <li ngbNavItem="headers">
+      <a ngbNavLink>
+        Headers
+        @if (headers().length > 0) {
+          <span class="badge rounded-pill text-bg-secondary ms-1">{{ headers().length }}</span>
+        }
+      </a>
+      <ng-template ngbNavContent>
+        @if (headers().length) {
+          <table class="table table-sm small mb-0 test-message__headers">
+            <tbody>
+              @for (header of headers(); track header[0]) {
+                <tr>
+                  <th scope="row">{{ header[0] }}</th>
+                  <td>{{ header[1] }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        } @else {
+          <p class="form-text mb-0">No headers.</p>
+        }
+      </ng-template>
+    </li>
+  </ul>
+  <div [ngbNavOutlet]="nav" class="send-tabs__content"></div>
+} @else {
+  <p class="test-message__placeholder" data-cy="test-placeholder">{{ placeholder() }}</p>
+}

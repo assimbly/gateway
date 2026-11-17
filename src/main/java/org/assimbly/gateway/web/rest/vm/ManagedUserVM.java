@@ -8,7 +8,8 @@ import org.assimbly.gateway.service.dto.AdminUserDTO;
  */
 public class ManagedUserVM extends AdminUserDTO {
 
-    public static final int PASSWORD_MIN_LENGTH = 4;
+    /** Length is what makes a password strong; any characters count, no mix of capitals, digits or symbols required. */
+    public static final int PASSWORD_MIN_LENGTH = 12;
 
     public static final int PASSWORD_MAX_LENGTH = 100;
 

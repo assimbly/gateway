@@ -1,5 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
@@ -13,6 +12,7 @@ import { ForbiddenMessageNamesValidatorDirective } from './message-validation.di
 
 import { IMessage, Message } from 'app/shared/model/message.model';
 import { IHeader, Header } from 'app/shared/model/header.model';
+import { SaveShortcutDirective } from 'app/shared/keyboard';
 import { MessageService } from './message.service';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
@@ -24,52 +24,56 @@ import { MessagePopupService } from 'app/entities/message/message-popup.service'
 @Component({
   selector: 'jhi-message-dialog',
   templateUrl: './message-dialog.component.html',
-  imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError, ForbiddenHeaderValidatorDirective, ForbiddenMessageNamesValidatorDirective],
+  imports: [
+    FormsModule,
+    FontAwesomeModule,
+    AlertError,
+    ForbiddenHeaderValidatorDirective,
+    ForbiddenMessageNamesValidatorDirective,
+    SaveShortcutDirective,
+  ],
 })
 export class MessageDialogComponent implements OnInit {
-  message: IMessage;
-  messages: IMessage[];
+  activeModal = inject(NgbActiveModal);
+  private messageService = inject(MessageService);
+  private headerService = inject(HeaderService);
+  private alertService = inject(AlertService);
+  private eventManager = inject(EventManager);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
+  message!: IMessage;
+  messages!: IMessage[];
   messageNames: Array<string> = [];
   headers: Array<Header> = [];
   headerArray: Array<string> = [];
-  isSaving: boolean;
+  isSaving!: boolean;
   public typeHeader: string[] = ['header', 'property'];
   public languageHeader: string[] = ['constant', 'simple', 'groovy', 'jsonpath', 'xpath'];
-
-  constructor(
-    public activeModal: NgbActiveModal,
-    private messageService: MessageService,
-    private headerService: HeaderService,
-    private alertService: AlertService,
-    private eventManager: EventManager,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {}
 
   ngOnInit() {
     this.isSaving = false;
     this.messageService.query().subscribe(
       res => {
-        this.messages = res.body;
-        this.messageNames = this.messages.map(h => h.name);
+        this.messages = res.body!;
+        this.messageNames = this.messages.map(h => h.name!);
       },
-      res => this.onError(res.body)
+      res => this.onError(res.body),
     );
-    this.loadHeader(this.route.fragment['value'] === 'clone');
+    this.loadHeader(this.route.snapshot.fragment === 'clone');
   }
-
 
   private loadHeader(cloneHeader: boolean) {
     if (this.message.id) {
       this.headerService.query().subscribe(res => {
-        this.headers = res.body.filter(hk => hk.messageId === this.message.id);
+        this.headers = res.body!.filter(hk => hk.messageId === this.message.id);
       });
     } else {
       const hk = new Header();
       hk.type = this.typeHeader[0];
       hk.language = this.languageHeader[0];
       this.headers.push(hk);
-      this.message.id = cloneHeader ? null : this.message.id;
+      this.message.id = cloneHeader ? null! : this.message.id;
     }
   }
 
@@ -86,8 +90,8 @@ export class MessageDialogComponent implements OnInit {
     }
   }
 
-  deleteHeader(header) {
-    this.headerService.delete(header.id).subscribe(res => {
+  deleteHeader(header: IHeader) {
+    this.headerService.delete(header.id!).subscribe(res => {
       this.removeHeader(this.headers.indexOf(header));
     });
   }
@@ -125,15 +129,15 @@ export class MessageDialogComponent implements OnInit {
 
   private mapHeaders() {
     if (typeof this.headers !== 'undefined') {
-      this.headerArray = this.headers.map(hk => hk.key);
+      this.headerArray = this.headers.map(hk => hk.key!);
       this.headerArray = this.headerArray.filter(k => k !== undefined);
     }
   }
 
-  private subscribeToSaveResponse(result: Observable<HttpResponse<IMessage>>, closePopup) {
+  private subscribeToSaveResponse(result: Observable<HttpResponse<IMessage>>, closePopup: boolean) {
     result.subscribe(data => {
       if (data.ok) {
-        this.onSaveSuccess(data.body, closePopup);
+        this.onSaveSuccess(data.body!, closePopup);
       } else {
         this.onSaveError();
       }
@@ -141,9 +145,9 @@ export class MessageDialogComponent implements OnInit {
   }
 
   private onSaveSuccess(result: IMessage, closePopup: boolean) {
-	this.eventManager.broadcast(new EventWithContent('messageListModification', 'OK'));
-	this.eventManager.broadcast(new EventWithContent('messageListModification', result.id ));
-	this.eventManager.broadcast(new EventWithContent('messageListModification', result));
+    this.eventManager.broadcast(new EventWithContent('messageListModification', 'OK'));
+    this.eventManager.broadcast(new EventWithContent('messageListModification', result.id));
+    this.eventManager.broadcast(new EventWithContent('messageListModification', result));
     this.isSaving = false;
     this.activeModal.dismiss(result);
 
@@ -151,11 +155,11 @@ export class MessageDialogComponent implements OnInit {
       header.messageId = result.id;
       if (header.id) {
         this.headerService.update(header).subscribe(hk => {
-          header = hk.body;
+          header = hk.body!;
         });
       } else {
         this.headerService.create(header).subscribe(hk => {
-          header = hk.body;
+          header = hk.body!;
         });
       }
     });
@@ -165,10 +169,10 @@ export class MessageDialogComponent implements OnInit {
     this.isSaving = false;
   }
   private onError(error: any) {
-        this.alertService.addAlert({
-		  type: 'danger',
-		  message: error.message,
-		});
+    this.alertService.addAlert({
+      type: 'danger',
+      message: error.message,
+    });
   }
 }
 
@@ -177,13 +181,13 @@ export class MessageDialogComponent implements OnInit {
   template: '',
 })
 export class MessagePopupComponent implements OnInit, OnDestroy {
-  routeSub: any;
+  private route = inject(ActivatedRoute);
+  private messagePopupService = inject(MessagePopupService);
 
-  constructor(private route: ActivatedRoute, private messagePopupService: MessagePopupService) {}
+  routeSub: any;
 
   ngOnInit() {
     this.routeSub = this.route.params.subscribe(params => {
-      console.log('message popup');
       if (params['id']) {
         this.messagePopupService.open(MessageDialogComponent as Component, params['id']);
       } else {

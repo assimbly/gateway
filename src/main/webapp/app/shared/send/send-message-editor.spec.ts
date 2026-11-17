@@ -4,7 +4,6 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
-import { provideTranslateService } from '@ngx-translate/core';
 
 import { fontAwesomeIcons } from 'app/config/font-awesome-icons';
 
@@ -16,7 +15,7 @@ describe('SendMessageEditor', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [provideTranslateService(), provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
     });
     TestBed.inject(FaIconLibrary).addIcons(...fontAwesomeIcons);
     fixture = TestBed.createComponent(SendMessageEditor);
@@ -24,7 +23,10 @@ describe('SendMessageEditor', () => {
     fixture.detectChanges();
   });
 
-  const tabs = () => Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('a[ngbNavLink]')).map(a => a.textContent?.replace(/\s+/g, ' ').trim());
+  const tabs = () =>
+    Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('a[ngbNavLink]')).map(a =>
+      a.textContent?.replace(/\s+/g, ' ').trim(),
+    );
 
   it('has a Body and a Headers tab, and no separate tab for JMS headers', () => {
     expect(tabs()).toEqual(['Body', 'Headers']);

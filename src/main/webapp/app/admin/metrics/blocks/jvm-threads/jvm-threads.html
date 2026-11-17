@@ -1,26 +1,26 @@
 @let stats = threadStats();
 
-<h4 jhiTranslate="metrics.jvm.threads.title">Threads</h4>
+<h4>Threads</h4>
 
-<span><span jhiTranslate="metrics.jvm.threads.runnable">Runnable</span> {{ stats.threadDumpRunnable }}</span>
+<span><span>Runnable</span> {{ stats.threadDumpRunnable }}</span>
 
 <ngb-progressbar [value]="stats.threadDumpRunnable" [max]="stats.threadDumpAll" [striped]="true" [animated]="false" type="success">
   <span>{{ (stats.threadDumpRunnable * 100) / stats.threadDumpAll | number: '1.0-0' }}%</span>
 </ngb-progressbar>
 
-<span><span jhiTranslate="metrics.jvm.threads.timedwaiting">Timed waiting</span> ({{ stats.threadDumpTimedWaiting }})</span>
+<span><span>Timed waiting</span> ({{ stats.threadDumpTimedWaiting }})</span>
 
 <ngb-progressbar [value]="stats.threadDumpTimedWaiting" [max]="stats.threadDumpAll" [striped]="true" [animated]="false" type="warning">
   <span>{{ (stats.threadDumpTimedWaiting * 100) / stats.threadDumpAll | number: '1.0-0' }}%</span>
 </ngb-progressbar>
 
-<span><span jhiTranslate="metrics.jvm.threads.waiting">Waiting</span> ({{ stats.threadDumpWaiting }})</span>
+<span><span>Waiting</span> ({{ stats.threadDumpWaiting }})</span>
 
 <ngb-progressbar [value]="stats.threadDumpWaiting" [max]="stats.threadDumpAll" [striped]="true" [animated]="false" type="warning">
   <span>{{ (stats.threadDumpWaiting * 100) / stats.threadDumpAll | number: '1.0-0' }}%</span>
 </ngb-progressbar>
 
-<span><span jhiTranslate="metrics.jvm.threads.blocked">Blocked</span> ({{ stats.threadDumpBlocked }})</span>
+<span><span>Blocked</span> ({{ stats.threadDumpBlocked }})</span>
 
 <ngb-progressbar [value]="stats.threadDumpBlocked" [max]="stats.threadDumpAll" [striped]="true" [animated]="false" type="success">
   <span>{{ (stats.threadDumpBlocked * 100) / stats.threadDumpAll | number: '1.0-0' }}%</span>

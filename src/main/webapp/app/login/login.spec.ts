@@ -3,10 +3,10 @@ import { ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Navigation, Router } from '@angular/router';
 
-import { provideTranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 
 import { AccountService } from 'app/core/auth';
+import { ProfileService } from 'app/layouts/profiles/profile.service';
 
 import Login from './login';
 import { LoginService } from './login.service';
@@ -17,11 +17,12 @@ describe('Login', () => {
   let mockRouter: Router;
   let mockAccountService: AccountService;
   let mockLoginService: LoginService;
+  let registration = false;
+  let firstSignIn = false;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        provideTranslateService(),
         {
           provide: ActivatedRoute,
           useValue: {},
@@ -36,6 +37,13 @@ describe('Login', () => {
           provide: LoginService,
           useValue: {
             login: vi.fn(() => of({})),
+            firstSignIn: vi.fn(() => of(firstSignIn)),
+          },
+        },
+        {
+          provide: ProfileService,
+          useValue: {
+            getProfileInfo: vi.fn(() => of({ registration })),
           },
         },
       ],
@@ -84,6 +92,37 @@ describe('Login', () => {
 
       // THEN
       expect(mockRouter.navigate).toHaveBeenCalledWith(['']);
+    });
+  });
+
+  describe('registration', () => {
+    it('offers no account of your own when an administrator adds users', () => {
+      expect(comp.registration()).toBe(false);
+    });
+
+    it('offers to register when the Gateway lets anyone create an account', () => {
+      registration = true;
+      const open = TestBed.createComponent(Login).componentInstance;
+      registration = false;
+
+      expect(open.registration()).toBe(true);
+    });
+  });
+
+  describe('first sign-in', () => {
+    it('says nothing about the default account once it has its own password', () => {
+      expect(comp.firstSignIn()).toBe(false);
+    });
+
+    it('tells a first-time user how to log in and that a new password follows', () => {
+      firstSignIn = true;
+      const first = TestBed.createComponent(Login);
+      firstSignIn = false;
+      first.detectChanges();
+
+      const note = first.nativeElement.querySelector('[data-cy="firstSignIn"]') as HTMLElement;
+      expect(note.textContent).toContain('admin');
+      expect(note.textContent).toContain('at least 12 characters');
     });
   });
 

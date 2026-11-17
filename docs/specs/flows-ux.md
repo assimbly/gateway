@@ -144,13 +144,17 @@ After using the slices in the running UI, some choices above were changed. Where
 - **Connections follow the Component.** The step editor has no Add → Connection for Component Steps: a Step whose Component needs a Connection (JMS, SJMS, ActiveMQ, AMQP, IBM MQ, RabbitMQ, SQL, …) shows the Connection field by itself. Route and Script Steps can't be read that way, so they keep Add → Connection.
 - **A failed start shows as Error, not as JSON.** Configure, start, stop, pause and resume calls handle their own errors instead of the page's error alert. In the editor and in the list, a failure turns the controls red and adds an Error badge. The badge opens a summary ("1 of 3 Steps failed to start.") with each failed Step's Endpoint and message, without the stack trace. An answer that reports `status: failed` counts as a failure even when the HTTP call succeeded.
 - **No jump when the canvas opens.** The canvas stays invisible (still measured) until the first fit has put the Steps in place, then fades in.
+- **Readable Routers and Actions.** Routers are listed by name and description (If / else, Content router, Split and combine…), the most used first. Assimbly's own Actions have readable titles and catalogue labels, and the Action tab starts with an **Essentials** chip for them.
+- **Small steps show their Options.** A Component with at most four Options starts with all of its Common Options as rows, a text value opens in a larger editor, and a Component without path syntax (Set body) shows no Path field.
+- **Nodes say what they do.** A node shows its component's title and, below it, its path.
+- **Variables in the editor.** Path and text Option fields have an `@{}` menu to insert a Variable, and a reference to an unknown Variable is warned about on the Step and its node.
+- **Start from an example.** The New Flow dialog and the empty Flows page offer three Example Flows: Folder to folder, Scheduled HTTP call and Route by content.
 
 ## Out of Scope
 
 - Per-component forms (ADR 0002).
 - Per-Step counters on canvas nodes. They need per-Step metrics from the runtime.
 - Linking an alert to the Step that failed. Alerts carry no Step reference.
-- A "Start from an example" card. It comes once a curated set of 5–10 example Flows is committed and packaged.
 - Converting a Flow between types, and moving Script and Route Flows onto the canvas.
 - Changing the theme system, or adding new themes.
 - Changes outside the Flows section (Broker, Administration).

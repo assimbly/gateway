@@ -4,20 +4,20 @@ import { Header } from 'app/shared/model/header.model';
 
 @Pipe({ name: 'MessageSortByHeaderPipe' })
 export class MessageSortByHeaderPipePipe implements PipeTransform {
-    transform(headers: KeyValue<string | number | symbol, any>[], ascending: boolean, predicate: string) {
+    transform(headers: KeyValue<string | number | symbol, any>[] | null, ascending: boolean, predicate: string | undefined) {
         let sortedHeaders: Header[] = [];
 
         if(headers){
 
           for (let i = 0; i < headers.length; i++) {
-              sortedHeaders.push(new Header(i, String(headers[i].key), headers[i].value, null, null, null));
+              sortedHeaders.push(new Header(i, String(headers[i].key), headers[i].value, null!, null!, null!));
           }
           const asc: number = ascending ? 1 : -1;
 
           if (predicate == 'key') {
-              sortedHeaders = sortedHeaders.sort((a, b) => (a.key.toLocaleLowerCase() < b.key.toLocaleLowerCase() ? asc : asc * -1));
+              sortedHeaders = sortedHeaders.sort((a, b) => (a.key!.toLocaleLowerCase() < b.key!.toLocaleLowerCase() ? asc : asc * -1));
           } else if (predicate == 'value') {
-              sortedHeaders = sortedHeaders.sort((a, b) => (a.value <= b.value ? asc : asc * -1));
+              sortedHeaders = sortedHeaders.sort((a, b) => (a.value! <= b.value! ? asc : asc * -1));
           }
 
         }

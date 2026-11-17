@@ -1,7 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit, OnDestroy, QueryList, ViewChildren, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
-import { Subscription, forkJoin, interval } from 'rxjs';
+import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { EMPTY, Subscription, concatMap, forkJoin, interval } from 'rxjs';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -20,26 +19,42 @@ import { ITEMS_PER_PAGE } from 'app/config/pagination.constants';
 import { FlowService } from './flow.service';
 import { IIntegration, GatewayType, EnvironmentType } from 'app/shared/model/integration.model';
 import { IntegrationService } from 'app/entities/integration/integration.service';
+import { EmptyState } from 'app/shared/empty-state';
 import { SearchToolbar } from 'app/shared/filter';
 import { DataTable, DataTableColumn } from 'app/shared/table';
+import { isPlainKey, isTypingTarget } from 'app/shared/keyboard';
 import { FlowRowComponent } from './flow-row.component';
+import { FlowRuntime } from './flow-status';
 import { FlowSearchByNamePipe } from './flow.searchbyname.pipe';
 import { FlowTypeChoicesComponent } from './flow-type-choices.component';
-import { NewFlowDialogComponent, takeChosenFile } from './new-flow-dialog.component';
+import { TutorialPanelState } from 'app/tutorials/tutorial-panel.state';
+import { NewFlowDialogComponent } from './new-flow-dialog.component';
+import { ImportDialogComponent } from 'app/entities/import/import-dialog.component';
 import { ApiService } from 'app/entities/api/api.service';
 import { IApiHandler } from 'app/entities/api/api.model';
 
 @Component({
   selector: 'jhi-flow',
   templateUrl: './flow.component.html',
-  styleUrl: './flow.component.scss',
-  imports: [CommonModule, RouterModule, FontAwesomeModule, SearchToolbar, DataTable, FlowRowComponent, FlowTypeChoicesComponent],
+  imports: [RouterModule, FontAwesomeModule, EmptyState, SearchToolbar, DataTable, FlowRowComponent, FlowTypeChoicesComponent],
+  host: {
+    '(document:keydown)': 'onKeydown($event)',
+  },
 })
 export class FlowComponent implements OnInit, OnDestroy {
-  integrations: IIntegration[];
-  integration: IIntegration;
+  protected flowService = inject(FlowService);
+  protected alertService = inject(AlertService);
+  protected eventManager = inject(EventManager);
+  protected parseLinks = inject(ParseLinks);
+  protected accountService = inject(AccountService);
+  protected integrationService = inject(IntegrationService);
+  protected changeDetector = inject(ChangeDetectorRef);
+  protected modalService = inject(NgbModal);
+
+  integrations!: IIntegration[];
+  integration!: IIntegration;
   flows: IFlow[] = [];
-  flow: IFlow;
+  flow!: IFlow;
   currentAccount: any;
   itemsPerPage: number;
   links: any;
@@ -47,51 +62,45 @@ export class FlowComponent implements OnInit, OnDestroy {
   sortState: SortState = { predicate: 'name', order: 'asc' };
   queryCount: any;
   totalItems = -1;
-  integrationExists: boolean;
+  integrationExists!: boolean;
   multipleIntegrations = false;
   finished = false;
 
-  singleIntegrationName: string;
-  singleIntegrationId: number;
-  singleIntegrationStage: string;
+  singleIntegrationName!: string;
+  singleIntegrationId!: number;
+  singleIntegrationStage!: string;
 
-  configuredIntegration: IIntegration;
-  indexIntegration: number;
+  configuredIntegration!: IIntegration;
+  indexIntegration!: number;
 
   flowActions = ['start', 'stop', 'pause', 'restart', 'resume'];
-  selectedAction: string;
+  selectedAction!: string;
   test: any;
   searchText = '';
   flowsLoading = true;
   flowsLoadFailed = false;
   readonly columns: DataTableColumn[] = [
     { key: 'name', header: 'Name', sortable: true },
-    { key: 'type', header: 'Type' },
-    { key: 'status', header: 'Status' },
-    { key: 'completed', header: 'Completed', numeric: true },
-    { key: 'failed', header: 'Failed', numeric: true },
+    { key: 'type', header: 'Type', sortable: true },
+    { key: 'status', header: 'Status', sortable: true },
+    { key: 'completed', header: 'Completed', numeric: true, sortable: true },
+    { key: 'failed', header: 'Failed', numeric: true, sortable: true },
     { key: 'stats', header: 'Stats' },
     { key: 'actions', header: 'Actions', align: 'end' },
   ];
   /** The Handler Flows by Flow id, to mark them with their API and Operation. */
   handlers: Record<number, IApiHandler> = {};
+  /** The runtime state of the Flows by Flow id, as their rows report it. */
+  runtimes: Record<number, FlowRuntime> = {};
   private readonly apiService = inject(ApiService);
+  readonly tutorialPanel = inject(TutorialPanelState);
   private readonly searchPipe = new FlowSearchByNamePipe();
   private readonly eventSubscriptions = new Subscription();
   private readonly polls = new Subscription();
 
-  @ViewChildren(FlowRowComponent) private flowRows: QueryList<FlowRowComponent>;
+  @ViewChildren(FlowRowComponent) private flowRows!: QueryList<FlowRowComponent>;
 
-  constructor(
-    protected flowService: FlowService,
-    protected alertService: AlertService,
-    protected eventManager: EventManager,
-    protected parseLinks: ParseLinks,
-    protected accountService: AccountService,
-    protected integrationService: IntegrationService,
-    protected changeDetector: ChangeDetectorRef,
-    protected modalService: NgbModal,
-  ) {
+  constructor() {
     this.flows = [];
     this.itemsPerPage = ITEMS_PER_PAGE + 5;
     this.page = 0;
@@ -102,7 +111,7 @@ export class FlowComponent implements OnInit, OnDestroy {
 
   loadFlows() {
     if (this.integrations.length > 1) {
-      this.getFlowsForSelectedIntegration(this.integrations[this.indexIntegration].id);
+      this.getFlowsForSelectedIntegration(this.integrations[this.indexIntegration].id!);
     } else {
       this.flowService
         .query({
@@ -111,23 +120,22 @@ export class FlowComponent implements OnInit, OnDestroy {
           sort: this.sort(),
         })
         .subscribe(
-          (res: HttpResponse<IFlow[]>) => this.onSuccess(res.body, res.headers),
-          (res: HttpErrorResponse) => this.onError(res.message)
+          (res: HttpResponse<IFlow[]>) => this.onSuccess(res.body!, res.headers),
+          (res: HttpErrorResponse) => this.onError(res.message),
         );
     }
   }
 
-  getFlowsForSelectedIntegration(event) {
-    let id = (event.target as HTMLSelectElement).value as string;
+  getFlowsForSelectedIntegration(integrationId: number) {
     this.flowService
-      .getFlowByIntegrationId(Number(id), {
+      .getFlowByIntegrationId(integrationId, {
         page: this.page,
         size: this.itemsPerPage,
         sort: this.sort(),
       })
       .subscribe(
-        (res: HttpResponse<IFlow[]>) => this.onSuccess(res.body, res.headers),
-        (res: HttpErrorResponse) => this.onError(res.message)
+        (res: HttpResponse<IFlow[]>) => this.onSuccess(res.body!, res.headers),
+        (res: HttpErrorResponse) => this.onError(res.message),
       );
   }
 
@@ -139,7 +147,7 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.loadFlows();
   }
 
-  loadPage(page) {
+  loadPage(page: number) {
     this.page = 0; // page;
     this.itemsPerPage = this.itemsPerPage + 5;
     this.loadFlows();
@@ -155,8 +163,9 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.registerChangeInFlows();
     this.registerChangeCreatedIntegration();
     this.registerDeletedFlows();
-    this.polls.add(interval(15000).subscribe(() => this.flowRows?.forEach(row => row.pollMessages())));
+    this.polls.add(interval(10000).subscribe(() => this.flowRows?.forEach(row => row.pollMessages())));
     this.polls.add(interval(10000).subscribe(() => this.flowRows?.forEach(row => row.pollAlerts())));
+    this.polls.add(interval(10000).subscribe(() => this.flowRows?.forEach(row => row.pollStatus())));
   }
 
   loadHandlers(): void {
@@ -173,43 +182,45 @@ export class FlowComponent implements OnInit, OnDestroy {
   }
 
   getIntegrations(): void {
-    forkJoin(this.flowService.getIntegrationName(), this.integrationService.query()).subscribe(([integrationName, integrations]) => {
-      this.integrations = integrations.body;
-      this.checkIntegrationType(this.integrations, integrationName.body);
+    forkJoin(this.flowService.getIntegrationName(), this.integrationService.query())
+      .pipe(
+        concatMap(([integrationName, integrations]) => {
+          this.integrations = integrations.body!;
+          this.checkIntegrationType(this.integrations, integrationName.body!);
 
-      if (!this.integrationExists) {
-        console.log('Creating integration');
-        this.integration = new Object();
-        this.integration.name = integrationName.body;
-        this.integration.type = GatewayType.FULL;
-        this.integration.environmentName = 'Dev1';
-        this.integration.stage = EnvironmentType.DEVELOPMENT;
-        this.integration.defaultFromComponentType = 'file';
-        this.integration.defaultToComponentType = 'file';
-        this.integration.defaultErrorComponentType = 'file';
+          if (!this.integrationExists) {
+            this.integration = new Object();
+            this.integration.name = integrationName.body!;
+            this.integration.type = GatewayType.FULL;
+            this.integration.environmentName = 'Dev1';
+            this.integration.stage = EnvironmentType.DEVELOPMENT;
+            this.integration.defaultFromComponentType = 'file';
+            this.integration.defaultToComponentType = 'file';
+            this.integration.defaultErrorComponentType = 'file';
+            return this.integrationService.create(this.integration);
+          }
 
-        this.integrationService.create(this.integration).subscribe(integration => {
-          console.log('integration created');
-          this.integration = integration.body;
-          this.integrations.push(this.integration);
-          this.integrationExists = true;
-          this.singleIntegrationName = integration.body.name;
-          this.singleIntegrationId = integration.body.id;
-          this.singleIntegrationStage = integration.body.stage ? integration.body.stage.toString().toLowerCase() : '';
-          this.flowsLoading = false;
-          this.changeDetector.detectChanges();
-        });
-      } else {
-        this.loadFlows();
-        if (!this.multipleIntegrations) {
-          this.singleIntegrationName = this.integrations[this.indexIntegration].name;
-          this.singleIntegrationId = this.integrations[this.indexIntegration].id;
-          this.singleIntegrationStage = this.integrations[this.indexIntegration].stage
-            ? this.integrations[this.indexIntegration].stage.toString().toLowerCase()
-            : '';
-        }
-      }
-    });
+          this.loadFlows();
+          if (!this.multipleIntegrations) {
+            this.singleIntegrationName = this.integrations[this.indexIntegration].name!;
+            this.singleIntegrationId = this.integrations[this.indexIntegration].id!;
+            this.singleIntegrationStage = this.integrations[this.indexIntegration].stage
+              ? this.integrations[this.indexIntegration].stage!.toString().toLowerCase()
+              : '';
+          }
+          return EMPTY;
+        }),
+      )
+      .subscribe(integration => {
+        this.integration = integration.body!;
+        this.integrations.push(this.integration);
+        this.integrationExists = true;
+        this.singleIntegrationName = integration.body!.name!;
+        this.singleIntegrationId = integration.body!.id!;
+        this.singleIntegrationStage = integration.body!.stage ? integration.body!.stage.toString().toLowerCase() : '';
+        this.flowsLoading = false;
+        this.changeDetector.detectChanges();
+      });
   }
 
   checkIntegrationType(integrations: IIntegration[], integrationName: String): void {
@@ -219,7 +230,7 @@ export class FlowComponent implements OnInit, OnDestroy {
       this.multipleIntegrations = integrations.length > 1;
     } else {
       this.multipleIntegrations = false;
-      this.configuredIntegration = integrations.find(integration => integration.name === integrationName);
+      this.configuredIntegration = integrations.find(integration => integration.name === integrationName)!;
       this.indexIntegration = integrations.findIndex(integration => integration.name == integrationName);
       this.integrationExists = this.indexIntegration >= 0;
       if (!this.integrationExists) {
@@ -239,29 +250,34 @@ export class FlowComponent implements OnInit, OnDestroy {
   }
 
   get filteredFlows(): IFlow[] {
-    return this.searchPipe.transform(this.flows ?? [], this.searchText, this.sortState.order === 'asc', this.sortState.predicate);
+    return this.searchPipe.transform(
+      this.flows ?? [],
+      this.searchText,
+      this.sortState.order === 'asc',
+      this.sortState.predicate,
+      this.runtimes,
+    );
   }
 
-  get integrationId(): number | undefined {
-    return this.integrations?.[this.indexIntegration]?.id;
+  /** A row reports its Flow's state when it changes, so the list can be sorted on it. */
+  onRuntimeChange(id: number, runtime: FlowRuntime): void {
+    this.runtimes = { ...this.runtimes, [id]: runtime };
   }
 
-  openNewFlow(): NewFlowDialogComponent {
-    const modalRef = this.modalService.open(NewFlowDialogComponent, { size: 'lg', ariaLabelledBy: 'new-flow-title' });
-    const dialog: NewFlowDialogComponent = modalRef.componentInstance;
-    dialog.integrationId = this.integrationId;
-    return dialog;
+  openNewFlow(): void {
+    this.modalService.open(NewFlowDialogComponent, { size: 'lg', ariaLabelledBy: 'new-flow-title' });
   }
 
-  importFromFile(event: Event): void {
-    const file = takeChosenFile(event);
-    if (file) {
-      void this.openNewFlow().importFile(file);
+  /** N adds a Flow, unless the key is typed into a field or a dialog is open. */
+  onKeydown(event: KeyboardEvent): void {
+    if ((isPlainKey(event, 'n') || isPlainKey(event, 'N')) && !isTypingTarget(event.target) && !this.modalService.hasOpenModals()) {
+      event.preventDefault();
+      this.openNewFlow();
     }
   }
 
-  trackId(index: number, item: IFlow) {
-    return item.id;
+  openImport(): void {
+    this.modalService.open(ImportDialogComponent, { size: 'lg', ariaLabelledBy: 'import-flow-title' });
   }
 
   registerChangeInFlows() {
@@ -293,16 +309,20 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.eventManager.broadcast({ name: 'trigerAction', content: selectedAction });
   }
 
-  private onSuccess(data, headers) {
+  private onSuccess(data: IFlow[], headers: HttpHeaders) {
     if (this.integrations.length === 1) {
-      this.links = this.parseLinks.parse(headers.get('link'));
+      this.links = this.parseLinks.parse(headers.get('link')!);
     }
     this.flows = new Array<IFlow>();
     for (let i = 0; i < data.length; i++) {
       this.flows.push(data[i]);
     }
-    this.totalItems = headers.get('X-Total-Count');
+    this.totalItems = Number(headers.get('X-Total-Count'));
     this.flowsLoading = false;
+    if (!this.flows.length) {
+      // A first-time user on an empty Gateway gets the Tutorials to start with.
+      this.tutorialPanel.showOnFirstVisit();
+    }
     this.changeDetector.detectChanges();
   }
 
@@ -310,9 +330,9 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.flowsLoading = false;
     this.flowsLoadFailed = true;
     this.changeDetector.detectChanges();
-		this.alertService.addAlert({
-		  type: 'danger',
-		  message: errorMessage,
-		});
+    this.alertService.addAlert({
+      type: 'danger',
+      message: errorMessage,
+    });
   }
 }

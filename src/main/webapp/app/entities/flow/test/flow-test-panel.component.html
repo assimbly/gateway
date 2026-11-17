@@ -1,0 +1,258 @@
+<section class="flow-test" aria-labelledby="flow-test-title">
+  <div class="flow-test__header">
+    <h5 id="flow-test-title" class="mb-0"><fa-icon icon="flask"></fa-icon> Test</h5>
+    @if (flowId()) {
+      <jhi-status-controls
+        data-tour="flow-status-controls"
+        [small]="false"
+        [busy]="busy()"
+        [tone]="state().tone"
+        [showStart]="shows('start')"
+        [startDisabled]="disabled('start') || !flowId() || draftReason() !== null"
+        [showPause]="shows('pause')"
+        [pauseDisabled]="disabled('pause')"
+        [showResume]="shows('resume')"
+        [showStop]="shows('stop')"
+        [stopDisabled]="disabled('stop')"
+        [showRestart]="shows('restart')"
+        (start)="start.emit()"
+        (pause)="pause.emit()"
+        (resume)="resume.emit()"
+        (stop)="stop.emit()"
+        (restart)="restart.emit()"
+      />
+    }
+  </div>
+
+  @if (blocked(); as reason) {
+    <div class="alert alert-secondary py-2 mb-0 small flow-test__notice" data-cy="test-blocked">
+      <span>{{ reason.text }}</span>
+    </div>
+  } @else if (unsaved()) {
+    <div class="alert alert-warning py-2 mb-0 small flow-test__notice" data-cy="test-unsaved">
+      <span>A test runs the saved Flow, without your unsaved changes.</span>
+      <button type="button" class="btn btn-fx btn-fx-sm btn-fx-secondary" (click)="saveAndRun.emit()">Save &amp; restart</button>
+    </div>
+  }
+
+  @if (graph()) {
+    <div class="btn-group btn-group-sm align-self-start" role="group" aria-label="What the Tester shows">
+      <button
+        type="button"
+        class="btn btn-outline-secondary"
+        data-cy="test-level-flow"
+        title="The message into and out of the whole Flow"
+        [class.active]="level() === 'flow'"
+        [attr.aria-pressed]="level() === 'flow'"
+        (click)="level.set('flow')"
+      >
+        Flow
+      </button>
+      <button
+        type="button"
+        class="btn btn-outline-secondary"
+        data-cy="test-level-step"
+        title="The message into and out of the Step selected on the Visual flow"
+        [class.active]="level() === 'step'"
+        [attr.aria-pressed]="level() === 'step'"
+        (click)="level.set('step')"
+      >
+        Step
+      </button>
+    </div>
+  }
+
+  @if (shownLevel() === 'flow') {
+    <ng-container *ngTemplateOutlet="subject; context: { kind: 'Flow', name: flowName() || 'This Flow', info: flowInfo() }"></ng-container>
+    @if (run(); as result) {
+      <div #result class="flow-test__status" data-cy="test-summary">
+        <span class="badge" [class.text-bg-success]="result.status === 'completed'" [class.text-bg-danger]="result.status === 'failed'">
+          {{ result.status === 'failed' ? 'Failed' : 'Passed' }}
+        </span>
+        <span class="small text-muted">
+          {{ duration(result.durationMillis) }}
+          @if (!routes()) {
+            · {{ passedSteps() }} of {{ result.steps.length }} Step runs completed
+          }
+        </span>
+      </div>
+      @if (result.error; as error) {
+        <ng-container *ngTemplateOutlet="errorDetail; context: { $implicit: error }"></ng-container>
+      }
+    }
+    @if (failure(); as error) {
+      <div #result class="alert alert-danger py-2 mb-0 small" role="alert">{{ error }}</div>
+    }
+
+    <div class="flow-test__io">
+      <section class="flow-test__part" data-cy="test-in" aria-labelledby="flow-test-in">
+        <ng-container *ngTemplateOutlet="partHeader; context: { id: 'flow-test-in', title: 'In', info: inInfo() }"></ng-container>
+        <jhi-send-message-editor [(body)]="body" [(headers)]="headers" [(bodyMode)]="bodyMode" [compact]="true" />
+        <div class="flow-test__actions">
+          <ng-container *ngTemplateOutlet="runButton"></ng-container>
+          @if (flowId() && !routes()) {
+            <a class="small" routerLink="/flow/message-sender" [queryParams]="{ flowId: flowId() }"
+              >Send to the Source's endpoint instead</a
+            >
+          }
+        </div>
+      </section>
+
+      <section class="flow-test__part" data-cy="test-out" aria-labelledby="flow-test-out">
+        <ng-container *ngTemplateOutlet="partHeader; context: { id: 'flow-test-out', title: 'Out', info: outInfo }"></ng-container>
+        <jhi-test-message
+          [message]="run()?.response"
+          [placeholder]="run() ? 'Nothing came back.' : 'Run the test to see what goes out of the Flow.'"
+        />
+        @if (run()) {
+          @if (scripts()) {
+            <p class="text-muted small mb-0">Each Script shows its Out on the Scripts tab.</p>
+          } @else if (!routes()) {
+            <p class="text-muted small mb-0"><ng-container *ngTemplateOutlet="selectStep"></ng-container></p>
+          }
+        }
+      </section>
+    </div>
+  } @else {
+    @if (selectedStep(); as step) {
+      <ng-container
+        *ngTemplateOutlet="subject; context: { kind: 'Step', name: step.label, detail: step.name, edit: selectedKey() }"
+      ></ng-container>
+      @switch (selectedMark()) {
+        @case ('input') {
+          <p class="small mb-0">This is the Source. The test message starts at the Step after it: the Flow's In goes into that Step.</p>
+        }
+        @case ('unreached') {
+          <p class="small mb-0" data-cy="test-unreached">The message didn't reach this Step.</p>
+        }
+        @case (undefined) {
+          <div class="flow-test__status">
+            <span class="small text-muted">Run the test to see this Step's In and Out.</span>
+            <ng-container *ngTemplateOutlet="runButton; context: { small: true }"></ng-container>
+          </div>
+        }
+        @default {
+          @if (stepRun(selectedMark()); as stepResult) {
+            <div class="flow-test__status" data-cy="test-step">
+              <span
+                class="badge"
+                [class.text-bg-success]="stepResult.status === 'completed'"
+                [class.text-bg-danger]="stepResult.status === 'failed'"
+                [class.text-bg-secondary]="stepResult.status === 'running'"
+                >{{ stepStatus(stepResult) }}</span
+              >
+              <span class="small text-muted"
+                >{{ duration(stepResult.ownMillis) }} in this Step · {{ duration(stepResult.totalMillis) }} with the Steps after it</span
+              >
+              <ng-container *ngTemplateOutlet="runButton; context: { small: true }"></ng-container>
+            </div>
+            @if (stepResult.error; as error) {
+              <ng-container *ngTemplateOutlet="errorDetail; context: { $implicit: error }"></ng-container>
+            }
+            <div class="flow-test__io">
+              <section class="flow-test__part" data-cy="test-in" aria-labelledby="flow-test-step-in">
+                <ng-container
+                  *ngTemplateOutlet="
+                    partHeader;
+                    context: { id: 'flow-test-step-in', title: 'In', info: 'What this Step received: the message as it came in.' }
+                  "
+                ></ng-container>
+                <jhi-test-message [message]="stepResult.in" placeholder="This Step received nothing." />
+              </section>
+              <section class="flow-test__part" data-cy="test-out" aria-labelledby="flow-test-step-out">
+                <ng-container
+                  *ngTemplateOutlet="
+                    partHeader;
+                    context: {
+                      id: 'flow-test-step-out',
+                      title: 'Out',
+                      info: 'What this Step passed on: the message as it went to the next Step.',
+                    }
+                  "
+                ></ng-container>
+                <jhi-test-message [message]="stepResult.out" [placeholder]="noOut(stepResult)" />
+              </section>
+            </div>
+          }
+        }
+      }
+    } @else {
+      <ng-container *ngTemplateOutlet="subject; context: { kind: 'Step', name: 'No Step selected' }"></ng-container>
+      <p class="small text-muted mb-0" data-cy="test-no-step"><ng-container *ngTemplateOutlet="selectStep"></ng-container></p>
+    }
+  }
+</section>
+
+<!-- What the panel shows: the Flow, or the selected Step with its name and an Edit Step button. -->
+<ng-template #subject let-kind="kind" let-name="name" let-detail="detail" let-edit="edit" let-info="info">
+  <div class="flow-test__subject" data-cy="test-subject">
+    <div class="flow-test__subject-text">
+      <span class="flow-test__kind">{{ kind }}</span>
+      <span class="flow-test__name">
+        {{ name }}
+        @if (detail) {
+          <span class="flow-test__detail"> · {{ detail }}</span>
+        }
+        @if (info) {
+          <ng-container *ngTemplateOutlet="infoIcon; context: { $implicit: info }"></ng-container>
+        }
+      </span>
+    </div>
+    @if (edit) {
+      <button type="button" class="btn btn-fx btn-fx-sm btn-fx-ghost" (click)="editStep.emit(edit)">Edit Step</button>
+    }
+  </div>
+</ng-template>
+
+<ng-template #partHeader let-id="id" let-title="title" let-info="info">
+  <div class="flow-test__part-header">
+    <h6 [id]="id" class="flow-test__part-title">{{ title }}</h6>
+    <ng-container *ngTemplateOutlet="infoIcon; context: { $implicit: info }"></ng-container>
+  </div>
+</ng-template>
+
+<!-- An explanation on hover or focus, so it doesn't take room. -->
+<ng-template #infoIcon let-text>
+  <button type="button" class="flow-test__info" data-cy="test-info" [ngbTooltip]="text" [attr.aria-label]="text" container="body">
+    <fa-icon icon="info-circle"></fa-icon>
+  </button>
+</ng-template>
+
+<!-- Run, under the message to send; beside a Step's result to run again. -->
+<ng-template #runButton let-small="small">
+  <button
+    type="button"
+    class="btn btn-fx btn-fx-primary"
+    [class.btn-fx-sm]="small"
+    data-cy="test-run"
+    [disabled]="!!blocked() || pending()"
+    (click)="runTest()"
+  >
+    <fa-icon [icon]="pending() ? 'sync' : run() ? 'redo' : 'play'" [animation]="pending() ? 'spin' : undefined"></fa-icon
+    ><span>{{ pending() ? 'Testing…' : run() ? 'Test again' : 'Test' }}</span>
+  </button>
+</ng-template>
+
+<!-- Full page the canvas is hidden: Visual flow moves the Tester beside it, so a Step can be clicked. -->
+<ng-template #selectStep>
+  Click a Step on the
+  @if (canvasHidden()) {
+    <button type="button" class="btn btn-link p-0 align-baseline small" data-cy="test-show-canvas" (click)="showCanvas.emit()">
+      Visual flow
+    </button>
+  } @else {
+    Visual flow
+  }
+  to see its In and Out.
+</ng-template>
+
+<ng-template #errorDetail let-error>
+  <div class="alert alert-danger py-2 mb-0 small" role="alert" data-cy="test-error">
+    @if (explain(error); as explanation) {
+      <p class="mb-1">
+        <b>{{ explanation.meaning }}</b> {{ explanation.fix }}
+      </p>
+    }
+    <p class="mb-0 flow-test__error">{{ error }}</p>
+  </div>
+</ng-template>

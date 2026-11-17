@@ -1,0 +1,36 @@
+/* ==============================================================
+The popover a tutorial's Show me puts next to an element (Driver.js renders it in the body)
+===============================================================*/
+
+.driver-popover.tutorial-popover {
+  max-width: 20rem;
+  border: 1px solid var(--app-border);
+  border-radius: 0.25rem;
+  background: var(--app-surface-elevated);
+  color: var(--app-text);
+
+  .driver-popover-description {
+    color: var(--app-text);
+    font-size: 0.875rem;
+  }
+
+  .driver-popover-close-btn {
+    color: var(--app-text-muted);
+  }
+
+  .driver-popover-arrow-side-bottom {
+    border-bottom-color: var(--app-surface-elevated);
+  }
+
+  .driver-popover-arrow-side-top {
+    border-top-color: var(--app-surface-elevated);
+  }
+
+  .driver-popover-arrow-side-left {
+    border-left-color: var(--app-surface-elevated);
+  }
+
+  .driver-popover-arrow-side-right {
+    border-right-color: var(--app-surface-elevated);
+  }
+}

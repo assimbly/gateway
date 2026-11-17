@@ -1,16 +1,30 @@
-import { Component, OnInit, ViewEncapsulation, inject, signal } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, computed, inject, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { NgbDropdownModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbModal, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { forkJoin, of, switchMap } from 'rxjs';
 
+import { confirmChoice } from 'app/entities/flow/editor/confirm-dialog.component';
+import { EmptyState } from 'app/shared/empty-state';
 import { SearchToolbar } from 'app/shared/filter';
-import { DataTable, DataTableColumn, RowActions, OverflowActionDirective, Truncate } from 'app/shared/table';
+import { SortState } from 'app/shared/sort';
+import {
+  DataTable,
+  DataTableColumn,
+  RowActions,
+  OverflowActionDirective,
+  PrimaryActionDirective,
+  Truncate,
+  sortRows,
+} from 'app/shared/table';
 import { IApi } from './api.model';
 import { ApiService, errorMessage } from './api.service';
 import { ApiStatus, apiStatus } from './api-status';
 import { HandlerFlowsService } from './handler-flows.service';
 import { downloadText } from './download';
+
+/** Running APIs first, then the ones that are partly or not running, then the ones with an error. */
+const STATUS_RANK: Record<string, number> = { started: 0, default: 1, failed: 2 };
 
 /** APIs → the list of APIs, with each API's status summarised from its Handler Flows. */
 @Component({
@@ -18,26 +32,50 @@ import { downloadText } from './download';
   templateUrl: './api-list.component.html',
   styleUrl: './api.scss',
   encapsulation: ViewEncapsulation.None,
-  imports: [RouterModule, FontAwesomeModule, NgbDropdownModule, NgbTooltipModule, SearchToolbar, DataTable, RowActions, OverflowActionDirective, Truncate],
+  imports: [
+    RouterModule,
+    FontAwesomeModule,
+    NgbDropdownModule,
+    NgbTooltipModule,
+    EmptyState,
+    SearchToolbar,
+    DataTable,
+    RowActions,
+    PrimaryActionDirective,
+    OverflowActionDirective,
+    Truncate,
+  ],
 })
 export class ApiListComponent implements OnInit {
   private readonly apiService = inject(ApiService);
   private readonly handlerFlows = inject(HandlerFlowsService);
+  private readonly modalService = inject(NgbModal);
 
   readonly apis = signal<IApi[]>([]);
   readonly statuses = signal<Map<number, ApiStatus>>(new Map());
   readonly loading = signal(true);
   readonly message = signal<string | undefined>(undefined);
   searchText = '';
+  sortState: SortState = { predicate: 'name', order: 'asc' };
 
-  readonly columns: DataTableColumn[] = [
-    { key: 'name', header: 'Name' },
-    { key: 'basePath', header: 'Base path' },
-    { key: 'version', header: 'Version' },
-    { key: 'status', header: 'API status' },
-    { key: 'operations', header: 'Operations', numeric: true },
-    { key: 'actions', header: 'Actions', align: 'end' },
-  ];
+  /** The Version column is dropped while no API has a version label: a column of dashes says nothing. */
+  readonly showVersion = computed(() => this.apis().some(api => !!api.versionLabel));
+
+  readonly columns = computed<DataTableColumn[]>(() =>
+    [
+      { key: 'name', header: 'Name', sortable: true },
+      { key: 'basePath', header: 'Base path', sortable: true },
+      { key: 'version', header: 'Version', sortable: true },
+      { key: 'status', header: 'API status', sortable: true },
+      { key: 'operations', header: 'Operations', numeric: true, sortable: true },
+      { key: 'actions', header: 'Actions', align: 'end' as const },
+    ].filter(column => column.key !== 'version' || this.showVersion()),
+  );
+
+  /** With no API at all, the list gives way to an explanation of APIs and how to add the first. */
+  get showEmptyState(): boolean {
+    return !this.loading() && !this.apis().length;
+  }
 
   ngOnInit(): void {
     this.load();
@@ -45,7 +83,18 @@ export class ApiListComponent implements OnInit {
 
   get filteredApis(): IApi[] {
     const text = this.searchText.trim().toLowerCase();
-    return this.apis().filter(api => !text || api.name.toLowerCase().includes(text) || api.basePath.toLowerCase().includes(text));
+    const apis = this.apis().filter(api => !text || api.name.toLowerCase().includes(text) || api.basePath.toLowerCase().includes(text));
+    const statuses = this.statuses();
+    return sortRows(apis, this.sortState, {
+      name: api => api.name,
+      basePath: api => api.basePath,
+      version: api => api.versionLabel,
+      status: api => {
+        const tone = statuses.get(api.id!)?.tone;
+        return tone === undefined ? undefined : (STATUS_RANK[tone] ?? 1);
+      },
+      operations: api => api.operationCount ?? 0,
+    });
   }
 
   load(): void {
@@ -74,12 +123,17 @@ export class ApiListComponent implements OnInit {
 
   deleteApi(api: IApi): void {
     const count = api.operationCount ?? api.operations?.length ?? 0;
-    if (!window.confirm(`Delete the API ${api.name}? Its ${count} ${count === 1 ? 'Operation and its Handler Flow are' : 'Operations and their Handler Flows are'} deleted too.`)) {
-      return;
-    }
-    this.apiService.delete(api.id!).subscribe({
-      next: () => this.load(),
-      error: error => this.message.set(errorMessage(error)),
+    const message = `Delete the API ${api.name}? Its ${count} ${count === 1 ? 'Operation and its Handler Flow are' : 'Operations and their Handler Flows are'} deleted too.`;
+    void confirmChoice(this.modalService, 'Delete API', message, [
+      { value: 'cancel', label: 'Cancel', style: 'secondary' },
+      { value: 'delete', label: 'Delete', style: 'danger', icon: 'trash' },
+    ]).then(choice => {
+      if (choice === 'delete') {
+        this.apiService.delete(api.id!).subscribe({
+          next: () => this.load(),
+          error: error => this.message.set(errorMessage(error)),
+        });
+      }
     });
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -12,10 +12,9 @@ type EntityArrayResponseType = HttpResponse<ILink[]>;
 
 @Injectable({ providedIn: 'root' })
 export class LinkService {
+    protected http = inject(HttpClient);
 
     public resourceUrl = `${serverApiUrl}api/link`;
-
-    constructor(protected http: HttpClient) {}
 
     create(link: ILink): Observable<EntityResponseType> {
         return this.http.post<ILink>(this.resourceUrl, link, { observe: 'response' });

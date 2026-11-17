@@ -1,0 +1,107 @@
+import { marked } from 'marked';
+
+import { Tutorial, TutorialStep } from './tutorial.model';
+
+/** Where the tutorials are served, as scripts/tutorials/sync.mjs copies them. */
+export const TUTORIALS_URL = 'content/tutorials/';
+
+const TUTORIAL_HEADER = /<!--\s*tutorial:\s*(\{[\s\S]*?\})\s*-->/;
+const STEP_META = /<!--\s*step:\s*(\{[\s\S]*?\})\s*-->/;
+const SHOW = /<!--\s*show:\s*([\s\S]*?)\s*-->/g;
+/** What separates the selector of a Show me from the page it's on, as in `<!-- show: [aria-label="Add"] @ /queue -->`. */
+const PAGE = ' @ ';
+/** A block only the written tutorial needs, such as the hint to follow it in the Gateway: the comment and the lines up to the next blank one. */
+const WEB_ONLY = /<!--\s*web-only\s*-->\n(?:[^\n]+\n?)*/g;
+const SECTION = /^## /m;
+/** The label the written tutorial puts above what you'll learn; the panel has a heading of its own for it. */
+const LEARN_LABEL = /^\*\*What you'll learn:?\*\*[ \t]*$/m;
+const PREREQUISITES = /^Before you start$/i;
+/** A quote that opens with a bold title, such as `> **Why?** ...` or `> **Tip: ...**`, as marked renders it. */
+const ASIDE = /<blockquote>\s*<p><strong>([\s\S]+?)<\/strong>[ \t]*([\s\S]*?)<\/blockquote>/g;
+
+interface StepMeta {
+  check?: string;
+  skip?: boolean;
+}
+
+/**
+ * A tutorial from its Markdown, as the documentation repository has it: the introduction and every `##` section that
+ * isn't marked `<!-- step: {"skip":true} -->` become the steps of the panel. A `## Before you start` section isn't a step
+ * of its own: it folds into the introduction, collapsed. The HTML comments that steer the panel are invisible on GitHub,
+ * so the same file is the written tutorial.
+ */
+export function parseTutorial(markdown: string): Tutorial {
+  const text = markdown.replace(/\r\n?/g, '\n');
+  const header = TUTORIAL_HEADER.exec(text);
+  if (!header) {
+    throw new Error('The tutorial has no <!-- tutorial: {...} --> comment.');
+  }
+  const { id, title, minutes, fixtures } = JSON.parse(header[1]) as Tutorial;
+
+  const [intro, ...sections] = text.replace(TUTORIAL_HEADER, '').replace(WEB_ONLY, '').split(SECTION);
+  const overview: TutorialStep = { title, html: render(intro.replace(/^# .*$/m, '').replace(LEARN_LABEL, ''), id) };
+  const steps: TutorialStep[] = [overview];
+  for (const section of sections) {
+    const newline = section.indexOf('\n');
+    // the panel numbers its steps itself, so "3. Meet ExampleFlow" and "Step 2: Create TestFlow" lose their numbers
+    const heading = (newline < 0 ? section : section.slice(0, newline)).trim().replace(/^(?:\d+\.|Step \d+:)\s*/, '');
+    const body = newline < 0 ? '' : section.slice(newline + 1);
+    const meta = stepMeta(body);
+    if (PREREQUISITES.test(heading)) {
+      overview.html += `<details class="tutorial-prerequisites"><summary>${heading}</summary>${render(body.replace(STEP_META, ''), id)}</details>`;
+    } else if (!meta.skip) {
+      steps.push({ title: heading, html: render(body.replace(STEP_META, ''), id), ...(meta.check ? { check: meta.check } : {}) });
+    }
+  }
+  return { id, title, minutes, fixtures: fixtures ?? {}, steps };
+}
+
+function stepMeta(body: string): StepMeta {
+  const match = STEP_META.exec(body);
+  return match ? (JSON.parse(match[1]) as StepMeta) : {};
+}
+
+function render(markdown: string, id: string): string {
+  const withButtons = markdown.replace(SHOW, (_, show: string) => showButton(show));
+  const html = marked.parse(withButtons, { async: false, gfm: true });
+  return (
+    html
+      // a tip or an explanation stays folded under its title, so the step itself is just what to do
+      .replace(ASIDE, (_, title: string, rest: string) => fold(title, rest))
+      // values such as a path or a URL are copied with a click or Enter, a code block with its Copy button
+      .replace(/(?<!<pre>)<code>/g, '<code class="tutorial-copy" data-tour-copy tabindex="0" role="button" title="Click to copy">')
+      .replace(/<pre>/g, '<div class="tutorial-code"><button type="button" class="tutorial-code__copy" data-tour-copy>Copy</button><pre>')
+      .replace(/<\/pre>/g, '</pre></div>')
+      // images sit next to the tutorial, and open at full size with a click or Enter
+      .replace(/(<img\s[^>]*?src=")(?![a-z]+:|\/|#)([^"]+)"/gi, `$1${TUTORIALS_URL}${id}/$2"`)
+      .replace(/<img\s/g, '<img tabindex="0" role="button" title="Click to enlarge" ')
+      // other pages open next to the Gateway, not in its place
+      .replace(/<a href="(https?:[^"]+)"/g, '<a href="$1" target="_blank" rel="noopener"')
+  );
+}
+
+/** A Show me button for `selector` or `selector @ page`: the panel opens the page first when the element isn't on this one. */
+function showButton(show: string): string {
+  const [selector, page] = splitShow(show);
+  const pageAttribute = page ? ` data-tour-page="${escapeAttribute(page)}"` : '';
+  return `<button type="button" class="tutorial-show" data-tour-show="${escapeAttribute(selector)}"${pageAttribute}>Show me</button>`;
+}
+
+/** The selector of a show comment and the page it names, if any. */
+export function splitShow(show: string): [selector: string, page: string | undefined] {
+  const at = show.lastIndexOf(PAGE);
+  return at < 0 ? [show, undefined] : [show.slice(0, at).trim(), show.slice(at + PAGE.length).trim()];
+}
+
+/** The quote as a section that opens on a click, under its title without the period or colon it ends with. */
+function fold(title: string, rest: string): string {
+  const label = title.trim().replace(/[.:]$/, '');
+  const kind = /^tip\b/i.test(label) ? ' tutorial-more--tip' : '';
+  // the title can have a paragraph of its own, as in "> **Good to know**" above a list
+  const body = rest.startsWith('</p>') ? rest.slice('</p>'.length) : `<p>${rest}`;
+  return `<details class="tutorial-more${kind}"><summary>${label}</summary>${body.trim()}</details>`;
+}
+
+function escapeAttribute(value: string): string {
+  return value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}

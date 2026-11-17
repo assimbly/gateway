@@ -13,6 +13,8 @@ export type StatusControlsTone = 'default' | 'started' | 'paused' | 'failed';
 })
 export default class StatusControls {
   readonly busy = input(false);
+  /** The small buttons of a table row; the editor header uses the full button size. */
+  readonly small = input(true);
   readonly tone = input<StatusControlsTone>('default');
   readonly showStart = input(false);
   readonly showPause = input(false);

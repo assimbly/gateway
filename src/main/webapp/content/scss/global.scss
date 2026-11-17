@@ -4,14 +4,16 @@
 @import 'bootstrap/scss/variables';
 
 // Import CSS files using @import (CSS files can't be used with @use)
-@import "~@ng-select/ng-select/themes/default.theme.css";
-@import '~codemirror/lib/codemirror.css';
-@import '~codemirror/theme/material-darker.css';
+@import '@ng-select/ng-select/themes/default.theme.css';
+@import 'codemirror/lib/codemirror.css';
+@import 'codemirror/theme/material-darker.css';
+@import 'driver.js/dist/driver.css';
 @import 'theme-tokens';
 @import 'buttons';
 @import 'tables';
 @import 'ng_select';
 @import 'send';
+@import 'tutorials';
 
 /* ==============================================================
 Bootstrap tweaks
@@ -187,6 +189,9 @@ Custom alerts for notification
       color: inherit;
       padding: 0;
       margin: 0;
+      // A long message wraps inside the alert instead of running out of it.
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
     }
     .popover pre {
       font-size: 10px;
@@ -373,7 +378,7 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   background-size: 100%;
   width: 60px;
   height: 50px;
-  background: url('/content/images/assimbly_transparant.png')
+  background: url('/content/images/assimbly_transparant.png');
 }
 
 .activemq-link {
@@ -394,7 +399,6 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   height: 50px;
   vertical-align: text-bottom;
 }
-
 
 .camel-img {
   display: inline-block;
@@ -434,8 +438,6 @@ ng-dropdown-panel > div {
 
 /* comment the popover as it interferes with ngb popover */
 
-
-
 /*
 .popover {
   min-width: 200px;
@@ -456,7 +458,8 @@ ng-dropdown-panel > div {
 */
 
 .popover.flow-stats-popover {
-  max-width: 28rem;
+  width: 26rem;
+  max-width: calc(100vw - 2rem);
 }
 
 .popover.flow-stats-popover .popover-body {
@@ -474,9 +477,9 @@ ng-dropdown-panel > div {
 }
 
 .flow-stats-note {
-  margin: 0;
-  font-size: 0.84rem;
-  word-break: break-all;
+  margin: 0.35rem 0 0;
+  font-size: 0.76rem;
+  color: var(--app-text-muted);
 }
 
 .flow-stats-section h6 {
@@ -514,30 +517,36 @@ ng-dropdown-panel > div {
   word-break: break-word;
 }
 
+.flow-stats-section thead th {
+  padding-right: 0;
+  padding-left: 1rem;
+  text-align: right;
+  font-size: 0.72rem;
+}
+
+.flow-stats-section tbody td + td {
+  padding-left: 1rem;
+}
+
+.flow-stats-details {
+  display: inline-block;
+  margin-top: 0.85rem;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+/* A label of a field that must be filled in */
+.form-control-label.required::after {
+  content: ' *';
+  color: var(--app-danger);
+}
+
 .invalid-field-message {
   margin-top: 0.25rem;
   margin-bottom: 0;
   color: var(--app-danger);
   line-height: 1.3;
 }
-
-.flow-error-detail {
-  max-height: 60vh;
-  overflow: auto;
-  text-align: left;
-}
-
-.flow-error-detail table td:first-child {
-  white-space: nowrap;
-  width: 1%;
-  min-width: 5.5rem;
-  padding-right: 1rem;
-}
-
-.flow-error-detail table td:last-child {
-  overflow-wrap: anywhere;
-}
-
 
 @media (min-width: 768px) {
   .flow-btns .btn {
@@ -603,7 +612,6 @@ ng-dropdown-panel > div {
     background-size: contain;
   }
 }
-
 
 .border-bottom-none {
   border-bottom: none !important;
@@ -747,7 +755,6 @@ ng-dropdown-panel > div {
   color: var(--app-warning-contrast);
   opacity: 1;
 }
-
 
 .btn-transparent {
   background-color: transparent !important;
@@ -1072,27 +1079,27 @@ ng-dropdown-panel > div {
 }
 
 .flex-wrapper {
-    display: flex;
-    margin-top: 10px;
-    min-height: 95vh;
-    flex-direction: column;
-    justify-content: space-between;
-    display: table;
+  display: flex;
+  margin-top: 10px;
+  min-height: 95vh;
+  flex-direction: column;
+  justify-content: space-between;
+  display: table;
 }
 
 .editor-nav {
-    background-color: var(--app-hover);
-    min-height: 70rem;
-    width: 54rem;
+  background-color: var(--app-hover);
+  min-height: 70rem;
+  width: 54rem;
 }
 
 .CodeMirror {
- border: 1px solid var(--app-border);
- height: 500px;
- width: 100%;
- background: var(--app-code-bg);
- color: var(--app-text);
- text-align: left;
+  border: 1px solid var(--app-border);
+  height: 500px;
+  width: 100%;
+  background: var(--app-code-bg);
+  color: var(--app-text);
+  text-align: left;
 }
 
 .CodeMirror-lines,
@@ -1230,6 +1237,34 @@ ng-dropdown-panel > div {
   height: 30rem;
 }
 
+/* A compact body, as in the Test panel: about 7 lines, growing with the text up to about 16 lines, then it scrolls */
+.body-codemirror--compact .CodeMirror {
+  height: auto;
+}
+
+.body-codemirror--compact .CodeMirror-scroll {
+  min-height: 10.5em;
+  max-height: 24em;
+}
+
+// The text of an import page: --import-rows sets the height in lines
+.import-codemirror ngx-codemirror {
+  display: block;
+  min-width: 0;
+}
+
+.import-codemirror .CodeMirror {
+  height: calc(var(--import-rows, 12) * 1.5em + 1rem);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+}
+
+.import-codemirror--active .CodeMirror,
+.import-codemirror .CodeMirror-focused {
+  border-color: var(--app-primary);
+  box-shadow: 0 0 0 0.15rem color-mix(in srgb, var(--app-primary) 25%, transparent);
+}
+
 .body-codemirror .CodeMirror-focused {
   border-color: var(--app-primary);
   box-shadow: 0 0 0 0.15rem color-mix(in srgb, var(--app-primary) 25%, transparent);
@@ -1341,17 +1376,15 @@ jhi-route-dialog {
   color: var(--app-text-muted);
 }
 
-#messageBrowserEditor
-.CodeMirror {
- border: 1px solid var(--app-border);
- height: auto;
- width: 100%;
+#messageBrowserEditor .CodeMirror {
+  border: 1px solid var(--app-border);
+  height: auto;
+  width: 100%;
 }
 
-#messageBrowserEditor
-.CodeMirror-scroll {
-    height: auto;
-    max-height:300px;
+#messageBrowserEditor .CodeMirror-scroll {
+  height: auto;
+  max-height: 300px;
 }
 
 .table {
@@ -1518,3 +1551,31 @@ input:-webkit-autofill:focus {
   color: var(--app-text);
 }
 
+// A Flow's log needs room for the log lines; the drawer is wider than the Alerts drawer.
+.offcanvas.flow-log-drawer {
+  --bs-offcanvas-width: min(60rem, 100vw);
+}
+
+// The Alerts of a Flow: room for a label column next to each error.
+.offcanvas.flow-alerts-drawer {
+  --bs-offcanvas-width: min(36rem, 100vw);
+}
+
+// The Camel route of a Flow, as the runtime built it, in a read-only editor that fills the drawer and scrolls on its own.
+.camel-route {
+  position: relative;
+  min-height: 0;
+}
+
+.camel-route ngx-codemirror,
+.camel-route .CodeMirror {
+  position: absolute;
+  inset: 0;
+}
+
+.camel-route .CodeMirror {
+  height: auto;
+  border: 1px solid var(--app-border);
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+}

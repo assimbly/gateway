@@ -1,5 +1,4 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpResponse } from '@angular/common/http';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -11,6 +10,7 @@ import { FileLoadError, DataUtils } from 'app/core/util/data-util.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { IRoute, Route } from 'app/shared/model/route.model';
+import { SaveShortcutDirective } from 'app/shared/keyboard';
 import { RouteService } from './route.service';
 import { ThemeService } from 'app/core/theme';
 // import { AlertError } from 'app/shared/alert/alert-error.model';
@@ -18,9 +18,15 @@ import { ThemeService } from 'app/core/theme';
 @Component({
     selector: 'jhi-route-update',
     templateUrl: './route-update.component.html',
-    imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, CodemirrorModule],
+    imports: [ReactiveFormsModule, FontAwesomeModule, CodemirrorModule, SaveShortcutDirective],
 })
 export class RouteUpdateComponent implements OnInit {
+    protected dataUtils = inject(DataUtils);
+    protected eventManager = inject(EventManager);
+    protected routeService = inject(RouteService);
+    protected activatedRoute = inject(ActivatedRoute);
+    private fb = inject(FormBuilder);
+
     isSaving = false;
     showType = false;
     readonly themeService = inject(ThemeService);
@@ -28,9 +34,9 @@ export class RouteUpdateComponent implements OnInit {
     private routeOptionsCache: Record<string, unknown> | null = null;
 
     editForm = this.fb.group({
-        id: [],
-        name: [],
-        type: [],
+        id: [null as IRoute['id'] | null],
+        name: [null as IRoute['name'] | null],
+        type: [null as IRoute['type'] | null],
         content: []
     });
 
@@ -60,14 +66,6 @@ export class RouteUpdateComponent implements OnInit {
             setTimeout(refresh);
         });
     }
-
-    constructor(
-        protected dataUtils: DataUtils,
-        protected eventManager: EventManager,
-        protected routeService: RouteService,
-        protected activatedRoute: ActivatedRoute,
-        private fb: FormBuilder
-    ) {}
 
     ngOnInit(): void {
         this.activatedRoute.data.subscribe(({ route }) => {

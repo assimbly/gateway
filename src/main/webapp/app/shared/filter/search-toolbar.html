@@ -20,6 +20,18 @@
     }
   </div>
   <ng-content select="[extras]" />
+  @if (hint()) {
+    <button
+      type="button"
+      class="btn btn-fx btn-fx-ghost btn-fx-icon search-toolbar-hint"
+      [ngbTooltip]="hint()"
+      triggers="hover focus click"
+      container="body"
+      [attr.aria-label]="hint()"
+    >
+      <fa-icon icon="info-circle" />
+    </button>
+  }
   <div class="search-toolbar-actions ms-auto d-flex align-items-center gap-2">
     <ng-content select="[actions]" />
   </div>

@@ -1,5 +1,4 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AlertError } from 'app/shared/alert';
@@ -10,41 +9,64 @@ import { QueueService } from './queue.service';
 
 @Component({
     templateUrl: './queue-delete-dialog.component.html',
-    imports: [CommonModule, FontAwesomeModule, AlertError],
+    imports: [FontAwesomeModule, AlertError],
 })
 export class QueueDeleteDialogComponent {
+    protected queueService = inject(QueueService);
+    activeModal = inject(NgbActiveModal);
+    protected eventManager = inject(EventManager);
+    private cdr = inject(ChangeDetectorRef);
+
     address?: IAddress;
     brokerType = '';
 
-    message = 'Are you sure you want to delete this queue?';
+    /** Replaces the confirmation question once the delete is refused or fails. */
+    message?: string;
     disableDelete = false;
 
-    constructor(
-        protected queueService: QueueService,
-        public activeModal: NgbActiveModal,
-        protected eventManager: EventManager,
-    ) {}
+    get text(): string {
+        if (this.message) {
+            return this.message;
+        }
+        const count = this.address?.numberOfMessages ?? 0;
+        if (count > 0) {
+            return `This queue has ${count} ${count === 1 ? 'message' : 'messages'}. Deleting the queue also deletes ${count === 1 ? 'it' : 'them'}. Are you sure?`;
+        }
+        return `Delete Queue '${this.address?.name}'? This cannot be undone.`;
+    }
 
     cancel(): void {
         this.activeModal.dismiss();
     }
 
     confirmDelete(name: string): void {
-        if (this.address?.numberOfConsumers > 0) {
+        if (this.address?.numberOfConsumers! > 0) {
             this.message = 'Cannot delete queue because there is at least one active consumer';
-            this.disableDelete = true;
-            return;
-        }
-        if (this.address?.numberOfMessages > 0) {
-            this.message = 'Cannot delete queue because there is at least one message on the queue. Please clear the queue before deleting';
             this.disableDelete = true;
             return;
         }
 
         this.disableDelete = true;
-        this.queueService.deleteQueue(name, this.brokerType).subscribe(() => {
-            this.eventManager.broadcast(new EventWithContent('queueListModification', 'deleted'));
-            this.activeModal.dismiss();
+        this.queueService.deleteQueue(name, this.brokerType).subscribe({
+            next: () => {
+                this.eventManager.broadcast(new EventWithContent('queueListModification', 'deleted'));
+                this.activeModal.dismiss();
+            },
+            error: err => {
+                const reason = this.reasonOf(err);
+                this.message = `The queue could not be deleted: ${reason}`;
+                this.disableDelete = false;
+                this.cdr.markForCheck();
+            },
         });
+    }
+
+    /** The runtime answers with a JSON text body that has a message. */
+    private reasonOf(err: any): string {
+        try {
+            return JSON.parse(err?.error)?.message ?? err?.message;
+        } catch {
+            return err?.message ?? 'unknown error';
+        }
     }
 }

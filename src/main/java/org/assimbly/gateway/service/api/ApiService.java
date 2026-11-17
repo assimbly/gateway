@@ -88,7 +88,7 @@ public class ApiService {
         if (moved) {
             for (ApiOperation operation : api.getOperations()) {
                 String fullPath = ApiPaths.fullPath(newBasePath, operation.getPath());
-                List<String> conflicts = conflictsWith(operation.getMethod(), fullPath, other -> other.getApi() == api);
+                List<String> conflicts = findConflicts(operation.getMethod(), fullPath, other -> other.getApi() == api);
                 if (!conflicts.isEmpty()) {
                     throw new ApiRuleException("With the base path " + newBasePath + ", " + operation.getMethod() + " " + fullPath
                         + " would clash with " + conflicts.getFirst() + ".");
@@ -212,6 +212,11 @@ public class ApiService {
      */
     @Transactional(readOnly = true)
     public List<String> conflictsWith(String method, String fullPath, Predicate<ApiOperation> ignored) {
+        return findConflicts(method, fullPath, ignored);
+    }
+
+    // Called from within this class, which runs in the caller's transaction; the proxied conflictsWith is for other beans.
+    private List<String> findConflicts(String method, String fullPath, Predicate<ApiOperation> ignored) {
         String key = ApiPaths.conflictKey(method, fullPath);
         return operationRepository.findAll().stream()
             .filter(other -> !ignored.test(other))
@@ -284,7 +289,7 @@ public class ApiService {
 
     private void checkConflicts(ApiOperation operation, String method, String path) {
         String fullPath = ApiPaths.fullPath(operation.getApi().getBasePath(), path);
-        List<String> conflicts = conflictsWith(method, fullPath, other -> other == operation || (operation.getId() != null && operation.getId().equals(other.getId())));
+        List<String> conflicts = findConflicts(method, fullPath, other -> other == operation || (operation.getId() != null && operation.getId().equals(other.getId())));
         if (!conflicts.isEmpty()) {
             throw new ApiRuleException(method + " " + fullPath + " is already handled by " + conflicts.getFirst() + ".", conflicts.size() > 1 ? conflicts : List.of());
         }

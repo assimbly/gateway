@@ -10,18 +10,20 @@ buildscript {
             credentials {
                 username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
                 password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
+            content { includeGroupAndSubgroups "org.assimbly" }
         }
         maven{  name = "Assimbly Custom Components"
             url = uri("https://maven.pkg.github.com/assimbly/custom-components")
             credentials {
                 username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
                 password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
+            content { includeGroupAndSubgroups "org.assimbly" }
         }
 
     }
 
     dependencies {
-        classpath("org.springframework.boot:spring-boot-starter-liquibase:4.1.1")
+        classpath("org.springframework.boot:spring-boot-starter-liquibase:4.1.2")
     }
 }
 
@@ -41,8 +43,8 @@ plugins {
     id "org.liquibase.gradle"
     id "io.spring.nohttp"
     id 'de.undercouch.download' version '5.7.0'
-    id "io.github.ben-manes.versions" version "0.63.1"
-    id 'org.graalvm.buildtools.native' version '1.1.13'
+    id "io.github.ben-manes.versions" version "0.67.0"
+    id 'org.graalvm.buildtools.native' version '1.1.18'
     //id("org.openrewrite.rewrite") version("latest.release")
 }
 
@@ -64,6 +66,7 @@ apply from: "$rootDir/scripts/upgrade/upgrade.gradle"
 apply from: "$rootDir/scripts/resources/resources.gradle"
 apply from: "$rootDir/scripts/version/version.gradle"
 apply from: "gradle/docker.gradle"
+apply from: "gradle/package.gradle"
 apply plugin: 'maven-publish'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
@@ -103,16 +106,6 @@ idea {
     }
 }
 
-eclipse {
-    sourceSets {
-        main {
-            java {
-                srcDirs += ["build/generated/sources/annotationProcessor/java/main"]
-            }
-        }
-    }
-}
-
 // Example images
 // image = 'eclipse-temurin:21' (temurin on docker)
 // image = 'open-21-jdk-jammy' (semeru on dockerhub)
@@ -130,9 +123,7 @@ jib {
         mainClass = 'org.assimbly.gateway.GatewayApp'
         ports = ['1000','1616','1617','2000-2003/udp','8088','8443','9000','9001','27017','61616','61617']
         format = 'OCI'
-        environment = [
-            ASSIMBLY_ENCRYPTION_SECRET: System.getenv('ASSIMBLY_ENCRYPTION_SECRET') ?: 'Pl34s3_Ch4ng3!_Th1s_1s_N0t_V3ry_S3c4r3!'
-        ]
+        // No default ASSIMBLY_ENCRYPTION_SECRET: without one, the Gateway generates its own key in /data (see GeneratedSecrets)
     }
     containerizingMode = 'exploded'
     extraDirectories {
@@ -268,23 +259,19 @@ repositories {
     mavenLocal()
     mavenCentral()
 
-    maven{ name = "Assimbly Base"
-        url = uri("https://maven.pkg.github.com/assimbly/base")
-        credentials {
-            username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
-            password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
-    }
     maven{ name = "Assimbly Runtime"
         url = uri("https://maven.pkg.github.com/assimbly/runtime")
         credentials {
             username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
             password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
+        content { includeGroupAndSubgroups "org.assimbly" }
     }
     maven{  name = "Assimbly Custom Components"
         url = uri("https://maven.pkg.github.com/assimbly/custom-components")
         credentials {
             username = project.findProperty("mavenUser") ?: System.getenv("GITHUB_ACTOR")
             password = project.findProperty("mavenToken") ?: System.getenv("GITHUB_TOKEN")}
+        content { includeGroupAndSubgroups "org.assimbly" }
     }
 
 }
@@ -297,6 +284,10 @@ dependencies {
         implementation group: "org.assimbly", name: "integration-rest", version: "${version}", changing: true
     }else if (project.hasProperty("broker")) {
         implementation group: "org.assimbly", name: "broker-rest", version: "${version}", changing: true
+        // Artemis' OpenWire protocol manager (artemis-openwire-protocol) still references the legacy javax.jms API.
+        // In the full build it only ends up on the classpath by accident (via a transitive dependency of the integration
+        // modules), so it has to be added explicitly for the broker-only build.
+        runtimeOnly "javax.jms:javax.jms-api:2.0.1"
     }else{
         implementation group: "org.assimbly", name: "integration-rest", version: "${version}", changing: true
         implementation group: "org.assimbly", name: "broker-rest", version: "${version}", changing: true
@@ -313,7 +304,7 @@ dependencies {
     implementation "tools.jackson.datatype:jackson-datatype-hibernate7"
     implementation "tools.jackson.datatype:jackson-datatype-hppc"
     implementation "tools.jackson.core:jackson-databind"
-    implementation "tools.jackson.module:jackson-module-afterburner"
+    implementation "tools.jackson.module:jackson-module-blackbird"
     implementation "tools.jackson.module:jackson-module-jakarta-xmlbind-annotations"
     implementation "com.mattbertolini:liquibase-slf4j:${liquibase_slf4j_version}"
     implementation "com.mysql:mysql-connector-j"
@@ -353,12 +344,11 @@ dependencies {
     implementation "org.springframework:spring-context-support"
 
     implementation "tech.jhipster:jhipster-framework:${jhipster_version}"
-    implementation 'org.slf4j:jcl-over-slf4j:2.0.18'
+    implementation 'org.slf4j:jcl-over-slf4j:2.0.20'
 
-    //force version 12.9 (same as mapforce)
-    implementation 'net.sf.saxon:Saxon-HE:12.9'
+    implementation 'net.sf.saxon:Saxon-HE:13.1'
 
-    implementation("io.github.assimbly:docconverter:3.0.2")
+    implementation("io.github.assimbly:docconverter:3.0.3")
 
     // reads OpenAPI 3.0 and 3.1 documents for the REST API builder's import; swagger-core comes as swagger-core-jakarta
     implementation("io.swagger.parser.v3:swagger-parser-v3:2.1.45") {
@@ -396,7 +386,7 @@ dependencies {
     liquibaseRuntime "com.h2database:h2"
     liquibaseRuntime "com.mysql:mysql-connector-j"
 
-    runtimeOnly "com.h2database:h2:2.5.250"
+    runtimeOnly "com.h2database:h2:2.5.252"
 
     // developmentOnly 'org.springframework.boot:spring-boot-devtools' // disabled: H2 file DB loses recent commits on DevTools RestartClassLoader
 
@@ -419,9 +409,12 @@ if (project.hasProperty("integration")){
             java {
                 exclude 'org/assimbly/gateway/camel/**'
                 exclude 'org/assimbly/gateway/config/importing/Import.java'
+                exclude 'org/assimbly/gateway/service/importing/**'
+                exclude 'org/assimbly/gateway/service/testrun/FlowTestRunService.java'
                 exclude 'org/assimbly/gateway/config/memory/**'
                 exclude 'org/assimbly/gateway/web/rest/headless/**'
                 exclude 'org/assimbly/gateway/web/rest/integration/**'
+                exclude 'org/assimbly/gateway/web/rest/gateway/ImportResource.java'
                 exclude 'org/assimbly/gateway/web/rest/gateway/EnvironmentVariablesResource.java'
                 exclude 'org/assimbly/gateway/web/rest/gateway/GroupResource.java'
             }
@@ -437,6 +430,10 @@ if (project.hasProperty("integration")){
                 exclude 'org/assimbly/gateway/web/rest/integration/**'
 
                 exclude 'org/assimbly/gateway/config/database/**'
+                exclude 'org/assimbly/gateway/config/firststart/**'
+                // need the Gateway's own database
+                exclude 'org/assimbly/gateway/config/security/LegacySecretMigration.java'
+                exclude 'org/assimbly/gateway/config/security/DefaultPasswordCheck.java'
 
                 exclude 'org/assimbly/gateway/config/audit/*'
                 exclude 'org/assimbly/gateway/config/exporting/*'
@@ -470,7 +467,14 @@ tasks.named('bootJar') {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
+if (!file('src/main/java/org/assimbly/gateway/config/security/LegacySecretMigration.java').exists()) {
+    sourceSets.test.java.exclude 'org/assimbly/gateway/config/security/LegacySecretMigrationTest.java'
+}
+
 tasks.named("bootRun") {
+    // Ehcache 3 still calls sun.misc.Unsafe (already reported upstream); allow it so JDK 24+ prints no deprecation warning.
+    // Artemis' LibaioContext loads a native library from an unnamed module; enable native access so JDK 25+ prints no restricted-method warning.
+    jvmArgs "--sun-misc-unsafe-memory-access=allow", "--enable-native-access=ALL-UNNAMED"
     environment "ASSIMBLY_ENCRYPTION_SECRET", System.getenv("ASSIMBLY_ENCRYPTION_SECRET") ?: "Pl34s3_Ch4ng3!_Th1s_1s_N0t_V3ry_S3c4r3!"
 }
 
@@ -524,13 +528,13 @@ dependencyUpdates {
 
 //After upgrading execute Gradle wrapper task: ./gradlew wrapper (gradlew.bat wrapper on Windows)
 wrapper {
-    gradleVersion = "9.7.1"
+    gradleVersion = "9.9.1"
 }
 
 if (project.hasProperty("nodeInstall")) {
     node {
-        version = "20.20.0"
-        npmVersion = "11.11.0"
+        version = "26.13.1"
+        npmVersion = "11.20.0"
         yarnVersion = "1.22.22"
         download = true
     }
@@ -592,6 +596,5 @@ rewrite {
 }
 */
 
-compileJava.dependsOn processResources
-processResources.dependsOn cleanResources,bootBuildInfo
+processResources.dependsOn bootBuildInfo
 bootBuildInfo.mustRunAfter cleanResources

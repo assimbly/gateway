@@ -1,5 +1,7 @@
 import { IAddress } from 'app/shared/model/address.model';
+import { sortRows } from 'app/shared/table/sort-rows';
 
+/** Filters the Queues or Topics on their name and sorts them on a column, the way the arrow of that column says. */
 export function filterAddresses(
   addresses: IAddress[] | null | undefined,
   searchText: string,
@@ -11,16 +13,15 @@ export function filterAddresses(
     return [];
   }
 
-  const asc = ascending ? 1 : -1;
-  let result = [...addresses];
-
-  if (predicate === 'name') {
-    result = result.sort((a, b) => ((a.name ?? '').toLocaleLowerCase() < (b.name ?? '').toLocaleLowerCase() ? asc : asc * -1));
-  } else if (predicate === 'numberOfConsumers') {
-    result = result.sort((a, b) => ((a.numberOfConsumers ?? 0) <= (b.numberOfConsumers ?? 0) ? asc : asc * -1));
-  } else if (predicate === 'numberOfMessages') {
-    result = result.sort((a, b) => ((a.numberOfMessages ?? 0) <= (b.numberOfMessages ?? 0) ? asc : asc * -1));
-  }
+  const result = sortRows(
+    addresses,
+    { predicate, order: ascending ? 'asc' : 'desc' },
+    {
+      name: address => address.name,
+      numberOfConsumers: address => address.numberOfConsumers ?? 0,
+      numberOfMessages: address => address.numberOfMessages ?? 0,
+    },
+  );
 
   if (searchText) {
     const query = searchText.toLocaleLowerCase();
@@ -30,4 +31,20 @@ export function filterAddresses(
     });
   }
   return result;
+}
+
+export interface AddressTotals {
+  consumers: number;
+  messages: number;
+}
+
+/** Adds up the Consumers and Messages of the Queues or Topics, counting a missing number as 0. */
+export function totalAddresses(addresses: IAddress[] | null | undefined): AddressTotals {
+  return (addresses ?? []).reduce(
+    (totals, address) => ({
+      consumers: totals.consumers + (address.numberOfConsumers ?? 0),
+      messages: totals.messages + (address.numberOfMessages ?? 0),
+    }),
+    { consumers: 0, messages: 0 },
+  );
 }

@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
@@ -12,29 +11,28 @@ import { EnvironmentVariables, IEnvironmentVariables } from 'app/shared/model/en
 import { EnvironmentVariablesService } from './environment-variables.service';
 import { IntegrationService } from 'app/entities/integration/integration.service';
 import { IIntegration } from 'app/shared/model/integration.model';
+import { SaveShortcutDirective } from 'app/shared/keyboard';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { forbiddenEnvironmentKeysValidator } from './environment-variables-validation.directive';
 
 @Component({
     selector: 'jhi-environment-variables-update',
     templateUrl: './environment-variables-update.component.html',
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, FontAwesomeModule, AlertError],
+    imports: [FormsModule, ReactiveFormsModule, FontAwesomeModule, AlertError, SaveShortcutDirective],
 })
 export class EnvironmentVariablesUpdateComponent implements OnInit {
+    protected alertService = inject(AlertService);
+    protected environmentVariablesService = inject(EnvironmentVariablesService);
+    protected integrationService = inject(IntegrationService);
+    protected activatedRoute = inject(ActivatedRoute);
+    protected router = inject(Router);
+
     environmentVariables: IEnvironmentVariables = new EnvironmentVariables();
-    isSaving: boolean;
+    isSaving!: boolean;
 
     integrations: IIntegration[] = [];
-    environmentVariablesForm: FormGroup;
+    environmentVariablesForm!: FormGroup;
     private knownVariables: IEnvironmentVariables[] = [];
-
-    constructor(
-        protected alertService: AlertService,
-        protected environmentVariablesService: EnvironmentVariablesService,
-        protected integrationService: IntegrationService,
-        protected activatedRoute: ActivatedRoute,
-        protected router: Router
-    ) {}
 
     ngOnInit() {
         this.initializeForm();
@@ -46,7 +44,7 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
                 this.environmentVariables.encrypted = false;
             }
             if (this.activatedRoute.snapshot.fragment === 'clone') {
-                this.environmentVariables.id = null;
+                this.environmentVariables.id = null!;
             }
             this.environmentVariablesForm.patchValue({
                 id: this.environmentVariables.id,
@@ -60,7 +58,7 @@ export class EnvironmentVariablesUpdateComponent implements OnInit {
 
         this.integrationService.query().subscribe(
             (res: HttpResponse<IIntegration[]>) => {
-                this.integrations = res.body;
+                this.integrations = res.body!;
                 this.environmentVariables.integrationId = this.integrations[0].id;
                 if (!this.environmentVariablesForm.controls.integrationId.value) {
                     this.environmentVariablesForm.patchValue({

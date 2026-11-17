@@ -3,6 +3,7 @@ export interface InfoResponse {
   git?: any;
   build?: any;
   activeProfiles?: string[];
+  registration?: boolean;
 }
 
 export class ProfileInfo {
@@ -11,5 +12,7 @@ export class ProfileInfo {
     public ribbonEnv?: string,
     public inProduction?: boolean,
     public openAPIEnabled?: boolean,
+    /** Anyone may create an account from the sign-in page. */
+    public registration?: boolean,
   ) {}
 }

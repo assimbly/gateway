@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, Observer, Subscription } from 'rxjs';
 
@@ -22,16 +22,18 @@ type AddressEntityArrayResponseType = HttpResponse<IAddress[]>;
 
 @Injectable({ providedIn: 'root' })
 export class TopicService {
+  protected http = inject(HttpClient);
+  protected router = inject(Router);
+  protected $window = inject(WindowRef);
+  protected brokerService = inject(BrokerService);
+
   public topicsResourceUrl = `${serverApiUrl}api/topics`;
   public brokersResourceUrl = `${serverApiUrl}api/brokers`;
 
   private gatewayid = 1;
   private brokerid = 1;
 
-  brokerType: string;
-
-  constructor(protected http: HttpClient, protected router: Router, protected $window: WindowRef, protected brokerService: BrokerService) {
-  }
+  brokerType!: string;
 
   create(topic: ITopic): Observable<EntityResponseType> {
     return this.http.post<ITopic>(this.topicsResourceUrl, topic, { observe: 'response' });

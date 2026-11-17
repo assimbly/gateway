@@ -8,19 +8,18 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import org.apache.commons.lang3.StringUtils;
-import org.assimbly.gateway.config.Constants;
-import org.assimbly.gateway.domain.enumeration.ThemePreference;
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
+import org.assimbly.gateway.config.Constants;
+import org.assimbly.gateway.domain.enumeration.ThemePreference;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * A user.
@@ -67,10 +66,6 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Column(nullable = false)
     private boolean activated;
 
-    @Size(min = 2, max = 10)
-    @Column(name = "lang_key", length = 10)
-    private String langKey;
-
     @Size(max = 256)
     @Column(name = "image_url", length = 256)
     private String imageUrl;
@@ -79,6 +74,10 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "theme_preference", length = 20, nullable = false)
     private ThemePreference themePreference = ThemePreference.SYSTEM;
+
+    /** The user still has a default password, and must choose a new one before using the Gateway. */
+    @Column(name = "password_change_required", nullable = false)
+    private boolean passwordChangeRequired = false;
 
     @Size(max = 20)
     @Column(name = "activation_key", length = 20)
@@ -97,8 +96,8 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @ManyToMany
     @JoinTable(
         name = "jhi_user_authority",
-        joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
-        inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "name")}
+        joinColumns = { @JoinColumn(name = "user_id", referencedColumnName = "id") },
+        inverseJoinColumns = { @JoinColumn(name = "authority_name", referencedColumnName = "name") }
     )
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @BatchSize(size = 20)
@@ -193,20 +192,20 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
         this.resetDate = resetDate;
     }
 
-    public String getLangKey() {
-        return langKey;
-    }
-
-    public void setLangKey(String langKey) {
-        this.langKey = langKey;
-    }
-
     public ThemePreference getThemePreference() {
         return themePreference;
     }
 
     public void setThemePreference(ThemePreference themePreference) {
         this.themePreference = ThemePreference.fromNullable(themePreference);
+    }
+
+    public boolean isPasswordChangeRequired() {
+        return passwordChangeRequired;
+    }
+
+    public void setPasswordChangeRequired(boolean passwordChangeRequired) {
+        this.passwordChangeRequired = passwordChangeRequired;
     }
 
     public Set<Authority> getAuthorities() {
@@ -244,7 +243,6 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
             ", email='" + email + '\'' +
             ", imageUrl='" + imageUrl + '\'' +
             ", activated='" + activated + '\'' +
-            ", langKey='" + langKey + '\'' +
             ", themePreference='" + themePreference + '\'' +
             ", activationKey='" + activationKey + '\'' +
             "}";

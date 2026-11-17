@@ -5,22 +5,48 @@
         <a routerLink="/rest-apis"><fa-icon icon="arrow-left"></fa-icon> APIs</a>
       </nav>
 
-      <form [formGroup]="form" (ngSubmit)="saveHeader()" novalidate>
+      <form
+        [formGroup]="form"
+        (ngSubmit)="saveHeader()"
+        (jhiSaveShortcut)="saveHeader()"
+        [saveShortcutDisabled]="saving || (!isNew && form.pristine)"
+        novalidate
+      >
         <div class="api-header">
           <div>
             <label class="form-label" for="api-name">Name</label>
-            <input id="api-name" class="form-control" formControlName="name" required
-                   [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid" />
+            <input
+              #nameInput
+              id="api-name"
+              class="form-control"
+              formControlName="name"
+              required
+              [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid"
+            />
           </div>
           <div>
             <label class="form-label" for="api-base-path">Base path</label>
-            <input id="api-base-path" class="form-control" formControlName="basePath" placeholder="/customers"
-                   [class.is-invalid]="form.controls.basePath.touched && form.controls.basePath.invalid" aria-describedby="api-base-path-help" />
-            <small class="text-muted" id="api-base-path-help">Starts with /, without parameters. Every Operation's path goes after it.</small>
+            <input
+              id="api-base-path"
+              class="form-control"
+              formControlName="basePath"
+              placeholder="/customers"
+              [class.is-invalid]="form.controls.basePath.touched && form.controls.basePath.invalid"
+              aria-describedby="api-base-path-help"
+            />
+            <small class="text-muted" id="api-base-path-help"
+              >Starts with /, without parameters. Every Operation's path goes after it.</small
+            >
           </div>
           <div>
             <label class="form-label" for="api-version">Version</label>
-            <input id="api-version" class="form-control" formControlName="versionLabel" placeholder="1.0" aria-describedby="api-version-help" />
+            <input
+              id="api-version"
+              class="form-control"
+              formControlName="versionLabel"
+              placeholder="1.0"
+              aria-describedby="api-version-help"
+            />
             <small class="text-muted" id="api-version-help">A label for the contract; it doesn't change any path.</small>
           </div>
           <div class="api-header__description">
@@ -29,8 +55,8 @@
           </div>
         </div>
         <div class="d-flex gap-2">
-          <button type="submit" class="btn btn-fx btn-fx-primary" [disabled]="saving || (!isNew && form.pristine)">
-            <fa-icon icon="save"></fa-icon> {{ isNew ? 'Create API' : 'Save' }}
+          <button type="submit" class="btn btn-fx btn-fx-primary" data-tour="api-save" [disabled]="saving || (!isNew && form.pristine)">
+            <fa-icon icon="save"></fa-icon> {{ isNew ? 'Add API' : 'Save' }}
           </button>
           @if (!isNew) {
             <button type="button" class="btn btn-fx btn-fx-ghost text-danger" (click)="deleteApi()">
@@ -61,8 +87,8 @@
               · <span [class]="'api-status api-status--' + s.tone">{{ s.label }}</span>
             }
           </span>
-          <button type="button" class="btn btn-fx btn-fx-primary" (click)="newOperation()">
-            <fa-icon icon="plus"></fa-icon> New Operation
+          <button type="button" class="btn btn-fx btn-fx-primary" data-tour="api-new-operation" (click)="newOperation()">
+            <fa-icon icon="plus"></fa-icon> Add Operation
           </button>
           <div ngbDropdown class="d-inline-block">
             <button type="button" class="btn btn-fx btn-fx-ghost" ngbDropdownToggle id="export-openapi">
@@ -94,14 +120,26 @@
                 @for (operation of api.operations; track operation.id) {
                   <tr [class.api-operation--selected]="isSelected(operation)" (click)="select(operation)">
                     <td>
-                      <button type="button" class="btn btn-link p-0" (click)="$event.stopPropagation(); select(operation)"
-                              [attr.aria-label]="'Edit ' + operation.method + ' ' + operation.fullPath">
+                      <button
+                        type="button"
+                        class="btn btn-link p-0"
+                        data-tour="operation-edit"
+                        (click)="$event.stopPropagation(); select(operation)"
+                        [attr.aria-label]="'Edit ' + operation.method + ' ' + operation.fullPath"
+                      >
                         <span [class]="methodClass(operation.method)">{{ operation.method }}</span>
                       </button>
                     </td>
                     <td>
                       @if (urlOf(operation); as url) {
-                        <a [href]="url" target="_blank" rel="noopener" (click)="$event.stopPropagation()" [ngbTooltip]="'Open ' + url + ' in a new tab'">
+                        <a
+                          [href]="url"
+                          target="_blank"
+                          rel="noopener"
+                          data-tour="operation-url"
+                          (click)="$event.stopPropagation()"
+                          [ngbTooltip]="'Open ' + url + ' in a new tab'"
+                        >
                           <code>{{ operation.fullPath }}</code>
                         </a>
                       } @else {
@@ -110,14 +148,21 @@
                     </td>
                     <td class="text-muted">{{ operation.summary }}</td>
                     <td class="text-nowrap">
-                      <a [routerLink]="['/flow/editor', operation.handlerFlowId]" [queryParams]="handlerFlowQueryParams(operation)"
-                         (click)="$event.stopPropagation()">{{ operation.handlerFlowName }}</a>
+                      <a
+                        [routerLink]="['/flow/editor', operation.handlerFlowId]"
+                        [queryParams]="handlerFlowQueryParams(operation)"
+                        data-tour="operation-handler-flow"
+                        (click)="$event.stopPropagation()"
+                        >{{ operation.handlerFlowName }}</a
+                      >
                     </td>
                     <td class="text-nowrap">
                       @let state = stateOf(operation);
                       {{ stateLabel(state) }}
                       @if (state?.draft) {
-                        <span class="badge text-bg-secondary ms-1" ngbTooltip="The Handler Flow is a Draft: finish it to start it.">Draft</span>
+                        <span class="badge text-bg-secondary ms-1" ngbTooltip="The Handler Flow is a Draft: finish it to start it."
+                          >Draft</span
+                        >
                       }
                     </td>
                   </tr>

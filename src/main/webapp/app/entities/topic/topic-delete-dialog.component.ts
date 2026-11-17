@@ -1,5 +1,4 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AlertError } from 'app/shared/alert';
@@ -10,32 +9,31 @@ import { TopicService } from './topic.service';
 
 @Component({
     templateUrl: './topic-delete-dialog.component.html',
-    imports: [CommonModule, FontAwesomeModule, AlertError],
+    imports: [FontAwesomeModule, AlertError],
 })
 export class TopicDeleteDialogComponent {
+    protected topicService = inject(TopicService);
+    activeModal = inject(NgbActiveModal);
+    protected eventManager = inject(EventManager);
+
     address?: IAddress;
     brokerType = '';
 
-    message = 'Are you sure you want to delete this topic?';
+    /** Replaces the confirmation question once the delete is refused. */
+    message?: string;
     disableDelete = false;
-
-    constructor(
-        protected topicService: TopicService,
-        public activeModal: NgbActiveModal,
-        protected eventManager: EventManager,
-    ) {}
 
     cancel(): void {
         this.activeModal.dismiss();
     }
 
     confirmDelete(name: string): void {
-        if (this.address?.numberOfConsumers > 0) {
+        if (this.address?.numberOfConsumers! > 0) {
             this.message = 'Cannot delete topic because there is at least one active consumer';
             this.disableDelete = true;
             return;
         }
-        if (this.address?.numberOfMessages > 0) {
+        if (this.address?.numberOfMessages! > 0) {
             this.message = 'Cannot delete topic because there is at least one message on the topic. Please clear the topic before deleting';
             this.disableDelete = true;
             return;

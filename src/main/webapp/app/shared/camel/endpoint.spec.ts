@@ -1,4 +1,19 @@
-import { OptionSchema, groupOptions, missingPathParts, pathRule, requiredOptions, valueFieldOf } from './endpoint';
+import {
+  OptionSchema,
+  commonOptions,
+  defaultLabelOf,
+  groupOptions,
+  missingPathParts,
+  pathFormat,
+  pathLabel,
+  pathRule,
+  requiredOptions,
+  splitHttpUrl,
+  suggestedOptions,
+  valueFieldOf,
+  valueLabelOf,
+  notAnInteger,
+} from './endpoint';
 
 const sftp: Record<string, Omit<OptionSchema, 'name'>> = {
   host: { kind: 'path', displayName: 'Host', group: 'common', type: 'string', required: true, description: 'Hostname of the FTP server' },
@@ -58,12 +73,65 @@ describe('Endpoint editing', () => {
       [{ type: 'enum', enum: ['Override', 'Append'] }, 'choice'],
       [{ type: 'integer' }, 'number'],
       [{ type: 'number' }, 'number'],
+      [{ type: 'object', enum: ['SelectOne', 'SelectList'] }, 'choice'],
       [{ type: 'string', secret: true }, 'secret'],
       [{ type: 'string' }, 'text'],
-      [{ type: 'duration' }, 'text'],
+      [{ name: 'language', type: 'string' }, 'choice'],
+      [{ type: 'duration' }, 'duration'],
+      [{ type: 'string', largeInput: true }, 'multiline'],
+      [{ type: 'string', inputLanguage: 'sql' }, 'multiline'],
+      [{ type: 'string', secret: true, largeInput: true }, 'secret'],
       [undefined, 'text'],
     ] as const)('gives an Option of %o a %s field', (option, field) => {
       expect(valueFieldOf(option)).toBe(field);
+    });
+  });
+
+  describe('Option details in plain words', () => {
+    it.each([
+      [{ type: 'boolean' }, 'On / Off'],
+      [{ type: 'integer' }, 'Number'],
+      [{ type: 'duration' }, 'Duration'],
+      [{ type: 'string' }, 'Text'],
+      [{ type: 'string', secret: true }, 'Secret'],
+      [{ type: 'enum', enum: ['Override', 'Append'] }, 'Choice'],
+    ] as const)('names the value of an Option of %o %s', (option, label) => {
+      expect(valueLabelOf(option)).toBe(label);
+    });
+
+    it('shows a default as the field of the Option does, and none when it has none', () => {
+      expect(defaultLabelOf({ defaultValue: false })).toBe('Off');
+      expect(defaultLabelOf({ defaultValue: true })).toBe('On');
+      expect(defaultLabelOf({ defaultValue: 500 })).toBe('500');
+      expect(defaultLabelOf({})).toBe('');
+      expect(defaultLabelOf(undefined)).toBe('');
+    });
+  });
+
+  describe('the key list of an Option row', () => {
+    it('starts with the Common Options, and the Option the row holds even when it is an advanced one', () => {
+      const options = groupOptions(properties, 'consumer');
+      const names = (held: string) => commonOptions(options, held).map(option => option.name);
+
+      expect(commonOptions(options, '').every(option => option.heading === 'Common')).toBe(true);
+      expect(names('')).not.toContain('delay');
+      expect(names('delay')).toContain('delay');
+    });
+  });
+
+  describe('integer values', () => {
+    it.each(['1000', ' 5 ', '-1', '+3', '', '@{timeout}', '{{timeout}}', '${header.size}'])('takes %p for an integer Option', value => {
+      expect(notAnInteger({ type: 'integer' }, value)).toBe(false);
+    });
+
+    it.each(['1.5', '10s', 'abc', '1 000', '1e3'])('refuses %p for an integer Option', value => {
+      expect(notAnInteger({ type: 'integer' }, value)).toBe(true);
+    });
+
+    it('leaves the values of other Options alone', () => {
+      expect(notAnInteger({ type: 'number' }, '1.5')).toBe(false);
+      expect(notAnInteger({ type: 'string' }, 'abc')).toBe(false);
+      expect(notAnInteger(undefined, 'abc')).toBe(false);
     });
   });
 
@@ -105,7 +173,117 @@ describe('Endpoint editing', () => {
     });
   });
 
+  describe('full URLs in HTTP(S) Steps', () => {
+    it('takes the scheme off and picks the Component it names', () => {
+      expect(splitHttpUrl('http', 'https://api.open-meteo.com/v1/forecast?latitude=52.37')).toEqual({
+        componentType: 'https',
+        uri: 'api.open-meteo.com/v1/forecast?latitude=52.37',
+      });
+      expect(splitHttpUrl('https', ' HTTP://www.dneonline.com/calculator.asmx ')).toEqual({
+        componentType: 'http',
+        uri: 'www.dneonline.com/calculator.asmx',
+      });
+      expect(splitHttpUrl('http', 'https://0.0.0.0:9001/hello')).toEqual({
+        componentType: 'https',
+        uri: '0.0.0.0:9001/hello',
+      });
+    });
+
+    it('strips leading slashes while keeping the current Component', () => {
+      expect(splitHttpUrl('http', '//0.0.0.0:9001/hello')).toEqual({
+        componentType: 'http',
+        uri: '0.0.0.0:9001/hello',
+      });
+      expect(splitHttpUrl('https', ' //0.0.0.0:9001/hello ')).toEqual({
+        componentType: 'https',
+        uri: '0.0.0.0:9001/hello',
+      });
+    });
+
+    it('leaves a path without a scheme, or another Component, alone', () => {
+      expect(splitHttpUrl('https', 'api.open-meteo.com/v1/forecast')).toBeNull();
+      expect(splitHttpUrl('http', '0.0.0.0:9001/hello')).toBeNull();
+      expect(splitHttpUrl('file', 'https://example.com')).toBeNull();
+      expect(splitHttpUrl('http', null)).toBeNull();
+    });
+  });
+
+  describe('Path label', () => {
+    it('names the Path field after the one value it takes', () => {
+      expect(
+        pathLabel(pathRule('file:directoryName', [{ name: 'directoryName', kind: 'path', displayName: 'Directory Name' }]).parts),
+      ).toBe('Directory Name');
+    });
+
+    it('names it after the required last part when the optional parts before it can be left out', () => {
+      const jms = pathRule('jms:destinationType:destinationName', [
+        { name: 'destinationType', kind: 'path', displayName: 'Destination Type', required: false },
+        { name: 'destinationName', kind: 'path', displayName: 'Destination Name', required: true },
+      ]);
+
+      expect(pathLabel(jms.parts)).toBe('Destination Name');
+    });
+
+    it("names a path part the schema doesn't describe after its syntax", () => {
+      expect(pathLabel(pathRule('headerName', []).parts)).toBe('Header Name');
+    });
+
+    it('keeps Path for a path of several values, or none', () => {
+      expect(pathLabel(pathRule('sftp:host:port/directoryName', properties).parts)).toBe('Path');
+      expect(pathLabel([])).toBe('Path');
+    });
+  });
+
+  describe('Path format', () => {
+    it('shows how to write a path of several values, without the scheme of the Component', () => {
+      const syntax = 'sftp:host:port/directoryName';
+
+      expect(pathFormat(syntax, pathRule(syntax, properties).parts)).toBe('host:port/directoryName');
+    });
+
+    it('shows none for a path of a single value, which its label names', () => {
+      const file = pathRule('file:directoryName', [{ name: 'directoryName', kind: 'path', displayName: 'Directory Name' }]);
+      const jms = pathRule('jms:destinationType:destinationName', [
+        { name: 'destinationType', kind: 'path', displayName: 'Destination Type', required: false },
+        { name: 'destinationName', kind: 'path', displayName: 'Destination Name', required: true },
+      ]);
+
+      expect(pathFormat('file:directoryName', file.parts)).toBe('');
+      expect(pathFormat('jms:destinationType:destinationName', jms.parts)).toBe('');
+      expect(pathFormat('', [])).toBe('');
+    });
+  });
+
   it('lists the required Options a Step of this role needs', () => {
     expect(requiredOptions(properties, 'producer')).toEqual(['username']);
+  });
+
+  describe('suggested Options', () => {
+    const setbody: OptionSchema[] = [
+      { name: 'language', kind: 'parameter', displayName: 'Language', group: 'common', type: 'string', defaultValue: 'simple' },
+      { name: 'expression', kind: 'parameter', displayName: 'Expression', group: 'common', type: 'string' },
+    ];
+
+    it('suggests every Common Option of a Component with only a few Options, the language first', () => {
+      expect(suggestedOptions(setbody, 'producer')).toEqual(['language', 'expression']);
+    });
+
+    it('suggests only the required Options of a Component with many Options', () => {
+      const many: OptionSchema[] = [
+        ...Array.from({ length: 10 }, (_, i) => ({ name: `option${i}`, kind: 'parameter', group: 'common' })),
+        { name: 'host', kind: 'parameter', group: 'common', required: true },
+      ];
+
+      expect(suggestedOptions(many, 'producer')).toEqual(['host']);
+    });
+
+    it("doesn't suggest Options of the other role", () => {
+      const fileLike: OptionSchema[] = [
+        { name: 'delay', kind: 'parameter', group: 'consumer' },
+        { name: 'fileExist', kind: 'parameter', group: 'producer' },
+      ];
+
+      expect(suggestedOptions(fileLike, 'producer')).toEqual(['fileExist']);
+    });
   });
 });

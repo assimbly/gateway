@@ -11,7 +11,6 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
   templateUrl: './send-toolbar.html',
 })
 export default class SendToolbar {
-  readonly title = input('Send message');
   readonly subtitle = input('');
   readonly showBack = input(false);
   readonly sending = input(false);

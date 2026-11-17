@@ -1,75 +1,73 @@
 @if (allBeans()) {
+<div>
+  <jhi-search-toolbar [(query)]="beansFilter" placeholder="Filter by prefix" inputId="configuration-filter">
+    <ng-container actions>
+      <button class="btn btn-fx btn-fx-secondary" type="button" (click)="refresh()" aria-label="Refresh">
+        <fa-icon icon="sync"></fa-icon>
+        <span class="d-none d-md-inline"> Refresh</span>
+      </button>
+    </ng-container>
+  </jhi-search-toolbar>
+
+  <h3 id="spring-configuration">Spring configuration</h3>
+
+  <table class="table table-sm table-striped table-bordered table-responsive d-table" aria-describedby="spring-configuration">
+    <thead>
+      <tr jhiSort [(sortState)]="sortState">
+        <th jhiSortBy="prefix" scope="col" class="w-40"><span>Prefix</span> <fa-icon icon="sort" /></th>
+        <th scope="col" class="w-60"><span>Properties</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (bean of beans(); track $index) {
+      <tr>
+        <td class="break">
+          <span>{{ bean.prefix }}</span>
+        </td>
+        <td>
+          @for (property of bean.properties | keyvalue; track property.key) {
+          <div class="row">
+            <div class="col-md-4 break">{{ property.key }}</div>
+            <div class="col-md-8">
+              <span class="float-end bg-secondary break">{{ property.value | json }}</span>
+            </div>
+          </div>
+          }
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+
+  @for (propertySource of propertySources(); track i; let i = $index) {
   <div>
-    <jhi-search-toolbar [(query)]="beansFilter" placeholder="Filter by prefix" inputId="configuration-filter">
-      <ng-container actions>
-        <button class="btn btn-fx btn-fx-secondary" type="button" (click)="refresh()" aria-label="Refresh">
-          <fa-icon icon="sync"></fa-icon>
-          <span class="d-none d-md-inline"> Refresh</span>
-        </button>
-      </ng-container>
-    </jhi-search-toolbar>
+    <h4 [id]="'property-source-' + i">
+      <span>{{ propertySource.name }}</span>
+    </h4>
 
-    <h3 id="spring-configuration">Spring configuration</h3>
-
-    <table class="table table-sm table-striped table-bordered table-responsive d-table" aria-describedby="spring-configuration">
+    <table class="table table-sm table-striped table-bordered table-responsive d-table" [aria-describedby]="'property-source-' + i">
       <thead>
-        <tr jhiSort [(sortState)]="sortState">
-          <th jhiSortBy="prefix" scope="col" class="w-40">
-            <span jhiTranslate="configuration.table.prefix">Prefix</span> <fa-icon icon="sort" />
-          </th>
-          <th scope="col" class="w-60"><span jhiTranslate="configuration.table.properties">Properties</span></th>
+        <tr>
+          <th scope="col" class="w-40">Property</th>
+          <th scope="col" class="w-60">Value</th>
         </tr>
       </thead>
       <tbody>
-        @for (bean of beans(); track $index) {
-          <tr>
-            <td class="break">
-              <span>{{ bean.prefix }}</span>
-            </td>
-            <td>
-              @for (property of bean.properties | keyvalue; track property.key) {
-                <div class="row">
-                  <div class="col-md-4 break">{{ property.key }}</div>
-                  <div class="col-md-8">
-                    <span class="float-end bg-secondary break">{{ property.value | json }}</span>
-                  </div>
-                </div>
-              }
-            </td>
-          </tr>
+        @for (property of propertySource.properties | keyvalue; track property.key) {
+        <tr>
+          <td class="break">{{ property.key }}</td>
+          <td class="break">
+            <span class="float-end bg-secondary break">{{ property.value.value }}</span>
+          </td>
+        </tr>
         }
       </tbody>
     </table>
-
-    @for (propertySource of propertySources(); track i; let i = $index) {
-      <div>
-        <h4 [id]="'property-source-' + i">
-          <span>{{ propertySource.name }}</span>
-        </h4>
-
-        <table class="table table-sm table-striped table-bordered table-responsive d-table" [aria-describedby]="'property-source-' + i">
-          <thead>
-            <tr>
-              <th scope="col" class="w-40">Property</th>
-              <th scope="col" class="w-60">Value</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (property of propertySource.properties | keyvalue; track property.key) {
-              <tr>
-                <td class="break">{{ property.key }}</td>
-                <td class="break">
-                  <span class="float-end bg-secondary break">{{ property.value.value }}</span>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    }
   </div>
+  }
+</div>
 } @else {
-  <div class="d-flex justify-content-center me-3">
-    <div class="spinner-border"></div>
-  </div>
+<div class="d-flex justify-content-center me-3">
+  <div class="spinner-border"></div>
+</div>
 }

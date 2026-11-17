@@ -4,14 +4,13 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import java.time.Instant;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.assimbly.gateway.config.Constants;
 import org.assimbly.gateway.domain.Authority;
 import org.assimbly.gateway.domain.User;
 import org.assimbly.gateway.domain.enumeration.ThemePreference;
-
-import java.time.Instant;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * A DTO representing a user, with his authorities.
@@ -40,10 +39,10 @@ public class AdminUserDTO {
 
     private boolean activated;
 
-    @Size(min = 2, max = 10)
-    private String langKey;
-
     private ThemePreference themePreference;
+
+    /** Read-only: only choosing a new password clears it. */
+    private boolean passwordChangeRequired;
 
     private String createdBy;
 
@@ -67,8 +66,8 @@ public class AdminUserDTO {
         this.email = user.getEmail();
         this.activated = user.isActivated();
         this.imageUrl = user.getImageUrl();
-        this.langKey = user.getLangKey();
         this.themePreference = ThemePreference.fromNullable(user.getThemePreference());
+        this.passwordChangeRequired = user.isPasswordChangeRequired();
         this.createdBy = user.getCreatedBy();
         this.createdDate = user.getCreatedDate();
         this.lastModifiedBy = user.getLastModifiedBy();
@@ -132,20 +131,20 @@ public class AdminUserDTO {
         this.activated = activated;
     }
 
-    public String getLangKey() {
-        return langKey;
-    }
-
-    public void setLangKey(String langKey) {
-        this.langKey = langKey;
-    }
-
     public ThemePreference getThemePreference() {
         return themePreference;
     }
 
     public void setThemePreference(ThemePreference themePreference) {
         this.themePreference = themePreference;
+    }
+
+    public boolean isPasswordChangeRequired() {
+        return passwordChangeRequired;
+    }
+
+    public void setPasswordChangeRequired(boolean passwordChangeRequired) {
+        this.passwordChangeRequired = passwordChangeRequired;
     }
 
     public String getCreatedBy() {
@@ -198,7 +197,6 @@ public class AdminUserDTO {
             ", email='" + email + '\'' +
             ", imageUrl='" + imageUrl + '\'' +
             ", activated=" + activated +
-            ", langKey='" + langKey + '\'' +
             ", themePreference='" + themePreference + '\'' +
             ", createdBy=" + createdBy +
             ", createdDate=" + createdDate +

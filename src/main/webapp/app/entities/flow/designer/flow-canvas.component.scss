@@ -84,6 +84,40 @@
   color: var(--app-text, #101828);
 }
 
+.flow-step-caption {
+  // The Step's path, on one line just below the square. Its width stays within a column of the auto-arrange layout.
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 184px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 0.7rem;
+  line-height: 1.2;
+  color: var(--app-text-muted, #667085);
+}
+
+// A name the user gave the Step reads stronger than its path.
+.flow-step-name {
+  font-weight: 600;
+  color: var(--app-text, #344054);
+}
+
+.flow-step-name-input {
+  width: 160px;
+  max-width: 160px;
+  padding: 1px 6px;
+  border: 1px solid var(--app-primary, #2e90fa);
+  border-radius: 4px;
+  background: var(--app-surface, #fff);
+  color: var(--app-text, #101828);
+  text-align: center;
+  outline: none;
+  cursor: text;
+}
+
 .flow-step-warning {
   position: absolute;
   top: 2px;
@@ -94,6 +128,77 @@
 
 .flow-step-warning--soft {
   color: var(--app-warning, #f79009);
+}
+
+// The messages a Step completed and failed, as round badges on its top right corner.
+.flow-step-counts {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  display: flex;
+  gap: 2px;
+  pointer-events: auto;
+}
+
+.flow-step-count {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  border: 2px solid var(--app-bg, #f8f9fb);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+}
+
+.flow-step-count--completed {
+  // Fixed colours: white on the dark theme's lighter success and danger colours would be hard to read.
+  background: #079455;
+}
+
+.flow-step-count--failed {
+  background: #d92d20;
+}
+
+// What a Step did in the last test run: a tick or cross and its time, on its top left corner.
+.flow-step-run {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  border: 2px solid var(--app-bg, #f8f9fb);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 16px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  background: #079455;
+}
+
+.flow-step-run--failed {
+  background: #d92d20;
+}
+
+.flow-step-run--input {
+  background: #475467;
+}
+
+.flow-step-run-failed {
+  border-color: #d92d20;
+  box-shadow: 0 0 0 2px color-mix(in srgb, #d92d20 35%, transparent);
+}
+
+.flow-step-run-unreached {
+  opacity: 0.45;
 }
 
 .flow-connector {
@@ -108,6 +213,42 @@
 
 .flow-connector-in {
   left: -6px;
+  // Kept for Foblex to end the Link on, but not drawn: the arrowhead alone marks where a Link comes in.
+  visibility: hidden;
+}
+
+// Deletes the Step; shows on the top right corner while the Step is hovered or selected.
+.flow-step-delete {
+  position: absolute;
+  top: -9px;
+  right: -9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--app-border, #d0d5dd);
+  background: var(--app-surface, #fff);
+  font-size: 0.65rem;
+  color: var(--app-text-muted, #667085);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 80ms ease-out;
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--app-danger, #f04438);
+    color: var(--app-danger, #f04438);
+  }
+}
+
+.flow-step:hover .flow-step-delete,
+.flow-step-selected .flow-step-delete,
+.flow-step-delete:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .flow-connector-out {

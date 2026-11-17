@@ -146,6 +146,30 @@ class OpenApiRoundTripIntTest {
     }
 
     @Test
+    void anOperationWithoutADeclaredSuccessExportsThe200ItsHandlerFlowAnswers() throws Exception {
+        ApiDTO api = apiService.createApi(new ApiDTO(null, "Greetings", "/greetings", "1.0", null, integrationId, 0, null));
+        apiService.createOperation(api.id(), new ApiOperationDTO(null, null, "GET", "/{name}", null, "sayHello", null, null, null,
+            "application/json", null, List.of(new ApiParameterDTO("name", "path", "string", true, null)), List.of(), null, null, null));
+
+        String yaml = openApiService.exportDocument(api.id(), "yaml", LISTENER);
+
+        JsonNode sayHello = Yaml.mapper().readTree(yaml).at("/paths/~1{name}/get");
+        assertThat(sayHello.at("/responses/200/description").asText()).isNotBlank();
+        assertThat(sayHello.at("/responses/200/content/application~1json").isMissingNode()).isFalse();
+        assertThat(sayHello.at("/responses/500").isMissingNode()).isFalse();
+        assertThat(new io.swagger.v3.parser.OpenAPIV3Parser().readContents(yaml, null, null).getMessages()).isEmpty();
+    }
+
+    @Test
+    void aDeclaredSuccessIsExportedWithoutAnExtra200() throws Exception {
+        ApiDTO api = openApiService.importDocument(fixture("crud-3.0.yaml"), integrationId).api();
+
+        JsonNode exported = Yaml.mapper().readTree(openApiService.exportDocument(api.id(), "yaml", LISTENER));
+
+        assertThat(exported.at("/paths/~1{id}/get/responses/200/description").asText()).isEqualTo("Found");
+    }
+
+    @Test
     void theServersOfAnExportCarryTheTenantPrefix() throws Exception {
         ApiDTO api = apiService.createApi(new ApiDTO(null, "Tenanted", "/tenanted", null, null, integrationId, 0, null));
 

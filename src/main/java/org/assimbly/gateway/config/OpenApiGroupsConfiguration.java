@@ -1,21 +1,28 @@
 package org.assimbly.gateway.config;
 
+import io.swagger.v3.oas.models.info.Info;
 import org.springdoc.core.customizers.ActuatorOpenApiCustomizer;
 import org.springdoc.core.customizers.ActuatorOperationCustomizer;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springdoc.core.customizers.OperationCustomizer;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springdoc.core.utils.Constants;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.StringUtils;
 import tech.jhipster.config.JHipsterProperties;
+import tech.jhipster.config.apidoc.JHipsterSpringDocGroupsConfiguration;
 
 import java.util.List;
 import java.util.Set;
 
+import static org.springdoc.core.utils.Constants.SPRINGDOC_SHOW_ACTUATOR;
+
 /**
  * Splits the Swagger UI into groups that can be selected in its top bar dropdown. Each group is served at
- * {@code /v3/api-docs/{id}}; the default group (all of {@code /api/**}) and JHipster's {@code management} group stay.
+ * {@code /v3/api-docs/{id}}; the default group (all of {@code /api/**}) and JHipster's {@code management} group stay, with readable names.
  * <p>
  * Controllers are matched by simple class name, so the controllers of the runtime jars and the headless variants
  * of the gateway resources are covered without compile time references. Tag names can't be used, because some
@@ -26,11 +33,11 @@ public class OpenApiGroupsConfiguration {
 
     /** The groups, in the order of the dropdown (see {@link SwaggerUiGroupsOrderAdvice}). */
     enum ApiGroup {
-        INTEGRATION("integration", "Integration runtime", Set.of(
+        INTEGRATION("integration", "Flows", Set.of(
             "FlowConfigurerRuntime", "FlowManagerRuntime", "CacheManagerRuntime", "IntegrationRuntime",
             "MessageManagerRuntime", "ValidationRuntime"
         )),
-        BROKER("broker", "Broker runtime", Set.of(
+        BROKER("broker", "Broker", Set.of(
             "BrokerConfigurerRuntime", "BrokerManagerRuntime", "MessageBrokerRuntime", "QueueManagerRuntime",
             "TopicManagerRuntime"
         )),
@@ -105,6 +112,25 @@ public class OpenApiGroupsConfiguration {
             .group(Constants.DEFAULT_GROUP_NAME)
             .displayName("All endpoints")
             .pathsToMatch(jHipsterProperties.getApiDocs().getDefaultIncludePattern()));
+    }
+
+    /** Replaces JHipster's management group (same paths and info), only to give it a capitalized name in the dropdown. */
+    @Bean
+    @ConditionalOnProperty(SPRINGDOC_SHOW_ACTUATOR)
+    public GroupedOpenApi openAPIManagementGroupedOpenAPI(
+        JHipsterProperties jHipsterProperties,
+        @Value("${spring.application.name:application}") String appName
+    ) {
+        JHipsterProperties.ApiDocs apiDocs = jHipsterProperties.getApiDocs();
+        return GroupedOpenApi.builder()
+            .group(JHipsterSpringDocGroupsConfiguration.MANAGEMENT_GROUP_NAME)
+            .displayName("Management")
+            .addOpenApiCustomizer(openApi -> openApi.info(new Info()
+                .title(StringUtils.capitalize(appName) + " Management API")
+                .description("Management endpoints documentation")
+                .version(apiDocs.getVersion())))
+            .pathsToMatch(apiDocs.getManagementIncludePattern())
+            .build();
     }
 
     private GroupedOpenApi group(ApiGroup group) {

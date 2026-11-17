@@ -10,6 +10,8 @@ export type StepKind = 'SOURCE' | 'ACTION' | 'ROUTER' | 'SINK';
 export interface DesignStep {
   key: string;
   id?: number;
+  /** What the user named the Step; unnamed Steps are known by their component. */
+  name?: string;
   kind: StepKind;
   componentType?: string;
   uri?: string;
@@ -78,7 +80,12 @@ const fixed = (branch: string, takesCondition: boolean, returnsToRouter: boolean
   takesCondition,
   returnsToRouter,
 });
-const list = (hasDefault: boolean, takesCondition: boolean): RouterShape => ({ slots: 'list', hasDefault, takesCondition, returnsToRouter: false });
+const list = (hasDefault: boolean, takesCondition: boolean): RouterShape => ({
+  slots: 'list',
+  hasDefault,
+  takesCondition,
+  returnsToRouter: false,
+});
 
 const ROUTER_SHAPES: Record<string, RouterShape> = {
   if: fixed('if', true, false),
@@ -96,12 +103,59 @@ const ROUTER_SHAPES: Record<string, RouterShape> = {
   link: list(false, false),
 };
 
-/** The kinds of Router that can be inserted on the canvas. */
-export const ROUTER_KINDS = Object.keys(ROUTER_SHAPES);
+/**
+ * What each kind of Router is called and does, in the words a user sees; the kind itself stays the id. Ordered by
+ * how often a kind is used, so the picker lists the common ones first.
+ */
+const ROUTER_NAMES: Record<string, { title: string; description: string }> = {
+  content: { title: 'Content router', description: 'Sends each message down the first Branch whose Condition matches.' },
+  if: { title: 'If / else', description: 'Takes the if Branch when the Condition holds, and the Default branch otherwise.' },
+  split: { title: 'Split', description: 'Handles each item of a list, found by an expression, on its own.' },
+  splitandaggregate: {
+    title: 'Split and combine',
+    description: 'Handles each item of a list on its own, then combines the results into one XML or JSON message.',
+  },
+  recipient: { title: 'Recipient list', description: 'Sends a copy of the message to every Branch.' },
+  enrich: { title: 'Enrich', description: 'Fetches extra data on a Branch and merges it into the message.' },
+  wiretap: { title: 'Wiretap', description: 'Sends a copy of the message down a Branch without waiting, and carries on.' },
+  loop: { title: 'Loop', description: 'Repeats a Branch a number of times.' },
+  dowhile: { title: 'Do while', description: 'Repeats a Branch as long as its Condition holds.' },
+  dynamic: { title: 'Dynamic router', description: 'Sends the message to addresses worked out from the message itself.' },
+  link: { title: 'Link', description: 'Hands the message to the Steps it links to.' },
+  splitwithnamespace: {
+    title: 'Split (XML with namespaces)',
+    description: 'Handles each item of an XML list whose expression uses namespaces, on its own.',
+  },
+  splitandaggregatewithnamespace: {
+    title: 'Split and combine (XML with namespaces)',
+    description: 'Like Split and combine, for XML whose expression uses namespaces.',
+  },
+};
+
+/** The kinds of Router that can be inserted on the canvas, the most used first. */
+export const ROUTER_KINDS = [
+  ...Object.keys(ROUTER_NAMES).filter(kind => kind in ROUTER_SHAPES),
+  ...Object.keys(ROUTER_SHAPES).filter(kind => !(kind in ROUTER_NAMES)),
+];
 
 /** The kind of Router a Step is, such as 'if' or 'content'. Imported Steps keep it in the uri. */
 export function routerKind(step: Pick<DesignStep, 'componentType' | 'uri'>): string {
   return (step.componentType || step.uri || '').toLowerCase().replace(/:.*$/, '');
+}
+
+/** What a kind of Router is called, such as 'If / else' for `if`; a kind without a name is shown as itself. */
+export function routerKindTitle(kind: string): string {
+  return ROUTER_NAMES[kind]?.title ?? kind;
+}
+
+/** What a kind of Router does, in one sentence. */
+export function routerKindDescription(kind: string): string | undefined {
+  return ROUTER_NAMES[kind]?.description;
+}
+
+/** What a Router Step is called, such as 'If / else'. */
+export function routerTitle(step: Pick<DesignStep, 'componentType' | 'uri'>): string {
+  return routerKindTitle(routerKind(step));
 }
 
 /** Router kinds the shape table doesn't know are treated as List Routers without a Default branch. */
@@ -117,7 +171,15 @@ export function loadFlowGraph(flow: IFlow, handler?: HandlerInfo): FlowGraph {
 
   const readOnlyReason = unsupportedReason(flowSteps);
   if (readOnlyReason) {
-    const graph = { flowId: flow.id, steps: savedSteps, links: linksFromSavedLinks(flowSteps, savedSteps), errorStep, handler, repaired: false, readOnlyReason };
+    const graph = {
+      flowId: flow.id,
+      steps: savedSteps,
+      links: linksFromSavedLinks(flowSteps, savedSteps),
+      errorStep,
+      handler,
+      repaired: false,
+      readOnlyReason,
+    };
     return arrangedIfUnplaced(graph);
   }
 
@@ -168,18 +230,20 @@ function withFixedSlotBranches(graph: FlowGraph): FlowGraph {
       return result;
     }
     const sink: DesignStep = { key: nextKey(), kind: 'SINK' };
-    return { ...result, steps: [...result.steps, sink], links: [...result.links, { ...plainLink(step.key, sink.key), rule: shape.branch }] };
+    return { ...result, steps: [...result.steps, sink], links: [...result.links, namedBranch(step.key, sink.key, shape.branch, shape)] };
   }, graph);
 }
 
 /** Why the designer can only show this Flow, if it can't edit it. */
 function unsupportedReason(flowSteps: IStep[]): string | undefined {
-  const unsupportedTypes = [...new Set(flowSteps.map(s => s.stepType as string).filter(t => !KINDS.includes(t as StepKind) && t !== 'ERROR'))];
+  const unsupportedTypes = [
+    ...new Set(flowSteps.map(s => s.stepType as string).filter(t => !KINDS.includes(t as StepKind) && t !== 'ERROR')),
+  ];
   if (unsupportedTypes.length) {
     return `This Flow uses Step types the designer can't edit: ${unsupportedTypes.join(', ')}.`;
   }
   if (hasAmbiguousBranches(flowSteps)) {
-    return "This Flow was imported before Branches got their own Link names, so it is not known which Branch settings belong to which Step. Import its DIL again to edit it here.";
+    return 'This Flow was imported before Branches got their own Link names, so it is not known which Branch settings belong to which Step. Import its DIL again to edit it here.';
   }
   return undefined;
 }
@@ -193,6 +257,11 @@ function hasAmbiguousBranches(flowSteps: IStep[]): boolean {
     branchSettings.set(link.name!, settings);
   }
   return [...branchSettings.values()].some(settings => settings.size > 1);
+}
+
+/** A new Flow laid out from ready-made Steps and Links, such as an Example Flow's; it has no id until it is saved. */
+export function newFlowGraph(steps: DesignStep[], links: DesignLink[]): FlowGraph {
+  return arrangedIfUnplaced({ steps, links, repaired: false });
 }
 
 function arrangedIfUnplaced(graph: FlowGraph): FlowGraph {
@@ -244,6 +313,7 @@ function toDesignStep(step: IStep): DesignStep {
   return {
     key: `step-${step.id}`,
     id: step.id,
+    name: step.name || undefined,
     kind: step.stepType as StepKind,
     componentType: step.componentType,
     uri: step.uri,
@@ -275,6 +345,16 @@ const rejected = (reason: string): EditResult => ({ outcome: 'rejected', reason 
 const accepted = (graph: FlowGraph): EditResult => ({ outcome: 'accepted', graph });
 const plainLink = (from: string, to: string): DesignLink => ({ from, to, transport: 'sync' });
 
+/** The language a new Branch's Condition is written in, until the user picks another. */
+export const DEFAULT_CONDITION_LANGUAGE = 'simple';
+
+/** A named Branch of a Router; on a Router that decides on a Condition, it starts in the default Condition language. */
+const namedBranch = (from: string, to: string, rule: string, shape: RouterShape): DesignLink => ({
+  ...plainLink(from, to),
+  rule,
+  ...(shape.takesCondition ? { language: DEFAULT_CONDITION_LANGUAGE } : {}),
+});
+
 /**
  * Inserts a new Action or Router into the Link that leads to `linkTo`.
  * The upstream part of the Link (its Branch name, Condition and settings) now leads to the new Step.
@@ -296,7 +376,7 @@ export function insertStep(graph: FlowGraph, linkTo: string, kind: 'ACTION' | 'R
   if (shape?.slots === 'fixed') {
     const sink: DesignStep = { key: nextKey(), kind: 'SINK', ...branchEndPosition(steps, inserted) };
     steps = [...steps, sink];
-    links = [...links, { ...plainLink(inserted.key, sink.key), rule: shape.branch }];
+    links = [...links, namedBranch(inserted.key, sink.key, shape.branch, shape)];
   }
 
   return accepted({ ...graph, steps, links });
@@ -334,9 +414,15 @@ export function appendStep(graph: FlowGraph, afterKey: string, kind: 'ACTION' | 
       return rejected('Only a Handler Flow ends a request with a Response.');
     }
     if (kind !== 'SINK' || !endsRequest(graph, afterKey)) {
-      return rejected('This Branch returns to its Router, so it can\'t answer the request: end it with an ordinary Sink.');
+      return rejected("This Branch returns to its Router, so it can't answer the request: end it with an ordinary Sink.");
     }
-    const response: DesignStep = { key: nextKey(), kind: 'SINK', componentType: RESPONSE_STEP_COMPONENT, options: 'status=200', ...nextColumnPosition(graph.steps, after) };
+    const response: DesignStep = {
+      key: nextKey(),
+      kind: 'SINK',
+      componentType: RESPONSE_STEP_COMPONENT,
+      options: 'status=200',
+      ...nextColumnPosition(graph.steps, after),
+    };
     return accepted({ ...graph, steps: [...graph.steps, response], links: [...graph.links, plainLink(after.key, response.key)] });
   }
 
@@ -350,7 +436,7 @@ export function appendStep(graph: FlowGraph, afterKey: string, kind: 'ACTION' | 
     for (const rule of branchRules) {
       const sink: DesignStep = { key: nextKey(), kind: 'SINK', ...nextColumnPosition(steps, appended) };
       steps = [...steps, sink];
-      links = [...links, { ...plainLink(appended.key, sink.key), rule }];
+      links = [...links, rule ? namedBranch(appended.key, sink.key, rule, shape) : plainLink(appended.key, sink.key)];
     }
   }
 
@@ -365,14 +451,13 @@ export function addBranch(graph: FlowGraph, routerKey: string): EditResult {
   }
   const shape = routerShape(router);
   if (shape.slots === 'fixed') {
-    return rejected(`An ${routerKind(router)} Router has a fixed set of Branches.`);
+    return rejected(`${routerTitle(router)} has a fixed set of Branches.`);
   }
 
   const sink: DesignStep = { key: nextKey(), kind: 'SINK', ...branchEndPosition(graph.steps, router) };
-  const branch = plainLink(router.key, sink.key);
-  if (shape.hasDefault) {
-    branch.rule = unusedBranchName(graph, router.key);
-  }
+  const branch = shape.hasDefault
+    ? namedBranch(router.key, sink.key, unusedBranchName(graph, router.key), shape)
+    : plainLink(router.key, sink.key);
   return accepted({ ...graph, steps: [...graph.steps, sink], links: [...graph.links, branch] });
 }
 
@@ -413,7 +498,9 @@ export function deleteStep(graph: FlowGraph, key: string): EditResult {
   // The only Step of a Branch goes together with the Branch.
   if (target.kind === 'SINK' || (target.kind === 'ACTION' && outbound.length === 0)) {
     const result = deleteBranch(graph, key);
-    return result.outcome === 'accepted' ? result : rejected(`This Step can't be deleted: it is all that is left of its Branch. ${result.reason}`);
+    return result.outcome === 'accepted'
+      ? result
+      : rejected(`This Step can't be deleted: it is all that is left of its Branch. ${result.reason}`);
   }
 
   if (target.kind === 'ROUTER' && inbound) {
@@ -427,6 +514,42 @@ export function deleteStep(graph: FlowGraph, key: string): EditResult {
 
   return rejected('This Step cannot be deleted.');
 }
+
+/**
+ * Deletes several Steps as one edit. Each goes as `deleteStep` would delete it on its own; a Step that can't go (such
+ * as the Source), or that already went with a Router before it, is left out.
+ */
+export function deleteSteps(graph: FlowGraph, keys: string[]): EditResult {
+  let result = graph;
+  for (const key of keys) {
+    const deleted = deleteStep(result, key);
+    if (deleted.outcome === 'accepted') {
+      result = deleted.graph;
+    }
+  }
+  return result === graph ? rejected('None of these Steps can be deleted.') : accepted(result);
+}
+
+/** Names a Step; an empty name takes its name away, so it is known by its component again. */
+export function renameStep(graph: FlowGraph, key: string, name: string): EditResult {
+  const step = graph.steps.find(s => s.key === key);
+  if (!step) {
+    return rejected('There is no such Step.');
+  }
+  const trimmed = name.trim() || undefined;
+  return accepted({ ...graph, steps: graph.steps.map(s => (s === step ? { ...s, name: trimmed } : s)) });
+}
+
+/**
+ * The name to show for a Step. An import used to give a Step without a name its id in the imported file, such as `12`
+ * or a UUID; that is no name the user gave it.
+ */
+export function shownName(step: Pick<DesignStep, 'name'>): string | undefined {
+  const name = step.name?.trim();
+  return name && !/^\d+$/.test(name) && !UUID.test(name) ? name : undefined;
+}
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** Whether the Step can be deleted, so the editor only offers to delete it then. */
 export function canDeleteStep(graph: FlowGraph, key: string): boolean {
@@ -500,7 +623,9 @@ export function changeComponent(graph: FlowGraph, key: string, componentType: st
 
 /** Whether two kinds of Router have the same Branches, so one can replace the other in place. */
 export function sameBranches(a: RouterShape, b: RouterShape): boolean {
-  return a.slots === 'fixed' && b.slots === 'fixed' ? a.branch === b.branch : a.slots === 'list' && b.slots === 'list' && a.hasDefault === b.hasDefault;
+  return a.slots === 'fixed' && b.slots === 'fixed'
+    ? a.branch === b.branch
+    : a.slots === 'list' && b.slots === 'list' && a.hasDefault === b.hasDefault;
 }
 
 function replaceStep(graph: FlowGraph, step: DesignStep): FlowGraph {
@@ -565,9 +690,57 @@ export function isResponse(graph: FlowGraph, step: DesignStep): boolean {
   );
 }
 
+/**
+ * What a Step is, as the canvas shows it on the Step: its component's title (from `titles`, such as 'File' for `file`),
+ * what kind of Router it is, the Operation of a Handler Flow, or a Response.
+ */
+export function stepLabel(graph: FlowGraph, step: DesignStep, titles: ReadonlyMap<string, string>): string {
+  const handler = graph.handler;
+  if (handler && isLockedSource(graph, step.key)) {
+    return `${handler.method} ${handler.fullPath}`;
+  }
+  if (isResponse(graph, step)) {
+    return `Response ${responseSettings(step).status}`;
+  }
+  if (step.componentType?.toLowerCase() === 'flowlink') {
+    return 'Call Flow';
+  }
+  if (step.kind === 'ROUTER') {
+    return routerTitle(step);
+  }
+  return step.componentType ? (titles.get(step.componentType) ?? step.componentType) : step.uri || 'choose a component';
+}
+
+/** What a Step works on, such as a folder or a queue, as the canvas shows it under the Step. Routers, Responses, Call Flows and the Operation have none. */
+export function stepPath(graph: FlowGraph, step: DesignStep): string {
+  if (!step.componentType || !step.uri || step.kind === 'ROUTER' || isResponse(graph, step) || isLockedSource(graph, step.key)) {
+    return '';
+  }
+  return step.componentType.toLowerCase() === 'flowlink' ? '' : step.uri;
+}
+
 export function moveStep(graph: FlowGraph, key: string, x: number, y: number): EditResult {
   const target = graph.steps.find(s => s.key === key);
   return target ? accepted(replaceStep(graph, { ...target, x, y })) : rejected('There is no such Step.');
+}
+
+export interface StepMove {
+  key: string;
+  x: number;
+  y: number;
+}
+
+/** Moves the Steps that were dragged together as one edit, so a single undo puts them all back. */
+export function moveSteps(graph: FlowGraph, moves: StepMove[]): EditResult {
+  let moved = graph;
+  for (const { key, x, y } of moves) {
+    const result = moveStep(moved, key, x, y);
+    if (result.outcome === 'rejected') {
+      return result;
+    }
+    moved = result.graph;
+  }
+  return accepted(moved);
 }
 
 /** Edits the Link to `linkTo`. Branch names are fixed on Fixed-slot Routers, and the Default branch has none. */
@@ -602,7 +775,7 @@ function renameRefusal(graph: FlowGraph, link: DesignLink, rule: string | undefi
   }
   const shape = routerShape(router);
   if (shape.slots === 'fixed') {
-    return `The Branches of an ${routerKind(router)} Router can't be renamed.`;
+    return `The Branches of ${routerTitle(router)} can't be renamed.`;
   }
   if (link === defaultBranch(graph, router)) {
     return "The Default branch can't be given a name.";
@@ -639,7 +812,18 @@ export function takesCondition(graph: FlowGraph, linkTo: string): boolean {
 export type PathRules = (componentType: string) => PathRule | undefined;
 
 /** The Components that only run with a Connection, such as a JMS broker or a database. */
-export const COMPONENTS_WITH_CONNECTION: readonly string[] = ['activemq', 'amazonmq', 'amqp', 'amqps', 'jms', 'sjms', 'sjms2', 'sql', 'ibmmq', 'spring-rabbitmq'];
+export const COMPONENTS_WITH_CONNECTION: readonly string[] = [
+  'activemq',
+  'amazonmq',
+  'amqp',
+  'amqps',
+  'jms',
+  'sjms',
+  'sjms2',
+  'sql',
+  'ibmmq',
+  'spring-rabbitmq',
+];
 
 export function needsConnection(componentType: string | undefined): boolean {
   return !!componentType && COMPONENTS_WITH_CONNECTION.includes(componentType.toLowerCase());
@@ -680,7 +864,15 @@ export function problems(graph: FlowGraph, pathRules?: PathRules): Problem[] {
     .filter(s => isResponse(graph, s) && !isHttpStatus(responseSettings(s).status))
     .map(s => ({ stepKey: s.key, message: 'Give the Response a status from 100 to 599.' }));
 
-  return [...stepProblems, ...pathProblems, ...connectionProblems, ...openEndProblems, ...linkProblems, ...responseProblems, ...statusProblems];
+  return [
+    ...stepProblems,
+    ...pathProblems,
+    ...connectionProblems,
+    ...openEndProblems,
+    ...linkProblems,
+    ...responseProblems,
+    ...statusProblems,
+  ];
 }
 
 function isHttpStatus(status: string): boolean {
@@ -706,6 +898,28 @@ export function warnings(graph: FlowGraph): Problem[] {
     }));
 }
 
+/** A Step kind as the UI names it. */
+export const KIND_NAMES: Record<StepKind, string> = { SOURCE: 'Source', ACTION: 'Action', ROUTER: 'Router', SINK: 'Sink' };
+
+/** Where a Problem is, as a list of them names it: the Step's kind and Component, such as "Sink · file", or its Branch. */
+export function problemPlace(graph: FlowGraph, problem: Problem): string {
+  if (problem.linkTo) {
+    const rule = graph.links.find(l => l.to === problem.linkTo)?.rule;
+    return rule ? `Branch ${rule}` : 'Branch';
+  }
+  const step = graph.steps.find(s => s.key === problem.stepKey);
+  if (!step) {
+    return 'Flow';
+  }
+  if (isLockedSource(graph, step.key)) {
+    return 'Operation';
+  }
+  if (isResponse(graph, step)) {
+    return 'Response';
+  }
+  return step.componentType ? `${KIND_NAMES[step.kind]} · ${step.componentType}` : KIND_NAMES[step.kind];
+}
+
 /** A Flow is a Draft while anything in it is incomplete. A Draft can be saved but not started. */
 export function isDraft(graph: FlowGraph, pathRules?: PathRules): boolean {
   return problems(graph, pathRules).length > 0;
@@ -717,10 +931,11 @@ export function stepsToSave(graph: FlowGraph, flowId: number): { key: string; st
     key: s.key,
     step: {
       id: s.id,
+      name: s.name,
       stepType: s.kind as IStep['stepType'],
       componentType: s.componentType,
       uri: s.uri,
-      options: s.kind === 'ROUTER' && isSplitRouter(s) ? withoutCondition(s.options) : s.options,
+      options: s.kind === 'ROUTER' && conditionBranch(s) ? withoutCondition(s.options) : s.options,
       connectionId: s.connectionId,
       messageId: s.messageId,
       routeId: s.routeId,
@@ -732,12 +947,16 @@ export function stepsToSave(graph: FlowGraph, flowId: number): { key: string; st
   }));
 }
 
-function isSplitRouter(step: DesignStep): boolean {
+/**
+ * The named Branch that holds a Fixed-slot Router's Condition, such as `split` or `if`; nothing for a Router whose
+ * Branches take no Condition, or whose Branches each hold their own.
+ */
+export function conditionBranch(step: Pick<DesignStep, 'componentType' | 'uri'>): string | undefined {
   const shape = routerShape(step);
-  return shape.slots === 'fixed' && shape.branch === 'split';
+  return shape.slots === 'fixed' && shape.takesCondition ? shape.branch : undefined;
 }
 
-/** A split Router's Condition lives on its split Branch, not in its options. */
+/** Such a Router's Condition lives on its named Branch; a copy in its options would give the runtime a second `language`. */
 function withoutCondition(options: string | undefined): string | undefined {
   return options
     ?.split('&')

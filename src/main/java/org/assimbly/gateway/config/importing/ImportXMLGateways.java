@@ -16,7 +16,8 @@ import javax.xml.xpath.XPathFactory;
 import java.util.Optional;
 
 @Service
-@Transactional
+// Spring only rolls back on unchecked exceptions by default, and the import methods throw checked ones
+@Transactional(rollbackFor = Exception.class)
 public class ImportXMLGateways {
 
     private final Logger log = LoggerFactory.getLogger(ImportXMLGateways.class);

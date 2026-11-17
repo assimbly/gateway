@@ -1,21 +1,20 @@
 package org.assimbly.gateway.config;
 
+import static java.util.Map.entry;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.core.util.Json;
+import java.util.Collection;
+import java.util.Map;
 import org.springdoc.core.customizers.OperationCustomizer;
 import org.springdoc.core.customizers.ParameterCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.annotation.RequestBody;
-
-import java.util.Collection;
-import java.util.Map;
-
-import static java.util.Map.entry;
 
 /**
  * Swagger UI documentation of the gateway REST resources that doesn't fit on the resources themselves:
@@ -83,30 +82,54 @@ public class OpenApiDocsConfiguration {
     /** Example bodies of entities (without id) and other JSON objects, keyed by class name. */
     private static final Map<String, String> ENTITY_BODIES = Map.ofEntries(
         entry("BrokerDTO", "{\"name\":\"Broker\",\"type\":\"classic\",\"configurationType\":\"file\",\"autoStart\":false}"),
-        entry("CertificateDTO", "{\"url\":\"https://example.com\",\"certificateName\":\"example.com\",\"certificateStore\":\"outbound-truststore.p12\",\"certificateFile\":\"-----BEGIN CERTIFICATE-----\\nMIIC...\\n-----END CERTIFICATE-----\"}"),
+        entry(
+            "CertificateDTO",
+            "{\"url\":\"https://example.com\",\"certificateName\":\"example.com\",\"certificateStore\":\"outbound-truststore.p12\",\"certificateFile\":\"-----BEGIN CERTIFICATE-----\\nMIIC...\\n-----END CERTIFICATE-----\"}"
+        ),
         entry("ConnectionDTO", "{\"name\":\"ActiveMQ\"}"),
         entry("ConnectionKeysDTO", "{\"key\":\"host\",\"value\":\"localhost\",\"connectionId\":1}"),
         entry("EnvironmentVariablesDTO", "{\"key\":\"API_URL\",\"value\":\"https://example.com\",\"encrypted\":false,\"integrationId\":1}"),
-        entry("FlowDTO", "{\"name\":\"Scheduler\",\"type\":\"esb\",\"autoStart\":false,\"maximumRedeliveries\":0,\"redeliveryDelay\":0,\"loadBalancing\":false,\"parallelProcessing\":false,\"logLevel\":\"INFO\",\"instances\":1,\"version\":1,\"integrationId\":1}"),
+        entry(
+            "FlowDTO",
+            "{\"name\":\"Scheduler\",\"type\":\"esb\",\"autoStart\":false,\"maximumRedeliveries\":0,\"redeliveryDelay\":0,\"loadBalancing\":false,\"parallelProcessing\":false,\"logLevel\":\"INFO\",\"instances\":1,\"version\":1,\"integrationId\":1}"
+        ),
         entry("HeaderDTO", "{\"key\":\"test\",\"value\":\"hello\",\"type\":\"header\",\"language\":\"constant\",\"messageId\":1}"),
-        entry("IntegrationDTO", "{\"name\":\"Default\",\"type\":\"FULL\",\"environmentName\":\"dev\",\"stage\":\"DEVELOPMENT\",\"defaultFromComponentType\":\"file\",\"defaultToComponentType\":\"file\",\"defaultErrorComponentType\":\"file\",\"connectorType\":\"CAMEL\"}"),
+        entry(
+            "IntegrationDTO",
+            "{\"name\":\"Default\",\"type\":\"FULL\",\"environmentName\":\"dev\",\"stage\":\"DEVELOPMENT\",\"defaultFromComponentType\":\"file\",\"defaultToComponentType\":\"file\",\"defaultErrorComponentType\":\"file\",\"connectorType\":\"CAMEL\"}"
+        ),
         entry("LinkDTO", "{\"name\":\"link\",\"bound\":\"out\",\"transport\":\"sync\",\"stepId\":1}"),
         entry("MessageDTO", "{\"name\":\"Message\",\"body\":\"Hello world\",\"language\":\"constant\"}"),
         entry("QueueDTO", "{\"itemsOnPage\":10,\"refreshInterval\":5000,\"selectedColumn\":\"name\",\"orderColumn\":\"name\"}"),
         entry("TopicDTO", "{\"itemsOnPage\":10,\"refreshInterval\":5000,\"selectedColumn\":\"name\",\"orderColumn\":\"name\"}"),
-        entry("RouteDTO", "{\"name\":\"route1\",\"content\":\"<route id=\\\"route1\\\"><from uri=\\\"timer:demo\\\"/><to uri=\\\"log:demo\\\"/></route>\"}"),
-        entry("StepDTO", "{\"name\":\"Timer\",\"stepType\":\"SOURCE\",\"componentType\":\"quartz\",\"uri\":\"quartz:timer\",\"options\":\"{\\\"cron\\\":\\\"0 * * * * ?\\\"}\",\"flowId\":1}")
+        entry(
+            "RouteDTO",
+            "{\"name\":\"route1\",\"content\":\"<route id=\\\"route1\\\"><from uri=\\\"timer:demo\\\"/><to uri=\\\"log:demo\\\"/></route>\"}"
+        ),
+        entry(
+            "StepDTO",
+            "{\"name\":\"Timer\",\"stepType\":\"SOURCE\",\"componentType\":\"quartz\",\"uri\":\"quartz:timer\",\"options\":\"{\\\"cron\\\":\\\"0 * * * * ?\\\"}\",\"flowId\":1}"
+        )
     );
 
     private static final Map<String, String> OTHER_BODIES = Map.ofEntries(
         entry("LoginVM", "{\"username\":\"admin\",\"password\":\"admin\",\"rememberMe\":false}"),
-        entry("ManagedUserVM", "{\"login\":\"john\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"john@example.com\",\"langKey\":\"en\",\"password\":\"secret\"}"),
-        entry("AdminUserDTO", "{\"login\":\"john\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"john@example.com\",\"activated\":true,\"langKey\":\"en\",\"authorities\":[\"ROLE_USER\"]}"),
+        entry(
+            "ManagedUserVM",
+            "{\"login\":\"john\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"john@example.com\",\"password\":\"secret\"}"
+        ),
+        entry(
+            "AdminUserDTO",
+            "{\"login\":\"john\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"john@example.com\",\"activated\":true,\"authorities\":[\"ROLE_USER\"]}"
+        ),
         entry("UserDTO", "{\"login\":\"john\"}"),
         entry("PasswordChangeDTO", "{\"currentPassword\":\"secret\",\"newPassword\":\"secret2\"}"),
         entry("KeyAndPasswordVM", "{\"key\":\"1234567890\",\"newPassword\":\"secret2\"}"),
         entry("LoggerVM", "{\"name\":\"org.assimbly\",\"level\":\"DEBUG\"}"),
-        entry("EmailRequest", "{\"protocol\":\"smtp\",\"host\":\"smtp.example.com\",\"port\":587,\"from\":\"noreply@example.com\",\"to\":\"john@example.com\",\"username\":\"noreply@example.com\",\"password\":\"secret\",\"subject\":\"Test\",\"body\":\"Hello world\",\"contentType\":\"text/plain\"}")
+        entry(
+            "EmailRequest",
+            "{\"protocol\":\"smtp\",\"host\":\"smtp.example.com\",\"port\":587,\"from\":\"noreply@example.com\",\"to\":\"john@example.com\",\"username\":\"noreply@example.com\",\"password\":\"secret\",\"subject\":\"Test\",\"body\":\"Hello world\",\"contentType\":\"text/plain\"}"
+        )
     );
 
     /** Example bodies of endpoints that take a plain String, keyed by method name. */
@@ -144,14 +167,20 @@ public class OpenApiDocsConfiguration {
             }
             for (MethodParameter parameter : handlerMethod.getMethodParameters()) {
                 if (!parameter.hasParameterAnnotation(RequestBody.class)) continue;
-                Doc doc = bodyDoc(handlerMethod.getMethod().getName(), parameter);
-                if (doc != null) {
-                    if (doc.description() != null) requestBody.setDescription(doc.description());
-                    if (doc.example() != null) requestBody.getContent().values().forEach(media -> media.setExample(doc.example()));
-                }
+                applyBodyDoc(requestBody, bodyDoc(handlerMethod.getMethod().getName(), parameter));
             }
             return operation;
         };
+    }
+
+    // The Swagger RequestBody is spelled out because the Spring annotation of the same name is imported
+    private static void applyBodyDoc(io.swagger.v3.oas.models.parameters.RequestBody requestBody, Doc doc) {
+        if (doc == null) return;
+        if (doc.description() != null) requestBody.setDescription(doc.description());
+        if (doc.example() != null) requestBody
+            .getContent()
+            .values()
+            .forEach(media -> media.setExample(doc.example()));
     }
 
     private static boolean isGatewayResource(Class<?> type) {
@@ -161,7 +190,7 @@ public class OpenApiDocsConfiguration {
     private static Doc findDoc(MethodParameter parameter, String name) {
         String resource = parameter.getContainingClass().getSimpleName();
         String method = parameter.getMethod() == null ? "" : parameter.getMethod().getName();
-        for (String key : new String[] {resource + "." + method + "." + name, resource + "." + name, name}) {
+        for (String key : new String[] { resource + "." + method + "." + name, resource + "." + name, name }) {
             Doc doc = PARAMETERS.get(key);
             if (doc != null) return doc;
         }
@@ -190,7 +219,7 @@ public class OpenApiDocsConfiguration {
                 node = array;
             }
             return new Doc(null, node);
-        } catch (JsonProcessingException e) {
+        } catch (JsonProcessingException _) {
             return null;
         }
     }

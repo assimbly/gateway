@@ -15,16 +15,10 @@ export const notificationInterceptor: HttpInterceptorFn = (req, next) => {
         const headers = Object.fromEntries(event.headers.keys().map(key => [key, event.headers.getAll(key)]));
         const message = getMessageFromHeaders(headers);
 
-        if (message.alertKey) {
+        if (message.alert) {
           alertService.addAlert({
             type: 'success',
-            translationKey: message.alertKey,
-            translationParams: { param: message.param },
-          });
-        } else if (message.alertMessage) {
-          alertService.addAlert({
-            type: 'success',
-            message: message.alertMessage,
+            message: message.alert,
           });
         }
       }

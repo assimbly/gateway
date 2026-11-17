@@ -2,7 +2,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, inject, signal } from '@angular/core';
 
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap/alert';
-import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
 import { AlertModel, AlertService, EventManager, EventWithContent } from 'app/core/util';
@@ -23,20 +22,15 @@ export class AlertError implements OnDestroy {
   private readonly alertService = inject(AlertService);
   private readonly eventManager = inject(EventManager);
 
-  private readonly translateService = inject(TranslateService);
-
   constructor() {
-    this.errorListener = this.eventManager.subscribe('jhipsterGradleSampleApplicationApp.error', (response: EventWithContent<unknown>) => {
+    this.errorListener = this.eventManager.subscribe('gatewayApp.error', (response: EventWithContent<unknown>) => {
       const errorResponse = (response as EventWithContent<AlertErrorModel>).content;
-      this.addErrorAlert(errorResponse.message, errorResponse.key, errorResponse.params);
+      this.addErrorAlert(errorResponse.message);
     });
 
-    this.httpErrorListener = this.eventManager.subscribe(
-      'jhipsterGradleSampleApplicationApp.httpError',
-      (response: EventWithContent<unknown>) => {
-        this.handleHttpError(response);
-      },
-    );
+    this.httpErrorListener = this.eventManager.subscribe('gatewayApp.httpError', (response: EventWithContent<unknown>) => {
+      this.handleHttpError(response);
+    });
   }
 
   setClasses(alert: AlertModel): Record<string, boolean> {
@@ -56,8 +50,9 @@ export class AlertError implements OnDestroy {
     alert.close?.();
   }
 
-  private addErrorAlert(message?: string, translationKey?: string, translationParams?: Record<string, unknown>): void {
-    this.alertService.addAlert({ type: 'danger', message, translationKey, translationParams }, this.alerts);
+  private addErrorAlert(message?: string): void {
+    // An error stays until the user closes it: the default five seconds are too short to read and act on it.
+    this.alertService.addAlert({ type: 'danger', message, timeout: 0 }, this.alerts);
   }
 
   private handleHttpError(response: EventWithContent<unknown>): void {
@@ -65,7 +60,7 @@ export class AlertError implements OnDestroy {
     switch (httpErrorResponse.status) {
       // connection refused, server not reachable
       case 0:
-        this.addErrorAlert('Server not reachable', 'error.server.not.reachable');
+        this.addErrorAlert('Server not reachable');
         break;
 
       case 400: {
@@ -74,7 +69,7 @@ export class AlertError implements OnDestroy {
       }
 
       case 404:
-        this.addErrorAlert('Not found', 'error.url.not.found');
+        this.addErrorAlert('Not found');
         break;
 
       default:
@@ -85,48 +80,29 @@ export class AlertError implements OnDestroy {
   private handleBadRequest(httpErrorResponse: HttpErrorResponse): void {
     const headers = Object.fromEntries(httpErrorResponse.headers.keys().map(key => [key, httpErrorResponse.headers.getAll(key)]));
     const message = getMessageFromHeaders(headers);
-    if (message.errorKey) {
-      const alertData = message.param ? { entityName: this.translateService.instant(`global.menu.entities.${message.param}`) } : undefined;
-      this.addErrorAlert(message.errorKey, message.errorKey, alertData);
-    } else if (message.errorMessage) {
-      this.addErrorAlert(message.errorMessage);
+    if (message.error) {
+      this.addErrorAlert(message.error);
     } else if (httpErrorResponse.error !== '' && httpErrorResponse.error.fieldErrors) {
       this.handleFieldsError(httpErrorResponse);
     } else if (httpErrorResponse.error !== '' && httpErrorResponse.error.message) {
-      this.addErrorAlert(
-        httpErrorResponse.error.detail ?? httpErrorResponse.error.message,
-        httpErrorResponse.error.message,
-        httpErrorResponse.error.params,
-      );
+      this.addErrorAlert(httpErrorResponse.error.detail ?? httpErrorResponse.error.message);
     } else {
-      this.addErrorAlert(httpErrorResponse.error, httpErrorResponse.error);
+      this.addErrorAlert(httpErrorResponse.error);
     }
   }
 
   private handleDefaultError(httpErrorResponse: HttpErrorResponse): void {
     if (httpErrorResponse.error !== '' && httpErrorResponse.error.message) {
-      this.addErrorAlert(
-        httpErrorResponse.error.detail ?? httpErrorResponse.error.message,
-        httpErrorResponse.error.message,
-        httpErrorResponse.error.params,
-      );
+      this.addErrorAlert(httpErrorResponse.error.detail ?? httpErrorResponse.error.message);
     } else {
-      this.addErrorAlert(httpErrorResponse.error, httpErrorResponse.error);
+      this.addErrorAlert(httpErrorResponse.error);
     }
   }
 
   private handleFieldsError(httpErrorResponse: HttpErrorResponse): void {
     const { fieldErrors } = httpErrorResponse.error;
     for (const fieldError of fieldErrors) {
-      if (['Min', 'Max', 'DecimalMin', 'DecimalMax'].includes(fieldError.message)) {
-        fieldError.message = 'Size';
-      }
-      // convert 'something[14].other[4].id' to 'something[].other[].id' so translations can be written to it
-      const convertedField: string = fieldError.field.replaceAll(/\[\d*\]/g, '[]');
-      const fieldName: string = this.translateService.instant(
-        `jhipsterGradleSampleApplicationApp.${fieldError.objectName as string}.${convertedField}`,
-      );
-      this.addErrorAlert(`Error on field "${fieldName}"`, `error.${fieldError.message as string}`, { fieldName });
+      this.addErrorAlert(`Error on field "${fieldError.field as string}"`);
     }
   }
 }

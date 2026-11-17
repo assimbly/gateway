@@ -1,11 +1,11 @@
 import { Component, OnInit, OnDestroy, TemplateRef, ChangeDetectorRef, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { NgClass, NgStyle, KeyValuePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { AlertService } from 'app/core/util/alert.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgbModal, NgbNavChangeEvent, NgbNavModule, NgbModalRef, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
@@ -22,22 +22,24 @@ import { AccountService } from 'app/core/auth/account.service';
 import { ThemeService } from 'app/core/theme';
 import { ITEMS_PER_PAGE } from 'app/config/pagination.constants';
 import { BrokerService } from 'app/entities/broker/broker.service';
+import { QueueClearDialogComponent } from 'app/entities/queue/queue-clear-dialog.component';
+import { TopicClearDialogComponent } from 'app/entities/topic/topic-clear-dialog.component';
 
-import { saveAs } from 'file-saver/FileSaver';
+import { saveAs } from 'app/shared/util/save-as';
 import { IBroker } from 'app/shared/model/broker.model';
 
 import { IHeader } from 'app/shared/model/header.model';
 
-import { ViewChild } from '@angular/core'
-import { CodemirrorComponent } from "@ctrl/ngx-codemirror";
+import { ViewChild } from '@angular/core';
+import { CodemirrorComponent } from '@ctrl/ngx-codemirror';
 
 @Component({
   selector: 'jhi-broker-message-browser',
   templateUrl: './broker-message-browser.component.html',
   imports: [
-    CommonModule,
     FormsModule,
     FontAwesomeModule,
+    RouterLink,
     NgbNavModule,
     NgbDropdownModule,
     InfiniteScrollModule,
@@ -47,30 +49,40 @@ import { CodemirrorComponent } from "@ctrl/ngx-codemirror";
     BrokerMessageBrowserRowComponent,
     MessageSearchByMessageIdPipe,
     MessageSortByHeaderPipePipe,
+    KeyValuePipe,
+    NgClass,
+    NgStyle,
   ],
 })
 export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
+  private brokerService = inject(BrokerService);
+  protected alertService = inject(AlertService);
+  protected eventManager = inject(EventManager);
+  private modalService = inject(NgbModal);
+  protected accountService = inject(AccountService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
   readonly themeService = inject(ThemeService);
 
-  @ViewChild('codeEditor') private codeEditor: CodemirrorComponent;
+  @ViewChild('codeEditor') private codeEditor!: CodemirrorComponent;
 
   messages: IMessage[];
-  message: IMessage;
+  message!: IMessage;
   selectedMessage: IMessage = {};
-  selectedHighlight: string;
+  selectedHighlight!: string;
   allMessages: any;
   headers: any;
-  headerKeys: IHeader[];
+  headerKeys!: IHeader[];
 
-  brokers: IBroker[];
-  brokerType: string;
-  endpointName: string;
-  endpointType: string;
-  targetEndpointName: string;
-
+  brokers!: IBroker[];
+  brokerType!: string;
+  endpointName!: string;
+  endpointType!: string;
+  targetEndpointName!: string;
 
   currentAccount: any;
-  eventSubscriber: Subscription;
+  eventSubscriber!: Subscription;
   itemsPerPage: number;
   links: any;
 
@@ -79,32 +91,24 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
 
   page: any;
   numberOfMessages = 100;
-  messagesCount: number;
-  fileExtension: string;
+  messagesCount!: number;
+  fileExtension!: string;
   isLoading = false;
   finished = false;
   searchText = '';
   active = '0';
   descending = false;
-  subtitle: string;
+  subtitle!: string;
 
   editorMode: any = 'text';
 
   objectKeys = Object.keys;
 
-  modalRef: NgbModalRef | null;
+  modalRef!: NgbModalRef | null;
 
   private readonly changeDetector = inject(ChangeDetectorRef);
 
-  constructor(
-    private brokerService: BrokerService,
-    protected alertService: AlertService,
-    protected eventManager: EventManager,
-    private modalService: NgbModal,
-    protected accountService: AccountService,
-    private router: Router,
-    private route: ActivatedRoute
-  ) {
+  constructor() {
     this.messages = [];
     this.itemsPerPage = ITEMS_PER_PAGE + 5;
     this.page = 1;
@@ -138,55 +142,48 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   }
 
   onNavChange(changeEvent: NgbNavChangeEvent) {
-  		console.log('nav changed');
-  		console.log(changeEvent);
-  		//this.selectedMessage.body = 'blabla';
-      //this.showMessage(this.message);
-      //document.getElementById("codemirror").click();
-      //this.subContent.nativeElement.click();
-      this.codeEditor.codeMirror.refresh()
-  	}
+    //this.selectedMessage.body = 'blabla';
+    //this.showMessage(this.message);
+    //document.getElementById("codemirror").click();
+    //this.subContent.nativeElement.click();
+    this.codeEditor.codeMirror!.refresh();
+  }
 
   loadMessages() {
     this.isLoading = true;
     if (this.brokerType) {
       this.getMessages();
     } else {
-      this.brokerService.getBrokers().subscribe(
-        data => {
-          if (data) {
-            for (let i = 0; i < data.body.length; i++) {
-              this.brokers.push(data.body[i]);
-            }
-            this.brokerType = this.brokers[0].type;
-            if (this.brokerType != null) {
-              this.getMessages();
-            } else {
-              console.log('Unknown broker: set brokertype to artemis');
-              this.brokerType = 'artemis';
-              this.getMessages();
-            }
+      this.brokerService.getBrokers().subscribe(data => {
+        if (data) {
+          for (let i = 0; i < data.body!.length; i++) {
+            this.brokers.push(data.body![i]);
           }
-        },
-        error => console.log(error)
-      );
+          this.brokerType = this.brokers[0].type!;
+          if (this.brokerType != null) {
+            this.getMessages();
+          } else {
+            this.brokerType = 'artemis';
+            this.getMessages();
+          }
+        }
+      });
     }
   }
 
   getMessages() {
-
     this.brokerService.countMessages(this.brokerType, this.endpointName).subscribe(
-      (res: HttpResponse<string>) => this.onSuccessCount(res.body, res.headers),
-      (res: HttpErrorResponse) => this.onError(res.message)
+      (res: HttpResponse<string>) => this.onSuccessCount(res.body!, res.headers),
+      (res: HttpErrorResponse) => this.onError(res.message),
     );
 
     this.brokerService.browseMessages(this.brokerType, this.endpointName, this.page, this.numberOfMessages, true).subscribe(
       (res: HttpResponse<IMessage[]>) => this.onSuccess(res.body, res.headers),
-      (res: HttpErrorResponse) => this.onError(res.message)
+      (res: HttpErrorResponse) => this.onError(res.message),
     );
   }
 
-  private onSuccess(data, headers) {
+  private onSuccess(data: any, headers: HttpHeaders) {
     this.isLoading = false;
     this.messages = new Array<IMessage>();
     this.allMessages = data;
@@ -222,7 +219,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     this.changeDetector.detectChanges();
   }
 
-  private onSuccessCount(data, headers) {
+  private onSuccessCount(data: string, headers: HttpHeaders) {
     this.messagesCount = parseInt(data);
 
     if (this.messagesCount === 0) {
@@ -235,7 +232,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     this.changeDetector.detectChanges();
   }
 
-  private onSuccessBrowse(data, headers) {
+  private onSuccessBrowse(data: any, headers: HttpHeaders) {
     if (data.messages.message) {
       for (let i = 0; i < data.messages.message.length; i++) {
         const message = data.messages.message[i];
@@ -254,7 +251,6 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   }
 
   getBody(message: any) {
-
     let body = '';
 
     if (message.body) {
@@ -272,32 +268,28 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
   }
 
   getHeaders(message: any) {
-
-      if(Object.keys(message.headers).length === 0){
-          return { "": ""};
-      }else{
-          return message.headers;
-      }
-
+    if (Object.keys(message.headers).length === 0) {
+      return { '': '' };
+    } else {
+      return message.headers;
+    }
   }
 
-  getJMSHeaders(message: any){
-
-      if(Object.keys(message.jmsHeaders).length === 0){
-          return { "": ""};
-      }else{
-          return message.jmsHeaders;
-      }
-
+  getJMSHeaders(message: any) {
+    if (Object.keys(message.jmsHeaders).length === 0) {
+      return { '': '' };
+    } else {
+      return message.jmsHeaders;
+    }
   }
 
   private onError(errorMessage: string) {
     this.isLoading = false;
     this.changeDetector.detectChanges();
-	this.alertService.addAlert({
-	  type: 'danger',
-	  message: errorMessage,
-	});
+    this.alertService.addAlert({
+      type: 'danger',
+      message: errorMessage,
+    });
   }
 
   reset() {
@@ -306,20 +298,16 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     this.loadMessages();
   }
 
-  trackTimestamp(index: number, item: IMessage) {
-    return item.timestamp;
-  }
-
   registerChangeInFlows() {
     this.eventSubscriber = this.eventManager.subscribe('messageListModification', response => this.reset());
   }
 
   sortByTimestamp() {
     if (this.descending) {
-      this.messages.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+      this.messages.sort((a, b) => b.timestamp!.localeCompare(a.timestamp!));
       this.descending = false;
     } else {
-      this.messages.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+      this.messages.sort((a, b) => a.timestamp!.localeCompare(b.timestamp!));
       this.descending = true;
     }
 
@@ -334,22 +322,37 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     this.loadMessages();
   }
 
-  deleteMessage(message: IMessage) {
-    this.brokerService.deleteMessage(this.brokerType, this.endpointName, message.messageid).subscribe(
+  clearMessage(message: IMessage) {
+    this.brokerService.deleteMessage(this.brokerType, this.endpointName, message.messageid!).subscribe(
       (res: HttpResponse<any>) => {
         this.loadMessages();
       },
-      (res: HttpErrorResponse) => this.onError(res.message)
+      (res: HttpErrorResponse) => this.onError(res.message),
+    );
+  }
+
+  /** Asks to remove every message from the queue or topic, as its row on the broker page does, and shows what's left. */
+  clearAllMessages() {
+    const dialog = this.endpointType === 'topic' ? TopicClearDialogComponent : QueueClearDialogComponent;
+    const modalRef = this.modalService.open(dialog);
+    modalRef.componentInstance.address = { name: this.endpointName };
+    modalRef.componentInstance.brokerType = this.brokerType;
+    modalRef.result.then(
+      () => {
+        this.page = 1;
+        this.loadMessages();
+      },
+      (): void => undefined,
     );
   }
 
   moveMessage(message: IMessage) {
-    this.brokerService.moveMessage(this.brokerType, this.endpointName, this.targetEndpointName, message.messageid).subscribe(
+    this.brokerService.moveMessage(this.brokerType, this.endpointName, this.targetEndpointName, message.messageid!).subscribe(
       (res: HttpResponse<any>) => {
         this.loadMessages();
         this.cancelModal();
       },
-      (res: HttpErrorResponse) => this.onError(res.message)
+      (res: HttpErrorResponse) => this.onError(res.message),
     );
   }
 
@@ -363,16 +366,16 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     const today = new Date().toISOString().slice(0, 10);
 
     if (bodyOnly) {
-      const blob = new Blob([message.body], { type: 'application/' + this.fileExtension });
+      const blob = new Blob([message.body!], { type: 'application/' + this.fileExtension });
       saveAs(blob, `${today}-${this.endpointName}-${message.messageid}.${this.fileExtension}`);
     } else {
-      this.brokerService.browseMessage(this.brokerType, this.endpointName, message.messageid).subscribe(
+      this.brokerService.browseMessage(this.brokerType, this.endpointName, message.messageid!).subscribe(
         (res: HttpResponse<any>) => {
           const exportMessage = JSON.stringify(res.body);
           const blob = new Blob([exportMessage], { type: 'application/json' });
           saveAs(blob, `${today}-${this.endpointName}-${message.messageid}.json`);
         },
-        (res: HttpErrorResponse) => this.onError(res.message)
+        (res: HttpErrorResponse) => this.onError(res.message),
       );
     }
   }
@@ -386,15 +389,15 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
         const today = new Date().toISOString().slice(0, 10);
         saveAs(blob, `${today}-${this.endpointName}.json`);
       },
-      (res: HttpErrorResponse) => this.onError(res.message)
+      (res: HttpErrorResponse) => this.onError(res.message),
     );
   }
 
   showMessage(message: IMessage) {
-    this.selectedHighlight = message.messageid;
-    this.brokerService.browseMessage(this.brokerType, this.endpointName, message.messageid).subscribe(
+    this.selectedHighlight = message.messageid!;
+    this.brokerService.browseMessage(this.brokerType, this.endpointName, message.messageid!).subscribe(
       (res: HttpResponse<IMessage[]>) => this.onSuccessBrowse(res.body, res.headers),
-      (res: HttpErrorResponse) => this.onError(res.message)
+      (res: HttpErrorResponse) => this.onError(res.message),
     );
   }
 
@@ -421,7 +424,7 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     }
   }
 
-  getFileType(doc) {
+  getFileType(doc: unknown) {
     if (typeof doc !== 'string' || !doc.trim()) {
       return 'txt';
     }
@@ -444,29 +447,25 @@ export class BrokerMessageBrowserComponent implements OnInit, OnDestroy {
     }
   }
 
-  setEditorContent(event: any){
-      console.log('set editor');
+  setEditorMode(str: any) {
+    if (str.startsWith('{') || str.startsWith('[')) {
+      this.editorMode = 'javascript';
+    } else if (str.startsWith('<') && str.endsWith('>')) {
+      this.editorMode = 'xml';
+    } else {
+      this.editorMode = 'text';
+    }
   }
 
-    setEditorMode(str: any) {
-        if (str.startsWith('{') || str.startsWith('[')) {
-            this.editorMode = 'javascript';
-        } else if (str.startsWith('<') && str.endsWith('>')) {
-            this.editorMode = 'xml';
-        } else {
-            this.editorMode = 'text';
-        }
-    }
-
-  timeConverter(UNIX_timestamp) {
+  timeConverter(UNIX_timestamp: number | string) {
     const a = new Date(UNIX_timestamp);
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const year = a.getFullYear();
     const month = months[a.getMonth()];
     const date = a.getDate();
-    const hour = ("0" + a.getHours()).slice(-2); // add "0" prefix and take last 2 digits
-    const min = ("0" + a.getMinutes()).slice(-2); // add "0" prefix and take last 2 digits
-    const sec = ("0" + a.getSeconds()).slice(-2); // add "0" prefix and take last 2 digits
+    const hour = ('0' + a.getHours()).slice(-2); // add "0" prefix and take last 2 digits
+    const min = ('0' + a.getMinutes()).slice(-2); // add "0" prefix and take last 2 digits
+    const sec = ('0' + a.getSeconds()).slice(-2); // add "0" prefix and take last 2 digits
     const time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec;
     return time;
   }

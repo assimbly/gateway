@@ -18,19 +18,17 @@
       "prefix": "jhi",
       "architect": {
         "build": {
-          "builder": "@angular-builders/custom-webpack:browser",
+          "builder": "@angular/build:application",
           "options": {
             "preserveSymlinks": true,
-            "customWebpackConfig": {
-              "path": "./webpack/webpack.custom.js"
+            "allowedCommonJsDependencies": ["codemirror", "buffer"],
+            "outputPath": {
+              "base": "build/resources/main/static",
+              "browser": ""
             },
-			"allowedCommonJsDependencies": [
-				"codemirror", "buffer", "file-saver/FileSaver"
-			],
-            "outputPath": "build/resources/main/static/",
             "index": "src/main/webapp/index.html",
-            "main": "src/main/webapp/main.ts",
-            "polyfills": ["zone.js", "zone.js/plugins/zone-patch-fetch"],
+            "browser": "src/main/webapp/main.ts",
+            "polyfills": ["src/main/webapp/polyfills.ts"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "stylePreprocessorOptions": {
@@ -42,19 +40,17 @@
               "src/main/webapp/logo_lightmode.svg",
               "src/main/webapp/logo_darkmode.svg",
               "src/main/webapp/manifest.webapp",
-              "src/main/webapp/robots.txt",
-              {
-                "glob": "*.{js,css,html,png}",
-                "input": "./node_modules/swagger-ui-dist",
-                "output": "swagger-ui",
-                "ignore": ["**/index.html"]
-              },
-              { "glob": "axios.min.js", "input": "./node_modules/axios/dist", "output": "swagger-ui" },
-              { "glob": "**/*", "input": "src/main/webapp/swagger-ui/", "output": "swagger-ui" }
+              "src/main/webapp/robots.txt"
             ],
-            "styles": ["node_modules/@foblex/flow/styles/default.scss",
-              "src/main/webapp/content/scss/vendor.scss", "src/main/webapp/content/scss/global.scss"],
-            "scripts": []
+            "styles": [
+              "node_modules/@foblex/flow/styles/default.scss",
+              "src/main/webapp/content/scss/vendor.scss",
+              "src/main/webapp/content/scss/global.scss"
+            ],
+            "scripts": [],
+            "define": {
+              "__TYPE__": "'FULL'"
+            }
           },
           "configurations": {
             "production": {
@@ -63,10 +59,6 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
-              "serviceWorker": true,
-              "ngswConfigPath": "ngsw-config.json",
               "budgets": [
                 {
                   "type": "initial",
@@ -81,21 +73,25 @@
               ]
             },
             "development": {
-              "buildOptimizer": false,
               "optimization": false,
-              "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
+            },
+            "headless": {
+              "define": {
+                "__TYPE__": "'HEADLESS'"
+              }
             }
           },
           "defaultConfiguration": "production"
         },
         "serve": {
-          "builder": "@angular-builders/custom-webpack:dev-server",
+          "builder": "@angular/build:dev-server",
           "options": {
             "buildTarget": "gateway:build:development",
-            "port": 9060
+            "port": 4200,
+            "proxyConfig": "proxy.conf.mjs"
           },
           "configurations": {
             "production": {

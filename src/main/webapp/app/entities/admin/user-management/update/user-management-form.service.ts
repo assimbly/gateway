@@ -29,10 +29,7 @@ type UserManagementFormRawValue = FormValueOf<IUserManagement>;
 
 type NewUserManagementFormRawValue = FormValueOf<NewUserManagement>;
 
-type UserManagementFormDefaults = Pick<
-  NewUserManagement,
-  'login' | 'activated' | 'langKey' | 'createdDate' | 'lastModifiedDate' | 'authorities'
->;
+type UserManagementFormDefaults = Pick<NewUserManagement, 'login' | 'activated' | 'createdDate' | 'lastModifiedDate' | 'authorities'>;
 
 type UserManagementFormGroupContent = {
   id: FormControl<UserManagementFormRawValue['id']>;
@@ -41,7 +38,6 @@ type UserManagementFormGroupContent = {
   lastName: FormControl<UserManagementFormRawValue['lastName']>;
   email: FormControl<UserManagementFormRawValue['email']>;
   activated: FormControl<UserManagementFormRawValue['activated']>;
-  langKey: FormControl<UserManagementFormRawValue['langKey']>;
   imageUrl: FormControl<UserManagementFormRawValue['imageUrl']>;
   createdBy: FormControl<UserManagementFormRawValue['createdBy']>;
   createdDate: FormControl<UserManagementFormRawValue['createdDate']>;
@@ -80,9 +76,6 @@ export class UserManagementFormService {
         validators: [Validators.required, Validators.email, Validators.minLength(5), Validators.maxLength(191)],
       }),
       activated: new FormControl(userManagementRawValue.activated),
-      langKey: new FormControl(userManagementRawValue.langKey, {
-        validators: [Validators.maxLength(10)],
-      }),
       imageUrl: new FormControl(userManagementRawValue.imageUrl, {
         validators: [Validators.maxLength(256)],
       }),
@@ -111,7 +104,6 @@ export class UserManagementFormService {
     return {
       login: null,
       activated: true,
-      langKey: 'en',
       createdDate: currentTime,
       lastModifiedDate: currentTime,
       authorities: [],

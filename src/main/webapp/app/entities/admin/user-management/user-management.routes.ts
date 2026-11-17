@@ -10,6 +10,8 @@ const userManagementRoute: Routes = [
     loadComponent: () => import('./list/user-management').then(m => m.UserManagement),
     data: {
       authorities: ['ROLE_ADMIN'],
+      // Sorted on a column like every other list, so its arrow shows from the start.
+      defaultSort: 'login,asc',
     },
     canActivate: [userRouteAccessService],
   },

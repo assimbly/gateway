@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject } from '@angular/core';
+import { NgClass } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { AlertError } from 'app/shared/alert';
@@ -12,18 +12,16 @@ import { Subscription } from 'rxjs';
 @Component({
     selector: 'jhi-message-detail',
     templateUrl: './message-detail.component.html',
-    imports: [CommonModule, RouterModule, AlertError],
+    imports: [RouterModule, AlertError, NgClass],
 })
 export class MessageDetailComponent implements OnInit {
-    message: IMessage;
+    protected activatedRoute = inject(ActivatedRoute);
+    protected messageService = inject(MessageService);
+    protected headerService = inject(HeaderService);
 
-    constructor(
-        protected activatedRoute: ActivatedRoute,
-        protected messageService: MessageService,
-        protected headerService: HeaderService
-    ) {}
-    public headers: Array<Header>;
-    private subscription: Subscription;
+    message!: IMessage;
+    public headers!: Array<Header>;
+    private subscription!: Subscription;
 
     ngOnInit() {
         this.activatedRoute.data.subscribe(({ message }) => {
@@ -31,16 +29,16 @@ export class MessageDetailComponent implements OnInit {
         });
     }
 
-    private load(id) {
+    private load(id: number) {
         this.messageService.find(id).subscribe(message => {
-            this.message = message.body;
-            this.loadHeader(this.message.id);
+            this.message = message.body!;
+            this.loadHeader(this.message.id!);
         });
     }
 
     private loadHeader(id: number) {
         this.headerService.query().subscribe(res => {
-            this.headers = res.body.filter(hk => hk.messageId === id);
+            this.headers = res.body!.filter(hk => hk.messageId === id);
         });
     }
 

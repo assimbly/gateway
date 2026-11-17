@@ -20,6 +20,8 @@ export const enum StepType {
 
 export interface IStep {
     id?: number;
+    /** What the user named the Step, shown under it on the canvas. */
+    name?: string;
     stepType?: StepType;
     componentType?: string;
     uri?: string;

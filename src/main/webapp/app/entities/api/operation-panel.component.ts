@@ -1,11 +1,15 @@
-import { Component, EventEmitter, Input, OnChanges, Output, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnChanges, inject, output, input } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CodemirrorModule } from '@ctrl/ngx-codemirror';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Observable, tap } from 'rxjs';
 
 import { ThemeService } from 'app/core/theme';
+import { confirmChoice } from 'app/entities/flow/editor/confirm-dialog.component';
+import { SaveShortcutDirective } from 'app/shared/keyboard';
 import {
   DEFAULT_MEDIA_TYPE,
   IApi,
@@ -25,33 +29,49 @@ import { exampleFromSchema, schemaFromExampleText } from './schema-from-example'
 /** Where a schema is edited: the request, or the Declared response at this index. */
 type SchemaTarget = 'request' | number;
 
+/** The parts of the panel, one shown at a time so the form stays short. */
+type OperationTab = 'general' | 'parameters' | 'request' | 'responses' | 'try';
+
 /**
  * An Operation in the API page's side panel: its contract (method, path, parameters, media types, request schema and
- * Declared responses), Open Handler Flow, and Try it. Path parameters follow the path as it is typed.
+ * Declared responses), Open Handler Flow, and Try it, each on a tab of its own. Save stays in view on every tab of the
+ * contract. Path parameters follow the path as it is typed.
  */
 @Component({
   selector: 'jhi-operation-panel',
   templateUrl: './operation-panel.component.html',
-  imports: [NgTemplateOutlet, FormsModule, RouterModule, FontAwesomeModule, CodemirrorModule],
+  imports: [NgTemplateOutlet, FormsModule, RouterModule, FontAwesomeModule, CodemirrorModule, SaveShortcutDirective],
 })
 export class OperationPanelComponent implements OnChanges {
-  @Input({ required: true }) api!: IApi;
+  readonly api = input.required<IApi>();
   /** The Operation to edit; none for a new one. */
-  @Input() operation?: IApiOperation;
-  @Input() state?: HandlerFlowState;
+  readonly operation = input<IApiOperation>();
+  readonly state = input<HandlerFlowState>();
   /** The full URL the Operation is served on, once known; its path links to it. */
-  @Input() url?: string;
+  readonly url = input<string>();
 
-  @Output() saved = new EventEmitter<IApiOperation>();
-  @Output() deleted = new EventEmitter<void>();
-  @Output() closed = new EventEmitter<void>();
+  readonly saved = output<IApiOperation>();
+  readonly deleted = output<void>();
+  readonly closed = output<void>();
 
   private readonly apiService = inject(ApiService);
   private readonly themeService = inject(ThemeService);
+  private readonly modalService = inject(NgbModal);
+  /** The panel is OnPush: what a request answers is shown once it is marked. */
+  private readonly cdr = inject(ChangeDetectorRef);
 
   readonly methods = METHODS;
   readonly parameterTypes = PARAMETER_TYPES;
   readonly mediaTypes = ['application/json', 'application/xml', 'text/plain', 'text/csv', 'application/octet-stream'];
+  readonly tabs: { id: OperationTab; label: string; icon: string }[] = [
+    { id: 'general', label: 'General', icon: 'sliders' },
+    { id: 'parameters', label: 'Parameters', icon: 'list' },
+    { id: 'request', label: 'Request', icon: 'arrow-right' },
+    { id: 'responses', label: 'Responses', icon: 'arrow-left' },
+    { id: 'try', label: 'Try it', icon: 'paper-plane' },
+  ];
+
+  activeTab: OperationTab = 'general';
 
   draft!: IApiOperation;
   saving = false;
@@ -70,17 +90,31 @@ export class OperationPanelComponent implements OnChanges {
   tryResult?: ITryResponse;
   tryError?: string;
 
+  /** The Operation shown last; another one starts on General again, a save of the same one keeps the tab. */
+  private shownId?: number;
   private optionsTheme = '';
   private optionsCache?: Record<string, unknown>;
 
   get isNew(): boolean {
-    return !this.operation?.id;
+    return !this.operation()?.id;
   }
 
   ngOnChanges(): void {
-    this.draft = this.operation
-      ? structuredClone(this.operation)
-      : { method: 'GET', path: '/', parameters: [], declaredResponses: [], requestMediaType: DEFAULT_MEDIA_TYPE, responseMediaType: DEFAULT_MEDIA_TYPE };
+    const operation = this.operation();
+    if (operation?.id === undefined || operation.id !== this.shownId) {
+      this.activeTab = 'general';
+    }
+    this.shownId = operation?.id;
+    this.draft = operation
+      ? structuredClone(operation)
+      : {
+          method: 'GET',
+          path: '/',
+          parameters: [],
+          declaredResponses: [],
+          requestMediaType: DEFAULT_MEDIA_TYPE,
+          responseMediaType: DEFAULT_MEDIA_TYPE,
+        };
     this.message = undefined;
     this.exampleFor = undefined;
     this.openSchemas = new Set();
@@ -154,36 +188,66 @@ export class OperationPanelComponent implements OnChanges {
   }
 
   save(): void {
-    this.saving = true;
-    this.message = undefined;
-    const request = this.isNew ? this.apiService.createOperation(this.api.id!, this.draft) : this.apiService.updateOperation(this.api.id!, this.draft);
-    request.subscribe({
-      next: saved => {
-        this.saving = false;
-        this.saved.emit(saved);
-      },
+    this.saveRequest().subscribe({
       error: error => {
-        this.saving = false;
         this.message = errorMessage(error);
+        this.cdr.markForCheck();
       },
     });
   }
 
+  /** Saves the Operation; the API page shows it as saved once it answers. */
+  saveRequest(): Observable<IApiOperation> {
+    this.saving = true;
+    this.message = undefined;
+    const request = this.isNew
+      ? this.apiService.createOperation(this.api().id!, this.draft)
+      : this.apiService.updateOperation(this.api().id!, this.draft);
+    return request.pipe(
+      tap({
+        next: saved => {
+          this.saving = false;
+          this.saved.emit(saved);
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.saving = false;
+          this.cdr.markForCheck();
+        },
+      }),
+    );
+  }
+
   delete(): void {
-    const operation = this.operation!;
-    if (!window.confirm(`Delete ${operation.method} ${operation.fullPath}? Its Handler Flow ${operation.handlerFlowName} is deleted too.`)) {
-      return;
-    }
-    this.apiService.deleteOperation(this.api.id!, operation.id!).subscribe({
-      next: () => this.deleted.emit(),
-      error: error => (this.message = errorMessage(error)),
+    const operation = this.operation()!;
+    const message = `Delete ${operation.method} ${operation.fullPath}? Its Handler Flow ${operation.handlerFlowName} is deleted too.`;
+    void confirmChoice(this.modalService, 'Delete Operation', message, [
+      { value: 'cancel', label: 'Cancel', style: 'secondary' },
+      { value: 'delete', label: 'Delete', style: 'danger', icon: 'trash' },
+    ]).then(choice => {
+      if (choice !== 'delete') {
+        return;
+      }
+      this.apiService.deleteOperation(this.api().id!, operation.id!).subscribe({
+        next: () => this.deleted.emit(),
+        error: error => {
+          this.message = errorMessage(error);
+          this.cdr.markForCheck();
+        },
+      });
     });
   }
 
   readonly handlerFlowQueryParams = handlerFlowQueryParams;
 
+  /** Whether the contract differs from the saved Operation, which is what Try it calls. */
+  hasUnsavedChanges(): boolean {
+    const operation = this.operation();
+    return !!operation && JSON.stringify(this.draft) !== JSON.stringify(operation);
+  }
+
   parametersIn(where: IApiParameter['in']): IApiParameter[] {
-    return (this.operation?.parameters ?? []).filter(p => p.in === where);
+    return (this.operation()?.parameters ?? []).filter(p => p.in === where);
   }
 
   tryKey(parameter: IApiParameter): string {
@@ -191,22 +255,29 @@ export class OperationPanelComponent implements OnChanges {
   }
 
   sendTry(): void {
-    const operation = this.operation!;
+    const operation = this.operation()!;
     const values = (where: IApiParameter['in']): Record<string, string> =>
       Object.fromEntries(this.parametersIn(where).map(p => [p.name, this.tryValues[this.tryKey(p)] ?? '']));
     this.trying = true;
     this.tryResult = undefined;
     this.tryError = undefined;
     this.apiService
-      .tryOperation(this.api.id!, operation.id!, { pathParameters: values('path'), query: values('query'), headers: values('header'), body: this.tryBody || undefined })
+      .tryOperation(this.api().id!, operation.id!, {
+        pathParameters: values('path'),
+        query: values('query'),
+        headers: values('header'),
+        body: this.tryBody || undefined,
+      })
       .subscribe({
         next: result => {
           this.trying = false;
           this.tryResult = result;
+          this.cdr.markForCheck();
         },
         error: error => {
           this.trying = false;
           this.tryError = errorMessage(error);
+          this.cdr.markForCheck();
         },
       });
   }

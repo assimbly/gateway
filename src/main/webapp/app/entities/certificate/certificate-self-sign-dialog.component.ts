@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { switchMap } from 'rxjs/operators';
 
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { CertificateService, IDENTITY_STORE } from './certificate.service';
@@ -10,16 +10,18 @@ import { CertificateService, IDENTITY_STORE } from './certificate.service';
 @Component({
   selector: 'jhi-certificate-self-sign-dialog',
   templateUrl: './certificate-self-sign-dialog.component.html',
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule, FontAwesomeModule],
 })
 export class CertificateSelfSignDialogComponent {
+  private eventManager = inject(EventManager);
+  private certificateService = inject(CertificateService);
+  activeModal = inject(NgbActiveModal);
+
   readonly identityStore = IDENTITY_STORE;
   cn = '';
   error = false;
-  errorMessage: String;
+  errorMessage!: String;
   isSaving = false;
-
-  constructor(private eventManager: EventManager, private certificateService: CertificateService, public activeModal: NgbActiveModal) {}
 
   clear() {
     this.activeModal.dismiss('cancel');
@@ -29,7 +31,7 @@ export class CertificateSelfSignDialogComponent {
     this.isSaving = true;
     this.certificateService
       .generateIdentity(this.cn)
-      .pipe(switchMap(res => this.certificateService.createFromRuntimeResponse(res.body, 'Self-Signed (' + this.cn + ')')))
+      .pipe(switchMap(res => this.certificateService.createFromRuntimeResponse(res.body!, 'Self-Signed (' + this.cn + ')')))
       .subscribe(
         () => {
           this.error = false;
@@ -40,7 +42,6 @@ export class CertificateSelfSignDialogComponent {
           this.error = true;
           this.isSaving = false;
           this.errorMessage = err.error;
-          console.log(err);
         },
       );
   }

@@ -4,16 +4,26 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.assimbly.gateway.config.exporting.Export;
+import org.assimbly.gateway.config.exporting.FluxygenExport;
 import org.assimbly.gateway.config.importing.Import;
 import org.assimbly.gateway.web.rest.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Resource to return information about the currently running Spring profiles.
@@ -30,6 +40,9 @@ public class EnvironmentResource {
 
 	@Autowired
     private Import confImport;
+
+	@Autowired
+    private FluxygenExport fluxygenExport;
 
 	private String configuration;
 
@@ -190,6 +203,66 @@ public class EnvironmentResource {
             log.error("Failed to get configuration: {} for flowid={}", e.getMessage(), flowid, e);
    			return ResponseUtil.createFailureResponse(integrationid, mediaType, "getFlowConfiguration", e.getMessage());
    		}
+    }
+
+    /** What to export for Fluxygen: the Flows (all when empty) and the passphrase that protects their secrets. */
+    public record FluxygenExportRequest(List<Long> flowIds, char[] passphrase) {
+
+        @Override
+        public boolean equals(Object o) {
+            return o instanceof FluxygenExportRequest(var otherFlowIds, var otherPassphrase)
+                && Objects.equals(flowIds, otherFlowIds)
+                && Arrays.equals(passphrase, otherPassphrase);
+        }
+
+        @Override
+        public int hashCode() {
+            return 31 * Objects.hashCode(flowIds) + Arrays.hashCode(passphrase);
+        }
+
+        // The passphrase is a secret, so it is masked rather than printed.
+        @Override
+        public String toString() {
+            return "FluxygenExportRequest[flowIds=" + flowIds + ", passphrase=" + (passphrase == null ? "null" : "****") + "]";
+        }
+    }
+
+    /**
+     * POST  /environment/{integrationid}/fluxygen-export : the Flows as a zip for Fluxygen, one DIL per Flow in the
+     * groupless group, with their secrets encrypted with the passphrase. A POST, so the passphrase never sits in a URL.
+     *
+     * @param integrationid (by integrationId)
+     * @param request the Flows and the passphrase
+     * @return the ResponseEntity with status 200 and the zip, or status 400 (Bad Request) with the reason as text
+     */
+    @Operation(summary = "Export flows as a zip to import into Fluxygen")
+    @PostMapping(
+        path = "/environment/{integrationid}/fluxygen-export",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = "application/zip"
+    )
+    public ResponseEntity<byte[]> exportForFluxygen(
+        @PathVariable(value = "integrationid") Long integrationid,
+        @RequestBody FluxygenExportRequest request
+    ) {
+        try {
+            byte[] zip = fluxygenExport.zip(integrationid, request.flowIds(), request.passphrase());
+            String fileName = fluxygenExport.fileName(LocalDate.now(ZoneId.systemDefault()).toString());
+            return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/zip"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment().filename(fileName).build().toString())
+                .header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION)
+                .body(zip);
+        } catch (IllegalArgumentException e) {
+            return textResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (Exception e) {
+            log.error("Export for Fluxygen of integration {} failed: {}", integrationid, e.getMessage());
+            return textResponse(HttpStatus.INTERNAL_SERVER_ERROR, "The export for Fluxygen failed: " + e.getMessage());
+        }
+    }
+
+    private static ResponseEntity<byte[]> textResponse(HttpStatus status, String message) {
+        return ResponseEntity.status(status).contentType(MediaType.TEXT_PLAIN).body(String.valueOf(message).getBytes(StandardCharsets.UTF_8));
     }
 
 }

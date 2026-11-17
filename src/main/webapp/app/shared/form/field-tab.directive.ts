@@ -1,4 +1,4 @@
-import { AfterViewInit, Directive, ElementRef, HostListener } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, HostListener, inject } from '@angular/core';
 
 /**
  * Keeps Tab and Shift+Tab on data-entry fields. Icon and inline buttons are skipped.
@@ -8,7 +8,7 @@ import { AfterViewInit, Directive, ElementRef, HostListener } from '@angular/cor
   selector: '[jhiFieldTab]',
 })
 export class FieldTabDirective implements AfterViewInit {
-  constructor(private host: ElementRef<HTMLElement>) {}
+  private host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   ngAfterViewInit(): void {
     this.skipInlineControls(this.host.nativeElement);

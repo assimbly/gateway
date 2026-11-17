@@ -7,7 +7,7 @@ import Settings from './settings';
 const settingsRoute: Route = {
   path: 'settings',
   component: Settings,
-  title: 'global.menu.account.settings',
+  title: 'Settings',
   canActivate: [userRouteAccessService],
 };
 

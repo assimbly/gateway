@@ -1,5 +1,5 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, DestroyRef, OnInit, OnDestroy, computed, signal, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
 import { Subscription, interval } from 'rxjs';
 import { EventManager } from 'app/core/util/event-manager.service';
@@ -18,33 +18,50 @@ import { TopicService } from './topic.service';
 import { TopicDeleteDialogComponent } from './topic-delete-dialog.component';
 import { IBroker } from 'app/shared/model/broker.model';
 import { SearchToolbar } from 'app/shared/filter';
-import { EndpointTypeSwitch } from 'app/shared/endpoint-switch';
+import { EndpointTypeSwitch, EndpointsEmptyState } from 'app/shared/endpoint-switch';
 import { DataTable, DataTableColumn } from 'app/shared/table';
 import { AddressRowComponent } from 'app/entities/broker/address-row.component';
+import { AddressTotalsRowComponent } from 'app/entities/broker/address-totals-row.component';
 import { filterAddresses } from 'app/shared/util/address-filter';
 
 @Component({
   selector: 'jhi-topic',
   templateUrl: './topic.component.html',
-  imports: [CommonModule, RouterModule, FontAwesomeModule, SearchToolbar, EndpointTypeSwitch, DataTable, AddressRowComponent],
+  imports: [
+    RouterModule,
+    FontAwesomeModule,
+    SearchToolbar,
+    EndpointTypeSwitch,
+    EndpointsEmptyState,
+    DataTable,
+    AddressRowComponent,
+    AddressTotalsRowComponent,
+  ],
 })
 export class TopicComponent implements OnInit, OnDestroy {
+  protected topicService = inject(TopicService);
+  protected alertService = inject(AlertService);
+  protected eventManager = inject(EventManager);
+  protected modalService = inject(NgbModal);
+  protected accountService = inject(AccountService);
+  private readonly destroyRef = inject(DestroyRef);
 
   topics: ITopic[] = [];
-  addresses: IAddress[] = [];
-  brokers: IBroker[] = [];
+  readonly addresses = signal<IAddress[]>([]);
+  readonly brokers = signal<IBroker[]>([]);
   eventSubscriber = new Subscription();
   currentAccount: any;
   itemsPerPage: number;
   links: any;
   page: number;
-  sortState: SortState = { predicate: 'name', order: 'desc' };
+  readonly sortState = signal<SortState>({ predicate: 'name', order: 'asc' });
 
-  timeInterval: Subscription;
-  isBroker: boolean | undefined;
+  readonly isBroker = signal<boolean | undefined>(undefined);
+  /** Whether the Topics of the Broker have been asked for, so an empty list is known to be empty. */
+  readonly addressesLoaded = signal(false);
 
-  searchTopicText: string = '';
-  brokerType = '';
+  readonly searchTopicText = signal('');
+  readonly brokerType = signal('');
   readonly columns: DataTableColumn[] = [
     { key: 'name', header: 'Name', sortable: true },
     { key: 'numberOfConsumers', header: 'Consumers', sortable: true, numeric: true },
@@ -52,17 +69,8 @@ export class TopicComponent implements OnInit, OnDestroy {
     { key: 'actions', header: 'Actions', align: 'end' },
   ];
 
-  private readonly changeDetector = inject(ChangeDetectorRef);
-
-  constructor(
-    protected topicService: TopicService,
-    protected alertService: AlertService,
-    protected eventManager: EventManager,
-    protected modalService: NgbModal,
-    protected accountService: AccountService
-  ) {
+  constructor() {
     this.topics = [];
-    this.brokers = [];
     this.itemsPerPage = ITEMS_PER_PAGE;
     this.page = 0;
     this.links = {
@@ -77,8 +85,6 @@ export class TopicComponent implements OnInit, OnDestroy {
     this.accountService.identity().subscribe(account => {
       this.currentAccount = account;
     });
-
-
   }
 
   ngAfterViewInit() {
@@ -88,9 +94,7 @@ export class TopicComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.eventSubscriber.unsubscribe();
-    this.timeInterval.unsubscribe();
   }
-
 
   reset(): void {
     this.page = 0;
@@ -102,22 +106,27 @@ export class TopicComponent implements OnInit, OnDestroy {
     this.getBrokerType();
   }
 
-  get filteredAddresses(): IAddress[] {
-    return filterAddresses(this.addresses, this.searchTopicText, this.sortState.order === 'asc', this.sortState.predicate ?? 'name', true);
-  }
+  /** Without a running Broker, or without any Topic, the list gives way to an explanation of Endpoints and what to do first. */
+  readonly showEmptyState = computed(() => {
+    if (this.isBroker() === undefined) {
+      return false;
+    }
+    return !this.isBroker() || (this.addressesLoaded() && !this.addresses().length);
+  });
 
-  trackId(index: number, item: IAddress): number {
-    return item.id!;
-  }
+  readonly filteredAddresses = computed(() => {
+    const { order, predicate } = this.sortState();
+    return filterAddresses(this.addresses(), this.searchTopicText(), order === 'asc', predicate ?? 'name', true);
+  });
 
   registerChangeInTopics(): void {
     this.eventSubscriber.add(this.eventManager.subscribe('topicListModification', () => this.reset()));
   }
 
   poll(): void {
-    this.timeInterval = interval(10000).subscribe(x => {
-      this.updateAllTopics();
-    });
+    interval(10000)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.updateAllTopics());
   }
 
   registerDeletedTopics() {
@@ -134,91 +143,71 @@ export class TopicComponent implements OnInit, OnDestroy {
   }
 
   sort(): string[] {
-    return sortParams(this.sortState);
+    return sortParams(this.sortState());
   }
 
   getBrokerType() {
-    this.topicService.getBrokers().subscribe(
-      data => {
-        if (data) {
-          for (let i = 0; i < data.body.length; i++) {
-            this.brokers.push(data.body[i]);
+    this.topicService.getBrokers().subscribe(data => {
+      if (data) {
+        const brokers = data.body ?? [];
+        this.brokers.set(brokers);
+        if (brokers[0]) {
+          this.isBroker.set(true);
+          this.brokerType.set(brokers[0].type!);
+          if (this.brokerType() != null) {
+            this.getAllTopics();
           }
-          if (this.brokers[0]) {
-            this.isBroker = true;
-            this.brokerType = this.brokers[0].type;
-            if (this.brokerType != null) {
-              this.getAllTopics();
-            }
-          } else {
-            this.isBroker = false;
-          }
-          this.changeDetector.detectChanges();
+        } else {
+          this.isBroker.set(false);
         }
-      },
-      error => console.log(error)
-    );
+      }
+    });
   }
 
   getAllTopics() {
-    this.addresses = [];
+    this.addresses.set([]);
+    this.addressesLoaded.set(false);
 
-    if (this.isBroker) {
-      this.topicService.getAllTopics(this.brokerType).subscribe(
+    if (this.isBroker()) {
+      this.topicService.getAllTopics(this.brokerType()).subscribe(
         data => {
-          if (data && data.body.topics) {
-            this.isBroker = true;
-            if (data.body.topics.topic) {
-              for (const address of data.body.topics.topic) {
-                if (address.temporary.toString() === 'false') {
-                  this.addresses.push(address);
-                }
-              }
-            }
+          this.addressesLoaded.set(true);
+          if (data && data.body!.topics) {
+            this.isBroker.set(true);
+            this.addresses.set((data.body!.topics.topic ?? []).filter(topic => topic.temporary!.toString() === 'false'));
           } else {
-            this.isBroker = false;
+            this.isBroker.set(false);
           }
-          this.changeDetector.detectChanges();
         },
         error => {
-          console.log(error);
-          this.isBroker = false;
-          this.changeDetector.detectChanges();
-        }
+          this.addressesLoaded.set(true);
+          this.isBroker.set(false);
+        },
       );
     }
   }
 
   updateAllTopics() {
-    if (this.isBroker) {
-      this.topicService.getAllTopics(this.brokerType).subscribe(
+    if (this.isBroker()) {
+      this.topicService.getAllTopics(this.brokerType()).subscribe(
         data => {
-          if (data && data.body.topics) {
-            this.isBroker = true;
-            if (data.body.topics.topic) {
-              for (let i = 0; i < data.body.topics.topic.length; i++) {
-                if (data.body.topics.topic[i].temporary.toString() === 'false') {
-                  this.addresses.splice(i, 1, data.body.topics.topic[i]);
-                }
-              }
-              this.addresses = [...this.addresses];
-            }
+          if (data && data.body!.topics) {
+            this.isBroker.set(true);
+            // Replace the whole list, so Topics deleted on the Broker drop out of the table.
+            this.addresses.set((data.body!.topics.topic ?? []).filter(topic => topic.temporary!.toString() === 'false'));
           }
-          this.changeDetector.detectChanges();
         },
         error => {
-          console.log(error);
-          this.isBroker = false;
-          this.changeDetector.detectChanges();
-        }
+          this.isBroker.set(false);
+        },
       );
     }
   }
 
   protected onError(errorMessage: string) {
-        this.alertService.addAlert({
-		  type: 'danger',
-		  message: errorMessage,
-		});
+    this.alertService.addAlert({
+      type: 'danger',
+      message: errorMessage,
+    });
   }
 }

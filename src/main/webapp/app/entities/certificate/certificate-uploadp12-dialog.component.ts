@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { switchMap } from 'rxjs/operators';
 
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { CertificateService, CERTIFICATE_NAME_PATTERN, IDENTITY_STORE, toCertificateName } from './certificate.service';
@@ -10,34 +10,36 @@ import { CertificateService, CERTIFICATE_NAME_PATTERN, IDENTITY_STORE, toCertifi
 @Component({
   selector: 'jhi-certificate-uploadp12-dialog',
   templateUrl: './certificate-uploadp12-dialog.component.html',
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule, FontAwesomeModule],
 })
 export class CertificateUploadP12DialogComponent {
+  private eventManager = inject(EventManager);
+  private certificateService = inject(CertificateService);
+  activeModal = inject(NgbActiveModal);
+
   readonly identityStore = IDENTITY_STORE;
   readonly namePattern = CERTIFICATE_NAME_PATTERN;
   name = '';
-  certificateFile: string;
+  certificateFile!: string;
   password = '';
   fileName = 'Choose file';
-  fileNameWithoutExtension: string;
+  fileNameWithoutExtension!: string;
   isSaving = false;
   uploadError = false;
-  uploadErrorMessage: String;
-
-  constructor(private eventManager: EventManager, private certificateService: CertificateService, public activeModal: NgbActiveModal) {}
+  uploadErrorMessage!: String;
 
   clear() {
     this.activeModal.dismiss('cancel');
   }
 
-  openFile(event) {
+  openFile(event: Event) {
     const reader = new FileReader();
     reader.onload = () => {
       this.certificateFile = reader.result as string;
     };
-    reader.readAsDataURL(event.target.files[0]);
+    reader.readAsDataURL((event.target as HTMLInputElement).files![0]);
 
-    this.fileName = event.target.files[0].name;
+    this.fileName = (event.target as HTMLInputElement).files![0].name;
     this.fileNameWithoutExtension = this.fileName.split('.').slice(0, -1).join('.');
     if (!this.name) {
       this.name = toCertificateName(this.fileNameWithoutExtension);
@@ -49,7 +51,9 @@ export class CertificateUploadP12DialogComponent {
     // the record stores the certificate the runtime returns, never the uploaded file with its private key
     this.certificateService
       .importIdentity(this.name, this.certificateFile, this.password)
-      .pipe(switchMap(res => this.certificateService.createFromRuntimeResponse(res.body, 'Identity (' + this.fileNameWithoutExtension + ')')))
+      .pipe(
+        switchMap(res => this.certificateService.createFromRuntimeResponse(res.body!, 'Identity (' + this.fileNameWithoutExtension + ')')),
+      )
       .subscribe(
         () => {
           this.uploadError = false;
@@ -60,7 +64,6 @@ export class CertificateUploadP12DialogComponent {
           this.isSaving = false;
           this.uploadError = true;
           this.uploadErrorMessage = err.error;
-          console.log(err);
         },
       );
   }

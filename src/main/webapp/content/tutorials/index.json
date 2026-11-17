@@ -1,0 +1,98 @@
+[
+  {
+    "id": "quick-start",
+    "wiki": "quick-start",
+    "title": "Quick start",
+    "minutes": 5,
+    "track": "Get started",
+    "fixtures": {
+      "ExampleFlow": "ExampleFlow.xml"
+    }
+  },
+  {
+    "id": "tutorial1",
+    "wiki": "tutorial6-your-first-flow",
+    "title": "Tutorial 1: Your first Flow",
+    "minutes": 5,
+    "track": "Get started",
+    "fixtures": {}
+  },
+  {
+    "id": "tutorial2",
+    "wiki": "tutorial6-debugging-a-flow",
+    "title": "Tutorial 2: Debugging a Flow",
+    "minutes": 8,
+    "track": "Get started",
+    "fixtures": {
+      "TestFlow": "TestFlow.xml"
+    }
+  },
+  {
+    "id": "tutorial3",
+    "wiki": "tutorial6-calling-a-rest-api",
+    "title": "Tutorial 3: Calling a REST API",
+    "minutes": 10,
+    "track": "Connect systems",
+    "fixtures": {
+      "TestFlow": "TestFlow.xml"
+    }
+  },
+  {
+    "id": "tutorial4",
+    "wiki": "tutorial6-creating-a-rest-api",
+    "title": "Tutorial 4: Creating a REST API",
+    "minutes": 10,
+    "track": "Connect systems",
+    "fixtures": {}
+  },
+  {
+    "id": "tutorial5",
+    "wiki": "tutorial6-create-a-new-broker",
+    "title": "Tutorial 5: Manage the broker",
+    "minutes": 10,
+    "track": "Messaging",
+    "fixtures": {}
+  },
+  {
+    "id": "tutorial6",
+    "wiki": "tutorial6-message-queueing",
+    "title": "Tutorial 6: Message Queueing",
+    "minutes": 15,
+    "track": "Messaging",
+    "fixtures": {
+      "TestFlow": "TestFlow.xml"
+    }
+  },
+  {
+    "id": "tutorial7",
+    "wiki": "tutorial6-simple-route",
+    "title": "Tutorial 7: Create a simple route",
+    "minutes": 10,
+    "track": "For Camel developers",
+    "fixtures": {}
+  },
+  {
+    "id": "tutorial8",
+    "wiki": "tutorial6-routes-with-split",
+    "title": "Tutorial 8: A route with queues and a split",
+    "minutes": 15,
+    "track": "For Camel developers",
+    "fixtures": {}
+  },
+  {
+    "id": "tutorial9",
+    "wiki": "tutorial6-running-scripts",
+    "title": "Tutorial 9: Running scripts",
+    "minutes": 10,
+    "track": "For Camel developers",
+    "fixtures": {}
+  },
+  {
+    "id": "tutorial10",
+    "wiki": "tutorial6-using-the-api",
+    "title": "Tutorial 10: Using the API",
+    "minutes": 5,
+    "track": "Automation",
+    "fixtures": {}
+  }
+]

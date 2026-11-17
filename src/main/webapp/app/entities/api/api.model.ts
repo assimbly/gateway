@@ -44,8 +44,10 @@ export interface IApiOperation {
 }
 
 /** The Handler Flow's editor, with the type of editor its Flow type opens in. */
-export function handlerFlowQueryParams(operation: IApiOperation): Record<string, unknown> {
-  return { mode: 'edit', editor: operation.flowType || 'flow', id: operation.handlerFlowId };
+export function handlerFlowQueryParams(operation: IApiOperation, apiId?: number): Record<string, unknown> {
+  // the editor's back arrow and Save & close return to the API the Handler Flow was opened from
+  const returnTo = apiId ? `/rest-apis/${apiId}` : undefined;
+  return { mode: 'edit', editor: operation.flowType || 'flow', id: operation.handlerFlowId, returnTo };
 }
 
 export interface IApi {

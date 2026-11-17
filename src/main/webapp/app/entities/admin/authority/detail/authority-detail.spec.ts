@@ -5,7 +5,6 @@ import { RouterTestingHarness } from '@angular/router/testing';
 
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
 import { faArrowLeft, faPencilAlt } from '@fortawesome/free-solid-svg-icons';
-import { provideTranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 
 import { AuthorityDetail } from './authority-detail';
@@ -17,7 +16,6 @@ describe('Authority Management Detail Component', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        provideTranslateService(),
         provideRouter(
           [
             {

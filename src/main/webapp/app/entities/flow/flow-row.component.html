@@ -1,10 +1,13 @@
 <td class="table-fx-identity">
-  <a [routerLink]="['/flow/editor', flow.id]" [queryParams]="{ mode: 'edit', editor: flow.type || 'flow', id: flow.id }">
-    <jhi-truncate [text]="flow.name" />
+  <a [routerLink]="['/flow/editor', flow().id]" [queryParams]="{ mode: 'edit', editor: flow().type || 'flow', id: flow().id }">
+    <jhi-truncate [text]="flow().name" />
   </a>
-  @if (handler) {
-    <a class="badge text-bg-light border fw-normal text-decoration-none ms-2" [routerLink]="['/rest-apis', handler.apiId]"
-       [ngbTooltip]="'Handles ' + handler.method + ' ' + handler.fullPath + ' of the API ' + handler.apiName">
+  @if (handler(); as handler) {
+    <a
+      class="badge text-bg-light border fw-normal text-decoration-none ms-2"
+      [routerLink]="['/rest-apis', handler.apiId]"
+      [ngbTooltip]="'Handles ' + handler.method + ' ' + handler.fullPath + ' of the API ' + handler.apiName"
+    >
       <fa-icon icon="plug"></fa-icon> {{ handler.apiName }} · {{ handler.method }} {{ handler.fullPath }}
     </a>
   }
@@ -12,7 +15,9 @@
 <td class="text-muted">{{ typeLabel }}</td>
 <td>
   <div class="d-flex align-items-center gap-2 text-nowrap">
-    <span class="visually-hidden">{{ state.label }}</span>
+    <span class="table-fx-state" data-cy="flow-row-state">
+      <span class="table-fx-state__dot" [attr.data-tone]="state.tone" aria-hidden="true"></span>{{ statusLabel }}
+    </span>
     <jhi-status-controls
       [busy]="disableActionBtns"
       [tone]="state.tone"
@@ -33,18 +38,13 @@
     @if (state.draft) {
       <a
         class="badge text-bg-secondary text-decoration-none"
-        [routerLink]="['/flow/editor', flow.id]"
-        [queryParams]="{ mode: 'edit', editor: flow.type || 'flow', id: flow.id }"
+        [routerLink]="['/flow/editor', flow().id]"
+        [queryParams]="{ mode: 'edit', editor: flow().type || 'flow', id: flow().id }"
         ngbTooltip="This Flow is a Draft. Finish its design to start it."
         >Draft</a
       >
     }
-    <jhi-flow-row-alerts
-      [flowName]="flow.name"
-      [failure]="failure"
-      [numberOfAlerts]="numberOfAlerts"
-      (alertsOpen)="openAlerts()"
-    />
+    <jhi-flow-row-alerts [failed]="!!failure" [numberOfAlerts]="numberOfAlerts" (alertsOpen)="openAlerts()" />
   </div>
 </td>
 <td class="text-end table-fx-numeric">{{ count(completedCount) }}</td>
@@ -55,12 +55,35 @@
       [loading]="flowStatsLoading"
       [empty]="flowStatsEmpty"
       [sections]="flowStatsSections"
-      (load)="getFlowStatistic(flow)"
+      [detailsLink]="detailsLink"
+      (load)="getFlowStatistic(flow())"
     />
+  } @else {
+    <span class="text-muted">—</span>
   }
 </td>
 <td class="text-end">
   <jhi-row-actions>
+    <button jhiOverflowAction type="button" ngbDropdownItem class="btn-fx-dropdown-item" (click)="navigateToFlowEditor('edit')">
+      <fa-icon icon="pencil-alt"></fa-icon>
+      <span>Edit</span>
+    </button>
+    <button jhiOverflowAction type="button" ngbDropdownItem class="btn-fx-dropdown-item" (click)="navigateToFlowEditor('clone')">
+      <fa-icon icon="clone"></fa-icon>
+      <span>Clone</span>
+    </button>
+    <button
+      jhiOverflowAction
+      type="button"
+      ngbDropdownItem
+      class="btn-fx-dropdown-item"
+      [disabled]="state.draft"
+      [title]="state.draft ? 'This Flow is a Draft. Finish its design to test it.' : ''"
+      (click)="navigateToFlowEditor('test')"
+    >
+      <fa-icon icon="flask"></fa-icon>
+      <span>Test</span>
+    </button>
     <button
       jhiOverflowAction
       type="button"
@@ -71,15 +94,11 @@
       (click)="sendTestMessage()"
     >
       <fa-icon icon="paper-plane"></fa-icon>
-      <span>Send test message</span>
+      <span>Send</span>
     </button>
-    <button jhiOverflowAction type="button" ngbDropdownItem class="btn-fx-dropdown-item" (click)="navigateToFlowEditor('edit')">
-      <fa-icon icon="pencil-alt"></fa-icon>
-      <span>Edit</span>
-    </button>
-    <button jhiOverflowAction type="button" ngbDropdownItem class="btn-fx-dropdown-item" (click)="navigateToFlowEditor('clone')">
-      <fa-icon icon="clone"></fa-icon>
-      <span>Clone</span>
+    <button jhiOverflowAction type="button" ngbDropdownItem class="btn-fx-dropdown-item" (click)="openLog()">
+      <fa-icon icon="file-alt"></fa-icon>
+      <span>View log</span>
     </button>
     <button jhiOverflowAction type="button" ngbDropdownItem class="btn-fx-dropdown-item" (click)="exportFlow()">
       <fa-icon icon="file-export"></fa-icon>

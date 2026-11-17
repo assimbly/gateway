@@ -10,6 +10,7 @@ import {
   canDeleteStep,
   changeComponent,
   deleteStep,
+  deleteSteps,
   EditResult,
   endsRequest,
   FlowGraph,
@@ -21,12 +22,17 @@ import {
   linksToSave,
   loadFlowGraph,
   moveStep,
+  moveSteps,
   openEnds,
+  problemPlace,
   problems,
   RESPONSE_COMPONENT,
   ROUTER_KINDS,
   routerShape,
+  routerTitle,
   stepsToSave,
+  renameStep,
+  shownName,
   takesCondition,
   updateLink,
   updateStep,
@@ -318,6 +324,26 @@ describe('Flow graph', () => {
       expect(newSink.kind).toBe('SINK');
       expect(newSink.id).toBeUndefined();
     });
+
+    it.each([
+      ['if', 'if'],
+      ['split', 'split'],
+      ['loop', 'loop'],
+    ])('writes the Condition of a new %s Router in the simple language', (kind, branch) => {
+      const graph = edited(insertStep(sourceToSink(), 'step-11', 'ROUTER', kind));
+
+      const router = graph.steps.find(s => s.kind === 'ROUTER')!;
+      expect(graph.links.filter(l => l.from === router.key).map(l => [l.rule, l.language])).toEqual([
+        [undefined, undefined],
+        [branch, 'simple'],
+      ]);
+    });
+
+    it('sets no Condition language on a Router whose Branches take no Condition', () => {
+      const graph = edited(insertStep(sourceToSink(), 'step-11', 'ROUTER', 'enrich'));
+
+      expect(graph.links.every(l => l.language === undefined)).toBe(true);
+    });
   });
 
   describe('adding the next Step after an open end', () => {
@@ -369,6 +395,18 @@ describe('Flow graph', () => {
       expect(openEnds(graph)).toEqual([]);
     });
 
+    it('writes the Condition of a new If / else Router in the simple language', () => {
+      const start = newFlow();
+
+      const graph = edited(appendStep(start, start.steps[0].key, 'ROUTER', 'if'));
+
+      const router = graph.steps.find(s => s.kind === 'ROUTER')!;
+      expect(graph.links.filter(l => l.from === router.key).map(l => [l.rule, l.language])).toEqual([
+        [undefined, undefined],
+        ['if', 'simple'],
+      ]);
+    });
+
     it('refuses to add a Step after a Step that already has a next Step', () => {
       expect(appendStep(sourceToSink(), 'step-10', 'ACTION', 'log').outcome).toBe('rejected');
     });
@@ -396,6 +434,12 @@ describe('Flow graph', () => {
       expect(new Set(names).size).toBe(4);
     });
 
+    it('writes the Condition of a new Content router Branch in the simple language', () => {
+      const graph = edited(addBranch(contentRouterFlow(), 'step-11'));
+
+      expect(graph.links.filter(l => l.from === 'step-11').at(-1)!.language).toBe('simple');
+    });
+
     it('does not name the Branches of a Recipient list Router', () => {
       const recipient = edited(insertStep(sourceToSink(), 'step-11', 'ROUTER', 'recipient'));
       const router = recipient.steps.find(s => s.kind === 'ROUTER')!;
@@ -411,7 +455,7 @@ describe('Flow graph', () => {
 
       const result = addBranch(ifRouter, router.key);
 
-      expect(result).toEqual({ outcome: 'rejected', reason: expect.stringContaining('if') });
+      expect(result).toEqual({ outcome: 'rejected', reason: expect.stringContaining('If / else') });
     });
 
     it('refuses to add a Branch to a Step that is not a Router', () => {
@@ -507,6 +551,58 @@ describe('Flow graph', () => {
     });
   });
 
+  describe('deleting several Steps', () => {
+    it('deletes a chain of Actions at once, reconnecting the Steps around them', () => {
+      const one = edited(insertStep(sourceToSink(), 'step-11', 'ACTION', 'setbody'));
+      const two = edited(insertStep(one, 'step-11', 'ACTION', 'log'));
+      const actions = two.steps.filter(s => s.kind === 'ACTION').map(s => s.key);
+
+      const graph = edited(deleteSteps(two, actions));
+
+      expect(graph.steps.map(s => s.key)).toEqual(['step-10', 'step-11']);
+      expect(linkKeys(graph)).toEqual(['step-10 → step-11']);
+    });
+
+    it('keeps the Source, and skips Steps that already went with their Router', () => {
+      const graph = edited(deleteSteps(contentRouterFlow(), ['step-10', 'step-11', 'step-12', 'step-13']));
+
+      expect(graph.steps.map(s => s.key)).toEqual(['step-10']);
+      expect(graph.links).toEqual([]);
+    });
+
+    it('refuses when none of the Steps can be deleted', () => {
+      expect(deleteSteps(contentRouterFlow(), ['step-10', 'step-12']).outcome).toBe('rejected');
+    });
+  });
+
+  describe('naming a Step', () => {
+    it('names a Step and saves the name with it', () => {
+      const graph = edited(renameStep(sourceToSink(), 'step-11', '  Write orders  '));
+
+      expect(graph.steps.find(s => s.key === 'step-11')!.name).toBe('Write orders');
+      expect(stepsToSave(graph, 1).find(s => s.key === 'step-11')!.step.name).toBe('Write orders');
+    });
+
+    it('takes the name away when it is emptied', () => {
+      const named = edited(renameStep(sourceToSink(), 'step-11', 'Write orders'));
+
+      expect(edited(renameStep(named, 'step-11', ' ')).steps.find(s => s.key === 'step-11')!.name).toBeUndefined();
+    });
+
+    it('loads the saved name of a Step', () => {
+      const graph = loadFlowGraph(flow([{ id: 10, name: 'Poll orders', stepType: 'SOURCE', componentType: 'timer' } as IStep]));
+
+      expect(graph.steps[0].name).toBe('Poll orders');
+    });
+
+    it('shows no name that an import gave a Step from its id', () => {
+      expect(shownName({ name: 'Poll orders' })).toBe('Poll orders');
+      expect(shownName({ name: '12' })).toBeUndefined();
+      expect(shownName({ name: '0b6a3c0e-1f0d-4a8e-9a55-2f4e0c1d9b7a' })).toBeUndefined();
+      expect(shownName({})).toBeUndefined();
+    });
+  });
+
   describe('changing the component of a Step', () => {
     it('changes the component of an Action', () => {
       const withAction = edited(insertStep(sourceToSink(), 'step-11', 'ACTION', 'setbody'));
@@ -542,6 +638,21 @@ describe('Flow graph', () => {
       const graph = edited(moveStep(sourceToSink(), 'step-10', 15, 30));
 
       expect(graph.steps.find(s => s.key === 'step-10')).toMatchObject({ x: 15, y: 30 });
+    });
+
+    it('moves Steps dragged together in one edit', () => {
+      const graph = edited(
+        moveSteps(sourceToSink(), [
+          { key: 'step-10', x: 15, y: 30 },
+          { key: 'step-11', x: 215, y: 30 },
+        ]),
+      );
+
+      expect(graph.steps.map(s => ({ key: s.key, x: s.x, y: s.y }))).toEqual([
+        { key: 'step-10', x: 15, y: 30 },
+        { key: 'step-11', x: 215, y: 30 },
+      ]);
+      expect(moveSteps(sourceToSink(), [{ key: 'gone', x: 0, y: 0 }]).outcome).toBe('rejected');
     });
 
     it("edits a Branch's name, Condition and settings", () => {
@@ -641,6 +752,15 @@ describe('Flow graph', () => {
 
       expect(problems(withSjmsSink())).toEqual([{ stepKey: 'step-11', message: 'Choose a Connection for this Step.' }]);
       expect(isDraft(withSjmsSink(3))).toBe(false);
+    });
+
+    it('names where a problem is: the Step by its kind and Component, a Branch by its name', () => {
+      const graph = edited(addBranch(contentRouterFlow(), 'step-11'));
+      const newBranch = graph.links.find(l => l.rule === 'branch2')!;
+
+      expect(problemPlace(graph, { stepKey: 'step-12', message: '' })).toBe('Sink · log');
+      expect(problemPlace(graph, { stepKey: 'step-11', message: '' })).toBe('Router');
+      expect(problemPlace(graph, { linkTo: newBranch.to, message: '' })).toBe('Branch branch2');
     });
   });
 
@@ -802,6 +922,22 @@ describe('Flow graph', () => {
 
       expect(stepsToSave(graph, 1).find(s => s.key === router.key)!.step.options).toBe('streaming=false');
     });
+
+    it.each(['if', 'loop', 'dowhile'])("drops the copy of an '%s' Router's Condition from its options too", kind => {
+      const inserted = edited(insertStep(sourceToSink(), 'step-11', 'ROUTER', kind));
+      const router = inserted.steps.find(s => s.kind === 'ROUTER')!;
+      const graph = edited(updateStep(inserted, router.key, { options: 'language=simple&expression=${body}&copy=true' }));
+
+      expect(stepsToSave(graph, 1).find(s => s.key === router.key)!.step.options).toBe('copy=true');
+    });
+
+    it('keeps the options of a Router whose Branches take no Condition', () => {
+      const inserted = edited(insertStep(sourceToSink(), 'step-11', 'ROUTER', 'enrich'));
+      const router = inserted.steps.find(s => s.kind === 'ROUTER')!;
+      const graph = edited(updateStep(inserted, router.key, { options: 'language=simple&expression=${body}' }));
+
+      expect(stepsToSave(graph, 1).find(s => s.key === router.key)!.step.options).toBe('language=simple&expression=${body}');
+    });
   });
 
   describe('arranging', () => {
@@ -844,6 +980,21 @@ describe('Flow graph', () => {
         graph.steps.some((b, j) => i !== j && Math.abs(a.x! - b.x!) < 150 && Math.abs(a.y! - b.y!) < 120),
       );
       expect(overlapping.map(s => s.key)).toEqual([]);
+    });
+  });
+
+  describe('Router names', () => {
+    it('names every kind of Router in words, not by its id', () => {
+      ROUTER_KINDS.forEach(kind => expect(routerTitle({ componentType: kind })).not.toBe(kind));
+      expect(routerTitle({ componentType: 'if' })).toBe('If / else');
+    });
+
+    it('shows a Router kind it has no name for as itself', () => {
+      expect(routerTitle({ componentType: 'multicast' })).toBe('multicast');
+    });
+
+    it('names an imported Router by the kind in its uri', () => {
+      expect(routerTitle({ uri: 'content:abc' })).toBe('Content router');
     });
   });
 });

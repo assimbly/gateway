@@ -1,25 +1,21 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-
-import { LANGUAGES } from 'app/config';
 import { Account, AccountService } from 'app/core/auth';
 import { ThemePreference, ThemeService } from 'app/core/theme';
 import { AlertError } from 'app/shared/alert';
-import { FindLanguageFromKeyPipe, TranslateDirective } from 'app/shared/language';
 import ThemeSelector from 'app/shared/theme/theme-selector';
+import { SaveShortcutDirective } from 'app/shared/keyboard';
 
 const initialAccount: Account = {} as Account;
 
 @Component({
   selector: 'jhi-settings',
-  imports: [TranslateDirective, TranslatePipe, FindLanguageFromKeyPipe, AlertError, ReactiveFormsModule, ThemeSelector],
+  imports: [AlertError, ReactiveFormsModule, ThemeSelector, SaveShortcutDirective],
   templateUrl: './settings.html',
 })
 export default class Settings implements OnInit {
   readonly success = signal(false);
-  languages = LANGUAGES;
 
   settingsForm = new FormGroup({
     firstName: new FormControl(initialAccount.firstName, {
@@ -34,7 +30,6 @@ export default class Settings implements OnInit {
       nonNullable: true,
       validators: [Validators.required, Validators.minLength(5), Validators.maxLength(254), Validators.email],
     }),
-    langKey: new FormControl(initialAccount.langKey, { nonNullable: true }),
     themePreference: new FormControl<ThemePreference>(initialAccount.themePreference ?? 'SYSTEM', { nonNullable: true }),
     activated: new FormControl(initialAccount.activated, { nonNullable: true }),
     authorities: new FormControl(initialAccount.authorities, { nonNullable: true }),
@@ -43,7 +38,6 @@ export default class Settings implements OnInit {
   });
 
   private readonly accountService = inject(AccountService);
-  private readonly translateService = inject(TranslateService);
   private readonly themeService = inject(ThemeService);
 
   ngOnInit(): void {
@@ -64,10 +58,6 @@ export default class Settings implements OnInit {
         this.success.set(true);
 
         this.accountService.authenticate(account);
-
-        if (account.langKey !== this.translateService.getCurrentLang()) {
-          this.translateService.use(account.langKey);
-        }
       },
       error() {
         // Handled by interceptor.

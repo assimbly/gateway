@@ -1,15 +1,13 @@
 package org.assimbly.gateway.service;
 
-import org.assimbly.gateway.service.dto.BrokerDTO;
-
 import java.util.List;
 import java.util.Optional;
+import org.assimbly.gateway.service.dto.BrokerDTO;
 
 /**
  * Service Interface for managing Broker.
  */
 public interface BrokerService {
-
     /**
      * Save a broker.
      *
@@ -25,6 +23,17 @@ public interface BrokerService {
      */
     List<BrokerDTO> findAll();
 
+    /**
+     * Get all brokers configured with autoStart=true.
+     *
+     * @return the list of auto-started broker entities
+     */
+    default List<BrokerDTO> findAllAutoStart() {
+        return findAll()
+            .stream()
+            .filter(b -> Boolean.TRUE.equals(b.isAutoStart()))
+            .toList();
+    }
 
     /**
      * Get the "id" broker.

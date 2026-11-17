@@ -3,15 +3,15 @@ import { RouterLink } from '@angular/router';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
-import { Alert, AlertError } from 'app/shared/alert';
+import { AlertError } from 'app/shared/alert';
+import { RoleLabelPipe } from 'app/shared/auth';
 import { FormatMediumDatetimePipe } from 'app/shared/date';
-import { TranslateDirective } from 'app/shared/language';
 import { IUserManagement } from '../user-management.model';
 
 @Component({
   selector: 'jhi-user-management-detail',
   templateUrl: './user-management-detail.html',
-  imports: [FontAwesomeModule, Alert, AlertError, TranslateDirective, RouterLink, FormatMediumDatetimePipe],
+  imports: [FontAwesomeModule, AlertError, RouterLink, FormatMediumDatetimePipe, RoleLabelPipe],
 })
 export class UserManagementDetail {
   readonly userManagement = input<IUserManagement | null>(null);

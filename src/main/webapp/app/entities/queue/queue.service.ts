@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpContext, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, Observer } from 'rxjs';
 
 import { serverApiUrl } from 'app/config';
@@ -20,13 +20,15 @@ type EntityArrayResponseType = HttpResponse<IQueue[]>;
 
 @Injectable({ providedIn: 'root' })
 export class QueueService {
+  protected http = inject(HttpClient);
+  protected router = inject(Router);
+  protected $window = inject(WindowRef);
+  protected brokerService = inject(BrokerService);
+
   public queuesResourceUrl = `${serverApiUrl}api/queues`;
   public brokersResourceUrl = `${serverApiUrl}api/brokers`;
 
-  brokerType: string;
-
-  constructor(protected http: HttpClient, protected router: Router, protected $window: WindowRef, protected brokerService: BrokerService) {   
-  }
+  brokerType!: string;
 
   create(queue: IQueue): Observable<EntityResponseType> {
     return this.http.post<IQueue>(this.queuesResourceUrl, queue, { observe: 'response' });
@@ -49,14 +51,15 @@ export class QueueService {
     return this.http.delete(`${this.queuesResourceUrl}/${id}`, { observe: 'response' });
   }
 
-  getAllQueues(brokerType: string): Observable<HttpResponse<IRootQueueAddress>> {
+  getAllQueues(brokerType: string, context?: HttpContext): Observable<HttpResponse<IRootQueueAddress>> {
     if (brokerType != null && brokerType != '') {
       return this.http.get<IRootQueueAddress>(`${this.brokersResourceUrl}/${brokerType}/queues`, {
         headers: new HttpHeaders({ PlaceholderReplacement: 'true', Accept: 'application/json' }),
         observe: 'response',
+        context,
       });
     } else {
-      return null;
+      return null!;
     }
   }
 

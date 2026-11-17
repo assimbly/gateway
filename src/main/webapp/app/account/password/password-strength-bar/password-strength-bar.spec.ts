@@ -1,19 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { provideTranslateService } from '@ngx-translate/core';
-
 import PasswordStrengthBar from './password-strength-bar';
 
 describe('PasswordStrengthBar', () => {
   let comp: PasswordStrengthBar;
   let fixture: ComponentFixture<PasswordStrengthBar>;
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [provideTranslateService()],
-    });
-  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(PasswordStrengthBar);

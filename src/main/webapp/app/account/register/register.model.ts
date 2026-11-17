@@ -3,6 +3,5 @@ export class Registration {
     public login: string,
     public email: string,
     public password: string,
-    public langKey: string,
   ) {}
 }

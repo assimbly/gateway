@@ -1,5 +1,9 @@
 package org.assimbly.gateway.security;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.Locale;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.assimbly.gateway.GatewayApp;
 import org.assimbly.gateway.domain.User;
@@ -12,11 +16,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Locale;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Test class for DomainUserDetailsService.
@@ -53,7 +52,6 @@ public class DomainUserDetailsServiceIntTest {
         userOne.setEmail(USER_ONE_EMAIL);
         userOne.setFirstName("userOne");
         userOne.setLastName("doe");
-        userOne.setLangKey("en");
         userRepository.save(userOne);
 
         userTwo = new User();
@@ -63,7 +61,6 @@ public class DomainUserDetailsServiceIntTest {
         userTwo.setEmail(USER_TWO_EMAIL);
         userTwo.setFirstName("userTwo");
         userTwo.setLastName("doe");
-        userTwo.setLangKey("en");
         userRepository.save(userTwo);
 
         userThree = new User();
@@ -73,7 +70,6 @@ public class DomainUserDetailsServiceIntTest {
         userThree.setEmail(USER_THREE_EMAIL);
         userThree.setFirstName("userThree");
         userThree.setLastName("doe");
-        userThree.setLangKey("en");
         userRepository.save(userThree);
     }
 
@@ -105,7 +101,8 @@ public class DomainUserDetailsServiceIntTest {
     @Transactional
     public void assertThatUserCanNotBeFoundByEmailIgnoreCase() {
         assertThrows(UsernameNotFoundException.class, () ->
-            domainUserDetailsService.loadUserByUsername(USER_TWO_EMAIL.toUpperCase(Locale.ENGLISH)));
+            domainUserDetailsService.loadUserByUsername(USER_TWO_EMAIL.toUpperCase(Locale.ENGLISH))
+        );
     }
 
     @Test
@@ -119,8 +116,6 @@ public class DomainUserDetailsServiceIntTest {
     @Test
     @Transactional
     public void assertThatUserNotActivatedExceptionIsThrownForNotActivatedUsers() {
-        assertThrows(UserNotActivatedException.class, () ->
-            domainUserDetailsService.loadUserByUsername(USER_THREE_LOGIN));
+        assertThrows(UserNotActivatedException.class, () -> domainUserDetailsService.loadUserByUsername(USER_THREE_LOGIN));
     }
-
 }

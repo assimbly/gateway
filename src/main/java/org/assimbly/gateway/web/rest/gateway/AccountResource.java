@@ -2,8 +2,14 @@ package org.assimbly.gateway.web.rest.gateway;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
+import org.assimbly.gateway.config.ApplicationProperties;
+import org.assimbly.gateway.config.security.PasswordChangeGate;
 import org.assimbly.gateway.domain.User;
 import org.assimbly.gateway.repository.UserRepository;
 import org.assimbly.gateway.security.SecurityUtils;
@@ -18,10 +24,12 @@ import org.assimbly.gateway.web.rest.vm.KeyAndPasswordVM;
 import org.assimbly.gateway.web.rest.vm.ManagedUserVM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
+import org.springframework.web.server.ResponseStatusException;
+import tech.jhipster.config.JHipsterConstants;
 
 /**
  * REST controller for managing the current user's account.
@@ -46,10 +54,26 @@ public class AccountResource {
 
     private final MailService mailService;
 
-    public AccountResource(UserRepository userRepository, UserService userService, MailService mailService) {
+    private final PasswordChangeGate passwordChangeGate;
+
+    /** Anyone may create an account: on dev, or when application.security.registration is on. */
+    private final boolean registrationOpen;
+
+    public AccountResource(
+        UserRepository userRepository,
+        UserService userService,
+        MailService mailService,
+        PasswordChangeGate passwordChangeGate,
+        ApplicationProperties applicationProperties,
+        Environment env
+    ) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.mailService = mailService;
+        this.passwordChangeGate = passwordChangeGate;
+        this.registrationOpen =
+            applicationProperties.getSecurity().isRegistration() ||
+            env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT));
     }
 
     /**
@@ -64,11 +88,35 @@ public class AccountResource {
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public void registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
+        if (!registrationOpen) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
         if (isPasswordLengthInvalid(managedUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }
         User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
         mailService.sendActivationEmail(user);
+    }
+
+    /**
+     * {@code GET  /account/first-sign-in} : whether the sign-in page may tell a first-time user to sign in with the
+     * default account {@code admin}. Only while it still has its default password, and only to a browser on the
+     * Gateway's own computer: someone elsewhere on the network is not told. Behind a proxy on the same computer, set
+     * {@code server.forward-headers-strategy} so the visitor's own address is the one checked.
+     */
+    @Operation(summary = "Whether the sign-in page shows how to sign in the first time")
+    @GetMapping("/account/first-sign-in")
+    public boolean isFirstSignIn(HttpServletRequest request) {
+        return passwordChangeGate.isRequired("admin") && isLocal(request.getRemoteAddr());
+    }
+
+    static boolean isLocal(String address) {
+        try {
+            // An IP address as the servlet container gives it: no name lookup happens
+            return address != null && InetAddress.getByName(address).isLoopbackAddress();
+        } catch (UnknownHostException _) {
+            return false;
+        }
     }
 
     /**
@@ -111,11 +159,11 @@ public class AccountResource {
     @Operation(summary = "Update the current user")
     @PostMapping("/account")
     public void saveAccount(@Valid @RequestBody AdminUserDTO userDTO) {
-        String userLogin = SecurityUtils
-            .getCurrentUserLogin()
-            .orElseThrow(() -> new AccountResourceException("Current user login not found"));
+        String userLogin = SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new AccountResourceException("Current user login not found")
+        );
         Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
-        if (existingUser.isPresent() && (!existingUser.orElseThrow().getLogin().equalsIgnoreCase(userLogin))) {
+        if (existingUser.isPresent() && !existingUser.orElseThrow().getLogin().equalsIgnoreCase(userLogin)) {
             throw new EmailAlreadyUsedException();
         }
         Optional<User> user = userRepository.findOneByLogin(userLogin);
@@ -126,7 +174,6 @@ public class AccountResource {
             userDTO.getFirstName(),
             userDTO.getLastName(),
             userDTO.getEmail(),
-            userDTO.getLangKey(),
             userDTO.getImageUrl(),
             userDTO.getThemePreference()
         );
@@ -188,8 +235,8 @@ public class AccountResource {
     private static boolean isPasswordLengthInvalid(String password) {
         return (
             StringUtils.isEmpty(password) ||
-                password.length() < ManagedUserVM.PASSWORD_MIN_LENGTH ||
-                password.length() > ManagedUserVM.PASSWORD_MAX_LENGTH
+            password.length() < ManagedUserVM.PASSWORD_MIN_LENGTH ||
+            password.length() > ManagedUserVM.PASSWORD_MAX_LENGTH
         );
     }
 }

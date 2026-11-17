@@ -13,6 +13,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -32,6 +35,14 @@ public class FlowAlertLogService {
 
     private static final String ALERT_LOG_SUFFIX = "_alerts.log";
 
+    /** The names of the daily alert logs and the time before each alert, as the runtime writes them. */
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
+    private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z");
+
+    /** At most this many alerts are added at once, each at most this long. */
+    static final int MAX_ADDED = 20;
+    static final int MAX_LENGTH = 4000;
+
     /** Where cleared alert logs go, inside the flow's alert directory. {@link #page} doesn't look into it. */
     static final String CLEARED_DIR = "cleared";
 
@@ -48,7 +59,7 @@ public class FlowAlertLogService {
 
     public FlowAlertsPageDTO page(long flowId, int offset, int limit) {
         int safeOffset = Math.max(offset, 0);
-        int safeLimit = Math.min(Math.max(limit, 0), PAGE_SIZE);
+        int safeLimit = Math.clamp(limit, 0, PAGE_SIZE);
         List<String> lines = readNewestFirst(flowId);
 
         FlowAlertsPageDTO page = new FlowAlertsPageDTO();
@@ -57,6 +68,34 @@ public class FlowAlertLogService {
         int to = Math.min(from + safeLimit, lines.size());
         page.setMessages(new ArrayList<>(lines.subList(from, to)));
         return page;
+    }
+
+    /**
+     * Adds alerts to a flow's alert log of today, like the runtime writes them: one line each, after the time. The
+     * Gateway adds what the runtime doesn't log itself, such as why a flow didn't start. Line breaks become spaces;
+     * long messages and many messages at once are cut off.
+     *
+     * @throws UncheckedIOException when the alert log can't be written
+     */
+    public synchronized void add(long flowId, List<String> messages) {
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.systemDefault());
+        String timestamp = now.format(TIMESTAMP_FORMAT);
+        List<String> lines = messages.stream()
+            .map(message -> message == null ? "" : message.replaceAll("\\s+", " ").trim())
+            .filter(message -> !message.isEmpty())
+            .limit(MAX_ADDED)
+            .map(message -> timestamp + " : " + (message.length() > MAX_LENGTH ? message.substring(0, MAX_LENGTH) + "…" : message))
+            .toList();
+        if (lines.isEmpty()) {
+            return;
+        }
+        Path file = alertsRoot.resolve(Long.toString(flowId)).resolve(now.format(DATE_FORMAT) + ALERT_LOG_SUFFIX);
+        try {
+            Files.createDirectories(file.getParent());
+            Files.write(file, lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            throw new UncheckedIOException("Could not add alerts to flow " + flowId, e);
+        }
     }
 
     /**
@@ -74,23 +113,30 @@ public class FlowAlertLogService {
         try {
             Files.createDirectories(clearedDir);
             for (Path file : files) {
-                Path target = unusedName(clearedDir, file.getFileName().toString());
-                try {
-                    Files.move(file, target);
-                } catch (IOException moveFailed) {
-                    // The runtime may hold the log open (Windows refuses to move it). Copy it aside and empty it;
-                    // alerts written in between are lost. If it can't be emptied, drop the copy so it isn't kept twice.
-                    Files.copy(file, target);
-                    try {
-                        Files.newOutputStream(file, StandardOpenOption.TRUNCATE_EXISTING).close();
-                    } catch (IOException truncateFailed) {
-                        Files.deleteIfExists(target);
-                        throw truncateFailed;
-                    }
-                }
+                moveAside(file, unusedName(clearedDir, file.getFileName().toString()));
             }
         } catch (IOException e) {
             throw new UncheckedIOException("Could not clear the alerts of flow " + flowId, e);
+        }
+    }
+
+    private static void moveAside(Path file, Path target) throws IOException {
+        try {
+            Files.move(file, target);
+        } catch (IOException _) {
+            // The runtime may hold the log open (Windows refuses to move it)
+            copyAndEmpty(file, target);
+        }
+    }
+
+    /** Alerts written in between are lost. If the log can't be emptied, the copy is dropped so it isn't kept twice. */
+    private static void copyAndEmpty(Path file, Path target) throws IOException {
+        Files.copy(file, target);
+        try {
+            Files.newOutputStream(file, StandardOpenOption.TRUNCATE_EXISTING).close();
+        } catch (IOException truncateFailed) {
+            Files.deleteIfExists(target);
+            throw truncateFailed;
         }
     }
 

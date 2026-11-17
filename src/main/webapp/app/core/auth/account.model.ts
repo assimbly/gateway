@@ -6,10 +6,11 @@ export class Account {
     public authorities: string[],
     public email: string,
     public firstName: string | null,
-    public langKey: string,
     public lastName: string | null,
     public login: string,
     public imageUrl: string | null,
     public themePreference: ThemePreference = 'SYSTEM',
+    /** The user still has a default password, and must choose a new one before using the Gateway. */
+    public passwordChangeRequired?: boolean,
   ) {}
 }

@@ -3,7 +3,6 @@ import { ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed, inject } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 
-import { provideTranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 
 import PasswordResetFinish from './password-reset-finish';
@@ -16,7 +15,6 @@ describe('PasswordResetFinish', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        provideTranslateService(),
         {
           provide: ActivatedRoute,
           useValue: { queryParams: of({ key: 'XYZPDQ' }) },

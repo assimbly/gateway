@@ -1,0 +1,42 @@
+<div class="flow-stats">
+  @if (loading()) {
+    <p class="flow-stats-empty">Loading stats…</p>
+  }
+  @if (!loading() && empty()) {
+    <p class="flow-stats-empty">{{ emptyMessage() }}</p>
+  }
+  @if (!loading() && !empty()) {
+    @for (section of sections(); track section) {
+      <section class="flow-stats-section">
+        <h6>{{ section.title }}</h6>
+        @if (section.rows.length > 0) {
+          <table>
+            @if (section.columns) {
+              <thead>
+                <tr>
+                  <td></td>
+                  @for (column of section.columns; track $index) {
+                    <th scope="col">{{ column }}</th>
+                  }
+                </tr>
+              </thead>
+            }
+            <tbody>
+              @for (row of section.rows; track row) {
+                <tr>
+                  <th scope="row">{{ row.label }}</th>
+                  @for (value of row.values; track $index) {
+                    <td>{{ value }}</td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+        @if (section.note) {
+          <p class="flow-stats-note">{{ section.note }}</p>
+        }
+      </section>
+    }
+  }
+</div>

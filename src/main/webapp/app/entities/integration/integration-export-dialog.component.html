@@ -1,25 +1,27 @@
 <form name="exportForm">
-    <div class="modal-header">
-        <h4 class="modal-title" id="myIntegrationLabel">Export Configuration (XML)</h4>
-        <button type="button" class="btn-close" aria-label="Close" (click)="clear()"></button>
+  <div class="modal-header">
+    <h4 class="modal-title" id="myIntegrationLabel">Export Configuration (XML)</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="clear()"></button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+      <label class="form-control-label font-weight-bold" for="field_id">Integration id</label>
+      <select class="form-control form-select" name="id" [(ngModel)]="integrationId" id="field_id" [disabled]="integrations.length === 1">
+        @for (integration of integrations; track integration.id) {
+          <option value="{{integration.id}}">{{integration.id}}</option>
+        }
+      </select>
     </div>
-    <div class="modal-body">
-        <div class="form-group">
-            <label class="form-control-label font-weight-bold" for="field_id">Integration id</label>
-            <select class="form-control form-select" name="id" [(ngModel)]="integrationId" id="field_id" [disabled]="integrations.length === 1">
-                <option *ngFor="let integration of integrations" value="{{integration.id}}">{{integration.id}}</option>
-            </select>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-fx btn-fx-secondary" (click)="clear()">
-            <span class="fa fa-ban"></span>
-            <span>Cancel</span>
-        </button>
-        <button type="button" class="btn btn-fx btn-fx-primary" (click)="exportConfiguration(integrations, integrationId)">
-            <span class="fa fa-upload"></span>
-            <span>Export</span>
-        </button>
-        <jhi-alert-error></jhi-alert-error>
-    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-fx btn-fx-secondary" (click)="clear()">
+      <span class="fa fa-ban"></span>
+      <span>Cancel</span>
+    </button>
+    <button type="button" class="btn btn-fx btn-fx-primary" (click)="exportConfiguration(integrations, integrationId)">
+      <span class="fa fa-upload"></span>
+      <span>Export</span>
+    </button>
+    <jhi-alert-error></jhi-alert-error>
+  </div>
 </form>

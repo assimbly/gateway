@@ -1,6 +1,10 @@
 package org.assimbly.gateway.service;
 
-import org.assimbly.gateway.config.Constants;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.stream.Collectors;
+import org.assimbly.gateway.config.security.PasswordChangeGate;
 import org.assimbly.gateway.domain.Authority;
 import org.assimbly.gateway.domain.User;
 import org.assimbly.gateway.domain.enumeration.ThemePreference;
@@ -21,11 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tech.jhipster.security.RandomUtil;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.stream.Collectors;
-
 /**
  * Service class for managing users.
  */
@@ -43,30 +42,32 @@ public class UserService {
 
     private final CacheManager cacheManager;
 
+    private final PasswordChangeGate passwordChangeGate;
+
     public UserService(
         UserRepository userRepository,
         PasswordEncoder passwordEncoder,
         AuthorityRepository authorityRepository,
-        CacheManager cacheManager
+        CacheManager cacheManager,
+        PasswordChangeGate passwordChangeGate
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
+        this.passwordChangeGate = passwordChangeGate;
     }
 
     public Optional<User> activateRegistration(String key) {
         log.debug("Activating user for activation key {}", key);
-        return userRepository
-            .findOneByActivationKey(key)
-            .map(user -> {
-                // activate given user for the registration key.
-                user.setActivated(true);
-                user.setActivationKey(null);
-                this.clearUserCaches(user);
-                log.debug("Activated user: {}", user);
-                return user;
-            });
+        return userRepository.findOneByActivationKey(key).map(user -> {
+            // activate given user for the registration key.
+            user.setActivated(true);
+            user.setActivationKey(null);
+            this.clearUserCaches(user);
+            log.debug("Activated user: {}", user);
+            return user;
+        });
     }
 
     public Optional<User> completePasswordReset(String newPassword, String key) {
@@ -78,6 +79,7 @@ public class UserService {
                 user.setPassword(passwordEncoder.encode(newPassword));
                 user.setResetKey(null);
                 user.setResetDate(null);
+                passwordChosen(user);
                 this.clearUserCaches(user);
                 return user;
             });
@@ -96,22 +98,18 @@ public class UserService {
     }
 
     public User registerUser(AdminUserDTO userDTO, String password) {
-        userRepository
-            .findOneByLogin(userDTO.getLogin().toLowerCase())
-            .ifPresent(existingUser -> {
-                boolean removed = removeNonActivatedUser(existingUser);
-                if (!removed) {
-                    throw new UsernameAlreadyUsedException();
-                }
-            });
-        userRepository
-            .findOneByEmailIgnoreCase(userDTO.getEmail())
-            .ifPresent(existingUser -> {
-                boolean removed = removeNonActivatedUser(existingUser);
-                if (!removed) {
-                    throw new EmailAlreadyUsedException();
-                }
-            });
+        userRepository.findOneByLogin(userDTO.getLogin().toLowerCase()).ifPresent(existingUser -> {
+            boolean removed = removeNonActivatedUser(existingUser);
+            if (!removed) {
+                throw new UsernameAlreadyUsedException();
+            }
+        });
+        userRepository.findOneByEmailIgnoreCase(userDTO.getEmail()).ifPresent(existingUser -> {
+            boolean removed = removeNonActivatedUser(existingUser);
+            if (!removed) {
+                throw new EmailAlreadyUsedException();
+            }
+        });
         User newUser = new User();
         String encryptedPassword = passwordEncoder.encode(password);
         newUser.setLogin(userDTO.getLogin().toLowerCase());
@@ -123,7 +121,6 @@ public class UserService {
             newUser.setEmail(userDTO.getEmail().toLowerCase());
         }
         newUser.setImageUrl(userDTO.getImageUrl());
-        newUser.setLangKey(userDTO.getLangKey());
         newUser.setThemePreference(ThemePreference.fromNullable(userDTO.getThemePreference()));
         // new user is not active
         newUser.setActivated(false);
@@ -157,11 +154,6 @@ public class UserService {
             user.setEmail(userDTO.getEmail().toLowerCase());
         }
         user.setImageUrl(userDTO.getImageUrl());
-        if (userDTO.getLangKey() == null) {
-            user.setLangKey(Constants.DEFAULT_LANGUAGE); // default language
-        } else {
-            user.setLangKey(userDTO.getLangKey());
-        }
         user.setThemePreference(ThemePreference.fromNullable(userDTO.getThemePreference()));
         String encryptedPassword = passwordEncoder.encode(RandomUtil.generatePassword());
         user.setPassword(encryptedPassword);
@@ -190,8 +182,7 @@ public class UserService {
      * @return updated user.
      */
     public Optional<AdminUserDTO> updateUser(AdminUserDTO userDTO) {
-        return Optional
-            .of(userRepository.findById(userDTO.getId()))
+        return Optional.of(userRepository.findById(userDTO.getId()))
             .filter(Optional::isPresent)
             .map(Optional::get)
             .map(user -> {
@@ -204,7 +195,6 @@ public class UserService {
                 }
                 user.setImageUrl(userDTO.getImageUrl());
                 user.setActivated(userDTO.isActivated());
-                user.setLangKey(userDTO.getLangKey());
                 if (userDTO.getThemePreference() != null) {
                     user.setThemePreference(userDTO.getThemePreference());
                 }
@@ -225,28 +215,24 @@ public class UserService {
     }
 
     public void deleteUser(String login) {
-        userRepository
-            .findOneByLogin(login)
-            .ifPresent(user -> {
-                userRepository.delete(user);
-                this.clearUserCaches(user);
-                log.debug("Deleted User: {}", user);
-            });
+        userRepository.findOneByLogin(login).ifPresent(user -> {
+            userRepository.delete(user);
+            this.clearUserCaches(user);
+            log.debug("Deleted User: {}", user);
+        });
     }
 
     /**
-     * Update basic information (first name, last name, email, language, theme) for the current user.
+     * Update basic information (first name, last name, email, theme) for the current user.
      *
      * @param firstName first name of user.
      * @param lastName  last name of user.
      * @param email     email id of user.
-     * @param langKey   language key.
      * @param imageUrl  image URL of user.
      * @param themePreference appearance preference.
      */
-    public void updateUser(String firstName, String lastName, String email, String langKey, String imageUrl, ThemePreference themePreference) {
-        SecurityUtils
-            .getCurrentUserLogin()
+    public void updateUser(String firstName, String lastName, String email, String imageUrl, ThemePreference themePreference) {
+        SecurityUtils.getCurrentUserLogin()
             .flatMap(userRepository::findOneByLogin)
             .ifPresent(user -> {
                 user.setFirstName(firstName);
@@ -254,7 +240,6 @@ public class UserService {
                 if (email != null) {
                     user.setEmail(email.toLowerCase());
                 }
-                user.setLangKey(langKey);
                 user.setImageUrl(imageUrl);
                 user.setThemePreference(ThemePreference.fromNullable(themePreference));
                 userRepository.save(user);
@@ -265,19 +250,32 @@ public class UserService {
 
     @Transactional
     public void changePassword(String currentClearTextPassword, String newPassword) {
-        SecurityUtils
-            .getCurrentUserLogin()
+        SecurityUtils.getCurrentUserLogin()
             .flatMap(userRepository::findOneByLogin)
             .ifPresent(user -> {
                 String currentEncryptedPassword = user.getPassword();
                 if (!passwordEncoder.matches(currentClearTextPassword, currentEncryptedPassword)) {
                     throw new InvalidPasswordException();
                 }
+                // A default password must really change: not to itself, and not to the login
+                if (
+                    user.isPasswordChangeRequired() &&
+                    (newPassword.equals(currentClearTextPassword) || newPassword.equalsIgnoreCase(user.getLogin()))
+                ) {
+                    throw new InvalidPasswordException();
+                }
                 String encryptedPassword = passwordEncoder.encode(newPassword);
                 user.setPassword(encryptedPassword);
+                passwordChosen(user);
                 this.clearUserCaches(user);
                 log.debug("Changed password for User: {}", user);
             });
+    }
+
+    /** The user chose their own password, so they no longer have to. */
+    private void passwordChosen(User user) {
+        user.setPasswordChangeRequired(false);
+        passwordChangeGate.clear(user.getLogin());
     }
 
     @Transactional(readOnly = true)

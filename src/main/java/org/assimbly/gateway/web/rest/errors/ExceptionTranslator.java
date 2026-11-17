@@ -1,9 +1,10 @@
 package org.assimbly.gateway.web.rest.errors;
 
-import java.util.*;
+import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedAnnotation;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
+import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.Nullable;
@@ -33,8 +34,6 @@ import tech.jhipster.web.rest.errors.ProblemDetailWithCause;
 import tech.jhipster.web.rest.errors.ProblemDetailWithCause.ProblemDetailWithCauseBuilder;
 import tech.jhipster.web.util.HeaderUtil;
 
-import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedAnnotation;
-
 /**
  * Controller advice to translate the server side exceptions to client-friendly json structures.
  * The error response follows RFC7807 - Problem Details for HTTP APIs (<a href="https://tools.ietf.org/html/rfc7807">...</a>).
@@ -62,13 +61,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     public @Nullable ResponseEntity<Object> handleAnyException(Throwable ex, NativeWebRequest request) {
         LOG.debug("Converting Exception to Problem Details:", ex);
         ProblemDetailWithCause pdCause = wrapAndCustomizeProblem(ex, request);
-		return handleExceptionInternal(
-			(Exception) ex,
-			pdCause,
-			buildHeaders(ex),
-			HttpStatusCode.valueOf(pdCause.getStatus()),
-			request
-		);
+        return handleExceptionInternal((Exception) ex, pdCause, buildHeaders(ex), HttpStatusCode.valueOf(pdCause.getStatus()), request);
     }
 
     @SuppressWarnings("java:S2638")
@@ -91,18 +84,14 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
 
     private ProblemDetailWithCause getProblemDetailWithCause(Throwable ex) {
         return switch (ex) {
-            case org.assimbly.gateway.service.UsernameAlreadyUsedException _ ->
-                (ProblemDetailWithCause) new LoginAlreadyUsedException().getBody();
-            case org.assimbly.gateway.service.EmailAlreadyUsedException _ ->
-                (ProblemDetailWithCause) new EmailAlreadyUsedException().getBody();
-            case org.assimbly.gateway.service.InvalidPasswordException _ ->
-                (ProblemDetailWithCause) new InvalidPasswordException().getBody();
-            case
-                ErrorResponseException exp when exp.getBody() instanceof ProblemDetailWithCause problemDetailWithCause ->
-                problemDetailWithCause;
+            case org.assimbly.gateway.service.UsernameAlreadyUsedException _ -> (ProblemDetailWithCause) new LoginAlreadyUsedException().getBody();
+            case org.assimbly.gateway.service.EmailAlreadyUsedException _ -> (ProblemDetailWithCause) new EmailAlreadyUsedException().getBody();
+            case org.assimbly.gateway.service.InvalidPasswordException _ -> (ProblemDetailWithCause) new InvalidPasswordException().getBody();
+            case ErrorResponseException exp when (
+                exp.getBody() instanceof ProblemDetailWithCause problemDetailWithCause
+            ) -> problemDetailWithCause;
             default -> ProblemDetailWithCauseBuilder.instance().withStatus(toStatus(ex).value()).build();
         };
-
     }
 
     @Nullable
@@ -132,8 +121,8 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
         if (problemProperties == null || !problemProperties.containsKey(PATH_KEY)) problem.setProperty(PATH_KEY, getPathValue(request));
 
         if (
-            (err instanceof MethodArgumentNotValidException fieldException) &&
-                (problemProperties == null || !problemProperties.containsKey(FIELD_ERRORS_KEY))
+            err instanceof MethodArgumentNotValidException fieldException &&
+            (problemProperties == null || !problemProperties.containsKey(FIELD_ERRORS_KEY))
         ) problem.setProperty(FIELD_ERRORS_KEY, getFieldErrors(fieldException));
 
         problem.setCause(buildCause(err.getCause(), request).orElse(null));
@@ -238,12 +227,12 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     private @Nullable HttpHeaders buildHeaders(Throwable err) {
         return err instanceof BadRequestAlertException badRequestAlertException
             ? HeaderUtil.createFailureAlert(
-            applicationName,
-            true,
-            badRequestAlertException.getEntityName(),
-            badRequestAlertException.getErrorKey(),
-            badRequestAlertException.getMessage()
-        )
+                  applicationName,
+                  false,
+                  badRequestAlertException.getEntityName(),
+                  badRequestAlertException.getErrorKey(),
+                  badRequestAlertException.getMessage()
+              )
             : null;
     }
 

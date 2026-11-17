@@ -1,5 +1,9 @@
 package org.assimbly.gateway.service.impl;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.assimbly.gateway.config.database.H2CommitSync;
 import org.assimbly.gateway.domain.Broker;
 import org.assimbly.gateway.repository.BrokerRepository;
@@ -12,11 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Service Implementation for managing Broker.
@@ -52,19 +51,21 @@ public class BrokerServiceImpl implements BrokerService {
         Broker broker = brokerMapper.toEntity(brokerDTO);
         broker = brokerRepository.save(broker);
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
-            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-                @Override
-                public void afterCommit() {
-                    h2CommitSync.checkpointOnCurrentConnection();
-                }
+            TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        h2CommitSync.checkpointOnCurrentConnection();
+                    }
 
-                @Override
-                public void afterCompletion(int status) {
-                    if (status == STATUS_COMMITTED) {
-                        h2CommitSync.evictPoolAndForceFile();
+                    @Override
+                    public void afterCompletion(int status) {
+                        if (status == STATUS_COMMITTED) {
+                            h2CommitSync.evictPoolAndForceFile();
+                        }
                     }
                 }
-            });
+            );
         }
         return brokerMapper.toDto(broker);
     }
@@ -78,11 +79,19 @@ public class BrokerServiceImpl implements BrokerService {
     @Transactional(readOnly = true)
     public List<BrokerDTO> findAll() {
         log.debug("Request to get all Brokers");
-        return brokerRepository.findAll().stream()
+        return brokerRepository.findAll().stream().map(brokerMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BrokerDTO> findAllAutoStart() {
+        log.debug("Request to get all auto-start Brokers");
+        return brokerRepository
+            .findAllByAutoStartTrue()
+            .stream()
             .map(brokerMapper::toDto)
             .collect(Collectors.toCollection(LinkedList::new));
     }
-
 
     /**
      * Get one broker by id.
@@ -94,8 +103,7 @@ public class BrokerServiceImpl implements BrokerService {
     @Transactional(readOnly = true)
     public Optional<BrokerDTO> findOne(Long id) {
         log.debug("Request to get Broker : {}", id);
-        return brokerRepository.findById(id)
-            .map(brokerMapper::toDto);
+        return brokerRepository.findById(id).map(brokerMapper::toDto);
     }
 
     /**

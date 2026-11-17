@@ -6,6 +6,7 @@ import { certificateRoute } from './certificate/certificate.route';
 import { connectionRoute } from './connection/connection.route';
 import { environmentVariablesRoute } from './environment-variables/environment-variables.route';
 import flowRoute from './flow/flow.route';
+import { importRoute } from './import/import.route';
 import { integrationRoute } from './integration/integration.route';
 import { messageRoute } from './message/message.route';
 import { queueRoute } from './queue/queue.route';
@@ -15,12 +16,12 @@ import { topicRoute } from './topic/topic.route';
 const routes: Routes = [
   {
     path: 'user-management',
-    title: 'userManagement.home.title',
+    title: 'Users',
     loadChildren: () => import('./admin/user-management/user-management.routes'),
   },
   {
     path: 'authority',
-    title: 'jhipsterGradleSampleApplicationApp.adminAuthority.home.title',
+    title: 'Authorities',
     loadChildren: () => import('./admin/authority/authority.routes'),
   },
   // Navbar Assimbly entities (orphaned after JHipster 9 standalone router migration)
@@ -32,6 +33,7 @@ const routes: Routes = [
   ...topicRoute,
   ...flowRoute,
   ...apiRoute,
+  ...importRoute,
   ...connectionRoute,
   ...messageRoute,
   ...routeRoute,

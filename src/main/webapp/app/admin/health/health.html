@@ -2,7 +2,7 @@
   <div class="d-flex justify-content-end align-items-center gap-2 mb-3">
     <button class="btn btn-fx btn-fx-secondary" type="button" (click)="refresh()" aria-label="Refresh">
       <fa-icon icon="sync"></fa-icon>
-      <span class="d-none d-md-inline" jhiTranslate="health.refresh.button">Refresh</span>
+      <span class="d-none d-md-inline">Refresh</span>
     </button>
   </div>
 
@@ -10,63 +10,46 @@
     <table id="healthCheck" class="table table-sm table-striped table-bordered" aria-label="Health Checks">
       <thead>
         <tr>
-          <th scope="col" jhiTranslate="health.table.service">Service name</th>
-          <th scope="col" class="text-center" jhiTranslate="health.table.status">Status</th>
-          <th scope="col" class="text-center" jhiTranslate="health.details.details">Details</th>
+          <th scope="col">Service name</th>
+          <th scope="col" class="text-center">Status</th>
+          <th scope="col" class="text-center">Details</th>
         </tr>
       </thead>
       @if (health(); as health) {
-        <tbody>
-          @for (componentHealth of health.components | keyvalue; track componentHealth.key) {
-            <tr>
-              <td [jhiTranslate]="'health.indicator.' + componentHealth.key">
-                {{
-                  {
-                    diskSpace: 'Disk space',
-                    ssl: 'SSL',
-                    mail: 'Email',
-                    livenessState: 'Liveness state',
-                    readinessState: 'Readiness state',
-                    ping: 'Application',
-                    db: 'Database',
-                  }[componentHealth.key] || componentHealth.key
-                }}
-              </td>
-              <td class="text-center">
-                <span
-                  class="badge"
-                  [class]="getBadgeClass(componentHealth.value!.status)"
-                  [jhiTranslate]="'health.status.' + (componentHealth.value?.status ?? 'UNKNOWN')"
-                >
-                  {{
-                    { UNKNOWN: 'UNKNOWN', UP: 'UP', OUT_OF_SERVICE: 'OUT_OF_SERVICE', DOWN: 'DOWN' }[
-                      componentHealth.value?.status ?? 'UNKNOWN'
-                    ]
-                  }}
-                </span>
-              </td>
-              <td class="text-center">
-                @if (componentHealth.value?.details) {
-                  <button
-                    type="button"
-                    class="btn btn-fx btn-fx-sm btn-fx-icon btn-fx-ghost"
-                    aria-label="Details"
-                    (click)="showHealth({ key: componentHealth.key, value: componentHealth.value })"
-                  >
-                    <fa-icon icon="eye" />
-                  </button>
-                }
-              </td>
-            </tr>
-          }
-        </tbody>
+      <tbody>
+        @for (componentHealth of health.components | keyvalue; track componentHealth.key) {
+        <tr>
+          <td>
+            {{ { diskSpace: 'Disk space', ssl: 'SSL', mail: 'Email', livenessState: 'Liveness state', readinessState: 'Readiness state',
+            ping: 'Application', db: 'Database', jms: 'ActiveMQ', rabbit: 'Rabbit', }[componentHealth.key] || componentHealth.key }}
+          </td>
+          <td class="text-center">
+            <span class="badge" [class]="getBadgeClass(componentHealth.value!.status)">
+              {{ componentHealth.value?.status ?? 'UNKNOWN' }}
+            </span>
+          </td>
+          <td class="text-center">
+            @if (componentHealth.value?.details) {
+            <button
+              type="button"
+              class="btn btn-fx btn-fx-sm btn-fx-icon btn-fx-ghost"
+              aria-label="Details"
+              (click)="showHealth({ key: componentHealth.key, value: componentHealth.value })"
+            >
+              <fa-icon icon="eye" />
+            </button>
+            }
+          </td>
+        </tr>
+        }
+      </tbody>
       }
     </table>
   </div>
 
   @if (!health()) {
-    <div class="d-flex justify-content-center me-3">
-      <div class="spinner-border"></div>
-    </div>
+  <div class="d-flex justify-content-center me-3">
+    <div class="spinner-border"></div>
+  </div>
   }
 </div>

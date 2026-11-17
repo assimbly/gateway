@@ -3,6 +3,7 @@ dependencies {
     implementation "com.h2database:h2"
 }
 
+def appVersion = project.version
 def profiles = "dev"
 if (project.hasProperty("no-liquibase")) {
     profiles += ",no-liquibase"
@@ -13,18 +14,18 @@ if (project.hasProperty("tls")) {
 
 springBoot {
     buildInfo {
-        properties {
-            time = null
-        }
+        excludes = ['time']
     }
 }
 
 bootRun {
     args = []
+    // Leaves out AOT output (only used with spring.aot.enabled), so bootRun skips the slow processAot
+    classpath = sourceSets.main.output + configurations.runtimeClasspath
 }
 
 task webapp(type: NpmTask) {
-    inputs.property('appVersion', project.version)
+    inputs.property('type', project.type)
     inputs.files("package-lock.json")
         .withPropertyName('package-lock')
         .withPathSensitivity(PathSensitivity.RELATIVE)
@@ -37,9 +38,6 @@ task webapp(type: NpmTask) {
     inputs.files("tsconfig.json", "tsconfig.base.json")
         .withPropertyName("tsconfig")
         .withPathSensitivity(PathSensitivity.RELATIVE)
-    inputs.dir("webpack/")
-        .withPropertyName("webpack/")
-        .withPathSensitivity(PathSensitivity.RELATIVE)
     inputs.dir("src/main/webapp/")
         .withPropertyName("webapp-source-dir")
         .withPathSensitivity(PathSensitivity.RELATIVE)
@@ -48,9 +46,7 @@ task webapp(type: NpmTask) {
 
     dependsOn npmInstall
 
-    args = ["run", "webapp:build"]
-    environment = [APP_VERSION: project.version]
-    environment = [TYPE: project.type]
+    args = project.type.equalsIgnoreCase("headless") ? ["run", "webapp:headless"] : ["run", "webapp:build"]
 }
 
 processResources {
@@ -59,7 +55,7 @@ processResources {
     inputs.property('springProfiles', profiles)
     filesMatching("**/application.yml") {
         filter {
-            it.replace("#project.version#", version)
+            it.replace("#project.version#", appVersion)
         }
         filter {
             it.replace("#spring.profiles.active#", profiles)

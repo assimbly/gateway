@@ -12,6 +12,23 @@ export interface CatalogueEntry {
   label?: string;
   consumerOnly?: boolean;
   producerOnly?: boolean;
+  /** Set on Assimbly's own steps: whether the step can be a Source, an Action or a Sink. */
+  source?: boolean;
+  action?: boolean;
+  sink?: boolean;
+}
+
+/** The chip for Assimbly's own Actions, which work on the message itself rather than talk to another system. */
+export const ESSENTIALS = 'essentials';
+
+/** Whether a component is one of Assimbly's own Actions that work on the message, such as Set body or XML to JSON. */
+export function isEssential(entry: CatalogueEntry): boolean {
+  return entry.action === true && !entry.source && !entry.sink;
+}
+
+/** The entries with the Essentials first, keeping the order within each group. */
+export function essentialsFirst<T extends CatalogueEntry>(entries: T[]): T[] {
+  return [...entries.filter(isEssential), ...entries.filter(entry => !isEssential(entry))];
 }
 
 /** Which side of an Endpoint a Step plays: a Source receives messages (consumer), Actions and Sinks send them (producer). */
@@ -27,6 +44,29 @@ export function labelsOf(entry: CatalogueEntry): string[] {
     .split(',')
     .map(label => label.trim())
     .filter(label => label.length > 0);
+}
+
+/** The catalogue labels that don't read well with just a capital: abbreviations, and words that are Camel's own. */
+const CATEGORY_TITLES: Record<string, string> = {
+  ai: 'AI',
+  api: 'API',
+  bigdata: 'Big data',
+  cms: 'CMS',
+  core: 'Built-in',
+  eip: 'Integration patterns',
+  http: 'HTTP',
+  iot: 'IoT',
+  jms: 'JMS',
+  mq: 'MQ',
+  rest: 'REST',
+  rpc: 'RPC',
+  saas: 'SaaS',
+  webservice: 'Web service',
+};
+
+/** How a catalogue label, such as `cloud` or `eip`, reads on its chip. The label itself stays what a chip filters on. */
+export function categoryTitle(label: string): string {
+  return CATEGORY_TITLES[label] ?? label.charAt(0).toUpperCase() + label.slice(1);
 }
 
 /** One chip per catalogue label, largest first; a component with several labels counts under each. */
@@ -56,11 +96,25 @@ export function searchCatalogue<T extends CatalogueEntry>(entries: T[], query: s
   if (!query.trim()) {
     return entries;
   }
+  return closestFirst(entries, query).filter(entry => matchRank(entry, query) < NO_MATCH);
+}
+
+/**
+ * The entries sorted by how closely they match the query, keeping their order otherwise; entries that don't match go
+ * last. Within a rank, a shorter matching id or title comes first, so `fil` finds `file` before `filter`.
+ */
+export function closestFirst<T extends CatalogueEntry>(entries: T[], query: string): T[] {
+  const q = query.trim().toLowerCase();
   return entries
-    .map(entry => ({ entry, rank: matchRank(entry, query) }))
-    .filter(ranked => ranked.rank < NO_MATCH)
-    .sort((a, b) => a.rank - b.rank)
+    .map(entry => ({ entry, rank: matchRank(entry, q), length: matchLength(entry, q) }))
+    .sort((a, b) => a.rank - b.rank || a.length - b.length)
     .map(ranked => ranked.entry);
+}
+
+/** The length of the shortest id or title that contains the query; 0 when only the description does. */
+function matchLength(entry: CatalogueEntry, q: string): number {
+  const lengths = [entry.name, entry.title ?? ''].filter(name => name.toLowerCase().includes(q)).map(name => name.length);
+  return lengths.length ? Math.min(...lengths) : 0;
 }
 
 export const NO_MATCH = 4;

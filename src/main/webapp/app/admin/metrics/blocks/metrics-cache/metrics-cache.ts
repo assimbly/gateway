@@ -3,12 +3,11 @@ import { Component, input } from '@angular/core';
 
 import { CacheMetrics } from 'app/admin/metrics/metrics.model';
 import { filterNaN } from 'app/core/util';
-import { TranslateDirective } from 'app/shared/language';
 
 @Component({
   selector: 'jhi-metrics-cache',
   templateUrl: './metrics-cache.html',
-  imports: [KeyValuePipe, DecimalPipe, TranslateDirective],
+  imports: [KeyValuePipe, DecimalPipe],
 })
 export class MetricsCache {
   /**

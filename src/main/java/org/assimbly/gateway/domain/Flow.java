@@ -9,7 +9,9 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -75,6 +77,13 @@ public class Flow implements Serializable {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "flow",cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH})
     private Set<Step> steps = new HashSet<>();
+
+    /** The Variables of this Flow by key; its Steps refer to them as @{key}, before a global Variable with that key. */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "flow_variable", joinColumns = @JoinColumn(name = "flow_id"))
+    @MapKeyColumn(name = "jhi_key")
+    @Column(name = "jhi_value")
+    private Map<String, String> variables = new HashMap<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -291,6 +300,14 @@ public class Flow implements Serializable {
 
     public void setSteps(Set<Step> steps) {
         this.steps = steps;
+    }
+
+    public Map<String, String> getVariables() {
+        return variables;
+    }
+
+    public void setVariables(Map<String, String> variables) {
+        this.variables = variables;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 

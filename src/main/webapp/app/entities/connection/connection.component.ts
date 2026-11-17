@@ -1,5 +1,4 @@
-import { Component, OnInit, OnDestroy, SimpleChanges, OnChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, SimpleChanges, OnChanges, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
@@ -21,33 +20,31 @@ import { Observable } from 'rxjs';
 @Component({
     selector: 'jhi-connection',
     templateUrl: './connection.component.html',
-    imports: [CommonModule, FormsModule, RouterModule, FontAwesomeModule, NgSelectModule, ConnectionKeysComponent],
+    imports: [FormsModule, RouterModule, FontAwesomeModule, NgSelectModule, ConnectionKeysComponent],
 })
 export class ConnectionComponent implements OnInit, OnDestroy, OnChanges {
+    protected connectionService = inject(ConnectionService);
+    protected alertService = inject(AlertService);
+    connectionsLists = inject(Connections);
+    protected eventManager = inject(EventManager);
+    protected accountService = inject(AccountService);
+
     [x: string]: any;
-    connections: IConnection[];
+    connections!: IConnection[];
     currentAccount: any;
-    eventSubscriber: Subscription;
-    connectionKey: ConnectionKeys;
-    connectionKeys: Array<ConnectionKeys>;
-    connection: Connection;
+    eventSubscriber!: Subscription;
+    connectionKey!: ConnectionKeys;
+    connectionKeys!: Array<ConnectionKeys>;
+    connection!: Connection;
     type: any;
-    isSaving: boolean;
+    isSaving!: boolean;
     disabledConnectionType = true;
     selectedConnection: Connection = new Connection();
-
-    constructor(
-        protected connectionService: ConnectionService,
-        protected alertService: AlertService,
-        public connectionsLists: Connections,
-        protected eventManager: EventManager,
-        protected accountService: AccountService
-    ) {}
 
     loadAll() {
         this.connectionService.query().subscribe(
             (res: HttpResponse<IConnection[]>) => {
-                this.connections = res.body;
+                this.connections = res.body!;
             },
             (res: HttpErrorResponse) => this.onError(res.message)
         );
@@ -92,8 +89,8 @@ export class ConnectionComponent implements OnInit, OnDestroy, OnChanges {
             this.selectedConnection = new Connection();
         } else {
             this.connectionKeysService.query().subscribe(
-                res => {
-                    this.connectionKeys = res.json;
+                (res: HttpResponse<ConnectionKeys[]>) => {
+                    this.connectionKeys = res.body!;
                     this.connectionKeys = this.connectionKeys.filter(k => k.connectionId === this.selectedConnection.id);
                     if (this.connectionKeys.length === 0) {
                         const newConnectionKeys = new ConnectionKeys();
@@ -101,7 +98,7 @@ export class ConnectionComponent implements OnInit, OnDestroy, OnChanges {
                         this.connectionKeys.push(newConnectionKeys);
                     }
                 },
-                res => this.onError(res.json)
+                (res: HttpErrorResponse) => this.onError(res.message)
             );
         }
     }
@@ -115,7 +112,7 @@ export class ConnectionComponent implements OnInit, OnDestroy, OnChanges {
     private subscribeToSaveResponse(result: Observable<HttpResponse<IConnection>>) {
         result.subscribe(data => {
             if (data.ok) {
-                this.onSaveSuccess(data.body);
+                this.onSaveSuccess(data.body!);
             } else {
                 this.onSaveError();
             }

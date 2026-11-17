@@ -4,7 +4,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
-import { provideTranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 
 import { fontAwesomeIcons } from 'app/config/font-awesome-icons';
@@ -45,7 +44,6 @@ describe('Navbar Component', () => {
     authorities: [],
     email: '',
     firstName: 'John',
-    langKey: '',
     lastName: 'Doe',
     login: 'john.doe',
     imageUrl: '',
@@ -56,7 +54,7 @@ describe('Navbar Component', () => {
     stubMatchMedia(true);
     localStorage.removeItem(LayoutService.STORAGE_KEY);
     TestBed.configureTestingModule({
-      providers: [provideTranslateService(), provideRouter([]), provideHttpClient(), provideHttpClientTesting(), LoginService],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting(), LoginService],
     });
   });
 
@@ -135,6 +133,12 @@ describe('Navbar Component', () => {
     expect(comp.sidebarInert()).toBe(false);
   });
 
+  it('should hide the sidebar while the user still has to replace a default password', () => {
+    accountService.authenticate({ ...account, passwordChangeRequired: true });
+
+    expect(comp.sidebarVisible()).toBe(false);
+  });
+
   it('should treat flows and admin child routes as active', () => {
     expect(comp.isFlowsActive()).toBe(true);
     expect(comp.isFlowListActive()).toBe(true);
@@ -144,7 +148,7 @@ describe('Navbar Component', () => {
     expect(comp.isActivePath('/admin/metrics')).toBe(false);
   });
 
-  it('should treat both queue and topic routes as the Endpoints entry', () => {
+  it('should treat both queue and topic routes as the Queues & Topics entry', () => {
     const currentPath = jest.spyOn(comp as any, 'currentPath');
 
     currentPath.mockReturnValue('/queue');
@@ -177,27 +181,27 @@ describe('Navbar Component', () => {
     expect(active()).toEqual([false, false, true]);
   });
 
-  it('should show Manage, Send and Endpoints in the broker menu in that order', () => {
+  it('should show Manage, Send and Queues & Topics in the broker menu in that order', () => {
     accountService.authenticate({ ...account, authorities: ['ROLE_ADMIN'] });
     fixture.detectChanges();
 
-    const labels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#broker-menu-items span')).map(
-      (span: HTMLElement) => span.textContent?.trim(),
+    const labels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#broker-menu-items span')).map((span: HTMLElement) =>
+      span.textContent?.trim(),
     );
-    expect(labels).toEqual(['Manage', 'Send', 'Endpoints']);
+    expect(labels).toEqual(['Manage', 'Send', 'Queues & Topics']);
 
     const sendLink: HTMLAnchorElement = fixture.nativeElement.querySelectorAll('#broker-menu-items a')[1];
     expect(sendLink.getAttribute('href')).toBe('/broker/sender/message-sender');
   });
 
-  it('should show a single Endpoints entry instead of Queues and Topics in the broker menu', () => {
+  it('should show a single Queues & Topics entry instead of Queues and Topics in the broker menu', () => {
     accountService.authenticate({ ...account, authorities: ['ROLE_ADMIN'] });
     fixture.detectChanges();
 
-    const labels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#broker-menu-items span')).map(
-      (span: HTMLElement) => span.textContent?.trim(),
+    const labels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#broker-menu-items span')).map((span: HTMLElement) =>
+      span.textContent?.trim(),
     );
-    expect(labels).toContain('Endpoints');
+    expect(labels).toContain('Queues & Topics');
     expect(labels).not.toContain('Queues');
     expect(labels).not.toContain('Topics');
   });
@@ -218,22 +222,27 @@ describe('Navbar Component', () => {
     fixture.nativeElement.querySelector('#flows-menu').click();
     fixture.detectChanges();
 
-    const labels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#flows-menu-items span')).map(
-      (span: HTMLElement) => span.textContent?.trim(),
+    const labels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#flows-menu-items span')).map((span: HTMLElement) =>
+      span.textContent?.trim(),
     );
     expect(labels).toContain('Variables');
     expect(labels).not.toContain('Environment Variables');
   });
 
-  it('should label the message sender submenu item as Send', () => {
+  it('should label the message sender submenu item as Send, for admins only as its page requires', () => {
+    const labels = (): (string | undefined)[] =>
+      Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#flows-menu-items span')).map((span: HTMLElement) =>
+        span.textContent?.trim(),
+      );
+
     accountService.authenticate(account);
     fixture.detectChanges();
+    expect(labels()).not.toContain('Send');
 
-    const labels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#flows-menu-items span')).map(
-      (span: HTMLElement) => span.textContent?.trim(),
-    );
-    expect(labels).toContain('Send');
-    expect(labels).not.toContain('Test message');
+    accountService.authenticate({ ...account, authorities: ['ROLE_ADMIN'] });
+    fixture.detectChanges();
+    expect(labels()).toContain('Send');
+    expect(labels()).not.toContain('Test message');
   });
 
   it('should keep the flows submenu expanded on the Flows list route', () => {
@@ -244,46 +253,105 @@ describe('Navbar Component', () => {
     expect(comp.accountExpanded()).toBe(false);
   });
 
-  it('should keep manually opened menus open when the navbar is recreated', () => {
-    comp.toggleBroker();
+  it('should keep the manually opened menu open when the navbar is recreated', () => {
     comp.toggleAdmin();
-    comp.toggleAccount();
 
     fixture.destroy();
     fixture = TestBed.createComponent(Navbar);
     comp = fixture.componentInstance;
 
-    expect(comp.flowsExpanded()).toBe(true);
-    expect(comp.brokerExpanded()).toBe(true);
+    expect(comp.flowsExpanded()).toBe(false);
     expect(comp.adminExpanded()).toBe(true);
-    expect(comp.accountExpanded()).toBe(true);
   });
 
-  it('should toggle submenu expansion independently', () => {
+  it('should collapse the other submenus when one opens', () => {
     expect(comp.flowsExpanded()).toBe(true);
-    expect(comp.brokerExpanded()).toBe(false);
-    expect(comp.adminExpanded()).toBe(false);
-    expect(comp.accountExpanded()).toBe(false);
 
-    comp.toggleFlows();
     comp.toggleBroker();
-    comp.toggleAdmin();
-    comp.toggleAccount();
-
     expect(comp.flowsExpanded()).toBe(false);
     expect(comp.brokerExpanded()).toBe(true);
+
+    comp.toggleAdmin();
+    expect(comp.brokerExpanded()).toBe(false);
     expect(comp.adminExpanded()).toBe(true);
+
+    comp.toggleAccount();
+    expect(comp.adminExpanded()).toBe(false);
     expect(comp.accountExpanded()).toBe(true);
 
-    comp.toggleFlows();
-    comp.toggleBroker();
-    comp.toggleAdmin();
     comp.toggleAccount();
-
-    expect(comp.flowsExpanded()).toBe(true);
-    expect(comp.brokerExpanded()).toBe(false);
-    expect(comp.adminExpanded()).toBe(false);
     expect(comp.accountExpanded()).toBe(false);
+  });
+
+  it('should group the Administration links under System and Diagnostics', () => {
+    accountService.authenticate({ ...account, authorities: ['ROLE_ADMIN'] });
+    fixture.detectChanges();
+
+    const items = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#admin-menu-items > *')).map(item =>
+      item.textContent?.trim(),
+    );
+    expect(items.slice(0, 5)).toEqual(['System', 'Gateways', 'Certificates', 'Users', 'Configuration']);
+    const diagnostics = items.indexOf('Diagnostics');
+    expect(diagnostics).toBeGreaterThan(4);
+    const database = items.indexOf('Database');
+    if (database !== -1) {
+      expect(database).toBeLessThan(diagnostics);
+    }
+    expect(items.indexOf('Log viewer')).toBeGreaterThan(diagnostics);
+    expect(items).toContain('Log levels');
+  });
+
+  it('should show the API definitions under API Explorer instead of Administration', () => {
+    jest.spyOn(profileService, 'getProfileInfo').mockReturnValue(of({ openAPIEnabled: true }));
+    accountService.authenticate({ ...account, authorities: ['ROLE_ADMIN'] });
+    fixture.detectChanges();
+
+    const links = Array.from<HTMLAnchorElement>(fixture.nativeElement.querySelectorAll('#api-menu-items a'));
+    expect(links.map(link => link.textContent?.trim())).toEqual([
+      'Flows',
+      'Broker',
+      'Configuration',
+      'Resources',
+      'Observability',
+      'Management',
+      'All endpoints',
+    ]);
+    expect(links[1].getAttribute('href')).toBe('/explorer/broker');
+    expect(fixture.nativeElement.querySelector('#admin-menu-items a[href="/admin/docs"]')).toBeNull();
+  });
+
+  it('should show API Explorer only to admins with the api-docs profile', () => {
+    jest.spyOn(profileService, 'getProfileInfo').mockReturnValue(of({ openAPIEnabled: true }));
+    accountService.authenticate(account);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#api-menu')).toBeNull();
+
+    accountService.authenticate({ ...account, authorities: ['ROLE_ADMIN'] });
+    comp.openAPIEnabled.set(false);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#api-menu')).toBeNull();
+  });
+
+  it('should treat API Explorer routes as its own group', () => {
+    const currentUrl = jest.spyOn(comp, 'currentUrl');
+
+    currentUrl.mockReturnValue('/explorer/broker');
+    expect(comp.isApiActive()).toBe(true);
+    expect(comp.isAdminActive()).toBe(false);
+    expect(comp.isActivePath('/explorer/broker')).toBe(true);
+    expect(comp.isActivePath('/explorer/integration')).toBe(false);
+
+    currentUrl.mockReturnValue('/admin/metrics');
+    expect(comp.isApiActive()).toBe(false);
+  });
+
+  it('should collapse the other submenus when API Explorer opens', () => {
+    comp.toggleApi();
+    expect(comp.flowsExpanded()).toBe(false);
+    expect(comp.apiExpanded()).toBe(true);
+
+    comp.toggleAdmin();
+    expect(comp.apiExpanded()).toBe(false);
   });
 
   it('should hide submenu items until the group is expanded', () => {
@@ -300,16 +368,33 @@ describe('Navbar Component', () => {
     expect(adminMenu.classList.contains('app-sidebar__subnav--collapsed')).toBe(true);
     expect(accountMenu.classList.contains('app-sidebar__subnav--collapsed')).toBe(true);
 
-    fixture.nativeElement.querySelector('#flows-menu').click();
-    fixture.nativeElement.querySelector('#broker-menu').click();
     fixture.nativeElement.querySelector('#admin-menu').click();
-    fixture.nativeElement.querySelector('#account-menu').click();
     fixture.detectChanges();
 
     expect(flowsMenu.classList.contains('app-sidebar__subnav--collapsed')).toBe(true);
-    expect(brokerMenu.classList.contains('app-sidebar__subnav--collapsed')).toBe(false);
+    expect(brokerMenu.classList.contains('app-sidebar__subnav--collapsed')).toBe(true);
     expect(adminMenu.classList.contains('app-sidebar__subnav--collapsed')).toBe(false);
-    expect(accountMenu.classList.contains('app-sidebar__subnav--collapsed')).toBe(false);
+    expect(accountMenu.classList.contains('app-sidebar__subnav--collapsed')).toBe(true);
+  });
+
+  it('should not have an Import entry in the sidebar', () => {
+    accountService.authenticate({ ...account, authorities: ['ROLE_ADMIN'] });
+    fixture.detectChanges();
+
+    const labels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('nav > a.app-sidebar__link')).map(link =>
+      link.textContent?.trim(),
+    );
+    expect(labels).toContain('APIs');
+    expect(labels).not.toContain('Import');
+  });
+
+  it('should show every signed-in user the Upgrade to Fluxygen link', () => {
+    accountService.authenticate(account);
+    fixture.detectChanges();
+
+    const link: HTMLAnchorElement = fixture.nativeElement.querySelector('[data-cy="fluxygen"]');
+    expect(link.textContent?.trim()).toBe('Upgrade to Fluxygen');
+    expect(link.getAttribute('href')).toBe('/fluxygen');
   });
 
   it('should render the light or dark logo as the Gateway icon', () => {

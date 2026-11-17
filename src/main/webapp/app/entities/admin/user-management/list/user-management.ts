@@ -11,13 +11,13 @@ import { combineLatest, filter, map, tap } from 'rxjs';
 
 import { DEFAULT_SORT_DATA, ITEMS_PER_PAGE, ITEM_DELETED_EVENT, PAGE_HEADER, SORT, TOTAL_COUNT_RESPONSE_HEADER } from 'app/config';
 import { AccountService } from 'app/core/auth';
-import { Alert, AlertError } from 'app/shared/alert';
+import { AlertError } from 'app/shared/alert';
 import { FormatMediumDatetimePipe } from 'app/shared/date';
 import { SearchToolbar } from 'app/shared/filter';
-import { TranslateDirective } from 'app/shared/language';
 import { ItemCount } from 'app/shared/pagination';
 import { SortService, type SortState, sortStateSignal } from 'app/shared/sort';
-import { DataTable, DataTableColumn, OverflowActionDirective, RowActions, Truncate } from 'app/shared/table';
+import { RoleLabelPipe } from 'app/shared/auth';
+import { DataTable, DataTableColumn, OverflowActionDirective, PrimaryActionDirective, RowActions, Truncate } from 'app/shared/table';
 import { UserManagementDeleteDialog } from '../delete/user-management-delete-dialog';
 import { UserManagementService } from '../service/user-management.service';
 import { IUserManagement } from '../user-management.model';
@@ -30,31 +30,33 @@ import { IUserManagement } from '../user-management.model';
     FontAwesomeModule,
     NgbDropdownModule,
     AlertError,
-    Alert,
-    TranslateDirective,
     FormatMediumDatetimePipe,
     NgbPagination,
     ItemCount,
     SearchToolbar,
     DataTable,
     RowActions,
+    PrimaryActionDirective,
     OverflowActionDirective,
     Truncate,
+    RoleLabelPipe,
   ],
 })
 export class UserManagement {
-  readonly userManagements = signal<IUserManagement[]>([]);
+  readonly userManagements = computed(() =>
+    this.fillComponentAttributesFromResponseBody([...this.userManagementService.userManagements()]),
+  );
   readonly searchText = signal('');
 
   sortState = sortStateSignal({});
   readonly columns: DataTableColumn[] = [
     { key: 'login', header: 'Login', sortable: true },
     { key: 'email', header: 'Email', sortable: true },
-    { key: 'activated', header: '' },
+    { key: 'activated', header: 'Status', sortable: true },
     { key: 'createdDate', header: 'Created date', sortable: true },
     { key: 'lastModifiedBy', header: 'Modified by', sortable: true },
     { key: 'lastModifiedDate', header: 'Modified date', sortable: true },
-    { key: 'profiles', header: 'Profiles' },
+    { key: 'authorities', header: 'Roles' },
     { key: 'actions', header: 'Actions', align: 'end' },
   ];
 
@@ -64,13 +66,11 @@ export class UserManagement {
     if (!query) {
       return users;
     }
-    return users.filter(
-      user => user.login.toLocaleLowerCase().includes(query) || (user.email ?? '').toLocaleLowerCase().includes(query),
-    );
+    return users.filter(user => user.login.toLocaleLowerCase().includes(query) || (user.email ?? '').toLocaleLowerCase().includes(query));
   });
 
   readonly itemsPerPage = signal(ITEMS_PER_PAGE);
-  readonly totalItems = signal(0);
+  readonly totalItems = computed(() => this.totalItemsFromResponseHeader(this.userManagementService.userManagementsResource.headers()));
   readonly page = signal(1);
 
   readonly router = inject(Router);
@@ -89,15 +89,6 @@ export class UserManagement {
   protected modalService = inject(NgbModal);
 
   constructor() {
-    effect(() => {
-      const headers = this.userManagementService.userManagementsResource.headers();
-      if (headers) {
-        this.fillComponentAttributesFromResponseHeader(headers);
-      }
-    });
-    effect(() => {
-      this.userManagements.set(this.fillComponentAttributesFromResponseBody([...this.userManagementService.userManagements()]));
-    });
     effect(() => {
       const activatedRouteState = this.activatedRouteState();
       untracked(() => {
@@ -148,8 +139,8 @@ export class UserManagement {
     return data;
   }
 
-  protected fillComponentAttributesFromResponseHeader(headers: HttpHeaders): void {
-    this.totalItems.set(Number(headers.get(TOTAL_COUNT_RESPONSE_HEADER)));
+  protected totalItemsFromResponseHeader(headers: HttpHeaders | undefined): number {
+    return headers ? Number(headers.get(TOTAL_COUNT_RESPONSE_HEADER)) : 0;
   }
 
   protected queryBackend(): void {

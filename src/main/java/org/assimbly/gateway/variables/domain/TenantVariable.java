@@ -47,7 +47,7 @@ public class TenantVariable {
     private long createdAt;
     private String createdBy;
 
-    private List<EnvironmentValue> values;
+    private final List<EnvironmentValue> values;
 
     private List<ObjectId> tagIds;
 

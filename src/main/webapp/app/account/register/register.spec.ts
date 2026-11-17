@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed, inject } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 
-import { TranslateService, provideTranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 
 import { EMAIL_ALREADY_USED_TYPE, LOGIN_ALREADY_USED_TYPE } from 'app/shared/jhipster/error.constants';
@@ -17,7 +16,6 @@ describe('Register', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        provideTranslateService(),
         {
           provide: ActivatedRoute,
           useValue: {},
@@ -42,30 +40,25 @@ describe('Register', () => {
     expect(comp.doNotMatch()).toBe(true);
   });
 
-  it('should update success to true after creating an account', inject(
-    [RegisterService, TranslateService],
-    (service: RegisterService, mockTranslateService: TranslateService) => {
-      vi.spyOn(service, 'save').mockReturnValue(of({}));
-      vi.spyOn(mockTranslateService, 'getCurrentLang').mockReturnValue('en');
-      comp.registerForm.patchValue({
-        password: 'password',
-        confirmPassword: 'password',
-      });
+  it('should update success to true after creating an account', inject([RegisterService], (service: RegisterService) => {
+    vi.spyOn(service, 'save').mockReturnValue(of({}));
+    comp.registerForm.patchValue({
+      password: 'password',
+      confirmPassword: 'password',
+    });
 
-      comp.register();
+    comp.register();
 
-      expect(service.save).toHaveBeenCalledWith({
-        email: '',
-        password: 'password',
-        login: '',
-        langKey: 'en',
-      });
-      expect(comp.success()).toBe(true);
-      expect(comp.errorUserExists()).toBe(false);
-      expect(comp.errorEmailExists()).toBe(false);
-      expect(comp.error()).toBe(false);
-    },
-  ));
+    expect(service.save).toHaveBeenCalledWith({
+      email: '',
+      password: 'password',
+      login: '',
+    });
+    expect(comp.success()).toBe(true);
+    expect(comp.errorUserExists()).toBe(false);
+    expect(comp.errorEmailExists()).toBe(false);
+    expect(comp.error()).toBe(false);
+  }));
 
   it('should notify of user existence upon 400/login already in use', inject([RegisterService], (service: RegisterService) => {
     const err = { status: 400, error: { type: LOGIN_ALREADY_USED_TYPE } };

@@ -1,0 +1,109 @@
+// The Import pages: the choice of what to import, and the page of each importer.
+
+.import-page {
+  max-width: 56rem;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.import-page__title {
+  margin-bottom: 0.25rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.import-page__lead {
+  margin-bottom: 1rem;
+  color: var(--app-text-muted);
+}
+
+// Messages from the Gateway can say several things, one per line.
+.import-message {
+  white-space: pre-line;
+}
+
+.import-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: 0.75rem;
+}
+
+.import-choice {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  background: var(--app-surface);
+  color: var(--app-text);
+  font-weight: normal;
+  text-align: left;
+  text-decoration: none;
+
+  &:hover {
+    border-color: var(--app-primary);
+    background: var(--app-hover);
+    color: var(--app-text);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--app-focus);
+    outline-offset: 2px;
+  }
+}
+
+.import-choice__icon {
+  margin-top: 0.125rem;
+  font-size: 1.25rem;
+  color: var(--app-primary-accessible);
+}
+
+.import-choice__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.import-choice__title {
+  font-weight: 600;
+}
+
+.import-choice__accepts {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--app-text-muted);
+}
+
+.import-choice__description {
+  font-size: 0.875rem;
+  color: var(--app-text-muted);
+}
+
+.import-choice__target {
+  margin-top: 0.25rem;
+  font-size: 0.8125rem;
+  color: var(--app-primary-accessible);
+}
+
+// Where a file can be chosen or dropped.
+.import-drop {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem;
+  border: 1px dashed var(--app-border);
+  border-radius: 8px;
+}
+
+.import-drop--active {
+  border-color: var(--app-primary);
+  background: var(--app-hover);
+}
+
+.import-drop__hint {
+  color: var(--app-text-muted);
+}

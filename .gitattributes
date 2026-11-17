@@ -21,6 +21,7 @@
 *.sass          text
 *.scss          text
 *.sh            text eol=lf
+.husky/*        text eol=lf
 *.sql           text
 *.txt           text
 *.ts            text

@@ -1,12 +1,28 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import { FZoomDirective } from '@foblex/flow';
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
-import { faCodeBranch, faCogs, faExclamationTriangle, faPlus, faSignInAlt, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCheck,
+  faCodeBranch,
+  faCogs,
+  faExclamationTriangle,
+  faMinus,
+  faPlus,
+  faRedo,
+  faSignInAlt,
+  faSignOutAlt,
+  faSitemap,
+  faTimes,
+  faUndo,
+} from '@fortawesome/free-solid-svg-icons';
 
 import { IFlow } from 'app/shared/model/flow.model';
 import { IStep } from 'app/shared/model/step.model';
 
 import { DesignerSelection, FlowCanvasComponent } from './flow-canvas.component';
 import { loadFlowGraph } from './flow-graph';
+import { StepRunMark } from '../test/flow-test-run';
 
 const contentRouterFlow: IFlow = {
   id: 1,
@@ -40,7 +56,20 @@ describe('Flow canvas', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({ imports: [FlowCanvasComponent] });
-    TestBed.inject(FaIconLibrary).addIcons(faPlus, faExclamationTriangle, faSignInAlt, faCogs, faCodeBranch, faSignOutAlt);
+    TestBed.inject(FaIconLibrary).addIcons(
+      faPlus,
+      faMinus,
+      faSitemap,
+      faExclamationTriangle,
+      faSignInAlt,
+      faCogs,
+      faCodeBranch,
+      faSignOutAlt,
+      faCheck,
+      faTimes,
+      faUndo,
+      faRedo,
+    );
     fixture = TestBed.createComponent(FlowCanvasComponent);
     const graph = loadFlowGraph(contentRouterFlow);
     fixture.componentRef.setInput('graph', graph);
@@ -52,8 +81,41 @@ describe('Flow canvas', () => {
     const steps: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('.flow-step'));
 
     expect(steps.map(s => s.querySelector('.flow-step-kind')!.textContent!.trim())).toEqual(['SOURCE', 'ROUTER', 'SINK', 'SINK']);
-    expect(steps.map(s => s.querySelector('.flow-step-label')!.textContent!.trim())).toEqual(['timer', 'content', 'log', 'choose a component']);
+    expect(steps.map(s => s.querySelector('.flow-step-label')!.textContent!.trim())).toEqual([
+      'Timer',
+      'Content router',
+      'Log Data',
+      'choose a component',
+    ]);
     expect(steps[3].classList).toContain('flow-step-problem');
+  });
+
+  it('shows the path of a Step under it, shortened in the middle when long', () => {
+    const graph = loadFlowGraph({
+      id: 3,
+      steps: [
+        { id: 20, stepType: 'SOURCE', componentType: 'file', uri: 'C:/messages/in', links: [{ name: '3-21', bound: 'out' }] },
+        {
+          id: 21,
+          stepType: 'SINK',
+          componentType: 'file',
+          uri: 'C:/a/very/long/folder/name/for/outgoing/orders',
+          links: [{ name: '3-21', bound: 'in' }],
+        },
+      ],
+    } as IFlow);
+    fixture.componentRef.setInput('graph', graph);
+    fixture.detectChanges();
+
+    const captions: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('.flow-step-caption'));
+    expect(captions.map(c => c.textContent!.trim())).toEqual(['C:/messages/in', 'C:/a/very/long…tgoing/orders']);
+    expect(captions[1].title).toBe('C:/a/very/long/folder/name/for/outgoing/orders');
+  });
+
+  it('shows no path under a Router', () => {
+    const router = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('.flow-step'))[1];
+
+    expect(router.querySelector('.flow-step-caption')).toBeNull();
   });
 
   it('labels the Branches of a Router with their name and Condition', () => {
@@ -87,6 +149,36 @@ describe('Flow canvas', () => {
     expect(canvas.openStepPicker({ type: 'flow' })).toBe(true);
   });
 
+  it('shows no message counts unless it is given them', () => {
+    expect(fixture.nativeElement.querySelectorAll('.flow-step-counts')).toHaveLength(0);
+  });
+
+  it('shows the completed and failed messages of each Step as badges, but no badge for none', () => {
+    fixture.componentRef.setInput(
+      'counts',
+      new Map([
+        ['step-10', { total: 1234, completed: 1234, failed: 0, pending: 0 }],
+        ['step-11', { total: 5, completed: 3, failed: 2, pending: 0 }],
+      ]),
+    );
+    fixture.detectChanges();
+
+    const steps: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('.flow-step'));
+    const badges = (step: HTMLElement) =>
+      Array.from(step.querySelectorAll<HTMLElement>('.flow-step-count')).map(b => [
+        b.className.split('--')[1],
+        b.textContent!.trim(),
+        b.title,
+      ]);
+
+    expect(badges(steps[0])).toEqual([['completed', '1.2k', '1,234 completed']]);
+    expect(badges(steps[1])).toEqual([
+      ['completed', '3', '3 completed'],
+      ['failed', '2', '2 failed'],
+    ]);
+    expect(steps[2].querySelector('.flow-step-counts')).toBeNull();
+  });
+
   it('reports which Step was clicked', () => {
     const selections: DesignerSelection[] = [];
     fixture.componentInstance.selectionChange.subscribe(selection => selections.push(selection));
@@ -94,5 +186,225 @@ describe('Flow canvas', () => {
     fixture.nativeElement.querySelectorAll('.flow-step')[1].click();
 
     expect(selections).toEqual([{ type: 'step', key: 'step-11' }]);
+  });
+
+  it('reports several selected Steps as one selection, and marks each of them', () => {
+    const selections: DesignerSelection[] = [];
+    fixture.componentInstance.selectionChange.subscribe(selection => selections.push(selection));
+
+    fixture.componentInstance.onSelectionChange({ nodeIds: ['step-11', 'step-12'], connectionIds: [] } as any);
+    fixture.componentRef.setInput('selection', selections[0]);
+    fixture.detectChanges();
+
+    expect(selections).toEqual([{ type: 'steps', keys: ['step-11', 'step-12'] }]);
+    const steps: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('.flow-step'));
+    expect(steps.map(s => s.classList.contains('flow-step-selected'))).toEqual([false, true, true, false]);
+  });
+
+  it('selects every Step at once', () => {
+    const selections: DesignerSelection[] = [];
+    fixture.componentInstance.selectionChange.subscribe(selection => selections.push(selection));
+
+    fixture.componentInstance.selectAllSteps();
+
+    expect(selections).toEqual([{ type: 'steps', keys: ['step-10', 'step-11', 'step-12', 'step-13'] }]);
+  });
+
+  it('offers a × only on Steps that can be deleted, and reports which one was clicked', () => {
+    const deleted: string[] = [];
+    const selections: DesignerSelection[] = [];
+    fixture.componentInstance.deleteStep.subscribe(key => deleted.push(key));
+    fixture.componentInstance.selectionChange.subscribe(selection => selections.push(selection));
+    const steps: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('.flow-step'));
+
+    // The Source starts every Flow, and the Default branch can't go.
+    expect(steps.map(s => !!s.querySelector('.flow-step-delete'))).toEqual([false, true, false, true]);
+
+    steps[1].querySelector<HTMLElement>('.flow-step-delete')!.click();
+
+    expect(deleted).toEqual(['step-11']);
+    expect(selections).toEqual([]);
+  });
+
+  describe('naming a Step', () => {
+    function names(): string[] {
+      return Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('.flow-step-name')).map(n => n.textContent!.trim());
+    }
+
+    function typeName(key: string, name: string, key2: 'Enter' | 'Escape'): { key: string; name: string }[] {
+      const renamed: { key: string; name: string }[] = [];
+      fixture.componentInstance.renameStep.subscribe(event => renamed.push(event));
+      fixture.componentInstance.editName(key);
+      fixture.detectChanges();
+      const input = fixture.nativeElement.querySelector('.flow-step-name-input') as HTMLInputElement;
+      input.value = name;
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: key2 }));
+      if (key2 === 'Enter') {
+        // Enter blurs the field, which jsdom doesn't do on its own.
+        input.dispatchEvent(new Event('blur'));
+      }
+      fixture.detectChanges();
+      return renamed;
+    }
+
+    it('shows the name under the Step instead of its path', () => {
+      const graph = loadFlowGraph(contentRouterFlow);
+      fixture.componentRef.setInput('graph', {
+        ...graph,
+        steps: graph.steps.map(s => (s.key === 'step-12' ? { ...s, name: 'Log orders' } : s)),
+      });
+      fixture.detectChanges();
+
+      expect(names()).toEqual(['Log orders']);
+    });
+
+    it('reports the name typed under a Step on Enter', () => {
+      expect(typeName('step-12', 'Log orders', 'Enter')).toEqual([{ key: 'step-12', name: 'Log orders' }]);
+      expect(fixture.nativeElement.querySelector('.flow-step-name-input')).toBeNull();
+    });
+
+    it('keeps the name as it was on Escape', () => {
+      expect(typeName('step-12', 'Log orders', 'Escape')).toEqual([]);
+      expect(fixture.nativeElement.querySelector('.flow-step-name-input')).toBeNull();
+    });
+
+    it('offers no name field when read-only', () => {
+      fixture.componentRef.setInput('readOnly', true);
+      fixture.componentInstance.editName('step-12');
+      fixture.detectChanges();
+
+      expect(fixture.nativeElement.querySelector('.flow-step-name-input')).toBeNull();
+    });
+  });
+
+  it('offers no × when read-only', () => {
+    fixture.componentRef.setInput('readOnly', true);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelectorAll('.flow-step-delete')).toHaveLength(0);
+  });
+
+  it('marks what each Step did in a test run: the Source gave the input, a Step failed, a Step was never reached', () => {
+    const message = { body: 'x', headers: {}, truncated: false };
+    fixture.componentRef.setInput(
+      'runResults',
+      new Map<string, StepRunMark>([
+        ['step-10', 'input'],
+        ['step-11', { stepId: '11', status: 'completed', startedAt: '', ownMillis: 4, totalMillis: 1500, in: message, out: message }],
+        [
+          'step-12',
+          { stepId: '12', status: 'failed', startedAt: '', ownMillis: 1200, totalMillis: 1200, in: message, out: null, error: 'Disk full' },
+        ],
+        ['step-13', 'unreached'],
+      ]),
+    );
+    fixture.detectChanges();
+
+    const steps: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('.flow-step'));
+    const badge = (step: HTMLElement) => step.querySelector<HTMLElement>('.flow-step-run')?.textContent!.trim();
+
+    expect(steps.map(badge)).toEqual(['Test input', '4 ms', '1.2 s', undefined]);
+    expect(steps[1].classList).toContain('flow-step-run-ok');
+    expect(steps[2].classList).toContain('flow-step-run-failed');
+    expect(steps[2].querySelector<HTMLElement>('.flow-step-run')!.title).toBe(
+      'Failed: Disk full. 1.2 s in this Step, 1.2 s with the Steps after it.',
+    );
+    expect(steps[3].classList).toContain('flow-step-run-unreached');
+  });
+
+  it('zooms the canvas in and out around the middle of the view, as the mouse wheel does', () => {
+    const zoom = fixture.debugElement.query(By.directive(FZoomDirective)).injector.get(FZoomDirective);
+    const zoomIn = jest.spyOn(zoom, 'zoomIn').mockImplementation(() => undefined);
+    const zoomOut = jest.spyOn(zoom, 'zoomOut').mockImplementation(() => undefined);
+
+    fixture.componentInstance.zoomIn();
+    fixture.componentInstance.zoomOut();
+
+    expect(zoomIn).toHaveBeenCalledWith();
+    expect(zoomOut).toHaveBeenCalledWith();
+  });
+
+  it('offers Auto-arrange on the minimap, but not when read-only', () => {
+    const canvas = fixture.componentInstance;
+    const arranged = jest.fn();
+    canvas.autoArrange.subscribe(arranged);
+    const view = canvas.minimap.createEmbeddedView(undefined);
+    const button = () =>
+      view.rootNodes
+        .map(node => (node as HTMLElement).querySelector?.<HTMLButtonElement>('[data-cy="auto-arrange"]'))
+        .find(found => found) ?? null;
+    view.detectChanges();
+
+    button()!.click();
+    expect(arranged).toHaveBeenCalledTimes(1);
+
+    fixture.componentRef.setInput('readOnly', true);
+    view.detectChanges();
+    expect(button()).toBeNull();
+    view.destroy();
+  });
+
+  it('offers Undo and Redo beside the minimap while there is a change to take back or bring back, but not when read-only', () => {
+    const canvas = fixture.componentInstance;
+    const undone = jest.fn();
+    const redone = jest.fn();
+    canvas.undo.subscribe(undone);
+    canvas.redo.subscribe(redone);
+    const view = canvas.minimap.createEmbeddedView(undefined);
+    const button = (name: string) =>
+      view.rootNodes.map(node => (node as HTMLElement).querySelector?.<HTMLButtonElement>(`[data-cy="${name}"]`)).find(found => found) ??
+      null;
+    view.detectChanges();
+    expect(button('undo')!.disabled).toBe(true);
+    expect(button('redo')!.disabled).toBe(true);
+
+    fixture.componentRef.setInput('canUndo', true);
+    fixture.componentRef.setInput('canRedo', true);
+    view.detectChanges();
+    button('undo')!.click();
+    button('redo')!.click();
+    expect(undone).toHaveBeenCalledTimes(1);
+    expect(redone).toHaveBeenCalledTimes(1);
+
+    fixture.componentRef.setInput('readOnly', true);
+    view.detectChanges();
+    expect(button('undo')).toBeNull();
+    view.destroy();
+  });
+
+  describe('bringing the Flow into view', () => {
+    const fitToScreen = jest.fn();
+
+    // jsdom lays nothing out: the canvas is 1000 by 400px from (100, 0), and the 120 by 100px Steps are in a row at y=150.
+    function fit(stepSpacing: number): FlowCanvasComponent {
+      const canvas = fixture.componentInstance;
+      fitToScreen.mockReset();
+      canvas.canvas = {
+        fitToScreen,
+        getScale: () => 1,
+        transform: { position: { x: 300, y: 50 }, scaledPosition: { x: 10, y: 5 } },
+      } as any;
+      const rect = (left: number, top: number, width: number, height: number) => () =>
+        ({ left, top, width, height, right: left + width, bottom: top + height }) as DOMRect;
+      fixture.nativeElement.querySelector('f-flow').getBoundingClientRect = rect(100, 0, 1000, 400);
+      fixture.nativeElement
+        .querySelectorAll('[data-step-key]')
+        .forEach((node: HTMLElement, i: number) => (node.getBoundingClientRect = rect(500 + i * stepSpacing, 150, 120, 100)));
+      jest.useFakeTimers();
+      canvas.fitToScreen();
+      jest.runOnlyPendingTimers();
+      jest.useRealTimers();
+      return canvas;
+    }
+
+    it('starts a Flow that fits at the left of the canvas, where its Source is, and in the middle from top to bottom', () => {
+      expect(fit(150).canvasPosition).toEqual({ x: 310 - (500 - 100 - 48), y: 55 - 150 + (400 - 100) / 2 });
+      expect(fitToScreen).not.toHaveBeenCalled();
+    });
+
+    it('shrinks a Flow that is too wide for the canvas', () => {
+      expect(fit(300).canvasPosition).toBeUndefined();
+      expect(fitToScreen).toHaveBeenCalledWith({ x: 80, y: 80 }, false, false, 1);
+    });
   });
 });

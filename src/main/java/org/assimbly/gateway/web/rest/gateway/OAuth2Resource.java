@@ -20,7 +20,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Calendar;
+import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -185,15 +185,14 @@ public class OAuth2Resource {
                 throw new OAuth2TokenException(error + " - " + errorDescription);
             } else {
                 // expire_date
-                Calendar nowCal = Calendar.getInstance();
                 int expiresIn = tokenInfoJson.getInt(SERVICE_PARAM_EXPIRES_IN);
-                nowCal.add(Calendar.SECOND, expiresIn);
+                Instant expireDate = Instant.now().plusSeconds(expiresIn);
                 // access_token
                 String accessToken = tokenInfoJson.getString(SERVICE_PARAM_ACCESS_TOKEN);
                 // refresh_token
                 String refreshToken = tokenInfoJson.optString(SERVICE_PARAM_REFRESH_TOKEN);
                 // add token info into hashmap
-                tokenInfoMap.put(SERVICE_PARAM_EXPIRES_IN, String.valueOf(nowCal.getTimeInMillis()));
+                tokenInfoMap.put(SERVICE_PARAM_EXPIRES_IN, String.valueOf(expireDate.toEpochMilli()));
                 tokenInfoMap.put(SERVICE_PARAM_ACCESS_TOKEN, accessToken);
                 tokenInfoMap.put(SERVICE_PARAM_REFRESH_TOKEN, refreshToken);
             }

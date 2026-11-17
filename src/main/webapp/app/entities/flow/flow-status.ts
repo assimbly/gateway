@@ -27,10 +27,29 @@ export function runtimeStatusOf(reported: string | null | undefined): RuntimeSta
   }
 }
 
+/**
+ * The status word a row takes from a later reading of the runtime, or null to keep what it shows. An Error stays
+ * while the runtime only says the Flow isn't running: the row clears it with the Flow's Alerts.
+ */
+export function polledStatus(shown: RuntimeStatus, reported: string | null | undefined): string | null {
+  const status = runtimeStatusOf(reported);
+  if (status === shown || (shown === 'inactiveError' && status === 'inactive')) {
+    return null;
+  }
+  return reported ?? '';
+}
+
+/** What a row reports about its Flow's runtime state, for the list to sort on. A null count means the Flow never ran. */
+export interface FlowRuntime {
+  status: RuntimeStatus;
+  completed: number | null;
+  failed: number | null;
+}
+
 export type FlowAction = 'start' | 'stop' | 'resume' | 'pause' | 'restart';
 
 export interface FlowStatusView {
-  /** The Flow status in words, for the controls' tooltip and screen readers. */
+  /** The Flow status in words, shown beside the controls. */
   label: 'Running' | 'Paused' | 'Stopped' | 'Error';
   /** The colour of the controls, which shows the Flow status. */
   tone: StatusControlsTone;
@@ -69,12 +88,12 @@ export function countLabel(count: number | null | undefined, ran: boolean): stri
 }
 
 /** The Flow type as the UI names it. */
-export function flowTypeLabel(type: string | undefined): 'Visual' | 'Script' | 'Route' {
+export function flowTypeLabel(type: string | undefined): 'Visual' | 'Script' | 'Camel route' {
   switch (type) {
     case 'script':
       return 'Script';
     case 'route':
-      return 'Route';
+      return 'Camel route';
     default:
       return 'Visual';
   }
@@ -83,6 +102,28 @@ export function flowTypeLabel(type: string | undefined): 'Visual' | 'Script' | '
 /** A Flow's Source Step; older Flows call it FROM. A Route Flow has none. */
 export function sourceStepOf(steps: IStep[] | null | undefined): IStep | undefined {
   return steps?.find(step => step.stepType === StepType.SOURCE || step.stepType === StepType.FROM);
+}
+
+/** The first Route of a Route Flow. It takes the place of the Source: a test message goes to where it reads from. */
+export function firstRouteStepOf(steps: IStep[] | null | undefined): IStep | undefined {
+  return steps?.find(step => step.stepType === StepType.ROUTE);
+}
+
+/** Where a Camel route in XML reads from: the Component, path and Options of the uri of its `<from>`. */
+export interface RouteSource {
+  componentType: string;
+  uri: string;
+  options: string;
+}
+
+/** The Endpoint the `<from>` of a Camel route in XML reads from, such as `sjms:NamesIn`. Undefined when it has none. */
+export function routeSourceOf(xml: string | null | undefined): RouteSource | undefined {
+  const from = /<from\b[^>]*?\buri\s*=\s*(["'])(.*?)\1/s.exec(xml ?? '')?.[2];
+  const endpoint = from
+    ?.replace(/&amp;/g, '&')
+    .trim()
+    .match(/^([a-z][\w+.-]*):(?:\/\/)?([^?]*)(?:\?(.*))?$/i);
+  return endpoint ? { componentType: endpoint[1].toLowerCase(), uri: endpoint[2], options: endpoint[3] ?? '' } : undefined;
 }
 
 /**
@@ -95,21 +136,21 @@ export function testMessageBlocked(
   source: { name: string; title?: string; consumerOnly?: boolean } | null,
 ): string | null {
   if (status !== 'active') {
-    return 'Start the Flow to send it a test message.';
+    return 'Start the Flow to send a message to it.';
   }
   if (!source) {
-    return 'This Flow has no Source to send a test message to.';
+    return 'This Flow has no Source to send a message to.';
   }
   if (source.consumerOnly) {
-    return `A test message can't be sent to a ${source.title ?? source.name} Source.`;
+    return `A message can't be sent to a ${source.title ?? source.name} Source.`;
   }
   return null;
 }
 
-/** Why a Flow didn't start: a one-line summary and, per failed Step, its Endpoint and the runtime's message. */
+/** Why a Flow didn't start: a one-line summary and, per failed Step, its id, Endpoint and the runtime's message. */
 export interface FlowFailure {
   summary: string;
-  steps: Array<{ uri?: string; message: string }>;
+  steps: Array<{ id?: string; uri?: string; message: string }>;
 }
 
 const DEFAULT_FAILURE = 'The Flow could not be started.';
@@ -124,8 +165,16 @@ export function flowFailureOf(answer: unknown): FlowFailure | null {
     const text = typeof answer === 'string' ? answer.trim() : '';
     return text ? { summary: text, steps: [] } : null;
   }
-  const steps: Array<{ uri?: string; message: string; status?: string }> = Array.isArray(flow?.steps) ? flow.steps : [];
-  const failedSteps = steps.filter(step => step?.status === 'error').map(step => ({ uri: step.uri || undefined, message: step.message ?? 'Failed.' }));
+  const steps: Array<{ id?: string | number; uri?: string; message: string; status?: string }> = Array.isArray(flow?.steps)
+    ? flow.steps
+    : [];
+  const failedSteps = steps
+    .filter(step => step?.status === 'error')
+    .map(step => ({
+      ...(step.id != null && step.id !== '' ? { id: String(step.id) } : {}),
+      uri: step.uri || undefined,
+      message: step.message ?? 'Failed.',
+    }));
   const installed = flow?.installed;
   const failed = flow?.status === 'failed' || flow?.status === 'error' || failedSteps.length > 0 || Number(installed?.failed) > 0;
   if (!failed) {
@@ -136,6 +185,21 @@ export function flowFailureOf(answer: unknown): FlowFailure | null {
       ? `${installed.failed} of ${installed.total} Steps failed to start.`
       : (flow?.message ?? DEFAULT_FAILURE);
   return { summary, steps: failedSteps };
+}
+
+/** The Steps a failed start names, as problems on the canvas: matched by saved Step id, by Step key. */
+export function failureProblems(
+  steps: ReadonlyArray<{ key: string; id?: number }>,
+  failure: FlowFailure | null,
+): Array<{ stepKey: string; message: string }> {
+  if (!failure) {
+    return [];
+  }
+  const keys = new Map(steps.filter(step => step.id != null).map(step => [String(step.id), step.key]));
+  return failure.steps.flatMap(step => {
+    const key = step.id ? keys.get(step.id) : undefined;
+    return key ? [{ stepKey: key, message: `Failed to start: ${step.message}` }] : [];
+  });
 }
 
 /** The failure of a call that failed: what its answer says, or a general message when it says nothing. */

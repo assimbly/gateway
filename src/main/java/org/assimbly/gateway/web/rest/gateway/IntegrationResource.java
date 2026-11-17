@@ -7,6 +7,7 @@ import org.assimbly.gateway.repository.IntegrationRepository;
 import org.assimbly.gateway.service.IntegrationService;
 import org.assimbly.gateway.service.dto.IntegrationDTO;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
+import org.assimbly.gateway.web.rest.util.FlowLogFilter;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.web.rest.util.LogUtil;
 import org.slf4j.Logger;
@@ -133,13 +134,14 @@ public class IntegrationResource {
     }
 
     /**
-     * Get  /getlog : get tail of log file for the webapplication.
+     * Get  /getlog : get tail of log file for the webapplication, or the last entries of one Flow in it.
      *
-     * @param lines (number of lines to return)
+     * @param lines (number of lines to return, or with flowId the number of entries)
+     * @param flowId (optional, only the entries this Flow logged)
      * @return the ResponseEntity with status 200 (Successful) and status 400 (Bad Request) if the configuration failed
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @Operation(summary = "Get the last lines of the integration log")
+    @Operation(summary = "Get the last lines of the integration log", description = "With flowId, the last entries the Flow logged: its Log Steps, Error Handler and when it was started or stopped.")
     @GetMapping(
         path = "/logs/{integrationid}/log/{lines}",
         produces = {MediaType.TEXT_PLAIN_VALUE}
@@ -147,11 +149,12 @@ public class IntegrationResource {
     public ResponseEntity<String> getLog(
         @Parameter(hidden = true) @RequestHeader("Accept") String mediaType,
         @PathVariable("integrationid") Long integrationid,
-        @PathVariable("lines") int lines
+        @Parameter(description = "Number of lines, or with flowId the number of entries") @PathVariable("lines") int lines,
+        @Parameter(description = "Only the entries of this Flow") @RequestParam(value = "flowId", required = false) Long flowId
     ) throws Exception {
         try {
             File file = new File(System.getProperty("java.io.tmpdir") + "/spring.log");
-            String springLog = LogUtil.tail(file, lines);
+            String springLog = flowId == null ? LogUtil.tail(file, lines) : FlowLogFilter.tail(file, flowId, lines);
             return org.assimbly.gateway.web.rest.util.ResponseUtil.createSuccessResponse(integrationid, mediaType, "getLog", springLog, true);
         } catch (Exception e) {
             return org.assimbly.gateway.web.rest.util.ResponseUtil.createFailureResponse(integrationid, mediaType, "getLog", e.getMessage());

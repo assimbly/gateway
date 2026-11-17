@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -10,12 +9,12 @@ import { IQueue } from 'app/shared/model/queue.model';
 @Component({
     selector: 'jhi-queue-detail',
     templateUrl: './queue-detail.component.html',
-    imports: [CommonModule, RouterModule, FontAwesomeModule, AlertError],
+    imports: [RouterModule, FontAwesomeModule, AlertError],
 })
 export class QueueDetailComponent implements OnInit {
-    queue: IQueue | null = null;
+    protected activatedRoute = inject(ActivatedRoute);
 
-    constructor(protected activatedRoute: ActivatedRoute) {}
+    queue: IQueue | null = null;
 
     ngOnInit(): void {
         this.activatedRoute.data.subscribe(({ queue }) => (this.queue = queue));

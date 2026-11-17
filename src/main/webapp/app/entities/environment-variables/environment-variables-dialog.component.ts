@@ -1,5 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
@@ -17,28 +16,27 @@ import { IIntegration } from 'app/shared/model/integration.model';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { forbiddenEnvironmentKeysValidator } from './environment-variables-validation.directive';
 import { IEnvironmentVariables, EnvironmentVariables } from 'app/shared/model/environment-variables.model';
+import { SaveShortcutDirective } from 'app/shared/keyboard';
 
 @Component({
     selector: 'jhi-environment-variables-dialog',
     templateUrl: './environment-variables-dialog.component.html',
-    imports: [CommonModule, ReactiveFormsModule, AlertError],
+    imports: [ReactiveFormsModule, AlertError, SaveShortcutDirective],
 })
 export class EnvironmentVariablesDialogComponent implements OnInit {
+    activeModal = inject(NgbActiveModal);
+    private alertService = inject(AlertService);
+    private environmentVariablesService = inject(EnvironmentVariablesService);
+    private integrationService = inject(IntegrationService);
+    private eventManager = inject(EventManager);
+    private route = inject(ActivatedRoute);
+
     environmentVariables: IEnvironmentVariables = new EnvironmentVariables();
     isSaving: boolean;
 
     integrations: Array<IIntegration> = [];
     environmentVariablesForm: FormGroup;
     private allEnvironmentVariablesKeys: Array<string> = [];
-
-    constructor(
-        public activeModal: NgbActiveModal,
-        private alertService: AlertService,
-        private environmentVariablesService: EnvironmentVariablesService,
-        private integrationService: IntegrationService,
-        private eventManager: EventManager,
-        private route: ActivatedRoute
-    ) {}
 
     ngOnInit() {
         this.initializeForm();

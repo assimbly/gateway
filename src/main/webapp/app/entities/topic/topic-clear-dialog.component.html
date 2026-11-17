@@ -1,22 +1,20 @@
-<form *ngIf="address" (submit)="$event.preventDefault()">
+@if (address) {
+  <form (submit)="$event.preventDefault()">
     <div class="modal-header">
-        <h4 class="modal-title">Confirm clear operation</h4>
-        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" (click)="cancel()"></button>
+      <h4 class="modal-title">Confirm clear operation</h4>
+      <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" (click)="cancel()"></button>
     </div>
-
     <div class="modal-body">
-        <jhi-alert-error></jhi-alert-error>
-
-        <p id="jhi-delete-topic-heading">{{message}}</p>
+      <jhi-alert-error></jhi-alert-error>
+      <p id="jhi-delete-topic-heading">{{message}}</p>
     </div>
-
     <div class="modal-footer">
-        <button type="button" class="btn btn-fx btn-fx-secondary" data-dismiss="modal" (click)="cancel()">
-            <fa-icon icon="ban"></fa-icon><span>Cancel</span>
-        </button>
-
-        <button id="jhi-confirm-delete-topic" type="button" class="btn btn-fx btn-fx-warning" [disabled]="disableClear" (click)="confirmClear(address.name!)">
-            <fa-icon icon="trash"></fa-icon><span>Clear</span>
-        </button>
+      <button type="button" class="btn btn-fx btn-fx-secondary" data-dismiss="modal" (click)="cancel()">
+        <fa-icon icon="ban"></fa-icon><span>Cancel</span>
+      </button>
+      <button id="jhi-confirm-delete-topic" type="button" class="btn btn-fx btn-fx-warning" [disabled]="disableClear" (click)="confirmClear(address.name!)">
+        <fa-icon icon="trash"></fa-icon><span>Clear</span>
+      </button>
     </div>
-</form>
+  </form>
+}

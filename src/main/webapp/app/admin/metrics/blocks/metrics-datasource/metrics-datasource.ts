@@ -3,12 +3,11 @@ import { Component, input } from '@angular/core';
 
 import { Databases } from 'app/admin/metrics/metrics.model';
 import { filterNaN } from 'app/core/util';
-import { TranslateDirective } from 'app/shared/language';
 
 @Component({
   selector: 'jhi-metrics-datasource',
   templateUrl: './metrics-datasource.html',
-  imports: [DecimalPipe, TranslateDirective],
+  imports: [DecimalPipe],
 })
 export class MetricsDatasource {
   /**

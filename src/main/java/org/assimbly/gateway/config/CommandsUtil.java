@@ -62,6 +62,9 @@ public final class CommandsUtil {
 
             if(baseDirectoryParam == null || baseDirectoryParam.equalsIgnoreCase("default")){
                 baseDirectoryParam = USER_HOME_DIR;
+            } else {
+                // A system property outranks application.yml and environment variables, so the start argument wins
+                System.setProperty(BaseDirectorySetting.BASE_DIRECTORY, baseDirectoryParam);
             }
 
             System.setProperty("user.home",baseDirectoryParam);

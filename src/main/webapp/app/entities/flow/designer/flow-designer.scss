@@ -1,7 +1,14 @@
 // Layout of the visual designer on the Flow editor page (the editor component uses ViewEncapsulation.None).
 
+// The canvas takes the full width of the window: no cap, and at the sides only a slim padding of the card.
 .flow-designer-page {
-  max-width: 1600px;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.jh-card:has(.flow-designer-page) {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
 }
 
 .flow-designer {
@@ -18,6 +25,12 @@
   .btn span {
     margin-left: 0.35rem;
   }
+}
+
+// Above the Scripts, the Steps on the other tabs, in a line.
+.script-flow-summary > span + span::before {
+  content: '\00b7';
+  margin: 0 0.5rem;
 }
 
 .flow-designer-toolbar-end {
@@ -77,6 +90,11 @@
     background: var(--flow-kind-color);
     border: none;
   }
+
+  // The theme circles the end of a Link to drag it elsewhere; Links can't be reassigned here.
+  .f-connection-drag-handle {
+    display: none;
+  }
 }
 
 .flow-designer-canvas {
@@ -108,7 +126,7 @@
 
 .flow-designer-panel {
   display: flex;
-  flex: 0 0 28rem;
+  flex: 0 0 24rem;
   flex-direction: column;
   gap: 0.75rem;
   min-height: 0;
@@ -116,45 +134,38 @@
   .form-group.container {
     padding: 0;
   }
+}
 
-  // In the Step form, fields take all the width their icon buttons leave, so the form has the same margin on both sides.
-  jhi-flow-editor-step .row {
-    > .col-10,
-    > .col-5 {
-      flex: 1 1 0;
-      width: auto;
-    }
+// The open tab other than the Visual flow (or the Routes or Scripts): full page, or as a side panel beside the canvas.
+.flow-designer-tab {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
 
-    > .btn.col-1,
-    > .btn.col-2 {
-      flex: 0 0 auto;
-      width: auto;
-      // A button has no gutter padding of its own; this keeps it inside the row's right edge.
-      margin-right: calc(var(--bs-gutter-x) * 0.5);
-    }
-  }
-
-  // An option's key and value get most of the row, with small gaps and compact buttons, so both stay readable.
-  jhi-flow-editor-step [formarrayname='options'] .row {
-    --bs-gutter-x: 0.5rem;
-
-    > .btn.col-1 {
-      width: 28px;
-      min-width: 28px;
-      padding-right: 0;
-      padding-left: 0;
-    }
+  > :not(.d-none) {
+    flex: 1 1 auto;
   }
 }
 
-// The Step, Link or Flow editor; it scrolls when it is taller than the space above the minimap.
+.flow-designer-tab--panel {
+  flex: 0 0 24rem;
+}
+
+// The < and > of the open tab, above the side panel.
+.flow-designer-layout .btn {
+  padding-inline: 0.5rem;
+}
+
+// The Step or Link editor; it scrolls when it is taller than the panel.
 .flow-designer-panel-editor {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
 }
 
-// The Flow settings fill the panel; the Notes take the height the settings above them leave.
+// The card of the selected Steps fills the panel.
 .flow-settings {
   height: 100%;
 
@@ -162,19 +173,6 @@
     display: flex;
     flex-direction: column;
     min-height: 0;
-  }
-
-  .notes-codemirror {
-    flex: 1 1 auto;
-    min-height: 10rem;
-    display: flex;
-    flex-direction: column;
-
-    .CodeMirror {
-      flex: 1 1 auto;
-      height: auto;
-      min-height: 0;
-    }
   }
 }
 
@@ -202,12 +200,35 @@
   min-width: 0;
 }
 
+.flow-variables .form-check-label {
+  display: block;
+  font-weight: 600;
+}
+
+// A Flow variable: its key, its value and a remove button, like a Step's Option row.
+.flow-variable-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr) var(--app-btn-height-sm);
+  gap: 0.5rem;
+  align-items: center;
+
+  + .flow-variable-row {
+    margin-top: 0.25rem;
+  }
+}
+
+// Over the bottom-right corner of the canvas, so it is there whether the side panel is shown or not.
 .flow-designer-minimap {
-  flex: 0 0 14rem;
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  width: 14rem;
+  height: 9.5rem;
   overflow: hidden;
   border: 1px solid var(--app-border, #d0d5dd);
   border-radius: 8px;
-  background: var(--app-bg, #f8f9fb);
+  background: var(--app-surface, #fff);
+  box-shadow: 0 4px 12px rgb(16 24 40 / 12%);
   cursor: crosshair;
   touch-action: none;
 
@@ -246,6 +267,45 @@
   }
 }
 
+// The +, − and Auto-arrange in the top-right corner of the minimap, and Undo and Redo in its top-left corner.
+.flow-minimap-history {
+  left: 0.375rem;
+}
+
+.flow-minimap-zoom {
+  right: 0.375rem;
+  flex-direction: column;
+
+  .btn + .btn {
+    border-top: 1px solid var(--app-border, #d0d5dd);
+  }
+}
+
+.flow-minimap-history .btn + .btn {
+  border-left: 1px solid var(--app-border, #d0d5dd);
+}
+
+.flow-minimap-zoom,
+.flow-minimap-history {
+  position: absolute;
+  top: 0.375rem;
+  display: flex;
+  overflow: hidden;
+  border: 1px solid var(--app-border, #d0d5dd);
+  border-radius: 6px;
+  background: var(--app-surface, #fff);
+  cursor: default;
+
+  .btn {
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0;
+    border-radius: 0;
+    font-size: 0.75rem;
+    line-height: 1;
+  }
+}
+
 @media (max-width: 1100px) {
   .flow-designer-body {
     flex-direction: column;
@@ -256,11 +316,195 @@
     height: 70vh;
   }
 
-  .flow-designer-panel {
+  .flow-designer-panel,
+  .flow-designer-tab--panel {
     flex-basis: auto;
   }
 
+  // No room for the map; its zoom and Auto-arrange buttons stay in the corner.
   .flow-designer-minimap {
-    display: none;
+    width: auto;
+    height: auto;
+    border: none;
+    background: none;
+    box-shadow: none;
+
+    .f-minimap {
+      display: none;
+    }
+  }
+
+  .flow-minimap-zoom,
+  .flow-minimap-history {
+    position: static;
+  }
+
+  // Under each other in the corner, at the width of the zoom buttons.
+  .flow-minimap-history {
+    width: fit-content;
+    margin: 0 0 0.375rem auto;
+  }
+}
+
+// The tabs above the editor, of Design (or Code) and of Test; they wrap when the editor is narrow.
+.flow-designer-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+
+  .btn span {
+    margin-left: 0.35rem;
+  }
+
+  .btn.active {
+    color: var(--app-primary-accessible, var(--app-primary));
+    box-shadow: inset 0 -2px 0 var(--app-primary);
+  }
+}
+
+// The Log or Camel route of Test, in place of the canvas and its panel.
+.flow-designer-view {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid var(--app-border, #d0d5dd);
+  border-radius: 8px;
+  background: var(--app-surface);
+
+  > * {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding-top: 0.75rem;
+  }
+}
+
+.flow-designer-unsaved {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+
+// The Route and Script editors: a tab of their Steps or Notes in Code, and their Routes or Scripts read-only beside the
+// panel in Test.
+.code-flow-pane {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+  text-align: start;
+
+  .form-group.container {
+    max-width: none;
+    margin-bottom: 0;
+    padding: 0;
+  }
+
+  // The Routes are what the editor is about, so their code gets room.
+  .route-codemirror-inline .CodeMirror-scroll {
+    max-height: calc(24lh + 8px);
+  }
+}
+
+.code-flow-alerts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.code-flow-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.code-flow-item.cdk-drag-preview {
+  box-shadow: 0 8px 24px rgb(16 24 40 / 18%);
+  border-radius: 8px;
+  opacity: 0.95;
+}
+
+.code-flow-item__placeholder {
+  min-height: 5rem;
+  border: 2px dashed var(--app-border, #d0d5dd);
+  border-radius: 8px;
+  background: var(--app-hover);
+}
+
+.code-flow-list.cdk-drop-list-dragging .code-flow-item:not(.cdk-drag-placeholder) {
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.code-flow-add {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 0.5rem;
+
+  .btn span {
+    margin-left: 0.35rem;
+  }
+}
+
+.code-flow-intro {
+  margin: 0;
+}
+
+// The Notes fill the pane.
+.code-flow-notes {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+
+  .notes-codemirror {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 10rem;
+
+    .CodeMirror {
+      flex: 1 1 auto;
+      height: auto;
+      min-height: 0;
+    }
+  }
+}
+
+.code-flow-read-only__name {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+// A Script in Test is as tall as its code, up to the height of a Route.
+.code-flow-read-only .script-codemirror {
+  .CodeMirror {
+    height: auto;
+  }
+
+  .CodeMirror-scroll {
+    max-height: calc(24lh + 8px);
+  }
+}
+
+// What a Script made of the test message, under its code.
+.code-flow-run {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+
+  pre {
+    max-height: 12rem;
+    overflow: auto;
   }
 }

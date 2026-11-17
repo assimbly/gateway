@@ -5,7 +5,7 @@ export type EndpointType = 'queue' | 'topic';
 
 /**
  * Queues / Topics toggle shown in the toolbar of the endpoint list pages.
- * Queues and Topics are separate routes, presented in the sidebar as one "Endpoints" entry.
+ * Queues and Topics are separate routes, presented in the sidebar as one "Queues & Topics" entry.
  */
 @Component({
   selector: 'jhi-endpoint-type-switch',

@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpContext, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { serverApiUrl } from 'app/config';
@@ -12,9 +12,9 @@ type EntityArrayResponseType = HttpResponse<IConnection[]>;
 
 @Injectable({ providedIn: 'root' })
 export class ConnectionService {
-    public resourceUrl = `${serverApiUrl}api/connections`;
+    protected http = inject(HttpClient);
 
-    constructor(protected http: HttpClient) {}
+    public resourceUrl = `${serverApiUrl}api/connections`;
 
     create(connection: IConnection): Observable<EntityResponseType> {
         return this.http.post<IConnection>(this.resourceUrl, connection, { observe: 'response' });
@@ -37,8 +37,8 @@ export class ConnectionService {
         return this.http.get<any>(`${this.resourceUrl}/${id}/keys`, { observe: 'response' });
     }
 
-    getAllConnections(): Observable<EntityArrayResponseType> {
-        return this.http.get<IConnection[]>(`${this.resourceUrl}/getallconnections`, { observe: 'response' });
+    getAllConnections(context?: HttpContext): Observable<EntityArrayResponseType> {
+        return this.http.get<IConnection[]>(`${this.resourceUrl}/getallconnections`, { observe: 'response', context });
     }
 
     delete(id: number): Observable<HttpResponse<any>> {

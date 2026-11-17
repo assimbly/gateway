@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
@@ -12,16 +11,22 @@ import { AlertService } from 'app/core/util/alert.service';
 import { IFlow, LogLevelType } from 'app/shared/model/flow.model';
 import { FlowService } from './flow.service';
 import { IIntegration } from 'app/shared/model/integration.model';
+import { SaveShortcutDirective } from 'app/shared/keyboard';
 import { IntegrationService } from 'app/entities/integration/integration.service';
 
 @Component({
   selector: 'jhi-flow-update',
   templateUrl: './flow-update.component.html',
-  imports: [CommonModule, FormsModule, FontAwesomeModule, AlertError],
+  imports: [FormsModule, FontAwesomeModule, AlertError, SaveShortcutDirective],
 })
 export class FlowUpdateComponent implements OnInit {
-  flow: IFlow;
-  isSaving: boolean;
+  protected alertService = inject(AlertService);
+  protected flowService = inject(FlowService);
+  protected integrationService = inject(IntegrationService);
+  protected activatedRoute = inject(ActivatedRoute);
+
+  flow!: IFlow;
+  isSaving!: boolean;
 
   public logLevelListType = [
     LogLevelType.OFF,
@@ -32,14 +37,7 @@ export class FlowUpdateComponent implements OnInit {
     LogLevelType.DEBUG
   ];
 
-  integrations: IIntegration[];
-
-  constructor(
-    protected alertService: AlertService,
-    protected flowService: FlowService,
-    protected integrationService: IntegrationService,
-    protected activatedRoute: ActivatedRoute
-  ) {}
+  integrations!: IIntegration[];
 
   ngOnInit() {
     this.isSaving = false;
@@ -48,7 +46,7 @@ export class FlowUpdateComponent implements OnInit {
     });
     this.integrationService.query().subscribe(
       (res: HttpResponse<IIntegration[]>) => {
-        this.integrations = res.body;
+        this.integrations = res.body!;
       },
       (res: HttpErrorResponse) => this.onError(res.message)
     );
@@ -88,9 +86,5 @@ export class FlowUpdateComponent implements OnInit {
       type: 'danger',
       message: errorMessage,
     });
-  }
-
-  trackIntegrationById(index: number, item: IIntegration) {
-    return item.id;
   }
 }

@@ -21,7 +21,8 @@ import javax.xml.xpath.XPathFactory;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-@Transactional
+// Spring only rolls back on unchecked exceptions by default, and the import methods throw checked ones
+@Transactional(rollbackFor = Exception.class)
 public class ImportXMLMessages {
 
     private final Logger log = LoggerFactory.getLogger(ImportXMLMessages.class);
@@ -117,17 +118,41 @@ public class ImportXMLMessages {
 
         log.debug("Get Header: " + messageName);
 
-        Map<String, Header> map = new ConcurrentHashMap<>();
-		for (Header s : headers) {
-			map.put(s.getKey(), s);
-		}
-
-        log.debug("Set Header: " + messageName);
-
         // Create XPath object
 		XPathExpression expr = xPath.compile("/dil/core/messages/message[id='" + messageId + "']/headers/*");
 
 		NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+
+        log.debug("Set Header: " + messageName);
+
+        mergeHeaders(message, headers, nodes);
+
+		if (message != null && headers != null) {
+
+            log.debug("Import into database: " + messageName);
+
+            message = messageRepository.save(message);
+
+			message.setHeaders(headers);
+
+			message = messageRepository.save(message);
+
+			String generatedmessageId = message.getId().toString();
+
+			messagesIdMap.put(messageId, generatedmessageId);
+
+		}
+
+        log.info("Finished importing message: {}", messageName);
+
+    }
+
+	private void mergeHeaders(Message message, Set<Header> headers, NodeList nodes) {
+
+        Map<String, Header> map = new ConcurrentHashMap<>();
+		for (Header s : headers) {
+			map.put(s.getKey(), s);
+		}
 
         for (int i = 0; i < nodes.getLength(); i++) {
 
@@ -164,25 +189,7 @@ public class ImportXMLMessages {
 			}
 		}
 
-		if (message != null && headers != null) {
-
-            log.debug("Import into database: " + messageName);
-
-            message = messageRepository.save(message);
-
-			message.setHeaders(headers);
-
-			message = messageRepository.save(message);
-
-			String generatedmessageId = message.getId().toString();
-
-			messagesIdMap.put(messageId, generatedmessageId);
-
-		}
-
-        log.info("Finished importing message: {}", messageName);
-
-    }
+	}
 
 	public void updateMessageIdsFromXml(Document doc, Map.Entry<String, String> entry) throws Exception {
 

@@ -15,6 +15,7 @@ public class ApplicationProperties {
     public final Documentation documentation = new Documentation();
     public final Gateway gateway = new Gateway();
     public final DeployDirectory deployDirectory = new DeployDirectory();
+    public final Security security = new Security();
 
     public Info getInfo() {
         return info;
@@ -30,6 +31,36 @@ public class ApplicationProperties {
 
     public DeployDirectory getDeployDirectory() {
         return deployDirectory;
+    }
+
+    public Security getSecurity() {
+        return security;
+    }
+
+    /** What the Gateway opens up beyond its secure defaults. */
+    public static class Security {
+
+        /** Lets anyone create an account from the sign-in page. Off: an administrator adds users. */
+        private boolean registration = false;
+
+        /** Lets Prometheus scrape /management/prometheus without signing in. */
+        private boolean publicPrometheus = false;
+
+        public boolean isRegistration() {
+            return registration;
+        }
+
+        public void setRegistration(boolean registration) {
+            this.registration = registration;
+        }
+
+        public boolean isPublicPrometheus() {
+            return publicPrometheus;
+        }
+
+        public void setPublicPrometheus(boolean publicPrometheus) {
+            this.publicPrometheus = publicPrometheus;
+        }
     }
 
 
@@ -81,6 +112,36 @@ public class ApplicationProperties {
         private String tenant;
         /** Where the runtime serves REST Sources: Try it calls Operations there, and an OpenAPI export names its port. */
         private String restListenerUrl = "https://localhost:9001";
+        /** Whether a new Gateway gets an example Flow and a default broker on its first start. */
+        private boolean firstStartSetup = true;
+        /** Whether the Gateway opens its Local URL in the default browser once started (ignored when headless or in a container). */
+        private boolean openBrowser = true;
+        /** Set by the Windows and Mac bundles: one Gateway per base directory, started from a tray / menu-bar icon. */
+        private boolean desktop;
+
+        public boolean getFirstStartSetup() {
+            return firstStartSetup;
+        }
+
+        public void setFirstStartSetup(boolean firstStartSetup) {
+            this.firstStartSetup = firstStartSetup;
+        }
+
+        public boolean getOpenBrowser() {
+            return openBrowser;
+        }
+
+        public void setOpenBrowser(boolean openBrowser) {
+            this.openBrowser = openBrowser;
+        }
+
+        public boolean getDesktop() {
+            return desktop;
+        }
+
+        public void setDesktop(boolean desktop) {
+            this.desktop = desktop;
+        }
 
         public String getTenant() {
             return tenant;

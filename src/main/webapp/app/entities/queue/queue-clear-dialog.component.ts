@@ -1,5 +1,4 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AlertError } from 'app/shared/alert';
@@ -10,20 +9,18 @@ import { QueueService } from './queue.service';
 
 @Component({
     templateUrl: './queue-clear-dialog.component.html',
-    imports: [CommonModule, FontAwesomeModule, AlertError],
+    imports: [FontAwesomeModule, AlertError],
 })
 export class QueueClearDialogComponent {
+    protected queueService = inject(QueueService);
+    activeModal = inject(NgbActiveModal);
+    protected eventManager = inject(EventManager);
+
     address?: IAddress;
     brokerType = '';
 
     message = 'Are you sure you want to clear this queue?';
     disableClear = false;
-
-    constructor(
-        protected queueService: QueueService,
-        public activeModal: NgbActiveModal,
-        protected eventManager: EventManager,
-    ) {}
 
     cancel(): void {
         this.activeModal.dismiss();

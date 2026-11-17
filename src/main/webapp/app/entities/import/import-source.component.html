@@ -1,0 +1,44 @@
+<div
+  class="import-drop"
+  [class.import-drop--active]="dragging()"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave()"
+  (drop)="onDrop($event)"
+>
+  <label class="btn btn-fx btn-fx-secondary mb-0" [for]="inputId">
+    <fa-icon icon="upload"></fa-icon> Choose a file
+  </label>
+  <input [id]="inputId" type="file" class="visually-hidden" [accept]="accept()" (change)="onFileInput($event)" />
+  <span class="import-drop__hint">
+    @if (fileName(); as name) {
+      <fa-icon icon="file-alt"></fa-icon> {{ name }}
+    } @else {
+      or drop {{ kind() }} here
+    }
+  </span>
+</div>
+
+@if (problem(); as message) {
+  <div class="alert alert-danger py-2 mt-2 mb-0" role="alert">{{ message }}</div>
+}
+
+<div class="form-label mt-3">Or paste it, or drop {{ kind() }} on the editor</div>
+<!-- the drop is handled here: the editor has its own drop output, which does not carry the browser event -->
+<div
+  class="import-codemirror"
+  [class.import-codemirror--active]="dragging()"
+  [style.--import-rows]="rows()"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave()"
+  (drop)="onDrop($event)"
+>
+  <ngx-codemirror
+    name="import-source-text"
+    [ngModel]="text()"
+    (ngModelChange)="onTyped($event)"
+    [ngModelOptions]="{ standalone: true }"
+    [options]="editorOptions()"
+    (codeMirrorLoaded)="refreshCodeMirror($event)"
+  >
+  </ngx-codemirror>
+</div>

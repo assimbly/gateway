@@ -1,4 +1,4 @@
-import { Injectable, Component } from '@angular/core';
+import { Injectable, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { CertificateService } from './certificate.service';
@@ -6,10 +6,14 @@ import { Certificate } from 'app/shared/model/certificate.model';
 
 @Injectable({ providedIn: 'root' })
 export class CertificatePopupService {
+    private modalService = inject(NgbModal);
+    private router = inject(Router);
+    private certificateService = inject(CertificateService);
+
     private ngbModalRef: NgbModalRef;
 
-    constructor(private modalService: NgbModal, private router: Router, private certificateService: CertificateService) {
-        this.ngbModalRef = null;
+    constructor() {
+        this.ngbModalRef = null!;
     }
 
     open(component: Component, id?: number | any): Promise<NgbModalRef> {
@@ -21,7 +25,7 @@ export class CertificatePopupService {
 
             if (id) {
                 this.certificateService.find(id).subscribe(integration => {
-                    this.ngbModalRef = this.gatewayModalRef(component, integration.body);
+                    this.ngbModalRef = this.gatewayModalRef(component, integration.body!);
                     resolve(this.ngbModalRef);
                 });
             } else {
@@ -40,11 +44,11 @@ export class CertificatePopupService {
         modalRef.result.then(
             result => {
                 this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
-                this.ngbModalRef = null;
+                this.ngbModalRef = null!;
             },
             reason => {
                 this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
-                this.ngbModalRef = null;
+                this.ngbModalRef = null!;
             }
         );
         return modalRef;

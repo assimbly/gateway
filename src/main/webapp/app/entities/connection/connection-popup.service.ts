@@ -1,4 +1,4 @@
-import { Injectable, Component } from '@angular/core';
+import { Injectable, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ConnectionService } from './connection.service';
@@ -6,10 +6,14 @@ import { IConnection, Connection } from 'app/shared/model/connection.model';
 
 @Injectable({ providedIn: 'root' })
 export class ConnectionPopupService {
+    private modalService = inject(NgbModal);
+    private router = inject(Router);
+    private connectionService = inject(ConnectionService);
+
     private ngbModalRef: NgbModalRef;
 
-    constructor(private modalService: NgbModal, private router: Router, private connectionService: ConnectionService) {
-        this.ngbModalRef = null;
+    constructor() {
+        this.ngbModalRef = null!;
     }
 
     open(component: Component, id?: number | any, type?: string): Promise<NgbModalRef> {
@@ -17,12 +21,12 @@ export class ConnectionPopupService {
         return new Promise<NgbModalRef>((resolve, reject) => {
             const isOpen = this.ngbModalRef !== null;
             if (isOpen) {
-                this.ngbModalRef = null;
+                this.ngbModalRef = null!;
             }
 
             if (id) {
                 this.connectionService.find(id).subscribe(connection => {
-                    this.ngbModalRef = this.connectionModalRef(component, connection.body);
+                    this.ngbModalRef = this.connectionModalRef(component, connection.body!);
                     resolve(this.ngbModalRef);
                 });
             } else {

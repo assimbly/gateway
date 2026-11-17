@@ -1,10 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, forkJoin } from 'rxjs';
 import dayjs from 'dayjs/esm';
 import { DATE_FORMAT } from 'app/config/input.constants';
 import { map } from 'rxjs/operators';
-import { environment } from 'environments/environment';
 
 import { serverApiUrl } from 'app/config';
 
@@ -31,13 +30,12 @@ type EntityArrayResponseType = HttpResponse<ICertificate[]>;
 
 @Injectable({ providedIn: 'root' })
 export class CertificateService {
+  protected http = inject(HttpClient);
 
   /** The gateway's certificate records. */
   public resourceUrl = `${serverApiUrl}api/certificate-resources`;
   /** The runtime's keystores. */
   public keystoreUrl = `${serverApiUrl}api/certificates`;
-
-  constructor(protected http: HttpClient) {}
 
   create(certificate: ICertificate): Observable<EntityResponseType> {
     const copy = this.convertDateFromClient(certificate);
@@ -107,7 +105,6 @@ export class CertificateService {
     const options = new HttpHeaders({
       'Content-Type': 'text/plain',
       keystoreName: TRUSTSTORE,
-      keystorePassword: environment.KEYSTORE_PWD,
     });
     return this.http.post(`${this.keystoreUrl}/${encodeURIComponent(name)}`, certificates, {
       headers: options,
@@ -118,14 +115,10 @@ export class CertificateService {
 
   /** Imports a server identity: a PKCS12 file (private key + certificate chain) as base64 or data URL. */
   importIdentity(name: string, p12: string, password: string): Observable<HttpResponse<string>> {
-    const options = new HttpHeaders({
-      'Content-Type': 'text/plain',
-      keystoreName: IDENTITY_STORE,
-      keystorePassword: environment.KEYSTORE_PWD,
-      password,
-    });
+    const options = new HttpHeaders({ keystoreName: IDENTITY_STORE });
 
-    return this.http.post(`${this.keystoreUrl}/identity/${encodeURIComponent(name)}`, p12, {
+    // the password of the file goes in the body: headers end up in proxy and access logs
+    return this.http.post(`${this.keystoreUrl}/identity/${encodeURIComponent(name)}`, { p12, password }, {
       headers: options,
       observe: 'response',
       responseType: 'text',
@@ -136,7 +129,6 @@ export class CertificateService {
   generateIdentity(cn: string): Observable<HttpResponse<string>> {
     const options = new HttpHeaders({
       keystoreName: IDENTITY_STORE,
-      keystorePassword: environment.KEYSTORE_PWD,
       cn,
     });
 
@@ -181,7 +173,6 @@ export class CertificateService {
   private domainHeaders(certificateType?: string): HttpHeaders {
     const headers = new HttpHeaders({
       keystoreName: TRUSTSTORE,
-      keystorePassword: environment.KEYSTORE_PWD,
     });
     return certificateType ? headers.set('certificateType', certificateType) : headers;
   }
@@ -192,7 +183,6 @@ export class CertificateService {
     const keystoreName = certificateStore || TRUSTSTORE;
     const options = new HttpHeaders({
       keystoreName,
-      keystorePassword: environment.KEYSTORE_PWD,
     });
     const path = keystoreName === IDENTITY_STORE ? 'identity/' : '';
 
@@ -213,7 +203,7 @@ export class CertificateService {
 
   protected convertDateFromServer(res: EntityResponseType): EntityResponseType {
     if (res.body) {
-      res.body.certificateExpiry = res.body.certificateExpiry != null ? dayjs(res.body.certificateExpiry) : null;
+      res.body.certificateExpiry = res.body.certificateExpiry != null ? dayjs(res.body.certificateExpiry) : null!;
     }
     return res;
   }
@@ -221,7 +211,7 @@ export class CertificateService {
   protected convertDateArrayFromServer(res: EntityArrayResponseType): EntityArrayResponseType {
     if (res.body) {
       res.body.forEach((certificate: ICertificate) => {
-        certificate.certificateExpiry = certificate.certificateExpiry != null ? dayjs(certificate.certificateExpiry) : null;
+        certificate.certificateExpiry = certificate.certificateExpiry != null ? dayjs(certificate.certificateExpiry) : null!;
       });
     }
     return res;

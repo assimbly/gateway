@@ -1,0 +1,58 @@
+# Quick start
+
+<!-- tutorial: {"id":"quick-start","wiki":"quick-start","title":"Quick start","minutes":5,"track":"Get started","fixtures":{"ExampleFlow":"ExampleFlow.xml"}} -->
+
+Run your first Flow in 5 minutes — no coding required.
+
+<!-- web-only -->
+
+> **Haven't started Assimbly yet?**
+>
+> 1. Download the bundle for **Windows** (`.zip`) or **Mac** (`.tar.gz`) from the [latest release](https://github.com/assimbly/gateway/releases/latest) and unpack it.
+> 2. Double-click **`Assimbly`** (`Assimbly.exe` on Windows, `Start Assimbly.command` on Mac). A message tells you Assimbly is starting; after ~10 seconds it says Assimbly is running and your browser opens **[http://localhost:8080](http://localhost:8080)**.
+> 3. Sign in with `admin` / `admin` and choose your own password.
+> 4. Click **Tutorials → Quick start** in the top menu to follow these steps interactively right inside Assimbly!
+>
+> _(Need help with Windows/Mac security prompts, Docker, or Java? See the [Install guide](https://github.com/assimbly/gateway/wiki/install).)_
+
+## Open ExampleFlow
+
+<!-- step: {"check":"route:/flow/editor"} -->
+
+Every new Assimbly Gateway comes with a ready-made Flow called _ExampleFlow_.
+
+1. Go to **Flows → Manage** and click _ExampleFlow_. <!-- show: tr[data-flow-name="ExampleFlow"] td a @ / -->
+
+You now see the visual Flow canvas with two connected Steps:
+
+- a **Source** (left) that creates one message (`Example flow running`) when the Flow starts <!-- show: .flow-step-source @ flow:ExampleFlow -->
+- a **Sink** (right) that writes that message to the log <!-- show: .flow-step-sink @ flow:ExampleFlow -->
+
+<!-- web-only -->
+
+> Don't see _ExampleFlow_? Click **Import** on **Flows → Manage** and select [ExampleFlow.xml](https://github.com/assimbly/documentation/blob/master/tutorials/v6/quick-start/ExampleFlow.xml).
+
+## Start it
+
+<!-- step: {"check":"flowStatus:ExampleFlow:started"} -->
+
+1. Click **Test** at the top of the editor. <!-- show: [data-cy="mode-toggle"] @ flow:ExampleFlow -->
+2. Click **▶** (Start) in the **Test** panel. <!-- show: [data-tour="flow-status-controls"] @ flow:ExampleFlow:test -->
+
+Within a second, a **1** appears on both Steps — your message was created and sent through the Flow!
+
+## See the message
+
+<!-- step: {"check":"flowLog:ExampleFlow:Example flow running"} -->
+
+1. Click the **Log** tab above the canvas. <!-- show: [data-cy="test-view-log"] @ flow:ExampleFlow:test -->
+
+You see the log entry with your message: `Example flow running`.
+
+## Stop it
+
+<!-- step: {"check":"flowStatus:ExampleFlow:stopped"} -->
+
+1. Click the **Visual flow** tab, then click **■** (Stop) in the **Test** panel. <!-- show: [data-tour="flow-status-controls"] @ flow:ExampleFlow:test -->
+
+**Congratulations — you just ran your first Assimbly Flow!** Next, build your own Flow from scratch in [Tutorial 1](https://github.com/assimbly/gateway/wiki/tutorial6-your-first-flow).

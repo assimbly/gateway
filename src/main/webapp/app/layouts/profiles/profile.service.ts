@@ -26,6 +26,7 @@ export class ProfileService {
           activeProfiles,
           inProduction: activeProfiles?.includes('prod'),
           openAPIEnabled: activeProfiles?.includes('api-docs'),
+          registration: response.registration === true,
         };
         if (activeProfiles && response['display-ribbon-on-profiles']) {
           const displayRibbonOnProfiles = response['display-ribbon-on-profiles'].split(',');

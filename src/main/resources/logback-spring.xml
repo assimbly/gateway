@@ -67,6 +67,7 @@
     <logger name="liquibase" level="WARN"/>
     <logger name="LiquibaseSchemaResolver" level="INFO"/>
     <logger name="org.quartz" level="WARN"/>
+    <logger name="org.springdoc.core.events.SpringDocAppInitializer" level="ERROR"/>
 
     <!-- Silence compact notation WARN messages from YAML DSL -->
     <logger name="org.apache.camel.dsl.yaml.common.YamlDeserializerBase" level="ERROR" />

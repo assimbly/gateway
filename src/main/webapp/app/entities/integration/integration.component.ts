@@ -1,5 +1,4 @@
-import { Component, OnInit, OnDestroy, TemplateRef, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, TemplateRef, signal, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -9,168 +8,187 @@ import { AlertService } from 'app/core/util/alert.service';
 import { NgbDropdownModule, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { HasAnyAuthorityDirective } from 'app/shared/auth';
+import { EmptyState } from 'app/shared/empty-state';
 import { SearchToolbar } from 'app/shared/filter';
 import { SortState } from 'app/shared/sort';
-import { DataTable, DataTableColumn, OverflowActionDirective, PrimaryActionDirective, RowActions, Truncate } from 'app/shared/table';
+import {
+  DataTable,
+  DataTableColumn,
+  OverflowActionDirective,
+  PrimaryActionDirective,
+  RowActions,
+  Truncate,
+  sortRows,
+} from 'app/shared/table';
 import { IIntegration } from 'app/shared/model/integration.model';
 import { IntegrationDeleteDialogComponent } from './integration-delete-dialog.component';
+import { IntegrationImportDialogComponent } from './integration-import-dialog.component';
 import { AccountService } from 'app/core/auth/account.service';
 import { IntegrationService } from './integration.service';
+import { enumLabel } from './gateway-stage.service';
 import { FlowService } from '../flow/flow.service';
 
 @Component({
-    selector: 'jhi-integration',
-    templateUrl: './integration.component.html',
-    imports: [
-        CommonModule,
-        RouterModule,
-        FontAwesomeModule,
-        NgbDropdownModule,
-        HasAnyAuthorityDirective,
-        SearchToolbar,
-        DataTable,
-        RowActions,
-        PrimaryActionDirective,
-        OverflowActionDirective,
-        Truncate,
-    ],
+  selector: 'jhi-integration',
+  templateUrl: './integration.component.html',
+  imports: [
+    RouterModule,
+    FontAwesomeModule,
+    NgbDropdownModule,
+    HasAnyAuthorityDirective,
+    EmptyState,
+    SearchToolbar,
+    DataTable,
+    RowActions,
+    PrimaryActionDirective,
+    OverflowActionDirective,
+    Truncate,
+  ],
 })
 export class IntegrationComponent implements OnInit, OnDestroy {
-    readonly integrations = signal<IIntegration[]>([]);
-    currentAccount: any;
-    eventSubscriber: Subscription;
-    restartIntegrationMessage: string;
-    modalRef: NgbModalRef | null;
-    searchText = '';
-    infoIntegration: IIntegration | null = null;
-    sortState: SortState = { predicate: 'name', order: 'asc' };
-    readonly columns: DataTableColumn[] = [
-        { key: 'name', header: 'Name', sortable: true },
-        { key: 'type', header: 'Type', sortable: true },
-        { key: 'stage', header: 'Stage', sortable: true },
-        { key: 'actions', header: 'Actions', align: 'end' },
-    ];
+  /** Type and stage in title case: Full, Production. */
+  readonly label = enumLabel;
+  protected flowService = inject(FlowService);
+  protected integrationService = inject(IntegrationService);
+  protected alertService = inject(AlertService);
+  protected eventManager = inject(EventManager);
+  protected accountService = inject(AccountService);
+  private router = inject(Router);
+  private modalService = inject(NgbModal);
 
-    constructor(
-        protected flowService: FlowService,
-        protected integrationService: IntegrationService,
-        protected alertService: AlertService,
-        protected eventManager: EventManager,
-        protected accountService: AccountService,
-        private router: Router,
-        private modalService: NgbModal,
-    ) {}
+  readonly integrations = signal<IIntegration[]>([]);
+  /** Whether the Gateways have been asked for, so an empty list is known to be empty. */
+  readonly loaded = signal(false);
+  currentAccount: any;
+  eventSubscriber!: Subscription;
+  restartIntegrationMessage!: string;
+  modalRef!: NgbModalRef | null;
+  searchText = '';
+  infoIntegration: IIntegration | null = null;
+  sortState: SortState = { predicate: 'name', order: 'asc' };
+  readonly columns: DataTableColumn[] = [
+    { key: 'name', header: 'Name', sortable: true },
+    { key: 'type', header: 'Type', sortable: true },
+    { key: 'stage', header: 'Stage', sortable: true },
+    { key: 'actions', header: 'Actions', align: 'end' },
+  ];
 
-    loadAll() {
-        this.integrationService.query().subscribe(
-            (res: HttpResponse<IIntegration[]>) => {
-                this.integrations.set(res.body ?? []);
-            },
-            (res: HttpErrorResponse) => this.onError(res.message)
-        );
+  loadAll() {
+    this.integrationService.query().subscribe(
+      (res: HttpResponse<IIntegration[]>) => {
+        this.integrations.set(res.body ?? []);
+        this.loaded.set(true);
+      },
+      (res: HttpErrorResponse) => this.onError(res.message),
+    );
+  }
+
+  ngOnInit() {
+    this.loadAll();
+    this.accountService.identity().subscribe(account => {
+      this.currentAccount = account;
+    });
+    this.registerChangeInIntegrations();
+  }
+
+  ngOnDestroy() {
+    this.eventManager.destroy(this.eventSubscriber);
+  }
+
+  get isAdmin(): boolean {
+    return this.accountService.hasAnyAuthority('ROLE_ADMIN');
+  }
+
+  /** With no Gateway at all, the list gives way to an explanation of Gateways and how to add the first. */
+  get showEmptyState(): boolean {
+    return this.loaded() && !this.integrations().length;
+  }
+
+  get filteredIntegrations(): IIntegration[] {
+    const query = this.searchText?.toLocaleLowerCase() ?? '';
+    let result = this.integrations() ?? [];
+    if (query) {
+      result = result.filter(item => (item.name ?? '').toLocaleLowerCase().includes(query));
     }
+    return sortRows(result, this.sortState, {
+      name: item => item.name,
+      type: item => item.type,
+      stage: item => item.stage,
+    });
+  }
 
-    ngOnInit() {
+  registerChangeInIntegrations() {
+    this.eventSubscriber = this.eventManager.subscribe('integrationListModification', response => this.loadAll());
+  }
+
+  openImportBackup(): void {
+    this.modalService.open(IntegrationImportDialogComponent, { size: 'lg', backdrop: 'static', ariaLabelledBy: 'import-backup-title' });
+  }
+
+  delete(integration: IIntegration): void {
+    const modalRef = this.modalService.open(IntegrationDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+    modalRef.componentInstance.integration = integration;
+    // unsubscribe not needed because closed completes on modal close
+    modalRef.closed.subscribe(reason => {
+      if (reason === 'deleted') {
         this.loadAll();
-        this.accountService.identity().subscribe(account => {
-            this.currentAccount = account;
-        });
-        this.registerChangeInIntegrations();
-    }
+      }
+    });
+  }
 
-    ngOnDestroy() {
-        this.eventManager.destroy(this.eventSubscriber);
-    }
+  openModal(templateRef: TemplateRef<any>) {
+    this.modalRef = this.modalService.open(templateRef);
+  }
 
-    trackId(index: number, item: IIntegration) {
-        return item.id;
-    }
+  openRestartIntegrationModal(templateRef: TemplateRef<any>) {
+    this.restartIntegrationMessage = '';
+    this.modalRef = this.modalService.open(templateRef);
+  }
 
-    get filteredIntegrations(): IIntegration[] {
-        const query = this.searchText?.toLocaleLowerCase() ?? '';
-        let result = [...(this.integrations() ?? [])];
-        const { predicate, order } = this.sortState;
-        const direction = order === 'asc' ? 1 : -1;
-        result.sort((a, b) => {
-            const left = String((a as any)[predicate ?? 'name'] ?? '').toLocaleLowerCase();
-            const right = String((b as any)[predicate ?? 'name'] ?? '').toLocaleLowerCase();
-            return left < right ? -1 * direction : direction;
-        });
-        if (query) {
-            result = result.filter(item => (item.name ?? '').toLocaleLowerCase().includes(query));
-        }
-        return result;
-    }
+  openInfoModal(templateRef: TemplateRef<any>, integration: IIntegration) {
+    this.infoIntegration = integration;
+    this.modalRef = this.modalService.open(templateRef);
+  }
 
-    registerChangeInIntegrations() {
-        this.eventSubscriber = this.eventManager.subscribe('integrationListModification', response => this.loadAll());
+  cancelModal(): void {
+    if (this.modalRef) {
+      this.modalRef.dismiss();
+      this.modalRef = null;
     }
+  }
 
-	delete(integration: IIntegration): void {
-		const modalRef = this.modalService.open(IntegrationDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
-		modalRef.componentInstance.integration = integration;
-		// unsubscribe not needed because closed completes on modal close
-		modalRef.closed.subscribe(reason => {
-		  if (reason === 'deleted') {
-			this.loadAll();
-		  }
-		});
-	}
+  restartIntegration(index: number) {
+    this.integrationService.stop(index).subscribe(
+      (res: HttpResponse<string>) => {
+        this.startIntegration(index);
+      },
+      (res: HttpErrorResponse) => {
+        this.restartIntegrationMessage = 'Assimbly Integration failed to stop: ' + res.message;
+        this.onError(res.message);
+      },
+    );
+  }
 
-    openModal(templateRef: TemplateRef<any>) {
-        this.modalRef = this.modalService.open(templateRef);
-    }
+  startIntegration(index: number) {
+    this.integrationService.start(index).subscribe(
+      (res: HttpResponse<string>) => {
+        this.restartIntegrationMessage = 'Assimbly Integration is (re)started successful';
+      },
+      (res: HttpErrorResponse) => {
+        this.restartIntegrationMessage = 'Assimbly Integration failed to start: ' + res.message;
+        this.onError(res.message);
+      },
+    );
+  }
 
-    openRestartIntegrationModal(templateRef: TemplateRef<any>) {
-        this.restartIntegrationMessage = '';
-        this.modalRef = this.modalService.open(templateRef);
-    }
+  protected onError(errorMessage: string) {
+    this.alertService.addAlert({
+      type: 'danger',
+      message: errorMessage,
+    });
+  }
 
-    openInfoModal(templateRef: TemplateRef<any>, integration: IIntegration) {
-        this.infoIntegration = integration;
-        this.modalRef = this.modalService.open(templateRef);
-    }
-
-    cancelModal(): void {
-        if (this.modalRef) {
-            this.modalRef.dismiss();
-            this.modalRef = null;
-        }
-    }
-
-    restartIntegration(index: number) {
-        this.integrationService.stop(index).subscribe(
-            (res: HttpResponse<string>) => {
-                this.startIntegration(index);
-            },
-            (res: HttpErrorResponse) => {
-                this.restartIntegrationMessage = 'Assimbly Integration failed to stop: ' + res.message;
-                this.onError(res.message);
-            }
-        );
-    }
-
-    startIntegration(index: number) {
-        this.integrationService.start(index).subscribe(
-            (res: HttpResponse<string>) => {
-                this.restartIntegrationMessage = 'Assimbly Integration is (re)started successful';
-            },
-            (res: HttpErrorResponse) => {
-                this.restartIntegrationMessage = 'Assimbly Integration failed to start: ' + res.message;
-                this.onError(res.message);
-            }
-        );
-    }
-
-    protected onError(errorMessage: string) {
-        this.alertService.addAlert({
-		  type: 'danger',
-		  message: errorMessage,
-		});
-    }
-
-    reset() {
-        this.integrations.set([]);
-        this.loadAll();
-    }
+  reset() {
+    this.loadAll();
+  }
 }

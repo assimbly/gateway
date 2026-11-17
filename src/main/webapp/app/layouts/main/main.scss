@@ -30,6 +30,16 @@
   background-color: var(--app-bg);
 }
 
+// Alerts lie over the page, top right, so they show on every page without moving its content.
+// The level is that of a Bootstrap toast: above a dialog that is still closing.
+.app-alerts {
+  position: fixed;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 1090;
+  width: min(28rem, calc(100vw - 1.5rem));
+}
+
 .app-topbar {
   display: flex;
   flex-shrink: 0;
@@ -71,6 +81,9 @@
 }
 
 .app-topbar__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
   color: var(--app-text);
   font-weight: 600;
   text-decoration: none;
@@ -79,6 +92,14 @@
 .app-topbar__brand:hover,
 .app-topbar__brand:focus-visible {
   color: var(--app-text);
+}
+
+.app-topbar__brand-icon {
+  display: block;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex-shrink: 0;
+  object-fit: contain;
 }
 
 .app-topbar__actions {

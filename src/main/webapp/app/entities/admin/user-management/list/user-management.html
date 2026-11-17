@@ -9,18 +9,16 @@
         aria-label="Add"
       >
         <fa-icon icon="plus" />
-        <span class="d-none d-md-inline" jhiTranslate="userManagement.home.createLabel">Add</span>
+        <span class="d-none d-md-inline">Add</span>
       </button>
       <button class="btn btn-fx btn-fx-secondary" type="button" (click)="load()" [disabled]="isLoading()" aria-label="Refresh">
         <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined"></fa-icon>
-        <span class="d-none d-md-inline" jhiTranslate="userManagement.home.refreshListLabel">Refresh</span>
+        <span class="d-none d-md-inline">Refresh</span>
       </button>
     </ng-container>
   </jhi-search-toolbar>
 
   <jhi-alert-error />
-
-  <jhi-alert />
 
   <jhi-data-table
     [columns]="columns"
@@ -28,122 +26,128 @@
     (sortChange)="navigateToWithComponentValues($event)"
     [loading]="isLoading() && userManagements().length === 0"
     [hasRows]="filteredUsers().length > 0"
-    [emptyMessage]="'No user found'"
+    [emptyMessage]="'No users match this filter.'"
     ariaLabel="Users"
   >
     @for (userManagement of filteredUsers(); track trackLogin(userManagement)) {
-      <tr data-cy="entityTable">
-        <td class="table-fx-identity">
-          <a [routerLink]="['/user-management', userManagement.login, 'edit']">
-            <jhi-truncate [text]="userManagement.login" />
+    <tr data-cy="entityTable">
+      <td class="table-fx-identity">
+        <a [routerLink]="['/user-management', userManagement.login, 'edit']">
+          <jhi-truncate [text]="userManagement.login" />
+        </a>
+      </td>
+      <td class="table-fx-identity">
+        <jhi-truncate [text]="userManagement.email" />
+      </td>
+      <td>
+        @if (userManagement.activated) {
+        <span class="badge text-bg-success">Activated</span>
+        } @else {
+        <span class="badge text-bg-secondary">Deactivated</span>
+        }
+      </td>
+      <td>{{ userManagement.createdDate | formatMediumDatetime }}</td>
+      <td>
+        @if (userManagement.lastModifiedBy) { {{ userManagement.lastModifiedBy }} } @else {
+        <span class="text-muted">—</span>
+        }
+      </td>
+      <td>
+        @if (userManagement.lastModifiedDate) { {{ userManagement.lastModifiedDate | formatMediumDatetime }} } @else {
+        <span class="text-muted">—</span>
+        }
+      </td>
+      <td>
+        @for (authority of userManagement.authorities; track $index) {
+        <span class="badge text-bg-secondary me-1">{{ authority | roleLabel }}</span>
+        } @empty {
+        <span class="text-muted">—</span>
+        }
+      </td>
+      <td class="text-end">
+        <jhi-row-actions>
+          <a
+            jhiPrimaryAction
+            class="btn btn-fx btn-fx-sm btn-fx-ghost"
+            [routerLink]="['/user-management', userManagement.login, 'edit']"
+            aria-label="Edit"
+            data-cy="entityEditButton"
+          >
+            <fa-icon icon="pencil-alt" />
+            <span class="d-none d-md-inline">Edit</span>
           </a>
-        </td>
-        <td class="table-fx-identity">
-          <jhi-truncate [text]="userManagement.email" />
-        </td>
-        <td>
-          @if (userManagement.activated) {
-            <span class="badge text-bg-success" jhiTranslate="userManagement.activated">Activated</span>
-          } @else {
-            <span class="badge text-bg-secondary" jhiTranslate="userManagement.deactivated">Deactivated</span>
-          }
-        </td>
-        <td>{{ userManagement.createdDate | formatMediumDatetime }}</td>
-        <td>{{ userManagement.lastModifiedBy }}</td>
-        <td>{{ userManagement.lastModifiedDate | formatMediumDatetime }}</td>
-        <td>
-          @for (authority of userManagement.authorities; track $index; let last = $last) {
-            <span>
-              <a class="badge bg-info" [routerLink]="['/authority', authority, 'view']">{{ authority }}</a
-              >{{ last ? '' : ', ' }}
-            </span>
-          }
-        </td>
-        <td class="text-end">
-          <jhi-row-actions>
+          <button
+            jhiOverflowAction
+            type="button"
+            ngbDropdownItem
+            class="btn-fx-dropdown-item"
+            [routerLink]="['/user-management', userManagement.login, 'view']"
+            data-cy="entityDetailsButton"
+          >
+            <fa-icon icon="eye" />
+            <span>View</span>
+          </button>
+          <ng-container jhiOverflowAction>
+            @if (userManagement.activated) {
             <button
-              jhiOverflowAction
               type="button"
               ngbDropdownItem
               class="btn-fx-dropdown-item"
-              [routerLink]="['/user-management', userManagement.login, 'view']"
-              data-cy="entityDetailsButton"
-            >
-              <fa-icon icon="eye" />
-              <span jhiTranslate="entity.action.view">View</span>
-            </button>
-            <button
-              jhiOverflowAction
-              type="button"
-              ngbDropdownItem
-              class="btn-fx-dropdown-item"
-              [routerLink]="['/user-management', userManagement.login, 'edit']"
-              data-cy="entityEditButton"
-            >
-              <fa-icon icon="pencil-alt" />
-              <span jhiTranslate="entity.action.edit">Edit</span>
-            </button>
-            <ng-container jhiOverflowAction>
-              @if (userManagement.activated) {
-                <button
-                  type="button"
-                  ngbDropdownItem
-                  class="btn-fx-dropdown-item"
-                  (click)="setActive(userManagement, false)"
-                  [disabled]="!currentAccount() || currentAccount()?.login === userManagement.login"
-                  data-cy="entityDeactivateButton"
-                >
-                  <fa-icon icon="ban" />
-                  <span>Deactivate</span>
-                </button>
-              } @else {
-                <button
-                  type="button"
-                  ngbDropdownItem
-                  class="btn-fx-dropdown-item"
-                  (click)="setActive(userManagement, true)"
-                  data-cy="entityActivateButton"
-                >
-                  <fa-icon icon="check" />
-                  <span>Activate</span>
-                </button>
-              }
-            </ng-container>
-            <button
-              jhiOverflowAction
-              type="button"
-              ngbDropdownItem
-              class="btn-fx-dropdown-item btn-fx-dropdown-danger"
-              (click)="delete(userManagement)"
+              (click)="setActive(userManagement, false)"
               [disabled]="!currentAccount() || currentAccount()?.login === userManagement.login"
-              data-cy="entityDeleteButton"
+              data-cy="entityDeactivateButton"
             >
-              <fa-icon icon="trash" />
-              <span jhiTranslate="entity.action.delete">Delete</span>
+              <fa-icon icon="ban" />
+              <span>Deactivate</span>
             </button>
-          </jhi-row-actions>
-        </td>
-      </tr>
+            } @else {
+            <button
+              type="button"
+              ngbDropdownItem
+              class="btn-fx-dropdown-item"
+              (click)="setActive(userManagement, true)"
+              data-cy="entityActivateButton"
+            >
+              <fa-icon icon="check" />
+              <span>Activate</span>
+            </button>
+            }
+          </ng-container>
+          <button
+            jhiOverflowAction
+            type="button"
+            ngbDropdownItem
+            class="btn-fx-dropdown-item btn-fx-dropdown-danger"
+            (click)="delete(userManagement)"
+            [disabled]="!currentAccount() || currentAccount()?.login === userManagement.login"
+            data-cy="entityDeleteButton"
+          >
+            <fa-icon icon="trash" />
+            <span>Delete</span>
+          </button>
+        </jhi-row-actions>
+      </td>
+    </tr>
     }
   </jhi-data-table>
 
   @if (userManagements().length > 0) {
-    <div>
-      <div class="d-flex justify-content-center">
-        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
-      </div>
-
-      <div class="d-flex justify-content-center">
-        <ngb-pagination
-          [collectionSize]="totalItems()"
-          [page]="page()"
-          [pageSize]="itemsPerPage()"
-          [maxSize]="5"
-          [rotate]="true"
-          [boundaryLinks]="true"
-          (pageChange)="navigateToPage($event)"
-        />
-      </div>
+  <div>
+    <div class="d-flex justify-content-center">
+      <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
     </div>
+
+    <div class="d-flex justify-content-center">
+      <ngb-pagination
+        [collectionSize]="totalItems()"
+        [page]="page()"
+        [pageSize]="itemsPerPage()"
+        [maxSize]="5"
+        [rotate]="true"
+        [boundaryLinks]="true"
+        (pageChange)="navigateToPage($event)"
+      />
+    </div>
+  </div>
   }
 </div>

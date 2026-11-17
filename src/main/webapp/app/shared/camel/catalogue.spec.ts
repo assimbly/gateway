@@ -1,4 +1,13 @@
-import { CatalogueEntry, categoryChips, roleMismatch, searchCatalogue } from './catalogue';
+import {
+  CatalogueEntry,
+  categoryChips,
+  categoryTitle,
+  closestFirst,
+  essentialsFirst,
+  isEssential,
+  roleMismatch,
+  searchCatalogue,
+} from './catalogue';
 
 const file: CatalogueEntry = { name: 'file', title: 'File', description: 'Read and write files.', label: 'file,core' };
 const sftp: CatalogueEntry = { name: 'sftp', title: 'SFTP', description: 'Upload and download files to/from SFTP servers.', label: 'file' };
@@ -38,6 +47,12 @@ describe('Camel catalogue', () => {
       ]);
     });
 
+    it('names a chip in words: a capital for most labels, and its own name for an abbreviation or a Camel word', () => {
+      expect(['cloud', 'messaging', 'file'].map(categoryTitle)).toEqual(['Cloud', 'Messaging', 'File']);
+      expect(['ai', 'iot', 'bigdata', 'webservice'].map(categoryTitle)).toEqual(['AI', 'IoT', 'Big data', 'Web service']);
+      expect(['core', 'eip'].map(categoryTitle)).toEqual(['Built-in', 'Integration patterns']);
+    });
+
     it('puts the long tail behind More', () => {
       const { shown, more } = categoryChips([file, sftp, kafka, timer, log], 2);
 
@@ -69,8 +84,33 @@ describe('Camel catalogue', () => {
       expect(searchCatalogue([kafka, file, sftp], 'SFTP').map(entry => entry.name)).toEqual(['sftp']);
     });
 
+    it('puts an exact or closest id or title on top, above components that only mention it', () => {
+      const filter: CatalogueEntry = { name: 'filter', title: 'Filter', description: 'Only lets matching messages through.' };
+      const ftp: CatalogueEntry = { name: 'ftp', title: 'FTP', description: 'Upload and download files to/from FTP servers.' };
+      expect(searchCatalogue([sftp, filter, ftp, file], 'file').map(entry => entry.name)).toEqual(['file', 'sftp', 'ftp']);
+      expect(searchCatalogue([sftp, filter, ftp, file], 'fil ').map(entry => entry.name)).toEqual(['file', 'filter', 'sftp', 'ftp']);
+    });
+
+    it('keeps entries that do not match at the end when only sorting', () => {
+      expect(closestFirst([kafka, sftp, file], 'file').map(entry => entry.name)).toEqual(['file', 'sftp', 'kafka']);
+    });
+
     it('lists everything for an empty search', () => {
       expect(searchCatalogue([kafka, file], ' ')).toEqual([kafka, file]);
+    });
+  });
+
+  describe('Essentials', () => {
+    const setbody: CatalogueEntry = { name: 'setbody', title: 'Set body', action: true, source: false, sink: false };
+    const amazonmq: CatalogueEntry = { name: 'amazonmq', title: 'Amazon MQ', action: true, source: true, sink: true };
+    const get: CatalogueEntry = { name: 'get', title: 'GET', action: true, source: true, sink: true };
+
+    it("counts Assimbly's own Actions that work on the message, not the ones that talk to another system", () => {
+      expect([setbody, amazonmq, get, file].filter(isEssential)).toEqual([setbody]);
+    });
+
+    it('lists the Essentials first and keeps the order of the rest', () => {
+      expect(essentialsFirst([file, kafka, setbody])).toEqual([setbody, file, kafka]);
     });
   });
 });

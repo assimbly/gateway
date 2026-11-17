@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
@@ -15,13 +15,13 @@ import { EnvironmentVariablesService } from './environment-variables.service';
     imports: [FontAwesomeModule, AlertError],
 })
 export class EnvironmentVariablesDeleteDialogComponent {
-    environmentVariables: IEnvironmentVariables;
+    protected environmentVariablesService = inject(EnvironmentVariablesService);
+    activeModal = inject(NgbActiveModal);
+    protected eventManager = inject(EventManager);
 
-    constructor(
-        protected environmentVariablesService: EnvironmentVariablesService,
-        public activeModal: NgbActiveModal,
-        protected eventManager: EventManager
-    ) {}
+    environmentVariables!: IEnvironmentVariables;
+    /** True while the delete runs, so a second click doesn't send it again. */
+    readonly deleting = signal(false);
 
     clear() {
         this.activeModal.dismiss('cancel');
@@ -31,12 +31,13 @@ export class EnvironmentVariablesDeleteDialogComponent {
         if (id == null) {
             return;
         }
+        this.deleting.set(true);
         this.environmentVariablesService.delete(id).subscribe({
             next: () => {
                 this.eventManager.broadcast(new EventWithContent('environmentVariablesListModification', 'Deleted an environmentVariables'));
                 this.activeModal.close('deleted');
             },
-            error: () => undefined,
+            error: () => this.deleting.set(false),
         });
     }
 }

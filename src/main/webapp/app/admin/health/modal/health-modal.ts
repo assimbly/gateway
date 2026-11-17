@@ -3,13 +3,12 @@ import { Component, inject } from '@angular/core';
 
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap/modal';
 
-import { TranslateDirective } from 'app/shared/language';
 import { HealthDetails, HealthKey } from '../health.model';
 
 @Component({
   selector: 'jhi-health-modal',
   templateUrl: './health-modal.html',
-  imports: [TranslateDirective, KeyValuePipe],
+  imports: [KeyValuePipe],
 })
 export default class HealthModal {
   health?: { key: HealthKey; value: HealthDetails };

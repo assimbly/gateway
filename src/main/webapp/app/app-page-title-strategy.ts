@@ -6,7 +6,12 @@ import { RouterStateSnapshot, TitleStrategy } from '@angular/router';
 export class AppPageTitleStrategy extends TitleStrategy {
   private readonly title = inject(Title);
 
-  override updateTitle(_routerState: RouterStateSnapshot): void {
-    this.title.setTitle('Assimbly');
+  override updateTitle(routerState: RouterStateSnapshot): void {
+    this.title.setTitle(pageTitle(this.buildTitle(routerState)));
   }
+}
+
+/** The browser tab says which page this is, such as "Flows - Assimbly"; just "Assimbly" for a page without a title. */
+export function pageTitle(page: string | undefined): string {
+  return page ? `${page} - Assimbly` : 'Assimbly';
 }

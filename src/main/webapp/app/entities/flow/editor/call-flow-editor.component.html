@@ -2,22 +2,22 @@
   <div class="card-body">
     <h5 class="border-bottom">CALL FLOW</h5>
     <p class="small text-muted">
-      @if (kind === 'ACTION') {
+      @if (kind() === 'ACTION') {
         Sends the message to another Flow, waits for its answer, and carries on with that answer.
       } @else {
         Hands the message over to another Flow; this Branch ends here.
       }
     </p>
 
-    @if (problem) {
+    @if (problem(); as problem) {
       <div class="alert alert-danger py-1 small">{{ problem }}</div>
     }
 
     <label class="form-label" for="call-flow-target">Flow to call</label>
-    @if (flows.length) {
+    @if (flows().length) {
       <select id="call-flow-target" class="form-select" [(ngModel)]="targetFlowId" (ngModelChange)="emit()" [class.is-invalid]="!targetFlowId">
         <option value="">Choose a Flow…</option>
-        @for (flow of flows; track flow.id) {
+        @for (flow of flows(); track flow.id) {
           <option [value]="'' + flow.id">{{ flow.name }}</option>
         }
       </select>
@@ -32,7 +32,7 @@
       <option value="async">async: through a queue</option>
     </select>
 
-    @if (deletable) {
+    @if (deletable()) {
       <button type="button" class="btn btn-fx btn-fx-ghost text-danger mt-3" (click)="remove.emit()"><fa-icon icon="trash"></fa-icon> Delete Step</button>
     }
   </div>

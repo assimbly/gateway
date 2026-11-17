@@ -15,8 +15,8 @@ export class ApiService {
   private readonly resourceUrl = `${serverApiUrl}api/apis`;
   private listener?: Observable<string>;
 
-  query(): Observable<IApi[]> {
-    return this.http.get<IApi[]>(this.resourceUrl);
+  query(context?: HttpContext): Observable<IApi[]> {
+    return this.http.get<IApi[]>(this.resourceUrl, { context });
   }
 
   find(id: number): Observable<IApi> {

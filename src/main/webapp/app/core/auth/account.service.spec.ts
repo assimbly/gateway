@@ -3,8 +3,6 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 
-import { TranslateService, provideTranslateService } from '@ngx-translate/core';
-
 import { serverApiUrl } from 'app/config';
 import { Authority } from 'app/shared/jhipster/constants';
 
@@ -18,7 +16,6 @@ function accountWithAuthorities(authorities: string[]): Account {
     authorities,
     email: '',
     firstName: '',
-    langKey: '',
     lastName: '',
     login: '',
     imageUrl: '',
@@ -33,7 +30,6 @@ describe('Account Service', () => {
   let httpMock: HttpTestingController;
   let mockStorageService: StateStorageService;
   let mockRouter: Router;
-  let mockTranslateService: TranslateService;
 
   beforeEach(() => {
     Object.defineProperty(window, 'matchMedia', {
@@ -52,7 +48,6 @@ describe('Account Service', () => {
     });
     TestBed.configureTestingModule({
       providers: [
-        provideTranslateService(),
         provideHttpClientTesting(),
         {
           provide: StateStorageService,
@@ -69,9 +64,6 @@ describe('Account Service', () => {
     mockStorageService = TestBed.inject(StateStorageService);
     mockRouter = TestBed.inject(Router);
     vi.spyOn(mockRouter, 'navigateByUrl');
-
-    mockTranslateService = TestBed.inject(TranslateService);
-    vi.spyOn(mockTranslateService, 'use');
   });
 
   afterEach(() => {
@@ -133,32 +125,6 @@ describe('Account Service', () => {
       // Then there is a new request
       const requests = httpMock.match({ method: 'GET' });
       expect(requests).toHaveLength(1);
-    });
-
-    describe('should change the language on authentication if necessary', () => {
-      it('should change language if user has not changed language manually', () => {
-        // GIVEN
-        mockStorageService.getLocale = mockFn(null);
-
-        // WHEN
-        service.identity().subscribe();
-        httpMock.expectOne({ method: 'GET' }).flush({ ...accountWithAuthorities([]), langKey: 'accountLang' });
-
-        // THEN
-        expect(mockTranslateService.use).toHaveBeenCalledWith('accountLang');
-      });
-
-      it('should not change language if user has changed language manually', () => {
-        // GIVEN
-        mockStorageService.getLocale = mockFn('sessionLang');
-
-        // WHEN
-        service.identity().subscribe();
-        httpMock.expectOne({ method: 'GET' }).flush({ ...accountWithAuthorities([]), langKey: 'accountLang' });
-
-        // THEN
-        expect(mockTranslateService.use).not.toHaveBeenCalled();
-      });
     });
 
     describe('navigateToStoredUrl', () => {

@@ -6,19 +6,18 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbDropdown, NgbDropdownMenu, NgbDropdownToggle } from '@ng-bootstrap/ng-bootstrap/dropdown';
 import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap/tooltip';
-import { TranslateService } from '@ngx-translate/core';
 
 import { filter, map, startWith } from 'rxjs';
 
-import { LANGUAGES } from 'app/config';
-import { AccountService, StateStorageService } from 'app/core/auth';
+import { API_DEFINITIONS, API_EXPLORER_PATH } from 'app/admin/docs/api-definitions';
+import { AccountService } from 'app/core/auth';
+import { GatewayStageService } from 'app/entities/integration/gateway-stage.service';
 import { ProfileService } from 'app/layouts/profiles/profile.service';
 import { LoginService } from 'app/login/login.service';
 import { HasAnyAuthorityDirective } from 'app/shared/auth';
-import { TranslateDirective } from 'app/shared/language';
-import ThemeSelector from 'app/shared/theme/theme-selector';
 import { LayoutService } from 'app/layouts/main/layout.service';
 import { ThemeService } from 'app/core/theme';
+import { TutorialPanelState } from 'app/tutorials/tutorial-panel.state';
 
 import { environment } from 'environments/environment';
 
@@ -35,8 +34,6 @@ import { environment } from 'environments/environment';
     NgbDropdownToggle,
     NgbTooltip,
     HasAnyAuthorityDirective,
-    TranslateDirective,
-    ThemeSelector,
   ],
   host: {
     id: 'app-sidebar',
@@ -50,19 +47,21 @@ import { environment } from 'environments/environment';
 })
 export default class Navbar implements OnInit {
   readonly inProduction = signal(true);
-  readonly languages = LANGUAGES;
   readonly openAPIEnabled = signal(false);
   readonly account = inject(AccountService).account;
   readonly type = environment.TYPE;
   readonly layout = inject(LayoutService);
+  readonly tutorialPanel = inject(TutorialPanelState);
   private readonly theme = inject(ThemeService);
   readonly brandIcon = computed(() => (this.theme.appearance() === 'dark' ? 'logo_darkmode.svg' : 'logo_lightmode.svg'));
-  readonly sidebarVisible = computed(() => this.account() !== null);
+  readonly stage = inject(GatewayStageService);
+  /** The brand as the collapsed sidebar names it, with the stage the badge would show. */
+  readonly brandName = computed(() => (this.stage.label() ? `Gateway (${this.stage.label()})` : 'Gateway'));
+  /** No menu while the user still has to replace a default password. */
+  readonly sidebarVisible = computed(() => this.account() !== null && !this.account()?.passwordChangeRequired);
   readonly sidebarInert = computed(() => !this.sidebarVisible() || (!this.layout.isDesktop() && !this.layout.mobileOpen()));
 
   private readonly loginService = inject(LoginService);
-  private readonly translateService = inject(TranslateService);
-  private readonly stateStorageService = inject(StateStorageService);
   private readonly profileService = inject(ProfileService);
   private readonly router = inject(Router);
   private readonly sidebarClose = viewChild<ElementRef<HTMLButtonElement>>('sidebarClose');
@@ -78,6 +77,9 @@ export default class Navbar implements OnInit {
   );
   readonly flowsExpanded = computed(() => this.layout.flowsExpanded());
   readonly brokerExpanded = computed(() => this.layout.brokerExpanded());
+  readonly apiExpanded = computed(() => this.layout.apiExpanded());
+  readonly apiDefinitions = API_DEFINITIONS;
+  readonly apiExplorerPath = API_EXPLORER_PATH;
   readonly adminExpanded = computed(() => this.layout.adminExpanded());
   readonly accountExpanded = computed(() => this.layout.accountExpanded());
 
@@ -105,11 +107,6 @@ export default class Navbar implements OnInit {
     });
   }
 
-  brandTitle(): string {
-    const title = this.translateService.instant('global.title');
-    return typeof title === 'string' && title.length > 0 ? title : 'Gateway';
-  }
-
   isFlowsActive(): boolean {
     return this.isFlowsPath(this.currentUrl());
   }
@@ -128,7 +125,7 @@ export default class Navbar implements OnInit {
     return current === path || current.startsWith(`${path}/`);
   }
 
-  /** The brokers list and its detail pages, but not the pages reached from Send or Endpoints. */
+  /** The brokers list and its detail pages, but not the pages reached from Send or Queues & Topics. */
   isBrokerManageActive(): boolean {
     return this.isActivePath('/broker') && !this.isBrokerSendActive() && !this.isActivePath('/broker/browser');
   }
@@ -146,6 +143,10 @@ export default class Navbar implements OnInit {
     return this.isBrokerPath(this.currentUrl());
   }
 
+  isApiActive(): boolean {
+    return this.isApiPath(this.currentUrl());
+  }
+
   isAdminActive(): boolean {
     return this.isAdminPath(this.currentUrl());
   }
@@ -155,24 +156,23 @@ export default class Navbar implements OnInit {
   }
 
   toggleFlows(): void {
-    this.layout.flowsExpanded.update(open => !open);
+    this.layout.toggleMenu('flows');
   }
 
   toggleBroker(): void {
-    this.layout.brokerExpanded.update(open => !open);
+    this.layout.toggleMenu('broker');
+  }
+
+  toggleApi(): void {
+    this.layout.toggleMenu('api');
   }
 
   toggleAdmin(): void {
-    this.layout.adminExpanded.update(open => !open);
+    this.layout.toggleMenu('admin');
   }
 
   toggleAccount(): void {
-    this.layout.accountExpanded.update(open => !open);
-  }
-
-  changeLanguage(languageKey: string): void {
-    this.stateStorageService.storeLocale(languageKey);
-    this.translateService.use(languageKey);
+    this.layout.toggleMenu('account');
   }
 
   collapseNavbar(): void {
@@ -193,6 +193,7 @@ export default class Navbar implements OnInit {
     this.layout.syncMenuExpansion({
       flows: this.isFlowsPath(url),
       broker: this.isBrokerPath(url),
+      api: this.isApiPath(url),
       admin: this.isAdminPath(url),
       account: this.isAccountPath(url),
     });
@@ -212,12 +213,14 @@ export default class Navbar implements OnInit {
     return path === '/broker' || path.startsWith('/broker/') || path.startsWith('/queue') || path.startsWith('/topic');
   }
 
+  private isApiPath(url: string): boolean {
+    const path = url.split('?')[0];
+    return path === API_EXPLORER_PATH || path.startsWith(`${API_EXPLORER_PATH}/`);
+  }
+
   private isAdminPath(url: string): boolean {
     return (
-      url.startsWith('/admin') ||
-      url.startsWith('/user-management') ||
-      url.startsWith('/integration') ||
-      url.startsWith('/certificate')
+      url.startsWith('/admin') || url.startsWith('/user-management') || url.startsWith('/integration') || url.startsWith('/certificate')
     );
   }
 

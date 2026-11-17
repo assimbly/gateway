@@ -3,10 +3,14 @@ import { IStep } from 'app/shared/model/step.model';
 import {
   countLabel,
   failureOfError,
+  failureProblems,
+  firstRouteStepOf,
   flowFailureOf,
   flowTypeLabel,
   hasRun,
   flowStatusView,
+  polledStatus,
+  routeSourceOf,
   runtimeStatusOf,
   sourceStepOf,
   testMessageBlocked,
@@ -23,11 +27,37 @@ describe('Flows list row status', () => {
   });
 
   it.each(['inactive', 'inactiveError'] as const)('marks a %s Draft, which it can not start', status => {
-    expect(flowStatusView(status, true)).toMatchObject({ draft: true, controls: ['start', 'pause', 'stop'], disabled: ['start', 'pause', 'stop'] });
+    expect(flowStatusView(status, true)).toMatchObject({
+      draft: true,
+      controls: ['start', 'pause', 'stop'],
+      disabled: ['start', 'pause', 'stop'],
+    });
+  });
+
+  it.each([
+    ['inactive', 'started', 'started'],
+    ['active', 'stopped', 'stopped'],
+    ['active', 'suspended', 'suspended'],
+    ['active', 'unconfigured', 'unconfigured'],
+    ['active', 'started', null],
+    ['inactive', 'unconfigured', null],
+  ] as const)('a row showing %s that reads %s again takes %s', (shown, reported, taken) => {
+    expect(polledStatus(shown, reported)).toBe(taken);
+  });
+
+  it('keeps an Error while the runtime only says the Flow is not running, and drops it once the Flow runs', () => {
+    expect(polledStatus('inactiveError', 'stopped')).toBeNull();
+    expect(polledStatus('inactiveError', 'unconfigured')).toBeNull();
+    expect(polledStatus('inactiveError', 'started')).toBe('started');
   });
 
   it('lets a Draft that is still running be stopped', () => {
-    expect(flowStatusView('active', true)).toMatchObject({ label: 'Running', draft: true, controls: ['pause', 'stop', 'restart'], disabled: [] });
+    expect(flowStatusView('active', true)).toMatchObject({
+      label: 'Running',
+      draft: true,
+      controls: ['pause', 'stop', 'restart'],
+      disabled: [],
+    });
   });
 
   it('shows — for a Flow that never ran, and the count, 0 included, once it has', () => {
@@ -67,12 +97,12 @@ describe('Flows list row status', () => {
 
   it.each(['inactive', 'paused', 'inactiveError'] as const)('blocks a test message while the Flow is %s', status => {
     expect(testMessageBlocked(status, { name: 'file', title: 'File', consumerOnly: false })).toBe(
-      'Start the Flow to send it a test message.',
+      'Start the Flow to send a message to it.',
     );
   });
 
-  it('blocks a test message to a Flow without a Source, such as a Route Flow', () => {
-    expect(testMessageBlocked('active', null)).toBe('This Flow has no Source to send a test message to.');
+  it('blocks a test message to a Flow without a Source', () => {
+    expect(testMessageBlocked('active', null)).toBe('This Flow has no Source to send a message to.');
   });
 
   it('finds the Source among the Steps, also as the older FROM Step', () => {
@@ -81,9 +111,34 @@ describe('Flows list row status', () => {
     expect(sourceStepOf([{ stepType: 'ROUTE' }] as IStep[])).toBeUndefined();
   });
 
+  it('takes the first Route of a Route Flow in place of its Source, not its Error handler', () => {
+    const steps = [
+      { stepType: 'ERROR', id: 1 },
+      { stepType: 'ROUTE', id: 2 },
+      { stepType: 'ROUTE', id: 3 },
+    ] as IStep[];
+    expect(firstRouteStepOf(steps)?.id).toBe(2);
+    expect(firstRouteStepOf([{ stepType: 'SOURCE' }] as IStep[])).toBeUndefined();
+  });
+
+  it.each([
+    ['<route>\n  <from uri="sjms:NamesIn"/>\n  <to uri="direct:split"/>\n</route>', { componentType: 'sjms', uri: 'NamesIn', options: '' }],
+    [
+      "<route><from id='in' uri='file://C:/messages/in?noop=true&amp;delay=500'/></route>",
+      { componentType: 'file', uri: 'C:/messages/in', options: 'noop=true&delay=500' },
+    ],
+    ['<route><from\n    uri="timer:tick?period=1000"/></route>', { componentType: 'timer', uri: 'tick', options: 'period=1000' }],
+  ])('reads where the route %j reads from', (xml, source) => {
+    expect(routeSourceOf(xml)).toEqual(source);
+  });
+
+  it.each([undefined, '', '<route><to uri="sjms:Out"/></route>', 'not xml'])('reads no Source from %j', xml => {
+    expect(routeSourceOf(xml)).toBeUndefined();
+  });
+
   it('blocks a test message to a Source whose Component only receives, such as a Scheduler', () => {
     expect(testMessageBlocked('active', { name: 'scheduler', title: 'Scheduler', consumerOnly: true })).toBe(
-      "A test message can't be sent to a Scheduler Source.",
+      "A message can't be sent to a Scheduler Source.",
     );
   });
 
@@ -91,7 +146,7 @@ describe('Flows list row status', () => {
     ['flow', 'Visual'],
     [undefined, 'Visual'],
     ['script', 'Script'],
-    ['route', 'Route'],
+    ['route', 'Camel route'],
   ])('calls a Flow of type %s a %s Flow', (type, label) => {
     expect(flowTypeLabel(type)).toBe(label);
   });
@@ -113,8 +168,15 @@ describe('Flows list row status', () => {
     it('says how many Steps failed, and which, without the stack trace', () => {
       expect(flowFailureOf(answer)).toEqual({
         summary: '1 of 3 Steps failed to start.',
-        steps: [{ uri: 'file://C:\messages\in', message: 'Multiple consumers' }],
+        steps: [{ id: '2', uri: 'file://C:\messages\in', message: 'Multiple consumers' }],
       });
+    });
+
+    it('marks the Step that failed to start on the canvas, by its saved id', () => {
+      const steps = [{ key: 'step-1', id: 1 }, { key: 'new-3', id: 2 }, { key: 'new-4' }];
+
+      expect(failureProblems(steps, flowFailureOf(answer))).toEqual([{ stepKey: 'new-3', message: 'Failed to start: Multiple consumers' }]);
+      expect(failureProblems(steps, null)).toEqual([]);
     });
 
     it('is no failure when the Flow started', () => {
@@ -122,7 +184,10 @@ describe('Flows list row status', () => {
     });
 
     it("uses the runtime's message when it doesn't count the Steps", () => {
-      expect(flowFailureOf({ flow: { status: 'failed', message: 'Start flow failed' } })).toEqual({ summary: 'Start flow failed', steps: [] });
+      expect(flowFailureOf({ flow: { status: 'failed', message: 'Start flow failed' } })).toEqual({
+        summary: 'Start flow failed',
+        steps: [],
+      });
     });
 
     it('takes an answer that is not JSON as the message', () => {

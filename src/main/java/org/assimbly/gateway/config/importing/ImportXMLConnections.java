@@ -20,7 +20,8 @@ import javax.xml.xpath.XPathFactory;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-@Transactional
+// Spring only rolls back on unchecked exceptions by default, and the import methods throw checked ones
+@Transactional(rollbackFor = Exception.class)
 public class ImportXMLConnections {
 
     private final Logger log = LoggerFactory.getLogger(ImportXMLConnections.class);
@@ -120,12 +121,37 @@ public class ImportXMLConnections {
         log.debug("Get Connection Keys: " + connectionName);
 
         Map<String, String> connectionMap = ImportXMLUtil.getMap(doc,"/dil/core/connections/connection[id='" + connectionId + "']/keys/*");
+
+        log.debug("Set Connection Keys: " + connectionName);
+
+        mergeConnectionKeys(connection, connectionKeys, connectionMap);
+
+        if (connection != null && connectionKeys != null) {
+
+            log.debug("Import into database: " + connectionName);
+
+            connection = connectionRepository.save(connection);
+
+			//save connectionkeys
+			connection.setConnectionKeys(connectionKeys);
+			connection = connectionRepository.save(connection);
+
+			String generatedConnectionId = connection.getId().toString();
+
+			connectionsIdMap.put(connectionId, generatedConnectionId);
+
+		}
+
+        log.info("Finish importing connection: {}", connectionName);
+
+    }
+
+	private void mergeConnectionKeys(Connection connection, Set<ConnectionKeys> connectionKeys, Map<String, String> connectionMap) {
+
 		Map<String, ConnectionKeys> map = new ConcurrentHashMap<>();
 		for (ConnectionKeys s : connectionKeys) {
 			map.put(s.getKey(), s);
 		}
-
-        log.debug("Set Connection Keys: " + connectionName);
 
         for (Map.Entry<String, String> entry : connectionMap.entrySet()) {
 
@@ -152,26 +178,7 @@ public class ImportXMLConnections {
 			}
 		}
 
-
-        if (connection != null && connectionKeys != null) {
-
-            log.debug("Import into database: " + connectionName);
-
-            connection = connectionRepository.save(connection);
-
-			//save connectionkeys
-			connection.setConnectionKeys(connectionKeys);
-			connection = connectionRepository.save(connection);
-
-			String generatedConnectionId = connection.getId().toString();
-
-			connectionsIdMap.put(connectionId, generatedConnectionId);
-
-		}
-
-        log.info("Finish importing connection: {}", connectionName);
-
-    }
+	}
 
 	public void updateConnectionIdsFromXml(Document doc, Map.Entry<String, String> entry) throws Exception {
 

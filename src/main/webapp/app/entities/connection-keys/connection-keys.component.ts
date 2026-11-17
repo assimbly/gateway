@@ -1,5 +1,4 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input, OnChanges, OnInit, SimpleChanges, inject, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -22,36 +21,34 @@ import { ForbiddenConnectionKeysValidatorDirective } from './connection-keys-val
 @Component({
     selector: 'jhi-connection-keys',
     templateUrl: './connection-keys.component.html',
-    imports: [CommonModule, FormsModule, RouterModule, FontAwesomeModule, Alert, ForbiddenConnectionKeysValidatorDirective],
+    imports: [FormsModule, RouterModule, FontAwesomeModule, Alert, ForbiddenConnectionKeysValidatorDirective],
 })
 export class ConnectionKeysComponent implements OnInit, OnChanges {
+    protected connectionKeysService = inject(ConnectionKeysService);
+    protected connections = inject(Connections);
+    protected alertService = inject(AlertService);
+    protected modalService = inject(NgbModal);
+    protected eventManager = inject(EventManager);
+    protected accountService = inject(AccountService);
+
     @Input() connectionKeys: Array<IConnectionKeys> = [];
-    @Input() connection: Connection;
+    readonly connection = input.required<Connection>();
 
     connectionKeysKeys: Array<string> = [];
-    isSaving: boolean;
-    connectionKey: IConnectionKeys;
+    isSaving!: boolean;
+    connectionKey!: IConnectionKeys;
     currentAccount: any;
-    eventSubscriber: Subscription;
+    eventSubscriber!: Subscription;
     requiredConnectionKey: Array<RequiredConnectionKey> = [];
-    private requiredType: RequiredConnectionKey;
+    private requiredType!: RequiredConnectionKey;
     driversList: Array<String> = this.connections.driversList;
     jmsProvidersList: Array<String> = ['ActiveMQ Artemis', 'ActiveMQ Classic', 'AMQ'];
     pooledList: Array<String> = ['true', 'false'];
 
-    constructor(
-        protected connectionKeysService: ConnectionKeysService,
-        protected connections: Connections,
-        protected alertService: AlertService,
-		protected modalService: NgbModal,
-        protected eventManager: EventManager,
-        protected accountService: AccountService
-    ) {}
-
     loadAll() {
         this.connectionKeysService.query().subscribe(
             (res: HttpResponse<IConnectionKeys[]>) => {
-                this.connectionKeys = res.body;
+                this.connectionKeys = res.body!;
             },
             (res: HttpErrorResponse) => this.onError(res.message)
         );
@@ -100,9 +97,9 @@ export class ConnectionKeysComponent implements OnInit, OnChanges {
                     connectionKey.isDisabled = true;
                 });
             }
-            const requiredType = this.requiredConnectionKey.find(x => x.name === this.connection.type);
+            const requiredType = this.requiredConnectionKey.find(x => x.name === this.connection().type);
             const requiredConnectionKeys = new Array<ConnectionKeys>();
-            requiredType.connectionKeys.forEach(sk => {
+            requiredType!.connectionKeys.forEach(sk => {
                 const ersk = this.connectionKeys.find(s => s.key === sk.connectionKeyName);
                 let rsk = new ConnectionKeys();
                 if (ersk instanceof ConnectionKeys) {
@@ -113,6 +110,7 @@ export class ConnectionKeysComponent implements OnInit, OnChanges {
                 rsk.valueType = sk.valueType;
                 rsk.placeholder = sk.placeholder;
                 rsk.isRequired = sk.isRequired;
+                rsk.value = rsk.value || sk.defaultValue;
                 requiredConnectionKeys.push(rsk);
             });
             this.connectionKeys.unshift(...requiredConnectionKeys);
@@ -124,7 +122,7 @@ export class ConnectionKeysComponent implements OnInit, OnChanges {
         if (connectionKey.id) {
             this.subscribeToSaveResponse(this.connectionKeysService.update(connectionKey), false, i);
         } else {
-            connectionKey.connectionId = this.connection.id;
+            connectionKey.connectionId = this.connection().id;
             this.subscribeToSaveResponse(this.connectionKeysService.create(connectionKey), true, i);
         }
     }
@@ -144,13 +142,13 @@ export class ConnectionKeysComponent implements OnInit, OnChanges {
         }
     }
 
-    editConnectionKey(connectionKey) {
+    editConnectionKey(connectionKey: IConnectionKeys) {
         connectionKey.isDisabled = false;
     }
 
     mapConnectionKeysKeys() {
         if (typeof this.connectionKeys !== 'undefined') {
-            this.connectionKeysKeys = this.connectionKeys.map(sk => sk.key);
+            this.connectionKeysKeys = this.connectionKeys.map(sk => sk.key!);
             this.connectionKeysKeys = this.connectionKeysKeys.filter(k => k !== undefined);
         }
     }
@@ -158,21 +156,21 @@ export class ConnectionKeysComponent implements OnInit, OnChanges {
     private subscribeToSaveResponse(result: Observable<HttpResponse<IConnectionKeys>>, isCreate: boolean, i: number) {
         result.subscribe(data => {
             if (data.ok) {
-                this.onSaveSuccess(data.body, isCreate, i);
+                this.onSaveSuccess(data.body!, isCreate, i);
             }
         });
     }
 
     cloneConnectionKey(connectionKey: ConnectionKeys) {
         const connectionKeyForClone = new ConnectionKeys(
-            null,
+            null!,
             connectionKey.key,
             connectionKey.value,
-            null,
+            null!,
             false,
             true,
-            null,
-            null,
+            null!,
+            null!,
             connectionKey.connectionId
         );
         this.connectionKeys.push(connectionKeyForClone);
@@ -180,7 +178,7 @@ export class ConnectionKeysComponent implements OnInit, OnChanges {
 
     private onSaveSuccess(result: IConnectionKeys, isCreate: boolean, i: number) {
         result.isRequired = this.requiredConnectionKey
-            .find(rsk => rsk.name === this.connection.type)
+            .find(rsk => rsk.name === this.connection().type)!
             .connectionKeys.some(sk => sk.connectionKeyName === result.key);
 
         if (isCreate) {
@@ -199,10 +197,6 @@ export class ConnectionKeysComponent implements OnInit, OnChanges {
 
     ngOnDestroy() {
         this.eventManager.destroy(this.eventSubscriber);
-    }
-
-    trackId(index: number, item: IConnectionKeys) {
-        return item.id;
     }
 
     registerChangeInConnectionKeys() {
@@ -227,4 +221,6 @@ export interface ConnectionKeyInformation {
     valueType: string;
     placeholder: string;
     isRequired: boolean;
+    /** What a new key of this kind starts with, such as `true` for pooled. */
+    defaultValue?: string;
 }

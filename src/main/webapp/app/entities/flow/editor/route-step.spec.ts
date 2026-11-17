@@ -1,4 +1,4 @@
-import { isRouteStep, missingRouteFields, routeToSave } from './route-step';
+import { isRouteConfiguration, isRouteStep, missingRouteFields, nextRouteName, routeToSave } from './route-step';
 
 describe('Route Step', () => {
   it('is a Route, or the Error handler of a Route Flow', () => {
@@ -31,5 +31,18 @@ describe('Route Step', () => {
 
   it('saves nothing for a Step without a name or a Route', () => {
     expect(routeToSave({ name: '', content: ' ' }, undefined)).toBeNull();
+  });
+
+  it('names a new Route after the Routes the Flow already has', () => {
+    expect(nextRouteName([])).toBe('Route1');
+    expect(nextRouteName(['Route1', 'Orders'])).toBe('Route2');
+    expect(nextRouteName(['Route1', 'Route3'])).toBe('Route2');
+    expect(nextRouteName([' route1 ', 'ROUTE2', null, undefined])).toBe('Route3');
+  });
+
+  it('tells a routeConfiguration from a route', () => {
+    expect(isRouteConfiguration('  <routeConfiguration id="x"/>')).toBe(true);
+    expect(isRouteConfiguration('<route><from uri="timer:x"/></route>')).toBe(false);
+    expect(isRouteConfiguration(null)).toBe(false);
   });
 });

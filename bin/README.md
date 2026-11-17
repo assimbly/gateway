@@ -61,6 +61,33 @@ build integration
 
 ---
 
+## buildExecutable
+
+Builds self-contained executable bundles (with an embedded Java 25 runtime via `jlink` / `jpackage`) for Windows and/or Mac so users can run Assimbly without installing Java.
+
+### Usage:
+
+To build the executable bundle:
+
+```buildExecutable [target] [module] [kind]```
+
+* Target: valid values are `win`, `mac`, or `all` (default is `win` on Windows, `mac` on Mac). The Windows bundle (`Assimbly.exe`) can only be built on Windows, so `win` and `all` need a Windows machine; the Mac bundle builds on both.
+* Module: valid values are `full`, `integration`, `broker` or `headless` (default is `full`)
+* Kind: kind of dependencies: `default` or `full` (default is `default`)
+
+### Examples:
+
+```
+buildExecutable
+buildExecutable all
+buildExecutable win full
+buildExecutable mac integration
+```
+
+The generated archives (`assimbly-gateway-<version>-windows-x64.zip` and `assimbly-gateway-<version>-mac-aarch64.tar.gz`) are placed in `build/distributions/`.
+
+---
+
 ##  BuildDocker
 
 Build a local Docker image to Docker Desktop. (Docker Desktop needs to be installed).
@@ -157,3 +184,35 @@ To print a report:
 example
 
 ```updateversion 1.1.0```
+
+---
+
+## checkfrontendversions
+
+Checks the frontend (`package.json`) dependencies for the latest versions using `npx npm-check-updates`.
+
+### Usage:
+
+```checkfrontendversions```
+
+---
+
+## updatefrontendversion
+
+Updates the frontend (`package.json`) dependency versions using `npx npm-check-updates`.
+
+### Usage:
+
+```updatefrontendversion [target]```
+
+* Target: valid values are `patch`, `minor` (patch + minor), `major`, or `all` (patch + minor + major). Default is `patch`.
+
+### Examples:
+
+```
+updatefrontendversion
+updatefrontendversion patch
+updatefrontendversion minor
+updatefrontendversion major
+updatefrontendversion all
+```

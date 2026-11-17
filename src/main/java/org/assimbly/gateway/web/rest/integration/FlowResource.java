@@ -8,6 +8,10 @@ import org.assimbly.gateway.service.FlowAlertLogService;
 import org.assimbly.gateway.service.FlowService;
 import org.assimbly.gateway.service.dto.FlowAlertsPageDTO;
 import org.assimbly.gateway.service.dto.FlowDTO;
+import org.assimbly.gateway.service.testrun.FlowTestRunException;
+import org.assimbly.gateway.service.testrun.FlowTestRunService;
+import org.assimbly.gateway.service.testrun.TestRunRequest;
+import org.assimbly.gateway.service.testrun.TestRunResult;
 import org.assimbly.gateway.web.rest.errors.BadRequestAlertException;
 import org.assimbly.gateway.web.rest.util.HeaderUtil;
 import org.assimbly.gateway.web.rest.util.PaginationUtil;
@@ -20,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +33,7 @@ import tech.jhipster.web.util.ResponseUtil;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -56,6 +62,9 @@ public class FlowResource {
 
     @Autowired
     private FlowAlertLogService flowAlertLogService;
+
+    @Autowired
+    private FlowTestRunService flowTestRunService;
 
     @Value("${server.port}")
     private int serverPort;
@@ -143,13 +152,17 @@ public class FlowResource {
      * GET  /flows/byname?name= : get the flow with this name, for example to check whether an import would replace it.
      *
      * @param name the name of the flow
+     * @param ignoreCase whether a flow with this name in another case is found when none has it exactly
      * @return the ResponseEntity with status 200 (OK) and with body the flowDTO, or with status 404 (Not Found)
      */
     @Operation(summary = "Get a flow by its name")
     @GetMapping("/flows/byname")
-    public ResponseEntity<FlowDTO> getFlowByName(@RequestParam(value = "name") String name) {
+    public ResponseEntity<FlowDTO> getFlowByName(
+        @RequestParam(value = "name") String name,
+        @RequestParam(value = "ignoreCase", defaultValue = "false") boolean ignoreCase
+    ) {
         log.debug("REST request to get Flow by name : {}", name);
-        return ResponseUtil.wrapOrNotFound(flowService.findByName(name));
+        return ResponseUtil.wrapOrNotFound(flowService.findByName(name, ignoreCase));
     }
 
     /**
@@ -182,8 +195,23 @@ public class FlowResource {
         @RequestParam(value = "offset", defaultValue = "0") int offset,
         @RequestParam(value = "limit", defaultValue = "10") int limit
     ) {
-        log.debug("REST request to get alerts for Flow : {}", id);
+        log.trace("REST request to get alerts for Flow : {}", id);
         return ResponseEntity.ok(flowAlertLogService.page(id, offset, limit));
+    }
+
+    /**
+     * POST /flows/:id/alerts : add alerts to a flow, such as why it didn't start. The Gateway puts the time before each.
+     *
+     * @param id the flow id
+     * @param messages the alerts, one line each
+     * @return the ResponseEntity with status 204 (No Content)
+     */
+    @Operation(summary = "Add alerts to a flow")
+    @PostMapping("/flows/{id}/alerts")
+    public ResponseEntity<Void> addFlowAlerts(@PathVariable(value = "id") Long id, @RequestBody List<String> messages) {
+        log.debug("REST request to add {} alerts to Flow : {}", messages.size(), id);
+        flowAlertLogService.add(id, messages);
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -198,6 +226,26 @@ public class FlowResource {
         log.debug("REST request to clear alerts for Flow : {}", id);
         flowAlertLogService.clear(id);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * POST /flows/:id/test-runs : send a message into a step of the running flow and report what each step did with it.
+     *
+     * @param id the flow id
+     * @param request the step to start at, and the body and headers to send it
+     * @return the ResponseEntity with status 200 (OK) and the steps the message passed, or with status 409 (Conflict)
+     * and a message when the test can't run, for example because the flow isn't started
+     */
+    @Operation(summary = "Test a running flow from one of its steps")
+    @PostMapping("/flows/{id}/test-runs")
+    public ResponseEntity<TestRunResult> testRunFlow(@PathVariable(value = "id") Long id, @RequestBody TestRunRequest request) {
+        log.debug("REST request to test Flow {} from step {}", id, request.entryStepId());
+        return ResponseEntity.ok(flowTestRunService.run(id.toString(), request.entryStepId(), request));
+    }
+
+    @ExceptionHandler(FlowTestRunException.class)
+    public ResponseEntity<Map<String, String>> testRunRefused(FlowTestRunException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", e.getMessage()));
     }
 
     /**

@@ -1,9 +1,9 @@
 package org.assimbly.gateway.repository;
 
+import java.util.List;
 import org.assimbly.gateway.domain.Broker;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
 
 /**
  * Spring Data  repository for the Broker entity.
@@ -11,5 +11,5 @@ import org.springframework.stereotype.Repository;
 @SuppressWarnings("unused")
 @Repository
 public interface BrokerRepository extends JpaRepository<Broker, Long> {
-
+    List<Broker> findAllByAutoStartTrue();
 }

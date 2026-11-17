@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { switchMap } from 'rxjs';
 
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -15,10 +15,12 @@ import { CertificateService } from './certificate.service';
     imports: [FontAwesomeModule, AlertError],
 })
 export class CertificateDeleteDialogComponent {
-    certificate: ICertificate;
-    isDeleting = false;
+    protected certificateService = inject(CertificateService);
+    activeModal = inject(NgbActiveModal);
+    protected eventManager = inject(EventManager);
 
-    constructor(protected certificateService: CertificateService, public activeModal: NgbActiveModal, protected eventManager: EventManager) {}
+    certificate!: ICertificate;
+    isDeleting = false;
 
     clear() {
         this.activeModal.dismiss('cancel');
@@ -27,7 +29,7 @@ export class CertificateDeleteDialogComponent {
     confirmDelete(id: number) {
         this.isDeleting = true;
         this.certificateService
-            .deleteCertificate(this.certificate.certificateName, this.certificate.certificateStore)
+            .deleteCertificate(this.certificate.certificateName!, this.certificate.certificateStore)
             .pipe(switchMap(() => this.certificateService.delete(id)))
             .subscribe({
                 next: () => {

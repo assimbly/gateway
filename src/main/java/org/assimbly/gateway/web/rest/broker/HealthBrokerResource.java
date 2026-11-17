@@ -90,9 +90,9 @@ public class HealthBrokerResource {
 
             MemoryUsage mem = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
 
-            backendResponse.addMemory("current", healthService.convertSizeToKb(mem.getUsed()));
-            backendResponse.addMemory("max", healthService.convertSizeToKb(mem.getMax()));
-            backendResponse.addMemory("committed", healthService.convertSizeToKb(mem.getCommitted()));
+            backendResponse.addMemory("current", healthService.convertSizeToKb((double) mem.getUsed()));
+            backendResponse.addMemory("max", healthService.convertSizeToKb((double) mem.getMax()));
+            backendResponse.addMemory("committed", healthService.convertSizeToKb((double) mem.getCommitted()));
             backendResponse.addMemory("cached", healthService.convertSizeToKb(mem.getCommitted() - (double) mem.getUsed()));
             backendResponse.addMemory("currentUsedPercentage", (mem.getUsed() * 100 / mem.getMax()));
 

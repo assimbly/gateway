@@ -34,3 +34,18 @@ export function routeToSave(fields: RouteFields, saved: IRoute | undefined): IRo
   }
   return { id: saved?.id, name, type: saved?.type ?? 'xml', content };
 }
+
+/** The name a new Route gets: Route1, Route2, … the first one the Flow doesn't use yet. */
+export function nextRouteName(taken: (string | null | undefined)[]): string {
+  const used = new Set(taken.map(name => name?.trim().toLowerCase()).filter(name => !!name));
+  let n = 1;
+  while (used.has(`route${n}`)) {
+    n++;
+  }
+  return `Route${n}`;
+}
+
+/** A Route that holds a routeConfiguration rather than a route; no message can be sent into it. */
+export function isRouteConfiguration(content: string | null | undefined): boolean {
+  return !!content?.trim().startsWith('<routeConfiguration');
+}

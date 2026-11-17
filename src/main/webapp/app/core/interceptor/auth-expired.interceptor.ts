@@ -15,7 +15,8 @@ export const authExpiredInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     tap({
       error(err: HttpErrorResponse) {
-        if (err.status === 401 && err.url && !err.url.includes('api/account')) {
+        // A 401 from api/authenticate means wrong credentials, not an expired session: the login form shows that itself
+        if (err.status === 401 && err.url && !err.url.includes('api/account') && !err.url.includes('api/authenticate')) {
           if (err.url.includes(loginService.logoutUrl())) {
             loginService.logoutInClient();
             return;

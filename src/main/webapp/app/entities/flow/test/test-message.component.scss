@@ -1,0 +1,25 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.test-message__headers th {
+  width: 40%;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.test-message__headers td {
+  word-break: break-word;
+}
+
+/* Where the message will be: the size of a short body, so the layout doesn't jump when it arrives. */
+.test-message__placeholder {
+  margin: 0;
+  padding: 1.5rem 0.75rem;
+  border: 1px dashed var(--app-border, #e4e7ec);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  text-align: center;
+  color: var(--app-text-muted, #667085);
+}

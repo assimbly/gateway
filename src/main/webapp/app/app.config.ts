@@ -11,7 +11,6 @@ import {
   withDebugTracing,
   withNavigationErrorHandler,
 } from '@angular/router';
-import { provideServiceWorker } from '@angular/service-worker';
 
 import { NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap/datepicker';
 import { environment } from 'environments/environment';
@@ -22,7 +21,6 @@ import { errorHandlerInterceptor } from 'app/core/interceptor/error-handler.inte
 import { notificationInterceptor } from 'app/core/interceptor/notification.interceptor';
 
 import './config/dayjs';
-import { provideTranslation } from 'app/shared/language';
 
 import { AppPageTitleStrategy } from './app-page-title-strategy';
 import routes from './app.routes';
@@ -50,10 +48,7 @@ if (environment.DEBUG_INFO_ENABLED) {
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideTranslation(),
     provideRouter(routes, ...routerFeatures),
-    // Set this to true to enable service worker (PWA)
-    provideServiceWorker('ngsw-worker.js', { enabled: false }),
     provideHttpClient(withInterceptors([authInterceptor, authExpiredInterceptor, errorHandlerInterceptor, notificationInterceptor])),
     Title,
     { provide: LOCALE_ID, useValue: 'en' },

@@ -1,28 +1,20 @@
 @if (authority) {
-  <form name="deleteForm" (ngSubmit)="confirmDelete(authority.name)">
-    <div class="modal-header">
-      <h4 class="modal-title" data-cy="authorityDeleteDialogHeading" jhiTranslate="entity.delete.title">Confirm delete operation</h4>
-    </div>
+<form name="deleteForm" (ngSubmit)="confirmDelete(authority.name)">
+  <div class="modal-header">
+    <h4 class="modal-title" data-cy="authorityDeleteDialogHeading">Delete Authority</h4>
+  </div>
 
-    <div class="modal-body">
-      <jhi-alert-error />
-      <p
-        id="jhi-delete-authority-heading"
-        jhiTranslate="jhipsterGradleSampleApplicationApp.adminAuthority.delete.question"
-        [translateValues]="{ id: authority.name }"
-      >
-        Are you sure you want to delete Authority {{ authority.name }}?
-      </p>
-    </div>
+  <div class="modal-body">
+    <jhi-alert-error />
+    <p id="jhi-delete-authority-heading">Are you sure you want to delete Authority {{ authority.name }}?</p>
+  </div>
 
-    <div class="modal-footer">
-      <button type="button" class="btn btn-fx btn-fx-secondary" (click)="cancel()">
-        <fa-icon icon="ban" /><span jhiTranslate="entity.action.cancel">Cancel</span>
-      </button>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-fx btn-fx-secondary" (click)="cancel()"><fa-icon icon="ban" /><span>Cancel</span></button>
 
-      <button id="jhi-confirm-delete-authority" data-cy="entityConfirmDeleteButton" type="submit" class="btn btn-fx btn-fx-danger">
-        <fa-icon icon="trash" /><span jhiTranslate="entity.action.delete">Delete</span>
-      </button>
-    </div>
-  </form>
+    <button id="jhi-confirm-delete-authority" data-cy="entityConfirmDeleteButton" type="submit" class="btn btn-fx btn-fx-danger">
+      <fa-icon icon="trash" /><span>Delete</span>
+    </button>
+  </div>
+</form>
 }

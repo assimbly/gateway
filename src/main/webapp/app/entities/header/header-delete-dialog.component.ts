@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
@@ -15,22 +15,26 @@ import { HeaderService } from './header.service';
     imports: [FontAwesomeModule, AlertError],
 })
 export class HeaderDeleteDialogComponent {
-    header: IHeader;
+    protected headerService = inject(HeaderService);
+    activeModal = inject(NgbActiveModal);
+    protected eventManager = inject(EventManager);
 
-    constructor(
-        protected headerService: HeaderService,
-        public activeModal: NgbActiveModal,
-        protected eventManager: EventManager
-    ) {}
+    header: IHeader;
+    /** True while the delete runs, so a second click doesn't send it again. */
+    readonly deleting = signal(false);
 
     clear() {
         this.activeModal.dismiss('cancel');
     }
 
     confirmDelete(id: number) {
-        this.headerService.delete(id).subscribe(response => {
-		    this.eventManager.broadcast(new EventWithContent('headerListModification', 'Deleted an header'));
-            this.activeModal.dismiss(true);
+        this.deleting.set(true);
+        this.headerService.delete(id).subscribe({
+            next: () => {
+                this.eventManager.broadcast(new EventWithContent('headerListModification', 'Deleted an header'));
+                this.activeModal.dismiss(true);
+            },
+            error: () => this.deleting.set(false),
         });
     }
 }

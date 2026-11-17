@@ -1,0 +1,16 @@
+<section class="empty-state" [attr.aria-labelledby]="titleId">
+  <h2 class="empty-state__title" [id]="titleId">{{ heading() }}</h2>
+  @if (description()) {
+    <p class="empty-state__lead">{{ description() }}</p>
+  }
+  <ng-content />
+  <div class="empty-state__primary">
+    <ng-content select="[primary]" />
+  </div>
+  <p class="empty-state__more">
+    <ng-content select="[secondary]" />
+    @if (showDocs()) {
+      <a class="empty-state__docs" [href]="docsUrl()" target="_blank" rel="noopener noreferrer">Read the docs</a>
+    }
+  </p>
+</section>

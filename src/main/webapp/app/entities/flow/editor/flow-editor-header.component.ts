@@ -6,14 +6,18 @@ import { NgClass } from '@angular/common';
 import { Router } from '@angular/router';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { NgbDropdownModule, NgbOffcanvas, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { NgbDropdownModule, NgbModal, NgbOffcanvas, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { EMPTY, Observable, Subject, catchError, forkJoin, map, merge, of, switchMap, timer } from 'rxjs';
 
 import { Components } from 'app/shared/camel/component-type';
+import { isPlainKey, isRunShortcut, isStopShortcut, isTypingTarget } from 'app/shared/keyboard';
 import { StatusControlsTone } from 'app/shared/table';
 
+import { DesignerSelection } from '../designer/flow-canvas.component';
 import { FlowService } from '../flow.service';
 import {
+  FlowAction,
   FlowFailure,
   RuntimeStatus,
   countLabel,
@@ -27,8 +31,22 @@ import {
 } from '../flow-status';
 import { FlowRowAlerts } from '../flow-row-alerts.component';
 import { FlowAlertsDrawerComponent } from '../flow-alerts-drawer.component';
+import { FlowLogDrawerComponent } from '../flow-log-drawer.component';
+import { CamelRouteDrawerComponent } from '../camel-route-drawer.component';
+import { GatewayStageService } from 'app/entities/integration/gateway-stage.service';
+import { confirmOnProduction } from './confirm-dialog.component';
 
 const POLL_INTERVAL = 10000;
+
+/** The visual editor designs a Flow, or runs and tests the saved Flow. */
+export type EditorMode = 'design' | 'test';
+
+/** Something in the Draft list: which Step or Branch it is on, what to do, and what to select to do it. */
+export interface DraftProblem {
+  where: string;
+  message: string;
+  selection: DesignerSelection;
+}
 
 const TONE_CLASS: Record<StatusControlsTone, string> = {
   default: 'btn-fx-secondary',
@@ -40,29 +58,70 @@ const TONE_CLASS: Record<StatusControlsTone, string> = {
 /**
  * The one header row of every Flow editor: the Flow's name, its counters and Alerts, and the actions to save, start or
  * stop the Flow and send it a test message. The colour of Start/Stop shows the Flow status.
+ *
+ * The visual editor has two modes instead, switched with a toggle: Design saves the Flow or saves and tests it; Test
+ * starts, pauses and stops the saved Flow, like the Flows list.
  */
+/**
+ * The page to go back to from the `returnTo` query parameter: only a path of this app, so a link can't send the user
+ * elsewhere. The Flows page when there is none.
+ */
+export function returnPath(param: string | null | undefined): string {
+  return param?.startsWith('/') && !param.startsWith('//') && !param.includes('\\') ? param : '/';
+}
+
 @Component({
   selector: 'jhi-flow-editor-header',
   templateUrl: './flow-editor-header.component.html',
   styleUrl: './flow-editor-header.component.scss',
   imports: [NgClass, ReactiveFormsModule, FontAwesomeModule, NgbDropdownModule, NgbTooltip, FlowRowAlerts],
+  host: {
+    '(document:keydown)': 'onKeydown($event)',
+  },
 })
 export class FlowEditorHeaderComponent {
   readonly nameControl = input.required<FormControl<string>>();
+  /** Where the back arrow leads: the page the editor was opened from, such as an API, or else the Flows. */
+  readonly returnTo = input('/');
+  readonly backLabel = computed(() => (this.returnTo() === '/' ? 'Back to Flows' : 'Back to the API'));
   /** The saved Flow's id; a new Flow has none until it is saved. */
   readonly flowId = input<number | null | undefined>();
   /** Why the Flow is a Draft, or null when it is complete enough to run. */
   readonly draftReason = input<string | null>(null);
+  /** Everything that keeps a visual Flow a Draft, listed behind the Draft badge. */
+  readonly draftProblems = input<DraftProblem[]>([]);
+  /** What may not be meant but doesn't keep the Flow from running, listed below the problems. */
+  readonly draftWarnings = input<DraftProblem[]>([]);
   /** The Component of the Flow's Source, which a test message is sent to. */
   readonly sourceComponent = input<string | undefined>();
+  /** The visual editor tests the Flow in its own Test panel instead of on the Send page. */
+  readonly testInEditor = input(false);
+  /** The header of the visual editor, with its Design/Test toggle. */
+  readonly modes = input(false);
+  readonly mode = input<EditorMode>('design');
+  /** What the toggle calls the editing mode: Design in the visual editor, Code in the Route editor. */
+  readonly designLabel = input('Design');
+  readonly designIcon = input<IconProp>('pencil-alt');
   readonly saving = input(false);
+  /** The Flow has edits that are not saved yet. */
+  readonly unsaved = input(false);
+  /** The last save succeeded and nothing changed since. */
+  readonly saved = input(false);
   /** Whether the user tried to save, after which a missing name is an error rather than a hint. */
   readonly submitted = input(false);
 
   readonly save = output<void>();
   readonly saveAndStart = output<void>();
-  /** Saves the Flow and goes back to the Manage page. */
+  /** Saves the running Flow and restarts it, so the change takes effect; Save alone keeps it on its previous configuration. */
+  readonly saveAndRestart = output<void>();
+  /** Save & close: saves the Flow and goes back to the Manage page. */
   readonly saveAndReturn = output<void>();
+  /** Send a message to this Flow was clicked in the visual editor, which opens its Test panel. */
+  readonly testRequested = output<void>();
+  /** The toggle, or its T key, asks for the other mode. */
+  readonly modeChange = output<EditorMode>();
+  /** A problem in the Draft list was clicked: the editor selects its Step or Branch. */
+  readonly problemSelected = output<DraftProblem>();
 
   readonly status = signal<RuntimeStatus>('inactive');
   readonly ran = signal(false);
@@ -78,6 +137,13 @@ export class FlowEditorHeaderComponent {
   readonly running = computed(() => this.status() === 'active' || this.status() === 'paused');
   readonly completedLabel = computed(() => countLabel(this.completed(), this.ran()));
   readonly failedLabel = computed(() => countLabel(this.failed(), this.ran()));
+  readonly issueCount = computed(() => {
+    const count = this.draftProblems().length;
+    return `${count} ${count === 1 ? 'issue' : 'issues'}`;
+  });
+  readonly draftLabel = computed(
+    () => `Draft: ${this.issueCount()} ${this.draftProblems().length === 1 ? 'keeps' : 'keep'} this Flow from running. Show them`,
+  );
 
   /** Why the Flow can't be started now, or null when it can. */
   readonly startBlocked = computed(() => {
@@ -89,9 +155,47 @@ export class FlowEditorHeaderComponent {
 
   /** Why no test message can be sent now, or null when it can. */
   readonly testMessageBlocked = computed(() => {
+    if (this.testInEditor()) {
+      // The Test panel says itself why it can't run yet.
+      return null;
+    }
     const source = this.sourceComponent();
-    return testMessageBlocked(this.status(), source ? (this.components.types.find(type => type.name === source) ?? { name: source }) : null);
+    return testMessageBlocked(
+      this.status(),
+      source ? (this.components.types.find(type => type.name === source) ?? { name: source }) : null,
+    );
   });
+
+  shows(action: FlowAction): boolean {
+    return this.state().controls.includes(action);
+  }
+
+  disabled(action: FlowAction): boolean {
+    return this.state().disabled.includes(action);
+  }
+
+  /**
+   * Why the toggle can't switch now, or null when it can: a Draft can't run, so it can't be tested until it is
+   * complete. Switching to Test saves the Flow automatically when needed; back to Design is always possible.
+   */
+  readonly toggleBlocked = computed(() => {
+    if (this.saving()) {
+      return 'Saving…';
+    }
+    if (this.mode() === 'design' && this.draftReason() !== null) {
+      return this.draftProblems().length
+        ? `Finish the Draft to test it: ${this.issueCount()}. Click Draft to see them.`
+        : `This Flow is a Draft: ${this.draftReason()}`;
+    }
+    return null;
+  });
+
+  /** A saved Flow switches between Design and Test, unless it is a Draft. */
+  toggleMode(): void {
+    if (this.toggleBlocked() === null) {
+      this.modeChange.emit(this.mode() === 'design' ? 'test' : 'design');
+    }
+  }
 
   /** The name is required: once the user empties it, or tries to save without one, the field says so. */
   nameInvalid(): boolean {
@@ -103,6 +207,8 @@ export class FlowEditorHeaderComponent {
   private readonly components = inject(Components);
   private readonly router = inject(Router);
   private readonly offcanvas = inject(NgbOffcanvas);
+  private readonly modals = inject(NgbModal);
+  private readonly gatewayStage = inject(GatewayStageService);
   private readonly nameInput = viewChild<ElementRef<HTMLInputElement>>('nameInput');
   private readonly refresh = new Subject<void>();
 
@@ -119,6 +225,38 @@ export class FlowEditorHeaderComponent {
     this.nameInput()?.nativeElement.focus();
   }
 
+  /**
+   * Ctrl+Enter (Cmd+Enter) does what the Save & start button does, or Save & restart while the Flow runs;
+   * Ctrl+Shift+Enter stops the Flow. Like Ctrl+S they also work while typing in a field or code editor, and only when
+   * their button is enabled. In the visual editor T switches between Design and Test, but not while typing. A dialog or
+   * drawer on top of the editor keeps the keys.
+   */
+  onKeydown(event: KeyboardEvent): void {
+    const covered = this.modals.hasOpenModals() || this.offcanvas.hasOpenOffcanvas();
+    if (this.modes() && !covered && (isPlainKey(event, 't') || isPlainKey(event, 'T')) && !isTypingTarget(event.target)) {
+      event.preventDefault();
+      this.toggleMode();
+      return;
+    }
+    const run = isRunShortcut(event);
+    if ((!run && !isStopShortcut(event)) || covered) {
+      return;
+    }
+    event.preventDefault();
+    if (this.busy() || (run && this.saving())) {
+      return;
+    }
+    if (!run) {
+      if (this.running()) {
+        this.stop();
+      }
+    } else if (this.running()) {
+      this.saveAndRestart.emit();
+    } else if (this.draftReason() === null) {
+      this.saveAndStart.emit();
+    }
+  }
+
   /** Starts the saved Flow. When the start fails the Flow shows the Error status. */
   start(id = this.flowId()): void {
     if (!id) {
@@ -127,21 +265,76 @@ export class FlowEditorHeaderComponent {
     this.run(this.flowService.configureAndStart(id));
   }
 
-  stop(): void {
-    const id = this.flowId();
+  /** Restarts the saved Flow with its saved configuration. */
+  restart(id = this.flowId()): void {
     if (id) {
-      this.run(this.flowService.stop(id));
+      this.run(this.flowService.configureAndRestart(id));
     }
   }
 
+  /** Stops the Flow; on stage Production after the user confirms it. */
+  stop(): void {
+    const id = this.flowId();
+    if (id) {
+      confirmOnProduction(this.modals, this.gatewayStage.production(), 'stop', this.nameControl().value, () =>
+        this.run(this.flowService.stop(id)),
+      );
+    }
+  }
+
+  /** Restart clicked in the status controls; on stage Production it asks first. */
+  confirmRestart(): void {
+    confirmOnProduction(this.modals, this.gatewayStage.production(), 'restart', this.nameControl().value, () => this.restart());
+  }
+
+  pause(): void {
+    const id = this.flowId();
+    if (id) {
+      this.run(this.flowService.pause(id));
+    }
+  }
+
+  resume(): void {
+    const id = this.flowId();
+    if (id) {
+      this.run(this.flowService.resume(id));
+    }
+  }
+
+  /** Opens the Alerts drawer. Clearing them also clears the Error: the Flow is then just stopped. */
   openAlerts(): void {
     const id = this.flowId();
     if (id) {
-      FlowAlertsDrawerComponent.open(this.offcanvas, { id, name: this.nameControl().value }, () => this.alerts.set(0));
+      FlowAlertsDrawerComponent.open(this.offcanvas, { id, name: this.nameControl().value }, () => {
+        this.alerts.set(0);
+        this.failure.set(null);
+        if (this.status() === 'inactiveError') {
+          this.status.set('inactive');
+        }
+      });
+    }
+  }
+
+  openLog(): void {
+    const id = this.flowId();
+    if (id) {
+      FlowLogDrawerComponent.open(this.offcanvas, { id, name: this.nameControl().value });
+    }
+  }
+
+  /** Shows the Camel route the runtime built for the Flow. */
+  openCamelRoute(): void {
+    const id = this.flowId();
+    if (id) {
+      CamelRouteDrawerComponent.open(this.offcanvas, { id, name: this.nameControl().value });
     }
   }
 
   sendTestMessage(): void {
+    if (this.testInEditor()) {
+      this.testRequested.emit();
+      return;
+    }
     this.router.navigate(['/flow/message-sender'], { queryParams: { flowId: this.flowId() } });
   }
 
@@ -161,6 +354,8 @@ export class FlowEditorHeaderComponent {
         this.failure.set(failureOfError(error.error));
         this.status.set('inactiveError');
         this.ran.set(true);
+        // The failure is an Alert now: count it.
+        this.refresh.next();
       },
     });
   }
@@ -178,12 +373,12 @@ export class FlowEditorHeaderComponent {
         }
         this.ran.set(this.ran() || hasRun(status.body));
         this.alerts.set(alerts.body?.total ?? 0);
-        return this.ran() ? this.flowService.getFlowMessages(id) : of(null);
+        return this.ran() ? this.flowService.getFlowTransactions(id) : of(null);
       }),
-      map(messages => {
-        if (messages) {
-          this.completed.set(messages.body?.completedTransactions ?? null);
-          this.failed.set(messages.body?.failedTransactions ?? null);
+      map(transactions => {
+        if (transactions) {
+          this.completed.set(transactions.body?.flow?.completed ?? null);
+          this.failed.set(transactions.body?.flow?.failed ?? null);
         }
       }),
       catchError(() => EMPTY),
