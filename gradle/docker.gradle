@@ -1,6 +1,6 @@
 jib {
     from {
-        image = "eclipse-temurin:11-jre-focal"
+        image = "eclipse-temurin:25-jre-noble"
     }
     to {
         image = "gateway:latest"
