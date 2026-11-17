@@ -1,4 +1,8 @@
 pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
     plugins {
         id 'org.springframework.boot' version "${spring_boot_version}"
         id 'org.springframework.boot.aot' version "${spring_boot_version}"
