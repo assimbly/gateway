@@ -31,6 +31,7 @@ const routeResolve: ResolveFn<IRoute> = activatedRoute => {
 export const routeRoute: Routes = [
   {
     path: 'route',
+    title: 'Routes',
     loadComponent: () => import('./route.component').then(m => m.RouteComponent),
     data: {
       authorities: ['ROLE_USER'],
@@ -39,6 +40,7 @@ export const routeRoute: Routes = [
   },
   {
     path: 'route/:id/view',
+    title: 'Route',
     loadComponent: () => import('./route-detail.component').then(m => m.RouteDetailComponent),
     resolve: {
       route: routeResolve,
@@ -50,6 +52,7 @@ export const routeRoute: Routes = [
   },
   {
     path: 'route/new',
+    title: 'Route',
     loadComponent: () => import('./route-update.component').then(m => m.RouteUpdateComponent),
     resolve: {
       route: routeResolve,
@@ -61,6 +64,7 @@ export const routeRoute: Routes = [
   },
   {
     path: 'route/:id/edit',
+    title: 'Route',
     loadComponent: () => import('./route-update.component').then(m => m.RouteUpdateComponent),
     resolve: {
       route: routeResolve,

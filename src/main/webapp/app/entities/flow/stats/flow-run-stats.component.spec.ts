@@ -39,16 +39,22 @@ describe('Flow run stats', () => {
 
   function serve(stats: IFlowStats): void {
     jest.spyOn(service, 'getFlowStats').mockReturnValue(of(new HttpResponse({ body: { flow: stats } })));
-    jest.spyOn(service, 'getFlowExchanges').mockReturnValue(of({ flow: { total: 3, completed: 2, failed: 1, pending: 0, steps: [{ id: '11', total: 3, completed: 2, failed: 1, pending: 0 }] } }));
+    jest
+      .spyOn(service, 'getFlowExchanges')
+      .mockReturnValue(
+        of({
+          flow: { total: 3, completed: 2, failed: 1, pending: 0, steps: [{ id: '11', total: 3, completed: 2, failed: 1, pending: 0 }] },
+        }),
+      );
     jest.spyOn(service, 'getStepStats').mockReturnValue(of({ step: { id: '1-11', stats: { meanProcessingTime: 2 } } }));
   }
 
   it('gives the canvas the counts of each Step and shows the stats of the running Flow', fakeAsync(() => {
     serve(started);
     const counts = jest.fn();
-    const running = jest.fn();
+    const status = jest.fn();
     fixture.componentInstance.countsChange.subscribe(counts);
-    fixture.componentInstance.runningChange.subscribe(running);
+    fixture.componentInstance.statusChange.subscribe(status);
 
     fixture.detectChanges();
     tick();
@@ -56,7 +62,8 @@ describe('Flow run stats', () => {
 
     const sink = graph.steps.find(step => step.kind === 'SINK')!;
     expect(counts).toHaveBeenCalledWith(new Map([[sink.key, { total: 3, completed: 2, failed: 1, pending: 0 }]]));
-    expect(running).toHaveBeenCalledWith(true);
+    expect(status).toHaveBeenCalledWith('active');
+    expect(fixture.nativeElement.querySelector('h5').textContent).toBe('Flow');
     expect(fixture.nativeElement.textContent).toContain('Running for');
     discardPeriodicTasks();
   }));
@@ -73,7 +80,7 @@ describe('Flow run stats', () => {
     fixture.detectChanges();
 
     expect(service.getStepStats).toHaveBeenCalledWith(1, 11);
-    expect(fixture.nativeElement.querySelector('h5').textContent).toContain('SINK');
+    expect(fixture.nativeElement.querySelector('h5').textContent).toBe('Sink');
     discardPeriodicTasks();
   }));
 
@@ -91,14 +98,29 @@ describe('Flow run stats', () => {
   it('says there are no stats while the Flow is stopped', fakeAsync(() => {
     serve({ id: '1', status: 'stopped' } as IFlowStats);
     const counts = jest.fn();
+    const status = jest.fn();
     fixture.componentInstance.countsChange.subscribe(counts);
+    fixture.componentInstance.statusChange.subscribe(status);
 
     fixture.detectChanges();
     tick();
     fixture.detectChanges();
 
     expect(counts).toHaveBeenCalledWith(undefined);
+    expect(status).toHaveBeenCalledWith('inactive');
     expect(fixture.nativeElement.textContent).toContain("There are no stats while the Flow isn't running.");
+    discardPeriodicTasks();
+  }));
+
+  it('tells a paused Flow from a stopped one', fakeAsync(() => {
+    serve({ id: '1', status: 'suspended' } as IFlowStats);
+    const status = jest.fn();
+    fixture.componentInstance.statusChange.subscribe(status);
+
+    fixture.detectChanges();
+    tick();
+
+    expect(status).toHaveBeenCalledWith('paused');
     discardPeriodicTasks();
   }));
 });

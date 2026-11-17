@@ -29,7 +29,6 @@ import { FlowSearchByNamePipe } from './flow.searchbyname.pipe';
 import { FlowTypeChoicesComponent } from './flow-type-choices.component';
 import { TutorialPanelState } from 'app/tutorials/tutorial-panel.state';
 import { NewFlowDialogComponent } from './new-flow-dialog.component';
-import { FluxygenExportDialogComponent } from './fluxygen-export-dialog.component';
 import { ImportDialogComponent } from 'app/entities/import/import-dialog.component';
 import { ApiService } from 'app/entities/api/api.service';
 import { IApiHandler } from 'app/entities/api/api.model';
@@ -265,10 +264,6 @@ export class FlowComponent implements OnInit, OnDestroy {
     this.runtimes = { ...this.runtimes, [id]: runtime };
   }
 
-  get integrationId(): number | undefined {
-    return this.integrations?.[this.indexIntegration]?.id;
-  }
-
   openNewFlow(): void {
     this.modalService.open(NewFlowDialogComponent, { size: 'lg', ariaLabelledBy: 'new-flow-title' });
   }
@@ -283,13 +278,6 @@ export class FlowComponent implements OnInit, OnDestroy {
 
   openImport(): void {
     this.modalService.open(ImportDialogComponent, { size: 'lg', ariaLabelledBy: 'import-flow-title' });
-  }
-
-  openFluxygenExport(): void {
-    const integrationId = this.integrationId;
-    if (integrationId !== undefined) {
-      FluxygenExportDialogComponent.open(this.modalService, integrationId);
-    }
   }
 
   registerChangeInFlows() {

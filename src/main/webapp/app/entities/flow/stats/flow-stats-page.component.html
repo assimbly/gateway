@@ -1,21 +1,30 @@
 <div class="container-fluid flow-designer-page">
   <header class="flow-stats-header">
-    <a routerLink="/" class="btn btn-fx btn-fx-ghost" title="Back to the Flows">
-      <fa-icon icon="arrow-left" /><span>Flows</span>
-    </a>
+    <a routerLink="/" class="btn btn-fx btn-fx-ghost" title="Back to the Flows"> <fa-icon icon="arrow-left" /><span>Flows</span> </a>
     <div class="flow-stats-header__title">
       <span class="flow-stats-header__label">Flow stats</span>
       <h1 class="flow-stats-header__name">{{ flow?.name }}</h1>
     </div>
     @if (read) {
-      <span class="badge" [class.text-bg-success]="running" [class.text-bg-secondary]="!running">{{ running ? 'Started' : 'Not running' }}</span>
+      <span class="badge" [ngClass]="statusBadge">{{ statusLabel }}</span>
     }
     <div class="flow-stats-header__actions">
-      <button type="button" class="btn btn-fx btn-fx-ghost" (click)="refresh()" [disabled]="!graph" title="Refreshes by itself every 5 seconds">
+      <button
+        type="button"
+        class="btn btn-fx btn-fx-ghost"
+        (click)="refresh()"
+        [disabled]="!graph"
+        title="Refreshes by itself every 5 seconds"
+      >
         <fa-icon icon="sync" /><span>Refresh</span>
       </button>
       @if (flow?.id) {
-        <a *jhiHasAnyAuthority="'ROLE_ADMIN'" class="btn btn-fx btn-fx-primary" [routerLink]="['/flow/editor', flow!.id]" [queryParams]="editorQueryParams">
+        <a
+          *jhiHasAnyAuthority="'ROLE_ADMIN'"
+          class="btn btn-fx btn-fx-primary"
+          [routerLink]="['/flow/editor', flow!.id]"
+          [queryParams]="editorQueryParams"
+        >
           <fa-icon icon="pencil-alt" /><span>Edit Flow</span>
         </a>
       }
@@ -50,7 +59,7 @@
             [graph]="graph"
             [selection]="selection"
             (countsChange)="onCountsChange($event)"
-            (runningChange)="onRunningChange($event)"
+            (statusChange)="onStatusChange($event)"
           />
         </div>
       </aside>

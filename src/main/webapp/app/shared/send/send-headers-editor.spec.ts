@@ -100,7 +100,7 @@ describe('SendHeadersEditor', () => {
       expect(templates.list).toHaveBeenCalled();
       expect(comp.templates()).toEqual([{ id: 7, name: 'orders' }]);
       expect(text()).toContain('Save as template');
-      expect(text()).toContain('Manage templates');
+      expect(text()).toContain('Manage message templates');
     });
 
     it('copies a template into the rows and marks the rows as modified when they change', () => {

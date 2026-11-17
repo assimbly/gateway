@@ -27,6 +27,7 @@ const loadFlowEditor = () => import('./editor/flow-editor.component').then(m => 
 const flowRoute: Routes = [
   {
     path: 'flow',
+    title: 'Flows',
     loadComponent: () => import('./flow.component').then(m => m.FlowComponent),
     data: {
       authorities: ['ROLE_USER'],
@@ -35,6 +36,7 @@ const flowRoute: Routes = [
   },
   {
     path: 'flow/message-sender',
+    title: 'Send to a Flow',
     loadComponent: () => import('./sender/flow-message-sender.component').then(m => m.FlowMessageSenderComponent),
     data: {
       authorities: ['ROLE_ADMIN'],
@@ -43,6 +45,7 @@ const flowRoute: Routes = [
   },
   {
     path: 'flow/:id/stats',
+    title: 'Flow stats',
     loadComponent: () => import('./stats/flow-stats-page.component').then(m => m.FlowStatsPageComponent),
     data: {
       authorities: ['ROLE_USER'],
@@ -51,6 +54,7 @@ const flowRoute: Routes = [
   },
   {
     path: 'flow/editor',
+    title: 'Flow editor',
     loadComponent: loadFlowEditor,
     data: {
       authorities: ['ROLE_ADMIN'],
@@ -60,6 +64,7 @@ const flowRoute: Routes = [
   },
   {
     path: 'flow/editor/:id',
+    title: 'Flow editor',
     loadComponent: loadFlowEditor,
     data: {
       authorities: ['ROLE_ADMIN'],
@@ -69,6 +74,7 @@ const flowRoute: Routes = [
   },
   {
     path: 'flow/editor/:id/:clone',
+    title: 'Flow editor',
     loadComponent: loadFlowEditor,
     data: {
       authorities: ['ROLE_ADMIN'],
@@ -78,6 +84,7 @@ const flowRoute: Routes = [
   },
   {
     path: 'flow/new',
+    title: 'Flow',
     loadComponent: () => import('./flow-update.component').then(m => m.FlowUpdateComponent),
     resolve: {
       flow: flowResolve,
@@ -89,6 +96,7 @@ const flowRoute: Routes = [
   },
   {
     path: 'flow/:id/edit',
+    title: 'Flow',
     loadComponent: () => import('./flow-update.component').then(m => m.FlowUpdateComponent),
     resolve: {
       flow: flowResolve,

@@ -4,76 +4,54 @@
 
 **What you'll learn**
 
-* Build a Flow on the canvas
-* Start it and send it a message
-* See the message arrive
+- Build a Flow on the canvas
+- Start it and send it a message
+- See the message arrive
 
 **File (Source)** → **File (Sink)**
 
 It takes about 5 minutes.
 
 <!-- web-only -->
+
 > You can also follow this tutorial inside the Gateway: click **Tutorials** in the menu. It shows each step next to the screen it's about and ticks it off once you've done it.
 
 ## Before you start
 
-* The Gateway running, and you signed in: see the [Quick start](https://github.com/assimbly/gateway/wiki/quick-start)
+- The Gateway running, and you signed in: see the [Quick start](https://github.com/assimbly/gateway/wiki/quick-start)
 
 ## Step 1: Create TestFlow
 
-You build *TestFlow*. It moves files from an `in` folder to an `out` folder.
+You build _TestFlow_. It moves files from an `in` folder to an `out` folder.
 
 1. Go to **Flows → Manage** and click **Add**. <!-- show: [aria-label="Add"] @ / -->
 2. Choose **Visual**. <!-- show: a.flow-type-choice -->
-3. At the top left, where it says *Flow name*, type `TestFlow`. <!-- show: #field_flowName -->
+3. At the top left, where it says _Flow name_, type `TestFlow`. <!-- show: #field_flowName -->
 
 The canvas shows two Steps: a **Source** and a **Sink**.
 
-> **Why a Source and a Sink?** The Source receives messages and the Sink delivers them. Every Flow has at least these two. You configure them in the next step.
-
-> **Why TestFlow?** The other tutorials start from this Flow too, so keep it.
+> **Why a Source and a Sink?** The Source receives messages and the Sink delivers them. Every Flow has at least these two.
 
 ## Step 2: Configure the Source and the Sink
 
 1. Click the **Source** on the canvas. <!-- show: .flow-step-source --> Set:
-   * **Component:** `File`
-   * **Directory Name:** `@{messages}/in` <!-- show: [formcontrolname="uri"] -->
+   - **Component:** `File`
+   - **Directory Name:** `@{messages}/in` <!-- show: [formcontrolname="uri"] -->
 2. Click the **Sink** on the canvas. <!-- show: .flow-step-sink --> Set:
-   * **Component:** `File`
-   * **Directory Name:** `@{messages}/out`
+   - **Component:** `File`
+   - **Directory Name:** `@{messages}/out`
 
-You save the Flow in the next step, when you start it.
-
-> **Tip: where are the settings?** Clicking a Step opens its settings in the **Editor**, beside the canvas. The enlarge button at the right of the tabs shows them full page, for more room, and **✕** hides them. <!-- show: [data-cy="panel-enlarge"] -->
-
-> **What is `@{messages}`?** A **Variable** that points to the folder `messages` in your home folder, such as `C:\Users\<you>\messages` on Windows, `/home/<you>/messages` on Linux, `/Users/<you>/messages` on macOS and `/data/messages` in Docker. That way the same Flow works on every machine. You find it under **Flows → Variables**.
-
-> **Do the folders have to exist?** No. The File component creates them when the Flow starts.
-
-> **Why change the Sink?** A new Flow's Sink writes each message to the log. Now it writes files instead.
+> **What is `@{messages}`?** A **Variable** that points to the folder `messages` in your home folder (see **Flows → Variables**). The File component creates the folders when the Flow starts.
 
 ## Step 3: Start it and test it
 
 <!-- step: {"check":"flowCompleted:TestFlow"} -->
 
-1. Click **Save & Test** at the top right. <!-- show: [data-tour="flow-save-test"] @ flow:TestFlow --> The editor switches to **Test**, with the **Tester** beside the Visual flow. <!-- show: [data-cy="test-tester"] @ flow:TestFlow:test -->
-2. Under **In**, type `Hello, Assimbly!` in **Body**. <!-- show: [data-cy="test-in"] @ flow:TestFlow:test -->
-3. Click **Test**. <!-- show: [data-cy="test-run"] @ flow:TestFlow:test -->
+1. Click **Test** at the top of the editor. <!-- show: [data-cy="mode-toggle"] @ flow:TestFlow --> The Flow is saved automatically and the **Test** panel opens beside the Visual flow. <!-- show: [data-cy="test-tester"] @ flow:TestFlow:test -->
+2. Click **▶** (Start) in the **Test** panel. <!-- show: [data-tour="flow-status-controls"] @ flow:TestFlow:test -->
+3. Under **In**, type `Hello, Assimbly!` in **Body**. <!-- show: [data-cy="test-in"] @ flow:TestFlow:test -->
+4. Click **Test**. <!-- show: [data-cy="test-run"] @ flow:TestFlow:test -->
 
-The Tester shows **Passed** under **Out**, and the Sink on the canvas shows a **1**. Click the Sink <!-- show: .flow-step-sink @ flow:TestFlow:test --> to see its **In** and **Out** in the Tester: the message it received and the message it passed on. Your message is now a file in `@{messages}/out`. Open it to have a look.
+The Tester shows **Passed** under **Out**, and the Sink on the canvas shows a **1**. Click the Sink <!-- show: .flow-step-sink @ flow:TestFlow:test --> to see its **In** and **Out** in the Tester. Your message is now a file in `@{messages}/out`. Open it to have a look.
 
-> **What does Save & Test do?** It saves the Flow, starts it and switches the editor from **Design** to **Test**, with the **Tester** beside the Visual flow. When the Flow already runs, it restarts it, so your change takes effect.
-
-> **Why does only the Sink count the message?** **Test** hands your message to the Step after the Source. The Source itself picks up every file in the `in` folder: drop a file there and it ends up in `out` too. Files it picked up move to a hidden `.camel` folder, so they're not processed twice.
-
-> **Good to know**
->
-> * **Design** and **Test** at the top switch between building the Flow and running it. <!-- show: [data-cy="mode-toggle"] @ flow:TestFlow -->
-> * A Flow that isn't finished, such as a Source without a Sink, is saved as a **Draft**. Click its **Draft** badge to see what's missing, and click a problem to go to its Step. A Draft can't be tested until it's finished.
-> * Design has the same tabs for every Flow: **Visual flow**, with the **Editor** beside the canvas, **Error handler**, **Settings** and **Notes**. Test has **Visual flow**, with the **Tester** beside the canvas, **Stats**, **Log** and **Camel route**.
-> * A tab opens in a panel beside the canvas. The buttons at the right of the tabs show it full page, put it back beside the canvas, or hide it (**✕**); click a tab to show it again. With the **Tester** beside the canvas you watch the Steps while you test: click a Step to see its **In** and **Out**, and **Flow** to go back to the whole Flow. <!-- show: [data-cy="panel-enlarge"] @ flow:TestFlow:test -->
-> * The **Error handler** tab decides what happens with errors. For a new Flow it writes them to the Gateway log.
-> * **Auto-arrange** on the minimap, in the corner of the canvas, lays the Flow out from left to right.
-> * Every Flow runs as an [Apache Camel](https://camel.apache.org/) route. **Camel route** in **Test** shows it. <!-- show: [data-cy="test-view-route"] @ flow:TestFlow:test -->
-
-**Done!** You built your first Flow. Leave *TestFlow* running and continue with [Tutorial 2: Debugging a Flow](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow).
+**Done!** You built your first Flow. Leave _TestFlow_ running and continue with [Tutorial 2: Debugging a Flow](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow).

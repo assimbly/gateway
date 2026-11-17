@@ -23,6 +23,7 @@ const integrationResolve: ResolveFn<IIntegration> = route => {
 export const integrationRoute: Routes = [
   {
     path: 'integration',
+    title: 'Gateways',
     loadComponent: () => import('./integration.component').then(m => m.IntegrationComponent),
     data: {
       authorities: ['ROLE_USER'],
@@ -31,6 +32,7 @@ export const integrationRoute: Routes = [
   },
   {
     path: 'integration/:id/view',
+    title: 'Gateway',
     loadComponent: () => import('./integration-detail.component').then(m => m.IntegrationDetailComponent),
     resolve: {
       integration: integrationResolve,
@@ -42,6 +44,7 @@ export const integrationRoute: Routes = [
   },
   {
     path: 'integration/new',
+    title: 'Gateway',
     loadComponent: () => import('./integration-update.component').then(m => m.IntegrationUpdateComponent),
     resolve: {
       integration: integrationResolve,
@@ -53,6 +56,7 @@ export const integrationRoute: Routes = [
   },
   {
     path: 'integration/:id/edit',
+    title: 'Gateway',
     loadComponent: () => import('./integration-update.component').then(m => m.IntegrationUpdateComponent),
     resolve: {
       integration: integrationResolve,

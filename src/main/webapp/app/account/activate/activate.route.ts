@@ -5,7 +5,7 @@ import Activate from './activate';
 const activateRoute: Route = {
   path: 'activate',
   component: Activate,
-  title: 'activate.title',
+  title: 'Activate account',
 };
 
 export default activateRoute;

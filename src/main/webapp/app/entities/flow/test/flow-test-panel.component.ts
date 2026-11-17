@@ -21,17 +21,18 @@ import SendMessageEditor from 'app/shared/send/send-message-editor';
 import { SendHeader } from 'app/shared/send/send-headers';
 import { sendErrorText } from 'app/shared/send/send-state';
 import { BodyMode } from 'app/shared/send/send-upload';
+import { StatusControls } from 'app/shared/table';
 
 import { FlowGraph, shownName, stepLabel, stepPath } from '../designer/flow-graph';
 import { explainError } from '../flow-errors';
+import { FlowAction, RuntimeStatus, flowStatusView } from '../flow-status';
 import { FlowService } from '../flow.service';
 import { FlowTestRun, StepRun, StepRunMark, entryStepOf, headersOf, runResultsByStepKey, shortDuration } from './flow-test-run';
 import { TestMessageComponent } from './test-message.component';
 
-/** Why a test can't run now, and the button that helps, if any. */
+/** Why a test can't run now. */
 interface Blocked {
   text: string;
-  action?: 'start';
 }
 
 /** What the panel shows: the message in and out of the whole Flow, or of the Step selected on the canvas. */
@@ -50,7 +51,7 @@ export type TestLevel = 'flow' | 'step';
   templateUrl: './flow-test-panel.component.html',
   styleUrl: './flow-test-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FontAwesomeModule, NgbTooltip, NgTemplateOutlet, RouterLink, SendMessageEditor, TestMessageComponent],
+  imports: [FontAwesomeModule, NgbTooltip, NgTemplateOutlet, RouterLink, SendMessageEditor, StatusControls, TestMessageComponent],
 })
 export class FlowTestPanelComponent {
   readonly flowId = input<number | null | undefined>();
@@ -64,6 +65,8 @@ export class FlowTestPanelComponent {
   /** The key of the Step selected on the canvas, whose messages are shown. */
   readonly selectedKey = input<string | undefined>();
   readonly running = input(false);
+  readonly status = input<RuntimeStatus>();
+  readonly busy = input(false);
   readonly draftReason = input<string | null>(null);
   readonly unsaved = input(false);
   /** The last run; the editor keeps it, and drops it once the Flow changes. */
@@ -73,6 +76,10 @@ export class FlowTestPanelComponent {
 
   readonly ran = output<FlowTestRun>();
   readonly start = output<void>();
+  readonly pause = output<void>();
+  readonly resume = output<void>();
+  readonly stop = output<void>();
+  readonly restart = output<void>();
   readonly saveAndRun = output<void>();
   readonly editStep = output<string>();
   /** Visual flow, full page: show the canvas beside the Tester, so a Step can be selected. */
@@ -118,7 +125,11 @@ export class FlowTestPanelComponent {
 
   /** What a test does, behind the info icon of the Flow. */
   readonly flowInfo = computed(() => {
-    const into = this.routes() ? 'into the first Route, past its from endpoint' : this.scripts() ? 'into the first Script, past the Source' : 'from the Step after the Source';
+    const into = this.routes()
+      ? 'into the first Route, past its from endpoint'
+      : this.scripts()
+        ? 'into the first Script, past the Source'
+        : 'from the Step after the Source';
     const what = this.routes() ? 'The Routes' : 'The Steps';
     return `Runs one message through the running Flow, ${into}. ${what} do what they always do: they write files, call APIs and put messages on queues.`;
   });
@@ -135,6 +146,18 @@ export class FlowTestPanelComponent {
     return graph ? entryStepOf(graph) : this.entryStepId();
   });
 
+  readonly effectiveStatus = computed<RuntimeStatus>(() => this.status() ?? (this.running() ? 'active' : 'inactive'));
+  readonly isRunning = computed(() => this.running() || this.effectiveStatus() === 'active' || this.effectiveStatus() === 'paused');
+  readonly state = computed(() => flowStatusView(this.effectiveStatus(), this.draftReason() !== null));
+
+  shows(action: FlowAction): boolean {
+    return this.state().controls.includes(action);
+  }
+
+  disabled(action: FlowAction): boolean {
+    return this.state().disabled.includes(action);
+  }
+
   readonly blocked = computed<Blocked | null>(() => {
     if (!this.flowId()) {
       return { text: 'Save the Flow first.' };
@@ -145,7 +168,7 @@ export class FlowTestPanelComponent {
     if (!this.entryStep()) {
       return { text: this.graph() ? 'Link a Step after the Source and save the Flow first.' : 'Save the Flow first.' };
     }
-    return this.running() ? null : { text: 'Start the Flow to test it.', action: 'start' };
+    return this.isRunning() ? null : { text: 'Start the Flow to test it.' };
   });
 
   readonly marks = computed(() => {
@@ -167,7 +190,9 @@ export class FlowTestPanelComponent {
     const graph = this.graph();
     const key = this.selectedKey();
     const step = graph && key ? graph.steps.find(s => s.key === key) : undefined;
-    return graph && step ? { label: stepLabel(graph, step, this.titles), name: shownName(step) ?? (stepPath(graph, step) || undefined) } : undefined;
+    return graph && step
+      ? { label: stepLabel(graph, step, this.titles), name: shownName(step) ?? (stepPath(graph, step) || undefined) }
+      : undefined;
   });
 
   readonly passedSteps = computed(() => this.run()?.steps.filter(step => step.status === 'completed').length ?? 0);

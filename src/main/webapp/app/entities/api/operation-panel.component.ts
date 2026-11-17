@@ -4,8 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CodemirrorModule } from '@ctrl/ngx-codemirror';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Observable, tap } from 'rxjs';
 
 import { ThemeService } from 'app/core/theme';
+import { confirmChoice } from 'app/entities/flow/editor/confirm-dialog.component';
+import { SaveShortcutDirective } from 'app/shared/keyboard';
 import {
   DEFAULT_MEDIA_TYPE,
   IApi,
@@ -36,7 +40,7 @@ type OperationTab = 'general' | 'parameters' | 'request' | 'responses' | 'try';
 @Component({
   selector: 'jhi-operation-panel',
   templateUrl: './operation-panel.component.html',
-  imports: [NgTemplateOutlet, FormsModule, RouterModule, FontAwesomeModule, CodemirrorModule],
+  imports: [NgTemplateOutlet, FormsModule, RouterModule, FontAwesomeModule, CodemirrorModule, SaveShortcutDirective],
 })
 export class OperationPanelComponent implements OnChanges {
   readonly api = input.required<IApi>();
@@ -52,6 +56,7 @@ export class OperationPanelComponent implements OnChanges {
 
   private readonly apiService = inject(ApiService);
   private readonly themeService = inject(ThemeService);
+  private readonly modalService = inject(NgbModal);
   /** The panel is OnPush: what a request answers is shown once it is marked. */
   private readonly cdr = inject(ChangeDetectorRef);
 
@@ -102,7 +107,14 @@ export class OperationPanelComponent implements OnChanges {
     this.shownId = operation?.id;
     this.draft = operation
       ? structuredClone(operation)
-      : { method: 'GET', path: '/', parameters: [], declaredResponses: [], requestMediaType: DEFAULT_MEDIA_TYPE, responseMediaType: DEFAULT_MEDIA_TYPE };
+      : {
+          method: 'GET',
+          path: '/',
+          parameters: [],
+          declaredResponses: [],
+          requestMediaType: DEFAULT_MEDIA_TYPE,
+          responseMediaType: DEFAULT_MEDIA_TYPE,
+        };
     this.message = undefined;
     this.exampleFor = undefined;
     this.openSchemas = new Set();
@@ -176,34 +188,53 @@ export class OperationPanelComponent implements OnChanges {
   }
 
   save(): void {
-    this.saving = true;
-    this.message = undefined;
-    const request = this.isNew ? this.apiService.createOperation(this.api().id!, this.draft) : this.apiService.updateOperation(this.api().id!, this.draft);
-    request.subscribe({
-      next: saved => {
-        this.saving = false;
-        this.saved.emit(saved);
-        this.cdr.markForCheck();
-      },
+    this.saveRequest().subscribe({
       error: error => {
-        this.saving = false;
         this.message = errorMessage(error);
         this.cdr.markForCheck();
       },
     });
   }
 
+  /** Saves the Operation; the API page shows it as saved once it answers. */
+  saveRequest(): Observable<IApiOperation> {
+    this.saving = true;
+    this.message = undefined;
+    const request = this.isNew
+      ? this.apiService.createOperation(this.api().id!, this.draft)
+      : this.apiService.updateOperation(this.api().id!, this.draft);
+    return request.pipe(
+      tap({
+        next: saved => {
+          this.saving = false;
+          this.saved.emit(saved);
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.saving = false;
+          this.cdr.markForCheck();
+        },
+      }),
+    );
+  }
+
   delete(): void {
     const operation = this.operation()!;
-    if (!window.confirm(`Delete ${operation.method} ${operation.fullPath}? Its Handler Flow ${operation.handlerFlowName} is deleted too.`)) {
-      return;
-    }
-    this.apiService.deleteOperation(this.api().id!, operation.id!).subscribe({
-      next: () => this.deleted.emit(),
-      error: error => {
-        this.message = errorMessage(error);
-        this.cdr.markForCheck();
-      },
+    const message = `Delete ${operation.method} ${operation.fullPath}? Its Handler Flow ${operation.handlerFlowName} is deleted too.`;
+    void confirmChoice(this.modalService, 'Delete Operation', message, [
+      { value: 'cancel', label: 'Cancel', style: 'secondary' },
+      { value: 'delete', label: 'Delete', style: 'danger', icon: 'trash' },
+    ]).then(choice => {
+      if (choice !== 'delete') {
+        return;
+      }
+      this.apiService.deleteOperation(this.api().id!, operation.id!).subscribe({
+        next: () => this.deleted.emit(),
+        error: error => {
+          this.message = errorMessage(error);
+          this.cdr.markForCheck();
+        },
+      });
     });
   }
 
@@ -231,7 +262,12 @@ export class OperationPanelComponent implements OnChanges {
     this.tryResult = undefined;
     this.tryError = undefined;
     this.apiService
-      .tryOperation(this.api().id!, operation.id!, { pathParameters: values('path'), query: values('query'), headers: values('header'), body: this.tryBody || undefined })
+      .tryOperation(this.api().id!, operation.id!, {
+        pathParameters: values('path'),
+        query: values('query'),
+        headers: values('header'),
+        body: this.tryBody || undefined,
+      })
       .subscribe({
         next: result => {
           this.trying = false;

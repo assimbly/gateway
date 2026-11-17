@@ -4,7 +4,7 @@ export const errorRoute: Routes = [
   {
     path: 'error',
     loadComponent: () => import('./error'),
-    title: 'error.title',
+    title: 'Error',
   },
   {
     path: 'accessdenied',
@@ -12,7 +12,7 @@ export const errorRoute: Routes = [
     data: {
       errorMessage: 'You are not authorized to access this page.',
     },
-    title: 'error.title',
+    title: 'Access denied',
   },
   {
     path: '404',
@@ -20,7 +20,7 @@ export const errorRoute: Routes = [
     data: {
       errorMessage: 'The page does not exist.',
     },
-    title: 'error.title',
+    title: 'Page not found',
   },
   {
     path: '**',

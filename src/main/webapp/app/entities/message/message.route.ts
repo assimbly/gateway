@@ -23,6 +23,7 @@ const messageResolve: ResolveFn<IMessage> = route => {
 export const messageRoute: Routes = [
   {
     path: 'message/all',
+    title: 'Message templates',
     loadComponent: () => import('./message-all.component').then(m => m.MessageAllComponent),
     data: {
       authorities: ['ROLE_USER'],
@@ -31,6 +32,7 @@ export const messageRoute: Routes = [
   },
   {
     path: 'message',
+    title: 'Message templates',
     loadComponent: () => import('./message-all.component').then(m => m.MessageAllComponent),
     data: {
       authorities: ['ROLE_USER'],
@@ -39,6 +41,7 @@ export const messageRoute: Routes = [
   },
   {
     path: 'message/:id/view',
+    title: 'Message template',
     loadComponent: () => import('./message-detail.component').then(m => m.MessageDetailComponent),
     resolve: {
       message: messageResolve,
@@ -50,6 +53,7 @@ export const messageRoute: Routes = [
   },
   {
     path: 'message/new',
+    title: 'Message template',
     loadComponent: () => import('./message-update.component').then(m => m.MessageUpdateComponent),
     resolve: {
       message: messageResolve,
@@ -61,6 +65,7 @@ export const messageRoute: Routes = [
   },
   {
     path: 'message/:id/edit',
+    title: 'Message template',
     loadComponent: () => import('./message-update.component').then(m => m.MessageUpdateComponent),
     resolve: {
       message: messageResolve,

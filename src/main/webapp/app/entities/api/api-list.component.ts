@@ -1,13 +1,22 @@
 import { Component, OnInit, ViewEncapsulation, computed, inject, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { NgbDropdownModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbModal, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { forkJoin, of, switchMap } from 'rxjs';
 
+import { confirmChoice } from 'app/entities/flow/editor/confirm-dialog.component';
 import { EmptyState } from 'app/shared/empty-state';
 import { SearchToolbar } from 'app/shared/filter';
 import { SortState } from 'app/shared/sort';
-import { DataTable, DataTableColumn, RowActions, OverflowActionDirective, PrimaryActionDirective, Truncate, sortRows } from 'app/shared/table';
+import {
+  DataTable,
+  DataTableColumn,
+  RowActions,
+  OverflowActionDirective,
+  PrimaryActionDirective,
+  Truncate,
+  sortRows,
+} from 'app/shared/table';
 import { IApi } from './api.model';
 import { ApiService, errorMessage } from './api.service';
 import { ApiStatus, apiStatus } from './api-status';
@@ -40,6 +49,7 @@ const STATUS_RANK: Record<string, number> = { started: 0, default: 1, failed: 2 
 export class ApiListComponent implements OnInit {
   private readonly apiService = inject(ApiService);
   private readonly handlerFlows = inject(HandlerFlowsService);
+  private readonly modalService = inject(NgbModal);
 
   readonly apis = signal<IApi[]>([]);
   readonly statuses = signal<Map<number, ApiStatus>>(new Map());
@@ -113,12 +123,17 @@ export class ApiListComponent implements OnInit {
 
   deleteApi(api: IApi): void {
     const count = api.operationCount ?? api.operations?.length ?? 0;
-    if (!window.confirm(`Delete the API ${api.name}? Its ${count} ${count === 1 ? 'Operation and its Handler Flow are' : 'Operations and their Handler Flows are'} deleted too.`)) {
-      return;
-    }
-    this.apiService.delete(api.id!).subscribe({
-      next: () => this.load(),
-      error: error => this.message.set(errorMessage(error)),
+    const message = `Delete the API ${api.name}? Its ${count} ${count === 1 ? 'Operation and its Handler Flow are' : 'Operations and their Handler Flows are'} deleted too.`;
+    void confirmChoice(this.modalService, 'Delete API', message, [
+      { value: 'cancel', label: 'Cancel', style: 'secondary' },
+      { value: 'delete', label: 'Delete', style: 'danger', icon: 'trash' },
+    ]).then(choice => {
+      if (choice === 'delete') {
+        this.apiService.delete(api.id!).subscribe({
+          next: () => this.load(),
+          error: error => this.message.set(errorMessage(error)),
+        });
+      }
     });
   }
 }

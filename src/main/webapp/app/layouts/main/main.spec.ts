@@ -59,12 +59,18 @@ describe('Main', () => {
     expect(mockAccountService.identity).toHaveBeenCalled();
   });
 
-  it('should set the page title on navigation', fakeAsync(() => {
-    router.resetConfig([{ path: '', title: 'ignored', component: BlankComponent }]);
+  it('names the page in the browser tab on navigation', fakeAsync(() => {
+    router.resetConfig([
+      { path: '', title: 'Flows', component: BlankComponent },
+      { path: 'untitled', component: BlankComponent },
+    ]);
 
     router.navigateByUrl('');
     tick();
+    expect(document.title).toBe('Flows - Assimbly');
 
+    router.navigateByUrl('/untitled');
+    tick();
     expect(document.title).toBe('Assimbly');
   }));
 });

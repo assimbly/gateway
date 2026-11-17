@@ -67,6 +67,10 @@
   white-space: nowrap;
 }
 
+.app-sidebar__stage {
+  flex-shrink: 0;
+}
+
 .app-sidebar__icon-btn {
   display: inline-flex;
   align-items: center;
@@ -197,6 +201,7 @@
   }
 
   .app-sidebar__brand-full,
+  .app-sidebar__stage,
   .app-sidebar__label,
   .app-sidebar__chevron {
     display: none;

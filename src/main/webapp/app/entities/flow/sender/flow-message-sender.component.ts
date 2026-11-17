@@ -16,7 +16,7 @@ import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { ThemeService } from 'app/core/theme';
 import { Components } from 'app/shared/camel/component-type';
 import { Connections } from 'app/shared/camel/connections';
-import { splitHttpUrl } from 'app/shared/camel/endpoint';
+import { OptionSchema, defaultLabelOf, splitHttpUrl, valueLabelOf } from 'app/shared/camel/endpoint';
 import { Connection } from 'app/shared/model/connection.model';
 import { IStep, StepType } from 'app/shared/model/step.model';
 import { ConnectionDialogComponent } from 'app/entities/connection/connection-dialog.component';
@@ -420,6 +420,15 @@ export class FlowMessageSenderComponent implements OnInit, OnDestroy {
   clearOptionHover(): void {
     this.hoveredOption = null;
     this.cdr.detectChanges();
+  }
+
+  /** What the hovered Option's value is and defaults to, in plain words, as the Step editor shows them. */
+  optionValueLabel(option: OptionSchema): string {
+    return valueLabelOf(option);
+  }
+
+  optionDefaultLabel(option: OptionSchema): string {
+    return defaultLabelOf(option);
   }
 
   // path editor

@@ -11,6 +11,7 @@ import { filter, map, startWith } from 'rxjs';
 
 import { API_DEFINITIONS, API_EXPLORER_PATH } from 'app/admin/docs/api-definitions';
 import { AccountService } from 'app/core/auth';
+import { GatewayStageService } from 'app/entities/integration/gateway-stage.service';
 import { ProfileService } from 'app/layouts/profiles/profile.service';
 import { LoginService } from 'app/login/login.service';
 import { HasAnyAuthorityDirective } from 'app/shared/auth';
@@ -53,6 +54,9 @@ export default class Navbar implements OnInit {
   readonly tutorialPanel = inject(TutorialPanelState);
   private readonly theme = inject(ThemeService);
   readonly brandIcon = computed(() => (this.theme.appearance() === 'dark' ? 'logo_darkmode.svg' : 'logo_lightmode.svg'));
+  readonly stage = inject(GatewayStageService);
+  /** The brand as the collapsed sidebar names it, with the stage the badge would show. */
+  readonly brandName = computed(() => (this.stage.label() ? `Gateway (${this.stage.label()})` : 'Gateway'));
   /** No menu while the user still has to replace a default password. */
   readonly sidebarVisible = computed(() => this.account() !== null && !this.account()?.passwordChangeRequired);
   readonly sidebarInert = computed(() => !this.sidebarVisible() || (!this.layout.isDesktop() && !this.layout.mobileOpen()));
@@ -121,7 +125,7 @@ export default class Navbar implements OnInit {
     return current === path || current.startsWith(`${path}/`);
   }
 
-  /** The brokers list and its detail pages, but not the pages reached from Send or Endpoints. */
+  /** The brokers list and its detail pages, but not the pages reached from Send or Queues & Topics. */
   isBrokerManageActive(): boolean {
     return this.isActivePath('/broker') && !this.isBrokerSendActive() && !this.isActivePath('/broker/browser');
   }

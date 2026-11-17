@@ -5,26 +5,24 @@
   </div>
   <div class="modal-body">
     @if (error) {
-      <div class="alert alert-danger">
-        <strong>Generate error!</strong> {{errorMessage}}
-      </div>
+      <div class="alert alert-danger"><strong>Generate error!</strong> {{ errorMessage }}</div>
     }
     <p class="text-muted">
-      Generates a private key and a self-signed certificate for the common name, stored as server identity in {{identityStore}}.
-      An identity with the same name is replaced.
+      Generates a private key and a self-signed certificate for the common name, stored as server identity in {{ identityStore }}. An
+      identity with the same name is replaced.
     </p>
     <div class="form-group">
       <label for="cn" class="form-control-label font-weight-bold">Common Name (CN)</label>
-      <input type="text" id="cn" name="cn" class="form-control" [(ngModel)]="cn" placeholder="Example: localhost">
+      <input type="text" id="cn" name="cn" class="form-control" [(ngModel)]="cn" placeholder="Example: localhost" />
     </div>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-fx btn-fx-secondary" (click)="clear()">
-      <span class="fa fa-ban"></span>
+      <fa-icon icon="ban"></fa-icon>
       <span>Cancel</span>
     </button>
     <button type="button" class="btn btn-fx btn-fx-primary" [disabled]="cn.trim() === '' || isSaving" (click)="generateIdentity()">
-      <span class="fa fa-upload"></span>
+      <fa-icon icon="upload"></fa-icon>
       <span>Generate</span>
     </button>
   </div>

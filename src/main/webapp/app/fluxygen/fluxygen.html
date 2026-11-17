@@ -60,9 +60,16 @@
       </li>
       <li>
         <strong>Export your Flows</strong>
-        <span>
-          On the <a routerLink="/" class="fluxygen__flows">Flows list</a>, <em>Export for Fluxygen</em> makes a zip that Fluxygen imports.
-        </span>
+        <span>Export for Fluxygen makes a zip of the Flows of this Gateway that Fluxygen imports.</span>
+        <button
+          type="button"
+          class="btn btn-fx btn-fx-secondary fluxygen__export"
+          data-cy="fluxygen-export"
+          [disabled]="integrationId() === undefined"
+          (click)="openExport()"
+        >
+          <fa-icon icon="file-export" /><span>Export for Fluxygen</span>
+        </button>
       </li>
       <li>
         <strong>Import and go live</strong>

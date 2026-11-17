@@ -1,14 +1,14 @@
 @if (frameSrc(); as src) {
-  <iframe
-    #frame
-    (load)="onLoad(frame)"
-    [src]="src"
-    width="100%"
-    height="900"
-    seamless
-    target="_top"
-    title="API Explorer"
-    class="border-0"
-    data-cy="swagger-frame"
-  ></iframe>
+<iframe
+  #frame
+  (load)="onLoad(frame)"
+  [src]="src"
+  width="100%"
+  height="900"
+  seamless
+  target="_top"
+  title="Gateway REST API"
+  class="border-0"
+  data-cy="swagger-frame"
+></iframe>
 }

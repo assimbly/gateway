@@ -1,7 +1,12 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import { forkJoin } from 'rxjs';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
+import { FlowService } from 'app/entities/flow/flow.service';
+import { FluxygenExportDialogComponent } from 'app/entities/flow/fluxygen-export-dialog.component';
+import { IntegrationService } from 'app/entities/integration/integration.service';
 
 export const FLUXYGEN_URLS = {
   tryIt: 'https://fluxygen.com/try-it-yourself/',
@@ -12,15 +17,39 @@ export const FLUXYGEN_URLS = {
   academy: 'https://academy.fluxygen.com/',
 } as const;
 
-/** What Fluxygen is, what it adds to Assimbly and how to move the Flows of this Gateway there. */
+/** What Fluxygen is, what it adds to Assimbly and how to move the Flows of this Gateway there, with Export for Fluxygen. */
 @Component({
   selector: 'jhi-fluxygen',
   templateUrl: './fluxygen.html',
   styleUrl: './fluxygen.scss',
-  imports: [RouterLink, FontAwesomeModule],
+  imports: [FontAwesomeModule],
 })
 export default class Fluxygen {
   readonly urls = FLUXYGEN_URLS;
+  /** The Gateway whose Flows Export for Fluxygen exports; undefined until it is known. */
+  readonly integrationId = signal<number | undefined>(undefined);
+
+  private readonly modalService = inject(NgbModal);
+
+  constructor() {
+    // The Gateway this app runs as, picked as the Flows list does: by its name, the first one for "default"
+    forkJoin([inject(FlowService).getIntegrationName(), inject(IntegrationService).query()]).subscribe({
+      next: ([name, response]) => {
+        const integrations = response.body ?? [];
+        const own =
+          name.body === 'default' ? integrations[0] : (integrations.find(integration => integration.name === name.body) ?? integrations[0]);
+        this.integrationId.set(own?.id);
+      },
+      error: () => undefined,
+    });
+  }
+
+  openExport(): void {
+    const integrationId = this.integrationId();
+    if (integrationId !== undefined) {
+      FluxygenExportDialogComponent.open(this.modalService, integrationId);
+    }
+  }
 
   /** The parts of the platform, Assimbly's own first. */
   readonly stack = [

@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { switchMap } from 'rxjs/operators';
 
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { CertificateService, CERTIFICATE_NAME_PATTERN, IDENTITY_STORE, toCertificateName } from './certificate.service';
@@ -9,7 +10,7 @@ import { CertificateService, CERTIFICATE_NAME_PATTERN, IDENTITY_STORE, toCertifi
 @Component({
   selector: 'jhi-certificate-uploadp12-dialog',
   templateUrl: './certificate-uploadp12-dialog.component.html',
-  imports: [FormsModule],
+  imports: [FormsModule, FontAwesomeModule],
 })
 export class CertificateUploadP12DialogComponent {
   private eventManager = inject(EventManager);

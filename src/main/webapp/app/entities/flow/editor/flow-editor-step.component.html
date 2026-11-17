@@ -248,9 +248,18 @@
         <div class="step-field step-field--bounded">
           <div class="step-field__head">
             <label class="step-field__label" for="field_component_type">Component</label>
-            <i triggers="mouseenter:mouseleave" popoverTitle="Info" [ngbPopover]="uriPopover" container="body" placement="right">
+            <button
+              type="button"
+              class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm"
+              triggers="hover focus click"
+              popoverTitle="Info"
+              placement="right"
+              container="body"
+              [ngbPopover]="uriPopover"
+              aria-label="About Component"
+            >
               <fa-icon icon="info-circle"></fa-icon>
-            </i>
+            </button>
             <div class="step-field__actions">
               <button
                 type="button"
@@ -307,11 +316,25 @@
 
         <div class="step-field step-field--bounded">
           <div class="step-field__head">
-            <label class="step-field__label" for="field_uri_{{ index() }}">{{ pathFieldLabel }}</label>
+            <label class="step-field__label" for="field_uri_{{ index() }}">
+              {{ pathFieldLabel }}
+              @if (pathRequired && !pathUnused) {
+                <span class="option-row__required" title="Required">*</span>
+              }
+            </label>
             @if (!pathUnused) {
-              <i triggers="mouseenter:mouseleave" popoverTitle="Info" [ngbPopover]="pathPopover" container="body" placement="right">
+              <button
+                type="button"
+                class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm"
+                triggers="hover focus click"
+                popoverTitle="Info"
+                placement="right"
+                container="body"
+                [ngbPopover]="pathPopover"
+                aria-label="About Path"
+              >
                 <fa-icon icon="info-circle"></fa-icon>
-              </i>
+              </button>
               <div class="step-field__actions">
                 <ng-container *ngTemplateOutlet="variableMenu; context: { control: stepForm().get('uri'), input: uriInput }"></ng-container>
                 <button
@@ -355,8 +378,10 @@
               Automatic: logs to <span class="font-monospace">{{ autoPath }}</span>. Type a logger name to use your own.
             </small>
           }
-          @if (uriPlaceholder() && !pathUnused) {
-            <small class="step-field__hint font-monospace" id="field_uri_syntax_{{ index() }}">{{ uriPlaceholder() }}</small>
+          @if (pathFormat && !pathUnused) {
+            <small class="step-field__hint" id="field_uri_syntax_{{ index() }}">
+              Format: <span class="font-monospace">{{ pathFormat }}</span>
+            </small>
           }
           @if (formSubmitted() && uriErrors?.required) {
             <div class="invalid-field-message">*{{ pathFieldLabel }} is required.</div>
@@ -366,9 +391,18 @@
         <div class="step-field step-field--options" formArrayName="options">
           <div class="step-field__head">
             <span class="step-field__label">Options</span>
-            <i triggers="mouseenter:mouseleave" popoverTitle="Info" [ngbPopover]="optionsPopover" container="body" placement="right">
+            <button
+              type="button"
+              class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm"
+              triggers="hover focus click"
+              popoverTitle="Info"
+              placement="right"
+              container="body"
+              [ngbPopover]="optionsPopover"
+              aria-label="About Options"
+            >
               <fa-icon icon="info-circle"></fa-icon>
-            </i>
+            </button>
             <div class="step-field__actions">
               <button
                 title="Add option"
@@ -416,7 +450,7 @@
               @let field = valueField(idx);
               <div class="option-row" [formGroupName]="idx" [attr.data-field]="field">
                 <ng-select
-                  [items]="optionChoices"
+                  [items]="optionChoicesFor(idx)"
                   bindLabel="displayName"
                   groupBy="heading"
                   panelClass="option-key-panel"
@@ -428,6 +462,7 @@
                   labelForId="field_options-key-{{ index() }}-{{ idx }}"
                   aria-label="Option"
                   (change)="changeOptionSelection($event, idx)"
+                  (search)="onOptionSearch($event.term)"
                   (close)="clearOptionHover()"
                 >
                   <ng-template ng-label-tmp let-label="label">
@@ -451,15 +486,20 @@
                     </div>
                   </ng-template>
                   <ng-template ng-footer-tmp>
+                    <!-- The list starts with the Common Options; a search goes through all of them anyway. -->
+                    @if (advancedOptionCount && !optionSearch) {
+                      <button type="button" class="option-key-panel__more" data-cy="advanced-options" (click)="toggleAdvancedOptions()">
+                        {{ showAdvancedOptions ? 'Hide advanced options' : 'Show advanced options (' + advancedOptionCount + ')' }}
+                      </button>
+                    }
                     <div class="option-desc-footer">
                       @if (hoveredOption; as opt) {
                         <div class="option-desc-footer-title">{{ opt.displayName }}</div>
                         <div class="option-desc-footer-body">{{ opt.description }}</div>
                         <div class="option-desc-footer-meta">
-                          <span><b>Group:</b> {{ opt.group }}</span>
-                          <span><b>Type:</b> {{ opt.type }}</span>
-                          @if (opt.hasOwnProperty('defaultValue')) {
-                            <span><b>Default:</b> {{ opt.defaultValue }}</span>
+                          <span><b>Type:</b> {{ optionValueLabel(opt) }}</span>
+                          @if (optionDefaultLabel(opt); as byDefault) {
+                            <span><b>Default:</b> {{ byDefault }}</span>
                           }
                         </div>
                       } @else {
@@ -630,9 +670,17 @@
           <div class="step-field__head">
             <label class="step-field__label" for="field_routeContent_{{ index() }}">Camel route</label>
             @if (stepType === 'ERROR') {
-              <i triggers="mouseenter:mouseleave" placement="right" popoverTitle="Info" [ngbPopover]="errorHandlerPopover">
+              <button
+                type="button"
+                class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm"
+                triggers="hover focus click"
+                popoverTitle="Info"
+                placement="right"
+                [ngbPopover]="errorHandlerPopover"
+                aria-label="About the error handler"
+              >
                 <fa-icon icon="info-circle"></fa-icon>
-              </i>
+              </button>
             }
             <div class="step-field__actions">
               <button
@@ -759,13 +807,13 @@
 
       <div class="step-field step-field--bounded" [style.display]="enableMessage() ? '' : 'none'">
         <div class="step-field__head">
-          <label class="step-field__label" for="field_message_{{ index() }}">Header</label>
+          <label class="step-field__label" for="field_message_{{ index() }}">Message template</label>
           <div class="step-field__actions">
             @if (messageCreated() && messageValue) {
               <button
                 type="button"
-                title="Edit header"
-                aria-label="Edit header"
+                title="Edit message template"
+                aria-label="Edit message template"
                 class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm"
                 (click)="onCreateOrEditMessage()"
               >
@@ -775,8 +823,8 @@
               <button
                 type="button"
                 class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm"
-                [title]="messageCreated() ? 'New header' : 'Create header'"
-                [attr.aria-label]="messageCreated() ? 'New header' : 'Create header'"
+                [title]="messageCreated() ? 'New message template' : 'Create message template'"
+                [attr.aria-label]="messageCreated() ? 'New message template' : 'Create message template'"
                 (click)="onCreateOrEditMessage()"
               >
                 <fa-icon icon="plus"></fa-icon>

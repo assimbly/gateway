@@ -34,11 +34,9 @@ You now see the visual Flow canvas with two connected Steps:
 <!-- step: {"check":"flowStatus:ExampleFlow:started"} -->
 
 1. Click **Test** at the top of the editor. <!-- show: [data-cy="mode-toggle"] @ flow:ExampleFlow -->
-2. Click **▶** (Start). <!-- show: [data-tour="flow-status-controls"] @ flow:ExampleFlow:test -->
+2. Click **▶** (Start) in the **Test** panel. <!-- show: [data-tour="flow-status-controls"] @ flow:ExampleFlow:test -->
 
 Within a second, a **1** appears on both Steps — your message was created and sent through the Flow!
-
-> **Design vs. Test:** **Design** is where you build and change a Flow. **Test** is where you run it and watch messages move through each Step live.
 
 ## See the message
 
@@ -52,6 +50,6 @@ You see the log entry with your message: `Example flow running`.
 
 <!-- step: {"check":"flowStatus:ExampleFlow:stopped"} -->
 
-1. Click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] @ flow:ExampleFlow:test -->
+1. Click the **Visual flow** tab, then click **■** (Stop) in the **Test** panel. <!-- show: [data-tour="flow-status-controls"] @ flow:ExampleFlow:test -->
 
 **Congratulations — you just ran your first Assimbly Flow!** Next, build your own Flow from scratch in [Tutorial 1](https://github.com/assimbly/gateway/wiki/tutorial6-your-first-flow).

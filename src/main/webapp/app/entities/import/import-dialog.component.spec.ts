@@ -35,8 +35,8 @@ describe('Import dialog', () => {
     fixture.detectChanges();
   });
 
-  it('is titled Import flow', () => {
-    expect(fixture.nativeElement.querySelector('.modal-title').textContent.trim()).toBe('Import flow');
+  it('is titled Import Flow', () => {
+    expect(fixture.nativeElement.querySelector('.modal-title').textContent.trim()).toBe('Import Flow');
   });
 
   it('offers a Flow (DIL), Camel XML, a script and OpenAPI, in that order', () => {

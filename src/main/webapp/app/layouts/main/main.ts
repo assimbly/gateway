@@ -5,6 +5,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
 
 import { AccountService } from 'app/core/auth';
+import { GatewayStageService } from 'app/entities/integration/gateway-stage.service';
 import { ThemeService } from 'app/core/theme';
 import { Alert } from 'app/shared/alert';
 import FooterComponent from '../footer/footer.component';
@@ -32,6 +33,8 @@ const PASSWORD_PAGE = '/account/password';
 export default class Main implements OnInit {
   readonly layout = inject(LayoutService);
   readonly tutorialPanel = inject(TutorialPanelState);
+  /** The Gateway's stage beside the brand, so nobody mistakes production for a test Gateway. */
+  readonly stage = inject(GatewayStageService);
   readonly signedIn = computed(() => this.accountService.isAuthenticated());
   /** No menu while a user still has to replace a default password: the Password page is all they can use. */
   readonly sidebarVisible = computed(() => this.signedIn() && !this.accountService.account()?.passwordChangeRequired);

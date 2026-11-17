@@ -10,7 +10,7 @@ const routes: Routes = [
   {
     path: '',
     loadComponent: () => import('./home/home'),
-    title: 'home.title',
+    title: 'Flows',
   },
   {
     path: '',
@@ -36,7 +36,7 @@ const routes: Routes = [
       {
         path: ':definition',
         loadComponent: () => import('./admin/docs/docs'),
-        title: 'global.menu.apiExplorer',
+        title: 'Gateway REST API',
       },
     ],
   },
@@ -46,13 +46,14 @@ const routes: Routes = [
   },
   {
     path: 'fluxygen',
+    title: 'Export for Fluxygen',
     canActivate: [userRouteAccessService],
     loadComponent: () => import('./fluxygen/fluxygen'),
   },
   {
     path: 'login',
     loadComponent: () => import('./login/login'),
-    title: 'login.title',
+    title: 'Log in',
   },
   {
     path: '',

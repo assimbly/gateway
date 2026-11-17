@@ -105,6 +105,23 @@
   white-space: normal;
 }
 
+// The row under the list that shows or hides the Advanced and Security Options.
+.option-key-panel__more {
+  display: block;
+  width: 100%;
+  padding: 0.375rem 0.75rem;
+  border: 0;
+  border-top: 1px solid var(--app-border);
+  background: transparent;
+  color: var(--app-primary-accessible, var(--app-primary));
+  font-size: 0.8125rem;
+  text-align: left;
+
+  &:hover {
+    background: var(--app-hover);
+  }
+}
+
 .option-desc-footer {
   border-top-color: var(--app-border);
   background: var(--app-hover);

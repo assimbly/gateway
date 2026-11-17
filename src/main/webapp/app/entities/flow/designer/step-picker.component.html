@@ -14,8 +14,8 @@
       #search
       type="search"
       class="form-control form-control-sm"
-      placeholder="Search components…"
-      aria-label="Search components"
+      placeholder="Search Steps, e.g. file, http, split"
+      aria-label="Search Steps"
       [(ngModel)]="filter"
       (keydown.enter)="$event.preventDefault(); pickFirstMatch()"
     />
@@ -83,7 +83,7 @@
             [attr.aria-pressed]="category === chip.label"
             (click)="chooseCategory(chip.label)"
           >
-            {{ chip.label }} <span class="step-picker-count">{{ chip.count }}</span>
+            {{ categoryTitle(chip.label) }} <span class="step-picker-count">{{ chip.count }}</span>
           </button>
         }
         @if (chips(kind).more.length) {
@@ -104,7 +104,8 @@
               <span class="step-picker-item-tag">{{ labels.ROUTER }}</span>
             }
           </span>
-          @if (item.title) {
+          <!-- The id of the component only while searching, where it shows why an entry matches. -->
+          @if (item.title && filter.trim()) {
             <span class="step-picker-item-id">{{ name }}</span>
           }
           @if (item.description) {
@@ -113,7 +114,7 @@
         </button>
       } @empty {
         <div class="step-picker-empty">
-          No {{ listsRouters(kind) && kind !== 'ROUTER' ? 'components' : (labels[kind] | lowercase) }} match "{{ filter }}".
+          No {{ listsRouters(kind) && kind !== 'ROUTER' ? 'Steps' : labels[kind] + 's' }} match "{{ filter }}".
         </div>
       }
       @if (kinds().includes('ROUTER')) {

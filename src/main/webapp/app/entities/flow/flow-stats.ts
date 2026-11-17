@@ -2,6 +2,7 @@ import dayjs from 'dayjs/esm';
 
 import { FlowGraph } from './designer/flow-graph';
 import { IFlowCounts, IFlowStats, IStepCounts, IStepStats } from './flow.service';
+import { flowStatusView } from './flow-status';
 
 /** A titled table of stats; with columns, every row has one value per column. */
 export interface FlowStatsSection {
@@ -20,7 +21,7 @@ export function flowStatsSections(stats: IFlowStats): FlowStatsSection[] {
     {
       title: 'Runtime',
       rows: [
-        { label: 'Status', values: ['Started'] },
+        { label: 'Status', values: [flowStatusView('active', false).label] },
         { label: 'Running for', values: [formatDuration(stats.uptimeMillis)] },
         { label: 'Last completed', values: [formatTimestamp(stats.lastCompleted)] },
         { label: 'Last failed', values: [formatTimestamp(stats.lastFailed)] },
@@ -28,14 +29,14 @@ export function flowStatsSections(stats: IFlowStats): FlowStatsSection[] {
     },
     {
       title: 'Messages',
-      columns: ['Transactions', 'Exchanges'],
+      columns: ['Messages', 'Step runs'],
       rows: [
         { label: 'Total', values: [formatCount(stats.transactionsTotal), formatCount(stats.exchangesTotal)] },
         { label: 'Completed', values: [formatCount(stats.transactionsCompleted), formatCount(stats.exchangesCompleted)] },
         { label: 'Pending', values: [formatCount(stats.transactionsPending), formatCount(stats.exchangesPending)] },
         { label: 'Failed', values: [formatCount(stats.transactionsFailed), formatCount(stats.exchangesFailed)] },
       ],
-      note: 'A transaction counts a message once, an exchange counts it once for every step it passes.',
+      note: 'Step runs count a message once for every Step it passes.',
     },
     {
       title: 'Processing time',
@@ -94,7 +95,12 @@ export function countsByStepKey(graph: FlowGraph, steps: IStepCounts[]): Map<str
       counts.set(
         key,
         sum
-          ? { total: sum.total + step.total, completed: sum.completed + step.completed, failed: sum.failed + step.failed, pending: sum.pending + step.pending }
+          ? {
+              total: sum.total + step.total,
+              completed: sum.completed + step.completed,
+              failed: sum.failed + step.failed,
+              pending: sum.pending + step.pending,
+            }
           : { total: step.total, completed: step.completed, failed: step.failed, pending: step.pending },
       );
     }

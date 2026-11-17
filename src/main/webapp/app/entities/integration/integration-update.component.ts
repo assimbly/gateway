@@ -10,6 +10,8 @@ import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { IIntegration, EnvironmentType, GatewayType } from 'app/shared/model/integration.model';
 import { SaveShortcutDirective } from 'app/shared/keyboard';
 import { IntegrationService } from './integration.service';
+import { enumLabel } from './gateway-stage.service';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { Components } from '../../shared/camel/component-type';
 import { Router } from '@angular/router';
 
@@ -24,6 +26,9 @@ export class IntegrationUpdateComponent implements OnInit {
   protected activatedRoute = inject(ActivatedRoute);
   protected router = inject(Router);
   components = inject(Components);
+  private readonly eventManager = inject(EventManager);
+  /** The stage in title case: Production. */
+  readonly label = enumLabel;
 
   integration!: IIntegration;
   isSaving!: boolean;
@@ -84,6 +89,8 @@ export class IntegrationUpdateComponent implements OnInit {
 
   protected onSaveSuccess() {
     this.isSaving = false;
+    // the stage badge beside the brand follows the saved stage
+    this.eventManager.broadcast(new EventWithContent('integrationListModification', 'Saved a Gateway'));
     this.router.navigate(['/integration']);
   }
 

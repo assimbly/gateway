@@ -3,7 +3,7 @@ import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { NgClass } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
@@ -12,7 +12,7 @@ import { EMPTY, Observable, Subject, catchError, forkJoin, map, merge, of, switc
 
 import { Components } from 'app/shared/camel/component-type';
 import { isPlainKey, isRunShortcut, isStopShortcut, isTypingTarget } from 'app/shared/keyboard';
-import { StatusControls, StatusControlsTone } from 'app/shared/table';
+import { StatusControlsTone } from 'app/shared/table';
 
 import { DesignerSelection } from '../designer/flow-canvas.component';
 import { FlowService } from '../flow.service';
@@ -33,6 +33,8 @@ import { FlowRowAlerts } from '../flow-row-alerts.component';
 import { FlowAlertsDrawerComponent } from '../flow-alerts-drawer.component';
 import { FlowLogDrawerComponent } from '../flow-log-drawer.component';
 import { CamelRouteDrawerComponent } from '../camel-route-drawer.component';
+import { GatewayStageService } from 'app/entities/integration/gateway-stage.service';
+import { confirmOnProduction } from './confirm-dialog.component';
 
 const POLL_INTERVAL = 10000;
 
@@ -60,17 +62,28 @@ const TONE_CLASS: Record<StatusControlsTone, string> = {
  * The visual editor has two modes instead, switched with a toggle: Design saves the Flow or saves and tests it; Test
  * starts, pauses and stops the saved Flow, like the Flows list.
  */
+/**
+ * The page to go back to from the `returnTo` query parameter: only a path of this app, so a link can't send the user
+ * elsewhere. The Flows page when there is none.
+ */
+export function returnPath(param: string | null | undefined): string {
+  return param?.startsWith('/') && !param.startsWith('//') && !param.includes('\\') ? param : '/';
+}
+
 @Component({
   selector: 'jhi-flow-editor-header',
   templateUrl: './flow-editor-header.component.html',
   styleUrl: './flow-editor-header.component.scss',
-  imports: [NgClass, ReactiveFormsModule, RouterLink, FontAwesomeModule, NgbDropdownModule, NgbTooltip, FlowRowAlerts, StatusControls],
+  imports: [NgClass, ReactiveFormsModule, FontAwesomeModule, NgbDropdownModule, NgbTooltip, FlowRowAlerts],
   host: {
     '(document:keydown)': 'onKeydown($event)',
   },
 })
 export class FlowEditorHeaderComponent {
   readonly nameControl = input.required<FormControl<string>>();
+  /** Where the back arrow leads: the page the editor was opened from, such as an API, or else the Flows. */
+  readonly returnTo = input('/');
+  readonly backLabel = computed(() => (this.returnTo() === '/' ? 'Back to Flows' : 'Back to the API'));
   /** The saved Flow's id; a new Flow has none until it is saved. */
   readonly flowId = input<number | null | undefined>();
   /** Why the Flow is a Draft, or null when it is complete enough to run. */
@@ -103,7 +116,7 @@ export class FlowEditorHeaderComponent {
   readonly saveAndRestart = output<void>();
   /** Save & close: saves the Flow and goes back to the Manage page. */
   readonly saveAndReturn = output<void>();
-  /** Send test message was clicked in the visual editor, which opens its Test panel. */
+  /** Send a message to this Flow was clicked in the visual editor, which opens its Test panel. */
   readonly testRequested = output<void>();
   /** The toggle, or its T key, asks for the other mode. */
   readonly modeChange = output<EditorMode>();
@@ -128,7 +141,9 @@ export class FlowEditorHeaderComponent {
     const count = this.draftProblems().length;
     return `${count} ${count === 1 ? 'issue' : 'issues'}`;
   });
-  readonly draftLabel = computed(() => `Draft: ${this.issueCount()} ${this.draftProblems().length === 1 ? 'keeps' : 'keep'} this Flow from running. Show them`);
+  readonly draftLabel = computed(
+    () => `Draft: ${this.issueCount()} ${this.draftProblems().length === 1 ? 'keeps' : 'keep'} this Flow from running. Show them`,
+  );
 
   /** Why the Flow can't be started now, or null when it can. */
   readonly startBlocked = computed(() => {
@@ -145,7 +160,10 @@ export class FlowEditorHeaderComponent {
       return null;
     }
     const source = this.sourceComponent();
-    return testMessageBlocked(this.status(), source ? (this.components.types.find(type => type.name === source) ?? { name: source }) : null);
+    return testMessageBlocked(
+      this.status(),
+      source ? (this.components.types.find(type => type.name === source) ?? { name: source }) : null,
+    );
   });
 
   shows(action: FlowAction): boolean {
@@ -157,15 +175,17 @@ export class FlowEditorHeaderComponent {
   }
 
   /**
-   * Why the toggle can't switch now, or null when it can: a new Flow has nothing to test yet, and a Draft can't run,
-   * so it can't be tested until it is complete. Back to Design is always possible.
+   * Why the toggle can't switch now, or null when it can: a Draft can't run, so it can't be tested until it is
+   * complete. Switching to Test saves the Flow automatically when needed; back to Design is always possible.
    */
   readonly toggleBlocked = computed(() => {
-    if (!this.flowId()) {
-      return 'Save the Flow first.';
+    if (this.saving()) {
+      return 'Saving…';
     }
     if (this.mode() === 'design' && this.draftReason() !== null) {
-      return this.draftProblems().length ? `Finish the Draft to test it: ${this.issueCount()}. Click Draft to see them.` : `This Flow is a Draft: ${this.draftReason()}`;
+      return this.draftProblems().length
+        ? `Finish the Draft to test it: ${this.issueCount()}. Click Draft to see them.`
+        : `This Flow is a Draft: ${this.draftReason()}`;
     }
     return null;
   });
@@ -188,6 +208,7 @@ export class FlowEditorHeaderComponent {
   private readonly router = inject(Router);
   private readonly offcanvas = inject(NgbOffcanvas);
   private readonly modals = inject(NgbModal);
+  private readonly gatewayStage = inject(GatewayStageService);
   private readonly nameInput = viewChild<ElementRef<HTMLInputElement>>('nameInput');
   private readonly refresh = new Subject<void>();
 
@@ -251,11 +272,19 @@ export class FlowEditorHeaderComponent {
     }
   }
 
+  /** Stops the Flow; on stage Production after the user confirms it. */
   stop(): void {
     const id = this.flowId();
     if (id) {
-      this.run(this.flowService.stop(id));
+      confirmOnProduction(this.modals, this.gatewayStage.production(), 'stop', this.nameControl().value, () =>
+        this.run(this.flowService.stop(id)),
+      );
     }
+  }
+
+  /** Restart clicked in the status controls; on stage Production it asks first. */
+  confirmRestart(): void {
+    confirmOnProduction(this.modals, this.gatewayStage.production(), 'restart', this.nameControl().value, () => this.restart());
   }
 
   pause(): void {

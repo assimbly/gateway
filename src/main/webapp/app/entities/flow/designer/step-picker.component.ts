@@ -11,7 +11,6 @@ import {
   output,
   input,
 } from '@angular/core';
-import { LowerCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbDropdown, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -23,6 +22,7 @@ import {
   ESSENTIALS,
   NO_MATCH,
   categoryChips,
+  categoryTitle,
   isEssential,
   labelsOf,
   matchRank,
@@ -77,7 +77,7 @@ const DESIGNER_ENTRIES: Record<string, CatalogueEntry> = {
   templateUrl: './step-picker.component.html',
   styleUrl: './step-picker.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, NgbDropdownModule, FontAwesomeModule, LowerCasePipe],
+  imports: [FormsModule, NgbDropdownModule, FontAwesomeModule],
 })
 export class StepPickerComponent implements OnChanges {
   readonly kinds = input.required<PickedKind[]>();
@@ -94,6 +94,7 @@ export class StepPickerComponent implements OnChanges {
 
   readonly labels: Record<PickedKind, string> = { ACTION: 'Action', ROUTER: 'Router', SINK: 'Sink' };
   readonly routerCategory = ROUTER_CATEGORY;
+  readonly categoryTitle = categoryTitle;
   readonly routerCount = ROUTER_KINDS.length;
 
   private readonly injector = inject(Injector);

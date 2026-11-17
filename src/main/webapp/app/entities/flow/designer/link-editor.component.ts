@@ -1,7 +1,17 @@
 import { ChangeDetectionStrategy, Component, output, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { canDeleteBranch, canRenameBranch, defaultBranch, DesignLink, FlowGraph, LinkSettings, routerOf, routerTitle, takesCondition } from './flow-graph';
+import {
+  canDeleteBranch,
+  canRenameBranch,
+  defaultBranch,
+  DesignLink,
+  FlowGraph,
+  LinkSettings,
+  routerOf,
+  routerTitle,
+  takesCondition,
+} from './flow-graph';
 
 /** Edits the Link leading to a Step: its Branch name and Condition (on a Router) and its transport settings. */
 @Component({
@@ -19,9 +29,25 @@ export class LinkEditorComponent {
   readonly linkChange = output<Partial<LinkSettings>>();
   readonly deleteBranch = output<void>();
 
-  readonly languages = ['simple', 'constant', 'header', 'jsonpath', 'xpath', 'groovy', 'javascript'];
-  readonly transports = ['sync', 'async'];
-  readonly patterns = ['', 'InOnly', 'InOut'];
+  // What is saved stays the id Camel knows; the label is how the choice reads here and on the Send page.
+  readonly languages = [
+    { value: 'simple', label: 'Simple expression' },
+    { value: 'constant', label: 'Fixed value' },
+    { value: 'header', label: 'Header' },
+    { value: 'jsonpath', label: 'JSONPath' },
+    { value: 'xpath', label: 'XPath' },
+    { value: 'groovy', label: 'Groovy' },
+    { value: 'javascript', label: 'JavaScript' },
+  ];
+  readonly transports = [
+    { value: 'sync', label: 'Direct' },
+    { value: 'async', label: 'Through a queue' },
+  ];
+  readonly patterns = [
+    { value: '', label: 'Default' },
+    { value: 'InOnly', label: 'Fire and forget' },
+    { value: 'InOut', label: 'Request and reply' },
+  ];
 
   get router() {
     return routerOf(this.graph(), this.link());

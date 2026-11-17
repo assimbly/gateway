@@ -210,10 +210,10 @@
   </f-canvas>
 
   <!-- Shift+drag on the background draws a box that selects the Steps in it. Alone in its @if, without even whitespace
-       around it (Foblex preserves whitespace), so it's projected into Foblex's selection-area slot. -->
-  @if (!readOnly()) {
-    <f-selection-area></f-selection-area>
-  }
+       around it (Foblex preserves whitespace), so it's projected into Foblex's selection-area slot. The formatter is
+       kept off it: it would put the element on a line of its own, and the whitespace ends the projection. -->
+  <!-- prettier-ignore -->
+  @if (!readOnly()) {<f-selection-area></f-selection-area>}
 
   <!-- Declared here, inside the flow, so the minimap can reach it; the editor shows it in a corner of the canvas. -->
   <ng-template #minimap>

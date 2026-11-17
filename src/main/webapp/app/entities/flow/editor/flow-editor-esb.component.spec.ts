@@ -345,13 +345,28 @@ describe('Flow editor modes', () => {
     });
   });
 
-  it('has nothing to test before the Flow is saved', () => {
+  it('saves automatically when switching to Test before the Flow is saved or while there are unsaved changes', () => {
     const { component, url } = editor(null);
+    const save = jest.spyOn(component, 'save').mockImplementation(then => {
+      Object.assign(component, { afterSaveAction: then, flow: { id: 7 }, designer: {}, refreshCanvas: jest.fn() });
+      (component as any).afterSave();
+    });
 
     component.setMode('test');
 
-    expect(component.viewMode).toBe('design');
-    expect(url()).not.toContain('view=test');
+    expect(save).toHaveBeenCalledWith('test');
+    expect(component.viewMode).toBe('test');
+    expect(url()).toContain('view=test');
+  });
+
+  it('clears the selected Step when switching to Test so the Tester shows the Flow toggle by default', () => {
+    const { component } = editor();
+    component.selection = { type: 'step', key: 's1' };
+
+    component.setMode('test');
+
+    expect(component.selection).toEqual({ type: 'flow' });
+    expect(component.selectedStepKey).toBeUndefined();
   });
 
   it('leaves the canvas keys alone in Test', () => {
@@ -512,6 +527,22 @@ describe('Flow editor modes', () => {
     expect(component.viewMode).toBe('test');
     expect(component.testView).toBe('flow');
     expect(url()).toContain('view=test');
+  });
+
+  it('keeps the page it was opened from through a save and a switch of mode, and Save & close returns there', () => {
+    const { component, url } = editor();
+    const navigateByUrl = jest.fn();
+    Object.assign((component as any).router, { navigateByUrl });
+    (component as any).location.replaceState('/flow/editor/7?mode=edit&editor=flow&id=7&returnTo=%2Frest-apis%2F5');
+    Object.assign(component, { designer: {}, refreshCanvas: jest.fn() });
+
+    (component as any).afterSave();
+    expect(url()).toContain('returnTo=%2Frest-apis%2F5');
+    expect(component.returnPath).toBe('/rest-apis/5');
+
+    Object.assign(component, { afterSaveAction: 'return' });
+    (component as any).afterSave();
+    expect(navigateByUrl).toHaveBeenCalledWith('/rest-apis/5');
   });
 });
 

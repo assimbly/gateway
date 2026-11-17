@@ -8,7 +8,7 @@ import { EmptyState } from 'app/shared/empty-state';
 import EndpointTypeSwitch, { type EndpointType } from './endpoint-type-switch';
 
 const ABOUT_ENDPOINTS =
-  'An Endpoint is a Queue or a Topic on your Broker: a named place where messages wait until a Flow or an application picks them up.';
+  'Queues and Topics live on your Broker: named places where messages wait until a Flow or an application picks them up.';
 
 /**
  * What the Queues and Topics pages show instead of their list when there is nothing to list: no Broker yet, a Broker

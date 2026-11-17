@@ -23,6 +23,7 @@ const certificateResolve: ResolveFn<ICertificate> = route => {
 export const certificateRoute: Routes = [
   {
     path: 'certificate',
+    title: 'Certificates',
     loadComponent: () => import('./certificate.component').then(m => m.CertificateComponent),
     data: {
       authorities: ['ROLE_USER'],
@@ -31,6 +32,7 @@ export const certificateRoute: Routes = [
   },
   {
     path: 'certificate/:id/view',
+    title: 'Certificate',
     loadComponent: () => import('./certificate-detail.component').then(m => m.CertificateDetailComponent),
     resolve: {
       certificate: certificateResolve,
@@ -42,6 +44,7 @@ export const certificateRoute: Routes = [
   },
   {
     path: 'certificate/new',
+    title: 'Certificate',
     loadComponent: () => import('./certificate-update.component').then(m => m.CertificateUpdateComponent),
     resolve: {
       certificate: certificateResolve,
@@ -53,6 +56,7 @@ export const certificateRoute: Routes = [
   },
   {
     path: 'certificate/:id/edit',
+    title: 'Certificate',
     loadComponent: () => import('./certificate-update.component').then(m => m.CertificateUpdateComponent),
     resolve: {
       certificate: certificateResolve,

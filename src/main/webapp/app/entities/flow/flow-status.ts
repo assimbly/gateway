@@ -136,13 +136,13 @@ export function testMessageBlocked(
   source: { name: string; title?: string; consumerOnly?: boolean } | null,
 ): string | null {
   if (status !== 'active') {
-    return 'Start the Flow to send it a test message.';
+    return 'Start the Flow to send a message to it.';
   }
   if (!source) {
-    return 'This Flow has no Source to send a test message to.';
+    return 'This Flow has no Source to send a message to.';
   }
   if (source.consumerOnly) {
-    return `A test message can't be sent to a ${source.title ?? source.name} Source.`;
+    return `A message can't be sent to a ${source.title ?? source.name} Source.`;
   }
   return null;
 }

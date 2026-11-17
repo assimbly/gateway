@@ -23,6 +23,7 @@ const environmentVariablesResolve: ResolveFn<IEnvironmentVariables> = route => {
 export const environmentVariablesRoute: Routes = [
   {
     path: 'environment-variables',
+    title: 'Variables',
     loadComponent: () => import('./environment-variables.component').then(m => m.EnvironmentVariablesComponent),
     data: {
       authorities: ['ROLE_USER'],
@@ -31,6 +32,7 @@ export const environmentVariablesRoute: Routes = [
   },
   {
     path: 'environment-variables/:id/view',
+    title: 'Variable',
     loadComponent: () => import('./environment-variables-detail.component').then(m => m.EnvironmentVariablesDetailComponent),
     resolve: {
       environmentVariables: environmentVariablesResolve,
@@ -42,6 +44,7 @@ export const environmentVariablesRoute: Routes = [
   },
   {
     path: 'environment-variables/new',
+    title: 'Variable',
     loadComponent: () => import('./environment-variables-update.component').then(m => m.EnvironmentVariablesUpdateComponent),
     resolve: {
       environmentVariables: environmentVariablesResolve,
@@ -53,6 +56,7 @@ export const environmentVariablesRoute: Routes = [
   },
   {
     path: 'environment-variables/:id/edit',
+    title: 'Variable',
     loadComponent: () => import('./environment-variables-update.component').then(m => m.EnvironmentVariablesUpdateComponent),
     resolve: {
       environmentVariables: environmentVariablesResolve,

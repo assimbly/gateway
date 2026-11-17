@@ -7,7 +7,7 @@ import Password from './password';
 const passwordRoute: Route = {
   path: 'password',
   component: Password,
-  title: 'global.menu.account.password',
+  title: 'Password',
   canActivate: [userRouteAccessService],
 };
 

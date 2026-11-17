@@ -14,7 +14,7 @@ import { StepService } from '../step/step.service';
 import { IntegrationService } from '../integration/integration.service';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 
-import { OverflowActionDirective, PrimaryActionDirective, RowActions, StatusControls, Truncate } from 'app/shared/table';
+import { OverflowActionDirective, RowActions, StatusControls, Truncate } from 'app/shared/table';
 import { FlowRowAlerts } from './flow-row-alerts.component';
 import { FlowRowStats } from './flow-row-stats.component';
 import { FlowStatsSection, flowStatsSections } from './flow-stats';
@@ -47,6 +47,8 @@ import dayjs from 'dayjs/esm';
 import { HttpContext, HttpResponse } from '@angular/common/http';
 import { HANDLES_OWN_ERRORS } from 'app/core/interceptor/error-handler.interceptor';
 import { forkJoin, Observable, Subscription, switchMap, tap } from 'rxjs';
+import { GatewayStageService } from 'app/entities/integration/gateway-stage.service';
+import { confirmOnProduction } from './editor/confirm-dialog.component';
 
 /** A status reading that fails is not reported as an error: the row keeps what it shows. */
 const POLL_CONTEXT = new HttpContext().set(HANDLES_OWN_ERRORS, true);
@@ -67,7 +69,6 @@ enum Status {
     NgbDropdownModule,
     NgbTooltip,
     RowActions,
-    PrimaryActionDirective,
     OverflowActionDirective,
     StatusControls,
     Truncate,
@@ -80,6 +81,7 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
   private stepService = inject(StepService);
   private integrationService = inject(IntegrationService);
   private modalService = inject(NgbModal);
+  private readonly gatewayStage = inject(GatewayStageService);
   private router = inject(Router);
   private eventManager = inject(EventManager);
   private changeDetector = inject(ChangeDetectorRef);
@@ -173,7 +175,7 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   /**
-   * Why the ⋮ menu's Send test message is unavailable, or null when it can be sent. A Route Flow sends to its first
+   * Why the ⋮ menu's Send is unavailable, or null when it can be sent. A Route Flow sends to its first
    * Route, whose `<from>` the list doesn't have: the Send page reads it.
    */
   get testMessageBlocked(): string | null {
@@ -205,13 +207,19 @@ export class FlowRowComponent implements OnInit, OnChanges, OnDestroy {
       case 'start':
         return this.start();
       case 'stop':
-        return this.stop();
+      case 'restart':
+        return confirmOnProduction(this.modalService, this.gatewayStage.production(), action, this.flow().name ?? 'this Flow', () => {
+          if (action === 'stop') {
+            this.stop();
+          } else {
+            this.restart();
+          }
+          this.changeDetector.markForCheck();
+        });
       case 'pause':
         return this.pause();
       case 'resume':
         return this.resume();
-      case 'restart':
-        return this.restart();
     }
   }
 

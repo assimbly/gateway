@@ -172,16 +172,19 @@
             </button>
             @if (brokerConfigurationFailed) {
               <span style="color: Tomato">
-                <i
-                  popoverClass="increase-popover-width"
-                  triggers="mouseenter:mouseleave"
+                <button
+                  type="button"
+                  class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm text-danger"
+                  triggers="hover focus click"
+                  popoverTitle="Error"
                   placement="right"
                   container="body"
-                  popoverTitle="Error"
+                  popoverClass="increase-popover-width"
                   [ngbPopover]="brokerErrorConfigurationPopover"
+                  aria-label="Why the Broker failed"
                 >
                   <fa-icon icon="circle-exclamation"></fa-icon>
-                </i>
+                </button>
               </span>
             }
             <div>

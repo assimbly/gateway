@@ -97,12 +97,12 @@ describe('Flows list row status', () => {
 
   it.each(['inactive', 'paused', 'inactiveError'] as const)('blocks a test message while the Flow is %s', status => {
     expect(testMessageBlocked(status, { name: 'file', title: 'File', consumerOnly: false })).toBe(
-      'Start the Flow to send it a test message.',
+      'Start the Flow to send a message to it.',
     );
   });
 
   it('blocks a test message to a Flow without a Source', () => {
-    expect(testMessageBlocked('active', null)).toBe('This Flow has no Source to send a test message to.');
+    expect(testMessageBlocked('active', null)).toBe('This Flow has no Source to send a message to.');
   });
 
   it('finds the Source among the Steps, also as the older FROM Step', () => {
@@ -138,7 +138,7 @@ describe('Flows list row status', () => {
 
   it('blocks a test message to a Source whose Component only receives, such as a Scheduler', () => {
     expect(testMessageBlocked('active', { name: 'scheduler', title: 'Scheduler', consumerOnly: true })).toBe(
-      "A test message can't be sent to a Scheduler Source.",
+      "A message can't be sent to a Scheduler Source.",
     );
   });
 

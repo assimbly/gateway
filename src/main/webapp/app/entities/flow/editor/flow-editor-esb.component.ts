@@ -51,7 +51,7 @@ import { SaveShortcutDirective, isTypingTarget } from 'app/shared/keyboard';
 import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { ThemeService } from 'app/core/theme';
 import { FlowCanvasComponent, DesignerSelection } from '../designer/flow-canvas.component';
-import { DraftProblem, EditorMode, FlowEditorHeaderComponent } from './flow-editor-header.component';
+import { DraftProblem, EditorMode, FlowEditorHeaderComponent, returnPath } from './flow-editor-header.component';
 import { FlowFailure, failureProblems, firstRouteStepOf, routeSourceOf, sourceStepOf } from '../flow-status';
 import { FlowTestPanelComponent } from '../test/flow-test-panel.component';
 import { FlowRunStatsComponent } from '../stats/flow-run-stats.component';
@@ -891,12 +891,12 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
 
   setPopoverMessages(): void {
     this.namePopoverMessage = `Name of the flow. Usually the name of the message type like <i>order</i>.<br/><br>Displayed on the <i>flows</i> page.`;
-    this.errorHandlerPopoverMessage = `Route or RouteConfiguration that handles errors in case of failures.`;
+    this.errorHandlerPopoverMessage = `The Camel route that gets a message when a Step fails.`;
     this.logLevelPopoverMessage = `Logs messages for each step to the console/log file`;
     this.notesPopoverMessage = `Notes to document the flow.`;
 
     this.componentPopoverMessage = `The component to use (scheme). Click on the docs icon for online documentation.`;
-    this.optionsPopoverMessage = `Endpoint options are optional settings that configure how an endpoint behaves.`;
+    this.optionsPopoverMessage = `Extra settings for this Step. Add only the ones you need: the rest keep their default.`;
     this.messagePopoverMessage = `A group of key/value pairs to add to the message header.<br/><br/> Use the button on the right to create or edit a header.`;
     this.routePopoverMessage = `A Camel route defined in XML.<br/><br/>`;
     this.connectionPopoverMessage = `If available then a connection can be selected. For example a database connection that sets up a connection.<br/><br/>
@@ -904,7 +904,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     this.popoverMessage = `Destination`;
 
     this.hostnamePopoverMessage = `URL, IP-address or DNS Name. For example camel.apache.org or 127.0.0.1`;
-    this.portPopoverMessage = `Number of the port. Range between 1 and 65536.`;
+    this.portPopoverMessage = `Number of the port. Range between 1 and 65535.`;
     this.timeoutPopoverMessage = `Timeout in seconds to wait for connection.`;
   }
 
@@ -1718,9 +1718,9 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Save & close always ends on Manage: a Flow without unsaved changes has nothing to save first.
+    // Save & close always ends where the editor was opened from: a Flow without unsaved changes has nothing to save first.
     if (then === 'return' && this.flow?.id && !this.hasUnsavedChanges) {
-      this.router.navigate(['/']);
+      this.router.navigateByUrl(this.returnPath);
       return;
     }
 
@@ -2551,9 +2551,23 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  /** Switches the mode; a new Flow has nothing to test until it is saved, and a Draft until it is complete. */
+  /** Where back and Save & close lead: the page the editor was opened from, such as an API, or else the Flows. */
+  get returnPath(): string {
+    return returnPath(this.returnToParam);
+  }
+
+  /** The `returnTo` query parameter of the current URL, which a switch of mode keeps. */
+  private get returnToParam(): string | undefined {
+    return this.router.parseUrl(this.location.path()).queryParams['returnTo'];
+  }
+
+  /** Switches the mode; a Draft cannot be tested until it is complete, and switching to Test saves automatically when needed. */
   setMode(mode: EditorMode): void {
-    if (mode === this.viewMode || (mode === 'test' && (!this.flow?.id || this.draftReason !== null))) {
+    if (mode === this.viewMode || (mode === 'test' && this.draftReason !== null)) {
+      return;
+    }
+    if (mode === 'test' && (!this.flow?.id || this.hasUnsavedChanges)) {
+      this.save('test');
       return;
     }
     this.applyMode(mode);
@@ -2578,7 +2592,9 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     if (this.tabLayout === 'closed') {
       this.tabLayout = 'panel';
     }
-    if (mode === 'design') {
+    if (mode === 'test') {
+      this.selection = { type: 'flow' };
+    } else {
       this.runCounts = undefined;
     }
   }
@@ -2878,15 +2894,21 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
     const then = this.afterSaveAction;
     this.afterSaveAction = 'stay';
     if (then === 'return') {
-      this.router.navigate(['/']);
+      this.router.navigateByUrl(this.returnPath);
       return;
     }
     const url = this.router.createUrlTree(['/flow/editor', this.flow.id], {
-      queryParams: { mode: 'edit', editor: this.activeEditor, id: this.flow.id, view: this.viewMode === 'test' ? 'test' : undefined },
+      queryParams: {
+        mode: 'edit',
+        editor: this.activeEditor,
+        id: this.flow.id,
+        view: this.viewMode === 'test' ? 'test' : undefined,
+        returnTo: this.returnToParam,
+      },
     });
     this.location.replaceState(this.router.serializeUrl(url));
-    // Save & Test: the editors go on to test the Flow they start.
-    if (this.hasModes && (then === 'start' || then === 'restart')) {
+    // Switching to Test when unsaved, or Save & start / restart: go on to Test once saved.
+    if (this.hasModes && (then === 'test' || then === 'start' || then === 'restart')) {
       this.openTest();
     }
     if (this.activeEditor === 'script') {
@@ -3059,7 +3081,7 @@ export class FlowEditorEsbComponent implements OnInit, OnDestroy {
   }
 }
 
-type AfterSave = 'stay' | 'start' | 'restart' | 'return';
+type AfterSave = 'stay' | 'test' | 'start' | 'restart' | 'return';
 
 /** What a failed save shows when no check gave a reason of its own. */
 const SAVING_FAILED = 'The Flow could not be saved. Try again. If it keeps failing, look for the cause under Administration → Log viewer.';

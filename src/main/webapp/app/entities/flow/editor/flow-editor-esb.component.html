@@ -36,16 +36,34 @@
     <div class="form-group row">
       <div class="col-8">
         <label class="form-control-label" for="field_host">Host name</label>
-        <i triggers="mouseenter:mouseleave" popoverTitle="Info" [ngbPopover]="hostnamePopover" container="body" placement="right">
+        <button
+          type="button"
+          class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm"
+          triggers="hover focus click"
+          popoverTitle="Info"
+          placement="right"
+          container="body"
+          [ngbPopover]="hostnamePopover"
+          aria-label="About Host name"
+        >
           <fa-icon icon="info-circle"></fa-icon>
-        </i>
+        </button>
         <input type="text" class="form-control" formControlName="connectionHost" id="connectionHost" required />
       </div>
       <div class="col-3">
         <label class="form-control-label" for="example-number-input">Port</label>
-        <i triggers="mouseenter:mouseleave" popoverTitle="Info" [ngbPopover]="portPopover" container="body" placement="right">
+        <button
+          type="button"
+          class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm"
+          triggers="hover focus click"
+          popoverTitle="Info"
+          placement="right"
+          container="body"
+          [ngbPopover]="portPopover"
+          aria-label="About Port"
+        >
           <fa-icon icon="info-circle"></fa-icon>
-        </i>
+        </button>
         <input type="number" class="form-control" min="1" max="65535" formControlName="connectionPort" id="connectionPort" />
       </div>
       <div class="col-1"></div>
@@ -53,9 +71,18 @@
     <div class="form-group row">
       <div class="col-8">
         <label class="form-control-label" for="example-number-input">Timeout</label>
-        <i triggers="mouseenter:mouseleave" popoverTitle="Info" [ngbPopover]="timeoutPopover" container="body" placement="right">
+        <button
+          type="button"
+          class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm"
+          triggers="hover focus click"
+          popoverTitle="Info"
+          placement="right"
+          container="body"
+          [ngbPopover]="timeoutPopover"
+          aria-label="About Timeout"
+        >
           <fa-icon icon="info-circle"></fa-icon>
-        </i>
+        </button>
         <input type="number" class="form-control" formControlName="connectionTimeout" id="connectionTimeout" />
       </div>
       <div class="col-4"></div>
@@ -96,6 +123,7 @@
         <jhi-flow-editor-header
           #editorHeader
           [nameControl]="nameControl"
+          [returnTo]="returnPath"
           [flowId]="flow?.id"
           [draftReason]="draftReason"
           [draftProblems]="draftProblems"
@@ -280,11 +308,17 @@
               [entryKind]="entryKind ?? 'route'"
               [selectedKey]="selectedStepKey"
               [running]="editorHeader.running()"
+              [status]="editorHeader.status()"
+              [busy]="editorHeader.busy()"
               [draftReason]="draftReason"
               [unsaved]="hasUnsavedChanges"
               [run]="testRun"
               (ran)="onTestRan($event)"
               (start)="editorHeader.start()"
+              (pause)="editorHeader.pause()"
+              (resume)="editorHeader.resume()"
+              (stop)="editorHeader.stop()"
+              (restart)="editorHeader.confirmRestart()"
               (saveAndRun)="saveAndTest()"
               (editStep)="editStepFromTest($event)"
               [canvasHidden]="tabLayout === 'full'"
@@ -389,7 +423,7 @@
         <ng-template #selectionEditor>
           @if (selection.type === 'step' && selectedStepIndex >= 0) {
             <div class="flow-step-name-field mb-2">
-              <label class="form-label small text-muted mb-1" for="field_stepName">Name</label>
+              <label class="form-label small text-muted mb-1" for="field_stepName">Step name</label>
               <input
                 type="text"
                 class="form-control form-control-sm"

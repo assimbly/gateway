@@ -38,12 +38,12 @@ describe('Flow stats', () => {
     const [runtime, messages, times] = flowStatsSections(stats);
 
     expect(rowsOf(runtime)).toEqual([
-      ['Status', 'Started'],
+      ['Status', 'Running'],
       ['Running for', '1 hour 2 minutes 3 seconds'],
       ['Last completed', '—'],
       ['Last failed', '—'],
     ]);
-    expect(messages.columns).toEqual(['Transactions', 'Exchanges']);
+    expect(messages.columns).toEqual(['Messages', 'Step runs']);
     expect(rowsOf(messages)[3]).toEqual(['Failed', '1', '2']);
     expect(rowsOf(times)).toEqual([
       ['Average', '4 ms'],
@@ -63,7 +63,10 @@ describe('Flow stats', () => {
 
     expect(stepStatsSections(counts, undefined).map(section => section.title)).toEqual(['Messages']);
 
-    const [messages, times] = stepStatsSections(counts, { id: '1-10', stats: { meanProcessingTime: 2, maxProcessingTime: 7, lastProcessingTime: 1 } });
+    const [messages, times] = stepStatsSections(counts, {
+      id: '1-10',
+      stats: { meanProcessingTime: 2, maxProcessingTime: 7, lastProcessingTime: 1 },
+    });
     expect(rowsOf(messages)).toEqual([
       ['Total', '5'],
       ['Completed', '3'],

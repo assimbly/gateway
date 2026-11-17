@@ -7,15 +7,15 @@ import { FlowRowStats } from './flow-row-stats.component';
 import { FlowStatsSection } from './flow-stats';
 
 const sections: FlowStatsSection[] = [
-  { title: 'Runtime', rows: [{ label: 'Status', values: ['Started'] }] },
+  { title: 'Runtime', rows: [{ label: 'Status', values: ['Running'] }] },
   {
     title: 'Messages',
-    columns: ['Transactions', 'Exchanges'],
+    columns: ['Messages', 'Step runs'],
     rows: [
       { label: 'Total', values: ['3', '9'] },
       { label: 'Failed', values: ['1', '2'] },
     ],
-    note: 'A transaction counts a message once.',
+    note: 'Step runs count a message once for every Step it passes.',
   },
 ];
 
@@ -38,7 +38,7 @@ describe('Flow stats popover', () => {
 
   afterEach(() => document.querySelectorAll('.flow-stats-popover').forEach(popover => popover.remove()));
 
-  it('shows transactions and exchanges side by side', () => {
+  it('shows messages and step runs side by side', () => {
     const popover = openPopover();
     const messages = popover.querySelectorAll('.flow-stats-section')[1];
 
@@ -47,7 +47,7 @@ describe('Flow stats popover', () => {
       [...row.querySelectorAll('th, td')].map(cell => cell.textContent!.trim()),
     );
 
-    expect(header).toEqual(['Transactions', 'Exchanges']);
+    expect(header).toEqual(['Messages', 'Step runs']);
     expect(rows).toEqual([
       ['Total', '3', '9'],
       ['Failed', '1', '2'],
@@ -59,7 +59,7 @@ describe('Flow stats popover', () => {
     const runtime = openPopover().querySelector('.flow-stats-section')!;
 
     expect(runtime.querySelector('thead')).toBeNull();
-    expect(runtime.querySelector('tbody td')!.textContent!.trim()).toBe('Started');
+    expect(runtime.querySelector('tbody td')!.textContent!.trim()).toBe('Running');
   });
 
   it('links to the stats of each Step when it is given where they are', () => {

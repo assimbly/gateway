@@ -27,6 +27,50 @@ describe('Flow row', () => {
     return { component, setFlowStatus };
   }
 
+  describe('on a Gateway on stage Production', () => {
+    function live(choice: string) {
+      const { component } = row();
+      const stop = jest.fn();
+      const restart = jest.fn();
+      const pause = jest.fn();
+      const open = jest.fn(() => ({ componentInstance: {}, result: Promise.resolve(choice) }));
+      Object.assign(component, {
+        flow: () => ({ id: 7, name: 'Orders', type: 'flow' }),
+        stop,
+        restart,
+        pause,
+        modalService: { open },
+        gatewayStage: { production: () => true },
+        changeDetector: { markForCheck: jest.fn() },
+      });
+      return { component, stop, restart, pause, open };
+    }
+
+    it('stops a Flow only after the user confirms it', async () => {
+      const { component, stop, open } = live('stop');
+
+      component.run('stop');
+      expect(stop).not.toHaveBeenCalled();
+      await Promise.resolve();
+
+      expect(open).toHaveBeenCalled();
+      expect(stop).toHaveBeenCalled();
+    });
+
+    it('keeps a Flow running when Restart is cancelled, and pauses without asking', async () => {
+      const { component, restart, pause, open } = live('cancel');
+
+      component.run('restart');
+      await Promise.resolve();
+      expect(restart).not.toHaveBeenCalled();
+
+      open.mockClear();
+      component.run('pause');
+      expect(pause).toHaveBeenCalled();
+      expect(open).not.toHaveBeenCalled();
+    });
+  });
+
   it('shows the status in words, and what it is doing while an action runs', () => {
     const { component } = row();
     Object.assign(component, { statusFlow: 'inactive', isDraft: false, disableActionBtns: false, flowStatus: 'unconfigured' });

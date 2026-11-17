@@ -5,13 +5,16 @@
       class="app-sidebar__brand"
       routerLink="/"
       (click)="collapseNavbar()"
-      [attr.aria-label]="iconOnly ? 'Gateway' : null"
-      [ngbTooltip]="iconOnly ? 'Gateway' : ''"
+      [attr.aria-label]="iconOnly ? brandName() : null"
+      [ngbTooltip]="iconOnly ? brandName() : ''"
       [disableTooltip]="!iconOnly"
       placement="end"
     >
       <img class="app-sidebar__brand-icon" [src]="brandIcon()" alt="" aria-hidden="true" />
       <span class="app-sidebar__brand-full navbar-title">Gateway</span>
+      @if (stage.label(); as stageLabel) {
+      <span class="badge app-sidebar__stage" [class]="stage.tone()" data-cy="gateway-stage">{{ stageLabel }}</span>
+      }
     </a>
     <button
       type="button"
@@ -97,6 +100,7 @@
         <span>Manage</span>
       </a>
       <a
+        *jhiHasAnyAuthority="'ROLE_ADMIN'"
         [class]="itemClass"
         routerLink="/flow/message-sender"
         [class.active]="isActivePath('/flow/message-sender')"
@@ -166,7 +170,7 @@
       </a>
       <a [class]="itemClass" routerLink="/queue" [class.active]="isEndpointsActive()" (click)="collapseNavbar()">
         <fa-icon icon="inbox" [fixedWidth]="true" />
-        <span>Endpoints</span>
+        <span>Queues &amp; Topics</span>
       </a>
     </ng-template>
     } }
@@ -180,7 +184,7 @@
           ngbDropdownToggle
           id="api-menu"
           [class.active]="isApiActive()"
-          aria-label="API Explorer"
+          aria-label="Gateway REST API"
         >
           <fa-icon icon="code" [fixedWidth]="true" />
         </button>
@@ -200,7 +204,7 @@
           (click)="toggleApi()"
         >
           <fa-icon icon="code" [fixedWidth]="true" />
-          <span class="app-sidebar__label">API Explorer</span>
+          <span class="app-sidebar__label">Gateway REST API</span>
           <fa-icon class="app-sidebar__chevron" [icon]="apiExpanded() ? 'chevron-down' : 'chevron-right'" />
         </button>
         <div id="api-menu-items" class="app-sidebar__subnav" [class.app-sidebar__subnav--collapsed]="!apiExpanded()">
@@ -312,7 +316,7 @@
         </a>
         <a [class]="itemClass" routerLink="/admin/logs" [class.active]="isActivePath('/admin/logs')" (click)="collapseNavbar()">
           <fa-icon icon="file-alt" [fixedWidth]="true" />
-          <span>Logs</span>
+          <span>Log levels</span>
         </a>
         <a [class]="itemClass" routerLink="/admin/logviewer" [class.active]="isActivePath('/admin/logviewer')" (click)="collapseNavbar()">
           <fa-icon icon="search" [fixedWidth]="true" />

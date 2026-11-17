@@ -1,4 +1,13 @@
-import { CatalogueEntry, categoryChips, closestFirst, essentialsFirst, isEssential, roleMismatch, searchCatalogue } from './catalogue';
+import {
+  CatalogueEntry,
+  categoryChips,
+  categoryTitle,
+  closestFirst,
+  essentialsFirst,
+  isEssential,
+  roleMismatch,
+  searchCatalogue,
+} from './catalogue';
 
 const file: CatalogueEntry = { name: 'file', title: 'File', description: 'Read and write files.', label: 'file,core' };
 const sftp: CatalogueEntry = { name: 'sftp', title: 'SFTP', description: 'Upload and download files to/from SFTP servers.', label: 'file' };
@@ -36,6 +45,12 @@ describe('Camel catalogue', () => {
         { label: 'monitoring', count: 1 },
         { label: 'scheduling', count: 1 },
       ]);
+    });
+
+    it('names a chip in words: a capital for most labels, and its own name for an abbreviation or a Camel word', () => {
+      expect(['cloud', 'messaging', 'file'].map(categoryTitle)).toEqual(['Cloud', 'Messaging', 'File']);
+      expect(['ai', 'iot', 'bigdata', 'webservice'].map(categoryTitle)).toEqual(['AI', 'IoT', 'Big data', 'Web service']);
+      expect(['core', 'eip'].map(categoryTitle)).toEqual(['Built-in', 'Integration patterns']);
     });
 
     it('puts the long tail behind More', () => {

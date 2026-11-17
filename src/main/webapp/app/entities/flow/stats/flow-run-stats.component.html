@@ -1,7 +1,7 @@
 <div class="card bg-light text-start">
   <div class="card-body">
     @if (selectedStep(); as step) {
-      <h5 class="border-bottom">{{ step.kind }}</h5>
+      <h5 class="border-bottom">{{ kindNames[step.kind] }}</h5>
       <p class="fw-semibold mb-0">{{ stepTitle(step) }}</p>
       @if (step.uri && step.kind !== 'ROUTER') {
         <p class="small text-muted text-break mb-3">{{ step.uri }}</p>
@@ -9,7 +9,7 @@
         <div class="mb-3"></div>
       }
     } @else {
-      <h5 class="border-bottom">FLOW</h5>
+      <h5 class="border-bottom">Flow</h5>
     }
     <jhi-flow-stats-sections
       [loading]="!read()"

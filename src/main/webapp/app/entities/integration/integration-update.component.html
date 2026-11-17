@@ -26,14 +26,17 @@
         <jhi-alert-error></jhi-alert-error>
         <h4>
           General
-          <i
-            placement="right"
-            triggers="mouseenter:mouseleave"
+          <button
+            type="button"
+            class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm"
+            triggers="hover focus click"
             popoverTitle="Info"
-            data-placement="bottom"
+            placement="right"
             [ngbPopover]="generalPopover"
-            class="fa fa-info-circle"
-          ></i>
+            aria-label="About General"
+          >
+            <fa-icon icon="info-circle"></fa-icon>
+          </button>
         </h4>
         <div class="form-group" [hidden]="!integration.id">
           <label for="id" class="font-weight-bold">ID</label>
@@ -60,13 +63,17 @@
         <br />
         <h4>
           Environment
-          <i
-            placement="right"
-            triggers="mouseenter:mouseleave"
+          <button
+            type="button"
+            class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm"
+            triggers="hover focus click"
             popoverTitle="Info"
+            placement="right"
             [ngbPopover]="environmentPopover"
-            class="fa fa-info-circle"
-          ></i>
+            aria-label="About Environment"
+          >
+            <fa-icon icon="info-circle"></fa-icon>
+          </button>
         </h4>
         <div class="form-group">
           <label class="form-control-label font-weight-bold" for="field_environmentName">Name</label>
@@ -82,20 +89,24 @@
           <label class="form-control-label font-weight-bold" for="field_stage">Stage</label>
           <select class="form-control form-select" name="stage" [(ngModel)]="integration.stage" id="field_stage">
             @for (integrationStage of integrationListStage; track integrationStage) {
-              <option [ngValue]="integrationStage">{{ integrationStage }}</option>
+              <option [ngValue]="integrationStage">{{ label(integrationStage) }}</option>
             }
           </select>
         </div>
         <br />
         <h4>
           Default components
-          <i
-            placement="right"
-            triggers="mouseenter:mouseleave"
+          <button
+            type="button"
+            class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm"
+            triggers="hover focus click"
             popoverTitle="Info"
+            placement="right"
             [ngbPopover]="defaultPopover"
-            class="fa fa-info-circle"
-          ></i>
+            aria-label="About Default components"
+          >
+            <fa-icon icon="info-circle"></fa-icon>
+          </button>
         </h4>
         <div class="form-group">
           <label class="form-control-label font-weight-bold" for="field_defaultFromComponentType">Source</label>

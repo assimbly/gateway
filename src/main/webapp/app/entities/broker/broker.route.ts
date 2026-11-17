@@ -23,6 +23,7 @@ const brokerResolve: ResolveFn<IBroker> = route => {
 export const brokerRoute: Routes = [
   {
     path: 'broker',
+    title: 'Brokers',
     loadComponent: () => import('./broker.component').then(m => m.BrokerComponent),
     data: {
       authorities: ['ROLE_USER'],
@@ -31,6 +32,7 @@ export const brokerRoute: Routes = [
   },
   {
     path: 'broker/:id/view',
+    title: 'Broker',
     loadComponent: () => import('./broker-detail.component').then(m => m.BrokerDetailComponent),
     resolve: {
       broker: brokerResolve,
@@ -42,6 +44,7 @@ export const brokerRoute: Routes = [
   },
   {
     path: 'broker/new',
+    title: 'Broker',
     loadComponent: () => import('./broker-update.component').then(m => m.BrokerUpdateComponent),
     resolve: {
       broker: brokerResolve,
@@ -53,6 +56,7 @@ export const brokerRoute: Routes = [
   },
   {
     path: 'broker/:id/edit',
+    title: 'Broker',
     loadComponent: () => import('./broker-update.component').then(m => m.BrokerUpdateComponent),
     resolve: {
       broker: brokerResolve,
@@ -64,6 +68,7 @@ export const brokerRoute: Routes = [
   },
   {
     path: 'broker/browser/message-browser',
+    title: 'Browse messages',
     loadComponent: () => import('./browser/broker-message-browser.component').then(m => m.BrokerMessageBrowserComponent),
     data: {
       authorities: ['ROLE_USER'],
@@ -72,6 +77,7 @@ export const brokerRoute: Routes = [
   },
   {
     path: 'broker/sender/message-sender',
+    title: 'Send to the Broker',
     loadComponent: () => import('./sender/broker-message-sender.component').then(m => m.BrokerMessageSenderComponent),
     data: {
       authorities: ['ROLE_USER'],

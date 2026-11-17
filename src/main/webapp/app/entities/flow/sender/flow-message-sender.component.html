@@ -142,70 +142,70 @@
         </div>
 
         <div class="send-options" formArrayName="options">
-            <label class="form-control-label d-block">Options</label>
-            <div class="form-text mb-2">
-              Optional settings added to the endpoint as name=value. Use the Camel documentation button next to Component for the valid options.
-            </div>
-            <div class="send-headers__rows">
-              @for (option of options.controls; track option; let idx = $index) {
-                <div class="send-option-row" [formGroupName]="idx">
-                  <ng-select
-                    [items]="componentOptions"
-                    bindLabel="displayName"
-                    bindValue="name"
-                    [addTag]="addOptionTag"
-                    formControlName="key"
-                    placeholder="Option"
-                    [attr.aria-label]="'Name of option ' + (idx + 1)"
-                    (change)="changeOptionSelection($event, idx)"
-                    (close)="clearOptionHover()"
+          <label class="form-control-label d-block">Options</label>
+          <div class="form-text mb-2">
+            Extra settings for the Component, each a name and a value. Add only the ones you need; the Camel documentation button next to
+            Component lists them.
+          </div>
+          <div class="send-headers__rows">
+            @for (option of options.controls; track option; let idx = $index) {
+              <div class="send-option-row" [formGroupName]="idx">
+                <ng-select
+                  [items]="componentOptions"
+                  bindLabel="displayName"
+                  bindValue="name"
+                  [addTag]="addOptionTag"
+                  formControlName="key"
+                  placeholder="Option"
+                  [attr.aria-label]="'Name of option ' + (idx + 1)"
+                  (change)="changeOptionSelection($event, idx)"
+                  (close)="clearOptionHover()"
+                >
+                  <ng-template ng-option-tmp let-item="item">
+                    <div (mouseenter)="onOptionHover(item)">{{ item.displayName }}</div>
+                  </ng-template>
+                  <ng-template ng-footer-tmp>
+                    <div class="option-desc-footer">
+                      @if (hoveredOption; as opt) {
+                        <div class="option-desc-footer-title">{{ opt.displayName }}</div>
+                        <div class="option-desc-footer-body">{{ opt.description }}</div>
+                        <div class="option-desc-footer-meta">
+                          <span><b>Type:</b> {{ optionValueLabel(opt) }}</span>
+                          @if (optionDefaultLabel(opt); as byDefault) {
+                            <span><b>Default:</b> {{ byDefault }}</span>
+                          }
+                        </div>
+                      } @else {
+                        <div class="option-desc-footer-placeholder">Hover an option to see its description</div>
+                      }
+                    </div>
+                  </ng-template>
+                </ng-select>
+                <div class="send-option-value">
+                  <input
+                    type="text"
+                    class="form-control"
+                    formControlName="value"
+                    [placeholder]="option.get('defaultValue')?.value || 'Value'"
+                    [attr.aria-label]="'Value of option ' + (idx + 1)"
+                    title="Value of the option. Click the Camel documentation button for the valid options."
+                  />
+                  <button
+                    type="button"
+                    class="btn btn-fx btn-fx-sm btn-fx-icon btn-fx-ghost-danger send-option-value__remove"
+                    title="Remove option"
+                    [attr.aria-label]="'Remove option ' + (idx + 1)"
+                    (click)="removeOption(idx)"
                   >
-                    <ng-template ng-option-tmp let-item="item">
-                      <div (mouseenter)="onOptionHover(item)">{{ item.displayName }}</div>
-                    </ng-template>
-                    <ng-template ng-footer-tmp>
-                      <div class="option-desc-footer">
-                        @if (hoveredOption; as opt) {
-                          <div class="option-desc-footer-title">{{ opt.displayName }}</div>
-                          <div class="option-desc-footer-body">{{ opt.description }}</div>
-                          <div class="option-desc-footer-meta">
-                            <span><b>Group:</b> {{ opt.group }}</span>
-                            <span><b>Type:</b> {{ opt.type }}</span>
-                            @if (opt.defaultValue !== undefined) {
-                              <span><b>Default:</b> {{ opt.defaultValue }}</span>
-                            }
-                          </div>
-                        } @else {
-                          <div class="option-desc-footer-placeholder">Hover an option to see its description</div>
-                        }
-                      </div>
-                    </ng-template>
-                  </ng-select>
-                  <div class="send-option-value">
-                    <input
-                      type="text"
-                      class="form-control"
-                      formControlName="value"
-                      [placeholder]="option.get('defaultValue')?.value || 'Value'"
-                      [attr.aria-label]="'Value of option ' + (idx + 1)"
-                      title="Value of the option. Click the Camel documentation button for the valid options."
-                    />
-                    <button
-                      type="button"
-                      class="btn btn-fx btn-fx-sm btn-fx-icon btn-fx-ghost-danger send-option-value__remove"
-                      title="Remove option"
-                      [attr.aria-label]="'Remove option ' + (idx + 1)"
-                      (click)="removeOption(idx)"
-                    >
-                      <fa-icon icon="times"></fa-icon>
-                    </button>
-                  </div>
+                    <fa-icon icon="times"></fa-icon>
+                  </button>
                 </div>
-              }
-            </div>
-            <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-sm mt-2" (click)="addOption()">
-              <fa-icon icon="plus"></fa-icon><span>Add option</span>
-            </button>
+              </div>
+            }
+          </div>
+          <button type="button" class="btn btn-fx btn-fx-ghost btn-fx-sm mt-2" (click)="addOption()">
+            <fa-icon icon="plus"></fa-icon><span>Add option</span>
+          </button>
         </div>
       </section>
     </form>

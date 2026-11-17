@@ -46,7 +46,11 @@ import {
   groupOptions,
   notAnInteger,
   pathLabel,
+  commonOptions,
+  defaultLabelOf,
+  pathFormat,
   pathRule,
+  valueLabelOf,
   requiredOptions,
   splitHttpUrl,
   suggestedOptions,
@@ -327,6 +331,57 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
     return this.stepType === 'SOURCE' ? 'consumer' : 'producer';
   }
 
+  /** Whether the key lists also offer the Advanced and Security Options; they leave those out until asked for. */
+  showAdvancedOptions = false;
+  /** What is typed in the open key list: a search looks through every Option. */
+  optionSearch = '';
+  private readonly rowChoicesCache = new Map<number, { all: OptionSchema[]; held: string; choices: OptionSchema[] }>();
+
+  /** How many Options the key lists leave out until asked for. None when there is no Common Option to start with. */
+  get advancedOptionCount(): number {
+    const all = this.optionChoices as Array<OptionSchema & { heading?: string }>;
+    const advanced = all.filter(option => option.heading !== 'Common').length;
+    return advanced === all.length ? 0 : advanced;
+  }
+
+  /**
+   * The Options the key list of a row offers: the Common ones and the one the row holds, or all of them once Show
+   * advanced options is chosen or something is typed. Cached per row so the list keeps its items.
+   */
+  optionChoicesFor(idx: number): OptionSchema[] {
+    const all = this.optionChoices;
+    if (this.showAdvancedOptions || this.optionSearch || !this.advancedOptionCount) {
+      return all;
+    }
+    const held = `${this.optionGroup(idx)?.get('key')?.value ?? ''}`;
+    const cached = this.rowChoicesCache.get(idx);
+    if (cached?.all === all && cached.held === held) {
+      return cached.choices;
+    }
+    const choices = commonOptions(all, held);
+    this.rowChoicesCache.set(idx, { all, held, choices });
+    return choices;
+  }
+
+  toggleAdvancedOptions(): void {
+    this.showAdvancedOptions = !this.showAdvancedOptions;
+    this.cdr.detectChanges();
+  }
+
+  onOptionSearch(term: string): void {
+    this.optionSearch = term?.trim() ?? '';
+    this.cdr.detectChanges();
+  }
+
+  /** What the hovered Option's value is and defaults to, in plain words. */
+  optionValueLabel(option: OptionSchema): string {
+    return valueLabelOf(option);
+  }
+
+  optionDefaultLabel(option: OptionSchema): string {
+    return defaultLabelOf(option);
+  }
+
   /** The Options this Step can set, under Common, Advanced and Security. Cached so the key list keeps its items. */
   get optionChoices(): OptionSchema[] {
     const options = this.componentOptions() ?? [];
@@ -352,6 +407,15 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
   /** What the Path field is called for this Component, such as Directory Name for File. */
   get pathFieldLabel(): string {
     return pathLabel(this.pathParts);
+  }
+
+  /** The format shown under a path of several values; the info icon by the label shows the full syntax of any path. */
+  get pathFormat(): string {
+    return pathFormat(this.uriPlaceholder() ?? '', this.pathParts);
+  }
+
+  get pathRequired(): boolean {
+    return this.pathParts.some(part => part.required);
   }
 
   /**
@@ -1031,8 +1095,10 @@ export class FlowEditorStepComponent implements OnChanges, OnDestroy {
     this.cdr.detectChanges();
   }
 
+  /** The key list closed: what was hovered and typed in it is over. */
   clearOptionHover(): void {
     this.hoveredOption = null;
+    this.optionSearch = '';
     this.cdr.detectChanges();
   }
 

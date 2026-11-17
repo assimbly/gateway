@@ -33,48 +33,55 @@
               alert.title
             }}</span>
             @if (alert.at) {
-              <time class="flow-alerts-drawer__time" [attr.datetime]="alert.at.toISOString()">{{ timestamp(alert) }} · {{ relative(alert) }}</time>
+              <time class="flow-alerts-drawer__time" [attr.datetime]="alert.at.toISOString()"
+                >{{ timestamp(alert) }} · {{ relative(alert) }}</time
+              >
             }
           </div>
-          <dl class="flow-alerts-drawer__fields">
-            @if (alert.endpoint) {
-              <dt>Endpoint</dt>
-              <dd><code class="flow-alerts-drawer__endpoint">{{ alert.endpoint }}</code></dd>
-            }
-            <dt>Error</dt>
-            <dd>
-              <div class="flow-alerts-drawer__error">
-                <code
-                  #error
-                  class="flow-alerts-drawer__message"
-                  [class.flow-alerts-drawer__message--clamped]="isLong(alert) && !expanded().has($index)"
-                  >{{ alert.message }}</code
-                >
-                <button
-                  type="button"
-                  class="btn btn-fx btn-fx-sm btn-fx-ghost flow-alerts-drawer__copy"
-                  [title]="copied() === $index ? 'Copied' : 'Copy the error'"
-                  (click)="copy(error, $index)"
-                >
-                  <fa-icon [icon]="copied() === $index ? 'check' : 'copy'" /><span>{{ copied() === $index ? 'Copied' : 'Copy' }}</span>
-                </button>
-              </div>
-              @if (isLong(alert)) {
-                <button
-                  type="button"
-                  class="btn btn-link btn-sm p-0 flow-alerts-drawer__more"
-                  [attr.aria-expanded]="expanded().has($index)"
-                  (click)="toggle($index)"
-                >
-                  {{ expanded().has($index) ? 'Show less' : 'Show all' }}
-                </button>
+          @let explanation = explain(alert.message);
+          @if (explanation) {
+            <p class="flow-alerts-drawer__meaning">{{ explanation.meaning }} {{ explanation.fix }}</p>
+          }
+          <details class="flow-alerts-drawer__details" [open]="!explanation">
+            <summary>Technical details</summary>
+            <dl class="flow-alerts-drawer__fields">
+              @if (alert.endpoint) {
+                <dt>Address</dt>
+                <dd>
+                  <code class="flow-alerts-drawer__endpoint">{{ alert.endpoint }}</code>
+                </dd>
               }
-            </dd>
-            @if (explain(alert.message); as explanation) {
-              <dt>What it means</dt>
-              <dd>{{ explanation.meaning }} {{ explanation.fix }}</dd>
-            }
-          </dl>
+              <dt>Error</dt>
+              <dd>
+                <div class="flow-alerts-drawer__error">
+                  <code
+                    #error
+                    class="flow-alerts-drawer__message"
+                    [class.flow-alerts-drawer__message--clamped]="isLong(alert) && !expanded().has($index)"
+                    >{{ alert.message }}</code
+                  >
+                  <button
+                    type="button"
+                    class="btn btn-fx btn-fx-sm btn-fx-ghost flow-alerts-drawer__copy"
+                    [title]="copied() === $index ? 'Copied' : 'Copy the error'"
+                    (click)="copy(error, $index)"
+                  >
+                    <fa-icon [icon]="copied() === $index ? 'check' : 'copy'" /><span>{{ copied() === $index ? 'Copied' : 'Copy' }}</span>
+                  </button>
+                </div>
+                @if (isLong(alert)) {
+                  <button
+                    type="button"
+                    class="btn btn-link btn-sm p-0 flow-alerts-drawer__more"
+                    [attr.aria-expanded]="expanded().has($index)"
+                    (click)="toggle($index)"
+                  >
+                    {{ expanded().has($index) ? 'Show less' : 'Show all' }}
+                  </button>
+                }
+              </dd>
+            </dl>
+          </details>
         </li>
       }
     </ol>

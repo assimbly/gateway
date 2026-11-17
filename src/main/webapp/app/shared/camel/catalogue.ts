@@ -46,6 +46,29 @@ export function labelsOf(entry: CatalogueEntry): string[] {
     .filter(label => label.length > 0);
 }
 
+/** The catalogue labels that don't read well with just a capital: abbreviations, and words that are Camel's own. */
+const CATEGORY_TITLES: Record<string, string> = {
+  ai: 'AI',
+  api: 'API',
+  bigdata: 'Big data',
+  cms: 'CMS',
+  core: 'Built-in',
+  eip: 'Integration patterns',
+  http: 'HTTP',
+  iot: 'IoT',
+  jms: 'JMS',
+  mq: 'MQ',
+  rest: 'REST',
+  rpc: 'RPC',
+  saas: 'SaaS',
+  webservice: 'Web service',
+};
+
+/** How a catalogue label, such as `cloud` or `eip`, reads on its chip. The label itself stays what a chip filters on. */
+export function categoryTitle(label: string): string {
+  return CATEGORY_TITLES[label] ?? label.charAt(0).toUpperCase() + label.slice(1);
+}
+
 /** One chip per catalogue label, largest first; a component with several labels counts under each. */
 export function categoryChips(entries: CatalogueEntry[], shownCount: number): { shown: CategoryChip[]; more: CategoryChip[] } {
   const counts = new Map<string, number>();

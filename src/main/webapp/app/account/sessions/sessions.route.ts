@@ -7,7 +7,7 @@ import Sessions from './sessions';
 const sessionsRoute: Route = {
   path: 'sessions',
   component: Sessions,
-  title: 'global.menu.account.sessions',
+  title: 'Sessions',
   canActivate: [userRouteAccessService],
 };
 

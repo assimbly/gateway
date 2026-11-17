@@ -111,11 +111,22 @@
   }
 }
 
+.flow-editor-header__save.btn-fx-secondary {
+  color: var(--app-text-muted);
+  background-color: var(--app-disabled-bg);
+  border-color: var(--app-border);
+
+  &:hover:not(:disabled):not(.disabled) {
+    color: var(--app-text);
+    background-color: var(--app-hover);
+  }
+}
+
 // Under the name field, without pushing the row down.
 .flow-editor-header__hint {
   position: absolute;
   top: 100%;
-  left: calc(var(--app-btn-height, 2.25rem) + 0.375rem);
+  left: 0;
   z-index: 1;
   font-size: 0.75rem;
   white-space: nowrap;

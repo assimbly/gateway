@@ -118,6 +118,38 @@ export function valueFieldOf(
   }
 }
 
+const FIELD_LABELS: Record<ValueField, string> = {
+  switch: 'On / Off',
+  choice: 'Choice',
+  number: 'Number',
+  duration: 'Duration',
+  secret: 'Secret',
+  text: 'Text',
+  multiline: 'Text',
+};
+
+/** What an Option's value is, in the words of its field rather than its Camel type: a `boolean` is On / Off. */
+export function valueLabelOf(option: Parameters<typeof valueFieldOf>[0]): string {
+  return FIELD_LABELS[valueFieldOf(option)];
+}
+
+/** An Option's default as its field shows it: On or Off for a switch. Empty when it has none. */
+export function defaultLabelOf(option: Pick<OptionSchema, 'defaultValue'> | undefined): string {
+  const value = option?.defaultValue;
+  if (value === undefined || value === null || value === '') {
+    return '';
+  }
+  if (typeof value === 'boolean') {
+    return value ? 'On' : 'Off';
+  }
+  return `${value}`;
+}
+
+/** The Options a key list offers before the others are asked for: the Common ones, and the one its row already holds. */
+export function commonOptions<T extends OptionSchema & { heading?: OptionHeading }>(options: T[], held: string): T[] {
+  return options.filter(option => option.heading === 'Common' || option.name === held);
+}
+
 /**
  * Whether a value can't be used for this Option: an `integer` Option takes a whole number, or a placeholder such as
  * `@{key}` or `{{key}}` that gets its number later. An empty value leaves the default.
@@ -194,8 +226,20 @@ function titleOf(name: string): string {
  */
 export function pathLabel(parts: PathPart[]): string {
   const last = parts.at(-1);
-  const single = parts.length === 1 || (!!last?.required && parts.filter(part => part.required).length === 1);
-  return single && last ? last.displayName : 'Path';
+  return last && takesOneValue(parts) ? last.displayName : 'Path';
+}
+
+/** Whether a single value fills the path: it has one part, or only its last part is required. */
+function takesOneValue(parts: PathPart[]): boolean {
+  return parts.length === 1 || (!!parts.at(-1)?.required && parts.filter(part => part.required).length === 1);
+}
+
+/**
+ * How to write a path that takes several values, such as `host:port/directoryName` for SFTP: the syntax without the
+ * Component's scheme. Empty for a path of a single value, whose field is named after that value.
+ */
+export function pathFormat(syntax: string, parts: PathPart[]): string {
+  return parts.length > 1 && !takesOneValue(parts) ? syntax.slice(syntax.indexOf(':') + 1) : '';
 }
 
 /**

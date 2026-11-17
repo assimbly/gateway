@@ -207,7 +207,18 @@ describe('Flow editor Component Step', () => {
     return (valueControl(row).closest('.option-row') as HTMLElement).dataset['field'];
   }
 
-  afterEach(() => document.body.querySelectorAll('.dropdown-menu').forEach(menu => menu.remove()));
+  afterEach(() => document.body.querySelectorAll('.dropdown-menu, ngb-popover-window').forEach(element => element.remove()));
+
+  it('explains a field from an info button that also opens from the keyboard', () => {
+    render('file', 'directoryName', []);
+
+    const info: HTMLButtonElement = fixture.nativeElement.querySelector('button[aria-label="About Component"]');
+    expect(info.getAttribute('triggers')).toBe('hover focus click');
+    info.dispatchEvent(new FocusEvent('focusin'));
+    fixture.detectChanges();
+
+    expect(document.body.querySelector('ngb-popover-window')?.textContent).toContain('Info');
+  });
 
   it("keeps the Path of a Component that doesn't read one in place, read-only", () => {
     render('setbody', '', []);
@@ -224,6 +235,57 @@ describe('Flow editor Component Step', () => {
     const actions: HTMLElement = pathField().closest('.step-field')!.querySelector('.step-field__head .step-field__actions')!;
     expect(actions.querySelector('[aria-label="Insert a Variable"]')).not.toBeNull();
     expect(actions.querySelector('[aria-label="Edit the path in a larger editor"]')).not.toBeNull();
+  });
+
+  it('shows how to write a path of several values and marks a required one, and shows no format for a single value', () => {
+    render('sftp', 'sftp:host:port/directoryName', []);
+    fixture.componentRef.setInput('componentOptions', [
+      { name: 'host', kind: 'path', displayName: 'Host', required: true },
+      { name: 'port', kind: 'path', displayName: 'Port' },
+      { name: 'directoryName', kind: 'path', displayName: 'Directory Name' },
+    ]);
+    fixture.detectChanges();
+    const field = () => pathField().closest('.step-field') as HTMLElement;
+    const text = (selector: string) => field().querySelector(selector)?.textContent?.replace(/\s+/g, ' ').trim();
+
+    expect(text('.step-field__label')).toBe('Path *');
+    expect(text('#field_uri_syntax_1')).toBe('Format: host:port/directoryName');
+
+    fixture.componentRef.setInput('uriPlaceholder', 'file:directoryName');
+    fixture.componentRef.setInput('componentOptions', [{ name: 'directoryName', kind: 'path', displayName: 'Directory Name' }]);
+    fixture.detectChanges();
+
+    expect(text('.step-field__label')).toBe('Directory Name');
+    expect(field().querySelector('#field_uri_syntax_1')).toBeNull();
+  });
+
+  it('offers the Common Options first, the others once asked for or searched, and always the Option a row holds', () => {
+    render('file', 'file:directoryName', [
+      { key: 'bufferSize', value: '1' },
+      { key: '', value: '' },
+    ]);
+    fixture.componentRef.setInput('componentOptions', [
+      { name: 'fileName', displayName: 'File Name', group: 'common', type: 'string' },
+      { name: 'bufferSize', displayName: 'Buffer Size', group: 'producer (advanced)', type: 'integer' },
+      { name: 'lazyStartProducer', displayName: 'Lazy Start Producer', group: 'producer (advanced)', type: 'boolean' },
+    ]);
+    fixture.detectChanges();
+    const step = fixture.componentInstance;
+    const names = (row: number) => step.optionChoicesFor(row).map(option => option.name);
+
+    expect(step.advancedOptionCount).toBe(2);
+    expect(names(1)).toEqual(['fileName']);
+    expect(names(0)).toEqual(['fileName', 'bufferSize']);
+    // The same list each time, so the key list keeps its items between checks.
+    expect(step.optionChoicesFor(1)).toBe(step.optionChoicesFor(1));
+
+    step.onOptionSearch('lazy');
+    expect(names(1)).toEqual(['fileName', 'bufferSize', 'lazyStartProducer']);
+    step.clearOptionHover();
+    expect(names(1)).toEqual(['fileName']);
+
+    step.toggleAdvancedOptions();
+    expect(names(1)).toEqual(['fileName', 'bufferSize', 'lazyStartProducer']);
   });
 
   it('says when an integer Option holds something else', () => {

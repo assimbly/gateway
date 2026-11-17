@@ -23,6 +23,7 @@ const connectionResolve: ResolveFn<IConnection> = route => {
 export const connectionRoute: Routes = [
   {
     path: 'connection/all',
+    title: 'Connections',
     loadComponent: () => import('./connection.component').then(m => m.ConnectionComponent),
     data: {
       authorities: ['ROLE_USER'],
@@ -31,6 +32,7 @@ export const connectionRoute: Routes = [
   },
   {
     path: 'connection',
+    title: 'Connections',
     loadComponent: () => import('./connection-all.component').then(m => m.ConnectionAllComponent),
     data: {
       authorities: ['ROLE_USER'],
@@ -39,6 +41,7 @@ export const connectionRoute: Routes = [
   },
   {
     path: 'connection/:id/view',
+    title: 'Connection',
     loadComponent: () => import('./connection-detail.component').then(m => m.ConnectionDetailComponent),
     resolve: {
       connection: connectionResolve,
@@ -50,6 +53,7 @@ export const connectionRoute: Routes = [
   },
   {
     path: 'connection/new',
+    title: 'Connection',
     loadComponent: () => import('./connection-update.component').then(m => m.ConnectionUpdateComponent),
     resolve: {
       connection: connectionResolve,
@@ -61,6 +65,7 @@ export const connectionRoute: Routes = [
   },
   {
     path: 'connection-all-new',
+    title: 'Connection',
     loadComponent: () => import('./connection.component').then(m => m.ConnectionComponent),
     data: {
       authorities: ['ROLE_USER'],
@@ -69,6 +74,7 @@ export const connectionRoute: Routes = [
   },
   {
     path: 'connection/:id/edit',
+    title: 'Connection',
     loadComponent: () => import('./connection-update.component').then(m => m.ConnectionUpdateComponent),
     resolve: {
       connection: connectionResolve,

@@ -4,13 +4,14 @@
 
 **What you'll learn**
 
-* Create a Script Flow
-* Write scripts in Simple and Groovy
-* Chain scripts one after another
+- Create a Script Flow
+- Write scripts in Simple and Groovy
+- Chain scripts one after another
 
 It takes about 10 minutes.
 
 <!-- web-only -->
+
 > You can also follow this tutorial inside the Gateway: click **Tutorials** in the menu. It shows each step next to the screen it's about and ticks it off once you've done it.
 
 ## How it works
@@ -21,10 +22,10 @@ A **Script** Flow runs your own scripts, for when a few lines of code are quicke
 
 > **What are the parts of a Script Flow?**
 >
-> * The **Source** starts the Flow, like in a visual Flow. A new Script Flow starts with **Once**, which sends one message when the Flow starts.
-> * A **Script** runs your script. Its result becomes the message. With more Scripts, each one gets the message the one before it made.
-> * The **Sink** takes the result of the last script. By default it's **Log Data**, which writes each result to the log.
-> * The **Error handler** takes care of a message when a script fails. By default it writes the error to the Gateway log.
+> - The **Source** starts the Flow, like in a visual Flow. A new Script Flow starts with **Once**, which sends one message when the Flow starts.
+> - A **Script** runs your script. Its result becomes the message. With more Scripts, each one gets the message the one before it made.
+> - The **Sink** takes the result of the last script. By default it's **Log Data**, which writes each result to the log.
+> - The **Error handler** takes care of a message when a script fails. By default it writes the error to the Gateway log.
 
 > **Which languages?** Camel's Simple language, Groovy, JavaScript, Python, JSLT and XSLT.
 
@@ -39,11 +40,11 @@ The script editor opens on the **Scripts** tab.
 
 ![Add a Script Flow](01-add-flow.png)
 
-> **What's on the other tabs?** **Source & result**, **Error handler** and **Notes** hold the other parts. The line above the scripts sums them up: *Starts: hello, once when started · Result: Log viewer · Errors: logged*.
+> **What's on the other tabs?** **Source & result**, **Error handler** and **Notes** hold the other parts. The line above the scripts sums them up: _Starts: hello, once when started · Result: Log viewer · Errors: logged_.
 
 ## Step 2: Set the Source
 
-1. At the top left, where it says *Flow name*, type `Clock`. <!-- show: #field_flowName -->
+1. At the top left, where it says _Flow name_, type `Clock`. <!-- show: #field_flowName -->
 2. Click the **Source & result** tab. <!-- show: [data-cy="script-tab-source"] -->
 3. Under **Source**, click **Component**, type `sched` and choose **Scheduler**. <!-- show: [formcontrolname="componentType"] -->
 4. Set **Name** to `clock`. <!-- show: [formcontrolname="uri"] -->
@@ -81,19 +82,15 @@ The script editor opens on the **Scripts** tab.
    body
    ```
 
-You save the Flow in the next step, when you start it.
-
 ![The two scripts](03-scripts.png)
 
 > **What does this script do?** In a script, `body` is the message: the greeting the Simple script made. The first line writes it to `clock.txt` in `@{messages}/out`. The second line, `body`, is the result of the script, so the message stays the same.
-
-> **Which language when?** **Simple** to build text from the message and its headers. **Groovy**, **JavaScript** or **Python** when you need real code. **JSLT** to transform JSON and **XSLT** to transform XML.
 
 ## Step 5: Start the Flow and read the result
 
 <!-- step: {"check":"flowCompleted:Clock"} -->
 
-1. Click **Save & Test**. <!-- show: [data-tour="flow-save-test"] @ flow:Clock -->
+1. Click **Test** at the top of the editor, <!-- show: [data-cy="mode-toggle"] @ flow:Clock --> then click **▶** (Start) in the **Test** panel. <!-- show: [data-tour="flow-status-controls"] @ flow:Clock:test -->
 
 Every 10 seconds the scripts run, and the **Stats** tab <!-- show: [data-cy="test-view-stats"] @ flow:Clock:test --> counts a run under **Completed**.
 
@@ -101,23 +98,15 @@ Every 10 seconds the scripts run, and the **Stats** tab <!-- show: [data-cy="tes
 
 2. Open `clock.txt` in `@{messages}/out`. Open it again a little later: the time has changed.
 3. Click the **Log** tab. <!-- show: [data-cy="test-view-log"] @ flow:Clock:test --> The Sink wrote each greeting there, after `Body:`.
-4. When you're done, click **■** (Stop). <!-- show: [data-tour="flow-status-controls"] @ flow:Clock:test --> Otherwise the Flow keeps writing the file.
-
-> **Where is `@{messages}/out`?** The `out` folder in your messages folder, such as `C:\Users\<you>\messages\out` on Windows. The Variable `messages` under **Flows → Variables** holds its path.
-
-> **Try it yourself**
->
-> * Add the date: click **Code**, <!-- show: [data-cy="mode-toggle"] @ flow:Clock --> change the Simple script to `Hello, Assimbly! It is ${date:now:yyyy-MM-dd HH:mm:ss}` and click **Save & Test**. <!-- show: [data-tour="flow-save-test"] @ flow:Clock -->
-> * Click **Test** in the **Tester**, beside the **Scripts**. Each Script shows what it made of the message, under **Out**.
-> * Break the Groovy script on purpose, for example by writing to a folder that doesn't exist. **Failed** goes up on the **Stats** tab and an **Alerts** badge appears. [Tutorial 2](https://github.com/assimbly/gateway/wiki/tutorial6-debugging-a-flow) shows how to find the error.
+4. When you're done, click the **Scripts** tab and click **■** (Stop) in the **Test** panel. <!-- show: [data-tour="flow-status-controls"] @ flow:Clock:test --> Otherwise the Flow keeps writing the file.
 
 ## Summary
 
-| Step | Language | What it does |
-|------|----------|--------------|
-| Source | **Scheduler** | Starts the Flow every 10 seconds (**Delay** `10000`). |
-| Script | **Simple** | Makes the greeting with the current time. The result becomes the message. |
-| Script | **Groovy** | Writes the message (`body`) to `clock.txt` and keeps it as the result. |
-| Sink | **Log Data** | Writes each result to the log. |
+| Step   | Language      | What it does                                                              |
+| ------ | ------------- | ------------------------------------------------------------------------- |
+| Source | **Scheduler** | Starts the Flow every 10 seconds (**Delay** `10000`).                     |
+| Script | **Simple**    | Makes the greeting with the current time. The result becomes the message. |
+| Script | **Groovy**    | Writes the message (`body`) to `clock.txt` and keeps it as the result.    |
+| Sink   | **Log Data**  | Writes each result to the log.                                            |
 
 **Done!** You ran your first scripts. In the last tutorial you control the Gateway without the browser: [Tutorial 10: Using the API](https://github.com/assimbly/gateway/wiki/tutorial6-using-the-api).

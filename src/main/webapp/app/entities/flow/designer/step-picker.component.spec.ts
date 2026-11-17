@@ -125,6 +125,37 @@ describe('Step picker', () => {
     });
   });
 
+  describe('what the open menu shows', () => {
+    /** Opens the menu, with or without a search; the menu is rendered in the body. */
+    function opened(filter = ''): HTMLElement {
+      fixture.detectChanges();
+      picker.open();
+      picker.filter = filter;
+      fixture.componentRef.changeDetectorRef.markForCheck();
+      fixture.detectChanges();
+      return document.body.querySelector<HTMLElement>('.step-picker')!;
+    }
+    const ids = (menu: HTMLElement) => [...menu.querySelectorAll('.step-picker-item-id')].map(id => id.textContent);
+
+    afterEach(() => fixture.destroy());
+
+    it('names the categories in words, and still filters on the catalogue label', () => {
+      const chips = [...opened().querySelectorAll<HTMLElement>('.step-picker-chip')];
+      const titles = chips.map(chip => chip.firstChild?.textContent?.trim());
+
+      expect(titles).toContain('Built-in');
+      expect(titles).not.toContain('core');
+
+      chips[titles.indexOf('Built-in')].click();
+      expect(picker.category).toBe('core');
+    });
+
+    it('shows the id of a component only while searching', () => {
+      expect(ids(opened())).toEqual([]);
+      expect(ids(opened('file'))).toContain('file');
+    });
+  });
+
   describe('searching for a Router', () => {
     /** Opens the menu with a search; the menu is rendered in the body. */
     function searchFor(filter: string): HTMLElement[] {

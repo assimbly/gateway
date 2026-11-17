@@ -14,28 +14,28 @@ const routes: Routes = [
   {
     path: 'configuration',
     loadComponent: () => import('./configuration/configuration'),
-    title: 'configuration.title',
+    title: 'Configuration',
   },
   {
     path: 'health',
     loadComponent: () => import('./health/health'),
-    title: 'health.title',
+    title: 'Health',
   },
   {
     path: 'logs',
     loadComponent: () => import('./logs/logs'),
-    title: 'logs.title',
+    title: 'Log levels',
   },
   {
     path: 'metrics',
     loadComponent: () => import('./metrics/metrics'),
-    title: 'metrics.title',
+    title: 'Metrics',
   },
-   {
-     path: 'logviewer',
-     loadComponent: () => import('./logviewer/logviewer.component'),
-     title: 'logviewer.title',
-   }
+  {
+    path: 'logviewer',
+    loadComponent: () => import('./logviewer/logviewer.component'),
+    title: 'Log viewer',
+  },
   // jhipster-needle-add-admin-route - JHipster will add admin routes here
 ];
 

@@ -31,6 +31,7 @@ const topicResolve: ResolveFn<ITopic> = route => {
 export const topicRoute: Routes = [
   {
     path: 'topic',
+    title: 'Topics',
     loadComponent: () => import('./topic.component').then(m => m.TopicComponent),
     data: {
       authorities: ['ROLE_USER'],
@@ -39,6 +40,7 @@ export const topicRoute: Routes = [
   },
   {
     path: 'topic/:id/view',
+    title: 'Topic',
     loadComponent: () => import('./topic-detail.component').then(m => m.TopicDetailComponent),
     resolve: {
       topic: topicResolve,
@@ -50,6 +52,7 @@ export const topicRoute: Routes = [
   },
   {
     path: 'topic/new',
+    title: 'Topic',
     loadComponent: () => import('./topic-update.component').then(m => m.TopicUpdateComponent),
     resolve: {
       topic: topicResolve,
@@ -61,6 +64,7 @@ export const topicRoute: Routes = [
   },
   {
     path: 'topic/:id/edit',
+    title: 'Topic',
     loadComponent: () => import('./topic-update.component').then(m => m.TopicUpdateComponent),
     resolve: {
       topic: topicResolve,

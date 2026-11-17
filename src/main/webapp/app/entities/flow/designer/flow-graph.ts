@@ -80,7 +80,12 @@ const fixed = (branch: string, takesCondition: boolean, returnsToRouter: boolean
   takesCondition,
   returnsToRouter,
 });
-const list = (hasDefault: boolean, takesCondition: boolean): RouterShape => ({ slots: 'list', hasDefault, takesCondition, returnsToRouter: false });
+const list = (hasDefault: boolean, takesCondition: boolean): RouterShape => ({
+  slots: 'list',
+  hasDefault,
+  takesCondition,
+  returnsToRouter: false,
+});
 
 const ROUTER_SHAPES: Record<string, RouterShape> = {
   if: fixed('if', true, false),
@@ -166,7 +171,15 @@ export function loadFlowGraph(flow: IFlow, handler?: HandlerInfo): FlowGraph {
 
   const readOnlyReason = unsupportedReason(flowSteps);
   if (readOnlyReason) {
-    const graph = { flowId: flow.id, steps: savedSteps, links: linksFromSavedLinks(flowSteps, savedSteps), errorStep, handler, repaired: false, readOnlyReason };
+    const graph = {
+      flowId: flow.id,
+      steps: savedSteps,
+      links: linksFromSavedLinks(flowSteps, savedSteps),
+      errorStep,
+      handler,
+      repaired: false,
+      readOnlyReason,
+    };
     return arrangedIfUnplaced(graph);
   }
 
@@ -223,12 +236,14 @@ function withFixedSlotBranches(graph: FlowGraph): FlowGraph {
 
 /** Why the designer can only show this Flow, if it can't edit it. */
 function unsupportedReason(flowSteps: IStep[]): string | undefined {
-  const unsupportedTypes = [...new Set(flowSteps.map(s => s.stepType as string).filter(t => !KINDS.includes(t as StepKind) && t !== 'ERROR'))];
+  const unsupportedTypes = [
+    ...new Set(flowSteps.map(s => s.stepType as string).filter(t => !KINDS.includes(t as StepKind) && t !== 'ERROR')),
+  ];
   if (unsupportedTypes.length) {
     return `This Flow uses Step types the designer can't edit: ${unsupportedTypes.join(', ')}.`;
   }
   if (hasAmbiguousBranches(flowSteps)) {
-    return "This Flow was imported before Branches got their own Link names, so it is not known which Branch settings belong to which Step. Import its DIL again to edit it here.";
+    return 'This Flow was imported before Branches got their own Link names, so it is not known which Branch settings belong to which Step. Import its DIL again to edit it here.';
   }
   return undefined;
 }
@@ -399,9 +414,15 @@ export function appendStep(graph: FlowGraph, afterKey: string, kind: 'ACTION' | 
       return rejected('Only a Handler Flow ends a request with a Response.');
     }
     if (kind !== 'SINK' || !endsRequest(graph, afterKey)) {
-      return rejected('This Branch returns to its Router, so it can\'t answer the request: end it with an ordinary Sink.');
+      return rejected("This Branch returns to its Router, so it can't answer the request: end it with an ordinary Sink.");
     }
-    const response: DesignStep = { key: nextKey(), kind: 'SINK', componentType: RESPONSE_STEP_COMPONENT, options: 'status=200', ...nextColumnPosition(graph.steps, after) };
+    const response: DesignStep = {
+      key: nextKey(),
+      kind: 'SINK',
+      componentType: RESPONSE_STEP_COMPONENT,
+      options: 'status=200',
+      ...nextColumnPosition(graph.steps, after),
+    };
     return accepted({ ...graph, steps: [...graph.steps, response], links: [...graph.links, plainLink(after.key, response.key)] });
   }
 
@@ -434,7 +455,9 @@ export function addBranch(graph: FlowGraph, routerKey: string): EditResult {
   }
 
   const sink: DesignStep = { key: nextKey(), kind: 'SINK', ...branchEndPosition(graph.steps, router) };
-  const branch = shape.hasDefault ? namedBranch(router.key, sink.key, unusedBranchName(graph, router.key), shape) : plainLink(router.key, sink.key);
+  const branch = shape.hasDefault
+    ? namedBranch(router.key, sink.key, unusedBranchName(graph, router.key), shape)
+    : plainLink(router.key, sink.key);
   return accepted({ ...graph, steps: [...graph.steps, sink], links: [...graph.links, branch] });
 }
 
@@ -475,7 +498,9 @@ export function deleteStep(graph: FlowGraph, key: string): EditResult {
   // The only Step of a Branch goes together with the Branch.
   if (target.kind === 'SINK' || (target.kind === 'ACTION' && outbound.length === 0)) {
     const result = deleteBranch(graph, key);
-    return result.outcome === 'accepted' ? result : rejected(`This Step can't be deleted: it is all that is left of its Branch. ${result.reason}`);
+    return result.outcome === 'accepted'
+      ? result
+      : rejected(`This Step can't be deleted: it is all that is left of its Branch. ${result.reason}`);
   }
 
   if (target.kind === 'ROUTER' && inbound) {
@@ -598,7 +623,9 @@ export function changeComponent(graph: FlowGraph, key: string, componentType: st
 
 /** Whether two kinds of Router have the same Branches, so one can replace the other in place. */
 export function sameBranches(a: RouterShape, b: RouterShape): boolean {
-  return a.slots === 'fixed' && b.slots === 'fixed' ? a.branch === b.branch : a.slots === 'list' && b.slots === 'list' && a.hasDefault === b.hasDefault;
+  return a.slots === 'fixed' && b.slots === 'fixed'
+    ? a.branch === b.branch
+    : a.slots === 'list' && b.slots === 'list' && a.hasDefault === b.hasDefault;
 }
 
 function replaceStep(graph: FlowGraph, step: DesignStep): FlowGraph {
@@ -785,7 +812,18 @@ export function takesCondition(graph: FlowGraph, linkTo: string): boolean {
 export type PathRules = (componentType: string) => PathRule | undefined;
 
 /** The Components that only run with a Connection, such as a JMS broker or a database. */
-export const COMPONENTS_WITH_CONNECTION: readonly string[] = ['activemq', 'amazonmq', 'amqp', 'amqps', 'jms', 'sjms', 'sjms2', 'sql', 'ibmmq', 'spring-rabbitmq'];
+export const COMPONENTS_WITH_CONNECTION: readonly string[] = [
+  'activemq',
+  'amazonmq',
+  'amqp',
+  'amqps',
+  'jms',
+  'sjms',
+  'sjms2',
+  'sql',
+  'ibmmq',
+  'spring-rabbitmq',
+];
 
 export function needsConnection(componentType: string | undefined): boolean {
   return !!componentType && COMPONENTS_WITH_CONNECTION.includes(componentType.toLowerCase());
@@ -826,7 +864,15 @@ export function problems(graph: FlowGraph, pathRules?: PathRules): Problem[] {
     .filter(s => isResponse(graph, s) && !isHttpStatus(responseSettings(s).status))
     .map(s => ({ stepKey: s.key, message: 'Give the Response a status from 100 to 599.' }));
 
-  return [...stepProblems, ...pathProblems, ...connectionProblems, ...openEndProblems, ...linkProblems, ...responseProblems, ...statusProblems];
+  return [
+    ...stepProblems,
+    ...pathProblems,
+    ...connectionProblems,
+    ...openEndProblems,
+    ...linkProblems,
+    ...responseProblems,
+    ...statusProblems,
+  ];
 }
 
 function isHttpStatus(status: string): boolean {
@@ -852,7 +898,8 @@ export function warnings(graph: FlowGraph): Problem[] {
     }));
 }
 
-const KIND_NAMES: Record<StepKind, string> = { SOURCE: 'Source', ACTION: 'Action', ROUTER: 'Router', SINK: 'Sink' };
+/** A Step kind as the UI names it. */
+export const KIND_NAMES: Record<StepKind, string> = { SOURCE: 'Source', ACTION: 'Action', ROUTER: 'Router', SINK: 'Sink' };
 
 /** Where a Problem is, as a list of them names it: the Step's kind and Component, such as "Sink · file", or its Branch. */
 export function problemPlace(graph: FlowGraph, problem: Problem): string {

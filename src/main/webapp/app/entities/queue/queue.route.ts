@@ -31,6 +31,7 @@ const queueResolve: ResolveFn<IQueue> = route => {
 export const queueRoute: Routes = [
   {
     path: 'queue',
+    title: 'Queues',
     loadComponent: () => import('./queue.component').then(m => m.QueueComponent),
     data: {
       authorities: ['ROLE_USER'],
@@ -39,6 +40,7 @@ export const queueRoute: Routes = [
   },
   {
     path: 'queue/:id/view',
+    title: 'Queue',
     loadComponent: () => import('./queue-detail.component').then(m => m.QueueDetailComponent),
     resolve: {
       queue: queueResolve,
@@ -50,6 +52,7 @@ export const queueRoute: Routes = [
   },
   {
     path: 'queue/new',
+    title: 'Queue',
     loadComponent: () => import('./queue-update.component').then(m => m.QueueUpdateComponent),
     resolve: {
       queue: queueResolve,
@@ -61,6 +64,7 @@ export const queueRoute: Routes = [
   },
   {
     path: 'queue/:id/edit',
+    title: 'Queue',
     loadComponent: () => import('./queue-update.component').then(m => m.QueueUpdateComponent),
     resolve: {
       queue: queueResolve,

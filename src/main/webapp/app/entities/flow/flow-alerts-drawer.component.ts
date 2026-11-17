@@ -22,8 +22,9 @@ export interface AlertsFlow {
 
 /**
  * A Flow's Alerts in a side drawer, newest first: why the Flow failed to start, stop and so on, and the messages that
- * failed. Every Alert shows the same fields: its time, the Endpoint when known, the error to copy and, for a common
- * error, what it means. Open Flow, and Clear, which clears them for everyone.
+ * failed. Every Alert shows its time and, for a common error, what it means; its Address when known and the error to
+ * copy are under Technical details, open at once when there is no explanation. Open Flow, and Clear, which clears them
+ * for everyone.
  */
 @Component({
   selector: 'jhi-flow-alerts-drawer',

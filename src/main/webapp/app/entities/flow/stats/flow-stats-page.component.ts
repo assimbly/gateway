@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewEncapsulation, inject, viewChild } from '@angular/core';
+import { NgClass } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { forkJoin } from 'rxjs';
@@ -10,7 +11,15 @@ import { operationUrl } from 'app/entities/api/operation-url';
 import { FlowGraph, loadFlowGraph } from '../designer/flow-graph';
 import { DesignerSelection, FlowCanvasComponent } from '../designer/flow-canvas.component';
 import { FlowService, IFlowCounts } from '../flow.service';
+import { RuntimeStatus, flowStatusView } from '../flow-status';
 import { FlowRunStatsComponent } from './flow-run-stats.component';
+
+const STATUS_BADGES: Record<RuntimeStatus, string> = {
+  active: 'text-bg-success',
+  paused: 'text-bg-warning',
+  inactive: 'text-bg-secondary',
+  inactiveError: 'text-bg-danger',
+};
 
 /**
  * The stats of a Flow drawn on the canvas, read-only: each Step shows the messages it completed and failed, and the
@@ -22,7 +31,7 @@ import { FlowRunStatsComponent } from './flow-run-stats.component';
   styleUrls: ['../designer/flow-designer.scss', './flow-stats-page.component.scss'],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, FontAwesomeModule, FlowCanvasComponent, FlowRunStatsComponent, HasAnyAuthorityDirective],
+  imports: [NgClass, RouterLink, FontAwesomeModule, FlowCanvasComponent, FlowRunStatsComponent, HasAnyAuthorityDirective],
 })
 export class FlowStatsPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -39,7 +48,7 @@ export class FlowStatsPageComponent implements OnInit {
   selection: DesignerSelection = { type: 'flow' };
   /** Whether the stats were read at least once. */
   read = false;
-  running = false;
+  status: RuntimeStatus = 'inactive';
   counts?: Map<string, IFlowCounts>;
 
   ngOnInit(): void {
@@ -80,9 +89,22 @@ export class FlowStatsPageComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
-  onRunningChange(running: boolean): void {
+  get running(): boolean {
+    return this.status === 'active';
+  }
+
+  /** The Flow status in the words of the Flows list. */
+  get statusLabel(): string {
+    return flowStatusView(this.status, false).label;
+  }
+
+  get statusBadge(): string {
+    return STATUS_BADGES[this.status];
+  }
+
+  onStatusChange(status: RuntimeStatus): void {
     this.read = true;
-    this.running = running;
+    this.status = status;
     this.cdr.markForCheck();
   }
 

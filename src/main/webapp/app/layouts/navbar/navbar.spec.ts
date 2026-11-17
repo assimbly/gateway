@@ -148,7 +148,7 @@ describe('Navbar Component', () => {
     expect(comp.isActivePath('/admin/metrics')).toBe(false);
   });
 
-  it('should treat both queue and topic routes as the Endpoints entry', () => {
+  it('should treat both queue and topic routes as the Queues & Topics entry', () => {
     const currentPath = jest.spyOn(comp as any, 'currentPath');
 
     currentPath.mockReturnValue('/queue');
@@ -181,27 +181,27 @@ describe('Navbar Component', () => {
     expect(active()).toEqual([false, false, true]);
   });
 
-  it('should show Manage, Send and Endpoints in the broker menu in that order', () => {
+  it('should show Manage, Send and Queues & Topics in the broker menu in that order', () => {
     accountService.authenticate({ ...account, authorities: ['ROLE_ADMIN'] });
     fixture.detectChanges();
 
     const labels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#broker-menu-items span')).map((span: HTMLElement) =>
       span.textContent?.trim(),
     );
-    expect(labels).toEqual(['Manage', 'Send', 'Endpoints']);
+    expect(labels).toEqual(['Manage', 'Send', 'Queues & Topics']);
 
     const sendLink: HTMLAnchorElement = fixture.nativeElement.querySelectorAll('#broker-menu-items a')[1];
     expect(sendLink.getAttribute('href')).toBe('/broker/sender/message-sender');
   });
 
-  it('should show a single Endpoints entry instead of Queues and Topics in the broker menu', () => {
+  it('should show a single Queues & Topics entry instead of Queues and Topics in the broker menu', () => {
     accountService.authenticate({ ...account, authorities: ['ROLE_ADMIN'] });
     fixture.detectChanges();
 
     const labels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#broker-menu-items span')).map((span: HTMLElement) =>
       span.textContent?.trim(),
     );
-    expect(labels).toContain('Endpoints');
+    expect(labels).toContain('Queues & Topics');
     expect(labels).not.toContain('Queues');
     expect(labels).not.toContain('Topics');
   });
@@ -229,15 +229,20 @@ describe('Navbar Component', () => {
     expect(labels).not.toContain('Environment Variables');
   });
 
-  it('should label the message sender submenu item as Send', () => {
+  it('should label the message sender submenu item as Send, for admins only as its page requires', () => {
+    const labels = (): (string | undefined)[] =>
+      Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#flows-menu-items span')).map((span: HTMLElement) =>
+        span.textContent?.trim(),
+      );
+
     accountService.authenticate(account);
     fixture.detectChanges();
+    expect(labels()).not.toContain('Send');
 
-    const labels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('#flows-menu-items span')).map((span: HTMLElement) =>
-      span.textContent?.trim(),
-    );
-    expect(labels).toContain('Send');
-    expect(labels).not.toContain('Test message');
+    accountService.authenticate({ ...account, authorities: ['ROLE_ADMIN'] });
+    fixture.detectChanges();
+    expect(labels()).toContain('Send');
+    expect(labels()).not.toContain('Test message');
   });
 
   it('should keep the flows submenu expanded on the Flows list route', () => {
@@ -293,6 +298,7 @@ describe('Navbar Component', () => {
       expect(database).toBeLessThan(diagnostics);
     }
     expect(items.indexOf('Log viewer')).toBeGreaterThan(diagnostics);
+    expect(items).toContain('Log levels');
   });
 
   it('should show the API definitions under API Explorer instead of Administration', () => {

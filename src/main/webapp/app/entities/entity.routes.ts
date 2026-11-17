@@ -16,12 +16,12 @@ import { topicRoute } from './topic/topic.route';
 const routes: Routes = [
   {
     path: 'user-management',
-    title: 'userManagement.home.title',
+    title: 'Users',
     loadChildren: () => import('./admin/user-management/user-management.routes'),
   },
   {
     path: 'authority',
-    title: 'jhipsterGradleSampleApplicationApp.adminAuthority.home.title',
+    title: 'Authorities',
     loadChildren: () => import('./admin/authority/authority.routes'),
   },
   // Navbar Assimbly entities (orphaned after JHipster 9 standalone router migration)

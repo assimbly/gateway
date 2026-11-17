@@ -6,12 +6,27 @@ import { provideRouter } from '@angular/router';
 import { throwError } from 'rxjs';
 
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { fontAwesomeIcons } from 'app/config/font-awesome-icons';
+import { GatewayStageService } from 'app/entities/integration/gateway-stage.service';
+import { EnvironmentType } from 'app/shared/model/integration.model';
 
 import { FlowService } from '../flow.service';
-import { DraftProblem, FlowEditorHeaderComponent } from './flow-editor-header.component';
+import { DraftProblem, FlowEditorHeaderComponent, returnPath } from './flow-editor-header.component';
+
+describe('the page the editor returns to', () => {
+  it('takes a path of this app', () => {
+    expect(returnPath('/rest-apis/5')).toBe('/rest-apis/5');
+  });
+
+  it.each([null, undefined, '', 'https://example.com', '//example.com', '/\\example.com', 'rest-apis/5'])(
+    'goes to the Flows for %p',
+    param => {
+      expect(returnPath(param)).toBe('/');
+    },
+  );
+});
 
 describe('Flow editor header', () => {
   let fixture: ComponentFixture<FlowEditorHeaderComponent>;
@@ -29,8 +44,16 @@ describe('Flow editor header', () => {
   });
 
   describe('the Draft badge', () => {
-    const missingDirectory: DraftProblem = { where: 'Sink · file', message: 'Fill in the Directory Name in the path.', selection: { type: 'step', key: 'step-3' } };
-    const undeclared: DraftProblem = { where: 'Response', message: "404 isn't a Declared response.", selection: { type: 'step', key: 'step-4' } };
+    const missingDirectory: DraftProblem = {
+      where: 'Sink · file',
+      message: 'Fill in the Directory Name in the path.',
+      selection: { type: 'step', key: 'step-3' },
+    };
+    const undeclared: DraftProblem = {
+      where: 'Response',
+      message: "404 isn't a Declared response.",
+      selection: { type: 'step', key: 'step-4' },
+    };
 
     beforeEach(() => {
       fixture.componentRef.setInput('draftReason', missingDirectory.message);
@@ -63,11 +86,11 @@ describe('Flow editor header', () => {
       expect(selected).toHaveBeenCalledWith(missingDirectory);
     });
 
-    it('says a Draft was saved as a Draft', () => {
+    it('does not show Saved text once saved', () => {
       fixture.componentRef.setInput('saved', true);
       fixture.detectChanges();
 
-      expect(fixture.nativeElement.querySelector('[data-cy="save-state"]').textContent.trim()).toBe('Saved as Draft');
+      expect(fixture.nativeElement.querySelector('[data-cy="save-state"]').textContent.trim()).toBe('');
     });
   });
 
@@ -117,10 +140,10 @@ describe('Flow editor header', () => {
     expect(fixture.nativeElement.querySelector('#field_flowName_hint').textContent).toContain('Name the Flow to save it.');
   });
 
-  it('goes back to the Flows', () => {
+  it('has no back button in the header', () => {
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('[data-cy="back-to-flows"]').getAttribute('href')).toBe('/');
+    expect(fixture.nativeElement.querySelector('[data-cy="back-to-flows"]')).toBeNull();
   });
 
   it('offers Save & close', () => {
@@ -147,7 +170,9 @@ describe('Flow editor header', () => {
   });
 
   it('restarts the Flow with its saved configuration', () => {
-    const restart = jest.spyOn(TestBed.inject(FlowService), 'configureAndRestart').mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
+    const restart = jest
+      .spyOn(TestBed.inject(FlowService), 'configureAndRestart')
+      .mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
     fixture.componentRef.setInput('flowId', 7);
     fixture.detectChanges();
 
@@ -157,7 +182,9 @@ describe('Flow editor header', () => {
   });
 
   it('turns Start red and offers the error when the Flow fails to start', () => {
-    const answer = JSON.stringify({ flow: { status: 'failed', installed: { total: 2, failed: 1 }, steps: [{ status: 'error', uri: 'file://in', message: 'Busy' }] } });
+    const answer = JSON.stringify({
+      flow: { status: 'failed', installed: { total: 2, failed: 1 }, steps: [{ status: 'error', uri: 'file://in', message: 'Busy' }] },
+    });
     jest
       .spyOn(TestBed.inject(FlowService), 'configureAndStart')
       .mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500, error: answer })));
@@ -169,7 +196,10 @@ describe('Flow editor header', () => {
 
     expect(buttonNamed('Start').classList).toContain('btn-fx-danger');
     expect(buttonNamed('Error')).toBeTruthy();
-    expect(fixture.componentInstance.failure()).toEqual({ summary: '1 of 2 Steps failed to start.', steps: [{ uri: 'file://in', message: 'Busy' }] });
+    expect(fixture.componentInstance.failure()).toEqual({
+      summary: '1 of 2 Steps failed to start.',
+      steps: [{ uri: 'file://in', message: 'Busy' }],
+    });
   });
 
   it('saves and starts on Ctrl+Enter and Cmd+Enter, also while typing the name', () => {
@@ -240,6 +270,23 @@ describe('Flow editor header', () => {
     expect(stop).toHaveBeenCalledWith(7);
   });
 
+  it('asks before Ctrl+Shift+Enter stops a Flow on a Gateway on stage Production', () => {
+    const stop = jest.spyOn(TestBed.inject(FlowService), 'stop').mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
+    const open = jest
+      .spyOn(TestBed.inject(NgbModal), 'open')
+      .mockReturnValue({ componentInstance: {}, result: new Promise(() => undefined) } as NgbModalRef);
+    TestBed.inject(GatewayStageService).stage.set(EnvironmentType.PRODUCTION);
+    fixture.componentRef.setInput('flowId', 7);
+    fixture.detectChanges();
+    fixture.componentInstance.status.set('active');
+
+    document.dispatchEvent(ctrlEnter({ shiftKey: true }));
+
+    expect(open).toHaveBeenCalled();
+    expect((open.mock.results[0].value as NgbModalRef).componentInstance.title).toBe('Stop Orders?');
+    expect(stop).not.toHaveBeenCalled();
+  });
+
   it('opens the Test panel of the visual editor instead of the Send page, also while the Flow is stopped', () => {
     fixture.componentRef.setInput('testInEditor', true);
     fixture.componentRef.setInput('sourceComponent', 'file');
@@ -247,18 +294,18 @@ describe('Flow editor header', () => {
     const testRequested = jest.fn();
     fixture.componentInstance.testRequested.subscribe(testRequested);
 
-    const send = buttonNamed('Send test message');
+    const send = buttonNamed('Send a message to this Flow');
     expect(send.disabled).toBe(false);
     send.click();
 
     expect(testRequested).toHaveBeenCalled();
   });
 
-  it('keeps Send test message to the Send page, while the Flow runs, outside the visual editor', () => {
+  it('keeps Send a message to this Flow to the Send page, while the Flow runs, outside the visual editor', () => {
     fixture.componentRef.setInput('sourceComponent', 'file');
     fixture.detectChanges();
 
-    expect(buttonNamed('Send test message').disabled).toBe(true);
+    expect(buttonNamed('Send a message to this Flow').disabled).toBe(true);
   });
 
   describe('with the Design and Test modes of the visual editor', () => {
@@ -269,32 +316,29 @@ describe('Flow editor header', () => {
       jest.spyOn(TestBed.inject(FlowService), 'getFlowStatus').mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
     });
 
-    it('designs with Save and Save & Test only', () => {
+    it('places an icon-only Save button next to the Flow name, grey when saved and primary when unsaved, without Save & Test', () => {
       fixture.detectChanges();
-      const saveAndStart = jest.fn();
-      fixture.componentInstance.saveAndStart.subscribe(saveAndStart);
+      const saveEmit = jest.fn();
+      fixture.componentInstance.save.subscribe(saveEmit);
+      const saveButton: HTMLButtonElement = fixture.nativeElement.querySelector('.flow-editor-header__title [data-cy="flow-save"]');
 
-      buttonNamed('Save & Test').click();
+      expect(saveButton).not.toBeNull();
+      expect(saveButton.textContent?.trim()).toBe('');
+      expect(saveButton.classList).toContain('btn-fx-icon');
+      expect(saveButton.classList).toContain('btn-fx-secondary');
 
-      expect(saveAndStart).toHaveBeenCalled();
-      expect(buttonNamed('Save & Test').classList).toContain('btn-fx-primary');
-      expect(buttonNamed('Save').classList).toContain('btn-fx-secondary');
-      for (const label of ['Log', 'Camel route', 'Send test message', 'Save & start', 'Save & close']) {
+      fixture.componentRef.setInput('unsaved', true);
+      fixture.detectChanges();
+      expect(saveButton.classList).toContain('btn-fx-primary');
+
+      saveButton.click();
+      expect(saveEmit).toHaveBeenCalled();
+
+      for (const label of ['Save & Test', 'Log', 'Camel route', 'Send a message to this Flow', 'Save & start', 'Save & close']) {
         expect(() => buttonNamed(label)).toThrow();
       }
       expect(fixture.nativeElement.querySelector('[aria-label="More save options"]')).toBeNull();
       expect(fixture.nativeElement.querySelector('[data-tour="flow-completed"]')).toBeNull();
-    });
-
-    it('saves, restarts and tests a running Flow', () => {
-      fixture.componentInstance.status.set('active');
-      fixture.detectChanges();
-      const saveAndRestart = jest.fn();
-      fixture.componentInstance.saveAndRestart.subscribe(saveAndRestart);
-
-      buttonNamed('Save & Test').click();
-
-      expect(saveAndRestart).toHaveBeenCalled();
     });
 
     it('switches to Test with the toggle and with T, but not while typing', () => {
@@ -306,7 +350,9 @@ describe('Flow editor header', () => {
 
       toggle.click();
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 't', bubbles: true, cancelable: true }));
-      fixture.nativeElement.querySelector('#field_flowName').dispatchEvent(new KeyboardEvent('keydown', { key: 't', bubbles: true, cancelable: true }));
+      fixture.nativeElement
+        .querySelector('#field_flowName')
+        .dispatchEvent(new KeyboardEvent('keydown', { key: 't', bubbles: true, cancelable: true }));
 
       expect(modeChange.mock.calls).toEqual([['test'], ['test']]);
     });
@@ -339,13 +385,13 @@ describe('Flow editor header', () => {
       expect(modeChange).toHaveBeenCalledWith('design');
     });
 
-    it('shows in Design whether the Flow runs, and leaves starting and stopping to Test', () => {
+    it('shows in Design whether the Flow runs, and leaves starting and stopping to the Test tab', () => {
       fixture.componentInstance.status.set('active');
       fixture.detectChanges();
 
       expect(fixture.nativeElement.querySelector('[data-cy="flow-state"]').textContent.trim()).toBe('Running');
       expect(fixture.nativeElement.querySelector('jhi-status-controls')).toBeNull();
-      expect(buttonNamed('Save')).toBeTruthy();
+      expect(fixture.nativeElement.querySelector('[data-cy="flow-save"]')).not.toBeNull();
     });
 
     it('calls the editing mode Code in the Route editor', () => {
@@ -353,66 +399,24 @@ describe('Flow editor header', () => {
       fixture.componentRef.setInput('designIcon', 'code');
       fixture.detectChanges();
 
-      const options = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('.flow-mode-toggle__option')).map(o => o.textContent?.trim());
+      const options = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('.flow-mode-toggle__option')).map(o =>
+        o.textContent?.trim(),
+      );
       expect(options).toEqual(['Code', 'Test']);
     });
 
-    it('has nothing to test before the Flow is saved', () => {
+    it('allows switching an unsaved Flow to Test so the editor can save it automatically', () => {
       fixture.componentRef.setInput('flowId', undefined);
       fixture.detectChanges();
       const modeChange = jest.fn();
       fixture.componentInstance.modeChange.subscribe(modeChange);
 
       const toggle: HTMLButtonElement = fixture.nativeElement.querySelector('[role="switch"]');
-      expect(toggle.disabled).toBe(true);
-      document.dispatchEvent(new KeyboardEvent('keydown', { key: 't', bubbles: true, cancelable: true }));
+      expect(toggle.disabled).toBe(false);
+      toggle.click();
 
-      expect(modeChange).not.toHaveBeenCalled();
+      expect(modeChange).toHaveBeenCalledWith('test');
     });
-
-    it('tests with the start, pause and stop controls of the Flows list', () => {
-      fixture.componentRef.setInput('mode', 'test');
-      fixture.componentInstance.status.set('active');
-      fixture.detectChanges();
-      const pause = jest.spyOn(TestBed.inject(FlowService), 'pause').mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
-
-      expect(fixture.nativeElement.querySelector('[role="switch"]').getAttribute('aria-checked')).toBe('true');
-      expect(controlNamed('Stop')).toBeTruthy();
-      expect(controlNamed('Restart')).toBeTruthy();
-      // As tall as the other buttons of the header, unlike the small ones of the Flows list.
-      expect(controlNamed('Stop').classList).not.toContain('btn-fx-sm');
-      expect(() => buttonNamed('Save')).toThrow();
-      controlNamed('Pause').click();
-
-      expect(pause).toHaveBeenCalledWith(7);
-    });
-
-    it('resumes a paused Flow', () => {
-      fixture.componentRef.setInput('mode', 'test');
-      fixture.componentInstance.status.set('paused');
-      fixture.detectChanges();
-      const resume = jest.spyOn(TestBed.inject(FlowService), 'resume').mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
-
-      controlNamed('Resume').click();
-
-      expect(resume).toHaveBeenCalledWith(7);
-    });
-
-    it('cannot start a Draft', () => {
-      fixture.componentRef.setInput('mode', 'test');
-      fixture.componentRef.setInput('draftReason', 'The Source has no Component yet.');
-      fixture.detectChanges();
-
-      expect(controlNamed('Start').disabled).toBe(true);
-    });
-
-    function controlNamed(label: string): HTMLButtonElement {
-      const button = fixture.nativeElement.querySelector(`jhi-status-controls button[aria-label="${label}"]`);
-      if (!button) {
-        throw new Error(`No control named ${label}`);
-      }
-      return button;
-    }
   });
 
   function ctrlEnter(init: KeyboardEventInit = {}): KeyboardEvent {

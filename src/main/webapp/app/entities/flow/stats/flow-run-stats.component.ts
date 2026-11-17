@@ -1,13 +1,28 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { EMPTY, Observable, Subject, catchError, distinctUntilChanged, filter, forkJoin, map, merge, of, switchMap, tap, timer } from 'rxjs';
+import {
+  EMPTY,
+  Observable,
+  Subject,
+  catchError,
+  distinctUntilChanged,
+  filter,
+  forkJoin,
+  map,
+  merge,
+  of,
+  switchMap,
+  tap,
+  timer,
+} from 'rxjs';
 
 import { Components } from 'app/shared/camel/component-type';
-import { DesignStep, FlowGraph, routerTitle } from '../designer/flow-graph';
+import { DesignStep, FlowGraph, KIND_NAMES, routerTitle } from '../designer/flow-graph';
 import { DesignerSelection } from '../designer/flow-canvas.component';
 import { FlowService, IFlowCounts, IFlowStats, IStepCounts, IStepStats } from '../flow.service';
 import { FlowStatsSection, countsByStepKey, flowStatsSections, stepStatsSections } from '../flow-stats';
 import { FlowStatsSections } from '../flow-stats-sections.component';
+import { RuntimeStatus, runtimeStatusOf } from '../flow-status';
 
 /** How often the stats are read again while they are in view. */
 const REFRESH_MILLIS = 5000;
@@ -36,8 +51,8 @@ export class FlowRunStatsComponent {
 
   /** The completed and failed messages of each Step, for the canvas; undefined while the Flow isn't running. */
   readonly countsChange = output<Map<string, IFlowCounts> | undefined>();
-  /** Whether the Flow runs, after every read of its stats. */
-  readonly runningChange = output<boolean>();
+  /** The Flow's runtime state, after every read of its stats. */
+  readonly statusChange = output<RuntimeStatus>();
 
   /** Whether the stats were read at least once. */
   readonly read = signal(false);
@@ -47,6 +62,7 @@ export class FlowRunStatsComponent {
   readonly stepStats = signal<IStepStats | undefined>(undefined);
 
   readonly running = computed(() => this.flowStats()?.status?.toLowerCase() === 'started');
+  readonly kindNames = KIND_NAMES;
 
   /** A Link shows the Flow's stats: a Link has none of its own. */
   readonly selectedStep = computed<DesignStep | undefined>(() => {
@@ -76,7 +92,9 @@ export class FlowRunStatsComponent {
         tap(() => this.stepStats.set(undefined)),
         switchMap(({ flowId, stepId }) =>
           flowId
-            ? merge(timer(0, REFRESH_MILLIS).pipe(filter(() => !document.hidden)), this.refresh$).pipe(switchMap(() => this.readStats(flowId, stepId)))
+            ? merge(timer(0, REFRESH_MILLIS).pipe(filter(() => !document.hidden)), this.refresh$).pipe(
+                switchMap(() => this.readStats(flowId, stepId)),
+              )
             : EMPTY,
         ),
         takeUntilDestroyed(),
@@ -89,7 +107,7 @@ export class FlowRunStatsComponent {
         this.counts.set(counts);
         this.stepStats.set(result.step);
         this.countsChange.emit(counts);
-        this.runningChange.emit(this.running());
+        this.statusChange.emit(runtimeStatusOf(result.flow?.status?.toLowerCase()));
       });
   }
 
@@ -109,7 +127,8 @@ export class FlowRunStatsComponent {
     return forkJoin({
       flow: orUndefined(this.flowService.getFlowStats(flowId).pipe(map(response => response.body?.flow))),
       steps: orUndefined(this.flowService.getFlowExchanges(flowId).pipe(map(response => response.flow?.steps ?? []))),
-      step: stepId != null ? orUndefined(this.flowService.getStepStats(flowId, stepId).pipe(map(response => response.step))) : of(undefined),
+      step:
+        stepId != null ? orUndefined(this.flowService.getStepStats(flowId, stepId).pipe(map(response => response.step))) : of(undefined),
     });
   }
 }

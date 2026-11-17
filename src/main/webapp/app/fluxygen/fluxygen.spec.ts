@@ -1,9 +1,15 @@
+import { HttpResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { of } from 'rxjs';
 
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { fontAwesomeIcons } from 'app/config/font-awesome-icons';
+import { FlowService } from 'app/entities/flow/flow.service';
+import { FluxygenExportDialogComponent } from 'app/entities/flow/fluxygen-export-dialog.component';
+import { IntegrationService } from 'app/entities/integration/integration.service';
 
 import Fluxygen, { FLUXYGEN_URLS } from './fluxygen';
 
@@ -11,7 +17,13 @@ describe('Fluxygen page', () => {
   let fixture: ComponentFixture<Fluxygen>;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({ providers: [provideRouter([])] });
+    TestBed.configureTestingModule({
+      providers: [
+        provideRouter([]),
+        { provide: FlowService, useValue: { getIntegrationName: () => of(new HttpResponse({ body: 'default' })) } },
+        { provide: IntegrationService, useValue: { query: () => of(new HttpResponse({ body: [{ id: 1001, name: 'default' }] })) } },
+      ],
+    });
     TestBed.inject(FaIconLibrary).addIcons(...fontAwesomeIcons);
     fixture = TestBed.createComponent(Fluxygen);
     fixture.detectChanges();
@@ -46,7 +58,11 @@ describe('Fluxygen page', () => {
     }
   });
 
-  it('points the export step to the Flows list', () => {
-    expect(fixture.nativeElement.querySelector('.fluxygen__flows').getAttribute('href')).toBe('/');
+  it('exports the Flows of this Gateway from its export step', () => {
+    const open = jest.spyOn(FluxygenExportDialogComponent, 'open').mockImplementation(() => undefined);
+
+    fixture.nativeElement.querySelector('[data-cy="fluxygen-export"]').click();
+
+    expect(open).toHaveBeenCalledWith(TestBed.inject(NgbModal), 1001);
   });
 });

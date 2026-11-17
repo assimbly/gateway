@@ -1,13 +1,17 @@
 import {
   OptionSchema,
+  commonOptions,
+  defaultLabelOf,
   groupOptions,
   missingPathParts,
+  pathFormat,
   pathLabel,
   pathRule,
   requiredOptions,
   splitHttpUrl,
   suggestedOptions,
   valueFieldOf,
+  valueLabelOf,
   notAnInteger,
 } from './endpoint';
 
@@ -80,6 +84,38 @@ describe('Endpoint editing', () => {
       [undefined, 'text'],
     ] as const)('gives an Option of %o a %s field', (option, field) => {
       expect(valueFieldOf(option)).toBe(field);
+    });
+  });
+
+  describe('Option details in plain words', () => {
+    it.each([
+      [{ type: 'boolean' }, 'On / Off'],
+      [{ type: 'integer' }, 'Number'],
+      [{ type: 'duration' }, 'Duration'],
+      [{ type: 'string' }, 'Text'],
+      [{ type: 'string', secret: true }, 'Secret'],
+      [{ type: 'enum', enum: ['Override', 'Append'] }, 'Choice'],
+    ] as const)('names the value of an Option of %o %s', (option, label) => {
+      expect(valueLabelOf(option)).toBe(label);
+    });
+
+    it('shows a default as the field of the Option does, and none when it has none', () => {
+      expect(defaultLabelOf({ defaultValue: false })).toBe('Off');
+      expect(defaultLabelOf({ defaultValue: true })).toBe('On');
+      expect(defaultLabelOf({ defaultValue: 500 })).toBe('500');
+      expect(defaultLabelOf({})).toBe('');
+      expect(defaultLabelOf(undefined)).toBe('');
+    });
+  });
+
+  describe('the key list of an Option row', () => {
+    it('starts with the Common Options, and the Option the row holds even when it is an advanced one', () => {
+      const options = groupOptions(properties, 'consumer');
+      const names = (held: string) => commonOptions(options, held).map(option => option.name);
+
+      expect(commonOptions(options, '').every(option => option.heading === 'Common')).toBe(true);
+      expect(names('')).not.toContain('delay');
+      expect(names('delay')).toContain('delay');
     });
   });
 
@@ -195,6 +231,26 @@ describe('Endpoint editing', () => {
     it('keeps Path for a path of several values, or none', () => {
       expect(pathLabel(pathRule('sftp:host:port/directoryName', properties).parts)).toBe('Path');
       expect(pathLabel([])).toBe('Path');
+    });
+  });
+
+  describe('Path format', () => {
+    it('shows how to write a path of several values, without the scheme of the Component', () => {
+      const syntax = 'sftp:host:port/directoryName';
+
+      expect(pathFormat(syntax, pathRule(syntax, properties).parts)).toBe('host:port/directoryName');
+    });
+
+    it('shows none for a path of a single value, which its label names', () => {
+      const file = pathRule('file:directoryName', [{ name: 'directoryName', kind: 'path', displayName: 'Directory Name' }]);
+      const jms = pathRule('jms:destinationType:destinationName', [
+        { name: 'destinationType', kind: 'path', displayName: 'Destination Type', required: false },
+        { name: 'destinationName', kind: 'path', displayName: 'Destination Name', required: true },
+      ]);
+
+      expect(pathFormat('file:directoryName', file.parts)).toBe('');
+      expect(pathFormat('jms:destinationType:destinationName', jms.parts)).toBe('');
+      expect(pathFormat('', [])).toBe('');
     });
   });
 

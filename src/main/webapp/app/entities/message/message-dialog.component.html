@@ -1,6 +1,13 @@
-<form (jhiSaveShortcut)="save(true)" [saveShortcutDisabled]="editForm.form.invalid || isSaving" name="editForm" role="form" novalidate #editForm="ngForm">
+<form
+  (jhiSaveShortcut)="save(true)"
+  [saveShortcutDisabled]="editForm.form.invalid || isSaving"
+  name="editForm"
+  role="form"
+  novalidate
+  #editForm="ngForm"
+>
   <div class="modal-header">
-    <h4 class="modal-title" id="myMessageLabel">{{ message?.id ? 'Edit Message' : 'Add Message' }}</h4>
+    <h4 class="modal-title" id="myMessageLabel">{{ message?.id ? 'Edit Message template' : 'Add Message template' }}</h4>
     <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" (click)="clear()"></button>
   </div>
   <div class="modal-body">
@@ -21,153 +28,166 @@
         [jhiExistingMessageNames]="messageNames"
         [(ngModel)]="message.name"
         #name="ngModel"
-        />
-        @if (name.invalid && (name.dirty || name.touched)) {
-          <div class="invalid-field-message">
-            @if (name.errors?.required) {
-              <span>Name is required.</span>
-            }
-            @if (name.errors?.existingMessageName) {
-              <span>Name already exists.</span>
-            }
-          </div>
-        }
-      </div>
+      />
+      @if (name.invalid && (name.dirty || name.touched)) {
+        <div class="invalid-field-message">
+          @if (name.errors?.required) {
+            <span>Name is required.</span>
+          }
+          @if (name.errors?.existingMessageName) {
+            <span>Name already exists.</span>
+          }
+        </div>
+      }
+    </div>
 
-      <div>
-        @if (headers) {
-          <div class="table-responsive">
-            <table class="table">
-              <thead>
+    <div>
+      @if (headers) {
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th colspan="4" class="border-top-0">Headers</th>
+              </tr>
+              <tr>
+                <td><span>Key</span></td>
+                <td><span>Value</span></td>
+                <td><span>Type</span></td>
+                <td><span>Language</span></td>
+                <td></td>
+              </tr>
+            </thead>
+            <tbody>
+              @for (header of headers; track header; let idx = $index) {
                 <tr>
-                  <th colspan="4" class="border-top-0">Headers</th>
-                </tr>
-                <tr>
-                  <td><span>Key</span></td>
-                  <td><span>Value</span></td>
-                  <td><span>Type</span></td>
-                  <td><span>Language</span></td>
-                  <td></td>
-                </tr>
-              </thead>
-              <tbody>
-                @for (header of headers; track header; let idx = $index) {
-                  <tr>
-                    <td>
-                      <input
-                        type="text"
-                        class="form-control"
-                        [(ngModel)]="header.key"
-                        value="header.key"
-                        name="headers-key{{ idx }}"
-                        id="headers-key{{ idx }}"
-                        required
-                        maxlength="255"
-                        [jhiExistingHeader]="headerArray"
-                        #key="ngModel"
-                        />
-                        @if (key.invalid && (key.dirty || key.touched)) {
-                          <div class="invalid-field-message">
-                            @if (key.errors?.required) {
-                              <span>Key is required.</span>
-                            }
-                            @if (key.errors?.existingHeaders) {
-                              <span>Key already exists.</span>
-                            }
-                          </div>
+                  <td>
+                    <input
+                      type="text"
+                      class="form-control"
+                      [(ngModel)]="header.key"
+                      value="header.key"
+                      name="headers-key{{ idx }}"
+                      id="headers-key{{ idx }}"
+                      required
+                      maxlength="255"
+                      [jhiExistingHeader]="headerArray"
+                      #key="ngModel"
+                    />
+                    @if (key.invalid && (key.dirty || key.touched)) {
+                      <div class="invalid-field-message">
+                        @if (key.errors?.required) {
+                          <span>Key is required.</span>
                         }
-                      </td>
-                      <td>
-                        <input
-                          type="text"
-                          class="form-control"
-                          [(ngModel)]="header.value"
-                          name="headers-value-{{ idx }}"
-                          id="headers-value-{{ idx }}"
-                          required
-                          maxlength="1000"
-                          value="header.value"
-                          #value="ngModel"
-                          />
-                          @if (value.invalid && (value.dirty || value.touched)) {
-                            <div class="invalid-field-message">
-                              @if (value.errors?.required) {
-                                <span>Value is required.</span>
-                              }
-                            </div>
-                          }
-                        </td>
-                        <td>
-                          <select
-                            class="form-control form-select"
-                            required
-                            id="field_header"
-                            name="headers-type-{{ idx }}"
-                            id="headers-type-{{ idx }}"
-                            [(ngModel)]="header.type"
-                            #type="ngModel"
-                            >
-                            @for (t of typeHeader; track t) {
-                              <option [ngValue]="t">{{ t }}</option>
-                            }
-                          </select>
-                        </td>
-                        <td>
-                          <select
-                            class="form-control form-select"
-                            required
-                            id="field_header_language"
-                            name="headers-language-{{ idx }}"
-                            id="headers-language-{{ idx }}"
-                            [(ngModel)]="header.language"
-                            #type="ngModel"
-                            >
-                            @for (t of languageHeader; track t) {
-                              <option [ngValue]="t">{{ t }}</option>
-                            }
-                          </select>
-                        </td>
-                        <td>
-                          <div class="btn-group flex-btn-group-container">
-                            <div class="btn-group flex-btn-group-container">
-                              <button type="button" class="btn btn-success" title="Add" (click)="addHeader()">
-                                <span><fa-icon icon="plus" style="color: white;"></fa-icon></span>
-                              </button>
-                              @if (header.id) {
-                                <button
-                                  type="button"
-                                  title="Delete"
-                                  queryParamsHandling="merge"
-                                  class="btn btn-danger"
-                                  (click)="deleteHeader(header)"
-                                  >
-                                  <span><fa-icon icon="trash" style="color: white;"></fa-icon></span>
-                                </button>
-                              }
-                              @if (!header.id) {
-                                <button type="button" title="Remove" class="btn btn-danger" (click)="removeHeader(idx)">
-                                  <span><fa-icon icon="times" style="color: white;"></fa-icon></span>
-                                </button>
-                              }
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
+                        @if (key.errors?.existingHeaders) {
+                          <span>Key already exists.</span>
+                        }
+                      </div>
                     }
-                  </tbody>
-                </table>
-              </div>
-            }
-          </div>
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      class="form-control"
+                      [(ngModel)]="header.value"
+                      name="headers-value-{{ idx }}"
+                      id="headers-value-{{ idx }}"
+                      required
+                      maxlength="1000"
+                      value="header.value"
+                      #value="ngModel"
+                    />
+                    @if (value.invalid && (value.dirty || value.touched)) {
+                      <div class="invalid-field-message">
+                        @if (value.errors?.required) {
+                          <span>Value is required.</span>
+                        }
+                      </div>
+                    }
+                  </td>
+                  <td>
+                    <select
+                      class="form-control form-select"
+                      required
+                      id="field_header"
+                      name="headers-type-{{ idx }}"
+                      id="headers-type-{{ idx }}"
+                      [(ngModel)]="header.type"
+                      #type="ngModel"
+                    >
+                      @for (t of typeHeader; track t) {
+                        <option [ngValue]="t">{{ t }}</option>
+                      }
+                    </select>
+                  </td>
+                  <td>
+                    <select
+                      class="form-control form-select"
+                      required
+                      id="field_header_language"
+                      name="headers-language-{{ idx }}"
+                      id="headers-language-{{ idx }}"
+                      [(ngModel)]="header.language"
+                      #type="ngModel"
+                    >
+                      @for (t of languageHeader; track t) {
+                        <option [ngValue]="t">{{ t }}</option>
+                      }
+                    </select>
+                  </td>
+                  <td>
+                    <div class="btn-group flex-btn-group-container">
+                      <div class="btn-group flex-btn-group-container">
+                        <button
+                          type="button"
+                          class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm"
+                          title="Add header"
+                          aria-label="Add header"
+                          (click)="addHeader()"
+                        >
+                          <fa-icon icon="plus"></fa-icon>
+                        </button>
+                        @if (header.id) {
+                          <button
+                            type="button"
+                            title="Delete header"
+                            aria-label="Delete header"
+                            queryParamsHandling="merge"
+                            class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm text-danger"
+                            (click)="deleteHeader(header)"
+                          >
+                            <fa-icon icon="trash"></fa-icon>
+                          </button>
+                        }
+                        @if (!header.id) {
+                          <button
+                            type="button"
+                            title="Remove header"
+                            aria-label="Remove header"
+                            class="btn btn-fx btn-fx-ghost btn-fx-icon btn-fx-sm"
+                            (click)="removeHeader(idx)"
+                          >
+                            <fa-icon icon="times"></fa-icon>
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">
-            <span><fa-icon icon="ban" style="color: white;"></fa-icon></span>&nbsp;
-            <span>Cancel</span>
-          </button>
-          <button type="button" (click)="save(true)" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
-            <span><fa-icon icon="save" style="color: white;"></fa-icon></span>&nbsp;
-            <span>Save</span>
-          </button>
-        </div>
-      </form>
+      }
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-fx btn-fx-secondary" data-dismiss="modal" (click)="clear()">
+      <fa-icon icon="ban"></fa-icon>
+      <span>Cancel</span>
+    </button>
+    <button type="button" (click)="save(true)" [disabled]="editForm.form.invalid || isSaving" class="btn btn-fx btn-fx-primary">
+      <fa-icon icon="save"></fa-icon>
+      <span>Save</span>
+    </button>
+  </div>
+</form>

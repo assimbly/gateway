@@ -279,16 +279,37 @@ describe('Flow test panel', () => {
     expect(text('[data-cy="test-unreached"]')).toContain("didn't reach this Step");
   });
 
-  it('offers to start a stopped Flow instead of running', () => {
+  it('controls the Flow with the start, pause, resume, stop and restart buttons in the Test header, without a Start button in the notice', () => {
     fixture.componentRef.setInput('running', false);
+    fixture.componentRef.setInput('status', 'inactive');
     fixture.detectChanges();
     const start = jest.fn();
+    const pause = jest.fn();
+    const resume = jest.fn();
+    const stop = jest.fn();
     fixture.componentInstance.start.subscribe(start);
+    fixture.componentInstance.pause.subscribe(pause);
+    fixture.componentInstance.resume.subscribe(resume);
+    fixture.componentInstance.stop.subscribe(stop);
 
     expect(runButton().disabled).toBe(true);
-    expect(text('[data-cy="test-blocked"]')).toContain('Start the Flow to test it.');
-    buttonNamed('Start').click();
+    expect(text('[data-cy="test-blocked"]')).toBe('Start the Flow to test it.');
+    expect(fixture.nativeElement.querySelector('[data-cy="test-blocked"] button')).toBeNull();
+
+    controlNamed('Start').click();
     expect(start).toHaveBeenCalled();
+
+    fixture.componentRef.setInput('status', 'active');
+    fixture.detectChanges();
+    controlNamed('Pause').click();
+    controlNamed('Stop').click();
+    expect(pause).toHaveBeenCalled();
+    expect(stop).toHaveBeenCalled();
+
+    fixture.componentRef.setInput('status', 'paused');
+    fixture.detectChanges();
+    controlNamed('Resume').click();
+    expect(resume).toHaveBeenCalled();
   });
 
   it("doesn't run a Draft", () => {
@@ -424,6 +445,14 @@ describe('Flow test panel', () => {
     const button = buttons.find(b => b.textContent?.trim() === label);
     if (!button) {
       throw new Error(`No button named ${label}`);
+    }
+    return button;
+  }
+
+  function controlNamed(label: string): HTMLButtonElement {
+    const button = fixture.nativeElement.querySelector(`jhi-status-controls button[aria-label="${label}"]`);
+    if (!button) {
+      throw new Error(`No control named ${label}`);
     }
     return button;
   }
