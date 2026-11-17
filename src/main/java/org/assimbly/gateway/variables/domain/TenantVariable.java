@@ -12,10 +12,15 @@ public class TenantVariable {
     public static final String ID_FIELD = "_id";
     public static final String TYPE_FIELD = "_type";
     public static final String NAME_FIELD = "name";
-    public static final String PROTECTED_VALUE_FIELD = "protectedValue";
-    public static final String STATIC_TENANT_VARIABLE_GROUP_ID_FIELD = "static_tenant_variable_group_id";
-    public static final String CREATED_AT_FIELD = "createdAt";
-    public static final String CREATED_BY_FIELD = "createdBy";
+    public static final String PROTECTED_VALUE_FIELD = "protected";
+    public static final String TENANT_VARIABLE_GROUP_ID_FIELD = "tenant_variable_group_id";
+    public static final String CREATED_AT_FIELD = "created_at";
+    public static final String CREATED_BY_FIELD = "created_by";
+    /** Pre-migration names, still read so a variable written before the cutover keeps its data. */
+    public static final String LEGACY_PROTECTED_VALUE_FIELD = "protectedValue";
+    public static final String LEGACY_GROUP_ID_FIELD = "static_tenant_variable_group_id";
+    public static final String LEGACY_CREATED_AT_FIELD = "createdAt";
+    public static final String LEGACY_CREATED_BY_FIELD = "createdBy";
     public static final String VALUES_FIELD = "values";
     public static final String TAG_IDS_FIELD = "tag_ids";
 
@@ -50,7 +55,6 @@ public class TenantVariable {
         this._id = new ObjectId();
         this._type = TenantVarType.TENANT_VARIABLE.getType();
         this.protectedValue = false;
-        this.staticTenantVariableGroupId = new ObjectId();
         this.values = new ArrayList<>();
         this.tagIds = new ArrayList<>();
     }
@@ -60,7 +64,6 @@ public class TenantVariable {
         this._type = TenantVarType.TENANT_VARIABLE.getType();
         this.protectedValue = false;
         this.name = name;
-        this.staticTenantVariableGroupId = new ObjectId();
         this.values = new ArrayList<>();
         this.tagIds = new ArrayList<>();
     }
@@ -89,13 +92,16 @@ public class TenantVariable {
         if(document.getString(TYPE_FIELD) != null) {
             tenantVariable.set_type(document.getString(TYPE_FIELD));
         }
-        if(document.get(PROTECTED_VALUE_FIELD) != null) {
-            tenantVariable.setProtectedValue(document.getBoolean(PROTECTED_VALUE_FIELD));
+        Object protectedField = first(document, PROTECTED_VALUE_FIELD, LEGACY_PROTECTED_VALUE_FIELD);
+        if(protectedField instanceof Boolean protectedValue) {
+            tenantVariable.setProtectedValue(protectedValue);
         }
         tenantVariable.setName(document.getString(NAME_FIELD));
-        tenantVariable.setStaticTenantVariableGroupId(document.getObjectId(STATIC_TENANT_VARIABLE_GROUP_ID_FIELD));
+        if(first(document, TENANT_VARIABLE_GROUP_ID_FIELD, LEGACY_GROUP_ID_FIELD) instanceof ObjectId groupId) {
+            tenantVariable.setStaticTenantVariableGroupId(groupId);
+        }
 
-        Object createdAtField = document.get(CREATED_AT_FIELD);
+        Object createdAtField = first(document, CREATED_AT_FIELD, LEGACY_CREATED_AT_FIELD);
         if (createdAtField != null) {
             if (createdAtField instanceof Long long1) {
                 tenantVariable.setCreatedAt(long1);
@@ -105,26 +111,37 @@ public class TenantVariable {
             }
         }
 
-        tenantVariable.setCreatedBy(document.getString(CREATED_BY_FIELD));
+        if(first(document, CREATED_BY_FIELD, LEGACY_CREATED_BY_FIELD) instanceof String createdBy) {
+            tenantVariable.setCreatedBy(createdBy);
+        }
 
         List<Document> valuesList = (List<Document>) document.get(VALUES_FIELD);
-        for (Document valueDoc : valuesList) {
+        for (Document valueDoc : valuesList == null ? List.<Document>of() : valuesList) {
             EnvironmentValue environmentValue = new EnvironmentValue();
             environmentValue.set_id(valueDoc.getObjectId(EnvironmentValue.ID_FIELD));
             environmentValue.setEnvironment(valueDoc.getString(EnvironmentValue.ENVIRONMENT_FIELD));
             environmentValue.setValue(valueDoc.getString(EnvironmentValue.VALUE_FIELD));
             environmentValue.setEncrypted(valueDoc.getBoolean(EnvironmentValue.ENCRYPTED_FIELD));
-            Object lastUpdateObj = valueDoc.get(EnvironmentValue.LAST_UPDATE_FIELD);
-            if (lastUpdateObj != null) {
-                environmentValue.setLastUpdate(((Number) lastUpdateObj).longValue());
+            Object lastUpdateObj = first(valueDoc, EnvironmentValue.UPDATED_AT_FIELD, EnvironmentValue.LEGACY_UPDATED_AT_FIELD);
+            if (lastUpdateObj instanceof Number lastUpdate) {
+                environmentValue.setLastUpdate(lastUpdate.longValue());
             }
-            environmentValue.setUpdatedBy(valueDoc.getString(EnvironmentValue.UPDATED_BY_FIELD));
+            if (first(valueDoc, EnvironmentValue.UPDATED_BY_FIELD, EnvironmentValue.LEGACY_UPDATED_BY_FIELD) instanceof String updatedBy) {
+                environmentValue.setUpdatedBy(updatedBy);
+            }
             tenantVariable.put(environmentValue);
         }
 
-        tenantVariable.setTagIds(document.getList(TAG_IDS_FIELD, ObjectId.class));
+        List<ObjectId> tagIds = document.getList(TAG_IDS_FIELD, ObjectId.class);
+        tenantVariable.setTagIds(tagIds == null ? new ArrayList<>() : tagIds);
 
         return tenantVariable;
+    }
+
+    /** The value under {@code key}, or under {@code legacyKey} when only the pre-migration name is present. */
+    private static Object first(Document document, String key, String legacyKey) {
+        Object value = document.get(key);
+        return value != null ? value : document.get(legacyKey);
     }
 
     public Document toDocument() {
@@ -133,10 +150,19 @@ public class TenantVariable {
         document.append(TYPE_FIELD, this.get_type());
         document.append(PROTECTED_VALUE_FIELD, this.isProtectedValue());
         document.append(NAME_FIELD, this.getName());
-        document.append(STATIC_TENANT_VARIABLE_GROUP_ID_FIELD, this.getStaticTenantVariableGroupId());
+        if (this.getStaticTenantVariableGroupId() != null) {
+            document.append(TENANT_VARIABLE_GROUP_ID_FIELD, this.getStaticTenantVariableGroupId());
+        }
         document.append(CREATED_AT_FIELD, this.getCreatedAt());
         document.append(CREATED_BY_FIELD, this.getCreatedBy());
+        document.append(VALUES_FIELD, this.valuesToDocuments());
+        document.append(TAG_IDS_FIELD, this.getTagIds() == null ? new ArrayList<ObjectId>() : this.getTagIds());
 
+        return document;
+    }
+
+    /** The environment values as stored; used whole on insert and as the {@code $set} of an update. */
+    public List<Document> valuesToDocuments() {
         List<Document> valuesList = new ArrayList<>();
         for (EnvironmentValue environmentValue : this.getValues()) {
             Document valueDoc = new Document();
@@ -144,15 +170,11 @@ public class TenantVariable {
             valueDoc.append(EnvironmentValue.ENVIRONMENT_FIELD, environmentValue.getEnvironment());
             valueDoc.append(EnvironmentValue.VALUE_FIELD, environmentValue.getValue());
             valueDoc.append(EnvironmentValue.ENCRYPTED_FIELD, environmentValue.isEncrypted());
-            valueDoc.append(EnvironmentValue.LAST_UPDATE_FIELD, environmentValue.getLastUpdate());
+            valueDoc.append(EnvironmentValue.UPDATED_AT_FIELD, environmentValue.getLastUpdate());
             valueDoc.append(EnvironmentValue.UPDATED_BY_FIELD, environmentValue.getUpdatedBy());
             valuesList.add(valueDoc);
         }
-        document.append(VALUES_FIELD, valuesList);
-
-        document.append(TAG_IDS_FIELD, this.getTagIds());
-
-        return document;
+        return valuesList;
     }
 
     public ObjectId get_id() {

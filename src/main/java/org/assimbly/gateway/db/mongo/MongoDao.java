@@ -129,7 +129,16 @@ public class MongoDao {
         MongoDatabase mongoDatabase = MongoClientProvider.getInstance().getDatabase(tenant);
         MongoCollection<Document> collection = mongoDatabase.getCollection(TENANT_VARIABLES_COLLECTION_NAME);
         if(tenantVariableExist) {
-            collection.replaceOne(new Document(TenantVariable.ID_FIELD, tenantVariable.get_id()), tenantVariable.toDocument());
+            // Targeted update: only what the gateway owns. A full replace would drop fields it does not
+            // know (helper_text, tag_ids edits made in the UI) and the pre-migration keys.
+            Document set = new Document(TenantVariable.VALUES_FIELD, tenantVariable.valuesToDocuments());
+            if (tenantVariable.getCreatedAt() > 0) {
+                set.append(TenantVariable.CREATED_AT_FIELD, tenantVariable.getCreatedAt());
+            }
+            if (tenantVariable.getCreatedBy() != null) {
+                set.append(TenantVariable.CREATED_BY_FIELD, tenantVariable.getCreatedBy());
+            }
+            collection.updateOne(new Document(TenantVariable.ID_FIELD, tenantVariable.get_id()), new Document("$set", set));
         } else {
             collection.insertOne(tenantVariable.toDocument());
         }
