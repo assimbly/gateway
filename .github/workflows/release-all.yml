@@ -4,40 +4,56 @@ name: Release for all repositories
 on:
   workflow_dispatch:
     inputs:
+      branch:
+        description: 'Branch to operate on'
+        default: 'next'
+        type: string
       milestone:
         description: 'Milestone to use as version'
         type: string
         required: true
+      tag:
+        description: 'Tag to use for this release (defaults to milestone if empty)'
+        default: 'next'
+        type: string
 
   workflow_call:
     inputs:
+      branch:
+        description: 'Branch to operate on'
+        default: 'next'
+        type: string
       milestone:
         description: 'Milestone to use as version'
         type: string
         required: true
+      tag:
+        description: 'Tag to use for this release (defaults to milestone if empty)'
+        default: 'next'
+        type: string
 
 jobs:
   call-base-release:  
-    uses: assimbly/base/.github/workflows/release.yml@main
+    uses: assimbly/base/.github/workflows/release.yml@next
     secrets: inherit
     with:
-      branch: 'main'
+      branch: ${{ inputs.branch }}
       milestone: ${{ inputs.milestone }}
 
   call-custom-components-release:
-    uses: assimbly/custom-components/.github/workflows/release.yml@main
+    uses: assimbly/custom-components/.github/workflows/release.yml@next
     needs: call-base-release
     secrets: inherit
     with:
-      branch: 'main'
+      branch: ${{ inputs.branch }}
       milestone: ${{ inputs.milestone }}
 
   call-runtime-release:
-    uses: assimbly/runtime/.github/workflows/release.yml@main
+    uses: assimbly/runtime/.github/workflows/release.yml@next
     needs: call-custom-components-release
     secrets: inherit
     with:
-      branch: 'main'
+      branch: ${{ inputs.branch }}
       milestone: ${{ inputs.milestone }}
 
   call-gateway-release:
@@ -45,14 +61,14 @@ jobs:
     needs: call-runtime-release
     secrets: inherit
     with:
-      branch: 'main'
+      branch: ${{ inputs.branch }}
       milestone: ${{ inputs.milestone }}
-      tag: ${{inputs.milestone}}
+      tag: ${{ inputs.tag != '' && inputs.tag || inputs.milestone }}
 
   call-release-notes-drafter:
     needs: call-gateway-release
     uses: ./.github/workflows/release-drafter.yml
     secrets: inherit
     with:
-      branch: 'main'
+      branch: ${{ inputs.branch }}
       milestone: ${{ inputs.milestone }}
