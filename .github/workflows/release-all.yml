@@ -33,16 +33,8 @@ on:
         type: string
 
 jobs:
-  call-base-release:  
-    uses: assimbly/base/.github/workflows/release.yml@next
-    secrets: inherit
-    with:
-      branch: ${{ inputs.branch }}
-      milestone: ${{ inputs.milestone }}
-
   call-custom-components-release:
     uses: assimbly/custom-components/.github/workflows/release.yml@next
-    needs: call-base-release
     secrets: inherit
     with:
       branch: ${{ inputs.branch }}

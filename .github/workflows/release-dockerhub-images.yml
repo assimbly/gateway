@@ -58,14 +58,6 @@ jobs:
               },
               {
                 "id": "github",
-                "name": "Assimbly Base Repository",
-                "url": "https://maven.pkg.github.com/assimbly/base",
-                "snapshots": {
-                  "enabled": "true"
-                }
-              },
-              {
-                "id": "github",
                 "name": "Assimbly Runtime Repository",
                 "url": "https://maven.pkg.github.com/assimbly/runtime",
                 "snapshots": {
