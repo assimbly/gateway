@@ -36,7 +36,3 @@ processResources {
 test.dependsOn webapp_test
 processResources.dependsOn webapp
 bootJar.dependsOn processResources
-
-dependencies {
-    runtimeOnly "org.springframework:spring-aspects:7.0.5"
-}

@@ -27,7 +27,3 @@ sourceSets {
 }
 
 compileJava.dependsOn("openApiGenerate")
-
-dependencies {
-    runtimeOnly "org.springframework:spring-aspects:7.0.5"
-}

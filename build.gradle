@@ -23,7 +23,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("org.springframework.boot:spring-boot-starter-liquibase:4.1.2")
+        classpath("org.springframework.boot:spring-boot-starter-liquibase:${spring_boot_version}")
     }
 }
 
@@ -41,9 +41,9 @@ plugins {
     id "com.github.node-gradle.node"
     id "org.liquibase.gradle"
     id "io.spring.nohttp"
-    id 'de.undercouch.download' version '5.7.0'
-    id "io.github.ben-manes.versions" version "0.67.0"
-    id 'org.graalvm.buildtools.native' version '1.1.18'
+    id 'de.undercouch.download'
+    id "io.github.ben-manes.versions"
+    id 'org.graalvm.buildtools.native'
     //id("org.openrewrite.rewrite") version("latest.release")
 }
 
@@ -93,9 +93,11 @@ configurations.configureEach {
     }*/
 }
 
+// Overrides Spring Boot's Jackson 3 BOM (3.1.8) and its matching jackson-annotations version:
+// docconverter 3.0.3 requires XmlReadFeature.WRAP_ROOT_ELEMENT_NAME (added in Jackson 3.2).
 dependencyManagement {
     imports {
-        mavenBom "tools.jackson:jackson-bom:3.2.2"
+        mavenBom "tools.jackson:jackson-bom:${jackson_bom_version}"
     }
 }
 
@@ -295,7 +297,7 @@ dependencies {
         // Artemis' OpenWire protocol manager (artemis-openwire-protocol) still references the legacy javax.jms API.
         // In the full build it only ends up on the classpath by accident (via a transitive dependency of the integration
         // modules), so it has to be added explicitly for the broker-only build.
-        runtimeOnly "javax.jms:javax.jms-api:2.0.1"
+        runtimeOnly "javax.jms:javax.jms-api:${javax_jms_api_version}"
     }else{
         implementation("org.assimbly:integration-rest:${version}") { changing = true }
         implementation("org.assimbly:broker-rest:${version}") { changing = true }
@@ -304,14 +306,11 @@ dependencies {
     implementation("org.assimbly:oauth2token:${version}") { changing = true }
     implementation("org.assimbly:sql:${version}") { changing = true }
 
-    implementation platform("tools.jackson:jackson-bom:3.2.2")
-
     implementation "com.fasterxml.jackson.core:jackson-annotations"
     implementation "tools.jackson.core:jackson-databind"
     implementation "tools.jackson.dataformat:jackson-dataformat-xml"
     implementation "tools.jackson.datatype:jackson-datatype-hibernate7"
     implementation "tools.jackson.datatype:jackson-datatype-hppc"
-    implementation "tools.jackson.core:jackson-databind"
     implementation "tools.jackson.module:jackson-module-blackbird"
     implementation "tools.jackson.module:jackson-module-jakarta-xmlbind-annotations"
     implementation "com.mattbertolini:liquibase-slf4j:${liquibase_slf4j_version}"
@@ -324,14 +323,14 @@ dependencies {
     implementation "org.apache.commons:commons-lang3"
     implementation 'org.eclipse.angus:jakarta.mail'
     implementation "org.ehcache:ehcache"
-    implementation "org.hibernate.orm:hibernate-core:${hibernate_version}"
-    implementation "org.hibernate.orm:hibernate-envers:${hibernate_version}"
-    implementation "org.hibernate.orm:hibernate-jcache:${hibernate_version}"
-    implementation "org.hibernate.validator:hibernate-validator:${hibernate_validator_version}"
+    implementation "org.hibernate.orm:hibernate-core"
+    implementation "org.hibernate.orm:hibernate-envers"
+    implementation "org.hibernate.orm:hibernate-jcache"
+    implementation "org.hibernate.validator:hibernate-validator"
     implementation "org.mapstruct:mapstruct-processor:${mapstruct_version}"
     implementation "org.mapstruct:mapstruct:${mapstruct_version}"
-    implementation "org.mongodb:mongodb-driver-core:${mongodb_version}"
-    implementation "org.mongodb:mongodb-driver-sync:${mongodb_version}"
+    implementation "org.mongodb:mongodb-driver-core"
+    implementation "org.mongodb:mongodb-driver-sync"
 
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation "org.springframework.boot:spring-boot-starter-aspectj"
@@ -352,22 +351,20 @@ dependencies {
     implementation "org.springframework:spring-context-support"
 
     implementation "tech.jhipster:jhipster-framework:${jhipster_version}"
-    implementation 'org.slf4j:jcl-over-slf4j:2.0.20'
+    implementation 'org.slf4j:jcl-over-slf4j'
 
-    implementation 'net.sf.saxon:Saxon-HE:13.1'
+    implementation "net.sf.saxon:Saxon-HE:${saxon_version}"
 
-    implementation("io.github.assimbly:docconverter:3.0.3")
+    implementation "io.github.assimbly:docconverter"
 
     // reads OpenAPI 3.0 and 3.1 documents for the REST API builder's import; swagger-core comes as swagger-core-jakarta
-    implementation("io.swagger.parser.v3:swagger-parser-v3:2.1.45") {
+    implementation("io.swagger.parser.v3:swagger-parser-v3:${swagger_parser_version}") {
         exclude group: "io.swagger.core.v3", module: "swagger-core"
     }
 
-    implementation 'com.warrenstrange:googleauth'
-
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
-    annotationProcessor "org.hibernate.orm:hibernate-processor:${hibernate_version}"
-    annotationProcessor "org.projectlombok:lombok-mapstruct-binding:0.2.0"
+    annotationProcessor "org.hibernate.orm:hibernate-processor"
+    annotationProcessor "org.projectlombok:lombok-mapstruct-binding:${lombok_mapstruct_binding_version}"
     annotationProcessor ("org.springframework.boot:spring-boot-configuration-processor") {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
     }
@@ -376,17 +373,16 @@ dependencies {
     annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
     annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
     annotationProcessor 'jakarta.transaction:jakarta.transaction-api'
-    annotationProcessor 'jakarta.interceptor:jakarta.interceptor-api:2.2.0'
-    annotationProcessor 'jakarta.enterprise:jakarta.enterprise.cdi-api:4.1.0'
-    compileOnly 'jakarta.interceptor:jakarta.interceptor-api:2.2.0'
-    compileOnly 'jakarta.enterprise:jakarta.enterprise.cdi-api:4.1.0'
+    annotationProcessor "jakarta.interceptor:jakarta.interceptor-api:${jakarta_interceptor_api_version}"
+    annotationProcessor "jakarta.enterprise:jakarta.enterprise.cdi-api:${jakarta_cdi_api_version}"
+    compileOnly "jakarta.interceptor:jakarta.interceptor-api:${jakarta_interceptor_api_version}"
+    compileOnly "jakarta.enterprise:jakarta.enterprise.cdi-api:${jakarta_cdi_api_version}"
 
     testImplementation "org.springframework.boot:spring-boot-test"
-    testImplementation "org.assertj:assertj-core:${assertj_version}"
+    testImplementation "org.assertj:assertj-core"
     testImplementation "org.mockito:mockito-core"
-    testImplementation "com.mattbertolini:liquibase-slf4j"
-    testImplementation "org.hamcrest:hamcrest:3.0"
-    testImplementation "org.mockito:mockito-junit-jupiter:5.23.0"
+    testImplementation "org.hamcrest:hamcrest"
+    testImplementation "org.mockito:mockito-junit-jupiter"
     testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 
     liquibaseRuntime "org.springframework.boot:spring-boot-starter-liquibase"
@@ -394,7 +390,7 @@ dependencies {
     liquibaseRuntime "com.h2database:h2"
     liquibaseRuntime "com.mysql:mysql-connector-j"
 
-    runtimeOnly "com.h2database:h2:2.5.252"
+    runtimeOnly "com.h2database:h2"
 
     // developmentOnly 'org.springframework.boot:spring-boot-devtools' // disabled: H2 file DB loses recent commits on DevTools RestartClassLoader
 

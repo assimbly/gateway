@@ -14,7 +14,3 @@ war {
     includes = ["WEB-INF/**", "META-INF/**"]
 
 }
-
-dependencies {
-    runtimeOnly "org.springframework:spring-aspects:7.0.5"
-}

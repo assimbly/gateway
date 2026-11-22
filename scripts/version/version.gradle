@@ -84,7 +84,3 @@ def searchAndReplace(projectFile, oldVersion, newVersion){
     }
 
 }
-
-dependencies {
-    runtimeOnly "org.springframework:spring-aspects:7.0.5"
-}

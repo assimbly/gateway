@@ -10,7 +10,11 @@ pluginManagement {
         id 'net.ltgt.apt-eclipse' version "${apt_plugin_version}"
         id 'net.ltgt.apt-idea' version "${apt_plugin_version}"
         id 'net.ltgt.apt' version "${apt_plugin_version}"
-        id "io.spring.nohttp" version "${spring_no_http_plugin_version}"    }
+        id "io.spring.nohttp" version "${spring_no_http_plugin_version}"
+        id 'de.undercouch.download' version "${download_plugin_version}"
+        id 'io.github.ben-manes.versions' version "${versions_plugin_version}"
+        id 'org.graalvm.buildtools.native' version "${graalvm_native_plugin_version}"
+    }
 }
 
 rootProject.name = 'gateway'

@@ -24,7 +24,3 @@ file("sonar-project.properties").withReader {
         }
     }
 }
-
-dependencies {
-    runtimeOnly "org.springframework:spring-aspects:7.0.5"
-}
