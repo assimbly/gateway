@@ -2,10 +2,6 @@ package org.assimbly.gateway.config;
 
 import static java.util.Map.entry;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.core.util.Json;
 import java.util.Collection;
 import java.util.Map;
@@ -15,6 +11,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.annotation.RequestBody;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Swagger UI documentation of the gateway REST resources that doesn't fit on the resources themselves:
@@ -219,7 +219,7 @@ public class OpenApiDocsConfiguration {
                 node = array;
             }
             return new Doc(null, node);
-        } catch (JsonProcessingException _) {
+        } catch (JacksonException _) {
             return null;
         }
     }

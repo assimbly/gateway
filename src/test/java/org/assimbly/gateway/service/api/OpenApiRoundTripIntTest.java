@@ -1,8 +1,13 @@
 package org.assimbly.gateway.service.api;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.core.util.Yaml;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import org.assimbly.gateway.GatewayApp;
 import org.assimbly.gateway.domain.Flow;
 import org.assimbly.gateway.domain.Integration;
@@ -21,13 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Importing an OpenAPI document creates an API with Draft Handler Flows, and exporting it gives the contract back
@@ -71,35 +70,43 @@ class OpenApiRoundTripIntTest {
         assertThat(api.basePath()).isEqualTo("/customers");
         assertThat(api.versionLabel()).isEqualTo("2.1.0");
         assertThat(api.description()).isEqualTo("Manage customers.");
-        assertThat(api.operations()).extracting(o -> o.method() + " " + o.path())
+        assertThat(api.operations())
+            .extracting(o -> o.method() + " " + o.path())
             .containsExactlyInAnyOrder("GET /", "POST /", "GET /{id}", "DELETE /{id}");
 
         ApiOperationDTO get = operation(api, "GET", "/{id}");
         assertThat(get.operationId()).isEqualTo("getCustomer");
         assertThat(get.parameters()).containsExactly(
             new ApiParameterDTO("id", "path", "integer", true, "The customer"),
-            new ApiParameterDTO("X-Request-Id", "header", "string", false, null));
-        assertThat(get.declaredResponses()).extracting(ApiDeclaredResponseDTO::status, ApiDeclaredResponseDTO::description)
+            new ApiParameterDTO("X-Request-Id", "header", "string", false, null)
+        );
+        assertThat(get.declaredResponses())
+            .extracting(ApiDeclaredResponseDTO::status, ApiDeclaredResponseDTO::description)
             .containsExactly(org.assertj.core.groups.Tuple.tuple("200", "Found"), org.assertj.core.groups.Tuple.tuple("404", "Not found"));
         assertThat(get.responseMediaType()).isEqualTo("application/json");
 
         ApiOperationDTO post = operation(api, "POST", "/");
-        assertThat(Json.mapper().readTree(post.requestSchema()).at("/required/0").asText()).isEqualTo("name");
+        assertThat(Json.mapper().readTree(post.requestSchema()).at("/required/0").asString()).isEqualTo("name");
 
-        assertThat(operation(api, "GET", "/").parameters()).containsExactly(new ApiParameterDTO("limit", "query", "integer", false, "At most this many"));
+        assertThat(operation(api, "GET", "/").parameters()).containsExactly(
+            new ApiParameterDTO("limit", "query", "integer", false, "At most this many")
+        );
     }
 
     @Test
     void eachImportedOperationGetsADraftHandlerFlowNamedAfterItsOperationId() throws Exception {
         ApiDTO api = openApiService.importDocument(fixture("crud-3.0.yaml"), integrationId).api();
 
-        assertThat(api.operations()).extracting(ApiOperationDTO::handlerFlowName)
+        assertThat(api.operations())
+            .extracting(ApiOperationDTO::handlerFlowName)
             .containsExactlyInAnyOrder("listCustomers", "createCustomer", "getCustomer", "delete-customers-id");
 
         Flow flow = flowRepository.findById(operation(api, "GET", "/{id}").handlerFlowId()).orElseThrow();
         assertThat(flow.getType()).isEqualTo("flow");
         // Only the Operation Source (an open end) and the Error Step: the Flow is a Draft until it answers.
-        assertThat(flow.getSteps()).extracting(s -> s.getStepType()).containsExactlyInAnyOrder(StepType.SOURCE, StepType.ERROR);
+        assertThat(flow.getSteps())
+            .extracting(s -> s.getStepType())
+            .containsExactlyInAnyOrder(StepType.SOURCE, StepType.ERROR);
     }
 
     @Test
@@ -108,26 +115,32 @@ class OpenApiRoundTripIntTest {
 
         JsonNode exported = Yaml.mapper().readTree(openApiService.exportDocument(api.id(), "yaml", LISTENER));
 
-        assertThat(exported.at("/openapi").asText()).isEqualTo("3.0.3");
-        assertThat(exported.at("/info/title").asText()).isEqualTo("Customers");
-        assertThat(exported.at("/info/version").asText()).isEqualTo("2.1.0");
-        assertThat(exported.at("/servers/0/url").asText()).isEqualTo(LISTENER + "/customers");
+        assertThat(exported.at("/openapi").asString()).isEqualTo("3.0.3");
+        assertThat(exported.at("/info/title").asString()).isEqualTo("Customers");
+        assertThat(exported.at("/info/version").asString()).isEqualTo("2.1.0");
+        assertThat(exported.at("/servers/0/url").asString()).isEqualTo(LISTENER + "/customers");
 
         JsonNode getCustomer = exported.at("/paths/~1{id}/get");
-        assertThat(getCustomer.at("/operationId").asText()).isEqualTo("getCustomer");
-        assertThat(getCustomer.at("/parameters/0/name").asText()).isEqualTo("id");
-        assertThat(getCustomer.at("/parameters/0/in").asText()).isEqualTo("path");
+        assertThat(getCustomer.at("/operationId").asString()).isEqualTo("getCustomer");
+        assertThat(getCustomer.at("/parameters/0/name").asString()).isEqualTo("id");
+        assertThat(getCustomer.at("/parameters/0/in").asString()).isEqualTo("path");
         assertThat(getCustomer.at("/parameters/0/required").asBoolean()).isTrue();
-        assertThat(getCustomer.at("/parameters/0/schema/type").asText()).isEqualTo("integer");
-        assertThat(getCustomer.at("/responses/404/description").asText()).isEqualTo("Not found");
+        assertThat(getCustomer.at("/parameters/0/schema/type").asString()).isEqualTo("integer");
+        assertThat(getCustomer.at("/responses/404/description").asString()).isEqualTo("Not found");
 
         JsonNode original = Yaml.mapper().readTree(fixture("crud-3.0.yaml"));
-        assertThat(getCustomer.at("/responses/200/content/application~1json/schema"))
-            .isEqualTo(original.at("/paths/~1{id}/get/responses/200/content/application~1json/schema"));
-        assertThat(exported.at("/paths/~1/post/requestBody/content/application~1json/schema"))
-            .isEqualTo(original.at("/paths/~1/post/requestBody/content/application~1json/schema"));
+        assertThat(getCustomer.at("/responses/200/content/application~1json/schema")).isEqualTo(
+            original.at("/paths/~1{id}/get/responses/200/content/application~1json/schema")
+        );
+        assertThat(exported.at("/paths/~1/post/requestBody/content/application~1json/schema")).isEqualTo(
+            original.at("/paths/~1/post/requestBody/content/application~1json/schema")
+        );
 
-        var reparsed = new io.swagger.v3.parser.OpenAPIV3Parser().readContents(openApiService.exportDocument(api.id(), "yaml", LISTENER), null, null);
+        var reparsed = new io.swagger.v3.parser.OpenAPIV3Parser().readContents(
+            openApiService.exportDocument(api.id(), "yaml", LISTENER),
+            null,
+            null
+        );
         assertThat(reparsed.getMessages()).isEmpty();
     }
 
@@ -142,19 +155,45 @@ class OpenApiRoundTripIntTest {
             assertThat(problem.isMissingNode()).as(pointer).isFalse();
         }
         JsonNode problemSchema = exported.at("/components/schemas/Problem/properties");
-        assertThat(problemSchema.fieldNames()).toIterable().containsExactlyInAnyOrder("type", "title", "status", "detail", "instance", "correlationId");
+        assertThat(problemSchema.propertyNames()).containsExactlyInAnyOrder(
+            "type",
+            "title",
+            "status",
+            "detail",
+            "instance",
+            "correlationId"
+        );
     }
 
     @Test
     void anOperationWithoutADeclaredSuccessExportsThe200ItsHandlerFlowAnswers() throws Exception {
         ApiDTO api = apiService.createApi(new ApiDTO(null, "Greetings", "/greetings", "1.0", null, integrationId, 0, null));
-        apiService.createOperation(api.id(), new ApiOperationDTO(null, null, "GET", "/{name}", null, "sayHello", null, null, null,
-            "application/json", null, List.of(new ApiParameterDTO("name", "path", "string", true, null)), List.of(), null, null, null));
+        apiService.createOperation(
+            api.id(),
+            new ApiOperationDTO(
+                null,
+                null,
+                "GET",
+                "/{name}",
+                null,
+                "sayHello",
+                null,
+                null,
+                null,
+                "application/json",
+                null,
+                List.of(new ApiParameterDTO("name", "path", "string", true, null)),
+                List.of(),
+                null,
+                null,
+                null
+            )
+        );
 
         String yaml = openApiService.exportDocument(api.id(), "yaml", LISTENER);
 
         JsonNode sayHello = Yaml.mapper().readTree(yaml).at("/paths/~1{name}/get");
-        assertThat(sayHello.at("/responses/200/description").asText()).isNotBlank();
+        assertThat(sayHello.at("/responses/200/description").asString()).isNotBlank();
         assertThat(sayHello.at("/responses/200/content/application~1json").isMissingNode()).isFalse();
         assertThat(sayHello.at("/responses/500").isMissingNode()).isFalse();
         assertThat(new io.swagger.v3.parser.OpenAPIV3Parser().readContents(yaml, null, null).getMessages()).isEmpty();
@@ -166,7 +205,7 @@ class OpenApiRoundTripIntTest {
 
         JsonNode exported = Yaml.mapper().readTree(openApiService.exportDocument(api.id(), "yaml", LISTENER));
 
-        assertThat(exported.at("/paths/~1{id}/get/responses/200/description").asText()).isEqualTo("Found");
+        assertThat(exported.at("/paths/~1{id}/get/responses/200/description").asString()).isEqualTo("Found");
     }
 
     @Test
@@ -175,7 +214,7 @@ class OpenApiRoundTripIntTest {
 
         String yaml = openApiService.exportDocument(api.id(), "yaml", LISTENER, "acme");
 
-        assertThat(Yaml.mapper().readTree(yaml).at("/servers/0/url").asText()).isEqualTo(LISTENER + "/_acme/tenanted");
+        assertThat(Yaml.mapper().readTree(yaml).at("/servers/0/url").asString()).isEqualTo(LISTENER + "/_acme/tenanted");
     }
 
     @Test
@@ -185,7 +224,8 @@ class OpenApiRoundTripIntTest {
         assertThat(api.name()).isEqualTo("Orders");
         // Without servers, the paths' shared first segment becomes the base path, so the full paths stay the same.
         assertThat(api.basePath()).isEqualTo("/orders");
-        assertThat(api.operations()).extracting(o -> o.method() + " " + o.fullPath())
+        assertThat(api.operations())
+            .extracting(o -> o.method() + " " + o.fullPath())
             .containsExactlyInAnyOrder("GET /orders/{orderId}", "PUT /orders/{orderId}");
 
         ApiOperationDTO get = operation(api, "GET", "/{orderId}");
@@ -194,8 +234,9 @@ class OpenApiRoundTripIntTest {
 
         JsonNode exported = Yaml.mapper().readTree(openApiService.exportDocument(api.id(), "yaml", LISTENER));
         JsonNode original = Json.mapper().readTree(fixture("crud-3.1.json"));
-        assertThat(exported.at("/paths/~1{orderId}/get/responses/200/content/application~1json/schema"))
-            .isEqualTo(original.at("/paths/~1orders~1{orderId}/get/responses/200/content/application~1json/schema"));
+        assertThat(exported.at("/paths/~1{orderId}/get/responses/200/content/application~1json/schema")).isEqualTo(
+            original.at("/paths/~1orders~1{orderId}/get/responses/200/content/application~1json/schema")
+        );
     }
 
     @Test
@@ -206,7 +247,7 @@ class OpenApiRoundTripIntTest {
         assertThat(put.parameters()).containsExactly(new ApiParameterDTO("petId", "path", "integer", true, null));
         JsonNode request = Json.mapper().readTree(put.requestSchema());
         assertThat(request.toString()).doesNotContain("$ref");
-        assertThat(request.at("/properties/owner/properties/email/format").asText()).isEqualTo("email");
+        assertThat(request.at("/properties/owner/properties/email/format").asString()).isEqualTo("email");
 
         JsonNode exported = Yaml.mapper().readTree(openApiService.exportDocument(api.id(), "yaml", LISTENER));
         assertThat(exported.at("/paths/~1{petId}/put/requestBody/content/application~1json/schema")).isEqualTo(request);
@@ -218,11 +259,23 @@ class OpenApiRoundTripIntTest {
 
         assertThat(result.api().basePath()).isEqualTo("/v3");
         assertThat(String.join("\n", result.dropped())).contains(
-            "x-audience", "x-logo", "x-owner", "x-rate-limit",
-            "contact", "tags", "security", "bearerAuth", "servers",
-            "cookie parameter session", "example of the query parameter status",
-            "callbacks", "X-Total", "examples", "application/xml",
-            "enum of the schema of the query parameter status");
+            "x-audience",
+            "x-logo",
+            "x-owner",
+            "x-rate-limit",
+            "contact",
+            "tags",
+            "security",
+            "bearerAuth",
+            "servers",
+            "cookie parameter session",
+            "example of the query parameter status",
+            "callbacks",
+            "X-Total",
+            "examples",
+            "application/xml",
+            "enum of the schema of the query parameter status"
+        );
     }
 
     @Test
@@ -243,10 +296,48 @@ class OpenApiRoundTripIntTest {
     @Test
     void anImportThatClashesWithAnExistingOperationIsRefusedAsAWhole() throws Exception {
         ApiDTO shop = apiService.createApi(new ApiDTO(null, "Shop", "/", null, null, integrationId, 0, null));
-        apiService.createOperation(shop.id(), new ApiOperationDTO(null, null, "GET", "/customers/{key}", null, null, null, null,
-            null, null, null, List.of(), List.of(), null, null, null));
-        apiService.createOperation(shop.id(), new ApiOperationDTO(null, null, "DELETE", "/customers/{key}", null, null, null, null,
-            null, null, null, List.of(), List.of(), null, null, null));
+        apiService.createOperation(
+            shop.id(),
+            new ApiOperationDTO(
+                null,
+                null,
+                "GET",
+                "/customers/{key}",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                List.of(),
+                List.of(),
+                null,
+                null,
+                null
+            )
+        );
+        apiService.createOperation(
+            shop.id(),
+            new ApiOperationDTO(
+                null,
+                null,
+                "DELETE",
+                "/customers/{key}",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                List.of(),
+                List.of(),
+                null,
+                null,
+                null
+            )
+        );
         long flowsBefore = flowRepository.count();
 
         assertThatThrownBy(() -> openApiService.importDocument(fixture("crud-3.0.yaml"), integrationId))
@@ -259,7 +350,12 @@ class OpenApiRoundTripIntTest {
     }
 
     private static ApiOperationDTO operation(ApiDTO api, String method, String path) {
-        return api.operations().stream().filter(o -> o.method().equals(method) && o.path().equals(path)).findFirst().orElseThrow();
+        return api
+            .operations()
+            .stream()
+            .filter(o -> o.method().equals(method) && o.path().equals(path))
+            .findFirst()
+            .orElseThrow();
     }
 
     private String fixture(String name) throws Exception {

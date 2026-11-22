@@ -13,56 +13,51 @@
 # http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 # ===================================================================
 
-
 spring:
-    application:
-        name: gateway
-    main:
-        allow-bean-definition-overriding: true
-        allow-circular-references: true
-        lazy-initialization: true
-    mvc:
-        pathmatch:
-            matching-strategy: ant_path_matcher
-    datasource:
-        type: com.zaxxer.hikari.HikariDataSource
-        url: jdbc:h2:mem:gateway;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;CASE_INSENSITIVE_IDENTIFIERS=TRUE;NON_KEYWORDS=VALUE
-        name:
-        username:
-        password:
-        hikari:
-            auto-commit: false
-    jpa:
-        open-in-view: false
-        show-sql: false
-        hibernate:
-            ddl-auto: none
-            naming:
-                physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
-                implicit-strategy: org.springframework.boot.hibernate.SpringImplicitNamingStrategy
-        properties:
-            hibernate.id.new_generator_mappings: true
-            hibernate.connection.provider_disables_autocommit: true
-            hibernate.cache.use_second_level_cache: false
-            hibernate.cache.use_query_cache: false
-            hibernate.generate_statistics: true
-            hibernate.hbm2ddl.auto: none
-            hibernate.jdbc.time_zone: UTC
-    liquibase:
-        contexts: test
-    mail:
-        host: localhost
-    messages:
-        basename: i18n/messages
-    # This property is deprecated and will be removed in future Spring Boot versions
-            # enabled: false
-    thymeleaf:
-        mode: HTML
-
+  application:
+    name: gateway
+  main:
+    allow-bean-definition-overriding: true
+    allow-circular-references: true
+    lazy-initialization: true
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:h2:mem:gateway;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;CASE_INSENSITIVE_IDENTIFIERS=TRUE;NON_KEYWORDS=VALUE
+    name:
+    username:
+    password:
+    hikari:
+      auto-commit: false
+  jpa:
+    open-in-view: false
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+        implicit-strategy: org.springframework.boot.hibernate.SpringImplicitNamingStrategy
+    properties:
+      hibernate.id.new_generator_mappings: true
+      hibernate.connection.provider_disables_autocommit: true
+      hibernate.cache.use_second_level_cache: false
+      hibernate.cache.use_query_cache: false
+      hibernate.generate_statistics: true
+      hibernate.hbm2ddl.auto: none
+      hibernate.jdbc.time_zone: UTC
+  liquibase:
+    contexts: test
+  mail:
+    host: localhost
+  messages:
+    basename: i18n/messages
+  # This property is deprecated and will be removed in future Spring Boot versions
+  # enabled: false
+  thymeleaf:
+    mode: HTML
 
 server:
-    port: 10344
-    address: localhost
+  port: 10344
+  address: localhost
 
 # ===================================================================
 # JHipster specific properties
@@ -71,29 +66,29 @@ server:
 # ===================================================================
 
 jhipster:
-    clientApp:
-        name: 'gatewayApp'
-    async:
-        core-pool-size: 1
-        max-pool-size: 50
-        queue-capacity: 10000
-    # To test logstash appender
-    logging:
-        logstash:
-            enabled: true
-            host: localhost
-            port: 5000
-    mail:
-        from: test@localhost
-        base-url: http://127.0.0.1:8080
-    security:
-        authentication:
-            jwt:
-                base64-secret: aW50ZWdyYXRpb24tdGVzdC1qd3Qtc2VjcmV0LWtleS1mb3ItdGhlLWFzc2ltYmx5LWdhdGV3YXktdGVzdHMtb25seQ==
-                token-validity-in-seconds: 86400
-        remember-me:
-            # security key (this key should be unique for your application, and kept secret)
-            key: 3ff0a5bceb965db5bcb77fecccd1ce908c269e49
+  clientApp:
+    name: 'gatewayApp'
+  async:
+    core-pool-size: 1
+    max-pool-size: 50
+    queue-capacity: 10000
+  # To test logstash appender
+  logging:
+    logstash:
+      enabled: true
+      host: localhost
+      port: 5000
+  mail:
+    from: test@localhost
+    base-url: http://127.0.0.1:8080
+  security:
+    authentication:
+      jwt:
+        base64-secret: aW50ZWdyYXRpb24tdGVzdC1qd3Qtc2VjcmV0LWtleS1mb3ItdGhlLWFzc2ltYmx5LWdhdGV3YXktdGVzdHMtb25seQ==
+        token-validity-in-seconds: 86400
+    remember-me:
+      # security key (this key should be unique for your application, and kept secret)
+      key: 3ff0a5bceb965db5bcb77fecccd1ce908c269e49
 
 # ===================================================================
 # Application specific properties
@@ -105,12 +100,12 @@ jhipster:
 # ===================================================================
 
 application:
-    gateway:
-        # Tests set up their own data, and must not start a broker
-        first-start-setup: false
-        open-browser: false
+  gateway:
+    # Tests set up their own data, and must not start a broker
+    first-start-setup: false
+    open-browser: false
 
 encryption:
-    jasypt:
-        algorithm: PBEWithHMACSHA512AndAES_256
-        password: integration-test-password
+  jasypt:
+    algorithm: PBEWithHMACSHA512AndAES_256
+    password: integration-test-password

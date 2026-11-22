@@ -24,7 +24,6 @@ springdoc:
   api-docs:
     enabled: false
 ---
-
 management:
   endpoints:
     web:
@@ -80,10 +79,10 @@ management:
       process: true
       system: true
     distribution:
-       percentiles-histogram:
-         http.server.requests: true
-       percentiles:
-         http.server.requests: 0.5, 0.95, 0.99
+      percentiles-histogram:
+        http.server.requests: true
+      percentiles:
+        http.server.requests: 0.5, 0.95, 0.99
 
     data:
       repository:
@@ -145,11 +144,6 @@ spring:
     allow-bean-definition-overriding: true
     allow-circular-references: true
     lazy-initialization: true
-  mvc:
-    # This property is deprecated and will be removed in future Spring Boot versions
-      # enabled: true
-    pathmatch:
-      matching-strategy: ant_path_matcher
   threads:
     virtual:
       enabled: true

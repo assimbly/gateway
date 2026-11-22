@@ -28,7 +28,6 @@ buildscript {
 }
 
 plugins {
-    id "ua.eshepelyuk.ManifestClasspath" version "1.0.0"
     id "application"
     id "java"
     id "java-library"
@@ -259,6 +258,15 @@ repositories {
     mavenLocal()
     mavenCentral()
 
+    maven {
+        name = "Atlassian Public"
+        url = uri("https://packages.atlassian.com/maven-public/")
+        content {
+            includeGroupAndSubgroups "com.atlassian"
+            includeGroupAndSubgroups "io.atlassian"
+        }
+    }
+
     maven{ name = "Assimbly Runtime"
         url = uri("https://maven.pkg.github.com/assimbly/runtime")
         credentials {
@@ -281,20 +289,20 @@ dependencies {
     //rewrite("org.openrewrite.recipe:rewrite-spring:6.28.1")
 
     if (project.hasProperty("integration") || project.hasProperty("headless")) {
-        implementation group: "org.assimbly", name: "integration-rest", version: "${version}", changing: true
+        implementation("org.assimbly:integration-rest:${version}") { changing = true }
     }else if (project.hasProperty("broker")) {
-        implementation group: "org.assimbly", name: "broker-rest", version: "${version}", changing: true
+        implementation("org.assimbly:broker-rest:${version}") { changing = true }
         // Artemis' OpenWire protocol manager (artemis-openwire-protocol) still references the legacy javax.jms API.
         // In the full build it only ends up on the classpath by accident (via a transitive dependency of the integration
         // modules), so it has to be added explicitly for the broker-only build.
         runtimeOnly "javax.jms:javax.jms-api:2.0.1"
     }else{
-        implementation group: "org.assimbly", name: "integration-rest", version: "${version}", changing: true
-        implementation group: "org.assimbly", name: "broker-rest", version: "${version}", changing: true
+        implementation("org.assimbly:integration-rest:${version}") { changing = true }
+        implementation("org.assimbly:broker-rest:${version}") { changing = true }
     }
 
-    implementation group:  "org.assimbly", name: "oauth2token", version: "${version}", changing: true
-    implementation group:  "org.assimbly", name: "sql", version: "${version}", changing: true
+    implementation("org.assimbly:oauth2token:${version}") { changing = true }
+    implementation("org.assimbly:sql:${version}") { changing = true }
 
     implementation platform("tools.jackson:jackson-bom:3.2.2")
 
@@ -528,7 +536,7 @@ dependencyUpdates {
 
 //After upgrading execute Gradle wrapper task: ./gradlew wrapper (gradlew.bat wrapper on Windows)
 wrapper {
-    gradleVersion = "9.9.1"
+    gradleVersion = "9.9.2"
 }
 
 if (project.hasProperty("nodeInstall")) {

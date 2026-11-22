@@ -1,24 +1,10 @@
 package org.assimbly.gateway.service.api;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.parser.OpenAPIV3Parser;
 import io.swagger.v3.parser.core.models.ParseOptions;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
-import org.assimbly.gateway.config.ApplicationProperties;
-import org.assimbly.gateway.service.dto.ApiDTO;
-import org.assimbly.gateway.service.dto.ApiDeclaredResponseDTO;
-import org.assimbly.gateway.service.dto.ApiImportResultDTO;
-import org.assimbly.gateway.service.dto.ApiOperationDTO;
-import org.assimbly.gateway.service.dto.ApiParameterDTO;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -30,6 +16,19 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import org.assimbly.gateway.config.ApplicationProperties;
+import org.assimbly.gateway.service.dto.ApiDTO;
+import org.assimbly.gateway.service.dto.ApiDeclaredResponseDTO;
+import org.assimbly.gateway.service.dto.ApiImportResultDTO;
+import org.assimbly.gateway.service.dto.ApiOperationDTO;
+import org.assimbly.gateway.service.dto.ApiParameterDTO;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Turns an OpenAPI 3.0 or 3.1 document into a new API, and an API into an OpenAPI 3.0.3 document (ADR 0004).
@@ -47,7 +46,14 @@ public class OpenApiService {
     private static final ObjectMapper YAML = Yaml.mapper();
     private static final ObjectMapper JSON = Json.mapper();
 
-    private static final Set<String> OPERATION_KEYS = Set.of("operationId", "summary", "description", "parameters", "requestBody", "responses");
+    private static final Set<String> OPERATION_KEYS = Set.of(
+        "operationId",
+        "summary",
+        "description",
+        "parameters",
+        "requestBody",
+        "responses"
+    );
     /** The keys of a parameter the model holds; its examples are listed as dropped on their own. */
     private static final Set<String> PARAMETER_KEYS = Set.of("name", "in", "required", "description", "schema", "example", "examples");
     private static final Set<String> MEDIA_TYPE_KEYS = Set.of("schema");
@@ -80,7 +86,8 @@ public class OpenApiService {
         for (ApiOperationDTO operation : operations) {
             String fullPath = ApiPaths.fullPath(api.basePath(), operation.path());
             String described = operation.method() + " " + fullPath;
-            apiService.conflictsWith(operation.method(), fullPath, other -> false)
+            apiService
+                .conflictsWith(operation.method(), fullPath, other -> false)
                 .forEach(other -> conflicts.add(described + " clashes with " + other));
             String earlier = seen.putIfAbsent(ApiPaths.conflictKey(operation.method(), fullPath), described);
             if (earlier != null) {
@@ -88,7 +95,10 @@ public class OpenApiService {
             }
         }
         if (!conflicts.isEmpty()) {
-            throw new ApiRuleException("Nothing was imported: " + conflicts.size() + " of its Operations clash with existing ones.", conflicts);
+            throw new ApiRuleException(
+                "Nothing was imported: " + conflicts.size() + " of its Operations clash with existing ones.",
+                conflicts
+            );
         }
 
         ApiDTO created = apiService.createApi(api);
@@ -122,19 +132,25 @@ public class OpenApiService {
         }
 
         String serverPath = ApiPaths.runtimePath(tenant, api.basePath());
-        root.putArray("servers").addObject().put("url", stripTrailingSlash(listenerUrl) + ("/".equals(serverPath) ? "" : serverPath));
+        root.putArray("servers")
+            .addObject()
+            .put("url", stripTrailingSlash(listenerUrl) + ("/".equals(serverPath) ? "" : serverPath));
 
         ObjectNode paths = root.putObject("paths");
         for (ApiOperationDTO operation : api.operations()) {
-            ObjectNode pathItem = paths.has(operation.path()) ? (ObjectNode) paths.get(operation.path()) : paths.putObject(operation.path());
+            ObjectNode pathItem = paths.has(operation.path())
+                ? (ObjectNode) paths.get(operation.path())
+                : paths.putObject(operation.path());
             pathItem.set(operation.method().toLowerCase(Locale.ROOT), exportOperation(operation));
         }
 
         root.putObject("components").putObject("schemas").set("Problem", problemSchema());
 
         try {
-            return "json".equalsIgnoreCase(format) ? JSON.writerWithDefaultPrettyPrinter().writeValueAsString(root) : YAML.writeValueAsString(root);
-        } catch (JsonProcessingException e) {
+            return "json".equalsIgnoreCase(format)
+                ? JSON.writerWithDefaultPrettyPrinter().writeValueAsString(root)
+                : YAML.writeValueAsString(root);
+        } catch (JacksonException e) {
             throw new IllegalStateException("The OpenAPI document could not be written", e);
         }
     }
@@ -150,7 +166,10 @@ public class OpenApiService {
         }
 
         if (operation.requestSchema() != null) {
-            node.putObject("requestBody").putObject("content").putObject(operation.requestMediaType()).set("schema", schema(operation.requestSchema()));
+            node.putObject("requestBody")
+                .putObject("content")
+                .putObject(operation.requestMediaType())
+                .set("schema", schema(operation.requestSchema()));
         }
 
         exportResponses(node.putObject("responses"), operation);
@@ -175,21 +194,33 @@ public class OpenApiService {
             ObjectNode response = responses.putObject(declared.status());
             response.put("description", declared.description());
             if (declared.mediaType() != null || declared.schema() != null) {
-                ObjectNode mediaType = response.putObject("content").putObject(declared.mediaType() != null ? declared.mediaType() : operation.responseMediaType());
+                ObjectNode mediaType = response
+                    .putObject("content")
+                    .putObject(declared.mediaType() != null ? declared.mediaType() : operation.responseMediaType());
                 if (declared.schema() != null) {
                     mediaType.set("schema", schema(declared.schema()));
                 }
             }
         }
-        if (operation.declaredResponses().stream().noneMatch(declared -> declared.status().startsWith("2"))) {
+        if (
+            operation
+                .declaredResponses()
+                .stream()
+                .noneMatch(declared -> declared.status().startsWith("2"))
+        ) {
             // A new Handler Flow ends in a Response with status 200, so that is what the Operation answers.
             ObjectNode success = responses.putObject("200");
             success.put("description", "The answer of the Handler Flow.");
-            success.putObject("content").putObject(operation.responseMediaType() != null ? operation.responseMediaType() : "application/json");
+            success
+                .putObject("content")
+                .putObject(operation.responseMediaType() != null ? operation.responseMediaType() : "application/json");
         }
         if (!responses.has("500")) {
             ObjectNode problem = responses.putObject("500");
-            problem.put("description", "The request failed. The body names the Operation and gives a correlation id to look the failure up with.");
+            problem.put(
+                "description",
+                "The request failed. The body names the Operation and gives a correlation id to look the failure up with."
+            );
             problem.putObject("content").putObject(PROBLEM_MEDIA_TYPE).putObject("schema").put("$ref", "#/components/schemas/Problem");
         }
     }
@@ -210,7 +241,7 @@ public class OpenApiService {
     private static JsonNode schema(String text) {
         try {
             return JSON.readTree(text);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new ApiRuleException("A stored schema isn't valid JSON: " + e.getOriginalMessage());
         }
     }
@@ -219,17 +250,19 @@ public class OpenApiService {
         JsonNode root;
         try {
             root = YAML.readTree(text == null ? "" : text);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new ApiRuleException("This isn't JSON or YAML: " + e.getOriginalMessage());
         }
         if (root == null || !root.isObject()) {
             throw new ApiRuleException("This isn't an OpenAPI 3.0 or 3.1 document.");
         }
         if (root.has("swagger")) {
-            throw new ApiRuleException("This is a Swagger 2.0 document. Only OpenAPI 3.0 and 3.1 are supported: convert it to OpenAPI 3 first, "
-                + "for example with the Swagger Editor or swagger2openapi.");
+            throw new ApiRuleException(
+                "This is a Swagger 2.0 document. Only OpenAPI 3.0 and 3.1 are supported: convert it to OpenAPI 3 first, " +
+                    "for example with the Swagger Editor or swagger2openapi."
+            );
         }
-        String version = root.path("openapi").asText("");
+        String version = root.path("openapi").asString("");
         if (!version.startsWith("3.0") && !version.startsWith("3.1")) {
             throw new ApiRuleException("This isn't an OpenAPI 3.0 or 3.1 document: it has no openapi: 3.0.x or 3.1.x.");
         }
@@ -238,7 +271,9 @@ public class OpenApiService {
         options.setResolve(false);
         SwaggerParseResult result = new OpenAPIV3Parser().readContents(text, null, options);
         if (result.getOpenAPI() == null) {
-            throw new ApiRuleException("This OpenAPI document can't be read: " + String.join("; ", Objects.requireNonNullElse(result.getMessages(), List.of())));
+            throw new ApiRuleException(
+                "This OpenAPI document can't be read: " + String.join("; ", Objects.requireNonNullElse(result.getMessages(), List.of()))
+            );
         }
         return root;
     }
@@ -267,19 +302,32 @@ public class OpenApiService {
 
         ApiDTO api(Long integrationId) {
             JsonNode info = root.path("info");
-            String title = info.path("title").asText("").strip();
+            String title = info.path("title").asString("").strip();
             dropUnknown(root, Set.of("openapi", "info", "paths", "components", "servers"), "", "");
             dropUnknown(info, Set.of("title", "version", "description"), "", " of info");
-            root.path("components").fieldNames().forEachRemaining(component -> {
-                if (component.equals("securitySchemes")) {
-                    root.path("components").path(component).fieldNames().forEachRemaining(name -> dropped.add("security scheme " + name));
-                } else if (!RESOLVED_COMPONENTS.contains(component)) {
-                    dropped.add(component + " of components");
-                }
-            });
+            root.path("components")
+                .propertyNames()
+                .forEach(component -> {
+                    if (component.equals("securitySchemes")) {
+                        root.path("components")
+                            .path(component)
+                            .propertyNames()
+                            .forEach(name -> dropped.add("security scheme " + name));
+                    } else if (!RESOLVED_COMPONENTS.contains(component)) {
+                        dropped.add(component + " of components");
+                    }
+                });
             String basePath = basePath();
-            return new ApiDTO(null, title.isEmpty() ? "Imported API" : title, basePath, textOrNull(info.path("version")),
-                textOrNull(info.path("description")), integrationId, 0, null);
+            return new ApiDTO(
+                null,
+                title.isEmpty() ? "Imported API" : title,
+                basePath,
+                textOrNull(info.path("version")),
+                textOrNull(info.path("description")),
+                integrationId,
+                0,
+                null
+            );
         }
 
         /**
@@ -289,7 +337,7 @@ public class OpenApiService {
         private String basePath() {
             JsonNode servers = root.path("servers");
             if (servers.isArray() && !servers.isEmpty()) {
-                String url = servers.get(0).path("url").asText("");
+                String url = servers.get(0).path("url").asString("");
                 String path = url.replaceFirst("^[a-zA-Z][a-zA-Z0-9+.-]*://[^/]*", "");
                 boolean usable = !path.contains("{") && !ApiPaths.normalize(path).equals("/");
                 dropped.add(usable ? "servers (the base path " + ApiPaths.normalize(path) + " was taken from the first one)" : "servers");
@@ -298,11 +346,13 @@ public class OpenApiService {
                 }
             }
             List<String> paths = new ArrayList<>();
-            root.path("paths").fieldNames().forEachRemaining(path -> {
-                if (!path.startsWith("x-")) {
-                    paths.add(path);
-                }
-            });
+            root.path("paths")
+                .propertyNames()
+                .forEach(path -> {
+                    if (!path.startsWith("x-")) {
+                        paths.add(path);
+                    }
+                });
             String first = paths.isEmpty() ? "" : firstSegment(paths.getFirst());
             boolean shared = !first.isEmpty() && !first.contains("{") && paths.stream().allMatch(path -> first.equals(firstSegment(path)));
             if (shared) {
@@ -320,16 +370,14 @@ public class OpenApiService {
 
         List<ApiOperationDTO> operations() {
             List<ApiOperationDTO> operations = new ArrayList<>();
-            Iterator<Map.Entry<String, JsonNode>> paths = root.path("paths").fields();
-            while (paths.hasNext()) {
-                Map.Entry<String, JsonNode> entry = paths.next();
+            for (Map.Entry<String, JsonNode> entry : root.path("paths").properties()) {
                 String path = entry.getKey();
                 if (path.startsWith("x-")) {
                     dropped.add(path + " (extension) of paths");
                     continue;
                 }
                 JsonNode pathItem = resolved(entry.getValue());
-                pathItem.fields().forEachRemaining(field -> {
+                pathItem.properties().forEach(field -> {
                     String key = field.getKey();
                     if (ApiService.METHODS.contains(key.toUpperCase(Locale.ROOT))) {
                         operations.add(operation(key.toUpperCase(Locale.ROOT), path, pathItem, field.getValue()));
@@ -345,7 +393,9 @@ public class OpenApiService {
             String where = method + " " + documentPath;
             dropUnknown(operation, OPERATION_KEYS, "", " of " + where);
 
-            String path = ApiPaths.normalize(documentPath.startsWith(stripFromPaths) ? documentPath.substring(stripFromPaths.length()) : documentPath);
+            String path = ApiPaths.normalize(
+                documentPath.startsWith(stripFromPaths) ? documentPath.substring(stripFromPaths.length()) : documentPath
+            );
 
             List<ApiParameterDTO> parameters = parameters(where, pathItem.path("parameters"), operation.path("parameters"));
 
@@ -362,9 +412,7 @@ public class OpenApiService {
             }
 
             List<ApiDeclaredResponseDTO> responses = new ArrayList<>();
-            Iterator<Map.Entry<String, JsonNode>> statuses = operation.path("responses").fields();
-            while (statuses.hasNext()) {
-                Map.Entry<String, JsonNode> entry = statuses.next();
+            for (Map.Entry<String, JsonNode> entry : operation.path("responses").properties()) {
                 String status = entry.getKey().toLowerCase(Locale.ROOT);
                 if (ApiService.isStatus(status)) {
                     responses.add(declaredResponse(status, entry.getValue(), where));
@@ -372,24 +420,44 @@ public class OpenApiService {
                     dropped.add("the " + entry.getKey() + " response of " + where);
                 }
             }
-            String responseMediaType = responses.stream()
+            String responseMediaType = responses
+                .stream()
                 .filter(response -> response.status().startsWith("2") && response.mediaType() != null)
                 .map(ApiDeclaredResponseDTO::mediaType)
                 .findFirst()
                 .orElse(null);
 
-            return new ApiOperationDTO(null, null, method, path, null, textOrNull(operation.path("operationId")),
-                textOrNull(operation.path("summary")), textOrNull(operation.path("description")), requestMediaType, responseMediaType,
-                requestSchema, parameters, responses, null, null, "flow");
+            return new ApiOperationDTO(
+                null,
+                null,
+                method,
+                path,
+                null,
+                textOrNull(operation.path("operationId")),
+                textOrNull(operation.path("summary")),
+                textOrNull(operation.path("description")),
+                requestMediaType,
+                responseMediaType,
+                requestSchema,
+                parameters,
+                responses,
+                null,
+                null,
+                "flow"
+            );
         }
 
         private ApiDeclaredResponseDTO declaredResponse(String status, JsonNode node, String where) {
             String whereResponse = "the " + status + " response of " + where;
             JsonNode response = resolved(node);
             dropUnknown(response, RESPONSE_KEYS, "", " of " + whereResponse);
-            response.path("headers").fieldNames().forEachRemaining(header -> dropped.add("the header " + header + " of " + whereResponse));
+            response
+                .path("headers")
+                .propertyNames()
+                .forEach(header -> dropped.add("the header " + header + " of " + whereResponse));
             Map.Entry<String, JsonNode> content = firstContent(response, whereResponse);
-            String description = response.path("description").asText("").isBlank() ? "Response " + status : response.path("description").asText();
+            String desc = response.path("description").asString("");
+            String description = desc.isBlank() ? "Response " + status : desc;
             if (content == null) {
                 return new ApiDeclaredResponseDTO(status, description, null, null);
             }
@@ -409,8 +477,8 @@ public class OpenApiService {
 
         /** The parameter as the model holds it; empty for a cookie parameter, which the model doesn't have. */
         private Optional<ApiParameterDTO> parameter(String where, JsonNode parameter) {
-            String name = parameter.path("name").asText("");
-            String in = parameter.path("in").asText("");
+            String name = parameter.path("name").asString("");
+            String in = parameter.path("in").asString("");
             if (in.equals("cookie")) {
                 dropped.add("the cookie parameter " + name + " of " + where);
                 return Optional.empty();
@@ -421,28 +489,33 @@ public class OpenApiService {
             }
             dropUnknown(parameter, PARAMETER_KEYS, "", whereParameter);
             // A parameter keeps only its type; the rest of its schema, such as a format or enum, is listed.
-            parameter.path("schema").fieldNames().forEachRemaining(key -> {
-                if (!key.equals("type")) {
-                    dropped.add(describeKey(key) + " of the schema" + whereParameter);
-                }
-            });
+            parameter
+                .path("schema")
+                .propertyNames()
+                .forEach(key -> {
+                    if (!key.equals("type")) {
+                        dropped.add(describeKey(key) + " of the schema" + whereParameter);
+                    }
+                });
             String type = parameterType(parameter.path("schema").path("type"));
             if (type == null) {
                 dropped.add("the schema" + whereParameter + " (kept as a string)");
                 type = "string";
             }
-            return Optional.of(new ApiParameterDTO(name, in, type, parameter.path("required").asBoolean(false),
-                textOrNull(parameter.path("description"))));
+            return Optional.of(
+                new ApiParameterDTO(name, in, type, parameter.path("required").asBoolean(false), textOrNull(parameter.path("description")))
+            );
         }
 
         /** A parameter's type when the model has it; an array type of 3.1 counts by its one non-null type. */
         private static String parameterType(JsonNode type) {
-            String name = type.isTextual() ? type.asText() : null;
+            String name = type.isString() ? type.asString() : null;
             if (type.isArray()) {
                 List<String> types = new ArrayList<>();
                 type.forEach(t -> {
-                    if (!t.asText().equals("null")) {
-                        types.add(t.asText());
+                    String value = t.asString("");
+                    if (!value.equals("null")) {
+                        types.add(value);
                     }
                 });
                 name = types.size() == 1 ? types.getFirst() : null;
@@ -455,7 +528,7 @@ public class OpenApiService {
 
         /** The first media type of a request body or response; any others, and examples, are dropped. */
         private Map.Entry<String, JsonNode> firstContent(JsonNode owner, String where) {
-            Iterator<Map.Entry<String, JsonNode>> content = owner.path("content").fields();
+            Iterator<Map.Entry<String, JsonNode>> content = owner.path("content").properties().iterator();
             if (!content.hasNext()) {
                 return null;
             }
@@ -472,13 +545,13 @@ public class OpenApiService {
             }
             try {
                 return JSON.writeValueAsString(resolved(schema));
-            } catch (JsonProcessingException e) {
+            } catch (JacksonException e) {
                 throw new IllegalStateException(e);
             }
         }
 
         private void dropUnknown(JsonNode node, Set<String> known, String prefix, String where) {
-            node.fieldNames().forEachRemaining(key -> {
+            node.propertyNames().forEach(key -> {
                 if (!known.contains(key)) {
                     dropped.add(prefix + describeKey(key) + where);
                 }
@@ -495,8 +568,8 @@ public class OpenApiService {
         }
 
         private JsonNode resolved(JsonNode node, Deque<String> trail) {
-            if (node.isObject() && node.path("$ref").isTextual()) {
-                String ref = node.get("$ref").asText();
+            if (node.isObject() && node.path("$ref").isString()) {
+                String ref = node.get("$ref").asString();
                 if (!ref.startsWith("#/") || trail.contains(ref)) {
                     return node;
                 }
@@ -511,7 +584,7 @@ public class OpenApiService {
             }
             if (node.isObject()) {
                 ObjectNode copy = JSON.createObjectNode();
-                node.fields().forEachRemaining(field -> copy.set(field.getKey(), resolved(field.getValue(), trail)));
+                node.properties().forEach(field -> copy.set(field.getKey(), resolved(field.getValue(), trail)));
                 return copy;
             }
             if (node.isArray()) {
@@ -523,7 +596,11 @@ public class OpenApiService {
         }
 
         private static String textOrNull(JsonNode node) {
-            return node.isValueNode() && !node.asText().isBlank() ? node.asText() : null;
+            if (!node.isValueNode() || node.isNull()) {
+                return null;
+            }
+            String text = node.asString("");
+            return text.isBlank() ? null : text;
         }
     }
 }
