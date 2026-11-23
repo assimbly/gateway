@@ -32,7 +32,7 @@ import org.springframework.transaction.support.TransactionTemplate;
  * <ul>
  *   <li>the Variable {@code messages}, a folder for files in the home folder ({@code /data/messages} with Docker), so
  *   a File Step's path reads {@code @{messages}/in} on every machine;</li>
- *   <li>the Connection {@code Gateway broker} to the built-in broker, while there is no Simple JMS Connection yet.</li>
+ *   <li>the Connection {@code Gateway broker} to the built-in broker, while there is no Artemis Connection yet.</li>
  * </ul>
  * Each is added on start when it is missing, also to a Gateway set up before it existed; a changed one is kept.
  */
@@ -43,7 +43,7 @@ public class GatewayConventions {
 
     static final String MESSAGES_VARIABLE = "messages";
     static final String BROKER_CONNECTION = "Gateway broker";
-    static final String BROKER_CONNECTION_TYPE = "SJMS";
+    static final String BROKER_CONNECTION_TYPE = "Artemis";
 
     private final Logger log = LoggerFactory.getLogger(GatewayConventions.class);
 
@@ -120,7 +120,7 @@ public class GatewayConventions {
         log.info("Added the Variable {} = {}", MESSAGES_VARIABLE, variable.getValue());
     }
 
-    /** A pooled Simple JMS Connection to the built-in Artemis broker, with the credentials the tutorials use. */
+    /** A pooled Artemis Connection to the built-in broker, with the credentials the tutorials use. */
     private void addBrokerConnection() {
         ConnectionDTO connection = new ConnectionDTO();
         connection.setName(BROKER_CONNECTION);
@@ -131,7 +131,6 @@ public class GatewayConventions {
         keys.put("url", "tcp://localhost:61616");
         keys.put("username", "admin");
         keys.put("password", encrypt("admin"));
-        keys.put("jmsprovider", "ActiveMQ Artemis");
         keys.put("pooled", "true");
         keys.forEach((key, value) -> {
             ConnectionKeysDTO connectionKey = new ConnectionKeysDTO();

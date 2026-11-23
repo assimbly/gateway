@@ -169,7 +169,7 @@ public class BrokerResource implements ApplicationRunner {
      * GET  /brokers/:id : get the broker type".
      *
      * @param id, the id of the broker to retrieve
-     * @return the brokerType (artemis or classic) with status 200 (OK) or with status 404 (Not Found)
+     * @return the brokerType (activemq or artemis) with status 200 (OK) or with status 404 (Not Found)
      */
     @Operation(summary = "Get the type of a broker")
     @GetMapping("/brokers/{id}/type")

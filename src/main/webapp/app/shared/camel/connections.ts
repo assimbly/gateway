@@ -14,23 +14,9 @@ export class Connections {
     'org.sqlite.JDBC',
   ];
 
-  connectionsList: string[] = [
-    'ActiveMQ',
-    'AmazonMQ',
-    'AMQP',
-    'AMQPS',
-    'IBMMQ',
-    'JDBC',
-    'JMS',
-    'RabbitMQ',
-    'SJMS',
-    'SJMS2',
-  ];
+  connectionsList: string[] = ['ActiveMQ', 'AmazonMQ', 'AMQP', 'AMQPS', 'Artemis', 'IBMMQ', 'JDBC', 'JMS', 'RabbitMQ', 'SJMS', 'SJMS2'];
 
-  pooledList: string[] = [
-      'true',
-      'false',
-    ];
+  pooledList: string[] = ['true', 'false'];
 
   keysList = [
     {
@@ -84,16 +70,16 @@ export class Connections {
           isRequired: true,
         },
         {
-           connectionKeyName: 'pooled',
-           valueType: 'list',
-           placeholder: '',
-           isRequired: true,
+          connectionKeyName: 'pooled',
+          valueType: 'list',
+          placeholder: '',
+          isRequired: true,
         },
       ],
     },
     {
       name: 'AmazonMQ',
-	    connectionKeys: [
+      connectionKeys: [
         {
           connectionKeyName: 'url',
           valueType: 'text',
@@ -113,10 +99,10 @@ export class Connections {
           isRequired: true,
         },
         {
-           connectionKeyName: 'pooled',
-           valueType: 'list',
-           placeholder: '',
-           isRequired: true,
+          connectionKeyName: 'pooled',
+          valueType: 'list',
+          placeholder: '',
+          isRequired: true,
         },
       ],
     },
@@ -217,10 +203,10 @@ export class Connections {
           isRequired: true,
         },
         {
-           connectionKeyName: 'pooled',
-           valueType: 'list',
-           placeholder: '',
-           isRequired: true,
+          connectionKeyName: 'pooled',
+          valueType: 'list',
+          placeholder: '',
+          isRequired: true,
         },
       ],
     },
@@ -254,6 +240,36 @@ export class Connections {
       ],
     },
     {
+      name: 'Artemis',
+      connectionKeys: [
+        {
+          connectionKeyName: 'url',
+          valueType: 'text',
+          placeholder: 'tcp://localhost:61616',
+          isRequired: true,
+        },
+        {
+          connectionKeyName: 'username',
+          valueType: 'text',
+          placeholder: 'user',
+          isRequired: true,
+        },
+        {
+          connectionKeyName: 'password',
+          valueType: 'password',
+          placeholder: '',
+          isRequired: true,
+        },
+        {
+          connectionKeyName: 'pooled',
+          valueType: 'list',
+          placeholder: '',
+          isRequired: true,
+          defaultValue: 'true',
+        },
+      ],
+    },
+    {
       name: 'SJMS',
       connectionKeys: [
         {
@@ -280,13 +296,13 @@ export class Connections {
           placeholder: '',
           isRequired: true,
         },
-         {
-           connectionKeyName: 'pooled',
-           valueType: 'list',
-           placeholder: '',
-           isRequired: true,
-           defaultValue: 'true',
-         },
+        {
+          connectionKeyName: 'pooled',
+          valueType: 'list',
+          placeholder: '',
+          isRequired: true,
+          defaultValue: 'true',
+        },
       ],
     },
     {
@@ -316,14 +332,14 @@ export class Connections {
           placeholder: '',
           isRequired: true,
         },
-         {
-           connectionKeyName: 'pooled',
-           valueType: 'list',
-           placeholder: '',
-           isRequired: true,
-         },
+        {
+          connectionKeyName: 'pooled',
+          valueType: 'list',
+          placeholder: '',
+          isRequired: true,
+        },
       ],
-    }
+    },
   ];
 
   getConnectionType(componentType: any) {
@@ -335,6 +351,8 @@ export class Connections {
       return 'AMQP';
     } else if (componentType === 'amqps') {
       return 'AMQPS';
+    } else if (componentType === 'artemis') {
+      return 'Artemis';
     } else if (componentType === 'ibmmq') {
       return 'IBMMQ';
     } else if (componentType === 'sql') {
@@ -345,7 +363,7 @@ export class Connections {
       return 'SJMS';
     } else if (componentType === 'sjms2') {
       return 'SJMS2';
-    }else if (componentType === 'spring-rabbitmq') {
+    } else if (componentType === 'spring-rabbitmq') {
       return 'RabbitMQ';
     } else {
       return '';
@@ -361,6 +379,8 @@ export class Connections {
       return true;
     } else if (componentType === 'amqps') {
       return true;
+    } else if (componentType === 'artemis') {
+      return true;
     } else if (componentType === 'ibmmq') {
       return true;
     } else if (componentType === 'sonicmq') {
@@ -368,7 +388,7 @@ export class Connections {
     } else if (componentType === 'sql') {
       return true;
     } else if (componentType === 'jms') {
-       return true;
+      return true;
     } else if (componentType === 'sjms') {
       return true;
     } else if (componentType === 'sjms2') {

@@ -24,7 +24,15 @@ import { SaveShortcutDirective } from 'app/shared/keyboard';
 @Component({
   selector: 'jhi-connection-update',
   templateUrl: './connection-update.component.html',
-  imports: [FormsModule, FontAwesomeModule, AlertError, ForbiddenConnectionNamesValidatorDirective, ForbiddenConnectionKeysValidatorDirective, FieldTabDirective, SaveShortcutDirective],
+  imports: [
+    FormsModule,
+    FontAwesomeModule,
+    AlertError,
+    ForbiddenConnectionNamesValidatorDirective,
+    ForbiddenConnectionKeysValidatorDirective,
+    FieldTabDirective,
+    SaveShortcutDirective,
+  ],
 })
 export class ConnectionUpdateComponent implements OnInit {
   protected connectionService = inject(ConnectionService);
@@ -42,7 +50,7 @@ export class ConnectionUpdateComponent implements OnInit {
   connectionKeysKeys: Array<string> = [];
 
   public driversList: Array<string> = this.connections.driversList;
-  jmsProvidersList: Array<string> = ['ActiveMQ Artemis', 'ActiveMQ Classic', 'AMQ'];
+  jmsProvidersList: Array<string> = ['Artemis', 'ActiveMQ', 'AMQ'];
   pooledList: Array<String> = ['true', 'false'];
 
   public disableType!: boolean;
@@ -61,7 +69,7 @@ export class ConnectionUpdateComponent implements OnInit {
       res => {
         this.connectionNames = res.body!.map(s => s.name!);
       },
-      res => this.onError(res.body)
+      res => this.onError(res.body),
     );
     if (this.activatedRoute.snapshot.fragment && this.activatedRoute.snapshot.fragment !== 'clone') {
       this.connection.type = this.connections.connectionsList.find(st => st === this.activatedRoute.snapshot.fragment);
@@ -73,7 +81,6 @@ export class ConnectionUpdateComponent implements OnInit {
     } else {
       this.loadConnectionKeys(false);
     }
-
   }
 
   changeType(cloneHeader: boolean) {
@@ -83,8 +90,8 @@ export class ConnectionUpdateComponent implements OnInit {
         this.connectionKeysRemoveList.push(
           this.connectionKeys.splice(
             this.connectionKeys.indexOf(this.connectionKeys.find(sk => rsk.connectionKeyName === sk.key && sk.id !== undefined)!),
-            1
-          )[0]
+            1,
+          )[0],
         );
       });
     }
@@ -142,7 +149,7 @@ export class ConnectionUpdateComponent implements OnInit {
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IConnection>>) {
     result.subscribe(
       (res: HttpResponse<IConnection>) => this.onSaveSuccess(res.body!),
-      (res: HttpErrorResponse) => this.onSaveError()
+      (res: HttpErrorResponse) => this.onSaveError(),
     );
   }
 
@@ -173,10 +180,10 @@ export class ConnectionUpdateComponent implements OnInit {
   }
 
   private onError(error: any) {
-        this.alertService.addAlert({
-		  type: 'danger',
-		  message: error.message,
-		});
+    this.alertService.addAlert({
+      type: 'danger',
+      message: error.message,
+    });
   }
 
   protected onSaveError() {

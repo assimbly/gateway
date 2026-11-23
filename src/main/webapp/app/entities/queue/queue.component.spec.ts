@@ -28,7 +28,7 @@ describe('QueueComponent', () => {
     });
     const component = TestBed.createComponent(QueueComponent).componentInstance;
     component.isBroker.set(true);
-    component.brokerType.set('classic');
+    component.brokerType.set('activemq');
     return component;
   }
 

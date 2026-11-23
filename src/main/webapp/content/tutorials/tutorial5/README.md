@@ -36,7 +36,7 @@ You see the broker _default_. The green buttons under **Status** show that it ru
 > - A **topic** is like a queue, but every subscriber gets its own copy of each message.
 > - Queues and topics are under **Broker → Queues & Topics**.
 
-> **Where does _default_ come from?** The Gateway created it when it first started: an [ActiveMQ Artemis](https://activemq.apache.org/components/artemis/) broker that starts with the Gateway.
+> **Where does _default_ come from?** The Gateway created it when it first started: an [Artemis](https://activemq.apache.org/components/artemis/) broker that starts with the Gateway.
 
 > **What do Consumers and Messages count?** **Consumers** is the number of receivers connected, such as running Flows that read from a queue. **Messages** is the number of messages waiting, over all queues.
 
@@ -64,7 +64,7 @@ After a few seconds the green buttons are back.
 > **What's in it?**
 >
 > - **Autostart** _Yes_: the broker starts with the Gateway.
-> - **Type** `ActiveMQ Artemis`. The other option is `ActiveMQ Classic`.
+> - **Type** `Artemis`. The other option is `ActiveMQ`.
 > - **Configuration type** _File_: the broker uses the file below, `broker.xml`, from `~/.assimbly/broker/`. <!-- show: #field_configuration_type -->
 > - In the file, `<acceptors>` sets the ports clients connect to, such as `61616` for JMS, and `<addresses>` the queues that always exist, such as `DLQ` (the dead letter queue).
 

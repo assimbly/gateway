@@ -53,7 +53,7 @@ export class ConnectionDialogComponent implements OnInit {
   public isSaving!: boolean;
   public connectionKeysKeys: Array<string> = [];
   public driversList: Array<String> = this.connections.driversList;
-  jmsProvidersList: Array<String> = ['ActiveMQ Artemis', 'ActiveMQ Classic', 'AMQ'];
+  jmsProvidersList: Array<String> = ['Artemis', 'ActiveMQ', 'AMQ'];
   pooledList: Array<String> = ['true', 'false'];
 
   public disableType!: boolean;

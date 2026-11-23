@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <!-- ActiveMQ and Artemis are separate Apache projects now; the runtime no longer accepts broker type 'classic' -->
+    <changeSet id="20261123120000-1" author="gateway">
+        <update tableName="broker">
+            <column name="type" value="activemq"/>
+            <where>type = 'classic'</where>
+        </update>
+    </changeSet>
+
+    <!-- The runtime still accepts the old jmsprovider names; renamed so the UI dropdown matches them -->
+    <changeSet id="20261123120000-2" author="gateway">
+        <update tableName="connection_keys">
+            <column name="value" value="ActiveMQ"/>
+            <where>jhi_key = 'jmsprovider' AND value = 'ActiveMQ Classic'</where>
+        </update>
+        <update tableName="connection_keys">
+            <column name="value" value="Artemis"/>
+            <where>jhi_key = 'jmsprovider' AND value = 'ActiveMQ Artemis'</where>
+        </update>
+    </changeSet>
+
+    <!-- The built-in broker's Connection is an Artemis Connection, so Artemis Steps can use it; Camel routes' sjms: endpoints still can -->
+    <changeSet id="20261123120000-3" author="gateway">
+        <update tableName="connection">
+            <column name="type" value="Artemis"/>
+            <where>name = 'Gateway broker' AND type = 'SJMS'</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>

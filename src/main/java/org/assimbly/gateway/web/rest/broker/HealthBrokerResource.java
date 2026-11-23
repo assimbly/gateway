@@ -1,11 +1,19 @@
 package org.assimbly.gateway.web.rest.broker;
 
-import tools.jackson.databind.ObjectMapper;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.io.ByteArrayOutputStream;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryUsage;
+import java.lang.management.ThreadMXBean;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.Objects;
 import org.assimbly.brokerrest.ManagedBrokerRuntime;
+import org.assimbly.gateway.service.BrokerService;
 import org.assimbly.gateway.service.HealthService;
+import org.assimbly.gateway.service.dto.BrokerDTO;
 import org.assimbly.gateway.service.response.BackendResponse;
 import org.assimbly.util.rest.ResponseUtil;
 import org.slf4j.Logger;
@@ -18,13 +26,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.io.ByteArrayOutputStream;
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryUsage;
-import java.lang.management.ThreadMXBean;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * REST controller for getting the {@link AuditEvent}s.
@@ -38,8 +40,11 @@ public class HealthBrokerResource {
 
     private final HealthService healthService;
 
-    public HealthBrokerResource(HealthService healthService) {
+    private final BrokerService brokerService;
+
+    public HealthBrokerResource(HealthService healthService, BrokerService brokerService) {
         this.healthService = healthService;
+        this.brokerService = brokerService;
     }
 
     @Autowired
@@ -50,10 +55,11 @@ public class HealthBrokerResource {
     @Operation(summary = "Get broker statistics")
     @GetMapping(
         path = "/engine",
-        produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE}
+        produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE }
     )
-    public ResponseEntity<String> getBrokerStats(@Parameter(hidden = true) @RequestHeader(value = "Accept") String mediaType) throws Exception {
-
+    public ResponseEntity<String> getBrokerStats(
+        @Parameter(hidden = true) @RequestHeader(value = "Accept") String mediaType
+    ) throws Exception {
         plainResponse = true;
         long connectorId = 1;
 
@@ -61,24 +67,28 @@ public class HealthBrokerResource {
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
             final ObjectMapper mapper = new ObjectMapper();
 
-            Map<String, Object> statsMap = managedBroker.getStats("classic");
+            Map<String, Object> statsMap = managedBroker.getStats(configuredBrokerType());
 
             mapper.writeValue(out, statsMap);
 
-            return ResponseUtil.createSuccessResponse(connectorId, mediaType, "/health/broker", out.toString(StandardCharsets.UTF_8), plainResponse);
+            return ResponseUtil.createSuccessResponse(
+                connectorId,
+                mediaType,
+                "/health/broker",
+                out.toString(StandardCharsets.UTF_8),
+                plainResponse
+            );
         } catch (Exception e) {
-            log.error("Get broker failed",e);
-            return ResponseUtil.createFailureResponse(connectorId, mediaType,"/health/broker",e.getMessage());
+            log.error("Get broker failed", e);
+            return ResponseUtil.createFailureResponse(connectorId, mediaType, "/health/broker", e.getMessage());
         }
     }
 
     @Operation(summary = "Get broker JVM statistics")
-    @GetMapping(
-        path = "/jvm",
-        produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE}
-    )
-    public ResponseEntity<String> getJvmStats(@Parameter(hidden = true) @RequestHeader(value = "Accept") String mediaType) throws Exception {
-
+    @GetMapping(path = "/jvm", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, MediaType.TEXT_PLAIN_VALUE })
+    public ResponseEntity<String> getJvmStats(
+        @Parameter(hidden = true) @RequestHeader(value = "Accept") String mediaType
+    ) throws Exception {
         plainResponse = true;
         long connectorId = 1;
 
@@ -94,7 +104,7 @@ public class HealthBrokerResource {
             backendResponse.addMemory("max", healthService.convertSizeToKb((double) mem.getMax()));
             backendResponse.addMemory("committed", healthService.convertSizeToKb((double) mem.getCommitted()));
             backendResponse.addMemory("cached", healthService.convertSizeToKb(mem.getCommitted() - (double) mem.getUsed()));
-            backendResponse.addMemory("currentUsedPercentage", (mem.getUsed() * 100 / mem.getMax()));
+            backendResponse.addMemory("currentUsedPercentage", (mem.getUsed() * 100) / mem.getMax());
 
             backendResponse.addThread("threadCount", threadMXBean.getThreadCount());
             backendResponse.addThread("peakThreadCount", threadMXBean.getPeakThreadCount());
@@ -103,10 +113,21 @@ public class HealthBrokerResource {
             backendResponse.addJvm("maxFileDescriptors", healthService.invokeMethod("getMaxFileDescriptorCount"));
 
             mapper.writeValue(out, backendResponse);
-            return org.assimbly.util.rest.ResponseUtil.createSuccessResponse(connectorId, mediaType, "/health/jvm", out.toString(StandardCharsets.UTF_8), plainResponse);
+            return org.assimbly.util.rest.ResponseUtil.createSuccessResponse(
+                connectorId,
+                mediaType,
+                "/health/jvm",
+                out.toString(StandardCharsets.UTF_8),
+                plainResponse
+            );
         } catch (Exception e) {
-            log.error("Get jvm failed",e);
-            return ResponseUtil.createFailureResponse(connectorId, mediaType,"/health/jvm",e.getMessage());
+            log.error("Get jvm failed", e);
+            return ResponseUtil.createFailureResponse(connectorId, mediaType, "/health/jvm", e.getMessage());
         }
+    }
+
+    /** The Gateway runs one broker; Artemis is what first start configures when none is stored. */
+    private String configuredBrokerType() {
+        return brokerService.findAll().stream().map(BrokerDTO::getType).filter(Objects::nonNull).findFirst().orElse("artemis");
     }
 }

@@ -81,7 +81,7 @@ public class OpenApiDocsConfiguration {
 
     /** Example bodies of entities (without id) and other JSON objects, keyed by class name. */
     private static final Map<String, String> ENTITY_BODIES = Map.ofEntries(
-        entry("BrokerDTO", "{\"name\":\"Broker\",\"type\":\"classic\",\"configurationType\":\"file\",\"autoStart\":false}"),
+        entry("BrokerDTO", "{\"name\":\"Broker\",\"type\":\"activemq\",\"configurationType\":\"file\",\"autoStart\":false}"),
         entry(
             "CertificateDTO",
             "{\"url\":\"https://example.com\",\"certificateName\":\"example.com\",\"certificateStore\":\"outbound-truststore.p12\",\"certificateFile\":\"-----BEGIN CERTIFICATE-----\\nMIIC...\\n-----END CERTIFICATE-----\"}"

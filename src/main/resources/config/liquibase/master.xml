@@ -34,6 +34,7 @@
     <include file="config/liquibase/changelog/20261019010000_added_column_password_change_required_jhi_user.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20261108120000_added_table_flow_variable.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20261114120000_dropped_column_lang_key_jhi_user.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20261123120000_renamed_activemq_broker_types.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20180114132915_added_entity_constraints_Flow.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20180114201816_added_entity_constraints_Step.xml" relativeToChangelogFile="false"/>

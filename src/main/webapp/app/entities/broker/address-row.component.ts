@@ -25,7 +25,7 @@ export class AddressRowComponent {
   readonly endpointType = input<'queue' | 'topic'>('queue');
 
   get clearLabel(): string {
-    return this.endpointType() === 'topic' && this.brokerType() === 'classic' ? 'Reset' : 'Clear';
+    return this.endpointType() === 'topic' && this.brokerType() === 'activemq' ? 'Reset' : 'Clear';
   }
 
   delete(address: IAddress): void {

@@ -1,5 +1,13 @@
 package org.assimbly.gateway.config.firststart;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.StringReader;
+import java.util.List;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
 import org.assimbly.gateway.GatewayApp;
 import org.assimbly.gateway.config.exporting.Export;
 import org.assimbly.gateway.domain.Flow;
@@ -16,15 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
-import java.io.StringReader;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /** A new Gateway gets an example Flow and a default broker, so a new user has something to start from. */
 @SpringBootTest(classes = GatewayApp.class)
@@ -60,11 +59,13 @@ class FirstStartIntTest {
         Integration integration = firstStart.setUp(true, true);
 
         List<Flow> flows = flowRepository.findAllByIntegrationId(integration.getId());
-        assertThat(flows).singleElement().satisfies(flow -> {
-            assertThat(flow.getName()).isEqualTo("ExampleFlow");
-            assertThat(flow.getType()).isEqualTo("flow");
-            assertThat(flow.isAutoStart()).isFalse();
-        });
+        assertThat(flows)
+            .singleElement()
+            .satisfies(flow -> {
+                assertThat(flow.getName()).isEqualTo("ExampleFlow");
+                assertThat(flow.getType()).isEqualTo("flow");
+                assertThat(flow.isAutoStart()).isFalse();
+            });
     }
 
     @Test
@@ -89,12 +90,14 @@ class FirstStartIntTest {
     void theDefaultBrokerIsArtemisStartedWithTheGateway() {
         firstStart.setUp(true, true);
 
-        assertThat(brokerService.findAll()).singleElement().satisfies(broker -> {
-            assertThat(broker.getName()).isEqualTo("default");
-            assertThat(broker.getType()).isEqualTo("artemis");
-            assertThat(broker.getConfigurationType()).isEqualTo("file");
-            assertThat(broker.isAutoStart()).isTrue();
-        });
+        assertThat(brokerService.findAll())
+            .singleElement()
+            .satisfies(broker -> {
+                assertThat(broker.getName()).isEqualTo("default");
+                assertThat(broker.getType()).isEqualTo("artemis");
+                assertThat(broker.getConfigurationType()).isEqualTo("file");
+                assertThat(broker.isAutoStart()).isTrue();
+            });
     }
 
     @Test
@@ -110,7 +113,7 @@ class FirstStartIntTest {
     void anExistingBrokerIsKept() {
         BrokerDTO existing = new BrokerDTO();
         existing.setName("mine");
-        existing.setType("classic");
+        existing.setType("activemq");
         existing.setConfigurationType("file");
         existing.setAutoStart(false);
         brokerService.save(existing);
@@ -122,7 +125,9 @@ class FirstStartIntTest {
 
     private Document export(Long flowId) throws Exception {
         String xml = dilExport.convertDBToFlowConfiguration(flowId, "application/xml", false);
-        return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(xml)));
+        return DocumentBuilderFactory.newInstance()
+            .newDocumentBuilder()
+            .parse(new InputSource(new StringReader(xml)));
     }
 
     private Element step(Document doc, String type) throws Exception {

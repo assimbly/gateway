@@ -72,12 +72,12 @@ describe('BrokerMessageSenderComponent', () => {
   });
 
   it('pre-fills the destination from the query params', () => {
-    create({ endpointName: 'news', endpointType: 'topic', brokerType: 'classic' });
+    create({ endpointName: 'news', endpointType: 'topic', brokerType: 'activemq' });
 
     expect(comp.openedFromEndpoint).toBe(true);
     expect(comp.selectedEndpointType).toBe('topic');
     expect(comp.messageSenderForm.controls.destination.value).toBe('news');
-    expect(topicService.getAllTopics).toHaveBeenCalledWith('classic');
+    expect(topicService.getAllTopics).toHaveBeenCalledWith('activemq');
     expect(comp.suggestions).toEqual(['news']);
   });
 

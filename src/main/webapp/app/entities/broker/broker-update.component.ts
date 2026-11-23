@@ -132,7 +132,7 @@ export class BrokerUpdateComponent implements OnInit {
   }
 
   onTypeChange(brokerType: string) {
-    if (brokerType === 'classic') {
+    if (brokerType === 'activemq') {
       this.artemisConfiguration = this.brokerConfiguration;
       this.brokerConfiguration = this.activemqConfiguration;
     } else {
@@ -144,9 +144,9 @@ export class BrokerUpdateComponent implements OnInit {
   setPopoverMessages() {
     this.namePopoverMessage = `Name of the broker.`;
     this.autostartPopoverMessage = `If true then the broker starts automatically when the gateway starts.`;
-    this.typePopoverMessage = `The ActiveMQ broker to use. Either ActiveMQ Classic or Artemis. Artemis is default`;
+    this.typePopoverMessage = `The ActiveMQ broker to use. Either ActiveMQ or Artemis. Artemis is default`;
     this.configurationTypePopoverMessage = `The type of configuration. Embedded starts a broker as localhost (for quick testing), File is default.`;
-    this.brokerConfigurationPopoverMessage = `The broker file (activemq.xml for Classic and broker.xml for Artemis). When the configuration is empty than a default file is created. Check the ActiveMQ or Artemis documentation how to configure the brokers.`;
+    this.brokerConfigurationPopoverMessage = `The broker file (activemq.xml for ActiveMQ and broker.xml for Artemis). When the configuration is empty than a default file is created. Check the ActiveMQ or Artemis documentation how to configure the brokers.`;
   }
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IBroker>>) {

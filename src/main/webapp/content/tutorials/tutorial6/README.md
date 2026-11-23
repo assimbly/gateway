@@ -8,9 +8,9 @@
 - Take them off with another Flow
 - See messages wait while the receiver is stopped
 
-**FileToQueue:** **File** → **Simple JMS**, onto _OrdersQueue_
+**FileToQueue:** **File** → **Artemis**, onto _OrdersQueue_
 
-**QueueToFile:** **Simple JMS** → **File**, off _OrdersQueue_
+**QueueToFile:** **Artemis** → **File**, off _OrdersQueue_
 
 It takes about 15 minutes.
 
@@ -39,13 +39,13 @@ You put a queue between two Flows. The first puts files on it, the second takes 
 ## Step 2: Put the files on a queue
 
 1. Click the **Sink** on the canvas. <!-- show: .flow-step-sink -->
-2. Click **Component**, type `sjms` and choose **Simple JMS**. <!-- show: [formcontrolname="componentType"] -->
+2. Click **Component**, type `artemis` and choose **Artemis**. <!-- show: [formcontrolname="componentType"] -->
 3. Set **Destination Name** to `OrdersQueue`. <!-- show: [formcontrolname="uri"] -->
 4. Check that **Connection** says _Gateway broker_. <!-- show: [formcontrolname="connection"] -->
 
 > **Do I create the queue first?** No. The broker creates it the first time a Flow uses it.
 
-> **What is the Connection for?** A JMS component needs to know which broker to talk to. The Gateway comes with a Connection to its built-in broker, _Gateway broker_, and picks it for you when it's the only one.
+> **What is the Connection for?** The Artemis component needs to know which broker to talk to. The Gateway comes with an Artemis Connection to its built-in broker, _Gateway broker_, and picks it for you when it's the only one.
 
 ## Step 3: Start it and send files
 
@@ -75,7 +75,7 @@ _OrdersQueue_ has 3 messages and 0 consumers: no one reads from it.
 1. Go to **Flows → Manage** and clone _TestFlow_ once more. <!-- show: tr[data-flow-name="TestFlow"] [aria-label="More actions"] @ / -->
 2. At the top left, where it says _Flow name_, type `QueueToFile`. <!-- show: #field_flowName -->
 3. Click the **Source** on the canvas. <!-- show: .flow-step-source -->
-4. Click **Component**, type `sjms` and choose **Simple JMS**. <!-- show: [formcontrolname="componentType"] -->
+4. Click **Component**, type `artemis` and choose **Artemis**. <!-- show: [formcontrolname="componentType"] -->
 5. Set **Destination Name** to `OrdersQueue`. <!-- show: [formcontrolname="uri"] -->
 6. Check that **Connection** says _Gateway broker_. <!-- show: [formcontrolname="connection"] -->
 
@@ -99,11 +99,11 @@ The Steps on the canvas show **3**: _QueueToFile_ took the waiting messages off 
 
 ## Summary
 
-| What                        | Where                              | What it does                                                                                       |
-| --------------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------- |
-| **Simple JMS** Sink         | _FileToQueue_                      | Puts every message on _OrdersQueue_.                                                               |
-| **Simple JMS** Source       | _QueueToFile_                      | Takes every message off _OrdersQueue_.                                                             |
-| Connection _Gateway broker_ | **Connection** field of a JMS Step | Tells the JMS component how to reach the broker. The Gateway comes with it; every Flow can use it. |
-| _OrdersQueue_               | **Broker → Queues & Topics**       | Holds the messages until a Flow takes them off.                                                    |
+| What                        | Where                                   | What it does                                                                                           |
+| --------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| **Artemis** Sink            | _FileToQueue_                           | Puts every message on _OrdersQueue_.                                                                   |
+| **Artemis** Source          | _QueueToFile_                           | Takes every message off _OrdersQueue_.                                                                 |
+| Connection _Gateway broker_ | **Connection** field of an Artemis Step | Tells the Artemis component how to reach the broker. The Gateway comes with it; every Flow can use it. |
+| _OrdersQueue_               | **Broker → Queues & Topics**            | Holds the messages until a Flow takes them off.                                                        |
 
 **Done!** You built your first Flows with message queueing. Know Camel? Continue with [Tutorial 7: Create a simple route](https://github.com/assimbly/gateway/wiki/tutorial6-simple-route).

@@ -1,5 +1,9 @@
 package org.assimbly.gateway.config.firststart;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.assimbly.gateway.GatewayApp;
 import org.assimbly.gateway.domain.EnvironmentVariables;
 import org.assimbly.gateway.repository.EnvironmentVariablesRepository;
@@ -13,11 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /** Every Gateway has a messages folder Variable and, until it has one of its own, a Connection to the built-in broker. */
 @SpringBootTest(classes = GatewayApp.class)
@@ -52,27 +51,37 @@ class GatewayConventionsIntTest {
     void theMessagesVariableIsAFolderInTheHomeFolder() {
         conventions.addMissing();
 
-        assertThat(variablesRepository.findAll()).singleElement().satisfies(variable -> {
-            assertThat(variable.getKey()).isEqualTo("messages");
-            assertThat(variable.getValue()).isEqualTo(System.getProperty("user.home").replace('\\', '/') + "/messages");
-            assertThat(variable.getIntegration()).isNotNull();
-        });
+        assertThat(variablesRepository.findAll())
+            .singleElement()
+            .satisfies(variable -> {
+                assertThat(variable.getKey()).isEqualTo("messages");
+                assertThat(variable.getValue()).isEqualTo(System.getProperty("user.home").replace('\\', '/') + "/messages");
+                assertThat(variable.getIntegration()).isNotNull();
+            });
     }
 
     @Test
     void theGatewayBrokerConnectionIsAPooledArtemisConnectionWithAnEncryptedPassword() {
         conventions.addMissing();
 
-        ConnectionDTO connection = connectionService.getAll().stream().filter(c -> "Gateway broker".equals(c.getName())).findFirst().orElseThrow();
-        assertThat(connection.getType()).isEqualTo("SJMS");
+        ConnectionDTO connection = connectionService
+            .getAll()
+            .stream()
+            .filter(c -> "Gateway broker".equals(c.getName()))
+            .findFirst()
+            .orElseThrow();
+        assertThat(connection.getType()).isEqualTo("Artemis");
 
-        Map<String, String> keys = connectionKeysService.findAll().stream()
-                .filter(key -> connection.getId().equals(key.getConnectionId()))
-                .collect(Collectors.toMap(ConnectionKeysDTO::getKey, ConnectionKeysDTO::getValue));
-        assertThat(keys).containsEntry("url", "tcp://localhost:61616")
-                .containsEntry("username", "admin")
-                .containsEntry("jmsprovider", "ActiveMQ Artemis")
-                .containsEntry("pooled", "true");
+        Map<String, String> keys = connectionKeysService
+            .findAll()
+            .stream()
+            .filter(key -> connection.getId().equals(key.getConnectionId()))
+            .collect(Collectors.toMap(ConnectionKeysDTO::getKey, ConnectionKeysDTO::getValue));
+        assertThat(keys)
+            .containsEntry("url", "tcp://localhost:61616")
+            .containsEntry("username", "admin")
+            .containsEntry("pooled", "true")
+            .doesNotContainKey("jmsprovider");
         assertThat(keys.get("password")).startsWith("ENC(").isNotEqualTo("admin");
     }
 
@@ -95,7 +104,7 @@ class GatewayConventionsIntTest {
 
         ConnectionDTO own = new ConnectionDTO();
         own.setName("LocalBroker");
-        own.setType("SJMS");
+        own.setType("Artemis");
         connectionService.save(own);
 
         conventions.addMissing();

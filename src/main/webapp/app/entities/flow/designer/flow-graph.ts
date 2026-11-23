@@ -817,6 +817,7 @@ export const COMPONENTS_WITH_CONNECTION: readonly string[] = [
   'amazonmq',
   'amqp',
   'amqps',
+  'artemis',
   'jms',
   'sjms',
   'sjms2',
