@@ -1,12 +1,6 @@
 package org.assimbly.gateway.config.security;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.logging.DeferredLogFactory;
-import org.springframework.mock.env.MockEnvironment;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,8 +9,13 @@ import java.nio.file.Path;
 import java.util.Base64;
 import java.util.Properties;
 import java.util.function.Supplier;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.logging.DeferredLogFactory;
+import org.springframework.mock.env.MockEnvironment;
 
 /** Every Gateway gets secrets of its own, unless its configuration sets them. */
 class GeneratedSecretsTest {
@@ -86,14 +85,39 @@ class GeneratedSecretsTest {
     }
 
     @Test
-    void headlessIsLeftAlone() {
-        MockEnvironment env = new MockEnvironment();
+    void theRuntimeJwtSecretIsTheTokenKeyWhenSet() {
+        MockEnvironment env = process(
+            new MockEnvironment()
+                .withProperty(GeneratedSecrets.RUNTIME_JWT_SECRET, "server-jwt")
+                .withProperty(GeneratedSecrets.RUNTIME_ENCRYPTION_SECRET, "server-key")
+        );
+
+        assertThat(env.getProperty(GeneratedSecrets.JWT_SECRET)).isEqualTo("server-jwt");
+        assertThat(home.resolve(".assimbly/security/secrets.properties")).doesNotExist();
+    }
+
+    @Test
+    void aConfiguredTokenKeyWinsOverTheRuntimeOne() {
+        MockEnvironment env = process(
+            new MockEnvironment()
+                .withProperty(GeneratedSecrets.JWT_SECRET, "configured-jwt")
+                .withProperty(GeneratedSecrets.RUNTIME_JWT_SECRET, "server-jwt")
+        );
+
+        assertThat(env.getProperty(GeneratedSecrets.JWT_SECRET)).isEqualTo("configured-jwt");
+    }
+
+    @Test
+    void headlessGetsATokenKeyOfItsOwnToo() {
+        // Headless configures its encryption key, but no longer a (published) token key
+        MockEnvironment env = new MockEnvironment().withProperty(GeneratedSecrets.ENCRYPTION_SECRET, "headless-key");
         env.setActiveProfiles("headless");
 
         process(env);
 
-        assertThat(env.getProperty(GeneratedSecrets.JWT_SECRET)).isNull();
-        assertThat(home.resolve(".assimbly")).doesNotExist();
+        assertThat(env.getProperty(GeneratedSecrets.JWT_SECRET)).isNotBlank();
+        assertThat(env.getProperty(GeneratedSecrets.ENCRYPTION_SECRET)).isEqualTo("headless-key");
+        assertThat(home.resolve(".assimbly/security/secrets.properties")).exists();
     }
 
     private static MockEnvironment process(MockEnvironment env) {

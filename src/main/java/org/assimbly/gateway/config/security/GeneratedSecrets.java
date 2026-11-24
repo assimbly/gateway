@@ -1,15 +1,5 @@
 package org.assimbly.gateway.config.security;
 
-import org.apache.commons.logging.Log;
-import org.assimbly.gateway.config.BaseDirectorySetting;
-import org.springframework.boot.EnvironmentPostProcessor;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.logging.DeferredLogFactory;
-import org.springframework.core.Ordered;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.Profiles;
-import org.springframework.core.env.PropertiesPropertySource;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -21,19 +11,26 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Properties;
+import org.apache.commons.logging.Log;
+import org.assimbly.gateway.config.BaseDirectorySetting;
+import org.springframework.boot.EnvironmentPostProcessor;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.logging.DeferredLogFactory;
+import org.springframework.core.Ordered;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.PropertiesPropertySource;
 
 /**
  * Gives every Gateway its own secrets: the key that signs login tokens and the key that encrypts Connection keys and
- * Variables. A secret the configuration sets always wins. Otherwise the encryption key is ASSIMBLY_ENCRYPTION_SECRET
- * when that is set, so the Gateway and the runtime use the same key, and anything still missing is generated once and
- * kept in {@code .assimbly/security/secrets.properties}.
- * <p>
- * The headless build gets its secrets from where it runs, so it is left alone.
+ * Variables. A secret the configuration sets always wins. Otherwise the token key is ASSIMBLY_JWT_SECRET and the
+ * encryption key ASSIMBLY_ENCRYPTION_SECRET when they are set (so a server can give its Gateways the same keys), and
+ * anything still missing is generated once and kept in {@code .assimbly/security/secrets.properties}.
  */
 public class GeneratedSecrets implements EnvironmentPostProcessor, Ordered {
 
     public static final String JWT_SECRET = "jhipster.security.authentication.jwt.base64-secret";
     public static final String ENCRYPTION_SECRET = "encryption.jasypt.password";
+    public static final String RUNTIME_JWT_SECRET = "ASSIMBLY_JWT_SECRET";
     public static final String RUNTIME_ENCRYPTION_SECRET = "ASSIMBLY_ENCRYPTION_SECRET";
 
     static final String PROPERTY_SOURCE_NAME = "generatedSecrets";
@@ -54,10 +51,6 @@ public class GeneratedSecrets implements EnvironmentPostProcessor, Ordered {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        if (environment.acceptsProfiles(Profiles.of("headless"))) {
-            return;
-        }
-
         boolean needsJwtSecret = isBlank(environment.getProperty(JWT_SECRET));
         boolean needsEncryptionSecret = isBlank(environment.getProperty(ENCRYPTION_SECRET));
         if (!needsJwtSecret && !needsEncryptionSecret) {
@@ -65,6 +58,11 @@ public class GeneratedSecrets implements EnvironmentPostProcessor, Ordered {
         }
 
         Properties secrets = new Properties();
+        String runtimeJwtSecret = environment.getProperty(RUNTIME_JWT_SECRET);
+        if (needsJwtSecret && !isBlank(runtimeJwtSecret)) {
+            secrets.setProperty(JWT_SECRET, runtimeJwtSecret);
+            needsJwtSecret = false;
+        }
         String runtimeSecret = environment.getProperty(RUNTIME_ENCRYPTION_SECRET);
         if (needsEncryptionSecret && !isBlank(runtimeSecret)) {
             secrets.setProperty(ENCRYPTION_SECRET, runtimeSecret);
@@ -126,7 +124,10 @@ public class GeneratedSecrets implements EnvironmentPostProcessor, Ordered {
         try {
             Files.createDirectories(file.getParent());
             try (OutputStream out = Files.newOutputStream(file)) {
-                secrets.store(out, "Secrets of this Gateway. Keep this file private, and keep it with the database: without it, encrypted values can't be read.");
+                secrets.store(
+                    out,
+                    "Secrets of this Gateway. Keep this file private, and keep it with the database: without it, encrypted values can't be read."
+                );
             }
             PosixFileAttributeView posix = Files.getFileAttributeView(file, PosixFileAttributeView.class);
             if (posix != null) {

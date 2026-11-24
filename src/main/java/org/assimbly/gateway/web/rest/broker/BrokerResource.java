@@ -41,7 +41,7 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 @Tag(name = "Brokers", description = "Manage the broker configurations")
 @Lazy(false)
-@DependsOn("firstStart") // a new Gateway's default broker must exist before the brokers are autostarted
+@DependsOn("environmentOverrides") // a new Gateway's default broker, and the broker the server sets, before the brokers are autostarted
 @RestController
 @RequestMapping("/api")
 public class BrokerResource implements ApplicationRunner {

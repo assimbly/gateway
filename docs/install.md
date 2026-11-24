@@ -73,6 +73,20 @@ Your browser opens **[http://localhost:8080](http://localhost:8080)** automatica
 
 > **Secure by default.** On its first start the Gateway generates its own keys for login tokens and for encrypting secrets, and keeps them in `.assimbly/security/secrets.properties` in your home folder (in `/data` with Docker). Keep that file with your database: without it, stored secrets can't be read. Registration is off: an administrator adds users under **Administration → Users**.
 
+### Settings for servers
+
+A server (or its deployment tooling) can set these environment variables on the container. They win over what the database holds and are applied on every start; one that isn't set leaves the database as it is. Every API call needs a login, also on the headless runtime: `POST /api/authenticate` with `{"username", "password"}` answers with a token to send as `Authorization: Bearer <token>`. Health (`/health/**`, `/management/health`, `/management/info`) stays public.
+
+| Variable | Where | What it does |
+| :--- | :--- | :--- |
+| `ASSIMBLY_API_USERNAME`, `ASSIMBLY_API_PASSWORD` | all | The user other services log in with. With a database it is created when missing, as a user (not an administrator); headless it is the API's one user, which is `admin`/`admin` (with a warning at startup) while these are not set. |
+| `ASSIMBLY_JWT_SECRET` | all | The key that signs login tokens: base64, at least 512 bits (`openssl rand -base64 64`). Otherwise the key in `secrets.properties`. |
+| `ASSIMBLY_ADMIN_PASSWORD` | with a database | The password of `admin`. |
+| `ASSIMBLY_BROKER_TYPE` | with a database | `activemq` or `artemis`: the type of the broker. Without a broker, one is created that starts with the Gateway. |
+| `ASSIMBLY_BROKER_CONFIGURATION` | with a database | The broker's configuration type, such as `file` (`activemq.xml` or `broker.xml` in `.assimbly/broker`). |
+
+A password set this way doesn't have to be changed at sign-in. Headless, a Mongo user's token from `GET /api/db/authenticate` (signed with `MONGO_SECRET_KEY`) is a login too, with or without `Bearer`.
+
 ---
 
 ## Troubleshooting

@@ -22,6 +22,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
@@ -84,10 +85,11 @@ public class SecurityConfiguration {
     private final ApplicationProperties.Security security;
     private final JwtAuthenticationConverter jwtAuthenticationConverter;
     private final PasswordChangeGate passwordChangeGate;
+    private final BearerTokenResolver bearerTokenResolver;
 
     private final boolean development;
-    // Outside dev and headless, the Gateway is locked down unless its configuration opens something up.
-    // The headless endpoints check their own credentials (Basic header or their own JWT).
+    // Outside dev, the Gateway is locked down unless its configuration opens something up. Headless too: its API
+    // answers whoever logged in at /api/authenticate, or, as a Mongo user, at /api/db/authenticate.
     private final boolean secured;
 
     public SecurityConfiguration(
@@ -95,14 +97,16 @@ public class SecurityConfiguration {
         JHipsterProperties jHipsterProperties,
         ApplicationProperties applicationProperties,
         JwtAuthenticationConverter jwtAuthenticationConverter,
-        PasswordChangeGate passwordChangeGate
+        PasswordChangeGate passwordChangeGate,
+        BearerTokenResolver bearerTokenResolver
     ) {
         this.jHipsterProperties = jHipsterProperties;
         this.security = applicationProperties.getSecurity();
         this.jwtAuthenticationConverter = jwtAuthenticationConverter;
         this.passwordChangeGate = passwordChangeGate;
+        this.bearerTokenResolver = bearerTokenResolver;
         this.development = env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT));
-        this.secured = !development && !env.acceptsProfiles(Profiles.of("headless"));
+        this.secured = !development;
     }
 
     @Bean
@@ -121,7 +125,9 @@ public class SecurityConfiguration {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .headers(this::securityHeaders)
             .authorizeHttpRequests(this::authorizeRequests)
-            .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)))
+            .oauth2ResourceServer(oauth2 ->
+                oauth2.bearerTokenResolver(bearerTokenResolver).jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter))
+            )
             .exceptionHandling(exceptions ->
                 exceptions
                     .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
@@ -151,6 +157,9 @@ public class SecurityConfiguration {
             .requestMatchers(STATIC_RESOURCES)
             .permitAll()
             .requestMatchers(HttpMethod.POST, "/api/authenticate")
+            .permitAll()
+            // The login of a user kept in Mongo, which answers with a token for the API
+            .requestMatchers(HttpMethod.GET, "/api/db/authenticate")
             .permitAll()
             .requestMatchers(HttpMethod.GET, "/api/account/first-sign-in")
             .permitAll()
@@ -189,7 +198,7 @@ public class SecurityConfiguration {
             .hasAuthority(AuthoritiesConstants.ADMIN);
     }
 
-    // On dev and headless the API is open, so Swagger UI and curl work without logging in
+    // On dev the API is open, so Swagger UI and curl work without logging in
     private void openAccess(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authz) {
         if (development) {
             authz
