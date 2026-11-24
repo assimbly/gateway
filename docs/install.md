@@ -85,7 +85,7 @@ A server (or its deployment tooling) can set these environment variables on the 
 | `ASSIMBLY_BROKER_TYPE` | with a database | `activemq` or `artemis`: the type of the broker. Without a broker, one is created that starts with the Gateway. |
 | `ASSIMBLY_BROKER_CONFIGURATION` | with a database | The broker's configuration type, such as `file` (`activemq.xml` or `broker.xml` in `.assimbly/broker`). |
 
-A password set this way doesn't have to be changed at sign-in. Headless, a Mongo user's token from `GET /api/db/authenticate` (signed with `MONGO_SECRET_KEY`) is a login too, with or without `Bearer`.
+A password set this way doesn't have to be changed at sign-in.
 
 ---
 
