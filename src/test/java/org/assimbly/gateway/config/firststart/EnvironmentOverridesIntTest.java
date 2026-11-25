@@ -184,6 +184,14 @@ class EnvironmentOverridesIntTest {
             });
     }
 
+    @Test
+    void aBrokerTypeTheRuntimeDoesntKnowStopsTheStart() {
+        env.withProperty(EnvironmentOverrides.BROKER_TYPE, "activmq");
+
+        assertThatThrownBy(this::apply).isInstanceOf(IllegalStateException.class).hasMessageContaining("activmq").hasMessageContaining("activemq, artemis");
+        assertThat(brokerService.findAll()).isEmpty();
+    }
+
     private void apply() {
         new EnvironmentOverrides(
             env,

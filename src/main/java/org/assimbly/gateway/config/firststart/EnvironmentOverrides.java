@@ -56,6 +56,9 @@ public class EnvironmentOverrides {
 
     static final String ADMIN = "admin";
 
+    /** The broker types the runtime accepts. */
+    static final List<String> BROKER_TYPES = List.of("activemq", "artemis");
+
     private final Logger log = LoggerFactory.getLogger(EnvironmentOverrides.class);
 
     private final Environment env;
@@ -107,10 +110,13 @@ public class EnvironmentOverrides {
             setPassword(ADMIN, adminPassword, ADMIN_PASSWORD, AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER);
         }
 
-        String brokerType = value(BROKER_TYPE);
+        String brokerType = lowerCase(value(BROKER_TYPE));
+        if (brokerType != null && !BROKER_TYPES.contains(brokerType)) {
+            throw new IllegalStateException(BROKER_TYPE + " is '" + brokerType + "': use one of " + String.join(", ", BROKER_TYPES));
+        }
         String brokerConfiguration = value(BROKER_CONFIGURATION);
         if (brokerType != null || brokerConfiguration != null) {
-            applyBroker(lowerCase(brokerType), lowerCase(brokerConfiguration));
+            applyBroker(brokerType, lowerCase(brokerConfiguration));
         }
     }
 

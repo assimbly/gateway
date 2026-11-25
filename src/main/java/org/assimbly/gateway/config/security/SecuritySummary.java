@@ -16,9 +16,6 @@ public final class SecuritySummary {
     static final String PUBLIC_JWT_SECRET =
         "bXktc2VjcmV0LWtleS13aGljaC1zaG91bGQtYmUtY2hhbmdlZC1pbi1wcm9kdWN0aW9uLWFuZC1iZS1iYXNlNjQtZW5jb2RlZAo=";
 
-    /** The password of the headless runtime's one user when ASSIMBLY_API_PASSWORD isn't set. */
-    static final String DEFAULT_HEADLESS_PASSWORD = "admin";
-
     private SecuritySummary() {}
 
     public static List<String> risks(Environment env) {
@@ -34,7 +31,16 @@ public final class SecuritySummary {
                     "): anyone can make one. Remove it to get a key of this Gateway's own."
             );
         }
-        if (headless && DEFAULT_HEADLESS_PASSWORD.equals(env.getProperty("spring.security.user.password"))) {
+        // The configured key wins over ASSIMBLY_JWT_SECRET (see GeneratedSecrets), so a different one is ignored
+        String runtimeJwtSecret = env.getProperty(GeneratedSecrets.RUNTIME_JWT_SECRET);
+        if (runtimeJwtSecret != null && !runtimeJwtSecret.isBlank() && !runtimeJwtSecret.equals(env.getProperty(GeneratedSecrets.JWT_SECRET))) {
+            risks.add(
+                "ASSIMBLY_JWT_SECRET differs from " +
+                    GeneratedSecrets.JWT_SECRET +
+                    " (JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET), which wins: ASSIMBLY_JWT_SECRET is ignored. Set only one of them."
+            );
+        }
+        if (headless && HeadlessApiUser.hasDefaultPassword(env.getProperty("spring.security.user.password"))) {
             risks.add("The API accepts the login admin/admin, which everyone knows. Set ASSIMBLY_API_USERNAME and ASSIMBLY_API_PASSWORD.");
         }
         // Headless stores no Variables or Connection keys (it has no database), so the mismatch can't hurt there

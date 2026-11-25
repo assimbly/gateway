@@ -79,10 +79,10 @@ A server (or its deployment tooling) can set these environment variables on the 
 
 | Variable | Where | What it does |
 | :--- | :--- | :--- |
-| `ASSIMBLY_API_USERNAME`, `ASSIMBLY_API_PASSWORD` | all | The user other services log in with. With a database it is created when missing, as a user (not an administrator); headless it is the API's one user, which is `admin`/`admin` (with a warning at startup) while these are not set. |
-| `ASSIMBLY_JWT_SECRET` | all | The key that signs login tokens: base64, at least 512 bits (`openssl rand -base64 64`). Otherwise the key in `secrets.properties`. |
+| `ASSIMBLY_API_USERNAME`, `ASSIMBLY_API_PASSWORD` | all | The user other services log in with. With a database it is created when missing, as a user (not an administrator); headless it is the API's one user, which is `admin`/`admin` (with a warning at startup) while these are not set or empty. The variables manage this user: changes made to it in the UI are undone at the next start. |
+| `ASSIMBLY_JWT_SECRET` | all | The key that signs login tokens: base64, at least 512 bits (`openssl rand -base64 64`); a shorter key stops the start. Without it the Gateway generates a key into `.assimbly/security/secrets.properties`, so that folder must be writable. If `JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET` is set as well, that one wins (with a warning at startup when they differ). |
 | `ASSIMBLY_ADMIN_PASSWORD` | with a database | The password of `admin`. |
-| `ASSIMBLY_BROKER_TYPE` | with a database | `activemq` or `artemis`: the type of the broker. Without a broker, one is created that starts with the Gateway. |
+| `ASSIMBLY_BROKER_TYPE` | with a database | `activemq` or `artemis` (anything else stops the start): the type of the broker. Without a broker, one is created that starts with the Gateway. |
 | `ASSIMBLY_BROKER_CONFIGURATION` | with a database | The broker's configuration type, such as `file` (`activemq.xml` or `broker.xml` in `.assimbly/broker`). |
 
 A password set this way doesn't have to be changed at sign-in.

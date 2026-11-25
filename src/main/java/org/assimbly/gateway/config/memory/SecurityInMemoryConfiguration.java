@@ -1,5 +1,7 @@
 package org.assimbly.gateway.config.memory;
 
+import org.assimbly.gateway.config.security.HeadlessApiUser;
+
 import org.springframework.boot.security.autoconfigure.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,8 +27,8 @@ public class SecurityInMemoryConfiguration {
         List<String> roles = user.getRoles();
         return new InMemoryUserDetailsManager(
             User
-                .withUsername(user.getName())
-                .password(passwordEncoder.encode(user.getPassword()))
+                .withUsername(HeadlessApiUser.username(user.getName()))
+                .password(passwordEncoder.encode(HeadlessApiUser.password(user.getPassword())))
                 .roles(StringUtils.toStringArray(roles))
                 .build()
         );

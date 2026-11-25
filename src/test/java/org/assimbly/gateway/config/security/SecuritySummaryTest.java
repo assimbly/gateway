@@ -49,6 +49,33 @@ class SecuritySummaryTest {
         assertThat(SecuritySummary.risks(env)).isEmpty();
     }
 
+    @Test
+    void headlessWithAnEmptyPasswordIsARiskToo() {
+        MockEnvironment env = headless().withProperty("spring.security.user.password", "");
+
+        assertThat(SecuritySummary.risks(env)).singleElement().asString().contains("ASSIMBLY_API_PASSWORD");
+    }
+
+    @Test
+    void anAssimblyJwtSecretThatIsIgnoredIsARisk() {
+        MockEnvironment env = headless()
+            .withProperty("spring.security.user.password", "a-password-of-its-own")
+            .withProperty(GeneratedSecrets.JWT_SECRET, "the-key-that-wins")
+            .withProperty(GeneratedSecrets.RUNTIME_JWT_SECRET, "another-key");
+
+        assertThat(SecuritySummary.risks(env)).singleElement().asString().contains("ASSIMBLY_JWT_SECRET is ignored");
+    }
+
+    @Test
+    void anAssimblyJwtSecretThatIsUsedIsNot() {
+        MockEnvironment env = headless()
+            .withProperty("spring.security.user.password", "a-password-of-its-own")
+            .withProperty(GeneratedSecrets.JWT_SECRET, "the-same-key")
+            .withProperty(GeneratedSecrets.RUNTIME_JWT_SECRET, "the-same-key");
+
+        assertThat(SecuritySummary.risks(env)).isEmpty();
+    }
+
     private static MockEnvironment headless() {
         MockEnvironment env = new MockEnvironment();
         env.setActiveProfiles("headless");
