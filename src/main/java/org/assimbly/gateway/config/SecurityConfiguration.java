@@ -86,8 +86,8 @@ public class SecurityConfiguration {
     private final PasswordChangeGate passwordChangeGate;
 
     private final boolean development;
-    // Outside dev and headless, the Gateway is locked down unless its configuration opens something up.
-    // The headless endpoints check their own credentials (Basic header or their own JWT).
+    // Outside dev, the Gateway is locked down unless its configuration opens something up. Headless too: its API
+    // answers whoever logged in at /api/authenticate.
     private final boolean secured;
 
     public SecurityConfiguration(
@@ -102,7 +102,7 @@ public class SecurityConfiguration {
         this.jwtAuthenticationConverter = jwtAuthenticationConverter;
         this.passwordChangeGate = passwordChangeGate;
         this.development = env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT));
-        this.secured = !development && !env.acceptsProfiles(Profiles.of("headless"));
+        this.secured = !development;
     }
 
     @Bean
@@ -189,7 +189,7 @@ public class SecurityConfiguration {
             .hasAuthority(AuthoritiesConstants.ADMIN);
     }
 
-    // On dev and headless the API is open, so Swagger UI and curl work without logging in
+    // On dev the API is open, so Swagger UI and curl work without logging in
     private void openAccess(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authz) {
         if (development) {
             authz

@@ -1,6 +1,7 @@
 package org.assimbly.gateway.config.firststart;
 
 import jakarta.annotation.PostConstruct;
+import java.time.Instant;
 import org.assimbly.gateway.config.ApplicationProperties;
 import org.assimbly.gateway.domain.Flow;
 import org.assimbly.gateway.domain.Integration;
@@ -23,8 +24,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.ClassUtils;
-
-import java.time.Instant;
 
 /**
  * Sets up a new Gateway, so a new user has something to start from: the Integration, an example Flow (when the
@@ -55,9 +54,15 @@ public class FirstStart {
     private final BrokerService brokerService;
     private final TransactionTemplate transactionTemplate;
 
-    public FirstStart(ApplicationProperties applicationProperties, IntegrationRepository integrationRepository,
-                      FlowRepository flowRepository, StepRepository stepRepository, LinkRepository linkRepository,
-                      BrokerService brokerService, PlatformTransactionManager transactionManager) {
+    public FirstStart(
+        ApplicationProperties applicationProperties,
+        IntegrationRepository integrationRepository,
+        FlowRepository flowRepository,
+        StepRepository stepRepository,
+        LinkRepository linkRepository,
+        BrokerService brokerService,
+        PlatformTransactionManager transactionManager
+    ) {
         this.applicationProperties = applicationProperties;
         this.integrationRepository = integrationRepository;
         this.flowRepository = flowRepository;
@@ -86,7 +91,11 @@ public class FirstStart {
 
     /** Creates the Integration and, with their modules, the example Flow and the default broker. */
     Integration setUp(boolean withExampleFlow, boolean withDefaultBroker) {
-        log.info("New Gateway: creating the Integration{}{}", withExampleFlow ? ", an example Flow" : "", withDefaultBroker ? ", a default broker" : "");
+        log.info(
+            "New Gateway: creating the Integration{}{}",
+            withExampleFlow ? ", an example Flow" : "",
+            withDefaultBroker ? ", a default broker" : ""
+        );
 
         Integration integration = integrationRepository.save(newIntegration());
 
@@ -168,7 +177,7 @@ public class FirstStart {
     }
 
     /** The broker the Brokers page proposes: Artemis with its default broker.xml, started with the Gateway. */
-    private static BrokerDTO defaultBroker() {
+    static BrokerDTO defaultBroker() {
         BrokerDTO broker = new BrokerDTO();
         broker.setName("default");
         broker.setType("artemis");

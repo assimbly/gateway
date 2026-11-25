@@ -1,10 +1,12 @@
 package org.assimbly.gateway.config.security;
 
 import jakarta.annotation.PostConstruct;
+import java.util.Set;
 import org.assimbly.gateway.domain.User;
 import org.assimbly.gateway.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,8 +14,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import tech.jhipster.config.JHipsterConstants;
-
-import java.util.Set;
 
 /**
  * A new Gateway comes with the accounts {@code admin} and {@code user}, whose password is their login. So the quick
@@ -23,6 +23,7 @@ import java.util.Set;
 @Lazy(false)
 @Component
 @Profile("!" + JHipsterConstants.SPRING_PROFILE_DEVELOPMENT)
+@DependsOn("environmentOverrides") // after the passwords the server sets, so a default one set that way is still caught
 public class DefaultPasswordCheck {
 
     static final Set<String> DEFAULT_ACCOUNTS = Set.of("admin", "user");
@@ -34,8 +35,12 @@ public class DefaultPasswordCheck {
     private final PasswordChangeGate gate;
     private final TransactionTemplate transactionTemplate;
 
-    public DefaultPasswordCheck(UserRepository userRepository, PasswordEncoder passwordEncoder, PasswordChangeGate gate,
-                                PlatformTransactionManager transactionManager) {
+    public DefaultPasswordCheck(
+        UserRepository userRepository,
+        PasswordEncoder passwordEncoder,
+        PasswordChangeGate gate,
+        PlatformTransactionManager transactionManager
+    ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.gate = gate;
@@ -61,6 +66,10 @@ public class DefaultPasswordCheck {
     }
 
     private boolean hasDefaultPassword(User user) {
-        return DEFAULT_ACCOUNTS.contains(user.getLogin()) && user.getPassword() != null && passwordEncoder.matches(user.getLogin(), user.getPassword());
+        return (
+            DEFAULT_ACCOUNTS.contains(user.getLogin()) &&
+            user.getPassword() != null &&
+            passwordEncoder.matches(user.getLogin(), user.getPassword())
+        );
     }
 }
